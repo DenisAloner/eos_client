@@ -1,0 +1,39 @@
+﻿Построение начато 01.11.2013 20:54:02.
+     1>Проект "E:\WORK\Cplusplus\ExplorersOfSaarum\EoS.vcxproj" в узле 2 (целевые объекты Build).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /IE:\WORK\Cplusplus\glsample_01\lib /IE:\WORK\Cplusplus\glsample_01\include /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _VC80_UPGRADE=0x0600 /Gm /EHsc /MTd /GS /Gy- /fp:precise /Zc:wchar_t /Zc:forScope /Fo".\Debug\\" /Fd".\Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt TGCButton.cpp
+         TGCButton.cpp
+     1>e:\work\cplusplus\explorersofsaarum\tgraph.h(37): warning C4244: инициализация: преобразование "std::streamoff" в "int", возможна потеря данных
+     1>e:\work\cplusplus\explorersofsaarum\tgraph.h(156): warning C4244: аргумент: преобразование "float" в "GLint", возможна потеря данных
+     1>e:\work\cplusplus\explorersofsaarum\tgraph.h(166): warning C4101: winZ: неиспользованная локальная переменная
+     1>e:\work\cplusplus\explorersofsaarum\tgraph.h(179): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 11.0\vc\include\stdio.h(218): см. объявление "fopen"
+     1>e:\work\cplusplus\explorersofsaarum\tgraph.h(185): warning C4018: <: несоответствие типов со знаком и без знака
+     1>e:\work\cplusplus\explorersofsaarum\tgraph.h(232): warning C4018: <: несоответствие типов со знаком и без знака
+     1>e:\work\cplusplus\explorersofsaarum\tgraph.h(246): warning C4244: =: преобразование "double" в "float", возможна потеря данных
+     1>e:\work\cplusplus\explorersofsaarum\tgraph.h(247): warning C4244: =: преобразование "double" в "float", возможна потеря данных
+     1>e:\work\cplusplus\explorersofsaarum\tgraph.h(248): warning C4244: =: преобразование "double" в "float", возможна потеря данных
+     1>e:\work\cplusplus\explorersofsaarum\tgraph.h(249): warning C4244: =: преобразование "double" в "float", возможна потеря данных
+     1>e:\work\cplusplus\explorersofsaarum\tgraph.h(250): warning C4244: =: преобразование "double" в "float", возможна потеря данных
+     1>e:\work\cplusplus\explorersofsaarum\tgraph.h(251): warning C4244: =: преобразование "double" в "float", возможна потеря данных
+     1>e:\work\cplusplus\explorersofsaarum\tgraph.h(252): warning C4244: =: преобразование "double" в "float", возможна потеря данных
+     1>e:\work\cplusplus\explorersofsaarum\tgraph.h(253): warning C4244: =: преобразование "double" в "float", возможна потеря данных
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:".\Debug\EoS.exe" /INCREMENTAL /NOLOGO /LIBPATH:E:\WORK\Cplusplus\glsample_01\lib /LIBPATH:E:\WORK\Cplusplus\glsample_01\include opengl32.lib glu32.lib glew32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"Debug\EoS.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"Debug\EoS.lib" /MACHINE:X86 /SAFESEH .\Debug\EoS.obj
+         .\Debug\EventBase.obj
+         .\Debug\TGCButton.obj
+         .\Debug\TGraph.obj
+         .\Debug\TGUI.obj
+         .\Debug\TGUIControl.obj
+         .\Debug\TGUIControlLayer.obj
+         .\Debug\TGUILayer.obj
+         .\Debug\TMap.obj
+         .\Debug\TMapObject.obj
+         .\Debug\TMapViewer.obj
+     1>EoS.obj : warning LNK4075: не учитывается "/EDITANDCONTINUE" из-за спецификации "/SAFESEH"
+         EoS.vcxproj -> E:\WORK\Cplusplus\ExplorersOfSaarum\Debug\EoS.exe
+     1>Построение проекта "E:\WORK\Cplusplus\ExplorersOfSaarum\EoS.vcxproj" завершено (целевые объекты Build).
+
+Построение успешно завершено.
+
+Затраченное время: 00:00:01.65
