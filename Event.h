@@ -1,77 +1,49 @@
+#pragma once
+#include <iostream>
+#include <functional>
+#include <map>
+#include "Definiton.h"
 
-#ifndef EVENT_H
-#define EVENT_H
-
-#include "EventBase.h"
-
-class Event: public EventBase
-{
+template<class EventArgType>
+class Event {
 public:
+	typedef std::function<void(EventArgType const&)> EventSignature;
+	typedef int EventHandle;
 
-	Event& operator += (const Delegate &deleg)
-	{
-		Push(deleg);
+public:
+	Event(): eventHandle(0) {};
+
+	EventHandle AddHandler(EventSignature const& f) {
+		functions.insert(std::make_pair(++eventHandle, f));
+		return eventHandle;
+	}
+
+	void RemoveHandler(EventHandle handle) {
+		functions.erase(handle);
+	}
+
+	void Clear() {
+		functions.clear();
+	}
+
+	Event& operator+=(EventSignature const& f) {
+		AddHandler(f);
 		return *this;
 	}
 
-	Event& operator -= (const Delegate &deleg)
-	{
-		Remove(deleg);
+	Event& operator-=(EventHandle handle) {
+		RemoveHandler(handle);
 		return *this;
 	}
 
-	void operator () ();
+	void operator()(EventArgType const& arg) {
+		//for each(auto const& f in functions) in Visual Studio
+		for(auto const& f : functions) {
+			f.second(arg);
+		}
+	}
 
-	template <class Arg>
-		void operator() (Arg arg);
-
-	template <class Arg1, class Arg2>
-		void operator() (Arg1 arg1, Arg2 arg2);
-
+private:
+	EventHandle eventHandle;
+	std::map<int, EventSignature> functions;
 };
-
-inline void Event::operator ()()
-{
-	EventBase::Iterator *iter = GetIterator();
-	Delegate d;
-
-	while (iter->HasNext())
-	{
-		d = iter->GetNext();
-		d();
-	}
-
-	delete iter;
-}
-
-template <class Arg>
-inline void Event::operator ()(Arg arg)
-{
-	EventBase::Iterator *iter = GetIterator();
-	Delegate d;
-
-	while (iter->HasNext())
-	{
-		d = iter->GetNext();
-		d(arg);
-	}
-
-	delete iter;
-}
-
-template <class Arg1, class Arg2>
-inline void Event::operator ()(Arg1 arg1, Arg2 arg2)
-{
-	EventBase::Iterator *iter = GetIterator();
-	Delegate d;
-
-	while (iter->HasNext())
-	{
-		d = iter->GetNext();
-		d(arg1, arg2);
-	}
-
-	delete iter;
-}
-
-#endif

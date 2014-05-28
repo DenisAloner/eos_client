@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -19,12 +19,12 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -48,7 +48,8 @@
     <OutDir>Debug\</OutDir>
     <IntDir>Debug\</IntDir>
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>E:\WORK\Cplusplus\glsample_01\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>E:\WORK\Cplusplus\ExplorersOfSaarum\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>E:\WORK\Cplusplus\ExplorersOfSaarum\include\freetype2;E:\WORK\Cplusplus\ExplorersOfSaarum\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -103,7 +104,8 @@
       <PrecompiledHeaderOutputFile>.\Debug\glsample.pch</PrecompiledHeaderOutputFile>
       <ObjectFileName>.\Debug\</ObjectFileName>
       <ProgramDataBaseFileName>.\Debug\</ProgramDataBaseFileName>
-      <AdditionalIncludeDirectories>E:\WORK\Cplusplus\glsample_01\lib;E:\WORK\Cplusplus\glsample_01\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\WORK\Cplusplus\ExplorersOfSaarum\lib;E:\WORK\Cplusplus\ExplorersOfSaarum\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Midl>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -120,44 +122,88 @@
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\Debug\glsample.bsc</OutputFile>
+      <PreserveSbr>true</PreserveSbr>
     </Bscmake>
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OutputFile>.\Debug\EoS.exe</OutputFile>
-      <AdditionalDependencies>opengl32.lib;glu32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>E:\WORK\Cplusplus\glsample_01\lib;E:\WORK\Cplusplus\glsample_01\include;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;glew32.lib;SDL2.lib;SDL2_Mixer.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>E:\WORK\Cplusplus\ExplorersOfSaarum\include\freetype2;E:\WORK\Cplusplus\ExplorersOfSaarum\lib;E:\WORK\Cplusplus\ExplorersOfSaarum\include;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Action_OpenInventory.cpp" />
+    <ClCompile Include="ApplicationGUI.cpp" />
+    <ClCompile Include="GameEntity.cpp" />
+    <ClCompile Include="GUI_ActionManager.cpp" />
     <ClCompile Include="EoS.cpp" />
-    <ClCompile Include="EventBase.cpp" />
-    <ClCompile Include="TClient.cpp" />
+    <ClCompile Include="Event.cpp" />
+    <ClCompile Include="GUI_Container.cpp" />
+    <ClCompile Include="GUI_Inventory.cpp" />
+    <ClCompile Include="GUI_Item.cpp" />
+    <ClCompile Include="GUI_ItemButton.cpp" />
+    <ClCompile Include="GUI_PopMenu.cpp" />
+    <ClCompile Include="GUI_ActionButton.cpp" />
+    <ClCompile Include="GUI_ActionPanel.cpp" />
+    <ClCompile Include="GUI_Text.cpp" />
+    <ClCompile Include="GUI_TextBox.cpp" />
+    <ClCompile Include="GUI_Timer.cpp" />
+    <ClCompile Include="GUI_Window.cpp" />
+    <ClCompile Include="MouseController.cpp" />
+    <ClCompile Include="Property_Container.cpp" />
+    <ClCompile Include="TAction.cpp" />
+    <ClCompile Include="TActionManager.cpp" />
+    <ClCompile Include="Application.cpp" />
     <ClCompile Include="TGCButton.cpp" />
-    <ClCompile Include="TGraph.cpp" />
-    <ClCompile Include="TGUI.cpp" />
-    <ClCompile Include="TGUIControl.cpp" />
-    <ClCompile Include="TGUIControlLayer.cpp" />
-    <ClCompile Include="TGUILayer.cpp" />
-    <ClCompile Include="TMap.cpp" />
-    <ClCompile Include="TMapObject.cpp" />
-    <ClCompile Include="TMapViewer.cpp" />
+    <ClCompile Include="TGCTextBox.cpp" />
+    <ClCompile Include="GraphicalController.cpp" />
+    <ClCompile Include="GUI_Object.cpp" />
+    <ClCompile Include="GUI_Layer.cpp" />
+    <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="GameMap.cpp" />
+    <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="GUI_MapViewer.cpp" />
+    <ClCompile Include="TParameter.cpp" />
+    <ClCompile Include="GameObjectProperty.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Delegate.h" />
+    <ClInclude Include="Action_OpenInventory.h" />
+    <ClInclude Include="ApplicationGUI.h" />
+    <ClInclude Include="GameEntity.h" />
+    <ClInclude Include="GUI_ActionManager.h" />
+    <ClInclude Include="Definiton.h" />
     <ClInclude Include="Event.h" />
-    <ClInclude Include="EventBase.h" />
-    <ClInclude Include="TClient.h" />
+    <ClInclude Include="GUI_Container.h" />
+    <ClInclude Include="GUI_Inventory.h" />
+    <ClInclude Include="GUI_Item.h" />
+    <ClInclude Include="GUI_ItemButton.h" />
+    <ClInclude Include="GUI_PopMenu.h" />
+    <ClInclude Include="GUI_ActionButton.h" />
+    <ClInclude Include="GUI_ActionPanel.h" />
+    <ClInclude Include="GUI_Text.h" />
+    <ClInclude Include="GUI_TextBox.h" />
+    <ClInclude Include="GUI_Timer.h" />
+    <ClInclude Include="GUI_Window.h" />
+    <ClInclude Include="MouseController.h" />
+    <ClInclude Include="Property_Container.h" />
+    <ClInclude Include="TAction.h" />
+    <ClInclude Include="TActionManager.h" />
+    <ClInclude Include="Application.h" />
     <ClInclude Include="TGCButton.h" />
-    <ClInclude Include="TGraph.h" />
-    <ClInclude Include="TGUI.h" />
-    <ClInclude Include="TGUIControl.h" />
-    <ClInclude Include="TGUIControlLayer.h" />
-    <ClInclude Include="TGUILayer.h" />
-    <ClInclude Include="TMap.h" />
-    <ClInclude Include="TMapObject.h" />
-    <ClInclude Include="TMapViewer.h" />
+    <ClInclude Include="TGCTextBox.h" />
+    <ClInclude Include="GraphicalController.h" />
+    <ClInclude Include="GUI_Object.h" />
+    <ClInclude Include="GUI_Layer.h" />
+    <ClInclude Include="Timer.h" />
+    <ClInclude Include="GameMap.h" />
+    <ClInclude Include="GameObject.h" />
+    <ClInclude Include="GUI_MapViewer.h" />
+    <ClInclude Include="TParameter.h" />
+    <ClInclude Include="GameObjectProperty.h" />
+    <ClInclude Include="ActionsDescription.h" />
+    <ClInclude Include="Description_GUI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

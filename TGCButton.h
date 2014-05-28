@@ -1,7 +1,7 @@
 #pragma once
-#include "tguicontrol.h"
+#include "GUI_Object.h"
 class TGCButton :
-	public TGUIControl
+	public GUI_Object
 {
 public:
 	
@@ -10,7 +10,8 @@ public:
 	TGCButton(void);
 	~TGCButton(void);
 
-	virtual void Render(TGraph* Graph);
-	void OnClick();
+	virtual void Render(GraphicalController* Graph);
+	virtual void OnMouseClick(MouseEventArgs const& e);
+	virtual MouseEventCallback GetMouseEventCallback();
 };
 

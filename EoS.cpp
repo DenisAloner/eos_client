@@ -5,16 +5,11 @@
 
 // Includes
 #include <windows.h>
-#include "TMap.h"
-#include "TMapObject.h"
-#include "TGraph.h"
-#include "TMapViewer.h"
-#include "TGUI.h"
-#include "TGUIControlLayer.h"
-#include "TGCButton.h"
-#include "TClient.h"
-
-
+#include "Application.h"
+#include "Definiton.h"
+#include <thread>
+#include <chrono>
+#include <string>
 // Function Declarations
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -22,15 +17,10 @@ void EnableOpenGL(HWND hWnd, HDC * hDC, HGLRC * hRC);
 void DisableOpenGL(HWND hWnd, HDC hDC, HGLRC hRC);
 BOOL load_texture(char* filename,GLuint num_tex);
 
-TMap Map;
-TPlayer* Player1;
-TMapViewer* Viewer;
-TGUIControlLayer* Menu;
-TGCButton* Button;
-TClient* Client;
-
-
 // WinMain
+
+void GameThreadHandler();
+BOOL SetClientRect(HWND hWnd, int x, int y);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, 
 				   LPSTR lpCmdLine, int iCmdShow)
@@ -61,8 +51,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		WS_CAPTION | WS_POPUPWINDOW | WS_VISIBLE,
 		0, 0, 1024, 1024,
 		NULL, NULL, hInstance, NULL );
-	
 	// enable OpenGL for the window
+	SetClientRect(hWnd, 1024, 1024);
 	EnableOpenGL( hWnd, &hDC, &hRC );
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -72,33 +62,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	// program main loop
 	glewInit();
 	//Map.GenerateLevel();
-	Map.GenerateRoom();
-	Player1=new TPlayer;
-	Map.AddObject(Player1,Map.Items[9][9]);
-	Map.AddNewObject(new TTorch(),Map.Items[7][7]);
-	Map.AddNewObject(new TTorch(),Map.Items[7][33]);
-	Map.AddNewObject(new TTorch(),Map.Items[33][33]);
-    Map.AddNewObject(new TTorch(),Map.Items[33][7]);
-	Map.AddObject(new TOrc(),Map.Items[14][14]);
-	Client=new TClient();
-	Viewer=new TMapViewer(Client->GUI);
-	Button=new TGCButton();
-	Button->Text="EXIT";
-	Button->x=924;
-	Button->y=974;
-    Button->width=100;
-	Button->height=50;
-	Menu=new TGUIControlLayer(Client->GUI);
-	Menu->Items.push_back(Button);
-	Viewer->LoadMaptextures(Client->Graph);
-	Viewer->Map=&Map;
-	Viewer->Player=Player1;
-	Client->GUI->Layers.push_back(Menu);
-	Client->GUI->Layers.push_back(Viewer);
-
-
-	int FrameNum=0;
-
+	Application::Instance().Initialization(hWnd);
+	std::thread GameThread(GameThreadHandler);
+	Application::Instance().m_timer = new Timer(8, 75);
+	std::thread AnimationThread(&Timer::cycle, Application::Instance().m_timer);
+	Application::Instance().GUI->MapViewer->center.x = Application::Instance().GUI->MapViewer->Player->Cell->x;
+	Application::Instance().GUI->MapViewer->center.y = Application::Instance().GUI->MapViewer->Player->Cell->y;
 	while ( !quit )
 	{
 		
@@ -122,23 +91,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		{
 			//Player1->Sprite=2+FrameNum;
 			//Map.MoveObject(Player1,Player1->x+1,Player1->y+1);
-			Player1->Sprite=3+FrameNum/10;
-			Viewer->Update();
-			Client->GUI->Render(Client->Graph);
+			Application::Instance().GUI->MapViewer->Update();
+			{
+				Application::Instance().UnderCursor(MouseEventArgs(Application::Instance().mouse->Position, 0));
+			}
+			Application::Instance().Render();
 			SwapBuffers( hDC );
-			FrameNum+=1;
-			if(FrameNum>39){FrameNum=0;}
+
 			//MessageBox(NULL,"1","1",MB_OK);
 		}
 		
 	}
 	
 	// shutdown OpenGL
+	GameThread.detach();
+	AnimationThread.detach();
 	DisableOpenGL( hWnd, hDC, hRC );
-	
 	// destroy the window explicitly
 	DestroyWindow( hWnd );
-	
 	return msg.wParam;
 	
 }
@@ -147,54 +117,90 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	
 	switch (message)
 	{
-		
 	case WM_CREATE:
 		return 0;
-		
+
 	case WM_CLOSE:
 		PostQuitMessage( 0 );
 		return 0;
-		
+	
 	case WM_DESTROY:
 		return 0;
 
-	case WM_LBUTTONDOWN:
-		TPoint Mouse;
-		Mouse=Client->Graph->GetMouseCoordinat(hWnd);
-		Client->GUI->Select(Mouse.x,Mouse.y);
+	case WM_MOUSEWHEEL:
+	{
+		Application::Instance().mouse->MouseWheel(MouseEventArgs(Application::Instance().mouse->Position, wParam));
 		return 0;
-		
+	}
+	
+	case WM_LBUTTONDOWN:
+	{
+		Application::Instance().mouse->MouseDown(MouseEventArgs(Application::Instance().mouse->Position, MK_LBUTTON));
+		return 0;
+	}
+	
+	case WM_RBUTTONDOWN:
+	{
+		Application::Instance().mouse->MouseDown(MouseEventArgs(Application::Instance().mouse->Position, MK_RBUTTON));
+		return 0;
+	}
+	
+	case WM_LBUTTONUP:
+	{
+		Application::Instance().mouse->MouseUp(MouseEventArgs(Application::Instance().mouse->Position, MK_LBUTTON));
+		return 0;
+	}
+	
+	case WM_RBUTTONUP:
+	{
+		Application::Instance().mouse->MouseUp(MouseEventArgs(Application::Instance().mouse->Position, MK_RBUTTON));
+		return 0;
+	}
+	
+	case WM_MOUSEMOVE:
+	{
+		if (Application::Instance().Ready)
+		{ 
+			Application::Instance().mouse->MouseMove(MouseEventArgs(Application::Instance().mouse->Position, wParam));
+		}
+		return 0;
+	}
+
 	case WM_KEYDOWN:
-		switch ( wParam )
+		switch (wParam)
 		{
-			
 		case VK_ESCAPE:
 			PostQuitMessage(0);
 			return 0;
 		case VK_SPACE:
 			return 0;
 		case VK_UP:
-			Map.MoveObject(Player1,Player1->Cell->x,Player1->Cell->y+1);
+			Application::Instance().KeyPress(wParam);
 			return 0;
 		case VK_DOWN:
-			Map.MoveObject(Player1,Player1->Cell->x,Player1->Cell->y-1);
+			Application::Instance().KeyPress(wParam);
 			return 0;
 		case VK_LEFT:
-			Map.MoveObject(Player1,Player1->Cell->x-1,Player1->Cell->y);
+			Application::Instance().KeyPress(wParam);
 			return 0;
 		case VK_RIGHT:
-			Map.MoveObject(Player1,Player1->Cell->x+1,Player1->Cell->y);
+			Application::Instance().KeyPress(wParam);
 			return 0;
-			
 		}
+		return 0;
+
+	case WM_CHAR:
+		Application::Instance().KeyPress(wParam);
+		return 0;
+
+	case WM_SETCURSOR:
+		SetCursor(NULL);
 		return 0;
 	
 	default:
-		return DefWindowProc( hWnd, message, wParam, lParam );
-			
+		return DefWindowProc( hWnd, message, wParam, lParam );	
 	}
 	
 }
@@ -234,4 +240,38 @@ void DisableOpenGL(HWND hWnd, HDC hDC, HGLRC hRC)
 	wglMakeCurrent( NULL, NULL );
 	wglDeleteContext( hRC );
 	ReleaseDC( hWnd, hDC );
+}
+
+void GameThreadHandler()
+{
+	int time = 1;
+	while (true)
+	{
+		if (time == 1)
+		{
+			time = 15;
+		}
+		else
+		{
+			time -= 1;
+		}
+		Application::Instance().GUI->Timer->Update(time);
+		if (time == 15)
+		{
+			Application::Instance().Update();
+			Application::Instance().GUI->MapViewer->Update();
+			Application::Instance().GUI->DescriptionBox->AddItemControl(new GUI_Text("’Ó‰ - " + std::to_string(Application::Instance().GameTurn) + ".", new GUI_TextFormat(10, 19, TColor(0.0, 0.8, 0.0, 1.0))));
+			Application::Instance().GameTurn += 1;
+		}
+		std::chrono::milliseconds Duration(250);
+		std::this_thread::sleep_for(Duration);
+	}
+}
+
+BOOL SetClientRect(HWND hWnd, int x, int y)
+{
+	RECT rect = { 0, 0, x, y }, rect2;
+	AdjustWindowRectEx(&rect, GetWindowLong(hWnd, GWL_STYLE), (BOOL)GetMenu(hWnd), GetWindowLong(hWnd, GWL_EXSTYLE));
+	GetWindowRect(hWnd, &rect2);
+	return MoveWindow(hWnd, rect2.left, rect2.top, rect.right - rect.left, rect.bottom - rect.top, TRUE);
 }
