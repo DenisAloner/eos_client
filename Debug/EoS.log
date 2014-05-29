@@ -1,8 +1,0 @@
-﻿Сборка начата 29.05.2014 16:11:41.
-     1>Проект "C:\Users\Alo\Documents\GitHub\eos_client\EoS.vcxproj" в узле 2 (целевые объекты Clean).
-     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppClean.targets(76,5): warning : Процесс не может получить доступ к файлу "c:\users\alo\documents\github\eos_client\debug\gui_layer.sbr", так как этот файл используется другим процессом.
-     1>Сборка проекта "C:\Users\Alo\Documents\GitHub\eos_client\EoS.vcxproj" завершена (целевые объекты Clean).
-
-Сборка успешно завершена.
-
-Затраченное время: 00:00:00.05

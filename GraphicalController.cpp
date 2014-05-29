@@ -2,40 +2,41 @@
 
 GraphicalController::GraphicalController()
 {
-	Sprites[0] = LoadTexture("C:\\ExplorersOfSaarum\\plitka_na_pol.bmp", false);
-	Sprites[1] = LoadTexture("C:\\ExplorersOfSaarum\\Stena.bmp", false);
-	Sprites[2] = LoadTexture("C:\\ExplorersOfSaarum\\sprite_8.bmp", false);
-	Sprites[3] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-1.bmp", false);
-	Sprites[4] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-2.bmp", false);
-	Sprites[5] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-3.bmp", false);
-	Sprites[6] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-4.bmp", false);
-	Sprites[7] = LoadTexture("C:\\ExplorersOfSaarum\\orc.bmp", false);
-	Sprites[8] = LoadTexture("C:\\ExplorersOfSaarum\\select.bmp", false);
-	Sprites[9] = LoadTexture("C:\\ExplorersOfSaarum\\Sunduk.bmp", false);
-	Sprites[10] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-5.bmp", false);
-	Sprites[11] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-6.bmp", false);
-	Sprites[12] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-7.bmp", false);
-	Sprites[13] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-8.bmp", false);
-	Sprites[14] = LoadTexture("C:\\ExplorersOfSaarum\\Elf2.bmp", false);
-	Sprites[15] = LoadTexture("C:\\ExplorersOfSaarum\\Stena2.bmp", false);
-	Sprites[16] = LoadTexture("C:\\ExplorersOfSaarum\\plitka_na_pol2.bmp", false);
-	Sprites[18] = LoadTexture("C:\\ExplorersOfSaarum\\IB2.bmp", false);
-	Sprites[19] = LoadTexture("C:\\ExplorersOfSaarum\\Screen.bmp", false);
-	Sprites[20] = LoadTexture("C:\\ExplorersOfSaarum\\Screen.bmp", false);
-	Sprites[21] = LoadTexture("C:\\ExplorersOfSaarum\\EoS_Cursor.bmp",true);
+	Sprites[0] = LoadTexture("C:\\ExplorersOfSaarum\\plitka_na_pol.bmp");
+	Sprites[1] = LoadTexture("C:\\ExplorersOfSaarum\\Stena.bmp");
+	Sprites[2] = LoadTexture("C:\\ExplorersOfSaarum\\sprite_8.bmp");
+	Sprites[3] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-1.bmp");
+	Sprites[4] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-2.bmp");
+	Sprites[5] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-3.bmp");
+	Sprites[6] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-4.bmp");
+	Sprites[7] = LoadTexture("C:\\ExplorersOfSaarum\\orc.bmp");
+	Sprites[8] = LoadTexture("C:\\ExplorersOfSaarum\\select.bmp");
+	Sprites[9] = LoadTexture("C:\\ExplorersOfSaarum\\Sunduk.bmp");
+	Sprites[10] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-5.bmp");
+	Sprites[11] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-6.bmp");
+	Sprites[12] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-7.bmp");
+	Sprites[13] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-8.bmp");
+	Sprites[14] = LoadTexture("C:\\ExplorersOfSaarum\\Elf2.bmp");
+	Sprites[15] = LoadTexture("C:\\ExplorersOfSaarum\\Stena2.bmp");
+	Sprites[16] = LoadTexture("C:\\ExplorersOfSaarum\\plitka_na_pol2.bmp");
+	Sprites[18] = LoadTexture("C:\\ExplorersOfSaarum\\IB2.bmp");
+	Sprites[19] = LoadTexture("C:\\ExplorersOfSaarum\\Screen.bmp");
+	Sprites[20] = LoadTexture("C:\\ExplorersOfSaarum\\Screen.bmp");
+	Sprites[21] = LoadTexture("C:\\ExplorersOfSaarum\\EoS_Cursor.bmp");
 
-	Actions[ActionKind_Move] = LoadTexture("C:\\ExplorersOfSaarum\\Action_0.bmp", false);
-	Actions[ActionKind_Push] = LoadTexture("C:\\ExplorersOfSaarum\\Action_1.bmp", false);
-	Actions[ActionKind_Turn] = LoadTexture("C:\\ExplorersOfSaarum\\Action_2.bmp", false);
-	Actions[ActionKind_OpenInventory] = LoadTexture("C:\\ExplorersOfSaarum\\Bag.bmp", false);
+	Actions[ActionKind_Move] = LoadTexture("C:\\ExplorersOfSaarum\\Action_0.bmp");
+	Actions[ActionKind_Push] = LoadTexture("C:\\ExplorersOfSaarum\\Action_1.bmp");
+	Actions[ActionKind_Turn] = LoadTexture("C:\\ExplorersOfSaarum\\Action_2.bmp");
+	Actions[ActionKind_OpenInventory] = LoadTexture("C:\\ExplorersOfSaarum\\Bag.bmp");
 
 	RenderShader = LoadShader("C:\\ExplorersOfSaarum\\EoS_Render.vsh", "C:\\ExplorersOfSaarum\\EoS_Render.fsh");
 	LightShader = LoadShader("C:\\ExplorersOfSaarum\\EoS_Light.vsh", "C:\\ExplorersOfSaarum\\EoS_Light.fsh");
 	HorizontalShader = LoadShader("C:\\ExplorersOfSaarum\\EoS_Render.vsh", "C:\\ExplorersOfSaarum\\EoS_HorizontalBlur.fsh");
 	VerticalShader = LoadShader("C:\\ExplorersOfSaarum\\EoS_Render.vsh", "C:\\ExplorersOfSaarum\\EoS_VerticalBlur.fsh");
-	Font = LoadTexture("C:\\ExplorersOfSaarum\\FontRender4.bmp", true);
-	ButtonTexture = LoadTexture("C:\\ExplorersOfSaarum\\Button.bmp", false);
-	PaperTexture = LoadTexture("C:\\ExplorersOfSaarum\\Paper.bmp", false);
+	Font = LoadTexture("C:\\ExplorersOfSaarum\\FontRender4.bmp");
+	ButtonTexture = LoadTexture("C:\\ExplorersOfSaarum\\Button.bmp");
+	PaperTexture = LoadTexture("C:\\ExplorersOfSaarum\\Paper.bmp");
+	
 	bool error = FT_Init_FreeType(&library);
 	if (error)
 	{
@@ -61,7 +62,7 @@ GraphicalController::GraphicalController()
 	{
 		MessageBox(NULL, "Font", "Error", MB_OK);
 	}
-	Sprites[17] = BindTexture(&slot->bitmap, true);
+	Sprites[17] = BindTexture(&slot->bitmap);
 	Scissors.push_front(new GLint[4]{0, 0, 1024, 1024});
 	glGenFramebuffersEXT(1, &FBO);
 }
@@ -90,7 +91,7 @@ void GraphicalController::CenterText(int x,int y,std::string Text,int sizex,int 
 {
 	int cx=x-(Text.length())*(sizex+1)/2;
 	int cy=y-sizey/2;
-	STextXY(cx,cy,Text,sizex,sizey);
+	OutputText(cx,cy,Text,sizex,sizey);
 }
 
 void GraphicalController::setVSync(bool sync)
@@ -115,7 +116,7 @@ void GraphicalController::setVSync(bool sync)
 	}
 }
 
-void GraphicalController::STextXY(int x, int y, std::string& Text, int sizex, int sizey)
+void GraphicalController::OutputText(int x, int y, std::string& Text, int sizex, int sizey)
 {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glUseProgramObjectARB(0);
@@ -156,26 +157,16 @@ void GraphicalController::STextXY(int x, int y, std::string& Text, int sizex, in
 	}
 }
 
-GLuint GraphicalController::BindTexture(FT_Bitmap* data, bool alpha)
+GLuint GraphicalController::BindTexture(FT_Bitmap* data)
 {
 	GLuint texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	if (alpha)
-	{
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	}
-	else {
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-	}
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	////glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, info.biWidth, info.biHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	//gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA,data->width,data->rows, GL_RGBA, GL_UNSIGNED_BYTE, data->buffer);
@@ -387,7 +378,7 @@ Point GraphicalController::GetOGLPos(float x, float y)
 	return Point(_Point.x, _Point.y);
 }
 
-GLuint GraphicalController::LoadTexture(const char * filename, bool alpha)
+GLuint GraphicalController::LoadTexture(const char * filename)
 {
 	GLuint texture;
 	char* data;
@@ -415,20 +406,10 @@ GLuint GraphicalController::LoadTexture(const char * filename, bool alpha)
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	//glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	if (alpha)
-	{
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	}
-	else {
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-	}
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, info.biWidth, info.biHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, info.biWidth, info.biHeight, GL_RGBA, GL_UNSIGNED_BYTE, data);

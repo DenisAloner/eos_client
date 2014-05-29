@@ -44,7 +44,6 @@ public:
 
 	GUI_TextFormat* Format;
 
-	virtual void Render(GraphicalController* Graph);
 	virtual void RenderAt(GraphicalController* Graph, int px, int py);
 	void Set(std::string t);
 

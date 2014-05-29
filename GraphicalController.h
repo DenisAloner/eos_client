@@ -55,12 +55,12 @@ public:
 	bool setUniformSampler(GLhandleARB object, const char * name);
 	bool setUniformPtr(GLhandleARB program, const char * name, const unsigned int value);
 	Point GetOGLPos(float x, float y);
-	GLuint LoadTexture(const char * filename, bool alpha);
-	void STextXY(int x, int y, std::string& Text, int sizex, int sizey);
+	GLuint LoadTexture(const char * filename);
+	void OutputText(int x, int y, std::string& Text, int sizex, int sizey);
 	void DrawSprite(double x0,double y0,double x1,double y1,double x2,double y2,double x3,double y3);
 	void CenterText(int x, int y, std::string Text, int sizex, int sizey);
 	void RenderText(double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
-	GLuint BindTexture(FT_Bitmap* data, bool alpha);
+	GLuint BindTexture(FT_Bitmap* data);
 	bool AddScissor(GLint* rect);
 	void RemoveScissor();
 	void DrawSpriteFBO(double TexWidth, double TexHeight, double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);

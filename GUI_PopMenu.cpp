@@ -114,7 +114,7 @@ void GUI_PopMenuItem::RenderAt(GraphicalController* Graph, int px, int py)
 		//Graph->DrawSprite(px, py, px, py + height, px + width, py + height, px + width, py);
 	}
 	glEnable(GL_TEXTURE_2D);
-	Graph->STextXY(px, py, Text, 8, 17);
+	Graph->OutputText(px, py, Text, 8, 17);
 }
 
 void GUI_PopMenuItem::OnUnderCursor(MouseEventArgs const& e)
