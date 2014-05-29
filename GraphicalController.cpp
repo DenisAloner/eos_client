@@ -86,11 +86,11 @@ void GraphicalController::DrawSpriteFBO(double TexWidth, double TexHeight, doubl
 	glEnd();
 }
 
-void GraphicalController::CenterText(int x,int y,char* Text,int sizex,int sizey)
+void GraphicalController::CenterText(int x,int y,std::string Text,int sizex,int sizey)
 {
-	int cx=x-(strlen(Text))*(sizex+1)/2;
+	int cx=x-(Text.length())*(sizex+1)/2;
 	int cy=y-sizey/2;
-	TextXY(cx,cy,Text,sizex,sizey);
+	STextXY(cx,cy,Text,sizex,sizey);
 }
 
 void GraphicalController::setVSync(bool sync)
@@ -255,4 +255,183 @@ void GraphicalController::BlurRect(int x, int y, int width, int height)
 	glEnable(GL_SCISSOR_TEST);
 	glBindTexture(GL_TEXTURE_2D, Sprites[19]);
 	DrawSpriteFBO(Tx, Ty, x, y, x, y + height, x + width, y + height, x + width, y);
+}
+
+GLcharARB* GraphicalController::LoadShaderSource(char* filename)
+{
+	GLcharARB* ShaderSource;
+	std::ifstream ShaderFile(filename, std::ifstream::binary);
+	if (ShaderFile)
+	{
+		ShaderFile.seekg(0, ShaderFile.end);
+		int length = ShaderFile.tellg();
+		ShaderFile.seekg(0, ShaderFile.beg);
+		ShaderSource = new GLcharARB[length + 1];
+		ShaderFile.read(ShaderSource, length);
+		ShaderSource[length] = '\0';
+		ShaderFile.close();
+	}
+	else {
+		return nullptr;
+	}
+	return ShaderSource;
+}
+
+GLhandleARB GraphicalController::LoadShader(char* vPath, char* fPath)
+{
+	const GLcharARB* VertexShaderSource = LoadShaderSource(vPath);
+	const GLcharARB* FragmentShaderSource = LoadShaderSource(fPath);
+	GLhandleARB Program;
+	GLhandleARB VertexShader;
+	GLhandleARB FragmentShader;
+	Program = glCreateProgramObjectARB();
+	VertexShader = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
+	FragmentShader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+	glShaderSourceARB(VertexShader, 1, &VertexShaderSource, NULL);
+	glCompileShaderARB(VertexShader);
+	GLint compileStatus;
+	glGetObjectParameterivARB(VertexShader, GL_OBJECT_COMPILE_STATUS_ARB, &compileStatus);
+	ShowError(VertexShader);
+	glShaderSourceARB(FragmentShader, 1, &FragmentShaderSource, NULL);
+	glCompileShaderARB(FragmentShader);
+	glGetObjectParameterivARB(FragmentShader, GL_OBJECT_COMPILE_STATUS_ARB, &compileStatus);
+	ShowError(FragmentShader);
+	glAttachObjectARB(Program, VertexShader);
+	glAttachObjectARB(Program, FragmentShader);
+	glLinkProgramARB(Program);
+	return Program;
+}
+
+bool GraphicalController::setUniformVector(GLhandleARB program, const char * name, const float * value)
+{
+	int loc = glGetUniformLocationARB(program, name);
+	if (loc < 0)
+		return false;
+	glUniform4fvARB(loc, 1, value);
+	return true;
+}
+
+bool GraphicalController::setUniformSampler(GLhandleARB object, const char * name)
+{
+	int loc = glGetUniformLocationARB(object, name);
+	if (loc < 0)
+		return false;
+	glUniform1iARB(loc, 0);
+	return true;
+}
+
+bool GraphicalController::setUniformPtr(GLhandleARB program, const char * name, const unsigned int value)
+{
+	int loc = glGetUniformLocationARB(program, name);
+	if (loc < 0)
+		return false;
+	glUniform1uiv(loc, 1, &value);
+	return true;
+}
+
+void GraphicalController::UnloadShaderSource(GLcharARB* ShaderSource)
+{
+	if (ShaderSource != nullptr)
+	{
+		delete[] ShaderSource;
+		ShaderSource = nullptr;
+	}
+}
+
+bool GraphicalController::checkOpenGLError()
+{
+	bool    retCode = true;
+
+	for (;;)
+	{
+		GLenum  glErr = glGetError();
+
+		if (glErr == GL_NO_ERROR)
+			return retCode;
+
+		printf("glError: %s\n", gluErrorString(glErr));
+		MessageBox(NULL, "glError: %s\n", "1", MB_OK);
+		retCode = false;
+		glErr = glGetError();
+	}
+
+	return retCode;
+}
+
+void GraphicalController::ShowError(GLhandleARB object)
+{
+	GLint LogLen;
+	GLcharARB * infoLog;
+	int charsWritten = 0;
+	checkOpenGLError();
+	glGetObjectParameterivARB(object, GL_OBJECT_INFO_LOG_LENGTH_ARB, &LogLen);
+	infoLog = new GLcharARB[LogLen];
+	glGetInfoLogARB(object, LogLen, &charsWritten, infoLog);
+	if (infoLog[0] != '\0'){ MessageBox(NULL, infoLog, "Error", MB_OK); }
+}
+
+Point GraphicalController::GetOGLPos(float x, float y)
+{
+	GLint viewport[4];
+	GLdouble modelview[16];
+	GLdouble projection[16];
+	GLfloat winX, winY, winZ;
+	TPoint _Point;
+	glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+	glGetDoublev(GL_PROJECTION_MATRIX, projection);
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	winX = (float)x;
+	winY = (float)viewport[3] - (float)y;
+	glReadPixels(x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
+	gluUnProject(winX, winY, winZ, modelview, projection, viewport, &_Point.x, &_Point.y, &_Point.z);
+	return Point(_Point.x, _Point.y);
+}
+
+GLuint GraphicalController::LoadTexture(const char * filename, bool alpha)
+{
+	GLuint texture;
+	char* data;
+	FILE* file;
+	BITMAPFILEHEADER header;
+	BITMAPINFOHEADER info;
+	file = fopen(filename, "rb");
+	fread(&header, sizeof(header), 1, file);
+	fread(&info, sizeof(info), 1, file);
+	data = new char[info.biWidth * info.biHeight * 4];
+	fread(data, info.biWidth * info.biHeight * sizeof(GLuint), 1, file);
+	fclose(file);
+	for (GLuint i = 0; i<info.biWidth * info.biHeight * 4; i += 4)
+	{
+		int r, g, b, a;
+		b = data[i];
+		g = data[i + 1];
+		r = data[i + 2];
+		a = data[i + 3];
+		data[i] = r;
+		data[i + 1] = g;
+		data[i + 2] = b;
+		data[i + 3] = a;
+	}
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	//glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	if (alpha)
+	{
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	}
+	else {
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	}
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, info.biWidth, info.biHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, info.biWidth, info.biHeight, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	delete data;
+	return texture;
 }
