@@ -9,7 +9,7 @@ struct GPosition
 	int x;
 	int y;
 
-	GPosition(int _x, int _y) : x(_x), y(_y){}
+	GPosition(int x, int y) : x(x), y(y){}
 	GPosition() : x(0), y(0){}
 };
 
