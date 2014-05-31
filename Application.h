@@ -16,15 +16,12 @@
 #include "GUI_ActionButton.h"
 #include "GUI_ActionManager.h"
 #include "GUI_PopMenu.h"
-#include "TGCTextBox.h"
-#include "TGCButton.h"
 #include "MouseController.h"
 #include "Description_GUI.h"
 #include "SDL.h"
 #include "SDL_mixer.h"
 #include "GUI_Item.h"
 #include "GUI_Window.h"
-#include "TGCButton.h"
 #include "GUI_Timer.h"
 #include "Property_Container.h"
 #include "GUI_Inventory.h"
@@ -34,8 +31,6 @@ class TActionManager;
 class GameObject;
 class MapCell;
 class TParameter;
-class TGCTextBox;
-class TGCButton;
 class GUI_ActionPanel;
 class GUI_ActionButton;
 class GUI_ActionManager;
@@ -55,71 +50,71 @@ class gui_MessageQueue
 {
 public:
 
-	std::mutex m;
-	std::condition_variable cv;
-	std::list<TParameter*> items;
-	bool ReadMessage;
-	bool ProcessedMessage;
-	bool Reader;
-	bool Busy;
+	std::mutex m_mutex;
+	std::condition_variable m_condition_variable;
+	std::list<TParameter*> m_items;
+	bool m_read_message;
+	bool m_processed_message;
+	bool m_reader;
+	bool m_busy;
 
 	gui_MessageQueue();
 	~gui_MessageQueue();
 
-	void Push(TParameter* p);
+	void push(TParameter* p);
 };
 
 class Application
 {
 public:
 
-	int GameTurn = 1;
-	bool Ready = false;
+	int m_game_turn = 1;
+	bool m_ready = false;
 
 	Timer* m_timer;
-	MouseController* mouse;
-	gui_MessageQueue MessageQueue;
+	MouseController* m_mouse;
+	gui_MessageQueue m_message_queue;
 
-	std::mutex UpdaterLock;
+	std::mutex m_update_mutex;
 
-	ApplicationGUI* GUI;
-	GraphicalController* Graph;
-	TActionManager* ActionManager;
+	ApplicationGUI* m_GUI;
+	GraphicalController* m_graph;
+	TActionManager* m_action_manager;
 
-	TAction* Actions[4];
+	TAction* m_actions[4];
 
-	Event<WPARAM> KeyPress;
-	Event<MouseEventArgs> MouseClick;
-	Event<MouseEventArgs> UnderCursor;
+	Event<WPARAM> key_press;
+	Event<MouseEventArgs> mouse_click;
+	Event<MouseEventArgs> under_cursor;
 
 	Mix_Chunk *music = NULL;
 
 	~Application(void);
 
-	static Application& Instance()
+	static Application& instance()
 	{
 		static Application Singleton;
 		return Singleton;
 	}
 
-	void Initialization(HWND _hWnd);
-	void OnKeyPress(WPARAM w);
-	void OnMouseClick(MouseEventArgs const& e);
-	void OnMouseDown(MouseEventArgs const& e);
-	void OnMouseWheel(MouseEventArgs const& e);
-	void OnMouseMove(MouseEventArgs const& e);
-	void OnUnderCursor(MouseEventArgs const& e);
-	void Render();
-	void Update(void);
+	void initialization(HWND _hWnd);
+	void on_key_press(WPARAM w);
+	void on_mouse_click(MouseEventArgs const& e);
+	void on_mouse_down(MouseEventArgs const& e);
+	void on_mouse_wheel(MouseEventArgs const& e);
+	void on_mouse_move(MouseEventArgs const& e);
+	void on_under_cursor(MouseEventArgs const& e);
+	void render();
+	void update(void);
 
-	bool Command_SelectLocation(GameObject* Object, MapCell*& Cell);
-	bool Command_SelectObject(GameObject*& Object);
-	bool Command_OpenInventory(GameObject*& Object);
-	bool Command_CheckPosition(GameObject*& _Object, MapCell*& _Position,GameMap*& _Map);
-	void Command_SetCursor(GLuint _Tile);
-	void Command_SetPickUpItem(GLuint _Tile);
-	void Command_SetCursorVisibility(bool _Visibility);
-	void Command_SetPickUpItemVisibility(bool _Visibility);
+	bool command_select_location(GameObject* Object, MapCell*& Cell);
+	bool command_select_object(GameObject*& Object);
+	bool command_open_inventory(GameObject*& Object);
+	bool command_check_position(GameObject*& _Object, MapCell*& _Position,GameMap*& _Map);
+	void command_set_cursor(GLuint _Tile);
+	void command_set_pickup_item(GLuint _Tile);
+	void command_set_cursor_visibility(bool _Visibility);
+	void command_set_pickup_item_visibility(bool _Visibility);
 	
 	void PlaySound1();
 

@@ -3,9 +3,9 @@
 
 GUI_ActionManager::GUI_ActionManager(TActionManager* ActionManager) :GUI_Container(0, 0, 0, 0)
 {
-	Item = ActionManager;
-	Item->AddEvent += std::bind(&GUI_ActionManager::OnItemAdd, this, std::placeholders::_1);
-	Item->RemoveEvent += std::bind(&GUI_ActionManager::OnItemRemove, this, std::placeholders::_1);
+	m_item = ActionManager;
+	m_item->add_item_event += std::bind(&GUI_ActionManager::on_item_add, this, std::placeholders::_1);
+	m_item->remove_item_event += std::bind(&GUI_ActionManager::on_item_remove, this, std::placeholders::_1);
 }
 
 
@@ -18,7 +18,7 @@ GUI_ActionManager::~GUI_ActionManager(void)
 //	glEnable(GL_BLEND);
 //	glDisable(GL_TEXTURE_2D);
 //	glColor4d(1.0, 1.0, 1.0, 0.5);
-//	Graph->DrawSprite(x,y,x,y+height,x+width,y+height,x+width,y);
+//	Graph->draw_sprite(x,y,x,y+height,x+width,y+height,x+width,y);
 //	glEnable(GL_TEXTURE_2D);
 //	int i=0;
 //	glColor4d(0.0, 0.0, 0.0, 1.0);
@@ -43,77 +43,76 @@ GUI_ActionManager::~GUI_ActionManager(void)
 //	glEnd();
 //}
 
-void GUI_ActionManager::AddItemControl(GUI_Object* object)
+void GUI_ActionManager::add_item_control(GUI_Object* object)
 {
-	static_cast<GUI_Item*>(object)->Resize(width - 4, 21);
+	static_cast<GUI_Item*>(object)->resize(m_size.x - 4, 21);
 	/*object->width = width - 4;
 	object->height = 21;*/
-	if (!ItemControls->Items.empty())
+	if (!m_item_controls->m_items.empty())
 	{
-		GUI_Item* LastElement = static_cast<GUI_Item*>(ItemControls->Items.back());
-		object->x = 2;
-		object->y = LastElement->y + LastElement->height + 2;
-		if (object->y + object->height>height)
+		GUI_Item* LastElement = static_cast<GUI_Item*>(m_item_controls->m_items.back());
+		object->m_position.x = 2;
+		object->m_position.y = LastElement->m_position.y + LastElement->m_size.y + 2;
+		if (object->m_position.y + object->m_size.y>m_size.y)
 		{
-			Scroll.y -= object->height;
+			m_scroll.y -= object->m_size.y;
 		}
 	}
 	else
 	{
-		object->x = 2;
-		object->y = 2;
+		object->m_position.x = 2;
+		object->m_position.y = 2;
 	}
-	static_cast<GUI_Item*>(object)->Close += std::bind(&GUI_ActionManager::RemoveItemFromSource, this, std::placeholders::_1);
-	ItemControls->add(object);
+	static_cast<GUI_Item*>(object)->close += std::bind(&GUI_ActionManager::remove_item_from_source, this, std::placeholders::_1);
+	m_item_controls->add(object);
 }
 
-void GUI_ActionManager::OnItemAdd(GameTask* const& e)
+void GUI_ActionManager::on_item_add(GameTask* const& e)
 {
-	GUI_Item* item = new GUI_Item(0, 0, 0,0, e->Action->GetDescription(e->Parameter), e);
-	item->Name = "Item";
-	AddItemControl(item);
+	GUI_Item* item = new GUI_Item(0, 0, 0,0, e->m_action->get_description(e->m_parameter), e);
+	add_item_control(item);
 }
 
-void GUI_ActionManager::RemoveItemControl(GUI_Object* object)
+void GUI_ActionManager::remove_item_control(GUI_Object* object)
 {
-	for (std::list<GUI_Object*>::iterator Current = ItemControls->Items.begin(); Current != ItemControls->Items.end(); Current++)
+	for (std::list<GUI_Object*>::iterator Current = m_item_controls->m_items.begin(); Current != m_item_controls->m_items.end(); Current++)
 	{
 		if (static_cast<GUI_Item*>(*Current)== object)
 		{
-			int lx = (*Current)->x;
-			int ly = (*Current)->y;
-			if (!Items.empty())
+			int lx = (*Current)->m_position.x;
+			int ly = (*Current)->m_position.y;
+			if (!m_items.empty())
 			{
 				int cx, cy;
-				for (std::list<GUI_Object*>::iterator Other = std::next(Current, 1); Other != ItemControls->Items.end(); Other++)
+				for (std::list<GUI_Object*>::iterator Other = std::next(Current, 1); Other != m_item_controls->m_items.end(); Other++)
 				{
-					cx = (*Other)->x;
-					cy = (*Other)->y;
-					(*Other)->x = lx;
-					(*Other)->y = ly;
+					cx = (*Other)->m_position.x;
+					cy = (*Other)->m_position.y;
+					(*Other)->m_position.x = lx;
+					(*Other)->m_position.y = ly;
 					lx = cx;
 					ly = cy;
 				}
 			}
-			ItemControls->remove(object);
+			m_item_controls->remove(object);
 			break;
 		}
 	}
 }
 
-void GUI_ActionManager::OnItemRemove(GameTask* const& e)
+void GUI_ActionManager::on_item_remove(GameTask* const& e)
 {
-	for (std::list<GUI_Object*>::iterator Current = ItemControls->Items.begin(); Current != ItemControls->Items.end(); Current++)
+	for (std::list<GUI_Object*>::iterator Current = m_item_controls->m_items.begin(); Current != m_item_controls->m_items.end(); Current++)
 	{
-		if (static_cast<GUI_Item*>(*Current)->Tag == e)
+		if (static_cast<GUI_Item*>(*Current)->m_tag == e)
 		{
-			RemoveItemControl((*Current));
+			remove_item_control((*Current));
 			break;
 		}
 	}
 }
 
-void GUI_ActionManager::RemoveItemFromSource(GUI_Object* object)
+void GUI_ActionManager::remove_item_from_source(GUI_Object* object)
 {
-	Item->Remove(static_cast<GUI_Item*>(object)->Tag);
+	m_item->remove(static_cast<GUI_Item*>(object)->m_tag);
 }

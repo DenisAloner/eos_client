@@ -21,9 +21,9 @@ class GCMapElement:
 {
 public:
 
-	MapCell* MapElement;
-	int x;
-	int y;
+	MapCell* m_map_element;
+	int m_x;
+	int m_y;
 
 	GCMapElement();
 	~GCMapElement();
@@ -35,56 +35,53 @@ class GUI_MapViewer :
 { 
 public:
 
-	Event<MouseEventArgs> StartMoving;
-	Event<MouseEventArgs> Move;
-	Event<MouseEventArgs> EndMoving;
+	Event<MouseEventArgs> start_moving;
+	Event<MouseEventArgs> move;
+	Event<MouseEventArgs> end_moving;
 
-	GUI_Object* focus;
-	GCMapElement* cursored;
-	Application* app;
+	GUI_Object* m_focus;
+	GCMapElement* m_cursored;
 
-	bool JustFocused;
-	bool IsMoving;
+	bool m_just_focused;
+	bool m_is_moving;
 
 	GUI_MapViewer(Application* app);
 	~GUI_MapViewer(void);
 
-	int TileCountX =32;
-	int TileCountY =64;
+	int m_tile_count_x = 32;
+	int m_tile_count_y = 64;
 
-	double TileSizeX;
-	double TileSizeY;
+	double m_tile_size_x;
+	double m_tile_size_y;
 
-	int CursorX;
-	int CursorY;
+	int m_cursor_x;
+	int m_cursor_y;
 
-	TPlayer* Player;
-	GameMap* Map;
-	GCMapElement* Items[512][512];
-	GUI_Layer* GUI;
-	TAction* AppliedAction;
+	TPlayer* m_player;
+	GameMap* m_map;
+	GCMapElement* m_items[512][512];
+	GUI_Layer* m_GUI;
 
-	Point center=Point(0,0);
-	Point InitialPosition = Point(0, 0);
+	GPosition m_center;
+	GPosition m_initial_position;
 
-	void Update();
-	virtual bool Select(int x,int y);
-	virtual void RenderAt(GraphicalController* Graph, int px, int py);
 	
-	void Ñalculate();
-	virtual void OnKeyPress(WPARAM w);
-	virtual void OnMouseClick(MouseEventArgs const& e);
-	virtual void OnMouseDown(MouseEventArgs const& e);
-	virtual void OnMouseWheel(MouseEventArgs const& e);
-	virtual void SetFocus(bool state);
-	virtual void OnItemGetFocus(GUI_Object* sender);
-	virtual void OnUnderCursor(MouseEventArgs const& e);
-	virtual void OnLoseFocus(GUI_Object* sender);
-	Point LocalXY(Point p);
-
-	virtual void OnMouseMove(MouseEventArgs const& e);
-	virtual void OnStartMoving(MouseEventArgs const& e);
-	virtual void OnMove(MouseEventArgs const& e);
-	virtual void OnEndMoving(MouseEventArgs const& e);
-	virtual MouseEventArgs SetLocalMousePosition(MouseEventArgs const& source);
+	virtual void on_key_press(WPARAM w);
+	virtual void on_mouse_click(MouseEventArgs const& e);
+	virtual void on_mouse_down(MouseEventArgs const& e);
+	virtual void on_mouse_wheel(MouseEventArgs const& e);
+	virtual void on_mouse_move(MouseEventArgs const& e);
+	virtual void on_start_moving(MouseEventArgs const& e);
+	virtual void on_move(MouseEventArgs const& e);
+	virtual void on_end_moving(MouseEventArgs const& e);
+	virtual void on_item_get_focus(GUI_Object* sender);
+	virtual void on_under_cursor(MouseEventArgs const& e);
+	virtual void on_lose_focus(GUI_Object* sender);
+	GPosition local_xy(GPosition p);
+	virtual void set_focus(bool state);
+	void update();
+	virtual bool select(int x, int y);
+	virtual void render(GraphicalController* Graph, int px, int py);
+	void calculate();
+	virtual MouseEventArgs set_local_mouse_control(MouseEventArgs const& source);
 };

@@ -15,16 +15,16 @@ class GUI_ActionManager :
 {
 public:
 
-	TActionManager* Item;
+	TActionManager* m_item;
 
 	GUI_ActionManager(TActionManager* ActionManager);
 	~GUI_ActionManager(void);
 
 	/*virtual void Render(GraphicalController* Graph);*/
-	virtual void OnItemAdd(GameTask* const& e);
-	virtual void OnItemRemove(GameTask* const& e);
-	void RemoveItemFromSource(GUI_Object* object);
-	virtual void AddItemControl(GUI_Object* object);
-	virtual void RemoveItemControl(GUI_Object* object);
+	virtual void on_item_add(GameTask* const& e);
+	virtual void on_item_remove(GameTask* const& e);
+	void remove_item_from_source(GUI_Object* object);
+	virtual void add_item_control(GUI_Object* object);
+	virtual void remove_item_control(GUI_Object* object);
 };
 

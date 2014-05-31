@@ -1,7 +1,7 @@
 #include "TParameter.h"
 
 
-TParameter::TParameter(ParameterKind _kind) :kind (_kind)
+TParameter::TParameter(ParameterKind _kind) :m_kind (_kind)
 {
 }
 

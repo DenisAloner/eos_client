@@ -4,24 +4,31 @@
 
 class GUI_Object;
 
-struct Point
+struct GPosition
 {
 	int x;
 	int y;
 
-	Point(int _x, int _y) : x(_x), y(_y){}
+	GPosition(int _x, int _y) : x(_x), y(_y){}
+	GPosition() : x(0), y(0){}
+};
+
+struct GSize
+{
+	int x;
+	int y;
+
+	GSize(int _x, int _y) : x(_x), y(_y){}
+	GSize() : x(0), y(0){}
 };
 
 struct MouseEventArgs
 {
-	Point Position;
-	WPARAM Flags;
+	GPosition position;
+	WPARAM flags;
 
-	MouseEventArgs(Point _Position, WPARAM _Flags) : Position(_Position), Flags(_Flags) {}
+	MouseEventArgs(GPosition position, WPARAM flags) : position(position), flags(flags) {}
 };
-
-typedef std::function<void(WPARAM)> KeyboardEventCallback;
-typedef std::function<void(MouseEventArgs)> MouseEventCallback;
 
 enum ActionKind
 {

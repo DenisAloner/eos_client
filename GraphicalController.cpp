@@ -2,41 +2,39 @@
 
 GraphicalController::GraphicalController()
 {
-	Sprites[0] = LoadTexture("C:\\ExplorersOfSaarum\\plitka_na_pol.bmp");
-	Sprites[1] = LoadTexture("C:\\ExplorersOfSaarum\\Stena.bmp");
-	Sprites[2] = LoadTexture("C:\\ExplorersOfSaarum\\sprite_8.bmp");
-	Sprites[3] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-1.bmp");
-	Sprites[4] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-2.bmp");
-	Sprites[5] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-3.bmp");
-	Sprites[6] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-4.bmp");
-	Sprites[7] = LoadTexture("C:\\ExplorersOfSaarum\\orc.bmp");
-	Sprites[8] = LoadTexture("C:\\ExplorersOfSaarum\\select.bmp");
-	Sprites[9] = LoadTexture("C:\\ExplorersOfSaarum\\Sunduk.bmp");
-	Sprites[10] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-5.bmp");
-	Sprites[11] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-6.bmp");
-	Sprites[12] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-7.bmp");
-	Sprites[13] = LoadTexture("C:\\ExplorersOfSaarum\\ElfSprite-8.bmp");
-	Sprites[14] = LoadTexture("C:\\ExplorersOfSaarum\\Elf2.bmp");
-	Sprites[15] = LoadTexture("C:\\ExplorersOfSaarum\\Stena2.bmp");
-	Sprites[16] = LoadTexture("C:\\ExplorersOfSaarum\\plitka_na_pol2.bmp");
-	Sprites[18] = LoadTexture("C:\\ExplorersOfSaarum\\IB2.bmp");
-	Sprites[19] = LoadTexture("C:\\ExplorersOfSaarum\\Screen.bmp");
-	Sprites[20] = LoadTexture("C:\\ExplorersOfSaarum\\Screen.bmp");
-	Sprites[21] = LoadTexture("C:\\ExplorersOfSaarum\\EoS_Cursor.bmp");
+	m_sprites[0] = load_texture("C:\\ExplorersOfSaarum\\plitka_na_pol.bmp");
+	m_sprites[1] = load_texture("C:\\ExplorersOfSaarum\\Stena.bmp");
+	m_sprites[2] = load_texture("C:\\ExplorersOfSaarum\\sprite_8.bmp");
+	m_sprites[3] = load_texture("C:\\ExplorersOfSaarum\\ElfSprite-1.bmp");
+	m_sprites[4] = load_texture("C:\\ExplorersOfSaarum\\ElfSprite-2.bmp");
+	m_sprites[5] = load_texture("C:\\ExplorersOfSaarum\\ElfSprite-3.bmp");
+	m_sprites[6] = load_texture("C:\\ExplorersOfSaarum\\ElfSprite-4.bmp");
+	m_sprites[7] = load_texture("C:\\ExplorersOfSaarum\\orc.bmp");
+	m_sprites[8] = load_texture("C:\\ExplorersOfSaarum\\select.bmp");
+	m_sprites[9] = load_texture("C:\\ExplorersOfSaarum\\Sunduk.bmp");
+	m_sprites[10] = load_texture("C:\\ExplorersOfSaarum\\ElfSprite-5.bmp");
+	m_sprites[11] = load_texture("C:\\ExplorersOfSaarum\\ElfSprite-6.bmp");
+	m_sprites[12] = load_texture("C:\\ExplorersOfSaarum\\ElfSprite-7.bmp");
+	m_sprites[13] = load_texture("C:\\ExplorersOfSaarum\\ElfSprite-8.bmp");
+	m_sprites[14] = load_texture("C:\\ExplorersOfSaarum\\Elf2.bmp");
+	m_sprites[15] = load_texture("C:\\ExplorersOfSaarum\\Stena2.bmp");
+	m_sprites[16] = load_texture("C:\\ExplorersOfSaarum\\plitka_na_pol2.bmp");
+	m_sprites[18] = load_texture("C:\\ExplorersOfSaarum\\IB2.bmp");
+	m_sprites[19] = load_texture("C:\\ExplorersOfSaarum\\Screen.bmp");
+	m_sprites[20] = load_texture("C:\\ExplorersOfSaarum\\Screen.bmp");
+	m_sprites[21] = load_texture("C:\\ExplorersOfSaarum\\EoS_Cursor.bmp");
 
-	Actions[ActionKind_Move] = LoadTexture("C:\\ExplorersOfSaarum\\Action_0.bmp");
-	Actions[ActionKind_Push] = LoadTexture("C:\\ExplorersOfSaarum\\Action_1.bmp");
-	Actions[ActionKind_Turn] = LoadTexture("C:\\ExplorersOfSaarum\\Action_2.bmp");
-	Actions[ActionKind_OpenInventory] = LoadTexture("C:\\ExplorersOfSaarum\\Bag.bmp");
+	m_actions[ActionKind_Move] = load_texture("C:\\ExplorersOfSaarum\\Action_0.bmp");
+	m_actions[ActionKind_Push] = load_texture("C:\\ExplorersOfSaarum\\Action_1.bmp");
+	m_actions[ActionKind_Turn] = load_texture("C:\\ExplorersOfSaarum\\Action_2.bmp");
+	m_actions[ActionKind_OpenInventory] = load_texture("C:\\ExplorersOfSaarum\\Bag.bmp");
 
-	RenderShader = LoadShader("C:\\ExplorersOfSaarum\\EoS_Render.vsh", "C:\\ExplorersOfSaarum\\EoS_Render.fsh");
-	LightShader = LoadShader("C:\\ExplorersOfSaarum\\EoS_Light.vsh", "C:\\ExplorersOfSaarum\\EoS_Light.fsh");
-	HorizontalShader = LoadShader("C:\\ExplorersOfSaarum\\EoS_Render.vsh", "C:\\ExplorersOfSaarum\\EoS_HorizontalBlur.fsh");
-	VerticalShader = LoadShader("C:\\ExplorersOfSaarum\\EoS_Render.vsh", "C:\\ExplorersOfSaarum\\EoS_VerticalBlur.fsh");
-	Font = LoadTexture("C:\\ExplorersOfSaarum\\FontRender4.bmp");
-	ButtonTexture = LoadTexture("C:\\ExplorersOfSaarum\\Button.bmp");
-	PaperTexture = LoadTexture("C:\\ExplorersOfSaarum\\Paper.bmp");
-	
+	m_render_shader = load_shader("C:\\ExplorersOfSaarum\\EoS_Render.vsh", "C:\\ExplorersOfSaarum\\EoS_Render.fsh");
+	m_light_shader = load_shader("C:\\ExplorersOfSaarum\\EoS_Light.vsh", "C:\\ExplorersOfSaarum\\EoS_Light.fsh");
+	m_horizontal_shader = load_shader("C:\\ExplorersOfSaarum\\EoS_Render.vsh", "C:\\ExplorersOfSaarum\\EoS_HorizontalBlur.fsh");
+	m_vertical_shader = load_shader("C:\\ExplorersOfSaarum\\EoS_Render.vsh", "C:\\ExplorersOfSaarum\\EoS_VerticalBlur.fsh");
+	m_font = load_texture("C:\\ExplorersOfSaarum\\FontRender4.bmp");
+
 	bool error = FT_Init_FreeType(&library);
 	if (error)
 	{
@@ -62,12 +60,12 @@ GraphicalController::GraphicalController()
 	{
 		MessageBox(NULL, "Font", "Error", MB_OK);
 	}
-	Sprites[17] = BindTexture(&slot->bitmap);
-	Scissors.push_front(new GLint[4]{0, 0, 1024, 1024});
-	glGenFramebuffersEXT(1, &FBO);
+	m_sprites[17] = bind_texture(&slot->bitmap);
+	m_scissors.push_front(new GLint[4]{0, 0, 1024, 1024});
+	glGenFramebuffersEXT(1, &m_FBO);
 }
 
-void GraphicalController::DrawSprite(double x0,double y0,double x1,double y1,double x2,double y2,double x3,double y3)
+void GraphicalController::draw_sprite(double x0,double y0,double x1,double y1,double x2,double y2,double x3,double y3)
 	{
 		glBegin(GL_QUADS);
 		glTexCoord2d(0,1); glVertex2d(x0, y0);
@@ -77,7 +75,7 @@ void GraphicalController::DrawSprite(double x0,double y0,double x1,double y1,dou
 		glEnd();
 	}
 
-void GraphicalController::DrawSpriteFBO(double TexWidth, double TexHeight, double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3)
+void GraphicalController::draw_sprite_FBO(double TexWidth, double TexHeight, double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3)
 {
 	glBegin(GL_QUADS);
 	glTexCoord2d(0, TexHeight); glVertex2d(x0, y0);
@@ -87,14 +85,14 @@ void GraphicalController::DrawSpriteFBO(double TexWidth, double TexHeight, doubl
 	glEnd();
 }
 
-void GraphicalController::CenterText(int x,int y,std::string Text,int sizex,int sizey)
+void GraphicalController::center_text(int x,int y,std::string Text,int sizex,int sizey)
 {
 	int cx=x-(Text.length())*(sizex+1)/2;
 	int cy=y-sizey/2;
-	OutputText(cx,cy,Text,sizex,sizey);
+	output_text(cx,cy,Text,sizex,sizey);
 }
 
-void GraphicalController::setVSync(bool sync)
+void GraphicalController::set_VSync(bool sync)
 {
 	// Function pointer for the wgl extention function we need to enable/disable
 	// vsync
@@ -116,12 +114,12 @@ void GraphicalController::setVSync(bool sync)
 	}
 }
 
-void GraphicalController::OutputText(int x, int y, std::string& Text, int sizex, int sizey)
+void GraphicalController::output_text(int x, int y, std::string& Text, int sizex, int sizey)
 {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glUseProgramObjectARB(0);
 	glActiveTextureARB(GL_TEXTURE0_ARB);
-	glBindTexture(GL_TEXTURE_2D, Font);
+	glBindTexture(GL_TEXTURE_2D, m_font);
 	int x0, y0, x1, y1, x2, y2, x3, y3;
 	double xt0, yt0, xt1, yt1, xt2, yt2, xt3, yt3;
 	unsigned char  i, j;
@@ -157,7 +155,7 @@ void GraphicalController::OutputText(int x, int y, std::string& Text, int sizex,
 	}
 }
 
-GLuint GraphicalController::BindTexture(FT_Bitmap* data)
+GLuint GraphicalController::bind_texture(FT_Bitmap* data)
 {
 	GLuint texture;
 	glGenTextures(1, &texture);
@@ -185,9 +183,9 @@ GLuint GraphicalController::BindTexture(FT_Bitmap* data)
 	return texture;
 }
 
-bool GraphicalController::AddScissor(GLint* rect)
+bool GraphicalController::add_scissor(GLint* rect)
 {
-	GLint* GlobalScissor = Scissors.front();
+	GLint* GlobalScissor = m_scissors.front();
 	GLint* LocalScissor = new GLint[4]{ rect[0], 1024 - rect[1] - rect[3], rect[0] + rect[2], 1024 - rect[1] };
 	if ((GlobalScissor[0] >LocalScissor[2]) || (GlobalScissor[2]<LocalScissor[0]) || (GlobalScissor[1]>LocalScissor[3]) || (GlobalScissor[3]<LocalScissor[1]))
 	{
@@ -209,46 +207,46 @@ bool GraphicalController::AddScissor(GLint* rect)
 	{
 		LocalScissor[3]=GlobalScissor[3];
 	}
-	Scissors.push_front(LocalScissor);
+	m_scissors.push_front(LocalScissor);
 	glScissor(LocalScissor[0], LocalScissor[1], LocalScissor[2] - LocalScissor[0], LocalScissor[3] - LocalScissor[1]);
 	return true;
 }
 
-void GraphicalController::RemoveScissor()
+void GraphicalController::remove_scissor()
 {
-	Scissors.pop_front();
-	GLint* Scissor = Scissors.front();
+	m_scissors.pop_front();
+	GLint* Scissor = m_scissors.front();
 	glScissor(Scissor[0], Scissor[1], Scissor[2] - Scissor[0], Scissor[3] - Scissor[1]);
 }
 
-void GraphicalController::BlurRect(int x, int y, int width, int height)
+void GraphicalController::blur_rect(int x, int y, int width, int height)
 {
 	glColor4f(1.0, 1.0, 1.0, 1.0);
 	glDisable(GL_SCISSOR_TEST);
 	glDisable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, Sprites[19]);
+	glBindTexture(GL_TEXTURE_2D, m_sprites[19]);
 	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, x, 1024 - y - height, width, height);
 	double Tx = width / 1024.0;
 	double Ty = height / 1024.0;
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, FBO);
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Sprites[20], 0);
-	glUseProgramObjectARB(HorizontalShader);
-	setUniformSampler(HorizontalShader, "Map");
-	DrawSpriteFBO(Tx, Ty, 0, 1024 - height, 0, 1024, width, 1024, width, 1024 - height);
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Sprites[19], 0);
-	glUseProgramObjectARB(VerticalShader);
-	setUniformSampler(VerticalShader, "Map");
-	glBindTexture(GL_TEXTURE_2D, Sprites[20]);
-	DrawSpriteFBO(Tx, Ty, 0, 1024 - height, 0, 1024, width, 1024, width, 1024 - height);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_FBO);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_sprites[20], 0);
+	glUseProgramObjectARB(m_horizontal_shader);
+	set_uniform_sampler(m_horizontal_shader, "Map");
+	draw_sprite_FBO(Tx, Ty, 0, 1024 - height, 0, 1024, width, 1024, width, 1024 - height);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_sprites[19], 0);
+	glUseProgramObjectARB(m_vertical_shader);
+	set_uniform_sampler(m_vertical_shader, "Map");
+	glBindTexture(GL_TEXTURE_2D, m_sprites[20]);
+	draw_sprite_FBO(Tx, Ty, 0, 1024 - height, 0, 1024, width, 1024, width, 1024 - height);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 	glUseProgramObjectARB(0);
 	glEnable(GL_SCISSOR_TEST);
-	glBindTexture(GL_TEXTURE_2D, Sprites[19]);
-	DrawSpriteFBO(Tx, Ty, x, y, x, y + height, x + width, y + height, x + width, y);
+	glBindTexture(GL_TEXTURE_2D, m_sprites[19]);
+	draw_sprite_FBO(Tx, Ty, x, y, x, y + height, x + width, y + height, x + width, y);
 }
 
-GLcharARB* GraphicalController::LoadShaderSource(char* filename)
+GLcharARB* GraphicalController::load_shader_source(char* filename)
 {
 	GLcharARB* ShaderSource;
 	std::ifstream ShaderFile(filename, std::ifstream::binary);
@@ -268,10 +266,10 @@ GLcharARB* GraphicalController::LoadShaderSource(char* filename)
 	return ShaderSource;
 }
 
-GLhandleARB GraphicalController::LoadShader(char* vPath, char* fPath)
+GLhandleARB GraphicalController::load_shader(char* vPath, char* fPath)
 {
-	const GLcharARB* VertexShaderSource = LoadShaderSource(vPath);
-	const GLcharARB* FragmentShaderSource = LoadShaderSource(fPath);
+	const GLcharARB* VertexShaderSource = load_shader_source(vPath);
+	const GLcharARB* FragmentShaderSource = load_shader_source(fPath);
 	GLhandleARB Program;
 	GLhandleARB VertexShader;
 	GLhandleARB FragmentShader;
@@ -282,18 +280,18 @@ GLhandleARB GraphicalController::LoadShader(char* vPath, char* fPath)
 	glCompileShaderARB(VertexShader);
 	GLint compileStatus;
 	glGetObjectParameterivARB(VertexShader, GL_OBJECT_COMPILE_STATUS_ARB, &compileStatus);
-	ShowError(VertexShader);
+	show_error(VertexShader);
 	glShaderSourceARB(FragmentShader, 1, &FragmentShaderSource, NULL);
 	glCompileShaderARB(FragmentShader);
 	glGetObjectParameterivARB(FragmentShader, GL_OBJECT_COMPILE_STATUS_ARB, &compileStatus);
-	ShowError(FragmentShader);
+	show_error(FragmentShader);
 	glAttachObjectARB(Program, VertexShader);
 	glAttachObjectARB(Program, FragmentShader);
 	glLinkProgramARB(Program);
 	return Program;
 }
 
-bool GraphicalController::setUniformVector(GLhandleARB program, const char * name, const float * value)
+bool GraphicalController::set_uniform_vector(GLhandleARB program, const char * name, const float * value)
 {
 	int loc = glGetUniformLocationARB(program, name);
 	if (loc < 0)
@@ -302,7 +300,7 @@ bool GraphicalController::setUniformVector(GLhandleARB program, const char * nam
 	return true;
 }
 
-bool GraphicalController::setUniformSampler(GLhandleARB object, const char * name)
+bool GraphicalController::set_uniform_sampler(GLhandleARB object, const char * name)
 {
 	int loc = glGetUniformLocationARB(object, name);
 	if (loc < 0)
@@ -311,7 +309,7 @@ bool GraphicalController::setUniformSampler(GLhandleARB object, const char * nam
 	return true;
 }
 
-bool GraphicalController::setUniformPtr(GLhandleARB program, const char * name, const unsigned int value)
+bool GraphicalController::set_uniform_ptr(GLhandleARB program, const char * name, const unsigned int value)
 {
 	int loc = glGetUniformLocationARB(program, name);
 	if (loc < 0)
@@ -320,7 +318,7 @@ bool GraphicalController::setUniformPtr(GLhandleARB program, const char * name, 
 	return true;
 }
 
-void GraphicalController::UnloadShaderSource(GLcharARB* ShaderSource)
+void GraphicalController::unload_shader_source(GLcharARB* ShaderSource)
 {
 	if (ShaderSource != nullptr)
 	{
@@ -329,7 +327,7 @@ void GraphicalController::UnloadShaderSource(GLcharARB* ShaderSource)
 	}
 }
 
-bool GraphicalController::checkOpenGLError()
+bool GraphicalController::check_OpenGL_error()
 {
 	bool    retCode = true;
 
@@ -349,19 +347,19 @@ bool GraphicalController::checkOpenGLError()
 	return retCode;
 }
 
-void GraphicalController::ShowError(GLhandleARB object)
+void GraphicalController::show_error(GLhandleARB object)
 {
 	GLint LogLen;
 	GLcharARB * infoLog;
 	int charsWritten = 0;
-	checkOpenGLError();
+	check_OpenGL_error();
 	glGetObjectParameterivARB(object, GL_OBJECT_INFO_LOG_LENGTH_ARB, &LogLen);
 	infoLog = new GLcharARB[LogLen];
 	glGetInfoLogARB(object, LogLen, &charsWritten, infoLog);
 	if (infoLog[0] != '\0'){ MessageBox(NULL, infoLog, "Error", MB_OK); }
 }
 
-Point GraphicalController::GetOGLPos(float x, float y)
+GPosition GraphicalController::get_OpenGL_position(float x, float y)
 {
 	GLint viewport[4];
 	GLdouble modelview[16];
@@ -375,10 +373,10 @@ Point GraphicalController::GetOGLPos(float x, float y)
 	winY = (float)viewport[3] - (float)y;
 	glReadPixels(x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
 	gluUnProject(winX, winY, winZ, modelview, projection, viewport, &_Point.x, &_Point.y, &_Point.z);
-	return Point(_Point.x, _Point.y);
+	return GPosition(_Point.x, _Point.y);
 }
 
-GLuint GraphicalController::LoadTexture(const char * filename)
+GLuint GraphicalController::load_texture(const char * filename)
 {
 	GLuint texture;
 	char* data;

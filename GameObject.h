@@ -8,7 +8,6 @@
 #include <algorithm>
 #include "GameObjectProperty.h"
 #include "Application.h"
-#include "GameEntity.h"
 #include "Property_Container.h"
 
 struct TLight
@@ -31,33 +30,30 @@ class Application;
 
 enum ActionKind;
 
-class GameObject: public GameEntity
+class GameObject
 {
 public:
 
-	GameObjectSize Size;
-	TLight* Light;
-	std::string Name;
+	GameObjectSize m_size;
+	TLight* m_light;
+	std::string m_name;
+	ObjectDirection m_direction;
+	unsigned int m_sprites[4][4];
+	bool m_selected;
+	MapCell* m_cell;
 
-	ObjectDirection direction;
+	std::list<TAction*> m_actions;
+	std::list<GameObjectProperty*> m_properties;
 
-	unsigned int Sprites[4][4];
-	bool selected;
-
-	MapCell* Cell;
-
-	std::list<TAction*> Actions;
-	std::list<GameObjectProperty*> Properties;
-
-	GameObject(Application* app);
+	GameObject();
 
 	void Render(int x,int y)
 	{
 	}
 
 	/*virtual bool ContainAction(TAction* Action);*/
-	virtual TAction* FindAction(ActionKind kind);
-	virtual GameObjectProperty* FindProperty(PropertyKind kind);
+	virtual TAction* find_action(ActionKind kind);
+	virtual GameObjectProperty* find_property(PropertyKind kind);
 	void Turn();
 
 };
@@ -68,7 +64,7 @@ class TFloor :
 {
 public:
 
-	TFloor(Application* app);
+	TFloor();
 
 };
 
@@ -77,7 +73,7 @@ class TPlayer :
 {
 public:
 
-	TPlayer(Application* app);
+	TPlayer();
 
 };
 
@@ -86,7 +82,7 @@ class TOrc :
 {
 public:
 
-	TOrc(Application* app);
+	TOrc();
 
 };
 
@@ -95,7 +91,7 @@ class Elf :
 {
 public:
 
-	Elf(Application* app);
+	Elf();
 
 };
 
@@ -104,7 +100,7 @@ class TWall :
 {
 public:
 
-	TWall(Application* app);
+	TWall();
 
 };
 
@@ -113,7 +109,7 @@ class TBox:
 {
 public:
 
-	TBox(Application* app);
+	TBox();
 
 };
 
@@ -122,6 +118,6 @@ class TTorch:
 {
 public:
 
-	TTorch(Application* app);
+	TTorch();
 
 };

@@ -7,19 +7,19 @@ MapCell::MapCell(int x0, int y0)
 }
 
 
-void MapCell::AddObject(GameObject* Object)
+void MapCell::add_object(GameObject* Object)
  {
-	 Objects.push_back(Object);
+	 m_items.push_back(Object);
  }
 
-GameObjectProperty* MapCell::FindProperty(PropertyKind kind,GameObject* excluded)
+GameObjectProperty* MapCell::find_property(PropertyKind kind,GameObject* excluded)
 {
 	GameObjectProperty* result(nullptr);
-	for(std::list<GameObject*>::iterator item=Objects.begin();item!=Objects.end();item++)
+	for(std::list<GameObject*>::iterator item=m_items.begin();item!=m_items.end();item++)
 	{
 		if(excluded!=(*item))
 		{
-			result=(*item)->FindProperty(kind);
+			result=(*item)->find_property(kind);
 			if(result!=nullptr)
 			{
 				return result;
@@ -29,73 +29,157 @@ GameObjectProperty* MapCell::FindProperty(PropertyKind kind,GameObject* excluded
 	return nullptr;
 }
 
-void GameMap::AddObject(GameObject* Object0,MapCell* Cell0)
+GameMap::GameMap()
 {
-	Object0->Cell=Cell0;
-	for(int i=0;i<Object0->Size.y;i++)
+	m_size = GSize(MapWidth, MapHeight);
+}
+
+void GameMap::add_object(GameObject* Object0,MapCell* Cell0)
+{
+	Object0->m_cell=Cell0;
+	for(int i=0;i<Object0->m_size.y;i++)
 	{
-		for(int j=0;j<Object0->Size.x;j++)
+		for(int j=0;j<Object0->m_size.x;j++)
 		{
-			Items[Cell0->y+i][Cell0->x-j]->AddObject(Object0);
+			m_items[Cell0->y+i][Cell0->x-j]->add_object(Object0);
 		}
 	}
 }
 
-void GameMap::GenerateRoom(void)
+void GameMap::generate_room(void)
 {
-	for(int i=0;i<Height;i++)
+	for(int i=0;i<m_size.y;i++)
 	{
-		for(int j=0;j<Width;j++)
+		for(int j=0;j<m_size.x;j++)
 		{
-			if ((i==0)||(j==0)||(i==Height-1)||(j==Width-1))
+			if ((i==0)||(j==0)||(i==m_size.y-1)||(j==m_size.x-1))
 			{
-				Items[i][j]=new MapCell(j,i);
-				TWall* w = new TWall(app);
+				m_items[i][j]=new MapCell(j,i);
+				TWall* w = new TWall();
 				int Choise(rand() % 100);
 				if (Choise < 50)
 				{
-					w->Sprites[ObjectDirection_Left][0] = 15;
-					w->Sprites[ObjectDirection_Left][1] = 15;
-					w->Sprites[ObjectDirection_Left][2] = 15;
-					w->Sprites[ObjectDirection_Left][3] = 15;
+					w->m_sprites[ObjectDirection_Left][0] = 15;
+					w->m_sprites[ObjectDirection_Left][1] = 15;
+					w->m_sprites[ObjectDirection_Left][2] = 15;
+					w->m_sprites[ObjectDirection_Left][3] = 15;
 				}
-				AddObject(w,Items[i][j]);
+				add_object(w,m_items[i][j]);
 			} else {
-				Items[i][j]=new MapCell(j,i);
-				TFloor* w =new TFloor(app);
+				m_items[i][j]=new MapCell(j,i);
+				TFloor* w =new TFloor();
 				int Choise(rand() % 100);
 				if (Choise < 50)
 				{
-					w->Sprites[ObjectDirection_Left][0] = 16;
-					w->Sprites[ObjectDirection_Left][1] = 16;
-					w->Sprites[ObjectDirection_Left][2] = 16;
-					w->Sprites[ObjectDirection_Left][3] = 16;
+					w->m_sprites[ObjectDirection_Left][0] = 16;
+					w->m_sprites[ObjectDirection_Left][1] = 16;
+					w->m_sprites[ObjectDirection_Left][2] = 16;
+					w->m_sprites[ObjectDirection_Left][3] = 16;
 				}
-				AddObject(w,Items[i][j]);
+				add_object(w,m_items[i][j]);
 			}
 		}
 	}
 }
 
-void GameMap::MoveObject(GameObject* Obj,MapCell* Pos)
+void GameMap::move_object(GameObject* Obj,MapCell* Pos)
 {
-	for(int i=0;i<Obj->Size.y;i++)
+	for (int i = 0; i<Obj->m_size.y; i++)
 	{
-		for(int j=0;j<Obj->Size.x;j++)
+		for (int j = 0; j<Obj->m_size.x; j++)
 		{
-			Items[Obj->Cell->y+i][Obj->Cell->x-j]->Objects.remove(Obj);
+			m_items[Obj->m_cell->y + i][Obj->m_cell->x - j]->m_items.remove(Obj);
 		}
 	}
-	AddObject(Obj,Pos);
+	add_object(Obj,Pos);
 }
 
-void GameMap::AddLight(GameObject* Object)
+void GameMap::add_light(GameObject* Object)
 {
-	Light.push_front(Object);
+	m_lights.push_front(Object);
 }
 
-void GameMap::AddNewObject(GameObject* Object, MapCell* Element)
+void GameMap::add_new_object(GameObject* Object, MapCell* Element)
 {
-	AddObject(Object, Element);
-	AddLight(Object);
+	add_object(Object, Element);
+	add_light(Object);
+}
+
+void GameMap::generate_level(void)
+{
+	srand(time(0));
+	GameMapBlock* Block;
+	Block = new GameMapBlock;
+	Block->coor[0] = 0;
+	Block->coor[1] = 0;
+	Block->coor[2] = MapWidth - 1;
+	Block->coor[3] = MapHeight - 1;
+	Block->Left = nullptr;
+	Block->Right = nullptr;
+	divide_block(Block, 100, 0);
+	//Fill(Block);
+}
+
+void GameMap::divide_block(GameMapBlock* Block, int Depth, int Current)
+{
+	int Choise(rand() % 100);
+	if (Choise<50)
+	{
+		int Range = Block->coor[2] - Block->coor[0];
+		if (Range<6){ return; }
+		Choise = rand() % (Range - 2) + 3;
+		if (Range - Choise<3)
+		{
+			Choise = 3;
+			if (Range - Choise - 3<3){ return; }
+		}
+		Block->Left = new GameMapBlock;
+		Block->Left->coor[0] = Block->coor[0];
+		Block->Left->coor[1] = Block->coor[1];
+		Block->Left->coor[2] = Block->coor[0] + Choise;
+		Block->Left->coor[3] = Block->coor[3];
+		Block->Right = new GameMapBlock;
+		Block->Right->coor[0] = Block->coor[0] + Choise;
+		Block->Right->coor[1] = Block->coor[1];
+		Block->Right->coor[2] = Block->coor[2];
+		Block->Right->coor[3] = Block->coor[3];
+		Block->Left->Left = nullptr;
+		Block->Left->Right = nullptr;
+		Block->Right->Left = nullptr;
+		Block->Right->Right = nullptr;
+		if (Current<Depth)
+		{
+			divide_block(Block->Left, Depth, Current + 1);
+			divide_block(Block->Right, Depth, Current + 1);
+		}
+	}
+	else {
+		int Range = Block->coor[3] - Block->coor[1];
+		if (Range<6){ return; }
+		Choise = rand() % (Range - 2) + 3;
+		if (Range - Choise<3)
+		{
+			Choise = 3;
+			if (Range - Choise - 3<3){ return; }
+		}
+		Block->Left = new GameMapBlock;
+		Block->Left->coor[0] = Block->coor[0];
+		Block->Left->coor[1] = Block->coor[1];
+		Block->Left->coor[2] = Block->coor[2];
+		Block->Left->coor[3] = Block->coor[1] + Choise;
+		Block->Right = new GameMapBlock;
+		Block->Right->coor[0] = Block->coor[0];
+		Block->Right->coor[1] = Block->coor[1] + Choise;
+		Block->Right->coor[2] = Block->coor[2];
+		Block->Right->coor[3] = Block->coor[3];
+		Block->Left->Left = nullptr;
+		Block->Left->Right = nullptr;
+		Block->Right->Left = nullptr;
+		Block->Right->Right = nullptr;
+		if (Current<Depth)
+		{
+			divide_block(Block->Left, Depth, Current + 1);
+			divide_block(Block->Right, Depth, Current + 1);
+		}
+	}
 }

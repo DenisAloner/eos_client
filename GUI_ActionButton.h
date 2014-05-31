@@ -11,12 +11,13 @@ class GUI_ActionButton :
 {
 public:
 
-	TAction* Action;
+	TAction* m_action;
+
 	GUI_ActionButton();
 	~GUI_ActionButton();
 
-	virtual void OnMouseClick(MouseEventArgs const& e);
-	virtual void RenderAt(GraphicalController* Graph, int px, int py);	
-	virtual bool CheckRegion(MouseEventArgs const& e);
+	virtual void on_mouse_click(MouseEventArgs const& e);
+	virtual void render(GraphicalController* Graph, int px, int py);	
+	virtual bool check_region(MouseEventArgs const& e);
 };
 

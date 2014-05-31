@@ -7,8 +7,8 @@ public:
 	GUI_ItemButton();
 	~GUI_ItemButton();
 
-	virtual bool CheckRegion(MouseEventArgs const& e);
-	virtual void RenderAt(GraphicalController* Graph, int px, int py);
-	virtual void OnMouseMove(MouseEventArgs const& e);
+	virtual bool check_region(MouseEventArgs const& e);
+	virtual void render(GraphicalController* Graph, int px, int py);
+	virtual void on_mouse_move(MouseEventArgs const& e);
 };
 

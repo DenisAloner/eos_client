@@ -3,30 +3,30 @@
 
 GUI_Text::GUI_Text(std::string _Text)
 {
-	Format = new GUI_TextFormat(8, 17, TColor(1.0, 1.0, 1.0, 1.0));
-	Set(_Text);
+	m_format = new GUI_TextFormat(8, 17, TColor(1.0, 1.0, 1.0, 1.0));
+	set(_Text);
 }
 
-GUI_Text::GUI_Text(std::string _Text, GUI_TextFormat* _Format) : Format(_Format)
+GUI_Text::GUI_Text(std::string _Text, GUI_TextFormat* _Format) : m_format(_Format)
 {
-	Set(_Text);
+	set(_Text);
 }
 
 GUI_Text::~GUI_Text()
 {
 }
 
-void GUI_Text::RenderAt(GraphicalController* Graph, int px, int py)
+void GUI_Text::render(GraphicalController* Graph, int px, int py)
 {
 	glEnable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);
-	glColor4d(Format->Color.R, Format->Color.G, Format->Color.B, Format->Color.A);
-	Graph->OutputText(px, py, Text, Format->SizeX, Format->SizeY);
+	glColor4d(m_format->m_color.R, m_format->m_color.G, m_format->m_color.B, m_format->m_color.A);
+	Graph->output_text(px, py, m_text, m_format->m_symbol_size.x, m_format->m_symbol_size.y);
 }
 
-void GUI_Text::Set(std::string t)
+void GUI_Text::set(std::string t)
 {
-	this->Text = t;
-	width = Text.length() *  Format->SizeX;
-	height = Format->SizeY;
+	m_text = t;
+	m_size.x = m_text.length() * m_format->m_symbol_size.x;
+	m_size.y = m_format->m_symbol_size.y;
 }

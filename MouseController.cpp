@@ -3,14 +3,13 @@
 
 MouseController::MouseController()
 {
-	ShowCursor = false;
-	ShowPickUpItem = false;
-	MouseDownStatus = false;
-	MouseDown += std::bind(&MouseController::OnMouseDown, this, std::placeholders::_1);
-	MouseUp += std::bind(&MouseController::OnMouseUp, this, std::placeholders::_1);
-	MouseMove += std::bind(&MouseController::OnMouseMove, this, std::placeholders::_1);
+	m_show_cursor = false;
+	m_show_pickup_item = false;
+	mouse_down += std::bind(&MouseController::on_mouse_down, this, std::placeholders::_1);
+	mouse_up += std::bind(&MouseController::on_mouse_up, this, std::placeholders::_1);
+	mouse_move += std::bind(&MouseController::on_mouse_move, this, std::placeholders::_1);
 	//MouseWheel += std::bind(&MouseController::OnMouseWheel, this, std::placeholders::_1);
-	Position = GetMouseCoordinat();
+	m_position = get_mouse_position();
 }
 
 
@@ -18,30 +17,30 @@ MouseController::~MouseController()
 {
 }
 
-void MouseController::OnMouseDown(MouseEventArgs const& e)
+void MouseController::on_mouse_down(MouseEventArgs const& e)
 {
 }
 
-void MouseController::OnMouseUp(MouseEventArgs const& e)
+void MouseController::on_mouse_up(MouseEventArgs const& e)
 {
-	MouseClick(e);
+	mouse_click(e);
 }
 
-void MouseController::OnMouseMove(MouseEventArgs const& e)
+void MouseController::on_mouse_move(MouseEventArgs const& e)
 {
-	Position = GetMouseCoordinat();
+	m_position = get_mouse_position();
 }
 
-Point MouseController::GetMouseCoordinat()
+GPosition MouseController::get_mouse_position()
 {
-	return Point(0, 0);
+	return GPosition(0, 0);
 }
 
 MouseController_Windows::MouseController_Windows(HWND _hWnd) :hWnd(_hWnd)
 {
 }
 
-Point MouseController_Windows::GetMouseCoordinat()
+GPosition MouseController_Windows::get_mouse_position()
 {
 	POINT mouse;
 	GetCursorPos(&mouse);
@@ -49,5 +48,5 @@ Point MouseController_Windows::GetMouseCoordinat()
 	GLfloat winX, winY, winZ;
 	winX = (float)mouse.x;
 	winY = (float)mouse.y;
-	return Application::Instance().Graph->GetOGLPos(winX, winY);
+	return Application::instance().m_graph->get_OpenGL_position(winX, winY);
 }

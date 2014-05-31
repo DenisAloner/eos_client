@@ -15,12 +15,10 @@ public:
 
 	GUI_PopMenu(void);
 	~GUI_PopMenu(void);
-
-	Application* Game;
 	
 	virtual void add(std::string Text, GameObject* Object);
-	virtual void OnLoseFocus(GUI_Object* sender);
-	virtual void OnUnderCursor(MouseEventArgs const& e);
+	virtual void on_lose_focus(GUI_Object* sender);
+	virtual void on_under_cursor(MouseEventArgs const& e);
 };
 
 class GUI_PopMenuItem :
@@ -28,19 +26,19 @@ class GUI_PopMenuItem :
 {
 public:
 
-	std::string Text;
-	GameObject* Object;
+	std::string m_text;
+	GameObject* m_object;
 
-	GUI_PopMenu* Owner;
+	GUI_PopMenu* m_owner;
 
 	GUI_PopMenuItem(void);
 	~GUI_PopMenuItem(void);
 
-	virtual void OnMouseClick(MouseEventArgs const& e);
-	virtual void OnUnderCursor(MouseEventArgs const& e);
-	virtual void OnGetFocus(GUI_Object* sender);
-	virtual void OnLoseFocus(GUI_Object* sender);
-	virtual void RenderAt(GraphicalController* Graph, int px, int py);
+	virtual void on_mouse_click(MouseEventArgs const& e);
+	virtual void on_under_cursor(MouseEventArgs const& e);
+	virtual void on_get_focus(GUI_Object* sender);
+	virtual void on_lose_focus(GUI_Object* sender);
+	virtual void render(GraphicalController* Graph, int px, int py);
 };
 
 

@@ -25,11 +25,10 @@ class GUI_TextFormat
 {
 public:
 
-	GUI_TextFormat(int _SizeX, int _SizeY, TColor _Color) : SizeX(_SizeX), SizeY(_SizeY), Color(_Color) {};
+	GUI_TextFormat(int _SizeX, int _SizeY, TColor _Color) : m_symbol_size(GSize(_SizeX,_SizeY)), m_color(_Color) {};
 	~GUI_TextFormat();
-	TColor Color;
-	int SizeX;
-	int SizeY;
+	TColor m_color;
+	GSize m_symbol_size;
 
 };
 
@@ -42,12 +41,12 @@ public:
 	GUI_Text(std::string _Text, GUI_TextFormat* _Format);
 	~GUI_Text();
 
-	GUI_TextFormat* Format;
+	GUI_TextFormat* m_format;
 
-	virtual void RenderAt(GraphicalController* Graph, int px, int py);
-	void Set(std::string t);
+	virtual void render(GraphicalController* Graph, int px, int py);
+	void set(std::string t);
 
 private:
-	std::string Text;
+	std::string m_text;
 };
 

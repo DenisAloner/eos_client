@@ -11,15 +11,15 @@ class GUI_Item :
 {
 public:
 
-	Event<GUI_Object*> Close;
+	Event<GUI_Object*> close;
 
-	GameTask* Tag;
+	GameTask* m_tag;
 
 	GUI_Item(int _x, int _y, int _width, int _height, std::string text, GameTask* tag);
 	~GUI_Item();
 
-	void OnCloseButtonClick();
-	virtual void Resize(int _width, int _height);
+	void on_close_button_click();
+	virtual void resize(int _width, int _height);
 	//virtual void OnMouseClick(MouseEventArgs const& e);
 };
 

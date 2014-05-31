@@ -4,14 +4,14 @@
 GUI_Object::GUI_Object(void)
 {
 	focused=false;
-	KeyPress+=std::bind(&GUI_Object::OnKeyPress,this,std::placeholders::_1);
-	MouseClick+=std::bind(&GUI_Object::OnMouseClick,this,std::placeholders::_1);
-	UnderCursor+=std::bind(&GUI_Object::OnUnderCursor,this,std::placeholders::_1);
-	GetFocus+=std::bind(&GUI_Object::OnGetFocus,this,std::placeholders::_1);
-	LoseFocus+=std::bind(&GUI_Object::OnLoseFocus,this,std::placeholders::_1);
-	MouseDown += std::bind(&GUI_Object::OnMouseDown, this, std::placeholders::_1);
-	MouseWheel += std::bind(&GUI_Object::OnMouseWheel, this, std::placeholders::_1);
-	MouseMove += std::bind(&GUI_Object::OnMouseMove, this, std::placeholders::_1);
+	key_press += std::bind(&GUI_Object::on_key_press, this, std::placeholders::_1);
+	mouse_click+=std::bind(&GUI_Object::on_mouse_click,this,std::placeholders::_1);
+	mouse_down += std::bind(&GUI_Object::on_mouse_down, this, std::placeholders::_1);
+	mouse_wheel += std::bind(&GUI_Object::on_mouse_wheel, this, std::placeholders::_1);
+	mouse_move += std::bind(&GUI_Object::on_mouse_move, this, std::placeholders::_1);
+	under_cursor+=std::bind(&GUI_Object::on_under_cursor,this,std::placeholders::_1);
+	get_focus+=std::bind(&GUI_Object::on_get_focus,this,std::placeholders::_1);
+	lose_focus+=std::bind(&GUI_Object::on_lose_focus,this,std::placeholders::_1);
 }
 
 
@@ -19,61 +19,61 @@ GUI_Object::~GUI_Object(void)
 {
 }
 
-void GUI_Object::RenderAt(GraphicalController* Graph, int px, int py)
+void GUI_Object::render(GraphicalController* Graph, int px, int py)
 {
 }
 
 
-void GUI_Object::OnMouseClick(MouseEventArgs const& e)
+void GUI_Object::on_mouse_click(MouseEventArgs const& e)
 {
-	SetFocus(true);
+	set_focus(true);
 }
 
-void GUI_Object::OnMouseDown(MouseEventArgs const& e)
+void GUI_Object::on_mouse_down(MouseEventArgs const& e)
 {
-	SetFocus(true);
+	set_focus(true);
 }
 
-void GUI_Object::OnMouseWheel(MouseEventArgs const& e)
-{
-}
-
-void GUI_Object::OnMouseMove(MouseEventArgs const& e)
+void GUI_Object::on_mouse_wheel(MouseEventArgs const& e)
 {
 }
 
-void GUI_Object::OnKeyPress(WPARAM w)
+void GUI_Object::on_mouse_move(MouseEventArgs const& e)
 {
 }
 
-void  GUI_Object::SetFocus(bool state)
+void GUI_Object::on_key_press(WPARAM w)
+{
+}
+
+void  GUI_Object::set_focus(bool state)
 {
 	focused=state;
 	if(state)
 	{
-		GetFocus(this);
+		get_focus(this);
 	} else {
-		LoseFocus(this);
+		lose_focus(this);
 	}
 }
 
-void GUI_Object::OnUnderCursor(MouseEventArgs const& e)
+void GUI_Object::on_under_cursor(MouseEventArgs const& e)
 {
 }
 
-bool GUI_Object::CheckRegion(MouseEventArgs const& e)
+bool GUI_Object::check_region(MouseEventArgs const& e)
 {
-	if(this->x<=e.Position.x&&this->x+width>=e.Position.x&&this->y<=e.Position.y&&this->y+height>=e.Position.y)
+	if (this->m_position.x <= e.position.x&&this->m_position.x + m_size.x >= e.position.x&&this->m_position.y <= e.position.y&&this->m_position.y + m_size.y >= e.position.y)
 	{
 		return true;
 	}
 	return false;
 }
 
-void GUI_Object::OnGetFocus(GUI_Object* sender)
+void GUI_Object::on_get_focus(GUI_Object* sender)
 {
 }
 
-void GUI_Object::OnLoseFocus(GUI_Object* sender)
+void GUI_Object::on_lose_focus(GUI_Object* sender)
 {
 }

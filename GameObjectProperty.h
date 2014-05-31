@@ -6,7 +6,7 @@ class GameObjectProperty
 {
 public:
 	
-	PropertyKind kind;
+	PropertyKind m_kind;
 
 	GameObjectProperty(PropertyKind _kind);
 	~GameObjectProperty(void);

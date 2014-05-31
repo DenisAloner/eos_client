@@ -12,24 +12,24 @@ public:
 
 	GameTask(TAction* Action, TParameter* Parameter);
 
-	TAction* Action;
-	TParameter* Parameter;
+	TAction* m_action;
+	TParameter* m_parameter;
 };
 
 class TActionManager
 {
 public:
 	
-	std::list<GameTask*> Actions;
+	std::list<GameTask*> m_items;
 
 	TActionManager(void);
 	~TActionManager(void);
 
-	Event<GameTask*> AddEvent;
-	Event<GameTask*> RemoveEvent;
+	Event<GameTask*> add_item_event;
+	Event<GameTask*> remove_item_event;
 
-	void Add(GameTask* Action);
-	void Remove();
-	void Remove(GameTask* item);
+	void add(GameTask* Action);
+	void remove();
+	void remove(GameTask* item);
 };
 

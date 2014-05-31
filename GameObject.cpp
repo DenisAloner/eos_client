@@ -1,8 +1,8 @@
 #include "GameObject.h"
 
-GameObject::GameObject(Application* app = nullptr)
+GameObject::GameObject()
 {
-	direction = ObjectDirection_Left;
+	m_direction = ObjectDirection_Left;
 }
 
 //bool GameObject::ContainAction(TAction* Action)
@@ -10,11 +10,11 @@ GameObject::GameObject(Application* app = nullptr)
 //	return std::find(Actions.begin(), Actions.end(), 1)==Actions.end();
 //}
 
-GameObjectProperty* GameObject::FindProperty(PropertyKind kind)
+GameObjectProperty* GameObject::find_property(PropertyKind kind)
 {
-	for(std::list<GameObjectProperty*>::iterator Current=Properties.begin();Current!=Properties.end();Current++)
+	for(std::list<GameObjectProperty*>::iterator Current=m_properties.begin();Current!=m_properties.end();Current++)
 	{
-		if((*Current)->kind==kind)
+		if((*Current)->m_kind==kind)
 		{
 			return (*Current);
 		}
@@ -22,11 +22,11 @@ GameObjectProperty* GameObject::FindProperty(PropertyKind kind)
 	return nullptr;
 }
 
-TAction* GameObject::FindAction(ActionKind kind)
+TAction* GameObject::find_action(ActionKind kind)
 {
-	for(std::list<TAction*>::iterator Current=Actions.begin();Current!=Actions.end();Current++)
+	for(std::list<TAction*>::iterator Current=m_actions.begin();Current!=m_actions.end();Current++)
 	{
-		if((*Current)->kind==kind)
+		if((*Current)->m_kind==kind)
 		{
 			return (*Current);
 		}
@@ -36,134 +36,134 @@ TAction* GameObject::FindAction(ActionKind kind)
 
 void GameObject::Turn()
 {
-	if(direction == ObjectDirection_Left)
+	if(m_direction == ObjectDirection_Left)
 	{
-		direction = ObjectDirection_Right;
+		m_direction = ObjectDirection_Right;
 	} else {
-		direction = ObjectDirection_Left;
+		m_direction = ObjectDirection_Left;
 	}
 }
 
-TPlayer::TPlayer(Application* app)
+TPlayer::TPlayer()
 {
-	Cell=nullptr;
-	Sprites[ObjectDirection_Left][0] = 3;
-	Sprites[ObjectDirection_Left][1] = 4;
-	Sprites[ObjectDirection_Left][2] = 5;
-	Sprites[ObjectDirection_Left][3] = 6;
-	Sprites[ObjectDirection_Right][0] = 10;
-	Sprites[ObjectDirection_Right][1] = 11;
-	Sprites[ObjectDirection_Right][2] = 12;
-	Sprites[ObjectDirection_Right][3] = 13;
-	Size.x = 2;
-	Size.y = 1;
-	Size.z = 6;
-	Light=nullptr;
-	Actions.push_back(app->Actions[ActionKind_Move]);
-	Properties.push_back(new GameObjectProperty(PropertyKind_Impassable));
-	Properties.push_back(new Property_Container(2,4,"Мешок"));
-	Name = "Игрок";
-	selected = false;
+	m_cell=nullptr;
+	m_sprites[ObjectDirection_Left][0] = 3;
+	m_sprites[ObjectDirection_Left][1] = 4;
+	m_sprites[ObjectDirection_Left][2] = 5;
+	m_sprites[ObjectDirection_Left][3] = 6;
+	m_sprites[ObjectDirection_Right][0] = 10;
+	m_sprites[ObjectDirection_Right][1] = 11;
+	m_sprites[ObjectDirection_Right][2] = 12;
+	m_sprites[ObjectDirection_Right][3] = 13;
+	m_size.x = 2;
+	m_size.y = 1;
+	m_size.z = 6;
+	m_light = nullptr;
+	m_actions.push_back(Application::instance().m_actions[ActionKind_Move]);
+	m_properties.push_back(new GameObjectProperty(PropertyKind_Impassable));
+	m_properties.push_back(new Property_Container(2, 4, "Мешок"));
+	m_name = "Игрок";
+	m_selected = false;
 }
 
-TOrc::TOrc(Application* app)
+TOrc::TOrc()
 {
-	Cell=nullptr;
-	Sprites[ObjectDirection_Left][0] = 7;
-	Sprites[ObjectDirection_Left][1] = 7;
-	Sprites[ObjectDirection_Left][2] = 7;
-	Sprites[ObjectDirection_Left][3] = 7;
-	Size.x = 3;
-	Size.y = 2;
-	Size.z = 6;
-	Light=nullptr;
-	Properties.push_back(new GameObjectProperty(PropertyKind_Impassable));
-	Name = "Враг";
-	selected = false;
+	m_cell = nullptr;
+	m_sprites[ObjectDirection_Left][0] = 7;
+	m_sprites[ObjectDirection_Left][1] = 7;
+	m_sprites[ObjectDirection_Left][2] = 7;
+	m_sprites[ObjectDirection_Left][3] = 7;
+	m_size.x = 3;
+	m_size.y = 2;
+	m_size.z = 6;
+	m_light = nullptr;
+	m_properties.push_back(new GameObjectProperty(PropertyKind_Impassable));
+	m_name = "Враг";
+	m_selected = false;
 }
 
-Elf::Elf(Application* app)
+Elf::Elf()
 {
-	Cell = nullptr;
-	Sprites[ObjectDirection_Left][0] =14;
-	Sprites[ObjectDirection_Left][1] = 14;
-	Sprites[ObjectDirection_Left][2] = 14;
-	Sprites[ObjectDirection_Left][3] = 14;
-	Size.x = 2;
-	Size.y = 2;
-	Size.z = 6;
-	Light = nullptr;
-	Properties.push_back(new GameObjectProperty(PropertyKind_Impassable));
-	Name = "Эльф";
-	selected = false;
+	m_cell = nullptr;
+	m_sprites[ObjectDirection_Left][0] = 14;
+	m_sprites[ObjectDirection_Left][1] = 14;
+	m_sprites[ObjectDirection_Left][2] = 14;
+	m_sprites[ObjectDirection_Left][3] = 14;
+	m_size.x = 2;
+	m_size.y = 2;
+	m_size.z = 6;
+	m_light = nullptr;
+	m_properties.push_back(new GameObjectProperty(PropertyKind_Impassable));
+	m_name = "Эльф";
+	m_selected = false;
 }
 
-TFloor::TFloor(Application* app)
+TFloor::TFloor()
 {
-	Cell=nullptr;
-	Sprites[ObjectDirection_Left][0] = 0;
-	Sprites[ObjectDirection_Left][1] = 0;
-	Sprites[ObjectDirection_Left][2] = 0;
-	Sprites[ObjectDirection_Left][3] = 0;
-	Light=nullptr;
-	Size.x = 1;
-	Size.y = 1;
-	Size.z = 1;
-	Actions.push_back(app->Actions[ActionKind_Move]);
-	Name = "Пол";
-	selected = false;
+	m_cell = nullptr;
+	m_sprites[ObjectDirection_Left][0] = 0;
+	m_sprites[ObjectDirection_Left][1] = 0;
+	m_sprites[ObjectDirection_Left][2] = 0;
+	m_sprites[ObjectDirection_Left][3] = 0;
+	m_light = nullptr;
+	m_size.x = 1;
+	m_size.y = 1;
+	m_size.z = 1;
+	m_actions.push_back(Application::instance().m_actions[ActionKind_Move]);
+	m_name = "Пол";
+	m_selected = false;
 }
 
-TBox::TBox(Application* app)
+TBox::TBox()
 {
-	Cell=nullptr;
-	Sprites[ObjectDirection_Left][0] = 9;
-	Sprites[ObjectDirection_Left][1] = 9;
-	Sprites[ObjectDirection_Left][2] = 9;
-	Sprites[ObjectDirection_Left][3] = 9;
-	Light=nullptr;
-	Size.x = 2;
-	Size.y = 2;
-	Size.z = 3;
-	Actions.push_back(app->Actions[ActionKind_Push]);
-	Properties.push_back(new GameObjectProperty(PropertyKind_Impassable));
-	Properties.push_back(new Property_Container(5, 5, "Внутри"));
-	Name = "Сундук";
-	selected = false;
+	m_cell = nullptr;
+	m_sprites[ObjectDirection_Left][0] = 9;
+	m_sprites[ObjectDirection_Left][1] = 9;
+	m_sprites[ObjectDirection_Left][2] = 9;
+	m_sprites[ObjectDirection_Left][3] = 9;
+	m_light = nullptr;
+	m_size.x = 2;
+	m_size.y = 2;
+	m_size.z = 3;
+	m_actions.push_back(Application::instance().m_actions[ActionKind_Push]);
+	m_properties.push_back(new GameObjectProperty(PropertyKind_Impassable));
+	m_properties.push_back(new Property_Container(5, 5, "Внутри"));
+	m_name = "Сундук";
+	m_selected = false;
 }
 
-TWall::TWall(Application* app)
+TWall::TWall()
 {
-	Cell=nullptr;
-	Sprites[ObjectDirection_Left][0] = 1;
-	Sprites[ObjectDirection_Left][1] = 1;
-	Sprites[ObjectDirection_Left][2] = 1;
-	Sprites[ObjectDirection_Left][3] = 1;
-	Light=nullptr;
-	Size.x = 1;
-	Size.y = 1;
-	Size.z = 5;
-	Properties.push_back(new GameObjectProperty(PropertyKind_Impassable));
-	Name = "Стена";
-	selected = false;
+	m_cell = nullptr;
+	m_sprites[ObjectDirection_Left][0] = 1;
+	m_sprites[ObjectDirection_Left][1] = 1;
+	m_sprites[ObjectDirection_Left][2] = 1;
+	m_sprites[ObjectDirection_Left][3] = 1;
+	m_light = nullptr;
+	m_size.x = 1;
+	m_size.y = 1;
+	m_size.z = 5;
+	m_properties.push_back(new GameObjectProperty(PropertyKind_Impassable));
+	m_name = "Стена";
+	m_selected = false;
 }
 
-TTorch::TTorch(Application* app)
+TTorch::TTorch()
 {
-	Cell=nullptr;
-	Sprites[ObjectDirection_Left][0] = 2;
-	Sprites[ObjectDirection_Left][1] = 2;
-	Sprites[ObjectDirection_Left][2] = 2;
-	Sprites[ObjectDirection_Left][3] = 2;
-	Size.x = 1;
-	Size.y = 1;
-	Size.z = 4;
-	Light=new TLight;
-	Light->Power=2;
-	Light->RGB[0]=1;
-	Light->RGB[1]=1;
-	Light->RGB[2]=1;
-	Properties.push_back(new GameObjectProperty(PropertyKind_Impassable));
-	Name = "Факел";
-	selected = false;
+	m_cell = nullptr;
+	m_sprites[ObjectDirection_Left][0] = 2;
+	m_sprites[ObjectDirection_Left][1] = 2;
+	m_sprites[ObjectDirection_Left][2] = 2;
+	m_sprites[ObjectDirection_Left][3] = 2;
+	m_size.x = 1;
+	m_size.y = 1;
+	m_size.z = 4;
+	m_light = new TLight;
+	m_light->Power = 2;
+	m_light->RGB[0] = 1;
+	m_light->RGB[1] = 1;
+	m_light->RGB[2] = 1;
+	m_properties.push_back(new GameObjectProperty(PropertyKind_Impassable));
+	m_name = "Факел";
+	m_selected = false;
 }

@@ -9,22 +9,22 @@ public:
 	GUI_Container(int _x, int _y, int _width, int _height);
 	~GUI_Container();
 
-	GUI_Layer* ManagingControls;
-	GUI_Layer* ItemControls;
+	GUI_Layer* m_managing_controls;
+	GUI_Layer* m_item_controls;
 
-	Point Scroll = Point(0, 0);
+	GPosition m_scroll;
 
-	virtual bool CheckRegion(MouseEventArgs const& e);
-	virtual void OnMouseClick(MouseEventArgs const& e);
-	virtual void RenderAt(GraphicalController* Graph, int px, int py);
-	virtual void OnMouseWheel(MouseEventArgs const& e);
-	void SetScroll(int dy);
-	virtual MouseEventArgs SetLocalMousePosition(MouseEventArgs const& source);
-	virtual void OnMouseDown(MouseEventArgs const& e);
-	virtual void OnMouseMove(MouseEventArgs const& e);
-	virtual void AddItemControl(GUI_Object* object);
-	virtual void RemoveItemControl(GUI_Object* object);
-	virtual void AddManagingControl(GUI_Object* object);
-	virtual void Resize(int _width, int _height);
+	virtual bool check_region(MouseEventArgs const& e);
+	virtual void on_mouse_click(MouseEventArgs const& e);
+	virtual void render(GraphicalController* Graph, int px, int py);
+	virtual void on_mouse_wheel(MouseEventArgs const& e);
+	virtual void on_mouse_down(MouseEventArgs const& e);
+	virtual void on_mouse_move(MouseEventArgs const& e);
+	virtual void add_item_control(GUI_Object* object);
+	virtual void remove_item_control(GUI_Object* object);
+	virtual void add_managing_control(GUI_Object* object);
+	virtual void resize(int _width, int _height);
+	void set_scroll(int dy);
+	virtual MouseEventArgs set_local_mouse_position(MouseEventArgs const& source);
 };
 

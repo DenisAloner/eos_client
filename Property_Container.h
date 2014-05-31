@@ -1,6 +1,6 @@
 #pragma once
 #include "GameObjectProperty.h"
-#include "GameObject.h"#
+#include "GameObject.h"
 #include <vector>
 
 class GameObject;
@@ -10,12 +10,11 @@ class Property_Container :
 {
 public:
 
-	std::vector<GameObject*> Items;
+	std::vector<GameObject*> m_items;
 
-	int Width;
-	int Height;
+	GSize m_size;
 
-	std::string Name;
+	std::string m_name;
 
 	Property_Container(int _Width, int _Height, std::string _Name);
 	~Property_Container();

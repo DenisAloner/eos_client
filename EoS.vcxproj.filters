@@ -4,8 +4,6 @@
     <ClCompile Include="EoS.cpp" />
     <ClCompile Include="Event.cpp" />
     <ClCompile Include="TActionManager.cpp" />
-    <ClCompile Include="TGCButton.cpp" />
-    <ClCompile Include="TGCTextBox.cpp" />
     <ClCompile Include="TParameter.cpp" />
     <ClCompile Include="TAction.cpp">
       <Filter>Actions</Filter>
@@ -56,7 +54,6 @@
     <ClCompile Include="GUI_Window.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
-    <ClCompile Include="GraphicalController.cpp" />
     <ClCompile Include="GUI_Timer.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
@@ -66,23 +63,20 @@
     <ClCompile Include="Property_Container.cpp">
       <Filter>Properties</Filter>
     </ClCompile>
-    <ClCompile Include="GameEntity.cpp" />
-    <ClCompile Include="Action_OpenInventory.cpp">
-      <Filter>Actions</Filter>
-    </ClCompile>
     <ClCompile Include="GUI_Inventory.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
     <ClCompile Include="MouseController.cpp">
       <Filter>Controllers</Filter>
     </ClCompile>
+    <ClCompile Include="GraphicalController.cpp">
+      <Filter>Controllers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Event.h" />
     <ClInclude Include="TActionManager.h" />
-    <ClInclude Include="TGCButton.h" />
     <ClInclude Include="TParameter.h" />
-    <ClInclude Include="TGCTextBox.h" />
     <ClInclude Include="TAction.h">
       <Filter>Actions</Filter>
     </ClInclude>
@@ -139,7 +133,6 @@
     <ClInclude Include="GUI_Window.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="GraphicalController.h" />
     <ClInclude Include="GUI_Timer.h">
       <Filter>GUI</Filter>
     </ClInclude>
@@ -149,14 +142,13 @@
     <ClInclude Include="Property_Container.h">
       <Filter>Properties</Filter>
     </ClInclude>
-    <ClInclude Include="GameEntity.h" />
-    <ClInclude Include="Action_OpenInventory.h">
-      <Filter>Actions</Filter>
-    </ClInclude>
     <ClInclude Include="GUI_Inventory.h">
       <Filter>GUI</Filter>
     </ClInclude>
     <ClInclude Include="MouseController.h">
+      <Filter>Controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicalController.h">
       <Filter>Controllers</Filter>
     </ClInclude>
   </ItemGroup>

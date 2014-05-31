@@ -11,30 +11,29 @@ class MouseController
 {
 public:
 
-	GLuint Cursor; 
-	GLuint PickUpItem;
+	GLuint m_cursor; 
+	GLuint m_pickup_item;
 
-	Point Position = Point(0, 0);
+	GPosition m_position;
 
-	bool ShowCursor;
-	bool ShowPickUpItem;
-	bool MouseDownStatus;
+	bool m_show_cursor;
+	bool m_show_pickup_item;
 	
-	Event<MouseEventArgs> MouseDown;
-	Event<MouseEventArgs> MouseUp;
-	Event<MouseEventArgs> MouseMove;
-	Event<MouseEventArgs> MouseClick;
-	Event<MouseEventArgs> MouseWheel;
+	Event<MouseEventArgs> mouse_down;
+	Event<MouseEventArgs> mouse_up;
+	Event<MouseEventArgs> mouse_move;
+	Event<MouseEventArgs> mouse_click;
+	Event<MouseEventArgs> mouse_wheel;
 
 	MouseController();
 	~MouseController();
 
-	void OnMouseDown(MouseEventArgs const& e);
-	void OnMouseUp(MouseEventArgs const& e);
-	void OnMouseMove(MouseEventArgs const& e);
+	void on_mouse_down(MouseEventArgs const& e);
+	void on_mouse_up(MouseEventArgs const& e);
+	void on_mouse_move(MouseEventArgs const& e);
 	//void OnMouseWheel(MouseEventArgs const& e);
 
-	virtual Point GetMouseCoordinat();
+	virtual GPosition get_mouse_position();
 
 };
 
@@ -46,6 +45,6 @@ public:
 	HWND hWnd;
 
 	MouseController_Windows(HWND _hWnd);
-	virtual Point GetMouseCoordinat();
+	virtual GPosition get_mouse_position();
 
 };

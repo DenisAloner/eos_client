@@ -5,9 +5,9 @@
 
 Timer::Timer(int l, int s)
 {
-	tick = 0;
-	tick_limit = l;
-	tick_size = s;
+	m_tick = 0;
+	m_tick_limit = l;
+	m_tick_size = s;
 }
 
 
@@ -17,12 +17,12 @@ Timer::~Timer()
 
 void Timer::next()
 {
-	if (tick > tick_limit-2)
+	if (m_tick > m_tick_limit-2)
 	{
-		tick = 0;
+		m_tick = 0;
 	} else
 	{
-		tick += 1;
+		m_tick += 1;
 	}
 }
 
@@ -30,7 +30,7 @@ void Timer::cycle()
 {
 	while (true)
 	{
-		std::chrono::milliseconds Duration(tick_size);
+		std::chrono::milliseconds Duration(m_tick_size);
 		std::this_thread::sleep_for(Duration);
 		next();
 	}

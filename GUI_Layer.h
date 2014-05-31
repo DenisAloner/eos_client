@@ -11,29 +11,29 @@ class GUI_Layer:
 {
 public:
 
-	std::list<GUI_Object*> Items;
-	GUI_Object* focus;
+	std::list<GUI_Object*> m_items;
+	GUI_Object* m_focus;
 
 	GUI_Layer(void);
 	~GUI_Layer(void);
 
-	virtual void RenderAt(GraphicalController* Graph, int px, int py);
-	virtual void OnMouseClick(MouseEventArgs const& e);
-	virtual void OnMouseDown(MouseEventArgs const& e);
-	virtual void OnMouseWheel(MouseEventArgs const& e);
-	virtual void OnMouseMove(MouseEventArgs const& e);
-	virtual void OnKeyPress(WPARAM w);
-	virtual void SetFocus(bool state);
+	virtual void render(GraphicalController* Graph, int px, int py);
+	virtual void on_mouse_click(MouseEventArgs const& e);
+	virtual void on_mouse_down(MouseEventArgs const& e);
+	virtual void on_mouse_wheel(MouseEventArgs const& e);
+	virtual void on_mouse_move(MouseEventArgs const& e);
+	virtual void on_key_press(WPARAM w);
+	virtual void set_focus(bool state);
 
-	virtual void OnUnderCursor(MouseEventArgs const& e);
+	virtual void on_under_cursor(MouseEventArgs const& e);
 
 	virtual void add(GUI_Object* object);
-	virtual void AddFront(GUI_Object* object);
+	virtual void add_front(GUI_Object* object);
 	virtual void remove(GUI_Object* object);
 	
-	virtual bool CheckRegion(MouseEventArgs const& e);
-	virtual void OnGetFocus(GUI_Object* sender);
-	virtual void OnItemGetFocus(GUI_Object* sender);
-	virtual MouseEventArgs SetLocalMousePosition(MouseEventArgs const& source);
+	virtual bool check_region(MouseEventArgs const& e);
+	virtual void on_get_focus(GUI_Object* sender);
+	virtual void on_item_get_focus(GUI_Object* sender);
+	virtual MouseEventArgs set_local_mouse_position(MouseEventArgs const& source);
 };
 

@@ -9,12 +9,12 @@ class GUI_InventoryItem :
 {
 public:
 
-	int Index;
+	int m_index;
 
 	GUI_InventoryItem(int _Width, int _Height, int _Index);
 	~GUI_InventoryItem();
 
-	virtual void RenderAt(GraphicalController* Graph, int px, int py);
+	virtual void render(GraphicalController* Graph, int px, int py);
 
 };
 

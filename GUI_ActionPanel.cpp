@@ -10,31 +10,22 @@ GUI_ActionPanel::~GUI_ActionPanel()
 {
 }
 
-void GUI_ActionPanel::OnMouseClick(MouseEventArgs const& e)
+void GUI_ActionPanel::add_item_control(GUI_Object* object)
 {
-	GUI_Layer::OnMouseClick(e);
-	if ((focus != this) && (focus == nullptr))
+	if (!m_item_controls->m_items.empty())
 	{
-		SetFocus(true);
-	}
-}
-
-void GUI_ActionPanel::AddItemControl(GUI_Object* object)
-{
-	if (!ItemControls->Items.empty())
-	{
-		GUI_Object* Back = ItemControls->Items.back();
-		object->y = 4;
-		object->x = Back->x + Back->width+4;
-		if (object->x + object->width>width)
+		GUI_Object* Back = m_item_controls->m_items.back();
+		object->m_position.y = 4;
+		object->m_position.x = Back->m_position.x + Back->m_size.x + 4;
+		if (object->m_position.x + object->m_size.x>m_size.x)
 		{
-			Scroll.x -= object->width;
+			m_scroll.x -= object->m_size.x;
 		}
 	}
 	else
 	{
-		object->x = 4;
-		object->y = 4;
+		object->m_position.x = 4;
+		object->m_position.y = 4;
 	}
-	ItemControls->add(object);
+	m_item_controls->add(object);
 }

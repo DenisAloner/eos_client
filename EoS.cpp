@@ -62,12 +62,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	// program main loop
 	glewInit();
 	//Map.GenerateLevel();
-	Application::Instance().Initialization(hWnd);
+	Application::instance().initialization(hWnd);
 	std::thread GameThread(GameThreadHandler);
-	Application::Instance().m_timer = new Timer(8, 75);
-	std::thread AnimationThread(&Timer::cycle, Application::Instance().m_timer);
-	Application::Instance().GUI->MapViewer->center.x = Application::Instance().GUI->MapViewer->Player->Cell->x;
-	Application::Instance().GUI->MapViewer->center.y = Application::Instance().GUI->MapViewer->Player->Cell->y;
+	Application::instance().m_timer = new Timer(8, 75);
+	std::thread AnimationThread(&Timer::cycle, Application::instance().m_timer);
+	Application::instance().m_GUI->MapViewer->m_center.x = Application::instance().m_GUI->MapViewer->m_player->m_cell->x;
+	Application::instance().m_GUI->MapViewer->m_center.y = Application::instance().m_GUI->MapViewer->m_player->m_cell->y;
 	while ( !quit )
 	{
 		
@@ -91,11 +91,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		{
 			//Player1->Sprite=2+FrameNum;
 			//Map.MoveObject(Player1,Player1->x+1,Player1->y+1);
-			Application::Instance().GUI->MapViewer->Update();
+			Application::instance().m_GUI->MapViewer->update();
 			{
-				Application::Instance().UnderCursor(MouseEventArgs(Application::Instance().mouse->Position, 0));
+				Application::instance().under_cursor(MouseEventArgs(Application::instance().m_mouse->m_position, 0));
 			}
-			Application::Instance().Render();
+			Application::instance().render();
 			SwapBuffers( hDC );
 
 			//MessageBox(NULL,"1","1",MB_OK);
@@ -131,39 +131,39 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_MOUSEWHEEL:
 	{
-		Application::Instance().mouse->MouseWheel(MouseEventArgs(Application::Instance().mouse->Position, wParam));
+		Application::instance().m_mouse->mouse_wheel(MouseEventArgs(Application::instance().m_mouse->m_position, wParam));
 		return 0;
 	}
 	
 	case WM_LBUTTONDOWN:
 	{
-		Application::Instance().mouse->MouseDown(MouseEventArgs(Application::Instance().mouse->Position, MK_LBUTTON));
+		Application::instance().m_mouse->mouse_down(MouseEventArgs(Application::instance().m_mouse->m_position, MK_LBUTTON));
 		return 0;
 	}
 	
 	case WM_RBUTTONDOWN:
 	{
-		Application::Instance().mouse->MouseDown(MouseEventArgs(Application::Instance().mouse->Position, MK_RBUTTON));
+		Application::instance().m_mouse->mouse_down(MouseEventArgs(Application::instance().m_mouse->m_position, MK_RBUTTON));
 		return 0;
 	}
 	
 	case WM_LBUTTONUP:
 	{
-		Application::Instance().mouse->MouseUp(MouseEventArgs(Application::Instance().mouse->Position, MK_LBUTTON));
+		Application::instance().m_mouse->mouse_up(MouseEventArgs(Application::instance().m_mouse->m_position, MK_LBUTTON));
 		return 0;
 	}
 	
 	case WM_RBUTTONUP:
 	{
-		Application::Instance().mouse->MouseUp(MouseEventArgs(Application::Instance().mouse->Position, MK_RBUTTON));
+		Application::instance().m_mouse->mouse_up(MouseEventArgs(Application::instance().m_mouse->m_position, MK_RBUTTON));
 		return 0;
 	}
 	
 	case WM_MOUSEMOVE:
 	{
-		if (Application::Instance().Ready)
+		if (Application::instance().m_ready)
 		{ 
-			Application::Instance().mouse->MouseMove(MouseEventArgs(Application::Instance().mouse->Position, wParam));
+			Application::instance().m_mouse->mouse_move(MouseEventArgs(Application::instance().m_mouse->m_position, wParam));
 		}
 		return 0;
 	}
@@ -177,22 +177,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case VK_SPACE:
 			return 0;
 		case VK_UP:
-			Application::Instance().KeyPress(wParam);
+			Application::instance().key_press(wParam);
 			return 0;
 		case VK_DOWN:
-			Application::Instance().KeyPress(wParam);
+			Application::instance().key_press(wParam);
 			return 0;
 		case VK_LEFT:
-			Application::Instance().KeyPress(wParam);
+			Application::instance().key_press(wParam);
 			return 0;
 		case VK_RIGHT:
-			Application::Instance().KeyPress(wParam);
+			Application::instance().key_press(wParam);
 			return 0;
 		}
 		return 0;
 
 	case WM_CHAR:
-		Application::Instance().KeyPress(wParam);
+		Application::instance().key_press(wParam);
 		return 0;
 
 	case WM_SETCURSOR:
@@ -255,13 +255,13 @@ void GameThreadHandler()
 		{
 			time -= 1;
 		}
-		Application::Instance().GUI->Timer->Update(time);
+		Application::instance().m_GUI->Timer->Update(time);
 		if (time == 15)
 		{
-			Application::Instance().Update();
-			Application::Instance().GUI->MapViewer->Update();
-			Application::Instance().GUI->DescriptionBox->AddItemControl(new GUI_Text("’Ó‰ - " + std::to_string(Application::Instance().GameTurn) + ".", new GUI_TextFormat(10, 19, TColor(0.0, 0.8, 0.0, 1.0))));
-			Application::Instance().GameTurn += 1;
+			Application::instance().update();
+			Application::instance().m_GUI->MapViewer->update();
+			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("’Ó‰ - " + std::to_string(Application::instance().m_game_turn) + ".", new GUI_TextFormat(10, 19, TColor(0.0, 0.8, 0.0, 1.0))));
+			Application::instance().m_game_turn += 1;
 		}
 		std::chrono::milliseconds Duration(250);
 		std::this_thread::sleep_for(Duration);

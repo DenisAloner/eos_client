@@ -3,7 +3,7 @@
 
 GUI_Layer::GUI_Layer()
 {
-	focus=nullptr;
+	m_focus=nullptr;
 }
 
 
@@ -11,138 +11,138 @@ GUI_Layer::~GUI_Layer(void)
 {
 }
 
-MouseEventArgs GUI_Layer::SetLocalMousePosition(MouseEventArgs const& source)
+MouseEventArgs GUI_Layer::set_local_mouse_position(MouseEventArgs const& source)
 {
-	return MouseEventArgs(Point(source.Position.x - x, source.Position.y - y), source.Flags);
+	return MouseEventArgs(GPosition(source.position.x - m_position.x, source.position.y - m_position.y), source.flags);
 }
 
-void GUI_Layer::OnMouseClick(MouseEventArgs const& e)
+void GUI_Layer::on_mouse_click(MouseEventArgs const& e)
 { 
-	MouseEventArgs LocalMouseEventArgs = SetLocalMousePosition(e);
-	for(std::list<GUI_Object*>::iterator Current=Items.begin();Current!=Items.end();Current++)
+	MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
+	for(std::list<GUI_Object*>::iterator Current=m_items.begin();Current!=m_items.end();Current++)
 	{
 		
-		if ((*Current)->CheckRegion(LocalMouseEventArgs))
+		if ((*Current)->check_region(LocalMouseEventArgs))
 		{
-			(*Current)->MouseClick(LocalMouseEventArgs);
+			(*Current)->mouse_click(LocalMouseEventArgs);
 			return;
 		}
 	}
 }
 
-void GUI_Layer::OnMouseDown(MouseEventArgs const& e)
+void GUI_Layer::on_mouse_down(MouseEventArgs const& e)
 {
-	MouseEventArgs LocalMouseEventArgs = SetLocalMousePosition(e);
-	for (std::list<GUI_Object*>::iterator Current = Items.begin(); Current != Items.end(); Current++)
+	MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
+	for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); Current++)
 	{
-		if ((*Current)->CheckRegion(LocalMouseEventArgs))
+		if ((*Current)->check_region(LocalMouseEventArgs))
 		{
-			(*Current)->MouseDown(LocalMouseEventArgs);
+			(*Current)->mouse_down(LocalMouseEventArgs);
 			return;
 		}
 	}
 }
 
-void GUI_Layer::OnMouseMove(MouseEventArgs const& e)
+void GUI_Layer::on_mouse_move(MouseEventArgs const& e)
 {
-	MouseEventArgs LocalMouseEventArgs = SetLocalMousePosition(e);
-	if (focus)
+	MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
+	if (m_focus)
 	{
-		focus->MouseMove(LocalMouseEventArgs);
+		m_focus->mouse_move(LocalMouseEventArgs);
 	}
 }
 
-void GUI_Layer::OnMouseWheel(MouseEventArgs const& e)
+void GUI_Layer::on_mouse_wheel(MouseEventArgs const& e)
 {
-	if (focus)
+	if (m_focus)
 	{
-		focus->MouseWheel(e);
+		m_focus->mouse_wheel(e);
 	}
 }
 
-void GUI_Layer::RenderAt(GraphicalController* Graph, int px, int py)
+void GUI_Layer::render(GraphicalController* Graph, int px, int py)
 {
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glUseProgramObjectARB(0);
-	for (std::list<GUI_Object*>::reverse_iterator Current = Items.rbegin(); Current != Items.rend(); Current++)
+	for (std::list<GUI_Object*>::reverse_iterator Current =m_items.rbegin(); Current != m_items.rend(); Current++)
 	{
-		(*Current)->RenderAt(Graph, px + (*Current)->x , py + (*Current)->y );
+		(*Current)->render(Graph, px + (*Current)->m_position.x, py + (*Current)->m_position.y);
 	}
 	glDisable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);
 }
 
-void GUI_Layer::OnKeyPress(WPARAM w)
+void GUI_Layer::on_key_press(WPARAM w)
 {
-	if(focus)
+	if(m_focus)
 	{
-		focus->KeyPress(w);
+		m_focus->key_press(w);
 	}
 }
 
-void GUI_Layer::SetFocus(bool state)
+void GUI_Layer::set_focus(bool state)
 {
 	focused=state;
 	if(state)
 	{
-		if(focus!=nullptr)
+		if(m_focus!=nullptr)
 		{
-			focus->SetFocus(false);
+			m_focus->set_focus(false);
 		}
-		GetFocus(this);
+		get_focus(this);
 	} else {
-		if(focus!=nullptr)
+		if(m_focus!=nullptr)
 		{
-			focus->SetFocus(false);
-			focus=nullptr;
+			m_focus->set_focus(false);
+			m_focus=nullptr;
 		}
-		LoseFocus(this);
+		lose_focus(this);
 	}
 }
 
 
-void GUI_Layer::OnUnderCursor(MouseEventArgs const& e)
+void GUI_Layer::on_under_cursor(MouseEventArgs const& e)
 {
-	MouseEventArgs LocalMouseEventArgs = SetLocalMousePosition(e);
-	if(focus!=nullptr)
+	MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
+	if(m_focus!=nullptr)
 	{
-		focus->UnderCursor(LocalMouseEventArgs);
+		m_focus->under_cursor(LocalMouseEventArgs);
 	}
 }
 
 void GUI_Layer::add(GUI_Object* object)
 {
-	Items.push_back(object);
-	object->GetFocus+=std::bind(&GUI_Layer::OnItemGetFocus,this,std::placeholders::_1);
-	object->Destroy += std::bind(&GUI_Layer::remove, this, std::placeholders::_1);
+	m_items.push_back(object);
+	object->get_focus+=std::bind(&GUI_Layer::on_item_get_focus,this,std::placeholders::_1);
+	object->destroy += std::bind(&GUI_Layer::remove, this, std::placeholders::_1);
 }
 
-void GUI_Layer::AddFront(GUI_Object* object)
+void GUI_Layer::add_front(GUI_Object* object)
 {
-	Items.push_front(object);
-	object->GetFocus+=std::bind(&GUI_Layer::OnItemGetFocus,this,std::placeholders::_1);
-	object->Destroy += std::bind(&GUI_Layer::remove, this, std::placeholders::_1);
+	m_items.push_front(object);
+	object->get_focus+=std::bind(&GUI_Layer::on_item_get_focus,this,std::placeholders::_1);
+	object->destroy += std::bind(&GUI_Layer::remove, this, std::placeholders::_1);
 }
 
 void GUI_Layer::remove(GUI_Object* object)
 {
-	if(focus==object)
+	if(m_focus==object)
 	{
-		focus=nullptr;
+		m_focus=nullptr;
 	}
-	Items.remove(object);
+	m_items.remove(object);
 }
 
-bool GUI_Layer::CheckRegion(MouseEventArgs const& e)
+bool GUI_Layer::check_region(MouseEventArgs const& e)
 {
-	MouseEventArgs LocalMouseEventArgs = SetLocalMousePosition(e);
-	if(this->x<=e.Position.x&&this->x+width>=e.Position.x&&this->y<=e.Position.y&&this->y+height>=e.Position.y)
+	MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
+	if (this->m_position.x <= e.position.x&&this->m_position.x + m_size.x >= e.position.x&&this->m_position.y <= e.position.y&&this->m_position.y + m_size.y >= e.position.y)
 	{
-		for(std::list<GUI_Object*>::iterator Current=Items.begin();Current!=Items.end();Current++)
+		for(std::list<GUI_Object*>::iterator Current=m_items.begin();Current!=m_items.end();Current++)
 		{
-			if ((*Current)->CheckRegion(LocalMouseEventArgs))
+			if ((*Current)->check_region(LocalMouseEventArgs))
 			{
 				return true;
 			}
@@ -151,15 +151,15 @@ bool GUI_Layer::CheckRegion(MouseEventArgs const& e)
 	return false;
 }
 
-void GUI_Layer::OnGetFocus(GUI_Object* sender)
+void GUI_Layer::on_get_focus(GUI_Object* sender)
 {
 }
 
-void GUI_Layer::OnItemGetFocus(GUI_Object* sender)
+void GUI_Layer::on_item_get_focus(GUI_Object* sender)
 {
-	if(focus!=sender)
+	if(m_focus!=sender)
 	{
-	SetFocus(true);
-	focus=sender;
+	set_focus(true);
+	m_focus=sender;
 	}
 }

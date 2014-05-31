@@ -29,44 +29,42 @@ public:
 	FT_Matrix     matrix;                 /* transformation matrix */
 	FT_Vector     pen;                    /* untransformed origin  */
 
-	GLuint Sprites[22];
-	GLuint Actions[4];
+	GLuint m_sprites[22];
+	GLuint m_actions[4];
 
-	GLhandleARB RenderShader;
-	GLhandleARB LightShader;
-	GLhandleARB HorizontalShader;
-	GLhandleARB VerticalShader;
-	GLuint ButtonTexture;
-	GLuint PaperTexture;
+	GLhandleARB m_render_shader;
+	GLhandleARB m_light_shader;
+	GLhandleARB m_horizontal_shader;
+	GLhandleARB m_vertical_shader;
 
-	GLuint Font;
+	GLuint m_font;
 
-	std::list<GLint*> Scissors;
+	std::list<GLint*> m_scissors;
 
-	GLuint FBO;
+	GLuint m_FBO;
 
 	GraphicalController();
 
-	void UnloadShaderSource(GLcharARB* ShaderSource);
-	bool checkOpenGLError();
-	void ShowError(GLhandleARB object);
-	GLhandleARB LoadShader(char* vPath, char* fPath);
-	bool setUniformVector(GLhandleARB program, const char * name, const float * value);
-	bool setUniformSampler(GLhandleARB object, const char * name);
-	bool setUniformPtr(GLhandleARB program, const char * name, const unsigned int value);
-	Point GetOGLPos(float x, float y);
-	GLuint LoadTexture(const char * filename);
-	void OutputText(int x, int y, std::string& Text, int sizex, int sizey);
-	void DrawSprite(double x0,double y0,double x1,double y1,double x2,double y2,double x3,double y3);
-	void CenterText(int x, int y, std::string Text, int sizex, int sizey);
-	void RenderText(double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
-	GLuint BindTexture(FT_Bitmap* data);
-	bool AddScissor(GLint* rect);
-	void RemoveScissor();
-	void DrawSpriteFBO(double TexWidth, double TexHeight, double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
-	void BlurRect(int x, int y, int width, int height);
-	GLcharARB* LoadShaderSource(char* filename);
-	void setVSync(bool sync);
+	void unload_shader_source(GLcharARB* ShaderSource);
+	bool check_OpenGL_error();
+	void show_error(GLhandleARB object);
+	GLhandleARB load_shader(char* vPath, char* fPath);
+	bool set_uniform_vector(GLhandleARB program, const char * name, const float * value);
+	bool set_uniform_sampler(GLhandleARB object, const char * name);
+	bool set_uniform_ptr(GLhandleARB program, const char * name, const unsigned int value);
+	GPosition get_OpenGL_position(float x, float y);
+	GLuint load_texture(const char * filename);
+	void output_text(int x, int y, std::string& Text, int sizex, int sizey);
+	void draw_sprite(double x0,double y0,double x1,double y1,double x2,double y2,double x3,double y3);
+	void center_text(int x, int y, std::string Text, int sizex, int sizey);
+	void render_text(double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
+	GLuint bind_texture(FT_Bitmap* data);
+	bool add_scissor(GLint* rect);
+	void remove_scissor();
+	void draw_sprite_FBO(double TexWidth, double TexHeight, double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
+	void blur_rect(int x, int y, int width, int height);
+	GLcharARB* load_shader_source(char* filename);
+	void set_VSync(bool sync);
 
 };
 

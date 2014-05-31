@@ -2,8 +2,8 @@
 
 TAction::TAction(void)
 {
-	kind = ActionKind_Move;
-	Name="Нету";
+	m_kind = ActionKind_Move;
+	m_name="Нет";
 }
 
 
@@ -20,24 +20,24 @@ void TAction::perfom(TParameter* parameter)
 {
 }
 
-void TAction::InteractionHandler()
+void TAction::interaction_handler()
 {
 	/*Game->PlaySound1();*/
-	if (Application::Instance().MessageQueue.Busy)
+	if (Application::instance().m_message_queue.m_busy)
 	{
-		if (Application::Instance().MessageQueue.Reader)
+		if (Application::instance().m_message_queue.m_reader)
 		{
 			TParameter* p = new TParameter(ParameterKind_Cancel);
-			Application::Instance().MessageQueue.Push(p);
+			Application::instance().m_message_queue.push(p);
 		}
-		while (Application::Instance().MessageQueue.Busy){}
+		while (Application::instance().m_message_queue.m_busy){}
 	}
 }
 
 ActionClass_Move::ActionClass_Move()
 {
-	kind = ActionKind_Move;
-	Name = "Идти";
+	m_kind = ActionKind_Move;
+	m_name = "Идти";
 }
 
 
@@ -45,25 +45,25 @@ ActionClass_Move::~ActionClass_Move()
 {
 }
 
-void ActionClass_Move::InteractionHandler()
+void ActionClass_Move::interaction_handler()
 {
-	TAction::InteractionHandler();
-	Application::Instance().MessageQueue.Busy = true;
+	TAction::interaction_handler();
+	Application::instance().m_message_queue.m_busy = true;
 	Parameter_Position* p = new Parameter_Position();
-	p->object = Application::Instance().GUI->MapViewer->Player;
-	p->map = Application::Instance().GUI->MapViewer->Map;
-	if (Application::Instance().Command_SelectLocation(p->object, p->place))
+	p->m_object = Application::instance().m_GUI->MapViewer->m_player;
+	p->m_map = Application::instance().m_GUI->MapViewer->m_map;
+	if (Application::instance().command_select_location(p->m_object, p->m_place))
 	{
-		Application::Instance().GUI->DescriptionBox->AddItemControl(new GUI_Text("Выбрана клетка {" + std::to_string(p->place->x) + "," + std::to_string(p->place->y) + "}."));
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));
 	}
 	else
 	{
-		Application::Instance().GUI->DescriptionBox->AddItemControl(new GUI_Text("Действие отменено."));
-		Application::Instance().MessageQueue.Busy = false;
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
-	Application::Instance().ActionManager->Add(new GameTask(this, p));
-	Application::Instance().MessageQueue.Busy = false;
+	Application::instance().m_action_manager->add(new GameTask(this, p));
+	Application::instance().m_message_queue.m_busy = false;
 }
 
 
@@ -83,7 +83,7 @@ bool ActionClass_Move::check(TParameter* parameter)
 	//	}
 	//}
 	//return true;
-	return Application::Instance().Command_CheckPosition(p->object,p->place,p->map);
+	return Application::instance().command_check_position(p->m_object,p->m_place,p->m_map);
 }
 
 void ActionClass_Move::perfom(TParameter* parameter)
@@ -91,17 +91,17 @@ void ActionClass_Move::perfom(TParameter* parameter)
 	Parameter_Position* p = static_cast<Parameter_Position*>(parameter);
 	if (check(p))
 	{
-		p->map->MoveObject(p->object, p->place);
+		p->m_map->move_object(p->m_object, p->m_place);
 	}
 }
 
-char const* ActionClass_Move::GetDescription(TParameter* parameter)
+char const* ActionClass_Move::get_description(TParameter* parameter)
 {
 	Parameter_Position* p = static_cast<Parameter_Position*>(parameter);
 	std::string s("Идти в X:");
-	s += std::to_string(p->place->x);
+	s += std::to_string(p->m_place->x);
 	s += ",Y:";
-	s += std::to_string(p->place->y);
+	s += std::to_string(p->m_place->y);
 	char* cstr = new char[s.length() + 1];
 	std::strcpy(cstr, s.c_str());
 	return cstr;
@@ -109,8 +109,8 @@ char const* ActionClass_Move::GetDescription(TParameter* parameter)
 
 ActionClass_Push::ActionClass_Push(void)
 {
-	kind = ActionKind_Push;
-	Name = "Толкать";
+	m_kind = ActionKind_Push;
+	m_name = "Толкать";
 }
 
 
@@ -118,14 +118,14 @@ ActionClass_Push::~ActionClass_Push(void)
 {
 }
 
-char const* ActionClass_Push::GetDescription(TParameter* parameter)
+char const* ActionClass_Push::get_description(TParameter* parameter)
 {
 	Parameter_MoveObjectByUnit* p = static_cast<Parameter_MoveObjectByUnit*>(parameter);
 	std::string s("Переместить ");
-	s += p->object->Name;
-	s += " в X:"+std::to_string(p->place->x);
+	s += p->m_object->m_name;
+	s += " в X:"+std::to_string(p->m_place->x);
 	s += ",Y:";
-	s += std::to_string(p->place->y);
+	s += std::to_string(p->m_place->y);
 	char* cstr = new char[s.length() + 1];
 	std::strcpy(cstr, s.c_str());
 	return cstr;
@@ -135,12 +135,12 @@ bool ActionClass_Push::check(TParameter* parameter)
 {
 	Parameter_MoveObjectByUnit* p = static_cast<Parameter_MoveObjectByUnit*>(parameter);
 	GameObjectProperty* result(nullptr);
-	for (int i = 0; i<p->object->Size.y; i++)
+	for (int i = 0; i<p->m_object->m_size.y; i++)
 	{
-		for (int j = 0; j<p->object->Size.x; j++)
+		for (int j = 0; j<p->m_object->m_size.x; j++)
 		{
-			if (p->map->Items[p->place->y + i][p->place->x - j] == nullptr){ return false; }
-			if (p->map->Items[p->place->y + i][p->place->x - j]->FindProperty(PropertyKind_Impassable, p->object) != nullptr)
+			if (p->m_map->m_items[p->m_place->y + i][p->m_place->x - j] == nullptr){ return false; }
+			if (p->m_map->m_items[p->m_place->y + i][p->m_place->x - j]->find_property(PropertyKind_Impassable, p->m_object) != nullptr)
 			{
 				return false;
 			}
@@ -154,48 +154,48 @@ void ActionClass_Push::perfom(TParameter* parameter)
 	Parameter_MoveObjectByUnit* p = static_cast<Parameter_MoveObjectByUnit*>(parameter);
 	if (check(p))
 	{
-		p->map->MoveObject(p->object, p->place);
+		p->m_map->move_object(p->m_object, p->m_place);
 	}
 }
 
-void ActionClass_Push::InteractionHandler()
+void ActionClass_Push::interaction_handler()
 {
-	TAction::InteractionHandler();
-	Application::Instance().MessageQueue.Busy = true;
+	TAction::interaction_handler();
+	Application::instance().m_message_queue.m_busy = true;
 	Parameter_MoveObjectByUnit* p = new Parameter_MoveObjectByUnit();
-	p->unit = Application::Instance().GUI->MapViewer->Player;
-	p->map = Application::Instance().GUI->MapViewer->Map;
-	if (Application::Instance().Command_SelectObject(p->object))
+	p->m_unit = Application::instance().m_GUI->MapViewer->m_player;
+	p->m_map = Application::instance().m_GUI->MapViewer->m_map;
+	if (Application::instance().command_select_object(p->m_object))
 	{
 		std::string a = "Выбран "; 
-		a.append(p->object->Name);
+		a.append(p->m_object->m_name);
 		a = a + ".";
-		Application::Instance().GUI->DescriptionBox->AddItemControl(new GUI_Text(a));
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
 	}
 	else
 	{
-		Application::Instance().GUI->DescriptionBox->AddItemControl(new GUI_Text("Действие отменено."));
-		Application::Instance().MessageQueue.Busy = false;
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
-	if (Application::Instance().Command_SelectLocation(p->object, p->place))
+	if (Application::instance().command_select_location(p->m_object, p->m_place))
 	{
-		Application::Instance().GUI->DescriptionBox->AddItemControl(new GUI_Text("Выбрана клетка {" + std::to_string(p->place->x) + "," + std::to_string(p->place->y) + "}."));
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));
 	}
 	else
 	{
-		Application::Instance().GUI->DescriptionBox->AddItemControl(new GUI_Text("Действие отменено."));
-		Application::Instance().MessageQueue.Busy = false;
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
-	Application::Instance().ActionManager->Add(new GameTask(this, p));
-	Application::Instance().MessageQueue.Busy = false;
+	Application::instance().m_action_manager->add(new GameTask(this, p));
+	Application::instance().m_message_queue.m_busy = false;
 }
 
 ActionClass_Turn::ActionClass_Turn(void)
 {
-	kind = ActionKind_Turn;
-	Name = "Повернуться";
+	m_kind = ActionKind_Turn;
+	m_name = "Повернуться";
 }
 
 
@@ -203,7 +203,7 @@ ActionClass_Turn::~ActionClass_Turn(void)
 {
 }
 
-char const* ActionClass_Turn::GetDescription(TParameter* parameter)
+char const* ActionClass_Turn::get_description(TParameter* parameter)
 {
 	Parameter_GameObject* p = static_cast<Parameter_GameObject*>(parameter);
 	std::string s("Повернуться");
@@ -223,24 +223,24 @@ void ActionClass_Turn::perfom(TParameter* parameter)
 	Parameter_GameObject* p = static_cast<Parameter_GameObject*>(parameter);
 	if (check(p))
 	{
-		p->object->Turn();
+		p->m_object->Turn();
 	}
 }
 
-void ActionClass_Turn::InteractionHandler()
+void ActionClass_Turn::interaction_handler()
 {
-	TAction::InteractionHandler();
-	Application::Instance().MessageQueue.Busy = true;
-	Application::Instance().GUI->DescriptionBox->AddItemControl(new GUI_Text("Вы разворачиваетесь."));
+	TAction::interaction_handler();
+	Application::instance().m_message_queue.m_busy = true;
+	Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Вы разворачиваетесь."));
 	Parameter_GameObject* p = new Parameter_GameObject();
-	p->object = Application::Instance().GUI->MapViewer->Player;
-	Application::Instance().ActionManager->Add(new GameTask(this, p));
-	Application::Instance().MessageQueue.Busy = false;
+	p->m_object = Application::instance().m_GUI->MapViewer->m_player;
+	Application::instance().m_action_manager->add(new GameTask(this, p));
+	Application::instance().m_message_queue.m_busy = false;
 }
 
 Action_OpenInventory::Action_OpenInventory()
 {
-	kind = ActionKind_OpenInventory;
+	m_kind = ActionKind_OpenInventory;
 }
 
 
@@ -248,27 +248,27 @@ Action_OpenInventory::~Action_OpenInventory()
 {
 }
 
-void Action_OpenInventory::InteractionHandler()
+void Action_OpenInventory::interaction_handler()
 {
-	TAction::InteractionHandler();
-	Application::Instance().MessageQueue.Busy = true;
+	TAction::interaction_handler();
+	Application::instance().m_message_queue.m_busy = true;
 	Parameter_GameObject* p = new Parameter_GameObject();
-	if (Application::Instance().Command_SelectObject(p->object))
+	if (Application::instance().command_select_object(p->m_object))
 	{
 		std::string a = "Выбран ";
-		a.append(p->object->Name);
+		a.append(p->m_object->m_name);
 		a = a + ".";
-		Application::Instance().GUI->DescriptionBox->AddItemControl(new GUI_Text(a));
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
 	}
 	else
 	{
-		Application::Instance().GUI->DescriptionBox->AddItemControl(new GUI_Text("Действие отменено."));
-		Application::Instance().MessageQueue.Busy = false;
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
 	//Game->ActionManager->Add(new GameTask(this, p));
-	Application::Instance().Command_OpenInventory(p->object);
-	Application::Instance().MessageQueue.Busy = false;
+	Application::instance().command_open_inventory(p->m_object);
+	Application::instance().m_message_queue.m_busy = false;
 }
 
 
@@ -282,7 +282,7 @@ void Action_OpenInventory::perfom(TParameter* parameter)
 
 }
 
-char const* Action_OpenInventory::GetDescription(TParameter* parameter)
+char const* Action_OpenInventory::get_description(TParameter* parameter)
 {
 	return "";
 }

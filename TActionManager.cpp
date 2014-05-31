@@ -2,8 +2,8 @@
 
 GameTask::GameTask(TAction* Action = nullptr, TParameter* Parameter = nullptr)
 {
-	this->Action=Action;
-	this->Parameter=Parameter;
+	m_action=Action;
+	m_parameter=Parameter;
 }
 
 TActionManager::TActionManager(void)
@@ -14,23 +14,23 @@ TActionManager::~TActionManager(void)
 {
 }
 
-void TActionManager::Add(GameTask* item)
+void TActionManager::add(GameTask* item)
 {
-	Actions.push_back(item);
-	AddEvent(item);
+	m_items.push_back(item);
+	add_item_event(item);
 }
 
-void TActionManager::Remove()
+void TActionManager::remove()
 {
-	if (!Actions.empty())
+	if (!m_items.empty())
 	{
-		RemoveEvent(Actions.front());
-		Actions.pop_front();
+		remove_item_event(m_items.front());
+		m_items.pop_front();
 	}
 }
 
-void TActionManager::Remove(GameTask* item)
+void TActionManager::remove(GameTask* item)
 {
-	RemoveEvent(item);
-	Actions.remove(item);
+	remove_item_event(item);
+	m_items.remove(item);
 }

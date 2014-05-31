@@ -13,10 +13,9 @@ public:
 	~GUI_TextBox();
 
 	//virtual void Render(GraphicalController* Graph);
-	virtual void AddItemControl(GUI_Object* object);
-
-	virtual void OnMouseWheel(MouseEventArgs const& e);
-	void SetScroll(int dy);
+	virtual void add_item_control(GUI_Object* object);
+	virtual void on_mouse_wheel(MouseEventArgs const& e);
+	void set_scroll(int dy);
 
 };
 

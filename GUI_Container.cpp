@@ -3,25 +3,22 @@
 
 GUI_Container::GUI_Container(int _x, int _y, int _width, int _height)
 {
-	x = _x;
-	y = _y;
-	width = _width;
-	height = _height;
-	Name = "Container";
-	ManagingControls = new GUI_Layer();
-	ManagingControls->x = 0;
-	ManagingControls->y = 0;
-	ManagingControls->width = width;
-	ManagingControls->height = height;
-	ManagingControls->Name = "ManagingLayer";
-	add(ManagingControls);
-	ItemControls = new GUI_Layer();
-	ItemControls->x = 0;
-	ItemControls->y = 0;
-	ItemControls->width = width;
-	ItemControls->height = height;
-	ItemControls->Name = "ItemLayer";
-	add(ItemControls);
+	m_position.x = _x;
+	m_position.y = _y;
+	m_size.x = _width;
+	m_size.y = _height;
+	m_managing_controls = new GUI_Layer();
+	m_managing_controls->m_position.x = 0;
+	m_managing_controls->m_position.y = 0;
+	m_managing_controls->m_size.x = m_size.x;
+	m_managing_controls->m_size.y = m_size.y;
+	add(m_managing_controls);
+	m_item_controls = new GUI_Layer();
+	m_item_controls->m_position.x = 0;
+	m_item_controls->m_position.y = 0;
+	m_item_controls->m_size.x = m_size.x;
+	m_item_controls->m_size.y = m_size.y;
+	add(m_item_controls);
 }
 
 
@@ -29,146 +26,146 @@ GUI_Container::~GUI_Container()
 {
 }
 
-bool GUI_Container::CheckRegion(MouseEventArgs const& e)
+bool GUI_Container::check_region(MouseEventArgs const& e)
 {
-	if (this->x <= e.Position.x&&this->x + width >= e.Position.x&&this->y <= e.Position.y&&this->y + height >= e.Position.y)
+	if (this->m_position.x <= e.position.x&&this->m_position.x + m_size.x >= e.position.x&&this->m_position.y <= e.position.y&&this->m_position.y + m_size.y >= e.position.y)
 	{
 		return true;
 	}
 	return false;
 }
 
-void GUI_Container::OnMouseClick(MouseEventArgs const& e)
+void GUI_Container::on_mouse_click(MouseEventArgs const& e)
 {
 	/*char buf2[32];
 	itoa(SetLocalMousePosition(e).Position.x, buf2, 10);
 	MessageBox(NULL, buf2, "eos", MB_OK);*/
-	GUI_Layer::OnMouseClick(e);
-	if ((focus != this) && (focus == nullptr))
+	GUI_Layer::on_mouse_click(e);
+	if ((m_focus != this) && (m_focus == nullptr))
 	{
-		SetFocus(true);
+		set_focus(true);
 	}
 }
 
-void GUI_Container::OnMouseDown(MouseEventArgs const& e)
+void GUI_Container::on_mouse_down(MouseEventArgs const& e)
 {
-	GUI_Layer::OnMouseDown(e);
-	if ((focus != this) && (focus == nullptr))
+	GUI_Layer::on_mouse_down(e);
+	if ((m_focus != this) && (m_focus == nullptr))
 	{
-		SetFocus(true);
+		set_focus(true);
 	}
 }
 
-void GUI_Container::OnMouseMove(MouseEventArgs const& e)
+void GUI_Container::on_mouse_move(MouseEventArgs const& e)
 {
-	MouseEventArgs LocalMouseEventArgs = SetLocalMousePosition(e);
-	for (std::list<GUI_Object*>::iterator Current = Items.begin(); Current != Items.end(); Current++)
+	MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
+	for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); Current++)
 	{
-		if ((*Current)->CheckRegion(LocalMouseEventArgs))
+		if ((*Current)->check_region(LocalMouseEventArgs))
 		{
-			(*Current)->MouseMove(LocalMouseEventArgs);
+			(*Current)->mouse_move(LocalMouseEventArgs);
 			return;
 		}
 	}
 }
 
-void GUI_Container::RenderAt(GraphicalController* Graph, int px, int py)
+void GUI_Container::render(GraphicalController* Graph, int px, int py)
 {
 	
 	glEnable(GL_SCISSOR_TEST);
-	if (Graph->AddScissor(new GLint[4]{px, py, width, height}))
+	if (Graph->add_scissor(new GLint[4]{px, py, m_size.x, m_size.y}))
 	{
 		
-		Graph->BlurRect(px, py, width, height);
+		Graph->blur_rect(px, py, m_size.x, m_size.y);
 
 		glEnable(GL_BLEND);
 		glDisable(GL_TEXTURE_2D);
 		glColor4d(0.0, 0.0, 0.0, 0.5);
-		Graph->DrawSprite(px, py, px, py + height, px + width, py + height, px + width, py);
+		Graph->draw_sprite(px, py, px, py + m_size.y, px + m_size.x, py + m_size.y, px + m_size.x, py);
 		glEnable(GL_TEXTURE_2D);
 		glColor4d(1.0, 1.0, 1.0, 1.0);
-		for (auto current : Items)
+		for (auto current : m_items)
 		{
-			(current)->RenderAt(Graph, px + current->x + Scroll.x, py + current->y + Scroll.y);
+			(current)->render(Graph, px + current->m_position.x + m_scroll.x, py + current->m_position.y + m_scroll.y);
 		}
-		Graph->RemoveScissor();
+		Graph->remove_scissor();
 		glDisable(GL_BLEND);
 		glDisable(GL_TEXTURE_2D);
 		glBegin(GL_LINES);
 		glColor4f(1.0, 1.0, 1.0, 1.0);
 		glVertex2d(px, py);
-		glVertex2d(px, py + height);
-		glVertex2d(px, py + height);
-		glVertex2d(px + width, py + height);
-		glVertex2d(px + width, py + height);
-		glVertex2d(px + width, py);
-		glVertex2d(px + width, py);
+		glVertex2d(px, py + m_size.y);
+		glVertex2d(px, py + m_size.y);
+		glVertex2d(px + m_size.x, py + m_size.y);
+		glVertex2d(px + m_size.x, py + m_size.y);
+		glVertex2d(px + m_size.x, py);
+		glVertex2d(px + m_size.x, py);
 		glVertex2d(px, py);
 		glEnd();
 	}
 }
 
-void GUI_Container::OnMouseWheel(MouseEventArgs const& e)
+void GUI_Container::on_mouse_wheel(MouseEventArgs const& e)
 {
-	int delta = GET_WHEEL_DELTA_WPARAM(e.Flags);
-	SetScroll(delta / 30);
+	int delta = GET_WHEEL_DELTA_WPARAM(e.flags);
+	set_scroll(delta / 30);
 }
 
-void GUI_Container::SetScroll(int dy)
+void GUI_Container::set_scroll(int dy)
 {
-	if (!Items.empty())
+	if (!m_items.empty())
 	{
 		GUI_Object* Item;
 		if (dy < 0)
 		{
-			Item = Items.back();
-			if (Item->y + Item->height + Scroll.y + dy< height)
+			Item = m_items.back();
+			if (Item->m_position.y + Item->m_size.y + m_scroll.y + dy< m_size.y)
 			{
-				if (Scroll.y != 0)
+				if (m_scroll.y != 0)
 				{
-					Scroll.y = height - (Item->y + Item->height);
+					m_scroll.y = m_size.y - (Item->m_position.y + Item->m_size.y);
 				}
 				return;
 			}
 		}
 		else{
-			Item = Items.front();
-			if (Item->y + Scroll.y + dy > 0)
+			Item = m_items.front();
+			if (Item->m_position.y + m_scroll.y + dy > 0)
 			{
-				Scroll.y = 0;
+				m_scroll.y = 0;
 				return;
 			}
 		}
-		Scroll.y += dy;
+		m_scroll.y += dy;
 	}
 }
 
-void GUI_Container::AddItemControl(GUI_Object* object)
+void GUI_Container::add_item_control(GUI_Object* object)
 {
-	ItemControls->add(object);
+	m_item_controls->add(object);
 }
 
-void GUI_Container::RemoveItemControl(GUI_Object* object)
+void GUI_Container::remove_item_control(GUI_Object* object)
 {
-	ItemControls->remove(object);
+	m_item_controls->remove(object);
 }
 
-void GUI_Container::AddManagingControl(GUI_Object* object)
+void GUI_Container::add_managing_control(GUI_Object* object)
 {
-	ManagingControls->add(object);
+	m_managing_controls->add(object);
 }
 
-MouseEventArgs GUI_Container::SetLocalMousePosition(MouseEventArgs const& source)
+MouseEventArgs GUI_Container::set_local_mouse_position(MouseEventArgs const& source)
 {
-	return MouseEventArgs(Point(source.Position.x - x - Scroll.x, source.Position.y - y - Scroll.y), source.Flags);
+	return MouseEventArgs(GPosition(source.position.x - m_position.x - m_scroll.x, source.position.y - m_position.y - m_scroll.y), source.flags);
 }
 
-void GUI_Container::Resize(int _width, int _height)
+void GUI_Container::resize(int _width, int _height)
 {
-	width = _width;
-	height = _height;
-	ManagingControls->width = width;
-	ManagingControls->height = height;
-	ItemControls->width = width;
-	ItemControls->height = height;
+	m_size.x = _width;
+	m_size.y = _height;
+	m_managing_controls->m_size.x = m_size.x;
+	m_managing_controls->m_size.y = m_size.y;
+	m_item_controls->m_size.x = m_size.x;
+	m_item_controls->m_size.y = m_size.y;
 }
