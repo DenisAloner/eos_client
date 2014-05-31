@@ -72,13 +72,10 @@ public:
 	virtual void RenderAt(GraphicalController* Graph, int px, int py);
 	
 	void Ñalculate();
-	virtual KeyboardEventCallback GetKeyboardEventCallback();
 	virtual void OnKeyPress(WPARAM w);
-	virtual MouseEventCallback GetMouseEventCallback();
 	virtual void OnMouseClick(MouseEventArgs const& e);
 	virtual void OnMouseDown(MouseEventArgs const& e);
 	virtual void OnMouseWheel(MouseEventArgs const& e);
-	virtual void OnMouseScroll(MouseEventArgs const& e);
 	virtual void SetFocus(bool state);
 	virtual void OnItemGetFocus(GUI_Object* sender);
 	virtual void OnUnderCursor(MouseEventArgs const& e);

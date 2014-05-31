@@ -12,6 +12,5 @@ public:
 
 	virtual void Render(GraphicalController* Graph);
 	virtual void OnMouseClick(MouseEventArgs const& e);
-	virtual MouseEventCallback GetMouseEventCallback();
 };
 

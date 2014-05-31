@@ -77,14 +77,6 @@ void Application::OnMouseWheel(MouseEventArgs const& e)
 	GUI->MouseWheel(e);
 }
 
-void Application::OnMouseScroll(MouseEventArgs const& e)
-{
-	/*MapViewer->center.x = MapViewer->Player->Cell->x + e.p.x;
-	MapViewer->center.y = MapViewer->Player->Cell->y + e.p.y;
-	MapViewer->Update();*/
-	GUI->MouseScroll(e);
-}
-
 void Application::OnUnderCursor(MouseEventArgs const& e)
 {
 	GUI->UnderCursor(e);
@@ -321,8 +313,8 @@ void Application::Update(void)
 bool Application::Command_SelectLocation(GameObject* Object, MapCell*& Cell)
 {
 	bool Result = false;
-	GUI->MapViewer->CursorX = Object->Area.x;
-	GUI->MapViewer->CursorY = Object->Area.y;
+	GUI->MapViewer->CursorX = Object->Size.x;
+	GUI->MapViewer->CursorY = Object->Size.y;
 	GUI->DescriptionBox->AddItemControl(new GUI_Text("Выберите клетку."));
 	bool Exit = false;
 	while (Exit == false)
@@ -431,9 +423,9 @@ void Application::Command_SetPickUpItemVisibility(bool _Visibility)
 
 bool Application::Command_CheckPosition(GameObject*& _Object, MapCell*& _Position, GameMap*& _Map)
 {
-	for (int i = 0; i<_Object->Area.y; i++)
+	for (int i = 0; i<_Object->Size.y; i++)
 	{
-		for (int j = 0; j<_Object->Area.x; j++)
+		for (int j = 0; j<_Object->Size.x; j++)
 		{
 			if (_Map->Items[_Position->y + i][_Position->x - j] == nullptr){ return false; }
 			if (_Map->Items[_Position->y + i][_Position->x - j]->FindProperty(PropertyKind_Impassable, _Object) != nullptr)

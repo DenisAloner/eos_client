@@ -43,15 +43,6 @@ void GUI_Layer::OnMouseDown(MouseEventArgs const& e)
 	}
 }
 
-void GUI_Layer::OnMouseScroll(MouseEventArgs const& e)
-{
-	MouseEventArgs LocalMouseEventArgs = SetLocalMousePosition(e);
-	if (focus)
-	{
-		focus->MouseScroll(LocalMouseEventArgs);
-	}
-}
-
 void GUI_Layer::OnMouseMove(MouseEventArgs const& e)
 {
 	MouseEventArgs LocalMouseEventArgs = SetLocalMousePosition(e);
@@ -82,17 +73,6 @@ void GUI_Layer::RenderAt(GraphicalController* Graph, int px, int py)
 	glDisable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);
 }
-
-KeyboardEventCallback GUI_Layer::GetKeyboardEventCallback()
-{
-	return std::bind(&GUI_Layer::OnKeyPress,this,std::placeholders::_1);
-}
-
-MouseEventCallback GUI_Layer::GetMouseEventCallback()
-{
-	return std::bind(&GUI_Layer::OnMouseClick,this,std::placeholders::_1);
-}
-
 
 void GUI_Layer::OnKeyPress(WPARAM w)
 {

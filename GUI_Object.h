@@ -23,7 +23,6 @@ public:
 	~GUI_Object(void);
 
 	Event<MouseEventArgs> MouseClick;
-	Event<MouseEventArgs> MouseScroll;
 	Event<MouseEventArgs> MouseDown;
 	Event<MouseEventArgs> MouseWheel;
 	Event<MouseEventArgs> MouseMove;
@@ -34,13 +33,10 @@ public:
 	Event<GUI_Object*> LoseFocus;
 
 	virtual void RenderAt(GraphicalController* Graph,int px,int py);
-	virtual MouseEventCallback GetMouseEventCallback();
 	virtual void OnMouseClick(MouseEventArgs const& e);
-	virtual void OnMouseScroll(MouseEventArgs const& e);
 	virtual void OnMouseDown(MouseEventArgs const& e);
 	virtual void OnMouseWheel(MouseEventArgs const& e);
 	virtual void OnMouseMove(MouseEventArgs const& e);
-	virtual KeyboardEventCallback GetKeyboardEventCallback();
 	virtual void OnKeyPress(WPARAM w);
 	virtual void SetFocus(bool state);
 	virtual void OnUnderCursor(MouseEventArgs const& e);

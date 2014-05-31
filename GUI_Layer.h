@@ -18,13 +18,10 @@ public:
 	~GUI_Layer(void);
 
 	virtual void RenderAt(GraphicalController* Graph, int px, int py);
-	virtual MouseEventCallback GetMouseEventCallback();
 	virtual void OnMouseClick(MouseEventArgs const& e);
 	virtual void OnMouseDown(MouseEventArgs const& e);
 	virtual void OnMouseWheel(MouseEventArgs const& e);
-	virtual void OnMouseScroll(MouseEventArgs const& e);
 	virtual void OnMouseMove(MouseEventArgs const& e);
-	virtual KeyboardEventCallback GetKeyboardEventCallback();
 	virtual void OnKeyPress(WPARAM w);
 	virtual void SetFocus(bool state);
 

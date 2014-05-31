@@ -32,9 +32,9 @@ GameObjectProperty* MapCell::FindProperty(PropertyKind kind,GameObject* excluded
 void GameMap::AddObject(GameObject* Object0,MapCell* Cell0)
 {
 	Object0->Cell=Cell0;
-	for(int i=0;i<Object0->Area.y;i++)
+	for(int i=0;i<Object0->Size.y;i++)
 	{
-		for(int j=0;j<Object0->Area.x;j++)
+		for(int j=0;j<Object0->Size.x;j++)
 		{
 			Items[Cell0->y+i][Cell0->x-j]->AddObject(Object0);
 		}
@@ -79,9 +79,9 @@ void GameMap::GenerateRoom(void)
 
 void GameMap::MoveObject(GameObject* Obj,MapCell* Pos)
 {
-	for(int i=0;i<Obj->Area.y;i++)
+	for(int i=0;i<Obj->Size.y;i++)
 	{
-		for(int j=0;j<Obj->Area.x;j++)
+		for(int j=0;j<Obj->Size.x;j++)
 		{
 			Items[Obj->Cell->y+i][Obj->Cell->x-j]->Objects.remove(Obj);
 		}

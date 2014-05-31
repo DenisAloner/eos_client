@@ -105,7 +105,6 @@ public:
 	void Initialization(HWND _hWnd);
 	void OnKeyPress(WPARAM w);
 	void OnMouseClick(MouseEventArgs const& e);
-	void OnMouseScroll(MouseEventArgs const& e);
 	void OnMouseDown(MouseEventArgs const& e);
 	void OnMouseWheel(MouseEventArgs const& e);
 	void OnMouseMove(MouseEventArgs const& e);

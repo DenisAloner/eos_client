@@ -17,10 +17,11 @@ struct TLight
 	float RGB[3];
 };
 
-struct TArea
+struct GameObjectSize
 {
 	int x;
 	int y;
+	int z;
 };
 
 class MapCell;
@@ -34,9 +35,7 @@ class GameObject: public GameEntity
 {
 public:
 
-	int Width;
-	int Height;
-	TArea Area;
+	GameObjectSize Size;
 	TLight* Light;
 	std::string Name;
 

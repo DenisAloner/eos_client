@@ -11,7 +11,6 @@ public:
 
 	virtual void Render(GraphicalController* Graph);
 
-	virtual KeyboardEventCallback GetKeyboardEventCallback();
 	virtual void OnKeyPress(WPARAM w);
 	virtual void OnMouseClick(MouseEventArgs const& e);
 };

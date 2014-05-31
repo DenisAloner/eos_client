@@ -103,14 +103,14 @@ void GUI_MapViewer::RenderAt(GraphicalController* Graph, int px, int py)
 							IsDraw=false;
 							if((*Current)->Cell->x==Items[y][x]->MapElement->x&&(*Current)->Cell->y==Items[y][x]->MapElement->y)
 							{
-								x0=(px+x+1-(*Current)->Width)*TileSizeX;
-								y0 = (TileCountY -py-y - (*Current)->Height)*TileSizeY;
-								x1 = (px+x + 1 - (*Current)->Width)*TileSizeX;
+								x0 = (px + x + 1 - (*Current)->Size.x)*TileSizeX;
+								y0 = (TileCountY - py - y - (*Current)->Size.z)*TileSizeY;
+								x1 = (px + x + 1 - (*Current)->Size.x)*TileSizeX;
 								y1 = (TileCountY - py-y)*TileSizeY;
 								x2 = (px +x+ 1)*TileSizeX;
 								y2 = (TileCountY - py-y)*TileSizeY;
 								x3 = (px+x + 1)*TileSizeX;
-								y3 = (TileCountY - py -y- (*Current)->Height)*TileSizeY;
+								y3 = (TileCountY - py - y - (*Current)->Size.z)*TileSizeY;
 								LightPos[0]=Items[y][x]->MapElement->x;
 								LightPos[1]=Items[y][x]->MapElement->y;
 								LightPos[2]=0;
@@ -166,8 +166,7 @@ void GUI_MapViewer::RenderAt(GraphicalController* Graph, int px, int py)
 								}
 								if ((*Current)->selected)
 								{
-
-									glColor4d(0.0,abs( (app->m_timer->tick-3.5)/3.5), 0.0, 1.0);
+									glColor4d(0.0, abs((app->m_timer->tick - 3.5) / 3.5), 0.0, 1.0);
 									glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 									glUseProgramObjectARB(0);
 									glActiveTextureARB(GL_TEXTURE0_ARB);
@@ -225,11 +224,6 @@ void GUI_MapViewer::RenderAt(GraphicalController* Graph, int px, int py)
 			glDisable(GL_TEXTURE_2D);
 }
 
-KeyboardEventCallback GUI_MapViewer::GetKeyboardEventCallback()
-{
-	return std::bind(&GUI_MapViewer::OnKeyPress,this,std::placeholders::_1);
-}
-
 void GUI_MapViewer::OnKeyPress(WPARAM w)
 {
 	Parameter_Position* P;
@@ -282,11 +276,6 @@ void GUI_MapViewer::OnKeyPress(WPARAM w)
 		}
 		return;
 		}
-}
-
-MouseEventCallback GUI_MapViewer::GetMouseEventCallback()
-{
-	return std::bind(&GUI_MapViewer::OnMouseClick,this,std::placeholders::_1);
 }
 
 void GUI_MapViewer::OnMouseClick(MouseEventArgs const& e)
@@ -344,23 +333,6 @@ void GUI_MapViewer :: OnMouseDown(MouseEventArgs const& e)
 			Items[p.y][p.x]->MouseDown(e);
 		}
 
-	}
-}
-
-void GUI_MapViewer::OnMouseScroll(MouseEventArgs const& e)
-{
-	if (e.Flags &MK_LBUTTON)
-	{
-		int dx=0;
-		int dy=0;
-		int limit = 1;
-		if (e.Position.x > 2*width / 3){ dx = limit; }
-		if (e.Position.x < width / 3){ dx = -limit; }
-		//if (e.p.x - width/ 2>width/4){ dx = 4*limit; }
-		if (e.Position.y > 2 * height / 3){ dy = -limit; }
-		if (e.Position.y < height / 3){ dy = limit; }
-		center.x = center.x + dx;
-		center.y = center.y + dy;
 	}
 }
 

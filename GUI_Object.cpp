@@ -10,7 +10,6 @@ GUI_Object::GUI_Object(void)
 	GetFocus+=std::bind(&GUI_Object::OnGetFocus,this,std::placeholders::_1);
 	LoseFocus+=std::bind(&GUI_Object::OnLoseFocus,this,std::placeholders::_1);
 	MouseDown += std::bind(&GUI_Object::OnMouseDown, this, std::placeholders::_1);
-	MouseScroll += std::bind(&GUI_Object::OnMouseScroll, this, std::placeholders::_1);
 	MouseWheel += std::bind(&GUI_Object::OnMouseWheel, this, std::placeholders::_1);
 	MouseMove += std::bind(&GUI_Object::OnMouseMove, this, std::placeholders::_1);
 }
@@ -24,10 +23,6 @@ void GUI_Object::RenderAt(GraphicalController* Graph, int px, int py)
 {
 }
 
-MouseEventCallback GUI_Object::GetMouseEventCallback()
-{
-	return std::bind(&GUI_Object::OnMouseClick,this,std::placeholders::_1);
-}
 
 void GUI_Object::OnMouseClick(MouseEventArgs const& e)
 {
@@ -39,21 +34,12 @@ void GUI_Object::OnMouseDown(MouseEventArgs const& e)
 	SetFocus(true);
 }
 
-void GUI_Object::OnMouseScroll(MouseEventArgs const& e)
-{
-}
-
 void GUI_Object::OnMouseWheel(MouseEventArgs const& e)
 {
 }
 
 void GUI_Object::OnMouseMove(MouseEventArgs const& e)
 {
-}
-
-KeyboardEventCallback GUI_Object::GetKeyboardEventCallback()
-{
-	return std::bind(&GUI_Object::OnKeyPress,this,std::placeholders::_1);
 }
 
 void GUI_Object::OnKeyPress(WPARAM w)

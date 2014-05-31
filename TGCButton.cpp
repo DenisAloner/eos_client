@@ -86,8 +86,3 @@ void TGCButton::Render(GraphicalController* Graph)
 	glUseProgramObjectARB(0);
 }
 
-MouseEventCallback TGCButton::GetMouseEventCallback()
-{
-	return std::bind(&TGCButton::OnMouseClick,this,std::placeholders::_1);
-}
-

@@ -135,9 +135,9 @@ bool ActionClass_Push::check(TParameter* parameter)
 {
 	Parameter_MoveObjectByUnit* p = static_cast<Parameter_MoveObjectByUnit*>(parameter);
 	GameObjectProperty* result(nullptr);
-	for (int i = 0; i<p->object->Area.y; i++)
+	for (int i = 0; i<p->object->Size.y; i++)
 	{
-		for (int j = 0; j<p->object->Area.x; j++)
+		for (int j = 0; j<p->object->Size.x; j++)
 		{
 			if (p->map->Items[p->place->y + i][p->place->x - j] == nullptr){ return false; }
 			if (p->map->Items[p->place->y + i][p->place->x - j]->FindProperty(PropertyKind_Impassable, p->object) != nullptr)

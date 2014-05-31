@@ -10,11 +10,6 @@ TGCTextBox::~TGCTextBox(void)
 {
 }
 
-KeyboardEventCallback TGCTextBox::GetKeyboardEventCallback()
-{
-	return TGCTextBox::KeyPress;
-}
-
 void TGCTextBox::OnKeyPress(WPARAM w)
 {
   /*  char buf2[32];
