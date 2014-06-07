@@ -18,7 +18,7 @@ public:
 	
 	virtual void add(std::string Text, GameObject* Object);
 	virtual void on_lose_focus(GUI_Object* sender);
-	virtual void on_under_cursor(MouseEventArgs const& e);
+	virtual void on_mouse_move(MouseEventArgs const& e);
 };
 
 class GUI_PopMenuItem :
@@ -35,7 +35,7 @@ public:
 	~GUI_PopMenuItem(void);
 
 	virtual void on_mouse_click(MouseEventArgs const& e);
-	virtual void on_under_cursor(MouseEventArgs const& e);
+	virtual void on_mouse_move(MouseEventArgs const& e);
 	virtual void on_get_focus(GUI_Object* sender);
 	virtual void on_lose_focus(GUI_Object* sender);
 	virtual void render(GraphicalController* Graph, int px, int py);

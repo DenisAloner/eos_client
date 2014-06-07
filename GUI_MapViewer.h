@@ -75,7 +75,6 @@ public:
 	virtual void on_move(MouseEventArgs const& e);
 	virtual void on_end_moving(MouseEventArgs const& e);
 	virtual void on_item_get_focus(GUI_Object* sender);
-	virtual void on_under_cursor(MouseEventArgs const& e);
 	virtual void on_lose_focus(GUI_Object* sender);
 	position_t local_xy(position_t p);
 	virtual void set_focus(bool state);

@@ -98,7 +98,6 @@ public:
 	//}
 	//}
 	
-
 	void add_object(GameObject* Object0, MapCell* Cell0);
 	void generate_room(void);
 	void divide_block(GameMapBlock* Block, int Depth, int Current);
@@ -106,6 +105,7 @@ public:
 	void move_object(GameObject* Obj,MapCell* Pos);
 	void add_light(GameObject* Object);
 	void add_new_object(GameObject* Object, MapCell* Element);
+	void fill(GameMapBlock* Block);
 
 };
 

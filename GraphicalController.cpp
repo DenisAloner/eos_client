@@ -24,6 +24,16 @@ GraphicalController::GraphicalController()
 	m_sprites[20] = load_texture("C:\\ExplorersOfSaarum\\Screen.bmp");
 	m_sprites[21] = load_texture("C:\\ExplorersOfSaarum\\EoS_Cursor.bmp");
 
+	m_sprites[22] = load_texture("C:\\ExplorersOfSaarum\\Tiles\\EoS_Wall_01.bmp");
+	m_sprites[23] = load_texture("C:\\ExplorersOfSaarum\\Tiles\\EoS_Wall_02.bmp");
+	m_sprites[24] = load_texture("C:\\ExplorersOfSaarum\\Tiles\\EoS_Wall_03.bmp");
+	m_sprites[25] = load_texture("C:\\ExplorersOfSaarum\\Tiles\\EoS_Wall_04.bmp");
+	m_sprites[26] = load_texture("C:\\ExplorersOfSaarum\\Tiles\\EoS_Wall_05.bmp");
+	m_sprites[27] = load_texture("C:\\ExplorersOfSaarum\\Tiles\\EoS_Floor_01.bmp");
+	m_sprites[28] = load_texture("C:\\ExplorersOfSaarum\\Tiles\\EoS_Floor_02.bmp");
+	m_sprites[29] = load_texture("C:\\ExplorersOfSaarum\\Tiles\\EoS_Floor_03.bmp");
+	m_sprites[30] = load_texture("C:\\ExplorersOfSaarum\\Tiles\\EoS_Floor_04.bmp");
+
 	m_actions[ActionKind_Move] = load_texture("C:\\ExplorersOfSaarum\\Action_0.bmp");
 	m_actions[ActionKind_Push] = load_texture("C:\\ExplorersOfSaarum\\Action_1.bmp");
 	m_actions[ActionKind_Turn] = load_texture("C:\\ExplorersOfSaarum\\Action_2.bmp");

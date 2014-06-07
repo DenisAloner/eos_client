@@ -9,7 +9,6 @@ GUI_Object::GUI_Object(void)
 	mouse_down += std::bind(&GUI_Object::on_mouse_down, this, std::placeholders::_1);
 	mouse_wheel += std::bind(&GUI_Object::on_mouse_wheel, this, std::placeholders::_1);
 	mouse_move += std::bind(&GUI_Object::on_mouse_move, this, std::placeholders::_1);
-	under_cursor+=std::bind(&GUI_Object::on_under_cursor,this,std::placeholders::_1);
 	get_focus+=std::bind(&GUI_Object::on_get_focus,this,std::placeholders::_1);
 	lose_focus+=std::bind(&GUI_Object::on_lose_focus,this,std::placeholders::_1);
 }
@@ -55,10 +54,6 @@ void  GUI_Object::set_focus(bool state)
 	} else {
 		lose_focus(this);
 	}
-}
-
-void GUI_Object::on_under_cursor(MouseEventArgs const& e)
-{
 }
 
 bool GUI_Object::check_region(MouseEventArgs const& e)

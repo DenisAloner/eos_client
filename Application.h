@@ -85,7 +85,6 @@ public:
 
 	Event<WPARAM> key_press;
 	Event<MouseEventArgs> mouse_click;
-	Event<MouseEventArgs> under_cursor;
 
 	Mix_Chunk *music;
 
@@ -103,7 +102,6 @@ public:
 	void on_mouse_down(MouseEventArgs const& e);
 	void on_mouse_wheel(MouseEventArgs const& e);
 	void on_mouse_move(MouseEventArgs const& e);
-	void on_under_cursor(MouseEventArgs const& e);
 	void render();
 	void update(void);
 

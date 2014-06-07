@@ -102,16 +102,6 @@ void GUI_Layer::set_focus(bool state)
 	}
 }
 
-
-void GUI_Layer::on_under_cursor(MouseEventArgs const& e)
-{
-	MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
-	if(m_focus!=nullptr)
-	{
-		m_focus->under_cursor(LocalMouseEventArgs);
-	}
-}
-
 void GUI_Layer::add(GUI_Object* object)
 {
 	m_items.push_back(object);

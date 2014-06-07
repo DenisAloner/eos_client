@@ -75,11 +75,6 @@ void Application::on_mouse_wheel(MouseEventArgs const& e)
 	m_GUI->mouse_wheel(e);
 }
 
-void Application::on_under_cursor(MouseEventArgs const& e)
-{
-	m_GUI->under_cursor(e);
-}
-
 void Application::render()
 {
 	m_update_mutex.lock();
@@ -120,7 +115,6 @@ void Application::initialization(HWND _hWnd)
 	m_mouse->mouse_down += std::bind(&Application::on_mouse_down, this, std::placeholders::_1);
 	m_mouse->mouse_wheel += std::bind(&Application::on_mouse_wheel, this, std::placeholders::_1);
 	m_mouse->mouse_move += std::bind(&Application::on_mouse_move, this, std::placeholders::_1);
-	under_cursor += std::bind(&Application::on_under_cursor, this, std::placeholders::_1);
 	m_action_manager = new TActionManager();
 
 	m_actions[0]=new ActionClass_Move();
@@ -134,9 +128,19 @@ void Application::initialization(HWND _hWnd)
 	m_GUI->MapViewer->m_size.w = 1024;
 	m_GUI->MapViewer->m_size.h = 1024;
 	m_GUI->MapViewer->m_map = new GameMap();
-	m_GUI->MapViewer->m_map->generate_room();
+	m_GUI->MapViewer->m_map->generate_level();
 	m_GUI->MapViewer->m_player = new TPlayer();
-	m_GUI->MapViewer->m_map->add_object(m_GUI->MapViewer->m_player, m_GUI->MapViewer->m_map->m_items[9][9]);
+	if (m_GUI->MapViewer->m_map->m_items[9][9] == nullptr)
+	{
+		m_GUI->MapViewer->m_map->m_items[9][9] = new MapCell(9, 9);
+		m_GUI->MapViewer->m_map->add_object(new TFloor(), m_GUI->MapViewer->m_map->m_items[9][9]);
+	}
+	if (m_GUI->MapViewer->m_map->m_items[9][8] == nullptr)
+	{
+		m_GUI->MapViewer->m_map->m_items[9][8] = new MapCell(8, 9);
+		m_GUI->MapViewer->m_map->add_object(new TFloor(), m_GUI->MapViewer->m_map->m_items[9][8]);
+	}
+	m_GUI->MapViewer->m_map->add_new_object(m_GUI->MapViewer->m_player, m_GUI->MapViewer->m_map->m_items[9][9]);
 
 	
 	//TGCButton* Button;
@@ -198,29 +202,6 @@ void Application::initialization(HWND _hWnd)
 	m_GUI->add(m_GUI->MapViewer);
 	m_GUI->MapViewer->m_GUI = MenuLayer;
 
-	TTorch* Torch1;
-	Torch1 = new TTorch();
-	/*Torch1->Light->RGB[0] = 1.0;
-	Torch1->Light->RGB[1] = 0.0;
-	Torch1->Light->RGB[2] = 0.0;*/
-	m_GUI->MapViewer->m_map->add_new_object(Torch1, m_GUI->MapViewer->m_map->m_items[1][1]);
-	Torch1 = new TTorch();
-	/*Torch1->Light->RGB[0] = 0.0;
-	Torch1->Light->RGB[1] = 1.0;
-	Torch1->Light->RGB[2] = 0.0;*/
-	m_GUI->MapViewer->m_map->add_new_object(Torch1, m_GUI->MapViewer->m_map->m_items[58][38]);
-	Torch1 = new TTorch();
-	/*Torch1->Light->RGB[0] = 0.0;
-	Torch1->Light->RGB[1] = 0.0;
-	Torch1->Light->RGB[2] = 1.0;*/
-	m_GUI->MapViewer->m_map->add_new_object(Torch1, m_GUI->MapViewer->m_map->m_items[58][1]);
-	m_GUI->MapViewer->m_map->add_new_object(new TTorch(), m_GUI->MapViewer->m_map->m_items[1][38]);
-	m_GUI->MapViewer->m_map->add_new_object(new TTorch(), m_GUI->MapViewer->m_map->m_items[29][1]);
-	m_GUI->MapViewer->m_map->add_new_object(new TTorch(), m_GUI->MapViewer->m_map->m_items[1][19]);
-	m_GUI->MapViewer->m_map->add_new_object(new TTorch(), m_GUI->MapViewer->m_map->m_items[29][38]);
-	m_GUI->MapViewer->m_map->add_new_object(new TTorch(), m_GUI->MapViewer->m_map->m_items[58][19]);
-	m_GUI->MapViewer->m_map->add_object(new Elf(), m_GUI->MapViewer->m_map->m_items[14][14]);
-	m_GUI->MapViewer->m_map->add_object(new TBox(), m_GUI->MapViewer->m_map->m_items[30][10]);
 	m_graph->set_VSync(false);
 	//if (SDL_Init(SDL_INIT_AUDIO) < 0)
 	//{

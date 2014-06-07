@@ -92,12 +92,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 			//Player1->Sprite=2+FrameNum;
 			//Map.MoveObject(Player1,Player1->x+1,Player1->y+1);
 			Application::instance().m_GUI->MapViewer->update();
-			{
-				Application::instance().under_cursor(MouseEventArgs(Application::instance().m_mouse->m_position, 0));
-			}
 			Application::instance().render();
 			SwapBuffers( hDC );
-
 			//MessageBox(NULL,"1","1",MB_OK);
 		}
 		

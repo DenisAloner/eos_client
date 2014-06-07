@@ -24,9 +24,6 @@ public:
 	virtual void on_mouse_move(MouseEventArgs const& e);
 	virtual void on_key_press(WPARAM w);
 	virtual void set_focus(bool state);
-
-	virtual void on_under_cursor(MouseEventArgs const& e);
-
 	virtual void add(GUI_Object* object);
 	virtual void add_front(GUI_Object* object);
 	virtual void remove(GUI_Object* object);

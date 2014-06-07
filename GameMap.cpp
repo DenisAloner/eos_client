@@ -32,6 +32,13 @@ GameObjectProperty* MapCell::find_property(PropertyKind kind,GameObject* exclude
 GameMap::GameMap()
 {
 	m_size = dimension_t(MapWidth, MapHeight);
+	for (int i = 0; i < m_size.h; i++)
+	{
+		for (int j = 0; j < m_size.w; j++)
+		{
+			m_items[i][j] = nullptr;
+		}
+	}
 }
 
 void GameMap::add_object(GameObject* Object0,MapCell* Cell0)
@@ -116,8 +123,8 @@ void GameMap::generate_level(void)
 	Block->coor[3] = MapHeight - 1;
 	Block->Left = nullptr;
 	Block->Right = nullptr;
-	divide_block(Block, 100, 0);
-	//Fill(Block);
+	divide_block(Block, 5, 0);
+	fill(Block);
 }
 
 void GameMap::divide_block(GameMapBlock* Block, int Depth, int Current)
@@ -181,5 +188,56 @@ void GameMap::divide_block(GameMapBlock* Block, int Depth, int Current)
 			divide_block(Block->Left, Depth, Current + 1);
 			divide_block(Block->Right, Depth, Current + 1);
 		}
+	}
+}
+
+void GameMap::fill(GameMapBlock* Block)
+{
+	if (Block->Left == nullptr&&Block->Right == nullptr)
+	{
+		int Choise(rand() % 100);
+		if (Choise < 50)
+		{
+			for (int i = Block->coor[1]; i < Block->coor[3] + 1; i++)
+			{
+				for (int j = Block->coor[0]; j < Block->coor[2] + 1; j++)
+				{
+					if ((i == Block->coor[1]) || (j == Block->coor[0]) || (i == Block->coor[3]) || (j == Block->coor[2]))
+					{
+						m_items[i][j] = new MapCell(j, i);
+						TWall* w = new TWall();
+						int Choise(rand() % 100);
+						w->m_sprites[ObjectDirection_Left][0] = 22 + Choise / 20;
+						w->m_sprites[ObjectDirection_Left][1] = 22 + Choise / 20;
+						w->m_sprites[ObjectDirection_Left][2] = 22 + Choise / 20;
+						w->m_sprites[ObjectDirection_Left][3] = 22 + Choise / 20;
+						add_object(w, m_items[i][j]);
+					}
+					else {
+						m_items[i][j] = new MapCell(j, i);
+						TFloor* w = new TFloor();
+						int Choise(rand() % 100);
+						w->m_sprites[ObjectDirection_Left][0] = 27 + Choise / 25;
+						w->m_sprites[ObjectDirection_Left][1] = 27 + Choise / 25;
+						w->m_sprites[ObjectDirection_Left][2] = 27 + Choise / 25;
+						w->m_sprites[ObjectDirection_Left][3] = 27 + Choise / 25;
+						add_object(w, m_items[i][j]);
+					}
+				}
+			}
+		}
+		else {
+			for (int i = Block->coor[1]; i < Block->coor[3] + 1; i++)
+			{
+				for (int j = Block->coor[0]; j < Block->coor[2] + 1; j++)
+				{
+					//m_items[i][j]=nullptr;
+				}
+			}
+		}
+	}
+	else {
+		fill(Block->Left);
+		fill(Block->Right);
 	}
 }

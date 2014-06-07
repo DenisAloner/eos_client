@@ -23,7 +23,6 @@ public:
 	Event<MouseEventArgs> mouse_wheel;
 	Event<MouseEventArgs> mouse_move;
 	Event<WPARAM> key_press;
-	Event<MouseEventArgs> under_cursor;
 	Event<GUI_Object*> destroy;
 	Event<GUI_Object*> get_focus;
 	Event<GUI_Object*> lose_focus;
@@ -34,7 +33,6 @@ public:
 	virtual void on_mouse_wheel(MouseEventArgs const& e);
 	virtual void on_mouse_move(MouseEventArgs const& e);
 	virtual void on_key_press(WPARAM w);
-	virtual void on_under_cursor(MouseEventArgs const& e);
 	virtual void on_get_focus(GUI_Object* sender);
 	virtual void on_lose_focus(GUI_Object* sender);
 	virtual bool check_region(MouseEventArgs const& e);

@@ -19,9 +19,8 @@ struct TPoint
 class GraphicalController
 {
 public:
-	/* origin is the upper left corner */
 
-	GLuint m_sprites[22];
+	GLuint m_sprites[31];
 	GLuint m_actions[4];
 
 	GLhandleARB m_render_shader;

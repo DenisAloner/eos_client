@@ -53,13 +53,13 @@ void GUI_PopMenu::on_lose_focus(GUI_Object* sender)
 	destroy(this);
 }
 
-void GUI_PopMenu::on_under_cursor(MouseEventArgs const& e)
+void GUI_PopMenu::on_mouse_move(MouseEventArgs const& e)
 {
 	for (std::list<GUI_Object*>::iterator Current = m_item_controls->m_items.begin(); Current != m_item_controls->m_items.end(); Current++)
 	{
 		if ((*Current)->check_region(MouseEventArgs(position_t(e.position.x - m_position.x, e.position.y - m_position.y), e.flags)))
 		{
-			(*Current)->under_cursor(MouseEventArgs(position_t(e.position.x - m_position.x, e.position.y - m_position.y), e.flags));
+			(*Current)->mouse_move(MouseEventArgs(position_t(e.position.x - m_position.x, e.position.y - m_position.y), e.flags));
 			return;
 		}
 	}
@@ -116,7 +116,7 @@ void GUI_PopMenuItem::render(GraphicalController* Graph, int px, int py)
 	Graph->output_text(px, py, m_text, 8, 17);
 }
 
-void GUI_PopMenuItem::on_under_cursor(MouseEventArgs const& e)
+void GUI_PopMenuItem::on_mouse_move(MouseEventArgs const& e)
 {
 	set_focus(true);
 }

@@ -58,7 +58,11 @@ TPlayer::TPlayer()
 	m_size.x = 2;
 	m_size.y = 1;
 	m_size.z = 6;
-	m_light = nullptr;
+	m_light = new TLight;
+	m_light->Power = 10;
+	m_light->RGB[0] = 1;
+	m_light->RGB[1] = 1;
+	m_light->RGB[2] = 1;
 	m_actions.push_back(Application::instance().m_actions[ActionKind_Move]);
 	m_properties.push_back(new GameObjectProperty(PropertyKind_Impassable));
 	m_properties.push_back(new Property_Container(2, 4, "Мешок"));
@@ -101,10 +105,10 @@ Elf::Elf()
 TFloor::TFloor()
 {
 	m_cell = nullptr;
-	m_sprites[ObjectDirection_Left][0] = 0;
-	m_sprites[ObjectDirection_Left][1] = 0;
-	m_sprites[ObjectDirection_Left][2] = 0;
-	m_sprites[ObjectDirection_Left][3] = 0;
+	m_sprites[ObjectDirection_Left][0] = 27;
+	m_sprites[ObjectDirection_Left][1] = 27;
+	m_sprites[ObjectDirection_Left][2] = 27;
+	m_sprites[ObjectDirection_Left][3] = 27;
 	m_light = nullptr;
 	m_size.x = 1;
 	m_size.y = 1;
@@ -135,10 +139,10 @@ TBox::TBox()
 TWall::TWall()
 {
 	m_cell = nullptr;
-	m_sprites[ObjectDirection_Left][0] = 1;
-	m_sprites[ObjectDirection_Left][1] = 1;
-	m_sprites[ObjectDirection_Left][2] = 1;
-	m_sprites[ObjectDirection_Left][3] = 1;
+	m_sprites[ObjectDirection_Left][0] = 22;
+	m_sprites[ObjectDirection_Left][1] = 22;
+	m_sprites[ObjectDirection_Left][2] = 22;
+	m_sprites[ObjectDirection_Left][3] = 22;
 	m_light = nullptr;
 	m_size.x = 1;
 	m_size.y = 1;

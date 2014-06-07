@@ -395,15 +395,6 @@ void GUI_MapViewer::on_item_get_focus(GUI_Object* sender)
 	}
 }
 
-void GUI_MapViewer::on_under_cursor(MouseEventArgs const& e)
-{
-	position_t p =local_xy(position_t(e.position.x,e.position.y));
-	if (m_items[p.y][p.x] != nullptr)
-	{
-		m_cursored = m_items[p.y][p.x];
-	}
-}
-
 void GUI_MapViewer::on_lose_focus(GUI_Object* sender)
 {
 	m_cursored = nullptr;
@@ -420,6 +411,11 @@ position_t GUI_MapViewer::local_xy(position_t p)
 }
 void GUI_MapViewer::on_mouse_move(MouseEventArgs const& e)
 {
+	position_t p = local_xy(position_t(e.position.x, e.position.y));
+	if (m_items[p.y][p.x] != nullptr)
+	{
+		m_cursored = m_items[p.y][p.x];
+	}
 	if (e.flags&MK_LBUTTON)
 	{
 		if (!m_is_moving)
