@@ -68,8 +68,8 @@ class Application
 {
 public:
 
-	int m_game_turn = 1;
-	bool m_ready = false;
+	int m_game_turn;
+	bool m_ready;
 
 	Timer* m_timer;
 	MouseController* m_mouse;
@@ -87,7 +87,7 @@ public:
 	Event<MouseEventArgs> mouse_click;
 	Event<MouseEventArgs> under_cursor;
 
-	Mix_Chunk *music = NULL;
+	Mix_Chunk *music;
 
 	~Application(void);
 

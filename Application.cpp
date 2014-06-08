@@ -6,7 +6,6 @@ void my_audio_callback(void *userdata, Uint8 *stream, int len);
 static Uint8 *audio_pos; // global pointer to the audio buffer to be played
 static Uint32 audio_len; // remaining length of the sample we have to play
 
-
 gui_MessageQueue::gui_MessageQueue()
 {
 	m_reader = false;
@@ -36,7 +35,6 @@ void gui_MessageQueue::push(TParameter* p)
 Application::Application()
 {
 }
-
 
 Application::~Application(void)
 {
@@ -105,6 +103,8 @@ void Application::render()
 
 void Application::initialization(HWND _hWnd)
 {
+	music = NULL;
+	m_game_turn = 1;
 	m_ready = false;
 	m_graph = new GraphicalController();
 	m_mouse = new MouseController_Windows(_hWnd);

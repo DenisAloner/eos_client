@@ -48,8 +48,8 @@ public:
 	GUI_MapViewer(Application* app);
 	~GUI_MapViewer(void);
 
-	int m_tile_count_x = 32;
-	int m_tile_count_y = 64;
+	int m_tile_count_x;
+	int m_tile_count_y;
 
 	double m_tile_size_x;
 	double m_tile_size_y;

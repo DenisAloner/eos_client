@@ -12,6 +12,8 @@ GCMapElement::~GCMapElement(void)
 
 GUI_MapViewer::GUI_MapViewer(Application* app = nullptr)
 {
+	m_tile_count_x = 32;
+	m_tile_count_y = 64;
 	m_just_focused = false;
 	m_is_moving = false;
 	m_focus=nullptr;
@@ -348,6 +350,12 @@ void GUI_MapViewer::on_mouse_wheel(MouseEventArgs const& e)
 		m_tile_count_y -= 4;
 		if (m_tile_count_x < 16){ m_tile_count_x = 16; }
 		if (m_tile_count_y < 32){ m_tile_count_y = 32; }
+	}
+	calculate();
+	GPosition p = local_xy(GPosition(e.position.x, e.position.y));
+	if (m_items[p.y][p.x] != nullptr)
+	{
+		m_cursored = m_items[p.y][p.x];
 	}
 }
 
