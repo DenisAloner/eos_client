@@ -25,10 +25,10 @@ class GUI_TextFormat
 {
 public:
 
-	GUI_TextFormat(int _SizeX, int _SizeY, TColor _Color) : m_symbol_size(GSize(_SizeX,_SizeY)), m_color(_Color) {};
+	GUI_TextFormat(int _SizeX, int _SizeY, TColor _Color) : m_symbol_size(dimension_t(_SizeX,_SizeY)), m_color(_Color) {};
 	~GUI_TextFormat();
 	TColor m_color;
-	GSize m_symbol_size;
+	dimension_t m_symbol_size;
 
 };
 

@@ -31,7 +31,7 @@ GameObjectProperty* MapCell::find_property(PropertyKind kind,GameObject* exclude
 
 GameMap::GameMap()
 {
-	m_size = GSize(MapWidth, MapHeight);
+	m_size = dimension_t(MapWidth, MapHeight);
 }
 
 void GameMap::add_object(GameObject* Object0,MapCell* Cell0)
@@ -48,11 +48,11 @@ void GameMap::add_object(GameObject* Object0,MapCell* Cell0)
 
 void GameMap::generate_room(void)
 {
-	for(int i=0;i<m_size.y;i++)
+	for(int i=0;i<m_size.h;i++)
 	{
-		for(int j=0;j<m_size.x;j++)
+		for(int j=0;j<m_size.w;j++)
 		{
-			if ((i==0)||(j==0)||(i==m_size.y-1)||(j==m_size.x-1))
+			if ((i==0)||(j==0)||(i==m_size.h-1)||(j==m_size.w-1))
 			{
 				m_items[i][j]=new MapCell(j,i);
 				TWall* w = new TWall();

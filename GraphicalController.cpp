@@ -35,37 +35,11 @@ GraphicalController::GraphicalController()
 	m_vertical_shader = load_shader("C:\\ExplorersOfSaarum\\EoS_Render.vsh", "C:\\ExplorersOfSaarum\\EoS_VerticalBlur.fsh");
 	m_font = load_texture("C:\\ExplorersOfSaarum\\FontRender4.bmp");
 
-	bool error = FT_Init_FreeType(&library);
-	if (error)
-	{
-		MessageBox(NULL, "Font", "Error", MB_OK);
-	}
-	error = FT_New_Face(library, "C:\\ExplorersOfSaarum\\arial.ttf", 0, &face);
-	if (error == FT_Err_Unknown_File_Format)
-	{
-		MessageBox(NULL, "The font file could be opened and read", "Error", MB_OK);
-	}
-	else if (error)
-	{
-		MessageBox(NULL, "The font file broken", "Error", MB_OK);
-	}
-	error = FT_Set_Char_Size(face,0 ,32 * 64, 300, 300);
-	if (error)
-	{
-		MessageBox(NULL, "Font", "Error", MB_OK);
-	}
-	slot = face->glyph;
-	error = FT_Load_Char(face, 1070, FT_LOAD_RENDER);
-	if (error)
-	{
-		MessageBox(NULL, "Font", "Error", MB_OK);
-	}
-	m_sprites[17] = bind_texture(&slot->bitmap);
-	m_scissors.push_front(new GLint[4]{0, 0, 1024, 1024});
+	m_scissors.push_front(frectangle_t(0.0f, 0.0f, 1024.0f, 1024.0f));
 	glGenFramebuffersEXT(1, &m_FBO);
 }
 
-void GraphicalController::draw_sprite(double x0,double y0,double x1,double y1,double x2,double y2,double x3,double y3)
+void GraphicalController::draw_sprite(double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3)
 	{
 		glBegin(GL_QUADS);
 		glTexCoord2d(0,1); glVertex2d(x0, y0);
@@ -155,68 +129,25 @@ void GraphicalController::output_text(int x, int y, std::string& Text, int sizex
 	}
 }
 
-GLuint GraphicalController::bind_texture(FT_Bitmap* data)
+bool GraphicalController::add_scissor(const frectangle_t& rect)
 {
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	////glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, info.biWidth, info.biHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-	//gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA,data->width,data->rows, GL_RGBA, GL_UNSIGNED_BYTE, data->buffer);
-	//for (int i = 0; i < data->rows*data->width*4; i++)
-	//{
-	//	if (data->buffer[i] != 0)
-	//	{
-	//		
-	//	}
-	//}
-	//glTexImage2D(GL_TEXTURE_2D,0,GL_ALPHA,data->width,data->rows,0,GL_ALPHA,GL_UNSIGNED_BYTE,data->buffer);
-	//char buf2[32];
-	//itoa(data->width, buf2, 10);
-	//MessageBox(0, buf2, "X", MB_OK);
-	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_ALPHA, data->width, data->rows, GL_ALPHA, GL_UNSIGNED_BYTE, data->buffer);
-	return texture;
-}
-
-bool GraphicalController::add_scissor(GLint* rect)
-{
-	GLint* GlobalScissor = m_scissors.front();
-	GLint* LocalScissor = new GLint[4]{ rect[0], 1024 - rect[1] - rect[3], rect[0] + rect[2], 1024 - rect[1] };
-	if ((GlobalScissor[0] >LocalScissor[2]) || (GlobalScissor[2]<LocalScissor[0]) || (GlobalScissor[1]>LocalScissor[3]) || (GlobalScissor[3]<LocalScissor[1]))
-	{
-		return false;
-	}
-	if (LocalScissor[0]<GlobalScissor[0])
-	{
-		LocalScissor[0]=GlobalScissor[0];
-	}
-	if (LocalScissor[2]>GlobalScissor[2])
-	{
-		LocalScissor[2] = GlobalScissor[2];
-	}
-	if (LocalScissor[1]<GlobalScissor[1])
-	{
-		LocalScissor[1] = GlobalScissor[1];
-	}
-	if (LocalScissor[3]>GlobalScissor[3])
-	{
-		LocalScissor[3]=GlobalScissor[3];
-	}
+	frectangle_t GlobalScissor = m_scissors.front();
+	frectangle_t LocalScissor(rect.x, 1024 - rect.y - rect.h, rect.x + rect.w, 1024 - rect.y);
+	if ((GlobalScissor.x > LocalScissor.w) || (GlobalScissor.w < LocalScissor.x) || (GlobalScissor.y > LocalScissor.h) || (GlobalScissor.h < LocalScissor.y)) return false;
+	if (LocalScissor.x < GlobalScissor.x) LocalScissor.x = GlobalScissor.x;
+	if (LocalScissor.w > GlobalScissor.w) LocalScissor.w = GlobalScissor.w;
+	if (LocalScissor.y < GlobalScissor.y) LocalScissor.y = GlobalScissor.y;
+	if (LocalScissor.h > GlobalScissor.h) LocalScissor.h = GlobalScissor.h;
 	m_scissors.push_front(LocalScissor);
-	glScissor(LocalScissor[0], LocalScissor[1], LocalScissor[2] - LocalScissor[0], LocalScissor[3] - LocalScissor[1]);
+	glScissor(LocalScissor.x, LocalScissor.y, LocalScissor.w - LocalScissor.x, LocalScissor.h - LocalScissor.y);
 	return true;
 }
 
 void GraphicalController::remove_scissor()
 {
 	m_scissors.pop_front();
-	GLint* Scissor = m_scissors.front();
-	glScissor(Scissor[0], Scissor[1], Scissor[2] - Scissor[0], Scissor[3] - Scissor[1]);
+	frectangle_t Scissor = m_scissors.front();
+	glScissor(Scissor.x, Scissor.y, Scissor.w - Scissor.x, Scissor.h - Scissor.y);
 }
 
 void GraphicalController::blur_rect(int x, int y, int width, int height)
@@ -359,7 +290,7 @@ void GraphicalController::show_error(GLhandleARB object)
 	if (infoLog[0] != '\0'){ MessageBox(NULL, infoLog, "Error", MB_OK); }
 }
 
-GPosition GraphicalController::get_OpenGL_position(float x, float y)
+position_t GraphicalController::get_OpenGL_position(float x, float y)
 {
 	GLint viewport[4];
 	GLdouble modelview[16];
@@ -373,7 +304,7 @@ GPosition GraphicalController::get_OpenGL_position(float x, float y)
 	winY = (float)viewport[3] - (float)y;
 	glReadPixels(x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
 	gluUnProject(winX, winY, winZ, modelview, projection, viewport, &_Point.x, &_Point.y, &_Point.z);
-	return GPosition(_Point.x, _Point.y);
+	return position_t(_Point.x, _Point.y);
 }
 
 GLuint GraphicalController::load_texture(const char * filename)
@@ -383,7 +314,7 @@ GLuint GraphicalController::load_texture(const char * filename)
 	FILE* file;
 	BITMAPFILEHEADER header;
 	BITMAPINFOHEADER info;
-	file = fopen(filename, "rb");
+	fopen_s(&file, filename, "rb");
 	fread(&header, sizeof(header), 1, file);
 	fread(&info, sizeof(info), 1, file);
 	data = new char[info.biWidth * info.biHeight * 4];

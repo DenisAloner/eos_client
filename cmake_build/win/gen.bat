@@ -1,24 +1,24 @@
 @echo OFF
 rem IMPORTANT Call this batch from eos_client/build/ directory
 
-if "%1" == "" goto usage
+if "%1"=="" goto usage
 
 set BUILD_TYPE=Debug
-if /i %2 == debug	set BUILD_TYPE=Debug
-if /i %2 == release	set BUILD_TYPE=Release
+if /i "%2"=="debug"		set BUILD_TYPE=Debug
+if /i "%2"=="release"	set BUILD_TYPE=Release
 
 set PLATFORM=x86
-if /i %3 == x86       set PLATFORM=x86
-if /i %3 == amd64     set PLATFORM=amd64
-if /i %3 == x64       set PLATFORM=amd64
-if /i %3 == arm       set PLATFORM=arm
-if /i %3 == x86_arm   set PLATFORM=x86_arm
-if /i %3 == x86_amd64 set PLATFORM=x86_amd64
+if /i "%3"=="x86"       set PLATFORM=x86
+if /i "%3"=="amd64"     set PLATFORM=amd64
+if /i "%3"=="x64"       set PLATFORM=amd64
+if /i "%3"=="arm"       set PLATFORM=arm
+if /i "%3"=="x86_arm"   set PLATFORM=x86_arm
+if /i "%3"=="x86_amd64" set PLATFORM=x86_amd64
 
 set PROJ_TYPE=
-if /i %PLATFORM% == amd64     set PROJ_TYPE= Win64
-if /i %PLATFORM% == x64       set PROJ_TYPE= Win64
-if /i %PLATFORM% == x86_amd64 set PROJ_TYPE= Win64
+if /i %PLATFORM%==amd64     set PROJ_TYPE= Win64
+if /i %PLATFORM%==x64       set PROJ_TYPE= Win64
+if /i %PLATFORM%==x86_amd64 set PROJ_TYPE= Win64
 
 rem Версия используемой VisualStudio
 set VSVER=%1
@@ -37,9 +37,9 @@ rem Очищаем текущий каталог для генерации но�
 for /F "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
 
 rem Выполняем конфигурирование VisualStudio
-call "%VSDIR%\VC\vcvarsall.bat" %PLATFORM%
+rem call "%VSDIR%\VC\vcvarsall.bat" %PLATFORM%
 
-rem Генерируем файлы салюшена VisualStudio
+rem Генерируем файлы решения VisualStudio
 cmake -G "Visual Studio %VSVER%%PROJ_TYPE%" %~dp0
 
 rem Запускаем сборку проекта

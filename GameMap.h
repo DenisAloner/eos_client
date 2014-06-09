@@ -46,7 +46,7 @@ class GameMap
 {
 public:
 
-	GSize m_size;
+	dimension_t m_size;
 
 	MapCell* m_items[MapHeight][MapWidth];
 	std::list<GameObject*> m_lights;

@@ -10,8 +10,8 @@ class GUI_Object
 {
 public:
 
-	GPosition m_position;
-	GSize m_size;
+	position_t m_position;
+	dimension_t m_size;
 
 	bool focused;
 

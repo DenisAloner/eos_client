@@ -17,7 +17,7 @@ public:
 	~GUI_Window();
 
 	bool m_is_moving;
-	GPosition m_initial_position;
+	position_t m_initial_position;
 
 	virtual void on_mouse_move(MouseEventArgs const& e);
 	virtual void on_start_moving(MouseEventArgs const& e);

@@ -16,10 +16,10 @@ void GUI_ActionPanel::add_item_control(GUI_Object* object)
 	{
 		GUI_Object* Back = m_item_controls->m_items.back();
 		object->m_position.y = 4;
-		object->m_position.x = Back->m_position.x + Back->m_size.x + 4;
-		if (object->m_position.x + object->m_size.x>m_size.x)
+		object->m_position.x = Back->m_position.x + Back->m_size.w + 4;
+		if (object->m_position.x + object->m_size.w>m_size.w)
 		{
-			m_scroll.x -= object->m_size.x;
+			m_scroll.x -= object->m_size.w;
 		}
 	}
 	else

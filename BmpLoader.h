@@ -17,24 +17,24 @@ class BmpLoader
 
    BmpLoader(const char* filename)
    {
-	   BITMAPFILEHEADER header;
-	   BITMAPINFOHEADER info;
-	   FILE *file;
-	   file=fopen(filename,"rb");
-	   fread(&header,sizeof(header),1,file);
-	   fread(&info,sizeof(info),1,file);
-	   pixels=new GLuint[info.biHeight*info.biWidth];
-	   fseek(file,header.bfOffBits,0);
-	   for(int i=0;i<info.biHeight;i++)
-		   for(int j=0;j<info.biWidth;j+=4)
-		   {
-			   RGB rbg;
-			   fread(&rbg,sizeof(rbg),1,file);
-			   pixels[(i*info.biWidth)+j]=rbg.blue;
-			    pixels[(i*info.biWidth)+j+1]=rbg.green;
-			    pixels[(i*info.biWidth)+j+2]=rbg.red;
-			   pixels[(i*info.biWidth)+j+3]=rbg.alpha;
-		   }
+		BITMAPFILEHEADER header;
+		BITMAPINFOHEADER info;
+		FILE *file;
+		fopen_s(&file, filename, "rb");
+		fread(&header,sizeof(header),1,file);
+		fread(&info,sizeof(info),1,file);
+		pixels=new GLuint[info.biHeight*info.biWidth];
+		fseek(file,header.bfOffBits,0);
+		for(int i=0;i<info.biHeight;i++)
+			for(int j=0;j<info.biWidth;j+=4)
+			{
+				RGB rbg;
+				fread(&rbg,sizeof(rbg),1,file);
+				pixels[(i*info.biWidth)+j]=rbg.blue;
+				pixels[(i*info.biWidth)+j+1]=rbg.green;
+				pixels[(i*info.biWidth)+j+2]=rbg.red;
+				pixels[(i*info.biWidth)+j+3]=rbg.alpha;
+			}
    }
 
    ~BmpLoader()

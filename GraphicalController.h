@@ -6,8 +6,6 @@
 #include "Definiton.h"
 #include <string>
 #include <list>
-#include <ft2build.h>
-#include FT_FREETYPE_H
 
 #define WIDTH   640
 #define HEIGHT  480
@@ -23,12 +21,6 @@ class GraphicalController
 public:
 	/* origin is the upper left corner */
 
-	FT_Library library;
-	FT_Face face;
-	FT_GlyphSlot slot;
-	FT_Matrix     matrix;                 /* transformation matrix */
-	FT_Vector     pen;                    /* untransformed origin  */
-
 	GLuint m_sprites[22];
 	GLuint m_actions[4];
 
@@ -39,7 +31,7 @@ public:
 
 	GLuint m_font;
 
-	std::list<GLint*> m_scissors;
+	std::list<frectangle_t> m_scissors;
 
 	GLuint m_FBO;
 
@@ -52,14 +44,13 @@ public:
 	bool set_uniform_vector(GLhandleARB program, const char * name, const float * value);
 	bool set_uniform_sampler(GLhandleARB object, const char * name);
 	bool set_uniform_ptr(GLhandleARB program, const char * name, const unsigned int value);
-	GPosition get_OpenGL_position(float x, float y);
+	position_t get_OpenGL_position(float x, float y);
 	GLuint load_texture(const char * filename);
 	void output_text(int x, int y, std::string& Text, int sizex, int sizey);
 	void draw_sprite(double x0,double y0,double x1,double y1,double x2,double y2,double x3,double y3);
 	void center_text(int x, int y, std::string Text, int sizex, int sizey);
 	void render_text(double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
-	GLuint bind_texture(FT_Bitmap* data);
-	bool add_scissor(GLint* rect);
+	bool add_scissor(const frectangle_t& rect);
 	void remove_scissor();
 	void draw_sprite_FBO(double TexWidth, double TexHeight, double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
 	void blur_rect(int x, int y, int width, int height);

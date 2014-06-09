@@ -3,8 +3,8 @@
 
 GUI_ActionButton::GUI_ActionButton()
 {
-	m_size.x = 40;
-	m_size.y = 40;
+	m_size.w = 40;
+	m_size.h = 40;
 }
 
 
@@ -20,17 +20,17 @@ void GUI_ActionButton::render(GraphicalController* Graph, int px, int py)
 	glEnable(GL_TEXTURE_2D);
 	glActiveTextureARB(GL_TEXTURE0_ARB);
 	glBindTexture(GL_TEXTURE_2D, Graph->m_actions[m_action->m_kind]);
-	Graph->draw_sprite(px, py, px, py + m_size.y, px + m_size.x, py +m_size.y, px + m_size.x, py);
+	Graph->draw_sprite(px, py, px, py + m_size.h, px + m_size.w, py +m_size.h, px + m_size.w, py);
 	glDisable(GL_TEXTURE_2D);
 	glBegin(GL_LINES);
 	glColor4f(1.0, 1.0, 1.0, 1);
 	glVertex2d(px, py);
-	glVertex2d(px, py + m_size.y);
-	glVertex2d(px, py + m_size.y);
-	glVertex2d(px + m_size.x, py + m_size.y);
-	glVertex2d(px + m_size.x, py + m_size.y);
-	glVertex2d(px + m_size.x, py);
-	glVertex2d(px + m_size.x, py);
+	glVertex2d(px, py + m_size.h);
+	glVertex2d(px, py + m_size.h);
+	glVertex2d(px + m_size.w, py + m_size.h);
+	glVertex2d(px + m_size.w, py + m_size.h);
+	glVertex2d(px + m_size.w, py);
+	glVertex2d(px + m_size.w, py);
 	glVertex2d(px, py);
 	glEnd();
 }
@@ -47,7 +47,7 @@ bool GUI_ActionButton::check_region(MouseEventArgs const& e)
 	//char buf2[32];
 	//itoa(e.Position.x, buf2, 10);
 	//MessageBox(NULL, buf2, "eos", MB_OK);
-	if (this->m_position.x <= e.position.x&&this->m_position.x + m_size.x >= e.position.x&&this->m_position.y <= e.position.y&&this->m_position.y + m_size.y >= e.position.y)
+	if (this->m_position.x <= e.position.x&&this->m_position.x + m_size.w >= e.position.x&&this->m_position.y <= e.position.y&&this->m_position.y + m_size.h >= e.position.y)
 	{
 		return true;
 	}

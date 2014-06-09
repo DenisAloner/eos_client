@@ -12,7 +12,7 @@ public:
 
 	std::vector<GameObject*> m_items;
 
-	GSize m_size;
+	dimension_t m_size;
 
 	std::string m_name;
 

@@ -62,8 +62,8 @@ public:
 	GCMapElement* m_items[512][512];
 	GUI_Layer* m_GUI;
 
-	GPosition m_center;
-	GPosition m_initial_position;
+	position_t m_center;
+	position_t m_initial_position;
 
 	
 	virtual void on_key_press(WPARAM w);
@@ -77,7 +77,7 @@ public:
 	virtual void on_item_get_focus(GUI_Object* sender);
 	virtual void on_under_cursor(MouseEventArgs const& e);
 	virtual void on_lose_focus(GUI_Object* sender);
-	GPosition local_xy(GPosition p);
+	position_t local_xy(position_t p);
 	virtual void set_focus(bool state);
 	void update();
 	virtual bool select(int x, int y);

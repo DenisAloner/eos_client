@@ -1,6 +1,6 @@
 #include "Application.h"
 
-void my_audio_callback(void *userdata, Uint8 *stream, int len);
+void my_audio_callback(void *userdata, uint8_t *stream, uint32_t len);
 
 // variable declarations
 static Uint8 *audio_pos; // global pointer to the audio buffer to be played
@@ -52,11 +52,11 @@ void Application::on_mouse_click(MouseEventArgs const& e)
 	MessageBox(NULL, buf2, "", MB_OK);*/
 	if (e.flags &MK_LBUTTON)
 	{
-		m_GUI->mouse_click(MouseEventArgs(GPosition(e.position.x, e.position.y), MK_LBUTTON));
+		m_GUI->mouse_click(MouseEventArgs(position_t(e.position.x, e.position.y), MK_LBUTTON));
 	}
 	if (e.flags &MK_RBUTTON)
 	{
-		m_GUI->mouse_click(MouseEventArgs(GPosition(e.position.x, e.position.y), MK_RBUTTON));
+		m_GUI->mouse_click(MouseEventArgs(position_t(e.position.x, e.position.y), MK_RBUTTON));
 	}
 }
 
@@ -87,7 +87,7 @@ void Application::render()
 	glClear( GL_COLOR_BUFFER_BIT );
 	glPushMatrix();
 	m_GUI->render(m_graph,0,0);
-	GPosition Mouse=Application::instance().m_mouse->get_mouse_position();
+	position_t Mouse=Application::instance().m_mouse->get_mouse_position();
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_2D);
@@ -112,8 +112,8 @@ void Application::initialization(HWND _hWnd)
 	command_set_cursor_visibility(true);
 
 	m_GUI = new ApplicationGUI();
-	m_GUI->m_position = GPosition(0, 0);
-	m_GUI->m_size = GSize(1024,1024);
+	m_GUI->m_position = position_t(0, 0);
+	m_GUI->m_size = dimension_t(1024,1024);
 	
 	key_press += std::bind(&Application::on_key_press, this, std::placeholders::_1);
 	m_mouse->mouse_click += std::bind(&Application::on_mouse_click, this, std::placeholders::_1);
@@ -131,8 +131,8 @@ void Application::initialization(HWND _hWnd)
 	m_GUI->MapViewer = new GUI_MapViewer(this);
 	m_GUI->MapViewer->m_position.x = 0;
 	m_GUI->MapViewer->m_position.y = 0;
-	m_GUI->MapViewer->m_size.x = 1024;
-	m_GUI->MapViewer->m_size.y = 1024;
+	m_GUI->MapViewer->m_size.w = 1024;
+	m_GUI->MapViewer->m_size.h = 1024;
 	m_GUI->MapViewer->m_map = new GameMap();
 	m_GUI->MapViewer->m_map->generate_room();
 	m_GUI->MapViewer->m_player = new TPlayer();
@@ -177,8 +177,8 @@ void Application::initialization(HWND _hWnd)
 	MenuLayer = new GUI_Layer();
 	MenuLayer->m_position.x = 0;
 	MenuLayer->m_position.y = 0;
-	MenuLayer->m_size.x = 1024;
-	MenuLayer->m_size.y = 1024;
+	MenuLayer->m_size.w = 1024;
+	MenuLayer->m_size.h = 1024;
 	GUI_TextBox* TextBox = new GUI_TextBox();
 	TextBox->m_position.x = 2;
 	TextBox->m_position.y = 710;
@@ -386,10 +386,10 @@ bool Application::command_open_inventory(GameObject*& Object)
 	if (Property != nullptr)
 	{
 		//MessageBox(NULL, "In_2", "", MB_OK);
-		GUI_Window* Window = new GUI_Window(1024 / 2 - (Property->m_size.x * 48 + 2) / 2, 1024 / 2 - (Property->m_size.y * 48 + 2) / 2, Property->m_size.x * 48 + 4, Property->m_size.y * 48 + 27,Object->m_name+"::"+Property->m_name);
+		GUI_Window* Window = new GUI_Window(1024 / 2 - (Property->m_size.w * 48 + 2) / 2, 1024 / 2 - (Property->m_size.h * 48 + 2) / 2, Property->m_size.w * 48 + 4, Property->m_size.h * 48 + 27,Object->m_name+"::"+Property->m_name);
 		GUI_Inventory* Inv = new GUI_Inventory(Property);
 		Inv->m_position.x = 2;
-		Inv->m_position.y = Window->m_size.y - Inv->m_size.y-2;
+		Inv->m_position.y = Window->m_size.h - Inv->m_size.h-2;
 		Window->add_item_control(Inv);
 		m_GUI->add_front(Window);
 		Result = true;
@@ -433,7 +433,7 @@ bool Application::command_check_position(GameObject*& _Object, MapCell*& _Positi
 	return true;
 }
 
-void my_audio_callback(void *userdata, Uint8 *stream, int len) {
+void my_audio_callback(void *userdata, uint8_t *stream, uint32_t len) {
 
 	if (audio_len == 0)
 		return;

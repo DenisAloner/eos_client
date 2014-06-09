@@ -14,7 +14,7 @@ public:
 	GLuint m_cursor; 
 	GLuint m_pickup_item;
 
-	GPosition m_position;
+	position_t m_position;
 
 	bool m_show_cursor;
 	bool m_show_pickup_item;
@@ -33,7 +33,7 @@ public:
 	void on_mouse_move(MouseEventArgs const& e);
 	//void OnMouseWheel(MouseEventArgs const& e);
 
-	virtual GPosition get_mouse_position();
+	virtual position_t get_mouse_position();
 
 };
 
@@ -45,6 +45,6 @@ public:
 	HWND hWnd;
 
 	MouseController_Windows(HWND _hWnd);
-	virtual GPosition get_mouse_position();
+	virtual position_t get_mouse_position();
 
 };

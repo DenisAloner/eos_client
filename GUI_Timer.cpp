@@ -15,12 +15,12 @@ GUI_Timer::~GUI_Timer()
 void GUI_Timer::Update(int time)
 {
 	GUI_Text* Text = static_cast<GUI_Text*>(m_item_controls->m_items.front());
-	Text->m_format->m_symbol_size.x = 48;
-	Text->m_format->m_symbol_size.y = 57;
+	Text->m_format->m_symbol_size.w = 48;
+	Text->m_format->m_symbol_size.h = 57;
 	Text->m_format->m_color.R = 1 - time / 15.0;
 	Text->m_format->m_color.G = time / 15.0;
 	Text->m_format->m_color.B = 0.0;
 	Text->set(std::to_string(time));
-	Text->m_position.x = m_size.x*0.5 - Text->m_size.x*0.5;
-	Text->m_position.y = m_size.y*0.5 - Text->m_size.y*0.5 + 2;
+	Text->m_position.x = m_size.w*0.5 - Text->m_size.w*0.5;
+	Text->m_position.y = m_size.h*0.5 - Text->m_size.h*0.5 + 2;
 }

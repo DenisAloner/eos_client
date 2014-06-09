@@ -5,19 +5,19 @@ GUI_Container::GUI_Container(int _x, int _y, int _width, int _height)
 {
 	m_position.x = _x;
 	m_position.y = _y;
-	m_size.x = _width;
-	m_size.y = _height;
+	m_size.w = _width;
+	m_size.h = _height;
 	m_managing_controls = new GUI_Layer();
 	m_managing_controls->m_position.x = 0;
 	m_managing_controls->m_position.y = 0;
-	m_managing_controls->m_size.x = m_size.x;
-	m_managing_controls->m_size.y = m_size.y;
+	m_managing_controls->m_size.w = m_size.w;
+	m_managing_controls->m_size.h = m_size.h;
 	add(m_managing_controls);
 	m_item_controls = new GUI_Layer();
 	m_item_controls->m_position.x = 0;
 	m_item_controls->m_position.y = 0;
-	m_item_controls->m_size.x = m_size.x;
-	m_item_controls->m_size.y = m_size.y;
+	m_item_controls->m_size.w = m_size.w;
+	m_item_controls->m_size.h = m_size.h;
 	add(m_item_controls);
 }
 
@@ -28,7 +28,7 @@ GUI_Container::~GUI_Container()
 
 bool GUI_Container::check_region(MouseEventArgs const& e)
 {
-	if (this->m_position.x <= e.position.x&&this->m_position.x + m_size.x >= e.position.x&&this->m_position.y <= e.position.y&&this->m_position.y + m_size.y >= e.position.y)
+	if (this->m_position.x <= e.position.x&&this->m_position.x + m_size.w >= e.position.x&&this->m_position.y <= e.position.y&&this->m_position.y + m_size.h >= e.position.y)
 	{
 		return true;
 	}
@@ -73,15 +73,15 @@ void GUI_Container::render(GraphicalController* Graph, int px, int py)
 {
 	
 	glEnable(GL_SCISSOR_TEST);
-	if (Graph->add_scissor(new GLint[4]{px, py, m_size.x, m_size.y}))
+	if (Graph->add_scissor(frectangle_t((float)px, (float)py, (float)m_size.w, (float)m_size.h)))
 	{
 		
-		Graph->blur_rect(px, py, m_size.x, m_size.y);
+		Graph->blur_rect(px, py, m_size.w, m_size.h);
 
 		glEnable(GL_BLEND);
 		glDisable(GL_TEXTURE_2D);
 		glColor4d(0.0, 0.0, 0.0, 0.5);
-		Graph->draw_sprite(px, py, px, py + m_size.y, px + m_size.x, py + m_size.y, px + m_size.x, py);
+		Graph->draw_sprite(px, py, px, py + m_size.h, px + m_size.w, py + m_size.h, px + m_size.w, py);
 		glEnable(GL_TEXTURE_2D);
 		glColor4d(1.0, 1.0, 1.0, 1.0);
 		for (auto current : m_items)
@@ -94,12 +94,12 @@ void GUI_Container::render(GraphicalController* Graph, int px, int py)
 		glBegin(GL_LINES);
 		glColor4f(1.0, 1.0, 1.0, 1.0);
 		glVertex2d(px, py);
-		glVertex2d(px, py + m_size.y);
-		glVertex2d(px, py + m_size.y);
-		glVertex2d(px + m_size.x, py + m_size.y);
-		glVertex2d(px + m_size.x, py + m_size.y);
-		glVertex2d(px + m_size.x, py);
-		glVertex2d(px + m_size.x, py);
+		glVertex2d(px, py + m_size.h);
+		glVertex2d(px, py + m_size.h);
+		glVertex2d(px + m_size.w, py + m_size.h);
+		glVertex2d(px + m_size.w, py + m_size.h);
+		glVertex2d(px + m_size.w, py);
+		glVertex2d(px + m_size.w, py);
 		glVertex2d(px, py);
 		glEnd();
 	}
@@ -119,11 +119,11 @@ void GUI_Container::set_scroll(int dy)
 		if (dy < 0)
 		{
 			Item = m_items.back();
-			if (Item->m_position.y + Item->m_size.y + m_scroll.y + dy< m_size.y)
+			if (Item->m_position.y + Item->m_size.h + m_scroll.y + dy< m_size.h)
 			{
 				if (m_scroll.y != 0)
 				{
-					m_scroll.y = m_size.y - (Item->m_position.y + Item->m_size.y);
+					m_scroll.y = m_size.h - (Item->m_position.y + Item->m_size.h);
 				}
 				return;
 			}
@@ -157,15 +157,15 @@ void GUI_Container::add_managing_control(GUI_Object* object)
 
 MouseEventArgs GUI_Container::set_local_mouse_position(MouseEventArgs const& source)
 {
-	return MouseEventArgs(GPosition(source.position.x - m_position.x - m_scroll.x, source.position.y - m_position.y - m_scroll.y), source.flags);
+	return MouseEventArgs(position_t(source.position.x - m_position.x - m_scroll.x, source.position.y - m_position.y - m_scroll.y), source.flags);
 }
 
 void GUI_Container::resize(int _width, int _height)
 {
-	m_size.x = _width;
-	m_size.y = _height;
-	m_managing_controls->m_size.x = m_size.x;
-	m_managing_controls->m_size.y = m_size.y;
-	m_item_controls->m_size.x = m_size.x;
-	m_item_controls->m_size.y = m_size.y;
+	m_size.w = _width;
+	m_size.h = _height;
+	m_managing_controls->m_size.w = m_size.w;
+	m_managing_controls->m_size.h = m_size.h;
+	m_item_controls->m_size.w = m_size.w;
+	m_item_controls->m_size.h = m_size.h;
 }

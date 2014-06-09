@@ -13,7 +13,7 @@ GUI_Layer::~GUI_Layer(void)
 
 MouseEventArgs GUI_Layer::set_local_mouse_position(MouseEventArgs const& source)
 {
-	return MouseEventArgs(GPosition(source.position.x - m_position.x, source.position.y - m_position.y), source.flags);
+	return MouseEventArgs(position_t(source.position.x - m_position.x, source.position.y - m_position.y), source.flags);
 }
 
 void GUI_Layer::on_mouse_click(MouseEventArgs const& e)
@@ -138,7 +138,7 @@ void GUI_Layer::remove(GUI_Object* object)
 bool GUI_Layer::check_region(MouseEventArgs const& e)
 {
 	MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
-	if (this->m_position.x <= e.position.x&&this->m_position.x + m_size.x >= e.position.x&&this->m_position.y <= e.position.y&&this->m_position.y + m_size.y >= e.position.y)
+	if (this->m_position.x <= e.position.x&&this->m_position.x + m_size.w >= e.position.x&&this->m_position.y <= e.position.y&&this->m_position.y + m_size.h >= e.position.y)
 	{
 		for(std::list<GUI_Object*>::iterator Current=m_items.begin();Current!=m_items.end();Current++)
 		{

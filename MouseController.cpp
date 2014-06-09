@@ -31,16 +31,16 @@ void MouseController::on_mouse_move(MouseEventArgs const& e)
 	m_position = get_mouse_position();
 }
 
-GPosition MouseController::get_mouse_position()
+position_t MouseController::get_mouse_position()
 {
-	return GPosition(0, 0);
+	return position_t(0, 0);
 }
 
 MouseController_Windows::MouseController_Windows(HWND _hWnd) :hWnd(_hWnd)
 {
 }
 
-GPosition MouseController_Windows::get_mouse_position()
+position_t MouseController_Windows::get_mouse_position()
 {
 	POINT mouse;
 	GetCursorPos(&mouse);

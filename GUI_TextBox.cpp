@@ -46,10 +46,10 @@ void GUI_TextBox::add_item_control(GUI_Object* object)
 	{
 		GUI_Text* LastElement = static_cast<GUI_Text*>(m_item_controls->m_items.back());
 		object->m_position.x = 0;
-		object->m_position.y = LastElement->m_position.y + LastElement->m_size.y;
-		if (object->m_position.y + object->m_size.y>m_size.y)
+		object->m_position.y = LastElement->m_position.y + LastElement->m_size.h;
+		if (object->m_position.y + object->m_size.h>m_size.h)
 		{
-			m_scroll.y -= object->m_size.y;
+			m_scroll.y -= object->m_size.h;
 		}
 	}
 	else
@@ -68,11 +68,11 @@ void GUI_TextBox::set_scroll(int dy)
 		if (dy < 0)
 		{
 			Item = static_cast<GUI_Text*>(m_item_controls->m_items.back());
-			if (Item->m_position.y + Item->m_size.y + m_scroll.y + dy< m_size.y)
+			if (Item->m_position.y + Item->m_size.h + m_scroll.y + dy< m_size.h)
 			{
 				if (m_scroll.y!=0)
 				{
-					m_scroll.y = m_size.y - (Item->m_position.y + Item->m_size.y);
+					m_scroll.y = m_size.h - (Item->m_position.y + Item->m_size.h);
 				}
 				return;
 			}

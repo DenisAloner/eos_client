@@ -63,7 +63,7 @@ void GUI_Object::on_under_cursor(MouseEventArgs const& e)
 
 bool GUI_Object::check_region(MouseEventArgs const& e)
 {
-	if (this->m_position.x <= e.position.x&&this->m_position.x + m_size.x >= e.position.x&&this->m_position.y <= e.position.y&&this->m_position.y + m_size.y >= e.position.y)
+	if (this->m_position.x <= e.position.x&&this->m_position.x + m_size.w >= e.position.x&&this->m_position.y <= e.position.y&&this->m_position.y + m_size.h >= e.position.y)
 	{
 		return true;
 	}

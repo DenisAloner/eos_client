@@ -41,8 +41,8 @@ GUI_MapViewer::~GUI_MapViewer(void)
 
 void GUI_MapViewer::calculate()
 {
-	m_tile_size_x = static_cast<double>(m_size.x) / static_cast<double>(m_tile_count_x);
-	m_tile_size_y = static_cast<double>(m_size.y) / static_cast<double>(m_tile_count_y);
+	m_tile_size_x = static_cast<double>(m_size.w) / static_cast<double>(m_tile_count_x);
+	m_tile_size_y = static_cast<double>(m_size.h) / static_cast<double>(m_tile_count_y);
 }
 
 void GUI_MapViewer::update()
@@ -56,7 +56,7 @@ void GUI_MapViewer::update()
 		{
 			x = m_center.x + j - m_tile_count_x / 2;
 			y = m_center.y + i - m_tile_count_y / 2;
-			if((x<0)||(x>m_map->m_size.x-1)||(y<0)||(y>m_map->m_size.y-1))
+			if((x<0)||(x>m_map->m_size.w-1)||(y<0)||(y>m_map->m_size.h-1))
 			{
 				m_items[i][j]->m_map_element=nullptr;
 			} else {
@@ -282,7 +282,7 @@ void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
 {
 	if (e.flags &MK_LBUTTON)
 	{
-		GPosition p = local_xy(GPosition(e.position.x, e.position.y));
+		position_t p = local_xy(position_t(e.position.x, e.position.y));
 		if (m_items[p.y][p.x] != nullptr)
 		{
 			m_items[p.y][p.x]->mouse_click(e);
@@ -302,7 +302,7 @@ void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
 		PopMenu=new GUI_PopMenu;
 		PopMenu->m_position.x = e.position.x;
 		PopMenu->m_position.y = e.position.y;
-		GPosition p = local_xy(GPosition(e.position.x, e.position.y));
+		position_t p = local_xy(position_t(e.position.x, e.position.y));
 		if (m_items[p.y][p.x] != nullptr)
 		{
 			//UnderCursor(CursorEventArgs(e.x, e.y));
@@ -325,7 +325,7 @@ void GUI_MapViewer :: on_mouse_down(MouseEventArgs const& e)
 {
 	if ((e.flags &MK_LBUTTON) || (e.flags &MK_RBUTTON))
 	{
-		GPosition p =local_xy(e.position);
+		position_t p =local_xy(e.position);
 		if (m_items[p.y][p.x] != nullptr)
 		{
 			m_items[p.y][p.x]->mouse_down(e);
@@ -352,7 +352,7 @@ void GUI_MapViewer::on_mouse_wheel(MouseEventArgs const& e)
 		if (m_tile_count_y < 32){ m_tile_count_y = 32; }
 	}
 	calculate();
-	GPosition p = local_xy(GPosition(e.position.x, e.position.y));
+	position_t p = local_xy(position_t(e.position.x, e.position.y));
 	if (m_items[p.y][p.x] != nullptr)
 	{
 		m_cursored = m_items[p.y][p.x];
@@ -397,7 +397,7 @@ void GUI_MapViewer::on_item_get_focus(GUI_Object* sender)
 
 void GUI_MapViewer::on_under_cursor(MouseEventArgs const& e)
 {
-	GPosition p =local_xy(GPosition(e.position.x,e.position.y));
+	position_t p =local_xy(position_t(e.position.x,e.position.y));
 	if (m_items[p.y][p.x] != nullptr)
 	{
 		m_cursored = m_items[p.y][p.x];
@@ -409,9 +409,9 @@ void GUI_MapViewer::on_lose_focus(GUI_Object* sender)
 	m_cursored = nullptr;
 }
 
-GPosition GUI_MapViewer::local_xy(GPosition p)
+position_t GUI_MapViewer::local_xy(position_t p)
 {
-	GPosition Result = GPosition(p.x / m_tile_size_x, m_tile_count_y - p.y / m_tile_size_y);
+	position_t Result = position_t(p.x / m_tile_size_x, m_tile_count_y - p.y / m_tile_size_y);
 	if (Result.x > m_tile_count_x - 1){ Result.x = m_tile_count_x - 1; }
 	if (Result.x <0){ Result.x = 0; }
 	if (Result.y > m_tile_count_y - 1){ Result.y = m_tile_count_y - 1; }
@@ -445,7 +445,7 @@ void GUI_MapViewer::on_mouse_move(MouseEventArgs const& e)
 void GUI_MapViewer::on_start_moving(MouseEventArgs const& e)
 {
 	m_is_moving = true;
-	GPosition p = local_xy(GPosition(e.position.x, e.position.y));
+	position_t p = local_xy(position_t(e.position.x, e.position.y));
 	m_initial_position.x = m_center.x - p.x;
 	m_initial_position.y = m_center.y - p.y;
 	//MessageBox(NULL, "Start", "", MB_OK);
@@ -453,7 +453,7 @@ void GUI_MapViewer::on_start_moving(MouseEventArgs const& e)
 
 void GUI_MapViewer::on_move(MouseEventArgs const& e)
 {
-	GPosition p = local_xy(GPosition(e.position.x, e.position.y));
+	position_t p = local_xy(position_t(e.position.x, e.position.y));
 	m_center.x = m_initial_position.x + p.x;
 	m_center.y = m_initial_position.y + p.y;
 }
@@ -467,5 +467,5 @@ void GUI_MapViewer::on_end_moving(MouseEventArgs const& e)
 
 MouseEventArgs GUI_MapViewer::set_local_mouse_control(MouseEventArgs const& source)
 {
-	return MouseEventArgs(GPosition(source.position.x - m_position.x, source.position.y - m_position.y), source.flags);
+	return MouseEventArgs(position_t(source.position.x - m_position.x, source.position.y - m_position.y), source.flags);
 }

@@ -12,7 +12,7 @@ public:
 	GUI_Layer* m_managing_controls;
 	GUI_Layer* m_item_controls;
 
-	GPosition m_scroll;
+	position_t m_scroll;
 
 	virtual bool check_region(MouseEventArgs const& e);
 	virtual void on_mouse_click(MouseEventArgs const& e);

@@ -4,7 +4,7 @@
 GUI_Window::GUI_Window(int _x, int _y, int _width, int _height, std::string _Name) :GUI_Container(_x, _y, _width, _height)
 {
 	m_is_moving = false;
-	GUI_Item* Header = new GUI_Item(2, 2, m_size.x- 4, 21, _Name, nullptr);
+	GUI_Item* Header = new GUI_Item(2, 2, m_size.w- 4, 21, _Name, nullptr);
 	Header->close += std::bind(&GUI_Window::on_header_close, this);
 	add_managing_control(Header);
 	start_moving += std::bind(&GUI_Window::on_start_moving, this, std::placeholders::_1);

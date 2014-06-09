@@ -45,17 +45,17 @@ GUI_ActionManager::~GUI_ActionManager(void)
 
 void GUI_ActionManager::add_item_control(GUI_Object* object)
 {
-	static_cast<GUI_Item*>(object)->resize(m_size.x - 4, 21);
+	static_cast<GUI_Item*>(object)->resize(m_size.w - 4, 21);
 	/*object->width = width - 4;
 	object->height = 21;*/
 	if (!m_item_controls->m_items.empty())
 	{
 		GUI_Item* LastElement = static_cast<GUI_Item*>(m_item_controls->m_items.back());
 		object->m_position.x = 2;
-		object->m_position.y = LastElement->m_position.y + LastElement->m_size.y + 2;
-		if (object->m_position.y + object->m_size.y>m_size.y)
+		object->m_position.y = LastElement->m_position.y + LastElement->m_size.h + 2;
+		if (object->m_position.y + object->m_size.h>m_size.h)
 		{
-			m_scroll.y -= object->m_size.y;
+			m_scroll.y -= object->m_size.h;
 		}
 	}
 	else
