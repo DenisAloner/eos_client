@@ -12,7 +12,6 @@ file(GLOB source_files ${PROJECT_SOURCE_DIR}/*.h ${PROJECT_SOURCE_DIR}/*.cpp)
 # )
 
 include_directories(
-	${PROJECT_SOURCE_DIR}
 	${PROJECT_SOURCE_DIR}/include
 )
 
