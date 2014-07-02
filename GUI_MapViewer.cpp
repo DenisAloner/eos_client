@@ -2,14 +2,6 @@
 #include "GUI_Layer.h"
 #include "GUI_PopMenu.h"
 
-GCMapElement::GCMapElement()
-{
-}
-
-GCMapElement::~GCMapElement(void)
-{
-}
-
 GUI_MapViewer::GUI_MapViewer(Application* app = nullptr)
 {
 	m_tile_count_x = 32;
@@ -20,16 +12,6 @@ GUI_MapViewer::GUI_MapViewer(Application* app = nullptr)
 	m_cursored = nullptr;
 	m_cursor_x = 1;
 	m_cursor_y = 1;
-	for (int i = 0; i<128; i++)
-	{
-		for (int j = 0; j<64; j++)
-		{
-			m_items[i][j]=new GCMapElement();
-			m_items[i][j]->get_focus+=std::bind(&GUI_MapViewer::on_item_get_focus,this,std::placeholders::_1);
-			m_items[i][j]->m_position.x = j;
-			m_items[i][j]->m_position.y = i;
-		}
-	}
 	start_moving += std::bind(&GUI_MapViewer::on_start_moving, this, std::placeholders::_1);
 	move += std::bind(&GUI_MapViewer::on_move, this, std::placeholders::_1);
 	end_moving += std::bind(&GUI_MapViewer::on_end_moving, this, std::placeholders::_1);
@@ -48,7 +30,7 @@ void GUI_MapViewer::calculate()
 void GUI_MapViewer::update()
 {
 	calculate();
-	int x;
+	/*int x;
 	int y;
 	for (int i = 0; i<m_tile_count_y; i++)
 	{
@@ -63,7 +45,7 @@ void GUI_MapViewer::update()
 				m_items[i][j]->m_map_element=m_map->m_items[y][x];
 			}
 		}
-	}
+	}*/
 }
 
 bool GUI_MapViewer::select(int x,int y)
@@ -88,33 +70,40 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 		glEnable(GL_TEXTURE_2D);
 		glEnable (GL_BLEND);
 		glColor4d(1.0,1.0,1.0,1.0);
-			double x0,y0,x1,y1,x2,y2,x3,y3;
-			float LightInfo[4];
-			float LightPos[4];
-			bool IsDraw;
-			for (int y = m_tile_count_y - 1; y>-1; y--)
+		double x0,y0,x1,y1,x2,y2,x3,y3;
+		float light[4];
+		bool IsDraw;
+		tile_t tile;
+		int x;
+		int y;
+		for (int gy = m_tile_count_y - 1; gy>-1; gy--)
 			{
-				for (int x = 0; x<m_tile_count_x; x++)
+				for (int gx = 0; gx<m_tile_count_x; gx++)
 				{
-					if(m_items[y][x]->m_map_element!=nullptr)
+					x = m_center.x + gx - m_tile_count_x / 2;
+					y = m_center.y + gy - m_tile_count_y / 2;
+					if ((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1))
 					{
-						for(std::list<GameObject*>::iterator Current=m_items[y][x]->m_map_element->m_items.begin();Current!=m_items[y][x]->m_map_element->m_items.end();Current++)
+					}
+					else 
+					{
+						light[0] = m_map->m_items[y][x]->m_light.R / 100.0;
+						light[1] = m_map->m_items[y][x]->m_light.G / 100.0;
+						light[2] = m_map->m_items[y][x]->m_light.B / 100.0;
+						light[3] = 0.0;
+						for (std::list<GameObject*>::iterator Current = m_map->m_items[y][x]->m_items.begin(); Current != m_map->m_items[y][x]->m_items.end(); Current++)
 						{
 							IsDraw=false;
-							if((*Current)->m_cell->x==m_items[y][x]->m_map_element->x&&(*Current)->m_cell->y==m_items[y][x]->m_map_element->y)
+							if ((*Current)->m_cell->x == m_map->m_items[y][x]->x && (*Current)->m_cell->y == m_map->m_items[y][x]->y)
 							{
-								x0 = (px + x + 1 - (*Current)->m_size.x)*m_tile_size_x;
-								y0 = (m_tile_count_y - py - y - (*Current)->m_size.z)*m_tile_size_y;
-								x1 = (px + x + 1 - (*Current)->m_size.x)*m_tile_size_x;
-								y1 = (m_tile_count_y - py - y)*m_tile_size_y;
-								x2 = (px + x + 1)*m_tile_size_x;
-								y2 = (m_tile_count_y - py - y)*m_tile_size_y;
-								x3 = (px + x + 1)*m_tile_size_x;
-								y3 = (m_tile_count_y - py - y - (*Current)->m_size.z)*m_tile_size_y;
-								LightPos[0]=m_items[y][x]->m_map_element->x;
-								LightPos[1]=m_items[y][x]->m_map_element->y;
-								LightPos[2]=0;
-								LightPos[3]=0;
+								x0 = (px + gx + 1 - (*Current)->m_size.x)*m_tile_size_x;
+								y0 = (m_tile_count_y - py - gy - (*Current)->m_size.z)*m_tile_size_y;
+								x1 = x0;
+								y1 = (m_tile_count_y - py - gy)*m_tile_size_y;
+								x2 = (px + gx + 1)*m_tile_size_x;
+								y2 = y1;
+								x3 = x2;
+								y3 = y0;
 								IsDraw=true;
 							} else {
 								/*if((x==Width-1&&Current->Item->Cell->y==Items[y][x]->y)||(y==0&&Current->Item->Cell->x==Items[y][x]->x)||(x==Width-1&&y==0))
@@ -136,42 +125,41 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 							}
 							if(IsDraw)
 							{
-								unsigned int Sprite = (*Current)->m_sprites[(*Current)->m_direction][Application::instance().m_timer->m_tick / 2];
+								(*Current)->m_tile_manager->set_tile(tile, (*Current), Application::instance().m_timer->m_tick / 2);
+								GLuint Sprite = tile.unit;
 								(*Current)->Render(x,y);
 								glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-								glUseProgramObjectARB(Graph->m_render_shader);
+								glUseProgramObjectARB(Graph->m_tile_shader);
 								glActiveTextureARB(GL_TEXTURE0_ARB);
-								glBindTexture( GL_TEXTURE_2D, Graph->m_sprites[Sprite]);
-								Graph->set_uniform_sampler(Graph->m_render_shader,"Map");
-								Graph->draw_sprite(x0,y0,x1,y1,x2,y2,x3,y3);
-								glUseProgramObjectARB(Graph->m_light_shader);
+								glBindTexture( GL_TEXTURE_2D,Sprite);
+								Graph->set_uniform_sampler(Graph->m_tile_shader,"Map");
+								Graph->set_uniform_vector(Graph->m_tile_shader, "light", light);
+								Graph->draw_tile(tile,x0,y0,x1,y1,x2,y2,x3,y3);
+								/*glUseProgramObjectARB(Graph->m_light_shader);
 								glActiveTextureARB(GL_TEXTURE0_ARB);
-								glBindTexture(GL_TEXTURE_2D, Graph->m_sprites[Sprite]);
+								glBindTexture(GL_TEXTURE_2D, Sprite);
 								Graph->set_uniform_sampler(Graph->m_light_shader,"Map");
-								glBlendFunc (GL_SRC_ALPHA, GL_ONE);
-								for(std::list<GameObject*>::iterator CurrentLight=m_map->m_lights.begin();CurrentLight!=m_map->m_lights.end();CurrentLight++)
-								{
-									LightPos[2]=(*CurrentLight)->m_cell->x;
-									LightPos[3]=(*CurrentLight)->m_cell->y;
-									Graph->set_uniform_vector(Graph->m_light_shader,"LightPos",LightPos);
-									LightInfo[0]=(*CurrentLight)->m_light->RGB[0];
-									LightInfo[1]=(*CurrentLight)->m_light->RGB[1];
-									LightInfo[2]=(*CurrentLight)->m_light->RGB[2];
-									LightInfo[3]=(*CurrentLight)->m_light->Power;
-									Graph->set_uniform_vector(Graph->m_light_shader,"LightInfo",LightInfo);
-									//char buf2[32];
-									//itoa(glGetAttribLocationARB(Graph->m_light_shader,"in_vertex"), buf2, 10);
-									//MessageBox(0, buf2, "Caption", MB_OK);
-									Graph->draw_sprite(x0,y0,x1,y1,x2,y2,x3,y3);
-								}
+								glBlendFunc (GL_SRC_ALPHA, GL_ONE);*/
+									/*for (std::list<GameObject*>::iterator CurrentLight = m_map->m_lights.begin(); CurrentLight != m_map->m_lights.end(); CurrentLight++)
+									{
+										LightPos[2] = (*CurrentLight)->m_cell->x;
+										LightPos[3] = (*CurrentLight)->m_cell->y;
+										Graph->set_uniform_vector(Graph->m_light_shader, "LightPos", LightPos);
+										LightInfo[0] = (*CurrentLight)->m_light->color.R;
+										LightInfo[1] = (*CurrentLight)->m_light->color.G;
+										LightInfo[2] = (*CurrentLight)->m_light->color.B;
+										LightInfo[3] = (*CurrentLight)->m_light->power;
+										Graph->set_uniform_vector(Graph->m_light_shader, "LightInfo", LightInfo);
+										Graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
+									}*/
 								if ((*Current)->m_selected)
 								{
 									glColor4d(0.0, abs((Application::instance().m_timer->m_tick - 3.5) / 3.5), 0.0, 1.0);
 									glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 									glUseProgramObjectARB(0);
 									glActiveTextureARB(GL_TEXTURE0_ARB);
-									glBindTexture(GL_TEXTURE_2D, Graph->m_sprites[Sprite]);
-									Graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+									glBindTexture(GL_TEXTURE_2D, Sprite);
+									Graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
 									glColor4d(1.0, 1.0, 1.0, 1.0);
 								}
 							}
@@ -181,44 +169,41 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 			}
 			if(m_cursored != nullptr)
 			{
-				GCMapElement* Item = m_cursored;
-				if(Item->m_map_element!=nullptr)
-				{
-					int x = px+Item->m_position.x;
-					int y =py+ Item->m_position.y;
-					x0 = (x - m_cursor_x + 1) * m_tile_size_x;
-					y0 = (m_tile_count_y - y - m_cursor_y) * m_tile_size_y;
-					x1 = (x - m_cursor_x + 1) * m_tile_size_x;
-					y1 = (m_tile_count_y - y) * m_tile_size_y;
-					x2 = (x + 1) * m_tile_size_x;
-					y2 = (m_tile_count_y - y) * m_tile_size_y;
-					x3 = (x + 1) * m_tile_size_x;
-					y3 = (m_tile_count_y - y - m_cursor_y) * m_tile_size_y;
-					glUseProgramObjectARB(0);
-					glEnable(GL_BLEND);
-					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-					glEnable(GL_TEXTURE_2D);
-					glActiveTextureARB(GL_TEXTURE0_ARB);
-					glBindTexture(GL_TEXTURE_2D, Graph->m_sprites[8]);
-					glColor4f(1.0, 1.0, 1.0, 0.5);
-					Graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
-					glDisable(GL_BLEND);
-					glDisable(GL_TEXTURE_2D);
-					glBegin(GL_LINES);
-					glColor4f(0.0, 1.0, 0.0, 1.0);
-					glVertex2d(x0, y0);
-					glVertex2d(x1, y1);
-					glVertex2d(x1, y1);
-					glVertex2d(x2, y2);
-					glVertex2d(x2, y2);
-					glVertex2d(x3, y3);
-					glVertex2d(x3, y3);
-					glVertex2d(x0, y0);
-					glEnd();
-					glEnable(GL_BLEND);
-					glEnable(GL_TEXTURE_2D);
-					glColor4f(1.0, 1.0, 1.0, 1);
-				}
+				MapCell* Item = m_cursored;
+				int x = px + Item->x - m_center.x + m_tile_count_x / 2;
+				int y = py + Item->y - m_center.y + m_tile_count_y / 2;
+				x0 = (x - m_cursor_x + 1) * m_tile_size_x;
+				y0 = (m_tile_count_y - y - m_cursor_y) * m_tile_size_y;
+				x1 = (x - m_cursor_x + 1) * m_tile_size_x;
+				y1 = (m_tile_count_y - y) * m_tile_size_y;
+				x2 = (x + 1) * m_tile_size_x;
+				y2 = (m_tile_count_y - y) * m_tile_size_y;
+				x3 = (x + 1) * m_tile_size_x;
+				y3 = (m_tile_count_y - y - m_cursor_y) * m_tile_size_y;
+				glUseProgramObjectARB(0);
+				glEnable(GL_BLEND);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				glEnable(GL_TEXTURE_2D);
+				glActiveTextureARB(GL_TEXTURE0_ARB);
+				glBindTexture(GL_TEXTURE_2D, Graph->m_select);
+				glColor4f(1.0, 1.0, 1.0, 0.5);
+				Graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+				glDisable(GL_BLEND);
+				glDisable(GL_TEXTURE_2D);
+				glBegin(GL_LINES);
+				glColor4f(0.0, 1.0, 0.0, 1.0);
+				glVertex2d(x0, y0);
+				glVertex2d(x1, y1);
+				glVertex2d(x1, y1);
+				glVertex2d(x2, y2);
+				glVertex2d(x2, y2);
+				glVertex2d(x3, y3);
+				glVertex2d(x3, y3);
+				glVertex2d(x0, y0);
+				glEnd();
+				glEnable(GL_BLEND);
+				glEnable(GL_TEXTURE_2D);
+				glColor4f(1.0, 1.0, 1.0, 1);
 			}
 			glDisable(GL_BLEND);
 			glDisable(GL_TEXTURE_2D);
@@ -237,7 +222,7 @@ void GUI_MapViewer::on_key_press(WPARAM w)
 		P->m_object=m_player;
 		P->m_place=m_map->m_items[m_player->m_cell->y+1][m_player->m_cell->x];
 		P->m_map=m_map;
-		Application::instance().m_action_manager->m_items.push_back(new GameTask(Application::instance().m_actions[ActionKind_Move], P));
+		Application::instance().m_action_manager->m_items.push_back(new GameTask(Application::instance().m_actions[action_e::move], P));
 		P->~Parameter_Position();
 		//app->TurnEnd=true;
 		return;
@@ -246,7 +231,7 @@ void GUI_MapViewer::on_key_press(WPARAM w)
 		P->m_object=m_player;
 		P->m_place=m_map->m_items[m_player->m_cell->y-1][m_player->m_cell->x];
 		P->m_map=m_map;
-		Application::instance().m_action_manager->m_items.push_back(new GameTask(Application::instance().m_actions[ActionKind_Move], P));
+		Application::instance().m_action_manager->m_items.push_back(new GameTask(Application::instance().m_actions[action_e::move], P));
 		P->~Parameter_Position();
 		//app->TurnEnd=true;
 		return;
@@ -255,7 +240,7 @@ void GUI_MapViewer::on_key_press(WPARAM w)
 		P->m_object=m_player;
 		P->m_place=m_map->m_items[m_player->m_cell->y][m_player->m_cell->x-1];
 		P->m_map=m_map;
-		Application::instance().m_action_manager->m_items.push_back(new GameTask(Application::instance().m_actions[ActionKind_Move], P));
+		Application::instance().m_action_manager->m_items.push_back(new GameTask(Application::instance().m_actions[action_e::move], P));
 		P->~Parameter_Position();
 		//app->TurnEnd=true;
 		return;
@@ -264,7 +249,7 @@ void GUI_MapViewer::on_key_press(WPARAM w)
 		P->m_object=m_player;
 		P->m_place=m_map->m_items[m_player->m_cell->y][m_player->m_cell->x+1];
 		P->m_map=m_map;
-		Application::instance().m_action_manager->m_items.push_back(new GameTask(Application::instance().m_actions[ActionKind_Move], P));
+		Application::instance().m_action_manager->m_items.push_back(new GameTask(Application::instance().m_actions[action_e::move], P));
 		P->~Parameter_Position();
 		//app->TurnEnd=true;
 		return;
@@ -283,17 +268,18 @@ void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
 	if (e.flags &MK_LBUTTON)
 	{
 		position_t p = local_xy(position_t(e.position.x, e.position.y));
-		if (m_items[p.y][p.x] != nullptr)
+		int x;
+		int y;
+		x = m_center.x + p.x - m_tile_count_x / 2;
+		y = m_center.y + p.y - m_tile_count_y / 2;
+		if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
 		{
-			m_items[p.y][p.x]->mouse_click(e);
+			//m_map->m_items[p.y][p.x]->mouse_click(e);
 			Parameter_MapCell* pr = new Parameter_MapCell();
-			if ((m_items[p.y][p.x]->m_map_element != nullptr) && (!m_just_focused))
+			pr->m_place = m_map->m_items[y][x];
+			if (Application::instance().m_message_queue.m_reader)
 			{
-				pr->m_place = m_items[p.y][p.x]->m_map_element;
-				if (Application::instance().m_message_queue.m_reader)
-				{
 					Application::instance().m_message_queue.push(pr);
-				}
 			}
 			m_just_focused = false;
 		}
@@ -303,10 +289,14 @@ void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
 		PopMenu->m_position.x = e.position.x;
 		PopMenu->m_position.y = e.position.y;
 		position_t p = local_xy(position_t(e.position.x, e.position.y));
-		if (m_items[p.y][p.x] != nullptr)
+		int x;
+		int y;
+		x = m_center.x + p.x - m_tile_count_x / 2;
+		y = m_center.y + p.y - m_tile_count_y / 2;
+		if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
 		{
 			//UnderCursor(CursorEventArgs(e.x, e.y));
-			for (std::list<GameObject*>::iterator Current = m_items[p.y][p.x]->m_map_element->m_items.begin(); Current !=m_items[p.y][p.x]->m_map_element->m_items.end(); Current++)
+			for (std::list<GameObject*>::iterator Current = m_map->m_items[y][x]->m_items.begin(); Current !=m_map->m_items[y][x]->m_items.end(); Current++)
 			{
 				PopMenu->add((*Current)->m_name, (*Current));
 			}
@@ -326,9 +316,15 @@ void GUI_MapViewer :: on_mouse_down(MouseEventArgs const& e)
 	if ((e.flags &MK_LBUTTON) || (e.flags &MK_RBUTTON))
 	{
 		position_t p =local_xy(e.position);
-		if (m_items[p.y][p.x] != nullptr)
+		int x;
+		int y;
+		x = m_center.x + p.x - m_tile_count_x / 2;
+		y = m_center.y + p.y - m_tile_count_y / 2;
+
+		if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
 		{
-			m_items[p.y][p.x]->mouse_down(e);
+			set_focus(true);
+			on_mouse_click(e);
 		}
 
 	}
@@ -353,9 +349,13 @@ void GUI_MapViewer::on_mouse_wheel(MouseEventArgs const& e)
 	}
 	calculate();
 	position_t p = local_xy(position_t(e.position.x, e.position.y));
-	if (m_items[p.y][p.x] != nullptr)
+	int x;
+	int y;
+	x = m_center.x + p.x - m_tile_count_x / 2;
+	y = m_center.y + p.y - m_tile_count_y / 2;
+	if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
 	{
-		m_cursored = m_items[p.y][p.x];
+		m_cursored = m_map->m_items[y][x];
 	}
 }
 
@@ -412,9 +412,13 @@ position_t GUI_MapViewer::local_xy(position_t p)
 void GUI_MapViewer::on_mouse_move(MouseEventArgs const& e)
 {
 	position_t p = local_xy(position_t(e.position.x, e.position.y));
-	if (m_items[p.y][p.x] != nullptr)
+	int x;
+	int y;
+	x = m_center.x + p.x - m_tile_count_x / 2;
+	y = m_center.y + p.y - m_tile_count_y / 2;
+	if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
 	{
-		m_cursored = m_items[p.y][p.x];
+		m_cursored = m_map->m_items[y][x];
 	}
 	if (e.flags&MK_LBUTTON)
 	{

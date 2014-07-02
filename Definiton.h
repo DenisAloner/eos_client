@@ -1,6 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include <functional>
+#include "glew.h"
 
 class GUI_Object;
 
@@ -62,19 +63,19 @@ struct MouseEventArgs
 	MouseEventArgs(position_t position, WPARAM flags) : position(position), flags(flags) {}
 };
 
-enum ActionKind
+enum action_e
 {
-	ActionKind_Move,
-	ActionKind_Push,
-	ActionKind_Turn,
-	ActionKind_OpenInventory
+	move,
+	push,
+	turn,
+	open_inventory
 };
 
-enum PropertyKind
+enum property_e
 {
-	PropertyKind_None,
-	PropertyKind_Impassable,
-	PropertyKind_Container
+	none,
+	permit_move,
+	container
 };
 
 enum ParameterKind
@@ -94,3 +95,58 @@ enum ObjectDirection
 	ObjectDirection_Down,
 	ObjectDirection_Right
 };
+
+struct tile_t
+{
+	GLuint unit;
+	GLdouble coordinat[8];
+};
+
+struct game_object_size_t
+{
+	int x;
+	int y;
+	int z;
+
+	game_object_size_t(int x, int y,int z) : x(x), y(y),z(z) {}
+	game_object_size_t() : x(0), y(0),z(0) {}
+};
+
+struct RGBA_t
+{
+	float R, G, B, A;
+
+	RGBA_t(float R, float G, float B, float A) : R(R), G(G), B(B), A(A){};
+
+	float RGBA_t::operator[](const std::size_t& index)
+	{
+		switch (index)
+		{
+		case 0: return R;
+		case 1: return G;
+		case 2: return B;
+		case 3: return A;
+		}
+	}
+};
+
+struct RGB_t
+{
+	float R, G, B;
+	RGB_t(float R, float G, float B) : R(R), G(G), B(B){};
+};
+
+struct light_t
+{
+	int R, G, B;
+
+	light_t(int R, int G, int B) : R(R), G(G), B(B){};
+	light_t() : R(0), G(0), B(0){};
+};
+
+template <typename T,int width, int height>
+class matrix_t{
+	T data[height][width];
+	//...member functions
+};
+

@@ -9,26 +9,12 @@
 
 class Application;
 class TAction;
-class TPlayer;
 class GUI_Object;
 class GUI_Layer;
 class TParameter;
 class MapCell;
 class GameMap;
-
-class GCMapElement:
-	public GUI_Object
-{
-public:
-
-	MapCell* m_map_element;
-	int m_x;
-	int m_y;
-
-	GCMapElement();
-	~GCMapElement();
-
-};
+class GameObject;
 
 class GUI_MapViewer :
 	public GUI_Object
@@ -40,7 +26,7 @@ public:
 	Event<MouseEventArgs> end_moving;
 
 	GUI_Object* m_focus;
-	GCMapElement* m_cursored;
+	MapCell* m_cursored;
 
 	bool m_just_focused;
 	bool m_is_moving;
@@ -57,9 +43,8 @@ public:
 	int m_cursor_x;
 	int m_cursor_y;
 
-	TPlayer* m_player;
+	GameObject* m_player;
 	GameMap* m_map;
-	GCMapElement* m_items[512][512];
 	GUI_Layer* m_GUI;
 
 	position_t m_center;

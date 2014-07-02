@@ -3,7 +3,7 @@
 
 GUI_Text::GUI_Text(std::string _Text)
 {
-	m_format = new GUI_TextFormat(8, 17, TColor(1.0, 1.0, 1.0, 1.0));
+	m_format = new GUI_TextFormat(8, 17, RGBA_t(1.0, 1.0, 1.0, 1.0));
 	set(_Text);
 }
 

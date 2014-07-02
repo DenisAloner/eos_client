@@ -9,36 +9,23 @@
 #include "GameObjectProperty.h"
 #include "Application.h"
 #include "Property_Container.h"
-
-struct TLight
-{
-	float Power;
-	float RGB[3];
-};
-
-struct GameObjectSize
-{
-	int x;
-	int y;
-	int z;
-};
+#include "TileManager.h"
 
 class MapCell;
 class GameObjectProperty;
 class TAction;
 class Application;
-
-enum ActionKind;
+class TileManager;
 
 class GameObject
 {
 public:
 
-	GameObjectSize m_size;
-	TLight* m_light;
 	std::string m_name;
+	game_object_size_t m_size;
+	light_t* m_light;
+	TileManager* m_tile_manager;
 	ObjectDirection m_direction;
-	unsigned int m_sprites[4][4];
 	bool m_selected;
 	MapCell* m_cell;
 
@@ -52,72 +39,11 @@ public:
 	}
 
 	/*virtual bool ContainAction(TAction* Action);*/
-	virtual TAction* find_action(ActionKind kind);
-	virtual GameObjectProperty* find_property(PropertyKind kind);
+	virtual TAction* find_action(action_e kind);
+	virtual GameObjectProperty* find_property(property_e kind);
 	void Turn();
 
 };
 
 
-class TFloor :
-	public GameObject
-{
-public:
 
-	TFloor();
-
-};
-
-class TPlayer :
-	public GameObject
-{
-public:
-
-	TPlayer();
-
-};
-
-class TOrc :
-	public GameObject
-{
-public:
-
-	TOrc();
-
-};
-
-class Elf :
-	public GameObject
-{
-public:
-
-	Elf();
-
-};
-
-class TWall :
-	public GameObject
-{
-public:
-
-	TWall();
-
-};
-
-class TBox:
-	public GameObject
-{
-public:
-
-	TBox();
-
-};
-
-class TTorch:
-	public GameObject
-{
-public:
-
-	TTorch();
-
-};

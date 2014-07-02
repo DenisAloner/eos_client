@@ -32,6 +32,144 @@ void gui_MessageQueue::push(TParameter* p)
 	m_items.pop_front();
 }
 
+void GameObjectManager::parser(const std::string& command)
+{
+	std::size_t found = 0;
+	std::string args;
+	command_e key;
+	found = command.find(" ");
+	if (found != std::string::npos)
+	{
+		//MessageBox(NULL, command.substr(0, found).c_str(), "", MB_OK);
+		key = m_commands.find(command.substr(0, found))->second;
+		args = command.substr(found + 1);
+	}
+	else {
+		key = m_commands.find(command)->second;
+	}
+	switch (key)
+	{
+	case command_e::obj:
+	{
+		m_object = new GameObject();
+		m_object->m_name = args;
+		m_items.insert(std::pair<std::string, GameObject*>(args, m_object));
+		break;
+	}
+	case command_e::size:
+	{
+		std::size_t pos = 0;
+		game_object_size_t size;
+		found = args.find(" ");
+		size.x = std::stoi(args.substr(0, found));
+		pos = found + 1;
+		found = args.find(" ", pos);
+		size.y = std::stoi(args.substr(pos, found - pos));
+		pos = found + 1;
+		size.z = std::stoi(args.substr(pos));
+		m_object->m_size = size;
+		break;
+	}
+	case command_e::tile_manager_single:
+	{
+		m_object->m_tile_manager = new TileManager_Single();
+		m_object->m_tile_manager->load_from_file(args);
+		break;
+	}
+	case command_e::tile_manager_map:
+	{
+		m_object->m_tile_manager = new TileManager_Map();
+		m_object->m_tile_manager->load_from_file(args);
+		break;
+	}
+	case command_e::light:
+	{
+		std::size_t pos = 0;
+		light_t* light = new light_t( 0, 0, 0);
+		found = args.find(" ");
+		light->R = std::stoi(args.substr(0, found));
+		pos = found + 1;
+		found = args.find(" ", pos);
+		light->G = std::stoi(args.substr(pos, found - pos));
+		pos = found + 1;
+		light->B = std::stoi(args.substr(pos));
+		m_object->m_light = light;
+		break;
+	}
+	case command_e::action_move:
+	{
+		m_object->m_actions.push_back(Application::instance().m_actions[action_e::move]);
+		break;
+	}
+	case command_e::property_permit_move:
+	{
+		m_object->m_properties.push_back(new GameObjectProperty(property_e::permit_move));
+		break;
+	}
+	case command_e::property_container:
+	{
+		std::size_t pos = 0;
+		std::string name;
+		int x;
+		int y;
+		found = args.find(" ");
+		name = args.substr(0, found);
+		pos = found + 1;
+		found = args.find(" ", pos);
+		x = std::stoi(args.substr(pos, found - pos));
+		pos = found + 1;
+		y = std::stoi(args.substr(pos));
+		m_object->m_properties.push_back(new Property_Container(x, y, name));
+		break;
+	}
+	}
+}
+
+void GameObjectManager::init()
+{
+	m_commands.insert(std::pair<std::string, command_e>("object", command_e::obj));
+	m_commands.insert(std::pair<std::string, command_e>("size", command_e::size));
+	m_commands.insert(std::pair<std::string, command_e>("tile_manager_single", command_e::tile_manager_single));
+	m_commands.insert(std::pair<std::string, command_e>("tile_manager_map", command_e::tile_manager_map));
+	m_commands.insert(std::pair<std::string, command_e>("light", command_e::light));
+	m_commands.insert(std::pair<std::string, command_e>("action_move", command_e::action_move));
+	m_commands.insert(std::pair<std::string, command_e>("property_permit_move", command_e::property_permit_move));
+	m_commands.insert(std::pair<std::string, command_e>("property_container", command_e::property_container));
+
+	GameObject* obj;
+	bytearray buffer;
+	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);
+	std::string config(buffer);
+	std::size_t pos = 0;
+	std::size_t found = 0;
+	while (pos != std::string::npos)
+	{
+		found = config.find("\r\n", pos);
+		if (found != std::string::npos)
+		{
+			if (found - pos > 0)
+			{
+				parser(config.substr(pos, found - pos));
+
+			}
+			pos = found + 2;
+		}
+		else {
+			parser(config.substr(pos));
+			pos = std::string::npos;
+		}
+	}
+
+};
+
+GameObject* GameObjectManager::new_object(std::string unit_name)
+{
+	GameObject* obj = new GameObject();
+	GameObject* config = m_items.find(unit_name)->second;
+	(*obj) = (*config);
+	return obj;
+}
+
 Application::Application()
 {
 }
@@ -103,7 +241,7 @@ void Application::initialization(HWND _hWnd)
 	m_ready = false;
 	m_graph = new GraphicalController();
 	m_mouse = new MouseController_Windows(_hWnd);
-	command_set_cursor(m_graph->m_sprites[21]);
+	command_set_cursor(m_graph->m_cursor);
 	command_set_cursor_visibility(true);
 
 	m_GUI = new ApplicationGUI();
@@ -117,32 +255,32 @@ void Application::initialization(HWND _hWnd)
 	m_mouse->mouse_move += std::bind(&Application::on_mouse_move, this, std::placeholders::_1);
 	m_action_manager = new TActionManager();
 
-	m_actions[0]=new ActionClass_Move();
+	m_actions[0] = new ActionClass_Move();
 	m_actions[1] = new ActionClass_Push();
 	m_actions[2] = new ActionClass_Turn();
 	m_actions[3] = new Action_OpenInventory();
+	m_game_object_manager.init();
 
 	m_GUI->MapViewer = new GUI_MapViewer(this);
 	m_GUI->MapViewer->m_position.x = 0;
 	m_GUI->MapViewer->m_position.y = 0;
 	m_GUI->MapViewer->m_size.w = 1024;
 	m_GUI->MapViewer->m_size.h = 1024;
-	m_GUI->MapViewer->m_map = new GameMap();
+	
+	m_GUI->MapViewer->m_map = new GameMap(dimension_t(200,200));
 	m_GUI->MapViewer->m_map->generate_level();
-	m_GUI->MapViewer->m_player = new TPlayer();
+	m_GUI->MapViewer->m_player = m_game_object_manager.new_object("Эльф");
 	if (m_GUI->MapViewer->m_map->m_items[9][9] == nullptr)
 	{
 		m_GUI->MapViewer->m_map->m_items[9][9] = new MapCell(9, 9);
-		m_GUI->MapViewer->m_map->add_object(new TFloor(), m_GUI->MapViewer->m_map->m_items[9][9]);
+		m_GUI->MapViewer->m_map->add_object(m_game_object_manager.new_object("Пол"), m_GUI->MapViewer->m_map->m_items[9][9]);
 	}
 	if (m_GUI->MapViewer->m_map->m_items[9][8] == nullptr)
 	{
 		m_GUI->MapViewer->m_map->m_items[9][8] = new MapCell(8, 9);
-		m_GUI->MapViewer->m_map->add_object(new TFloor(), m_GUI->MapViewer->m_map->m_items[9][8]);
+		m_GUI->MapViewer->m_map->add_object(m_game_object_manager.new_object("Пол"), m_GUI->MapViewer->m_map->m_items[9][8]);
 	}
-	m_GUI->MapViewer->m_map->add_new_object(m_GUI->MapViewer->m_player, m_GUI->MapViewer->m_map->m_items[9][9]);
-
-	
+	m_GUI->MapViewer->m_map->add_object(m_GUI->MapViewer->m_player, m_GUI->MapViewer->m_map->m_items[9][9]);
 	//TGCButton* Button;
 	//Button = new TGCButton();
 	//Button->x = 100;
@@ -166,16 +304,16 @@ void Application::initialization(HWND _hWnd)
 	ActionPanel = new GUI_ActionPanel(2,975,898,47);
 	GUI_ActionButton* ActionButton;
 	ActionButton = new GUI_ActionButton();
-	ActionButton->m_action = m_actions[ActionKind_Move];
+	ActionButton->m_action = m_actions[action_e::move];
 	ActionPanel->add_item_control(ActionButton);
 	ActionButton = new GUI_ActionButton();
-	ActionButton->m_action = m_actions[ActionKind_Push];
+	ActionButton->m_action = m_actions[action_e::push];
 	ActionPanel->add_item_control(ActionButton);
 	ActionButton = new GUI_ActionButton();
-	ActionButton->m_action = m_actions[ActionKind_Turn];
+	ActionButton->m_action = m_actions[action_e::turn];
 	ActionPanel->add_item_control(ActionButton);
 	ActionButton = new GUI_ActionButton();
-	ActionButton->m_action = m_actions[ActionKind_OpenInventory];
+	ActionButton->m_action = m_actions[action_e::open_inventory];
 	ActionPanel->add_item_control(ActionButton);
 	GUI_Layer* MenuLayer;
 	MenuLayer = new GUI_Layer();
@@ -259,13 +397,14 @@ void Application::initialization(HWND _hWnd)
 	if (music == NULL) {
 
 		/* Actually loads up the music */
-		music = Mix_LoadWAV("C:\\ExplorersOfSaarum\\Click.wav");
+		music = Mix_LoadWAV((FileSystem::instance().m_resource_path+"Sounds\\Click.wav").c_str());
 
 		/* This begins playing the music - the first argument is a
 		pointer to Mix_Music structure, and the second is how many
 		times you want it to loop (use -1 for infinite, and 0 to
 		have it just play once) */
 	}
+
 	m_ready = true;
 }
 
@@ -277,6 +416,7 @@ void Application::PlaySound1()
 void Application::update(void)
 {
 	m_update_mutex.lock();
+	m_GUI->MapViewer->m_map->calculate_lighting();
 	if(!m_action_manager->m_items.empty())
 	{
 		GameTask* A;
@@ -363,7 +503,7 @@ bool Application::command_open_inventory(GameObject*& Object)
 {
 	//MessageBox(NULL, "In_1", "", MB_OK);
 	bool Result = false;
-	Property_Container* Property = static_cast<Property_Container*>(Object->find_property(PropertyKind_Container));
+	Property_Container* Property = static_cast<Property_Container*>(Object->find_property(property_e::container));
 	if (Property != nullptr)
 	{
 		//MessageBox(NULL, "In_2", "", MB_OK);
@@ -405,7 +545,7 @@ bool Application::command_check_position(GameObject*& _Object, MapCell*& _Positi
 		for (int j = 0; j<_Object->m_size.x; j++)
 		{
 			if (_Map->m_items[_Position->y + i][_Position->x - j] == nullptr){ return false; }
-			if (_Map->m_items[_Position->y + i][_Position->x - j]->find_property(PropertyKind_Impassable, _Object) != nullptr)
+			if (_Map->m_items[_Position->y + i][_Position->x - j]->find_property(property_e::permit_move, _Object) == nullptr)
 			{
 				return false;
 			}

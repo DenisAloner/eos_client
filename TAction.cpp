@@ -2,7 +2,7 @@
 
 TAction::TAction(void)
 {
-	m_kind = ActionKind_Move;
+	m_kind = action_e::move;
 	m_name="Нет";
 }
 
@@ -36,7 +36,7 @@ void TAction::interaction_handler()
 
 ActionClass_Move::ActionClass_Move()
 {
-	m_kind = ActionKind_Move;
+	m_kind = action_e::move;
 	m_name = "Идти";
 }
 
@@ -76,7 +76,7 @@ bool ActionClass_Move::check(TParameter* parameter)
 	//	for (int j = 0; j<p->object->Area.x; j++)
 	//	{
 	//		if (p->map->Items[p->place->y + i][p->place->x - j] == nullptr){ return false; }
-	//		if (p->map->Items[p->place->y + i][p->place->x - j]->FindProperty(PropertyKind_Impassable, p->object) != nullptr)
+	//		if (p->map->Items[p->place->y + i][p->place->x - j]->FindProperty(property_action_move, p->object) != nullptr)
 	//		{
 	//			return false;
 	//		}
@@ -95,21 +95,19 @@ void ActionClass_Move::perfom(TParameter* parameter)
 	}
 }
 
-char const* ActionClass_Move::get_description(TParameter* parameter)
+std::string ActionClass_Move::get_description(TParameter* parameter)
 {
 	Parameter_Position* p = static_cast<Parameter_Position*>(parameter);
 	std::string s("Идти в X:");
 	s += std::to_string(p->m_place->x);
 	s += ",Y:";
 	s += std::to_string(p->m_place->y);
-	char* cstr = new char[s.length() + 1];
-	std::strcpy(cstr, s.c_str());
-	return cstr;
+	return s;
 }
 
 ActionClass_Push::ActionClass_Push(void)
 {
-	m_kind = ActionKind_Push;
+	m_kind = action_e::push;
 	m_name = "Толкать";
 }
 
@@ -118,7 +116,7 @@ ActionClass_Push::~ActionClass_Push(void)
 {
 }
 
-char const* ActionClass_Push::get_description(TParameter* parameter)
+std::string ActionClass_Push::get_description(TParameter* parameter)
 {
 	Parameter_MoveObjectByUnit* p = static_cast<Parameter_MoveObjectByUnit*>(parameter);
 	std::string s("Переместить ");
@@ -126,27 +124,13 @@ char const* ActionClass_Push::get_description(TParameter* parameter)
 	s += " в X:"+std::to_string(p->m_place->x);
 	s += ",Y:";
 	s += std::to_string(p->m_place->y);
-	char* cstr = new char[s.length() + 1];
-	std::strcpy(cstr, s.c_str());
-	return cstr;
+	return s;
 }
 
 bool ActionClass_Push::check(TParameter* parameter)
 {
 	Parameter_MoveObjectByUnit* p = static_cast<Parameter_MoveObjectByUnit*>(parameter);
-	GameObjectProperty* result(nullptr);
-	for (int i = 0; i<p->m_object->m_size.y; i++)
-	{
-		for (int j = 0; j<p->m_object->m_size.x; j++)
-		{
-			if (p->m_map->m_items[p->m_place->y + i][p->m_place->x - j] == nullptr){ return false; }
-			if (p->m_map->m_items[p->m_place->y + i][p->m_place->x - j]->find_property(PropertyKind_Impassable, p->m_object) != nullptr)
-			{
-				return false;
-			}
-		}
-	}
-	return true;
+	return Application::instance().command_check_position(p->m_object, p->m_place, p->m_map);
 }
 
 void ActionClass_Push::perfom(TParameter* parameter)
@@ -194,7 +178,7 @@ void ActionClass_Push::interaction_handler()
 
 ActionClass_Turn::ActionClass_Turn(void)
 {
-	m_kind = ActionKind_Turn;
+	m_kind = action_e::turn;
 	m_name = "Повернуться";
 }
 
@@ -203,13 +187,11 @@ ActionClass_Turn::~ActionClass_Turn(void)
 {
 }
 
-char const* ActionClass_Turn::get_description(TParameter* parameter)
+std::string ActionClass_Turn::get_description(TParameter* parameter)
 {
 	Parameter_GameObject* p = static_cast<Parameter_GameObject*>(parameter);
 	std::string s("Повернуться");
-	char* cstr = new char[s.length() + 1];
-	std::strcpy(cstr, s.c_str());
-	return cstr;
+	return s;
 }
 
 bool ActionClass_Turn::check(TParameter* parameter)
@@ -240,7 +222,7 @@ void ActionClass_Turn::interaction_handler()
 
 Action_OpenInventory::Action_OpenInventory()
 {
-	m_kind = ActionKind_OpenInventory;
+	m_kind = action_e::open_inventory;
 }
 
 
@@ -266,7 +248,6 @@ void Action_OpenInventory::interaction_handler()
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
-	//Game->ActionManager->Add(new GameTask(this, p));
 	Application::instance().command_open_inventory(p->m_object);
 	Application::instance().m_message_queue.m_busy = false;
 }
@@ -279,10 +260,9 @@ bool Action_OpenInventory::check(TParameter* parameter)
 
 void Action_OpenInventory::perfom(TParameter* parameter)
 {
-
 }
 
-char const* Action_OpenInventory::get_description(TParameter* parameter)
+std::string Action_OpenInventory::get_description(TParameter* parameter)
 {
 	return "";
 }

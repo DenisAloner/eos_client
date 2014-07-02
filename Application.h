@@ -25,6 +25,9 @@
 #include "GUI_Timer.h"
 #include "Property_Container.h"
 #include "GUI_Inventory.h"
+#include "FileSystem.h"
+#include <map>
+#include "TileManager.h"
 
 class TAction;
 class TActionManager;
@@ -64,6 +67,34 @@ public:
 	void push(TParameter* p);
 };
 
+class GameObjectManager
+{
+public:
+
+	enum command_e
+	{
+		obj,
+		size,
+		tile_manager_single,
+		tile_manager_map,
+		light,
+		action_move,
+		property_permit_move,
+		property_container
+	};
+
+	std::map<std::string, GameObject*> m_items;
+	std::map<std::string, command_e> m_commands;
+
+	GameObject* m_object;
+
+	void parser(const std::string& command);
+	GameObject* new_object(std::string unit_name);
+
+	void init();
+
+};
+
 class Application
 {
 public:
@@ -76,6 +107,8 @@ public:
 	gui_MessageQueue m_message_queue;
 
 	std::mutex m_update_mutex;
+
+	GameObjectManager m_game_object_manager;
 
 	ApplicationGUI* m_GUI;
 	GraphicalController* m_graph;

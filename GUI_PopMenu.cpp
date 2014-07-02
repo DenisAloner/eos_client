@@ -41,7 +41,7 @@ void GUI_PopMenu::add(std::string Text, GameObject* Object)
 			maxlen = object->m_text.length();
 		}
 	}
-	resize(maxlen * 9+2, m_item_controls->m_items.size() * 18);
+	resize(maxlen * 9+8, m_item_controls->m_items.size() * 18);
 	for (std::list<GUI_Object*>::iterator Current = m_item_controls->m_items.begin(); Current != m_item_controls->m_items.end(); Current++)
 	{
 		(*Current)->m_size.w = m_size.w - 1;
@@ -106,14 +106,16 @@ void GUI_PopMenuItem::render(GraphicalController* Graph, int px, int py)
 		glColor4d(1.0, 1.0,1.0, 0.75);
 		Graph->draw_sprite(px, py, px, py + m_size.h, px + m_size.w, py + m_size.h, px + m_size.w, py);
 		glColor4d(0, 0, 0, 1);
+		glEnable(GL_TEXTURE_2D);
+		Graph->output_text(px+4, py, m_text, 8, 17);
 	}
 	else {
 		glColor4d(1, 1, 1, 1);
 		//glColor4d(1, 1, 1, 0.25);
 		//Graph->draw_sprite(px, py, px, py + height, px + width, py + height, px + width, py);
+		glEnable(GL_TEXTURE_2D);
+		Graph->output_text(px, py, m_text, 8, 17);
 	}
-	glEnable(GL_TEXTURE_2D);
-	Graph->output_text(px, py, m_text, 8, 17);
 }
 
 void GUI_PopMenuItem::on_mouse_move(MouseEventArgs const& e)

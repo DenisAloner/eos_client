@@ -2,48 +2,22 @@
 
 GraphicalController::GraphicalController()
 {
-	m_sprites[0] = load_texture("C:\\ExplorersOfSaarum\\plitka_na_pol.bmp");
-	m_sprites[1] = load_texture("C:\\ExplorersOfSaarum\\Stena.bmp");
-	m_sprites[2] = load_texture("C:\\ExplorersOfSaarum\\sprite_8.bmp");
-	m_sprites[3] = load_texture("C:\\ExplorersOfSaarum\\ElfSprite-1.bmp");
-	m_sprites[4] = load_texture("C:\\ExplorersOfSaarum\\ElfSprite-2.bmp");
-	m_sprites[5] = load_texture("C:\\ExplorersOfSaarum\\ElfSprite-3.bmp");
-	m_sprites[6] = load_texture("C:\\ExplorersOfSaarum\\ElfSprite-4.bmp");
-	m_sprites[7] = load_texture("C:\\ExplorersOfSaarum\\orc.bmp");
-	m_sprites[8] = load_texture("C:\\ExplorersOfSaarum\\select.bmp");
-	m_sprites[9] = load_texture("C:\\ExplorersOfSaarum\\Sunduk.bmp");
-	m_sprites[10] = load_texture("C:\\ExplorersOfSaarum\\ElfSprite-5.bmp");
-	m_sprites[11] = load_texture("C:\\ExplorersOfSaarum\\ElfSprite-6.bmp");
-	m_sprites[12] = load_texture("C:\\ExplorersOfSaarum\\ElfSprite-7.bmp");
-	m_sprites[13] = load_texture("C:\\ExplorersOfSaarum\\ElfSprite-8.bmp");
-	m_sprites[14] = load_texture("C:\\ExplorersOfSaarum\\Elf2.bmp");
-	m_sprites[15] = load_texture("C:\\ExplorersOfSaarum\\Stena2.bmp");
-	m_sprites[16] = load_texture("C:\\ExplorersOfSaarum\\plitka_na_pol2.bmp");
-	m_sprites[18] = load_texture("C:\\ExplorersOfSaarum\\IB2.bmp");
-	m_sprites[19] = load_texture("C:\\ExplorersOfSaarum\\Screen.bmp");
-	m_sprites[20] = load_texture("C:\\ExplorersOfSaarum\\Screen.bmp");
-	m_sprites[21] = load_texture("C:\\ExplorersOfSaarum\\EoS_Cursor.bmp");
+	m_actions[action_e::move] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_0.bmp");
+	m_actions[action_e::push] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_1.bmp");
+	m_actions[action_e::turn] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_2.bmp");
+	m_actions[action_e::open_inventory] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_3.bmp");
 
-	m_sprites[22] = load_texture("C:\\ExplorersOfSaarum\\Tiles\\EoS_Wall_01.bmp");
-	m_sprites[23] = load_texture("C:\\ExplorersOfSaarum\\Tiles\\EoS_Wall_02.bmp");
-	m_sprites[24] = load_texture("C:\\ExplorersOfSaarum\\Tiles\\EoS_Wall_03.bmp");
-	m_sprites[25] = load_texture("C:\\ExplorersOfSaarum\\Tiles\\EoS_Wall_04.bmp");
-	m_sprites[26] = load_texture("C:\\ExplorersOfSaarum\\Tiles\\EoS_Wall_05.bmp");
-	m_sprites[27] = load_texture("C:\\ExplorersOfSaarum\\Tiles\\EoS_Floor_01.bmp");
-	m_sprites[28] = load_texture("C:\\ExplorersOfSaarum\\Tiles\\EoS_Floor_02.bmp");
-	m_sprites[29] = load_texture("C:\\ExplorersOfSaarum\\Tiles\\EoS_Floor_03.bmp");
-	m_sprites[30] = load_texture("C:\\ExplorersOfSaarum\\Tiles\\EoS_Floor_04.bmp");
-
-	m_actions[ActionKind_Move] = load_texture("C:\\ExplorersOfSaarum\\Action_0.bmp");
-	m_actions[ActionKind_Push] = load_texture("C:\\ExplorersOfSaarum\\Action_1.bmp");
-	m_actions[ActionKind_Turn] = load_texture("C:\\ExplorersOfSaarum\\Action_2.bmp");
-	m_actions[ActionKind_OpenInventory] = load_texture("C:\\ExplorersOfSaarum\\Bag.bmp");
-
-	m_render_shader = load_shader("C:\\ExplorersOfSaarum\\EoS_Render.vsh", "C:\\ExplorersOfSaarum\\EoS_Render.fsh");
-	m_light_shader = load_shader("C:\\ExplorersOfSaarum\\EoS_Light.vsh", "C:\\ExplorersOfSaarum\\EoS_Light.fsh");
-	m_horizontal_shader = load_shader("C:\\ExplorersOfSaarum\\EoS_Render.vsh", "C:\\ExplorersOfSaarum\\EoS_HorizontalBlur.fsh");
-	m_vertical_shader = load_shader("C:\\ExplorersOfSaarum\\EoS_Render.vsh", "C:\\ExplorersOfSaarum\\EoS_VerticalBlur.fsh");
-	m_font = load_texture("C:\\ExplorersOfSaarum\\FontRender4.bmp");
+	m_render_shader = load_shader("EoS_Render", "EoS_Render");
+	m_light_shader = load_shader("EoS_Light", "EoS_Light");
+	m_horizontal_shader = load_shader("EoS_Render", "EoS_HorizontalBlur");
+	m_vertical_shader = load_shader("EoS_Render", "EoS_VerticalBlur");
+	m_tile_shader = load_shader("EoS_Tile", "EoS_Tile");
+	m_empty_01 = load_texture(FileSystem::instance().m_resource_path +  "Tiles\\EoS_Empty.bmp");
+	m_empty_02 = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Empty.bmp");
+	m_close = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Close.bmp");
+	m_select = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Select.bmp");
+	m_font = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Font.bmp");
+	m_cursor = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Cursor.bmp");
 
 	m_scissors.push_front(frectangle_t(0.0f, 0.0f, 1024.0f, 1024.0f));
 	glGenFramebuffersEXT(1, &m_FBO);
@@ -58,6 +32,16 @@ void GraphicalController::draw_sprite(double x0, double y0, double x1, double y1
 		glTexCoord2d(1,1); glVertex2d(x3, y3);
 		glEnd();
 	}
+
+void GraphicalController::draw_tile(tile_t& tile,double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3)
+{
+	glBegin(GL_QUADS);
+	glTexCoord2d(tile.coordinat[0], tile.coordinat[1]); glVertex2d(x0, y0);
+	glTexCoord2d(tile.coordinat[2], tile.coordinat[3]); glVertex2d(x1, y1);
+	glTexCoord2d(tile.coordinat[4], tile.coordinat[5]); glVertex2d(x2, y2);
+	glTexCoord2d(tile.coordinat[6], tile.coordinat[7]); glVertex2d(x3, y3);
+	glEnd();
+}
 
 void GraphicalController::draw_sprite_FBO(double TexWidth, double TexHeight, double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3)
 {
@@ -166,70 +150,25 @@ void GraphicalController::blur_rect(int x, int y, int width, int height)
 	glDisable(GL_SCISSOR_TEST);
 	glDisable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, m_sprites[19]);
+	glBindTexture(GL_TEXTURE_2D, m_empty_01);
 	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, x, 1024 - y - height, width, height);
 	double Tx = width / 1024.0;
 	double Ty = height / 1024.0;
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_FBO);
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_sprites[20], 0);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_empty_02, 0);
 	glUseProgramObjectARB(m_horizontal_shader);
 	set_uniform_sampler(m_horizontal_shader, "Map");
 	draw_sprite_FBO(Tx, Ty, 0, 1024 - height, 0, 1024, width, 1024, width, 1024 - height);
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_sprites[19], 0);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_empty_01, 0);
 	glUseProgramObjectARB(m_vertical_shader);
 	set_uniform_sampler(m_vertical_shader, "Map");
-	glBindTexture(GL_TEXTURE_2D, m_sprites[20]);
+	glBindTexture(GL_TEXTURE_2D, m_empty_02);
 	draw_sprite_FBO(Tx, Ty, 0, 1024 - height, 0, 1024, width, 1024, width, 1024 - height);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 	glUseProgramObjectARB(0);
 	glEnable(GL_SCISSOR_TEST);
-	glBindTexture(GL_TEXTURE_2D, m_sprites[19]);
+	glBindTexture(GL_TEXTURE_2D, m_empty_01);
 	draw_sprite_FBO(Tx, Ty, x, y, x, y + height, x + width, y + height, x + width, y);
-}
-
-GLcharARB* GraphicalController::load_shader_source(char* filename)
-{
-	GLcharARB* ShaderSource;
-	std::ifstream ShaderFile(filename, std::ifstream::binary);
-	if (ShaderFile)
-	{
-		ShaderFile.seekg(0, ShaderFile.end);
-		int length = ShaderFile.tellg();
-		ShaderFile.seekg(0, ShaderFile.beg);
-		ShaderSource = new GLcharARB[length + 1];
-		ShaderFile.read(ShaderSource, length);
-		ShaderSource[length] = '\0';
-		ShaderFile.close();
-	}
-	else {
-		return nullptr;
-	}
-	return ShaderSource;
-}
-
-GLhandleARB GraphicalController::load_shader(char* vPath, char* fPath)
-{
-	const GLcharARB* VertexShaderSource = load_shader_source(vPath);
-	const GLcharARB* FragmentShaderSource = load_shader_source(fPath);
-	GLhandleARB Program;
-	GLhandleARB VertexShader;
-	GLhandleARB FragmentShader;
-	Program = glCreateProgramObjectARB();
-	VertexShader = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
-	FragmentShader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
-	glShaderSourceARB(VertexShader, 1, &VertexShaderSource, NULL);
-	glCompileShaderARB(VertexShader);
-	GLint compileStatus;
-	glGetObjectParameterivARB(VertexShader, GL_OBJECT_COMPILE_STATUS_ARB, &compileStatus);
-	show_error(VertexShader);
-	glShaderSourceARB(FragmentShader, 1, &FragmentShaderSource, NULL);
-	glCompileShaderARB(FragmentShader);
-	glGetObjectParameterivARB(FragmentShader, GL_OBJECT_COMPILE_STATUS_ARB, &compileStatus);
-	show_error(FragmentShader);
-	glAttachObjectARB(Program, VertexShader);
-	glAttachObjectARB(Program, FragmentShader);
-	glLinkProgramARB(Program);
-	return Program;
 }
 
 bool GraphicalController::set_uniform_vector(GLhandleARB program, const char * name, const float * value)
@@ -256,6 +195,15 @@ bool GraphicalController::set_uniform_ptr(GLhandleARB program, const char * name
 	if (loc < 0)
 		return false;
 	glUniform1uiv(loc, 1, &value);
+	return true;
+}
+
+bool GraphicalController::set_uniform_float(GLhandleARB program, const char * name, const float value)
+{
+	int loc = glGetUniformLocationARB(program, name);
+	if (loc < 0)
+		return false;
+	glUniform1f(loc,value);
 	return true;
 }
 
@@ -317,41 +265,110 @@ position_t GraphicalController::get_OpenGL_position(float x, float y)
 	return position_t(_Point.x, _Point.y);
 }
 
-GLuint GraphicalController::load_texture(const char * filename)
+//GLuint GraphicalController::load_texture(const char * filename)
+//{
+//	GLuint texture;
+//	char* data;
+//	FILE* file;
+//	BITMAPFILEHEADER header;
+//	BITMAPINFOHEADER info;
+//	fopen_s(&file, filename, "rb");
+//	fread(&header, sizeof(header), 1, file);
+//	fread(&info, sizeof(info), 1, file);
+//	data = new char[info.biWidth * info.biHeight * 4];
+//	fread(data, info.biWidth * info.biHeight * sizeof(GLuint), 1, file);
+//	fclose(file);
+//	for (GLuint i = 0; i<info.biWidth * info.biHeight * 4; i += 4)
+//	{
+//		int r, g, b, a;
+//		b = data[i];
+//		g = data[i + 1];
+//		r = data[i + 2];
+//		a = data[i + 3];
+//		data[i] = r;
+//		data[i + 1] = g;
+//		data[i + 2] = b;
+//		data[i + 3] = a;
+//	}
+//	glGenTextures(1, &texture);
+//	glBindTexture(GL_TEXTURE_2D, texture);
+//	//glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+//	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+//	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+//	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+//	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+//	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+//	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, info.biWidth, info.biHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+//	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, info.biWidth, info.biHeight, GL_RGBA, GL_UNSIGNED_BYTE, data);
+//	delete data;
+//	return texture;
+//}
+
+GLuint GraphicalController::load_texture(const std::string& path)
 {
 	GLuint texture;
-	char* data;
 	FILE* file;
-	BITMAPFILEHEADER header;
-	BITMAPINFOHEADER info;
-	fopen_s(&file, filename, "rb");
-	fread(&header, sizeof(header), 1, file);
-	fread(&info, sizeof(info), 1, file);
-	data = new char[info.biWidth * info.biHeight * 4];
-	fread(data, info.biWidth * info.biHeight * sizeof(GLuint), 1, file);
-	fclose(file);
-	for (GLuint i = 0; i<info.biWidth * info.biHeight * 4; i += 4)
-	{
-		int r, g, b, a;
-		b = data[i];
-		g = data[i + 1];
-		r = data[i + 2];
-		a = data[i + 3];
-		data[i] = r;
-		data[i + 1] = g;
-		data[i + 2] = b;
-		data[i + 3] = a;
-	}
+	BITMAPFILEHEADER* header;
+	BITMAPINFOHEADER* info;
+	char* data;
+	bytearray buff;
+	FileSystem::instance().load_from_file(path, buff);
+	header = reinterpret_cast<BITMAPFILEHEADER*>(buff.get());
+	info = reinterpret_cast<BITMAPINFOHEADER*>(buff.get() + sizeof(*header));
+	data = reinterpret_cast<char*>(buff.get() + sizeof(*header)+sizeof(*info));
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	//glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, info.biWidth, info.biHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, info.biWidth, info.biHeight, GL_RGBA, GL_UNSIGNED_BYTE, data);
-	delete data;
+	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, info->biWidth, info->biHeight, GL_BGRA, GL_UNSIGNED_BYTE, data);
 	return texture;
 }
+
+GLcharARB* GraphicalController::load_shader_source(const std::string& path)
+{
+	GLcharARB* ShaderSource;
+	std::ifstream ShaderFile(path, std::ifstream::binary);
+	if (ShaderFile)
+	{
+		ShaderFile.seekg(0, ShaderFile.end);
+		int length = ShaderFile.tellg();
+		ShaderFile.seekg(0, ShaderFile.beg);
+		ShaderSource = new GLcharARB[length + 1];
+		ShaderFile.read(ShaderSource, length);
+		ShaderSource[length] = '\0';
+		ShaderFile.close();
+	}
+	else {
+		return nullptr;
+	}
+	return ShaderSource;
+}
+
+GLhandleARB GraphicalController::load_shader(const std::string& vPath, const std::string& fPath)
+{
+	const GLcharARB* VertexShaderSource = load_shader_source(FileSystem::instance().m_resource_path + "Shaders\\" + vPath + ".vsh");
+	const GLcharARB* FragmentShaderSource = load_shader_source(FileSystem::instance().m_resource_path + "Shaders\\" + fPath + ".fsh");
+	GLhandleARB Program;
+	GLhandleARB VertexShader;
+	GLhandleARB FragmentShader;
+	Program = glCreateProgramObjectARB();
+	VertexShader = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
+	FragmentShader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+	glShaderSourceARB(VertexShader, 1, &VertexShaderSource, NULL);
+	glCompileShaderARB(VertexShader);
+	GLint compileStatus;
+	glGetObjectParameterivARB(VertexShader, GL_OBJECT_COMPILE_STATUS_ARB, &compileStatus);
+	show_error(VertexShader);
+	glShaderSourceARB(FragmentShader, 1, &FragmentShaderSource, NULL);
+	glCompileShaderARB(FragmentShader);
+	glGetObjectParameterivARB(FragmentShader, GL_OBJECT_COMPILE_STATUS_ARB, &compileStatus);
+	show_error(FragmentShader);
+	glAttachObjectARB(Program, VertexShader);
+	glAttachObjectARB(Program, FragmentShader);
+	glLinkProgramARB(Program);
+	return Program;
+}
+

@@ -1,0 +1,27 @@
+object Эльф
+size 2 1 6
+tile_manager_map EoS_Elf
+action_move
+property_container Мешок 2 4
+
+object Пол
+size 1 1 1
+tile_manager_single EoS_Floor_01
+property_permit_move
+
+object Стена
+size 1 1 5
+tile_manager_single EoS_Wall_01
+
+object Грязь
+size 1 1 5
+tile_manager_single EoS_Mud
+
+object Факел
+size 1 1 4
+tile_manager_single EoS_Torch
+light 20 20 20
+
+object Дверь
+size 5 1 5
+tile_manager_single EoS_Door

@@ -12,7 +12,7 @@ class TAction
 {
 public:
 
-	ActionKind m_kind;
+	action_e m_kind;
 	std::string m_name;
 
 	TAction(void);
@@ -20,7 +20,7 @@ public:
 
 	virtual bool check(TParameter* parameter);
 	virtual void perfom(TParameter* parameter);
-	virtual char const* get_description(TParameter* parameter) = 0;
+	virtual std::string get_description(TParameter* parameter) = 0;
 	virtual void interaction_handler();
 };
 
@@ -35,7 +35,7 @@ public:
 
 	virtual bool check(TParameter* parameter);
 	virtual void perfom(TParameter* parameter);
-	virtual char const* get_description(TParameter* parameter);
+	virtual std::string get_description(TParameter* parameter);
 	virtual void interaction_handler();
 };
 
@@ -50,7 +50,7 @@ public:
 
 	virtual bool check(TParameter* parameter);
 	virtual void perfom(TParameter* parameter);
-	virtual char const* get_description(TParameter* parameter);
+	virtual std::string get_description(TParameter* parameter);
 	virtual void interaction_handler();
 
 };
@@ -65,7 +65,7 @@ public:
 
 	virtual bool check(TParameter* parameter);
 	virtual void perfom(TParameter* parameter);
-	virtual char const* get_description(TParameter* parameter);
+	virtual std::string get_description(TParameter* parameter);
 	virtual void interaction_handler();
 
 };
@@ -80,7 +80,7 @@ public:
 
 	virtual bool check(TParameter* parameter);
 	virtual void perfom(TParameter* parameter);
-	virtual char const* get_description(TParameter* parameter);
+	virtual std::string get_description(TParameter* parameter);
 	virtual void interaction_handler();
 
 };

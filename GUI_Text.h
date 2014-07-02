@@ -3,31 +3,13 @@
 #include <string>
 
 
-struct TColor
-{
-	float R, G, B, A;
-
-	TColor(float _R, float _G, float _B, float _A) : R(_R), G(_G), B(_B), A(_A){};
-
-	float TColor::operator[](const std::size_t& index)
-	{
-		switch (index)
-		{
-		case 0: return R;
-		case 1: return G;
-		case 2: return B;
-		case 3: return A;
-		}
-	}
-};
-
 class GUI_TextFormat
 {
 public:
 
-	GUI_TextFormat(int _SizeX, int _SizeY, TColor _Color) : m_symbol_size(dimension_t(_SizeX,_SizeY)), m_color(_Color) {};
+	GUI_TextFormat(int _SizeX, int _SizeY, RGBA_t _Color) : m_symbol_size(dimension_t(_SizeX,_SizeY)), m_color(_Color) {};
 	~GUI_TextFormat();
-	TColor m_color;
+	RGBA_t m_color;
 	dimension_t m_symbol_size;
 
 };
