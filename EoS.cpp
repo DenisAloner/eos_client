@@ -4,12 +4,14 @@
 //
 
 // Includes
-#include <windows.h>
 #include "Application.h"
 #include "Definiton.h"
+#include "winlog.h"
+#include <windows.h>
 #include <thread>
 #include <chrono>
 #include <string>
+
 // Function Declarations
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -31,6 +33,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	HGLRC hRC;
 	MSG msg;
 	BOOL quit = FALSE;
+
+	// initialize logging
+	FLAGS_logtostderr = true;
+	FLAGS_colorlogtostderr = true;
+	google::InitGoogleLogging("EoS");
+	std::shared_ptr<WinDebugSink> sink(new WinDebugSink());
+	google::AddLogSink(sink.get());
 
 	// register window class
 	wc.style = CS_OWNDC;

@@ -1,8 +1,12 @@
 #include "FileSystem.h"
 
+#ifndef RESOURCES_PATH
+#define RESOURCES_PATH "resources\\"
+#endif
+
 FileSystem::FileSystem()
+: m_resource_path(RESOURCES_PATH)
 {
-	m_resource_path = "C:\\Users\\Alo\\Documents\\GitHub\\eos_client\\resources\\";
 }
 
 FileSystem::~FileSystem()

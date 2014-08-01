@@ -1,37 +1,46 @@
 #include "GraphicalController.h"
+#undef ERROR
+#include <glog/logging.h>
+
 
 GraphicalController::GraphicalController()
 {
-	m_actions[action_e::move] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_0.bmp");
-	m_actions[action_e::push] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_1.bmp");
-	m_actions[action_e::turn] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_2.bmp");
-	m_actions[action_e::open_inventory] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_3.bmp");
+	try
+	{
+		m_actions[action_e::move] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_0.bmp");
+		m_actions[action_e::push] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_1.bmp");
+		m_actions[action_e::turn] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_2.bmp");
+		m_actions[action_e::open_inventory] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_3.bmp");
 
-	m_render_shader = load_shader("EoS_Render", "EoS_Render");
-	m_light_shader = load_shader("EoS_Light", "EoS_Light");
-	m_horizontal_shader = load_shader("EoS_Render", "EoS_HorizontalBlur");
-	m_vertical_shader = load_shader("EoS_Render", "EoS_VerticalBlur");
-	m_tile_shader = load_shader("EoS_Tile", "EoS_Tile");
-	m_empty_01 = load_texture(FileSystem::instance().m_resource_path +  "Tiles\\EoS_Empty.bmp");
-	m_empty_02 = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Empty.bmp");
-	m_close = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Close.bmp");
-	m_select = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Select.bmp");
-	m_font = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Font.bmp");
-	m_cursor = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Cursor.bmp");
-
+		m_render_shader = load_shader("EoS_Render", "EoS_Render");
+		m_light_shader = load_shader("EoS_Light", "EoS_Light");
+		m_horizontal_shader = load_shader("EoS_Render", "EoS_HorizontalBlur");
+		m_vertical_shader = load_shader("EoS_Render", "EoS_VerticalBlur");
+		m_tile_shader = load_shader("EoS_Tile", "EoS_Tile");
+		m_empty_01 = load_texture(FileSystem::instance().m_resource_path +  "Tiles\\EoS_Empty.bmp");
+		m_empty_02 = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Empty.bmp");
+		m_close = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Close.bmp");
+		m_select = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Select.bmp");
+		m_font = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Font.bmp");
+		m_cursor = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Cursor.bmp");
+	}
+	catch(std::logic_error e)
+	{
+		LOG(FATAL) << "Ошибка при загрузке ресурсов: " << e.what();
+	}
 	m_scissors.push_front(frectangle_t(0.0f, 0.0f, 1024.0f, 1024.0f));
 	glGenFramebuffersEXT(1, &m_FBO);
 }
 
 void GraphicalController::draw_sprite(double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3)
-	{
-		glBegin(GL_QUADS);
-		glTexCoord2d(0,1); glVertex2d(x0, y0);
-		glTexCoord2d(0,0); glVertex2d(x1, y1);
-		glTexCoord2d(1,0); glVertex2d(x2, y2);
-		glTexCoord2d(1,1); glVertex2d(x3, y3);
-		glEnd();
-	}
+{
+	glBegin(GL_QUADS);
+	glTexCoord2d(0,1); glVertex2d(x0, y0);
+	glTexCoord2d(0,0); glVertex2d(x1, y1);
+	glTexCoord2d(1,0); glVertex2d(x2, y2);
+	glTexCoord2d(1,1); glVertex2d(x3, y3);
+	glEnd();
+}
 
 void GraphicalController::draw_tile(tile_t& tile,double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3)
 {
@@ -41,6 +50,20 @@ void GraphicalController::draw_tile(tile_t& tile,double x0, double y0, double x1
 	glTexCoord2d(tile.coordinat[4], tile.coordinat[5]); glVertex2d(x2, y2);
 	glTexCoord2d(tile.coordinat[6], tile.coordinat[7]); glVertex2d(x3, y3);
 	glEnd();
+}
+
+bool GraphicalController::CompileSuccessful(int obj)
+{
+	int status;
+	glGetShaderiv(obj, GL_COMPILE_STATUS, &status);
+	return status == GL_TRUE;
+}
+
+bool GraphicalController::LinkSuccessful(int obj)
+{
+	int status;
+	glGetProgramiv(obj, GL_LINK_STATUS, &status);
+	return status == GL_TRUE;
 }
 
 void GraphicalController::draw_sprite_FBO(double TexWidth, double TexHeight, double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3)
@@ -312,7 +335,10 @@ GLuint GraphicalController::load_texture(const std::string& path)
 	BITMAPINFOHEADER* info;
 	char* data;
 	bytearray buff;
-	FileSystem::instance().load_from_file(path, buff);
+	if (!FileSystem::instance().load_from_file(path, buff))
+	{
+		throw std::logic_error("Не удалось загрузить файл `" + path + "`");
+	}
 	header = reinterpret_cast<BITMAPFILEHEADER*>(buff.get());
 	info = reinterpret_cast<BITMAPINFOHEADER*>(buff.get() + sizeof(*header));
 	data = reinterpret_cast<char*>(buff.get() + sizeof(*header)+sizeof(*info));
@@ -361,14 +387,18 @@ GLhandleARB GraphicalController::load_shader(const std::string& vPath, const std
 	glCompileShaderARB(VertexShader);
 	GLint compileStatus;
 	glGetObjectParameterivARB(VertexShader, GL_OBJECT_COMPILE_STATUS_ARB, &compileStatus);
-	show_error(VertexShader);
+	if (!CompileSuccessful(VertexShader))
+		LOG(FATAL) << "Не удалось скомпилировать вершинный шейдер `" << vPath << "`";
 	glShaderSourceARB(FragmentShader, 1, &FragmentShaderSource, NULL);
 	glCompileShaderARB(FragmentShader);
 	glGetObjectParameterivARB(FragmentShader, GL_OBJECT_COMPILE_STATUS_ARB, &compileStatus);
-	show_error(FragmentShader);
+	if (!CompileSuccessful(FragmentShader))
+		LOG(FATAL) << "Не удалось скомпилировать фрагментный шейдер `" << fPath << "`";
 	glAttachObjectARB(Program, VertexShader);
 	glAttachObjectARB(Program, FragmentShader);
 	glLinkProgramARB(Program);
+	if (!LinkSuccessful(Program))
+		LOG(FATAL) << "Не удалось слинковать шейдерную программу!";
 	return Program;
 }
 
