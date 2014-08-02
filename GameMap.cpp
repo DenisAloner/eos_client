@@ -235,14 +235,14 @@ void GameMap::connect_room()
 		temp = m_rooms.front();
 		if (!m_link_rooms.empty())
 		{
-			index = (rand() % m_link_rooms.size());
+			index = rand() % m_link_rooms.size();
 			auto nx = std::next(m_link_rooms.begin(),index);
 			link_room(temp, *nx);
 			m_link_rooms.push_front(temp);
 			m_rooms.pop_front();
 		}
 		else {
-			index = (rand() % (m_rooms.size()))+1;
+			index = (rand() % (m_rooms.size() - 1)) + 1;
 			auto nx = std::next(m_rooms.begin(), index);
 			m_link_rooms.push_front(temp);
 			m_link_rooms.push_front(*nx);
@@ -396,7 +396,7 @@ void  GameMap::calculate_lighting()
 	{
 		for (int x = 0; x< m_size.w; x++)
 		{
-			m_items[y][x]->m_light = light_t();
+			m_items[y][x]->m_light = light_t(25,25,25);
 		}
 	}
 	for (std::list<GameObject*>::iterator Current = m_lights.begin(); Current != m_lights.end(); Current++)
