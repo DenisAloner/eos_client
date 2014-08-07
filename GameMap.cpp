@@ -41,7 +41,7 @@ GameMap::GameMap(dimension_t size)
 		{
 			//m_items[i][j] = nullptr;
 			m_items[i][j] = new MapCell(j, i);
-			obj = Application::instance().m_game_object_manager.new_object("Грязь");
+			obj = Application::instance().m_game_object_manager.new_object("dirt");
 			//add_object(obj, m_items[i][j]);
 		}
 	}
@@ -75,11 +75,11 @@ void GameMap::generate_room(void)
 			if ((i==0)||(j==0)||(i==m_size.h-1)||(j==m_size.w-1))
 			{
 				m_items[i][j] = new MapCell(j, i);
-				GameObject* obj = Application::instance().m_game_object_manager.new_object("Стена");
+				GameObject* obj = Application::instance().m_game_object_manager.new_object("wall");
 				add_object(obj, m_items[i][j]);
 			} else {
 				m_items[i][j] = new MapCell(j, i);
-				GameObject* obj = Application::instance().m_game_object_manager.new_object("Пол");
+				GameObject* obj = Application::instance().m_game_object_manager.new_object("floor");
 				add_object(obj, m_items[i][j]);
 			}
 		}
@@ -209,20 +209,20 @@ void GameMap::fill()
 				if ((i == block->rect.y) || (j == block->rect.x) || (i == block->rect.y + block->rect.h) || (j == block->rect.x + block->rect.w))
 				{
 				/*	m_items[i][j] = new MapCell(j, i);
-					GameObject* obj = Application::instance().m_game_object_manager.new_object("Стена");
+					GameObject* obj = Application::instance().m_game_object_manager.new_object("wall");
 					add_object(obj, m_items[i][j]);*/
 				}
 				else {
 					m_items[i][j] = new MapCell(j, i);
-					GameObject* obj = Application::instance().m_game_object_manager.new_object("Пол");
+					GameObject* obj = Application::instance().m_game_object_manager.new_object("floor");
 					add_object(obj, m_items[i][j]);
 				}
 			}
 		}
-		add_new_object(Application::instance().m_game_object_manager.new_object("Факел"), m_items[block->rect.y + 1][block->rect.x + 1]);
-		add_new_object(Application::instance().m_game_object_manager.new_object("Факел"), m_items[block->rect.y + 1][block->rect.x + block->rect.w - 1]);
-		add_new_object(Application::instance().m_game_object_manager.new_object("Факел"), m_items[block->rect.y + block->rect.h - 1][block->rect.x + block->rect.w - 1]);
-		add_new_object(Application::instance().m_game_object_manager.new_object("Факел"), m_items[block->rect.y + block->rect.h - 1][block->rect.x + 1]);
+		add_new_object(Application::instance().m_game_object_manager.new_object("torch"), m_items[block->rect.y + 1][block->rect.x + 1]);
+		add_new_object(Application::instance().m_game_object_manager.new_object("torch"), m_items[block->rect.y + 1][block->rect.x + block->rect.w - 1]);
+		add_new_object(Application::instance().m_game_object_manager.new_object("torch"), m_items[block->rect.y + block->rect.h - 1][block->rect.x + block->rect.w - 1]);
+		add_new_object(Application::instance().m_game_object_manager.new_object("torch"), m_items[block->rect.y + block->rect.h - 1][block->rect.x + 1]);
 	}
 }
 
@@ -269,18 +269,18 @@ void  GameMap::add_wall()
 					{
 						if (!m_items[y+i][x +j]->m_items.empty()&&(!(i==0&&j==0)))
 						{
-							if (m_items[y + i][x + j]->m_items.front()->m_name == "Пол")
+							if (m_items[y + i][x + j]->m_items.front()->m_name == "floor")
 								empty = false;
 						}
 					}
 				}
 				if (empty)
 				{
-					add_object(Application::instance().m_game_object_manager.new_object("Грязь"), m_items[y][x]);
+					add_object(Application::instance().m_game_object_manager.new_object("dirt"), m_items[y][x]);
 				}
 				else
 				{
-					add_object(Application::instance().m_game_object_manager.new_object("Стена"), m_items[y][x]);
+					add_object(Application::instance().m_game_object_manager.new_object("wall"), m_items[y][x]);
 				}
 			}
 		}
@@ -306,7 +306,7 @@ void GameMap::link_room(block_t* a, block_t* b)
 		for (int j = -2; j < 3; j++)
 		{
 			m_items[ac.y+j][i]->m_items.clear();
-			add_object(Application::instance().m_game_object_manager.new_object("Пол"), m_items[ac.y+j][i]);
+			add_object(Application::instance().m_game_object_manager.new_object("floor"), m_items[ac.y+j][i]);
 		}
 	}
 	if (ac.y < bc.y)
@@ -323,7 +323,7 @@ void GameMap::link_room(block_t* a, block_t* b)
 		for (int j = -2; j < 3; j++)
 		{
 			m_items[i][bc.x+j]->m_items.clear();
-			add_object(Application::instance().m_game_object_manager.new_object("Пол"), m_items[i][bc.x + j]);
+			add_object(Application::instance().m_game_object_manager.new_object("floor"), m_items[i][bc.x + j]);
 		}
 	}
 }
@@ -340,7 +340,7 @@ void  GameMap::add_doors()
 		b = false;
 		for (int i = rect.x; i < rect.x + rect.w+1; i++)
 		{
-			if (m_items[rect.y][i]->m_items.front()->m_name == "Пол") 
+			if (m_items[rect.y][i]->m_items.front()->m_name == "floor") 
 			{ 
 				if (!b)
 				{
@@ -348,13 +348,13 @@ void  GameMap::add_doors()
 					s = i;
 				}
 			}
-			if (m_items[rect.y][i]->m_items.front()->m_name == "Стена") 
+			if (m_items[rect.y][i]->m_items.front()->m_name == "wall") 
 			{
 				if (b)
 				{
 					if (i - s == 5)
 					{
-						add_object(Application::instance().m_game_object_manager.new_object("Дверь"), m_items[rect.y][i-1]);
+						add_object(Application::instance().m_game_object_manager.new_object("door"), m_items[rect.y][i-1]);
 					}
 				}
 				b = false;
@@ -364,7 +364,7 @@ void  GameMap::add_doors()
 		b = false;
 		for (int i = rect.x; i < rect.x + rect.w + 1; i++)
 		{
-			if (m_items[rect.y+rect.h][i]->m_items.front()->m_name == "Пол")
+			if (m_items[rect.y+rect.h][i]->m_items.front()->m_name == "floor")
 			{
 				if (!b)
 				{
@@ -372,13 +372,13 @@ void  GameMap::add_doors()
 					s = i;
 				}
 			}
-			if (m_items[rect.y + rect.h][i]->m_items.front()->m_name == "Стена")
+			if (m_items[rect.y + rect.h][i]->m_items.front()->m_name == "wall")
 			{
 				if (b)
 				{
 					if (i - s == 5)
 					{
-						add_object(Application::instance().m_game_object_manager.new_object("Дверь"), m_items[rect.y + rect.h][i - 1]);
+						add_object(Application::instance().m_game_object_manager.new_object("door"), m_items[rect.y + rect.h][i - 1]);
 					}
 				}
 				b = false;

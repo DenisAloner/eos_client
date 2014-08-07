@@ -269,16 +269,16 @@ void Application::initialization(HWND _hWnd)
 	
 	m_GUI->MapViewer->m_map = new GameMap(dimension_t(200,200));
 	m_GUI->MapViewer->m_map->generate_level();
-	m_GUI->MapViewer->m_player = m_game_object_manager.new_object("Эльф");
+	m_GUI->MapViewer->m_player = m_game_object_manager.new_object("elf");
 	if (m_GUI->MapViewer->m_map->m_items[9][9] == nullptr)
 	{
 		m_GUI->MapViewer->m_map->m_items[9][9] = new MapCell(9, 9);
-		m_GUI->MapViewer->m_map->add_object(m_game_object_manager.new_object("Пол"), m_GUI->MapViewer->m_map->m_items[9][9]);
+		m_GUI->MapViewer->m_map->add_object(m_game_object_manager.new_object("floor"), m_GUI->MapViewer->m_map->m_items[9][9]);
 	}
 	if (m_GUI->MapViewer->m_map->m_items[9][8] == nullptr)
 	{
 		m_GUI->MapViewer->m_map->m_items[9][8] = new MapCell(8, 9);
-		m_GUI->MapViewer->m_map->add_object(m_game_object_manager.new_object("Пол"), m_GUI->MapViewer->m_map->m_items[9][8]);
+		m_GUI->MapViewer->m_map->add_object(m_game_object_manager.new_object("floor"), m_GUI->MapViewer->m_map->m_items[9][8]);
 	}
 	m_GUI->MapViewer->m_map->add_object(m_GUI->MapViewer->m_player, m_GUI->MapViewer->m_map->m_items[9][9]);
 	//TGCButton* Button;

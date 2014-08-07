@@ -102,7 +102,7 @@ void GameObject::Turn()
 //	m_size.z = 6;
 //	m_light = nullptr;
 //	m_properties.push_back(new GameObjectProperty(property_action_move));
-//	m_name = "Эльф";
+//	m_name = "elf";
 //	m_selected = false;
 //}
 //
@@ -119,7 +119,7 @@ void GameObject::Turn()
 //	m_size.y = 1;
 //	m_size.z = 1;
 //	m_actions.push_back(Application::instance().m_actions[action_move]);
-//	m_name = "Пол";
+//	m_name = "floor";
 //	m_selected = false;
 //}
 //
@@ -154,7 +154,7 @@ void GameObject::Turn()
 //	m_size.y = 1;
 //	m_size.z =3;
 //	m_properties.push_back(new GameObjectProperty(property_action_move));
-//	m_name = "Стена";
+//	m_name = "wall";
 //	m_selected = false;
 //}
 //
@@ -174,7 +174,7 @@ void GameObject::Turn()
 //	m_light->RGB[1] = 1;
 //	m_light->RGB[2] = 1;
 //	m_properties.push_back(new GameObjectProperty(property_action_move));
-//	m_name = "Факел";
+//	m_name = "torch";
 //	m_selected = false;
 //}
 //
