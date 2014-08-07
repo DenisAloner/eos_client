@@ -10,6 +10,8 @@
 #include "game/graphics/GUI_MapViewer.h"
 #include "game/graphics/GUI_TextBox.h"
 #include "game/graphics/GUI_Timer.h"
+#include "utils/log.h"
+
 
 
 void my_audio_callback(void *userdata, uint8_t *stream, uint32_t len);
@@ -82,6 +84,11 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->m_size = size;
 		break;
 	}
+	case command_e::layer:
+	{
+		m_object->m_layer = std::stoi(args);
+		break;
+	}
 	case command_e::tile_manager_single:
 	{
 		m_object->m_tile_manager = new TileManager_Single();
@@ -141,6 +148,7 @@ void GameObjectManager::init()
 {
 	m_commands.insert(std::pair<std::string, command_e>("object", command_e::obj));
 	m_commands.insert(std::pair<std::string, command_e>("size", command_e::size));
+	m_commands.insert(std::pair<std::string, command_e>("layer", command_e::layer));
 	m_commands.insert(std::pair<std::string, command_e>("tile_manager_single", command_e::tile_manager_single));
 	m_commands.insert(std::pair<std::string, command_e>("tile_manager_map", command_e::tile_manager_map));
 	m_commands.insert(std::pair<std::string, command_e>("light", command_e::light));
@@ -177,6 +185,11 @@ void GameObjectManager::init()
 GameObject* GameObjectManager::new_object(std::string unit_name)
 {
 	GameObject* obj = new GameObject();
+	items_t::iterator it = m_items.find(unit_name);
+	if (it == m_items.end())
+	{
+		LOG(FATAL) << "Ёлемент `" << unit_name << "` отсутствует в m_items";
+	}
 	GameObject* config = m_items.find(unit_name)->second;
 	(*obj) = (*config);
 	return obj;
@@ -228,7 +241,7 @@ void Application::on_mouse_wheel(MouseEventArgs const& e)
 void Application::render()
 {
 	m_update_mutex.lock();
-	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+	glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
 	glClear( GL_COLOR_BUFFER_BIT );
 	glPushMatrix();
 	m_GUI->render(m_graph,0,0);
@@ -239,6 +252,7 @@ void Application::render()
 	glActiveTextureARB(GL_TEXTURE0_ARB);
 	if (m_mouse->m_show_cursor)
 	{
+		glColor4d(1.0, 1.0, 1.0, 1.0);
 		glBindTexture(GL_TEXTURE_2D, m_mouse->m_cursor);
 		m_graph->draw_sprite(Mouse.x, Mouse.y, Mouse.x, Mouse.y + 48, Mouse.x + 48, Mouse.y + 48, Mouse.x + 48, Mouse.y);
 	}
@@ -271,6 +285,7 @@ void Application::initialization(HWND _hWnd)
 	m_actions[1] = new ActionClass_Push();
 	m_actions[2] = new ActionClass_Turn();
 	m_actions[3] = new Action_OpenInventory();
+	m_actions[4] = new Action_CellInfo();
 	m_game_object_manager.init();
 
 	m_GUI->MapViewer = new GUI_MapViewer(this);
@@ -313,6 +328,9 @@ void Application::initialization(HWND _hWnd)
 	ActionPanel->add_item_control(ActionButton);
 	ActionButton = new GUI_ActionButton();
 	ActionButton->m_action = m_actions[action_e::open_inventory];
+	ActionPanel->add_item_control(ActionButton);
+	ActionButton = new GUI_ActionButton();
+	ActionButton->m_action = m_actions[action_e::cell_info];
 	ActionPanel->add_item_control(ActionButton);
 	GUI_Layer* MenuLayer;
 	MenuLayer = new GUI_Layer();
@@ -415,7 +433,6 @@ void Application::PlaySound1()
 void Application::update(void)
 {
 	m_update_mutex.lock();
-	m_GUI->MapViewer->m_map->calculate_lighting();
 	if(!m_action_manager->m_items.empty())
 	{
 		GameTask* A;
@@ -423,6 +440,7 @@ void Application::update(void)
 		A->m_action->perfom(A->m_parameter);
 		m_action_manager->remove();
 	}
+	m_GUI->MapViewer->m_map->calculate_lighting();
 	m_update_mutex.unlock();
 }
 

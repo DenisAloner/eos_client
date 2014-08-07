@@ -68,147 +68,129 @@ bool GUI_MapViewer::select(int x,int y)
 
 
 void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
+{
+	float light[4];
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, Graph->m_FBO);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glUseProgramObjectARB(0);
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+	double x0, y0, x1, y1, x2, y2, x3, y3;
+	bool IsDraw;
+	tile_t tile;
+	int x;
+	int y;
+	glColor4d(1.0, 1.0, 1.0, 1.0);
+	for (int gy = m_tile_count_y - 1; gy > -6; gy--)
 	{
-		glEnable(GL_TEXTURE_2D);
-		glEnable (GL_BLEND);
-		glColor4d(1.0,1.0,1.0,1.0);
-		double x0,y0,x1,y1,x2,y2,x3,y3;
-		float light[4];
-		bool IsDraw;
-		tile_t tile;
-		int x;
-		int y;
-		for (int gy = m_tile_count_y - 1; gy>-1; gy--)
+		for (int gx = 0; gx < m_tile_count_x + 5; gx++)
+		{
+			x = m_center.x + gx - m_tile_count_x / 2;
+			y = m_center.y + gy - m_tile_count_y / 2;
+			if ((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1))
 			{
-				for (int gx = 0; gx<m_tile_count_x; gx++)
+			}
+			else
+			{
+				light[0] = m_map->m_items[y][x]->m_light.R / 100.0;
+				light[1] = m_map->m_items[y][x]->m_light.G / 100.0;
+				light[2] = m_map->m_items[y][x]->m_light.B / 100.0;
+				light[3] = 0.0;
+				for (std::list<GameObject*>::iterator Current = m_map->m_items[y][x]->m_items.begin(); Current != m_map->m_items[y][x]->m_items.end(); Current++)
 				{
-					x = m_center.x + gx - m_tile_count_x / 2;
-					y = m_center.y + gy - m_tile_count_y / 2;
-					if ((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1))
+					IsDraw = false;
+					if ((*Current)->m_cell->x == m_map->m_items[y][x]->x && (*Current)->m_cell->y == m_map->m_items[y][x]->y)
 					{
+						x0 = (px + gx + 1 - (*Current)->m_size.x)*m_tile_size_x;
+						y0 = (m_tile_count_y - py - gy - (*Current)->m_size.z)*m_tile_size_y;
+						x1 = x0;
+						y1 = (m_tile_count_y - py - gy)*m_tile_size_y;
+						x2 = (px + gx + 1)*m_tile_size_x;
+						y2 = y1;
+						x3 = x2;
+						y3 = y0;
+						IsDraw = true;
 					}
-					else 
+					if (IsDraw)
 					{
-						light[0] = m_map->m_items[y][x]->m_light.R / 100.0;
-						light[1] = m_map->m_items[y][x]->m_light.G / 100.0;
-						light[2] = m_map->m_items[y][x]->m_light.B / 100.0;
-						light[3] = 0.0;
-						for (std::list<GameObject*>::iterator Current = m_map->m_items[y][x]->m_items.begin(); Current != m_map->m_items[y][x]->m_items.end(); Current++)
+						glUseProgramObjectARB(Graph->m_tile_shader);
+						(*Current)->m_tile_manager->set_tile(tile, (*Current), Application::instance().m_timer->m_tick / 2);
+						GLuint Sprite = tile.unit;
+						glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+						glActiveTextureARB(GL_TEXTURE0_ARB);
+						glBindTexture(GL_TEXTURE_2D, Sprite);
+						Graph->set_uniform_sampler(Graph->m_tile_shader, "Map");
+						Graph->set_uniform_ptr(Graph->m_tile_shader, "layer_num", (*Current)->m_layer);
+						Graph->set_uniform_vector(Graph->m_tile_shader, "light", light);
+						Graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
+						if ((*Current)->m_layer == 2)
 						{
-							IsDraw=false;
-							if ((*Current)->m_cell->x == m_map->m_items[y][x]->x && (*Current)->m_cell->y == m_map->m_items[y][x]->y)
-							{
-								x0 = (px + gx + 1 - (*Current)->m_size.x)*m_tile_size_x;
-								y0 = (m_tile_count_y - py - gy - (*Current)->m_size.z)*m_tile_size_y;
-								x1 = x0;
-								y1 = (m_tile_count_y - py - gy)*m_tile_size_y;
-								x2 = (px + gx + 1)*m_tile_size_x;
-								y2 = y1;
-								x3 = x2;
-								y3 = y0;
-								IsDraw=true;
-							} else {
-								/*if((x==Width-1&&Current->Item->Cell->y==Items[y][x]->y)||(y==0&&Current->Item->Cell->x==Items[y][x]->x)||(x==Width-1&&y==0))
-								{
-									x0=(Current->Item->Cell->x+1-Current->Item->Width)*32;
-									y0=(64-Current->Item->Cell->y-Current->Item->Height)*16;
-									x1=(Current->Item->Cell->x+1-Current->Item->Width)*32;
-									y1=(64-Current->Item->Cell->y)*16;
-									x2=(Current->Item->Cell->x+1)*32;
-									y2=(64-Current->Item->Cell->y)*16;
-									x3=(Current->Item->Cell->x+1)*32;
-									y3=(64-Current->Item->Cell->y-Current->Item->Height)*16;
-									LightPos[0]=Current->Item->Cell->x;
-									LightPos[1]=Current->Item->Cell->y;
-									LightPos[2]=0;
-									LightPos[3]=0;
-									IsDraw=true;
-								}*/
-							}
-							if(IsDraw)
-							{
-								(*Current)->m_tile_manager->set_tile(tile, (*Current), Application::instance().m_timer->m_tick / 2);
-								GLuint Sprite = tile.unit;
-								(*Current)->Render(x,y);
-								glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-								glUseProgramObjectARB(Graph->m_tile_shader);
-								glActiveTextureARB(GL_TEXTURE0_ARB);
-								glBindTexture( GL_TEXTURE_2D,Sprite);
-								Graph->set_uniform_sampler(Graph->m_tile_shader,"Map");
-								Graph->set_uniform_vector(Graph->m_tile_shader, "light", light);
-								Graph->draw_tile(tile,x0,y0,x1,y1,x2,y2,x3,y3);
-								/*glUseProgramObjectARB(Graph->m_light_shader);
-								glActiveTextureARB(GL_TEXTURE0_ARB);
-								glBindTexture(GL_TEXTURE_2D, Sprite);
-								Graph->set_uniform_sampler(Graph->m_light_shader,"Map");
-								glBlendFunc (GL_SRC_ALPHA, GL_ONE);*/
-									/*for (std::list<GameObject*>::iterator CurrentLight = m_map->m_lights.begin(); CurrentLight != m_map->m_lights.end(); CurrentLight++)
-									{
-										LightPos[2] = (*CurrentLight)->m_cell->x;
-										LightPos[3] = (*CurrentLight)->m_cell->y;
-										Graph->set_uniform_vector(Graph->m_light_shader, "LightPos", LightPos);
-										LightInfo[0] = (*CurrentLight)->m_light->color.R;
-										LightInfo[1] = (*CurrentLight)->m_light->color.G;
-										LightInfo[2] = (*CurrentLight)->m_light->color.B;
-										LightInfo[3] = (*CurrentLight)->m_light->power;
-										Graph->set_uniform_vector(Graph->m_light_shader, "LightInfo", LightInfo);
-										Graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
-									}*/
-								if ((*Current)->m_selected)
-								{
-									glColor4d(0.0, abs((Application::instance().m_timer->m_tick - 3.5) / 3.5), 0.0, 1.0);
-									glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-									glUseProgramObjectARB(0);
-									glActiveTextureARB(GL_TEXTURE0_ARB);
-									glBindTexture(GL_TEXTURE_2D, Sprite);
-									Graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
-									glColor4d(1.0, 1.0, 1.0, 1.0);
-								}
-							}
+							glUseProgramObjectARB(Graph->m_mask_shader);
+							glBindTexture(GL_TEXTURE_2D, Graph->m_empty_02);
+							Graph->set_uniform_sampler(Graph->m_mask_shader, "Map");
+							Graph->draw_tile_FBO(x1 / 1024.0, (1024 - y1) / 1024.0, x3 / 1024.0, (1024 - y3) / 1024.0, x0, y0, x1, y1, x2, y2, x3, y3);
+						}
+						if ((*Current)->m_selected)
+						{
+							glUseProgramObjectARB(0);
+							glColor4d(0.0, abs((Application::instance().m_timer->m_tick - 3.5) / 3.5), 0.0, 1.0);
+							glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+							glActiveTextureARB(GL_TEXTURE0_ARB);
+							glBindTexture(GL_TEXTURE_2D, Sprite);
+							Graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
+							glColor4d(1.0, 1.0, 1.0, 1.0);
 						}
 					}
 				}
 			}
-			if(m_cursored != nullptr)
-			{
-				MapCell* Item = m_cursored;
-				int x = px + Item->x - m_center.x + m_tile_count_x / 2;
-				int y = py + Item->y - m_center.y + m_tile_count_y / 2;
-				x0 = (x - m_cursor_x + 1) * m_tile_size_x;
-				y0 = (m_tile_count_y - y - m_cursor_y) * m_tile_size_y;
-				x1 = (x - m_cursor_x + 1) * m_tile_size_x;
-				y1 = (m_tile_count_y - y) * m_tile_size_y;
-				x2 = (x + 1) * m_tile_size_x;
-				y2 = (m_tile_count_y - y) * m_tile_size_y;
-				x3 = (x + 1) * m_tile_size_x;
-				y3 = (m_tile_count_y - y - m_cursor_y) * m_tile_size_y;
-				glUseProgramObjectARB(0);
-				glEnable(GL_BLEND);
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-				glEnable(GL_TEXTURE_2D);
-				glActiveTextureARB(GL_TEXTURE0_ARB);
-				glBindTexture(GL_TEXTURE_2D, Graph->m_select);
-				glColor4f(1.0, 1.0, 1.0, 0.5);
-				Graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
-				glDisable(GL_BLEND);
-				glDisable(GL_TEXTURE_2D);
-				glBegin(GL_LINES);
-				glColor4f(0.0, 1.0, 0.0, 1.0);
-				glVertex2d(x0, y0);
-				glVertex2d(x1, y1);
-				glVertex2d(x1, y1);
-				glVertex2d(x2, y2);
-				glVertex2d(x2, y2);
-				glVertex2d(x3, y3);
-				glVertex2d(x3, y3);
-				glVertex2d(x0, y0);
-				glEnd();
-				glEnable(GL_BLEND);
-				glEnable(GL_TEXTURE_2D);
-				glColor4f(1.0, 1.0, 1.0, 1);
-			}
-			glDisable(GL_BLEND);
-			glDisable(GL_TEXTURE_2D);
+		}
+	}
+	if (m_cursored != nullptr)
+	{
+		MapCell* Item = m_cursored;
+		int x = px + Item->x - m_center.x + m_tile_count_x / 2;
+		int y = py + Item->y - m_center.y + m_tile_count_y / 2;
+		x0 = (x - m_cursor_x + 1) * m_tile_size_x;
+		y0 = (m_tile_count_y - y - m_cursor_y) * m_tile_size_y;
+		x1 = (x - m_cursor_x + 1) * m_tile_size_x;
+		y1 = (m_tile_count_y - y) * m_tile_size_y;
+		x2 = (x + 1) * m_tile_size_x;
+		y2 = (m_tile_count_y - y) * m_tile_size_y;
+		x3 = (x + 1) * m_tile_size_x;
+		y3 = (m_tile_count_y - y - m_cursor_y) * m_tile_size_y;
+		glUseProgramObjectARB(0);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_TEXTURE_2D);
+		glActiveTextureARB(GL_TEXTURE0_ARB);
+		glBindTexture(GL_TEXTURE_2D, Graph->m_select);
+		glColor4f(1.0, 1.0, 1.0, 0.5);
+		Graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+		glDisable(GL_BLEND);
+		glDisable(GL_TEXTURE_2D);
+		glBegin(GL_LINES);
+		glColor4f(0.0, 1.0, 0.0, 1.0);
+		glVertex2d(x0, y0);
+		glVertex2d(x1, y1);
+		glVertex2d(x1, y1);
+		glVertex2d(x2, y2);
+		glVertex2d(x2, y2);
+		glVertex2d(x3, y3);
+		glVertex2d(x3, y3);
+		glVertex2d(x0, y0);
+		glEnd();
+		glEnable(GL_BLEND);
+		glEnable(GL_TEXTURE_2D);
+		glColor4f(1.0, 1.0, 1.0, 1.0);
+	}
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glUseProgramObjectARB(0);
+	glDisable(GL_BLEND);
+	glBindTexture(GL_TEXTURE_2D, Graph->m_empty_01);
+	glColor4d(1.0, 1.0, 1.0, 1.0);
+	Graph->draw_sprite(0, 0, 0, 1024, 1024, 1024, 1024, 0);
+	glDisable(GL_TEXTURE_2D);
 }
 
 void GUI_MapViewer::on_key_press(WPARAM w)
@@ -274,17 +256,20 @@ void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
 		int y;
 		x = m_center.x + p.x - m_tile_count_x / 2;
 		y = m_center.y + p.y - m_tile_count_y / 2;
-		if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
+		if (!m_just_focused)
 		{
-			//m_map->m_items[p.y][p.x]->mouse_click(e);
-			Parameter_MapCell* pr = new Parameter_MapCell();
-			pr->m_place = m_map->m_items[y][x];
-			if (Application::instance().m_message_queue.m_reader)
+			if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
 			{
+				//m_map->m_items[p.y][p.x]->mouse_click(e);
+				Parameter_MapCell* pr = new Parameter_MapCell();
+				pr->m_place = m_map->m_items[y][x];
+				if (Application::instance().m_message_queue.m_reader)
+				{
 					Application::instance().m_message_queue.push(pr);
+				}
 			}
-			m_just_focused = false;
 		}
+		m_just_focused = false;
 	} else {
 		GUI_PopMenu* PopMenu;
 		PopMenu=new GUI_PopMenu;
@@ -326,7 +311,7 @@ void GUI_MapViewer :: on_mouse_down(MouseEventArgs const& e)
 		if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
 		{
 			set_focus(true);
-			on_mouse_click(e);
+			//on_mouse_click(e);
 		}
 
 	}

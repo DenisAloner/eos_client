@@ -10,12 +10,12 @@ GraphicalController::GraphicalController()
 		m_actions[action_e::push] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_1.bmp");
 		m_actions[action_e::turn] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_2.bmp");
 		m_actions[action_e::open_inventory] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_3.bmp");
+		m_actions[action_e::cell_info] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_4.bmp");
 
-		m_render_shader = load_shader("EoS_Render", "EoS_Render");
-		m_light_shader = load_shader("EoS_Light", "EoS_Light");
-		m_horizontal_shader = load_shader("EoS_Render", "EoS_HorizontalBlur");
-		m_vertical_shader = load_shader("EoS_Render", "EoS_VerticalBlur");
-		m_tile_shader = load_shader("EoS_Tile", "EoS_Tile");
+		m_horizontal_shader = load_shader("EoS_blur", "EoS_blur_horizontal");
+		m_vertical_shader = load_shader("EoS_blur", "EoS_blur_vertical");
+		m_mask_shader = load_shader("EoS_mask", "EoS_mask");
+		m_tile_shader = load_shader("EoS_tile", "EoS_tile");
 		m_empty_01 = load_texture(FileSystem::instance().m_resource_path +  "Tiles\\EoS_Empty.bmp");
 		m_empty_02 = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Empty.bmp");
 		m_close = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Close.bmp");
@@ -27,8 +27,15 @@ GraphicalController::GraphicalController()
 	{
 		LOG(FATAL) << "Ошибка при загрузке ресурсов: " << e.what();
 	}
+
 	m_scissors.push_front(frectangle_t(0.0f, 0.0f, 1024.0f, 1024.0f));
 	glGenFramebuffersEXT(1, &m_FBO);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_FBO);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_empty_01, 0);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT1_EXT, GL_TEXTURE_2D, m_empty_02, 0);
+	GLenum buffers[] = { GL_COLOR_ATTACHMENT0_EXT, GL_COLOR_ATTACHMENT1_EXT };
+	glDrawBuffers(2, buffers);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
 
 void GraphicalController::draw_sprite(double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3)
@@ -72,6 +79,16 @@ void GraphicalController::draw_sprite_FBO(double TexWidth, double TexHeight, dou
 	glTexCoord2d(0, 0); glVertex2d(x1, y1);
 	glTexCoord2d(TexWidth, 0); glVertex2d(x2, y2);
 	glTexCoord2d(TexWidth, TexHeight); glVertex2d(x3, y3);
+	glEnd();
+}
+
+void GraphicalController::draw_tile_FBO(double tx1, double ty1, double tx2, double ty2, double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3)
+{
+	glBegin(GL_QUADS);
+	glTexCoord2d(tx1, ty2); glVertex2d(x0, y0);
+	glTexCoord2d(tx1, ty1); glVertex2d(x1, y1);
+	glTexCoord2d(tx2, ty1); glVertex2d(x2, y2);
+	glTexCoord2d(tx2, ty2); glVertex2d(x3, y3);
 	glEnd();
 }
 
@@ -191,6 +208,7 @@ void GraphicalController::blur_rect(int x, int y, int width, int height)
 	glEnable(GL_SCISSOR_TEST);
 	glBindTexture(GL_TEXTURE_2D, m_empty_01);
 	draw_sprite_FBO(Tx, Ty, x, y, x, y + height, x + width, y + height, x + width, y);
+	glColor4f(1.0, 1.0, 1.0, 1.0);
 }
 
 bool GraphicalController::set_uniform_vector(GLhandleARB program, const char * name, const float * value)
@@ -211,12 +229,12 @@ bool GraphicalController::set_uniform_sampler(GLhandleARB object, const char * n
 	return true;
 }
 
-bool GraphicalController::set_uniform_ptr(GLhandleARB program, const char * name, const unsigned int value)
+bool GraphicalController::set_uniform_ptr(GLhandleARB program, const char * name, const int value)
 {
 	int loc = glGetUniformLocationARB(program, name);
 	if (loc < 0)
 		return false;
-	glUniform1uiv(loc, 1, &value);
+	glUniform1iv(loc, 1, &value);
 	return true;
 }
 
@@ -341,6 +359,7 @@ GLuint GraphicalController::load_texture(const std::string& path)
 	bytearray buff;
 	if (!FileSystem::instance().load_from_file(path, buff))
 	{
+		MessageBox(NULL, path.c_str(), "", MB_OK);
 		throw std::logic_error("Не удалось загрузить файл `" + path + "`");
 	}
 	header = reinterpret_cast<BITMAPFILEHEADER*>(buff.get());

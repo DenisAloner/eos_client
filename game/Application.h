@@ -62,6 +62,7 @@ public:
 	{
 		obj,
 		size,
+		layer,
 		tile_manager_single,
 		tile_manager_map,
 		light,
@@ -70,8 +71,10 @@ public:
 		property_container
 	};
 
-	std::map<std::string, GameObject*> m_items;
-	std::map<std::string, command_e> m_commands;
+	typedef std::map<std::string, GameObject*> items_t;
+	typedef std::map<std::string, command_e> commands_t;
+	items_t m_items;
+	commands_t m_commands;
 
 	GameObject* m_object;
 

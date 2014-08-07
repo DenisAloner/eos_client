@@ -11,17 +11,23 @@ property_permit_move
 
 object wall
 size 1 1 5
-tile_manager_single EoS_Wall_01
+tile_manager_single EoS_Wall
+layer 2
 
 object dirt
 size 1 1 5
-tile_manager_single EoS_Mud
+tile_manager_single Mud
+layer 2
 
 object torch
 size 1 1 4
 tile_manager_single EoS_Torch
-light 20 20 20
+light 80 80 80
 
 object door
 size 5 1 5
 tile_manager_single EoS_Door
+
+object door1
+size 1 5 9
+tile_manager_single EoS_Door_01

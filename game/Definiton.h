@@ -71,7 +71,8 @@ enum action_e
 	move,
 	push,
 	turn,
-	open_inventory
+	open_inventory,
+	cell_info
 };
 
 enum property_e

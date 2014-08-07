@@ -18,13 +18,12 @@ class GraphicalController
 {
 public:
 
-	GLuint m_actions[4];
+	GLuint m_actions[5];
 
-	GLhandleARB m_render_shader;
-	GLhandleARB m_light_shader;
 	GLhandleARB m_horizontal_shader;
 	GLhandleARB m_vertical_shader;
 	GLhandleARB m_tile_shader;
+	GLhandleARB m_mask_shader;
 
 	GLuint m_empty_01;
 	GLuint m_empty_02;
@@ -44,7 +43,7 @@ public:
 	void show_error(GLhandleARB object);
 	bool set_uniform_vector(GLhandleARB program, const char * name, const float * value);
 	bool set_uniform_sampler(GLhandleARB object, const char * name);
-	bool set_uniform_ptr(GLhandleARB program, const char * name, const unsigned int value);
+	bool set_uniform_ptr(GLhandleARB program, const char * name, const int value);
 	position_t get_OpenGL_position(float x, float y);
 	GLuint load_texture(const std::string& path);
 	void output_text(int x, int y, std::string& Text, int sizex, int sizey);
@@ -60,6 +59,7 @@ public:
 	void set_VSync(bool sync);
 	bool set_uniform_float(GLhandleARB program, const char * name, const float value);
 	void draw_tile(tile_t& tile, double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
+	void draw_tile_FBO(double tx1, double ty1, double tx2, double ty2, double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
 
 private:
 	bool CompileSuccessful(int obj);

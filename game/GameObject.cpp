@@ -4,6 +4,7 @@
 
 GameObject::GameObject()
 {
+	m_layer = 1;
 	m_direction = ObjectDirection_Left;
 	m_selected = false;
 	m_light = nullptr;

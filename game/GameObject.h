@@ -18,6 +18,8 @@ class TileManager;
 class GameObject
 {
 public:
+
+	int m_layer;
 	std::string m_name;
 	game_object_size_t m_size;
 	light_t* m_light;

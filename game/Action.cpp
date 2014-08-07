@@ -295,3 +295,50 @@ std::string Action_OpenInventory::get_description(Parameter* parameter)
 {
 	return "";
 }
+
+Action_CellInfo::Action_CellInfo()
+{
+	m_kind = action_e::cell_info;
+}
+
+
+Action_CellInfo::~Action_CellInfo()
+{
+}
+
+void Action_CellInfo::interaction_handler()
+{
+	Action::interaction_handler();
+	Application::instance().m_message_queue.m_busy = true;
+	Parameter_Position* p = new Parameter_Position();
+	p->m_object = Application::instance().m_GUI->MapViewer->m_player;
+	p->m_map = Application::instance().m_GUI->MapViewer->m_map;
+	if (Application::instance().command_select_location(p->m_object, p->m_place))
+	{
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(" Освещение {" + std::to_string(p->m_place->m_light.R) + "," + std::to_string(p->m_place->m_light.G) + "," + std::to_string(p->m_place->m_light.B) + "}."));
+	}
+	else
+	{
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Не выбрана клетка карты."));
+		Application::instance().m_message_queue.m_busy = false;
+		return;
+	}
+	Application::instance().m_message_queue.m_busy = false;
+}
+
+
+bool Action_CellInfo::check(Parameter* parameter)
+{
+	return true;
+}
+
+void Action_CellInfo::perfom(Parameter* parameter)
+{
+}
+
+std::string Action_CellInfo::get_description(Parameter* parameter)
+{
+	return "";
+}
+

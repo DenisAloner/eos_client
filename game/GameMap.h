@@ -22,6 +22,7 @@ public:
 	int y;
 
 	light_t m_light;
+	light_t m_light_blur;
 	std::list<GameObject*> m_items;
 
 
@@ -43,7 +44,13 @@ public:
 	};
 
 	dimension_t m_size;
-	float m_coefficient[10000];
+
+	float m_coefficient[21][21];
+	bool m_light_map[41][41];
+	bool m_light_map2[41][41];
+	light_t m_local_light[3][41][41];
+	bool m_barrier_map[41][41];
+
 	 
 	std::vector<std::vector<MapCell*> > m_items;
 	std::list<GameObject*> m_lights;
@@ -66,6 +73,9 @@ public:
 	void link_room(block_t* a, block_t* b);
 	void add_wall();
 	void add_doors();
+	bool line2(int x1, int y1, int x2, int y2);
+	void blur_lighting();
+
 };
 
 #endif //GAMEMAP_H

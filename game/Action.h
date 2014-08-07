@@ -86,4 +86,20 @@ public:
 
 };
 
+
+class Action_CellInfo :
+	public Action
+{
+public:
+
+	Action_CellInfo();
+	~Action_CellInfo();
+
+	virtual bool check(Parameter* parameter);
+	virtual void perfom(Parameter* parameter);
+	virtual std::string get_description(Parameter* parameter);
+	virtual void interaction_handler();
+
+};
+
 #endif //TACTION_H
