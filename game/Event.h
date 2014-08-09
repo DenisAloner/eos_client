@@ -1,11 +1,14 @@
 #pragma once
+
+#include "Definiton.h"
 #include <iostream>
 #include <functional>
 #include <map>
-#include "Definiton.h"
+
 
 template<class EventArgType>
-class Event {
+class Event
+{
 public:
 	typedef std::function<void(EventArgType const&)> EventSignature;
 	typedef int EventHandle;

@@ -1,8 +1,7 @@
-#ifndef LOG_HPP
-#define	LOG_HPP
+#ifndef WINLOG_HPP
+#define	WINLOG_HPP
 
-#undef ERROR
-#include <glog/logging.h>
+#include "log.h"
 #include <iomanip>
 
 
@@ -37,4 +36,4 @@ class WinDebugSink : public google::LogSink
 	}
 };
 
-#endif //LOG_HPP
+#endif //WINLOG_HPP

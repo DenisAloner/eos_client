@@ -1,6 +1,5 @@
 #include "GraphicalController.h"
-#undef ERROR
-#include <glog/logging.h>
+#include "utils/log.h"
 
 
 GraphicalController::GraphicalController()

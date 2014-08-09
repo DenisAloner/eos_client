@@ -1,13 +1,32 @@
 cmake_minimum_required(VERSION 2.8)
 project(eos_client)
 
-set(PROJECT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/../../)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-file(GLOB SOURCE_FILES ${PROJECT_SOURCE_DIR}/*.h ${PROJECT_SOURCE_DIR}/*.cpp)
+set(PROJECT_DIR ${CMAKE_SOURCE_DIR}/../../)
+
+file(GLOB SRC_ROOT ${PROJECT_DIR}/*.h ${PROJECT_DIR}/*.cpp)
+file(GLOB SRC_GAME ${PROJECT_DIR}/game/*.h ${PROJECT_DIR}/game/*.cpp)
+file(GLOB SRC_GAME_GRAPHICS ${PROJECT_DIR}/game/graphics/*.h ${PROJECT_DIR}/game/graphics/*.cpp)
+file(GLOB SRC_GAME_UTILS ${PROJECT_DIR}/game/utils/*.h ${PROJECT_DIR}/game/utils/*.cpp)
+set(SOURCE_FILES
+	${SRC_ROOT}
+	${SRC_GAME}
+	${SRC_GAME_GRAPHICS}
+	${SRC_GAME_UTILS}
+)
+
+source_group("" FILES ${SRC_ROOT})
+source_group("game" FILES ${SRC_GAME})
+source_group("game\\graphics" FILES ${SRC_GAME_GRAPHICS})
+source_group("game\\utils" FILES ${SRC_GAME_UTILS})
 
 include_directories(
-	${PROJECT_SOURCE_DIR}/include
-	${PROJECT_SOURCE_DIR}/lib/glog/src/windows
+	${PROJECT_DIR}/game
+	${PROJECT_DIR}/game/graphics
+	${PROJECT_DIR}/game/utils
+	${PROJECT_DIR}/include
+	${PROJECT_DIR}/lib/glog/src/windows
 )
 
 find_package(OpenGL REQUIRED)
@@ -19,22 +38,22 @@ else (OPENGL_FOUND)
 endif (OPENGL_FOUND)
 
 find_library(GLEW_LIB glew32
-	PATHS ${PROJECT_SOURCE_DIR}/lib/win/${LIB_PLATFORM}
+	PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}
 	DOC "OpenGL libraries"
 )
 
 find_library(SDL_LIB SDL2
-	PATHS ${PROJECT_SOURCE_DIR}/lib/win/${LIB_PLATFORM}
+	PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}
 	DOC "SDL libraries"
 )
 
 find_library(SDLMIXER_LIB SDL2_Mixer
-	PATHS ${PROJECT_SOURCE_DIR}/lib/win/${LIB_PLATFORM}
+	PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}
 	DOC "SDL libraries"
 )
 
 find_library(GLOG_LIB libglog
-	PATHS ${PROJECT_SOURCE_DIR}/lib/win/${LIB_PLATFORM}
+	PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}
 	DOC "Logging library"
 )
 
@@ -46,7 +65,7 @@ set(EXT_LIBRARIES
 	${GLOG_LIB}
 )
 
-include(${PROJECT_SOURCE_DIR}/cmake_build/common/game.cmake)
+include(${PROJECT_DIR}/cmake_build/common/game.cmake)
 
 add_executable(${PROJECT_NAME} WIN32 ${SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} ${EXT_LIBRARIES})
