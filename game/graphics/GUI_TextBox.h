@@ -1,8 +1,11 @@
-#pragma once
+#ifndef GUI_TEXTBOX_H
+#define	GUI_TEXTBOX_H
+
 #include "GUI_Container.h"
 #include <list>
 #include "GUI_Text.h"
 #include "Definiton.h"
+
 
 class GUI_TextBox :
 	public GUI_Container
@@ -19,3 +22,4 @@ public:
 
 };
 
+#endif //GUI_TEXTBOX_H

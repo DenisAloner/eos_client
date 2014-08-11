@@ -1,4 +1,6 @@
-#pragma once
+#ifndef GUI_ACTIONPANEL_H
+#define	GUI_ACTIONPANEL_H
+
 #include "GUI_Container.h"
 
 class GUI_ActionPanel :
@@ -12,3 +14,4 @@ public:
 	virtual void add_item_control(GUI_Object* object);
 };
 
+#endif //GUI_ACTIONPANEL_H

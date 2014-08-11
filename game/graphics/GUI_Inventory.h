@@ -1,4 +1,6 @@
-#pragma once
+#ifndef GUI_INVENTORY_H
+#define	GUI_INVENTORY_H
+
 #include "GUI_Layer.h"
 #include "Property_Container.h"
 
@@ -27,3 +29,4 @@ public:
 	~GUI_Inventory();
 };
 
+#endif //GUI_INVENTORY_H

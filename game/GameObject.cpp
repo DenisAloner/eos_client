@@ -1,4 +1,6 @@
-#include "GameObject.h"
+#include "game/GameObject.h"
+#include "game/Action.h"
+
 
 GameObject::GameObject()
 {
@@ -9,10 +11,12 @@ GameObject::GameObject()
 	m_tile_manager = nullptr;
 }
 
-//bool GameObject::ContainAction(TAction* Action)
+
+//bool GameObject::ContainAction(Action* Action)
 //{
 //	return std::find(Actions.begin(), Actions.end(), 1)==Actions.end();
 //}
+
 
 GameObjectProperty* GameObject::find_property(property_e kind)
 {
@@ -26,17 +30,19 @@ GameObjectProperty* GameObject::find_property(property_e kind)
 	return nullptr;
 }
 
-TAction* GameObject::find_action(action_e kind)
+
+Action* GameObject::find_action(action_e kind)
 {
-	for(std::list<TAction*>::iterator Current=m_actions.begin();Current!=m_actions.end();Current++)
+	for(std::list<Action*>::iterator Current=m_actions.begin();Current!=m_actions.end();Current++)
 	{
-		if((*Current)->m_kind==kind)
+		if((*Current)->m_kind == kind)
 		{
 			return (*Current);
 		}
 	}
 	return nullptr;
 }
+
 
 void GameObject::Turn()
 {
@@ -47,6 +53,7 @@ void GameObject::Turn()
 		m_direction = ObjectDirection_Left;
 	}
 }
+
 
 //TPlayer::TPlayer()
 //{

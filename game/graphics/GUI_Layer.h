@@ -1,8 +1,11 @@
-#pragma once
+#ifndef GUI_LAYER_H
+#define	GUI_LAYER_H
+
 #include "GraphicalController.h"
 #include "Event.h"
 #include "GUI_Object.h"
 #include <list>
+
 
 class GraphicalController;
 
@@ -34,3 +37,4 @@ public:
 	virtual MouseEventArgs set_local_mouse_position(MouseEventArgs const& source);
 };
 
+#endif //GUI_LAYER_H

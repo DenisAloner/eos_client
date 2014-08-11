@@ -1,13 +1,16 @@
-#pragma once
-#include "glew.h"
+#ifndef TILEMANAGER_H
+#define	TILEMANAGER_H
+
 #include <string>
+#include "graphics/gl.hpp"
 #include "Application.h"
 
+
+class GameObject;
 
 class TileManager
 {
 public:
-
 	GLuint m_unit;
 
 	TileManager();
@@ -36,3 +39,5 @@ public:
 
 	virtual void set_tile(tile_t& tile, GameObject* obj, unsigned int num);
 };
+
+#endif //TILEMANAGER_H

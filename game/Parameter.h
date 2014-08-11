@@ -1,36 +1,33 @@
-#pragma once
+#ifndef TPARAMETER_H
+#define	TPARAMETER_H
+
 #include <vector>
 #include "Definiton.h"
-#include "GameMap.h"
-#include "GameObject.h"
+
 
 class MapCell;
 class GameObject;
 class GameMap;
 
-class TParameter
+class Parameter
 {
 public:
-
 	ParameterKind m_kind;
 
-	TParameter(ParameterKind _kind);
-	~TParameter(void);
+	Parameter(ParameterKind _kind);
+	~Parameter(void);
 };
 
-class Parameter_MapCell :
-	public TParameter
+class Parameter_MapCell : public Parameter
 {
 public:
-
 	MapCell* m_place;
 
 	Parameter_MapCell();
 	~Parameter_MapCell();
 };
 
-class Parameter_GameObject :
-	public TParameter
+class Parameter_GameObject : public Parameter
 {
 public:
 	GameObject* m_object;
@@ -39,11 +36,9 @@ public:
 	~Parameter_GameObject();
 };
 
-class Parameter_Position:
-	public TParameter
+class Parameter_Position : public Parameter
 {
 public:
-
 	GameObject* m_object;
 	MapCell* m_place;
 	GameMap* m_map;
@@ -52,11 +47,9 @@ public:
 	~Parameter_Position(void);
 };
 
-class Parameter_MoveObjectByUnit :
-	public TParameter
+class Parameter_MoveObjectByUnit : public Parameter
 {
 public:
-
 	GameObject* m_unit;
 	GameObject* m_object;
 	MapCell* m_place;
@@ -65,3 +58,5 @@ public:
 	Parameter_MoveObjectByUnit(void);
 	~Parameter_MoveObjectByUnit(void);
 };
+
+#endif //TPARAMETER_H

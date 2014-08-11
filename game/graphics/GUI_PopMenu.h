@@ -1,9 +1,12 @@
-#pragma once
+#ifndef GUI_POPMENU_H
+#define	GUI_POPMENU_H
+
 #include <list>
 #include "GUI_Object.h"
 #include "GUI_Container.h"
 #include "GameObject.h"
 #include "Application.h"
+
 
 class GameObject;
 class Application;
@@ -41,4 +44,4 @@ public:
 	virtual void render(GraphicalController* Graph, int px, int py);
 };
 
-
+#endif //GUI_POPMENU_H

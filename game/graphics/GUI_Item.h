@@ -1,8 +1,10 @@
-#pragma once
+#ifndef GUI_ITEM_H
+#define	GUI_ITEM_H
+
 #include "GUI_Container.h"
 #include "GUI_Text.h"
 #include "GUI_ItemButton.h"
-#include "TActionManager.h"
+#include "ActionManager.h"
 
 class GameTask;
 
@@ -23,3 +25,4 @@ public:
 	//virtual void OnMouseClick(MouseEventArgs const& e);
 };
 
+#endif //GUI_ITEM_H

@@ -1,53 +1,39 @@
-#pragma once
+#ifndef APPLICATION_H
+#define	APPLICATION_H
 
-#include "graphics/GUI_Object.h"
-#include "graphics/GUI_Layer.h"
-#include "graphics/GUI_ActionPanel.h"
-#include "graphics/GUI_ActionButton.h"
-#include "graphics/GUI_ActionManager.h"
-#include "graphics/GUI_PopMenu.h"
-#include "graphics/GUI_Item.h"
-#include "graphics/GUI_Window.h"
-#include "graphics/GUI_Timer.h"
-#include "graphics/GUI_Inventory.h"
-#include "Event.h"
-#include "Definiton.h"
-#include "TActionManager.h"
-#include "GraphicalController.h"
-#include "GameObject.h"
-#include "GameMap.h"
-#include "TParameter.h"
-#include "Timer.h"
-#include "MouseController.h"
-#include "Description_GUI.h"
+#include "game/graphics/GUI_Inventory.h"
+#include "game/Event.h"
+#include "game/Definiton.h"
+#include "game/GraphicalController.h"
+#include "game/Timer.h"
+#include "game/Description_GUI.h"
+#include "game/Property_Container.h"
+#include "game/FileSystem.h"
+#include "game/TileManager.h"
 #include "SDL.h"
 #include "SDL_mixer.h"
-#include "Property_Container.h"
-#include "FileSystem.h"
-#include "TileManager.h"
 #include <mutex>
 #include <condition_variable>
 #include <map>
 
 
-class TAction;
-class TActionManager;
+class Action;
+class ActionManager;
 class GameObject;
+class GameMap;
 class MapCell;
-class TParameter;
+class Parameter;
+class Action_OpenInventory;
+class MouseController;
 class GUI_ActionPanel;
 class GUI_ActionButton;
 class GUI_ActionManager;
 class GUI_Layer;
 class GUI_Object;
 class GUI_PopMenu;
-class GameMap;
 class GUI_Item;
 class GUI_Window;
-class TGCButton;
 class GUI_Timer;
-class Action_OpenInventory;
-class MouseController;
 
 
 class gui_MessageQueue
@@ -56,7 +42,7 @@ public:
 
 	std::mutex m_mutex;
 	std::condition_variable m_condition_variable;
-	std::list<TParameter*> m_items;
+	std::list<Parameter*> m_items;
 	bool m_read_message;
 	bool m_processed_message;
 	bool m_reader;
@@ -65,7 +51,7 @@ public:
 	gui_MessageQueue();
 	~gui_MessageQueue();
 
-	void push(TParameter* p);
+	void push(Parameter* p);
 };
 
 class GameObjectManager
@@ -113,9 +99,9 @@ public:
 
 	ApplicationGUI* m_GUI;
 	GraphicalController* m_graph;
-	TActionManager* m_action_manager;
+	ActionManager* m_action_manager;
 
-	TAction* m_actions[4];
+	Action* m_actions[4];
 
 	Event<WPARAM> key_press;
 	Event<MouseEventArgs> mouse_click;
@@ -157,3 +143,4 @@ private:
 	
 };
 
+#endif //APPLICATION_H

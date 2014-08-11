@@ -45,8 +45,8 @@ position_t MouseController_Windows::get_mouse_position()
 	POINT mouse;
 	GetCursorPos(&mouse);
 	ScreenToClient(hWnd, &mouse);
-	GLfloat winX, winY, winZ;
-	winX = (float)mouse.x;
-	winY = (float)mouse.y;
+	GLfloat winX, winY;
+	winX = static_cast<GLfloat>(mouse.x);
+	winY = static_cast<GLfloat>(mouse.y);
 	return Application::instance().m_graph->get_OpenGL_position(winX, winY);
 }

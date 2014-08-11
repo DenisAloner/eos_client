@@ -1,4 +1,6 @@
-#pragma once
+#ifndef GUI_WINDOW_H
+#define	GUI_WINDOW_H
+
 #include "GUI_Container.h"
 #include "GUI_Item.h"
 #include <list>
@@ -29,3 +31,4 @@ public:
 
 };
 
+#endif GUI_WINDOW_H

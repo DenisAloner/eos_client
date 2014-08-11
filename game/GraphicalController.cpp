@@ -276,15 +276,20 @@ position_t GraphicalController::get_OpenGL_position(float x, float y)
 	GLdouble modelview[16];
 	GLdouble projection[16];
 	GLfloat winX, winY, winZ;
-	TPoint _Point;
+
+	struct
+	{
+		GLdouble x, y, z;
+	} point;
+
 	glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
 	glGetDoublev(GL_PROJECTION_MATRIX, projection);
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	winX = (float)x;
 	winY = (float)viewport[3] - (float)y;
 	glReadPixels(x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
-	gluUnProject(winX, winY, winZ, modelview, projection, viewport, &_Point.x, &_Point.y, &_Point.z);
-	return position_t(_Point.x, _Point.y);
+	gluUnProject(winX, winY, winZ, modelview, projection, viewport, &point.x, &point.y, &point.z);
+	return position_t(point.x, point.y);
 }
 
 //GLuint GraphicalController::load_texture(const char * filename)

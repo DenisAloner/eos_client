@@ -1,5 +1,9 @@
-#pragma once
+#ifndef GUI_ITEMBUTTON_H
+#define	GUI_ITEMBUTTON_H
+
 #include "GUI_Object.h"
+
+
 class GUI_ItemButton :
 	public GUI_Object
 {
@@ -12,3 +16,4 @@ public:
 	virtual void on_mouse_move(MouseEventArgs const& e);
 };
 
+#endif GUI_ITEMBUTTON_H

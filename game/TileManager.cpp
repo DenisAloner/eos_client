@@ -1,4 +1,5 @@
-#include "TileManager.h"
+#include "game/TileManager.h"
+#include "game/GameObject.h"
 
 
 TileManager::TileManager()
@@ -17,13 +18,16 @@ bool TileManager::load_from_file(const std::string& filename)
 	return true;
 }
 
+
 void  TileManager::set_tile(tile_t& tile, GameObject* obj, unsigned int num)
 {
 }
 
+
 TileManager_Single::TileManager_Single()
 {
 }
+
 
 void  TileManager_Single::set_tile(tile_t& tile, GameObject* obj, unsigned int num)
 {
@@ -38,9 +42,11 @@ void  TileManager_Single::set_tile(tile_t& tile, GameObject* obj, unsigned int n
 	tile.coordinat[7] = 1.0;
 }
 
+
 TileManager_Map::TileManager_Map()
 {
 }
+
 
 void  TileManager_Map::set_tile(tile_t& tile, GameObject* obj, unsigned int num)
 {

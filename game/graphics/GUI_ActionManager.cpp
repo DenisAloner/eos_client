@@ -1,7 +1,8 @@
 #include "GUI_ActionManager.h"
+#include "Action.h"
 
 
-GUI_ActionManager::GUI_ActionManager(TActionManager* ActionManager) :GUI_Container(0, 0, 0, 0)
+GUI_ActionManager::GUI_ActionManager(ActionManager* ActionManager) :GUI_Container(0, 0, 0, 0)
 {
 	m_item = ActionManager;
 	m_item->add_item_event += std::bind(&GUI_ActionManager::on_item_add, this, std::placeholders::_1);

@@ -1,4 +1,7 @@
-#include "GameMap.h"
+#include "game/GameMap.h"
+#include "game/GameObject.h"
+#include "game/Application.h"
+
 
 MapCell::MapCell(int x0, int y0)
 {
@@ -19,7 +22,7 @@ GameObjectProperty* MapCell::find_property(property_e kind,GameObject* excluded)
 	{
 		if(excluded!=(*item))
 		{
-			result=(*item)->find_property(kind);
+			result = (*item)->find_property(kind);
 			if(result!=nullptr)
 			{
 				return result;

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GUI_OBJECT_H
+#define	GUI_OBJECT_H
 
 #include "Event.h"
 #include "GraphicalController.h"
@@ -42,3 +43,4 @@ public:
 
 };
 
+#endif //GUI_OBJECT_H

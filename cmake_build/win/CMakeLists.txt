@@ -5,29 +5,25 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(PROJECT_DIR ${CMAKE_SOURCE_DIR}/../../)
 
-file(GLOB SRC_ROOT ${PROJECT_DIR}/*.h ${PROJECT_DIR}/*.cpp)
+file(GLOB SRC_PLATFORM ${PROJECT_DIR}/platform/win/*.h ${PROJECT_DIR}/platform/win/*.cpp)
+file(GLOB SRC_PLATFORM_GAME ${PROJECT_DIR}/platform/win/game/*.h ${PROJECT_DIR}/platform/win/game/*.cpp)
 file(GLOB SRC_GAME ${PROJECT_DIR}/game/*.h ${PROJECT_DIR}/game/*.cpp)
 file(GLOB SRC_GAME_GRAPHICS ${PROJECT_DIR}/game/graphics/*.h ${PROJECT_DIR}/game/graphics/*.cpp)
 file(GLOB SRC_GAME_UTILS ${PROJECT_DIR}/game/utils/*.h ${PROJECT_DIR}/game/utils/*.cpp)
+
 set(SOURCE_FILES
-	${SRC_ROOT}
+	${SRC_PLATFORM}
+	${SRC_PLATFORM_GAME}
 	${SRC_GAME}
 	${SRC_GAME_GRAPHICS}
 	${SRC_GAME_UTILS}
 )
 
-source_group("" FILES ${SRC_ROOT})
+source_group("platform" FILES ${SRC_PLATFORM})
+source_group("platform\\game" FILES ${SRC_PLATFORM_GAME})
 source_group("game" FILES ${SRC_GAME})
 source_group("game\\graphics" FILES ${SRC_GAME_GRAPHICS})
 source_group("game\\utils" FILES ${SRC_GAME_UTILS})
-
-include_directories(
-	${PROJECT_DIR}/game
-	${PROJECT_DIR}/game/graphics
-	${PROJECT_DIR}/game/utils
-	${PROJECT_DIR}/include
-	${PROJECT_DIR}/lib/glog/src/windows
-)
 
 find_package(OpenGL REQUIRED)
 if (OPENGL_FOUND)
@@ -57,6 +53,16 @@ find_library(GLOG_LIB libglog
 	DOC "Logging library"
 )
 
+
+include_directories(
+	${PROJECT_DIR}
+	${PROJECT_DIR}/game
+	${PROJECT_DIR}/game/graphics
+	${PROJECT_DIR}/game/utils
+	${PROJECT_DIR}/include
+	${PROJECT_DIR}/lib/glog/src/windows
+)
+
 set(EXT_LIBRARIES
 	${OGL_LIB}
 	${GLEW_LIB}
@@ -67,8 +73,14 @@ set(EXT_LIBRARIES
 
 include(${PROJECT_DIR}/cmake_build/common/game.cmake)
 
+list(APPEND GAME_DEFINES
+	__DESKTOP__
+)
+
 add_executable(${PROJECT_NAME} WIN32 ${SOURCE_FILES})
+
 target_link_libraries(${PROJECT_NAME} ${EXT_LIBRARIES})
+
 set_target_properties(${PROJECT_NAME}
 	PROPERTIES
 	COMPILE_DEFINITIONS "${GAME_DEFINES}"

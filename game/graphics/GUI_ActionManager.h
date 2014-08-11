@@ -1,23 +1,22 @@
-#pragma once
+#ifndef GUI_ACTIONMANAGER_H
+#define	GUI_ACTIONMANAGER_H
+
 #include "GUI_Container.h"
-#include "TActionManager.h"
 #include "GUI_Item.h"
 
 class Application;
-class GUI_Object;
-class TActionManager;
-struct ActionManagerEventArgs;
+class ActionManager;
 class GameTask;
+class GUI_Object;
 
-class GUI_ActionManager :
-	public GUI_Container
+struct ActionManagerEventArgs;
 
+class GUI_ActionManager : public GUI_Container
 {
 public:
+	ActionManager* m_item;
 
-	TActionManager* m_item;
-
-	GUI_ActionManager(TActionManager* ActionManager);
+	GUI_ActionManager(ActionManager* ActionManager);
 	~GUI_ActionManager(void);
 
 	/*virtual void Render(GraphicalController* Graph);*/
@@ -28,3 +27,4 @@ public:
 	virtual void remove_item_control(GUI_Object* object);
 };
 
+#endif //GUI_ACTIONMANAGER_H

@@ -1,16 +1,15 @@
-#pragma once
-#include "GraphicalController.h"
+#ifndef GAMEMAP_H
+#define	GAMEMAP_H
+
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
 #include <conio.h>
-#include "GameObject.h"
 #include <list>
-#include "GameObjectProperty.h"
-#include "Application.h"
+#include "GraphicalController.h"
+
 
 class Application;
-
 class GameObject;
 class GameObjectProperty;
 
@@ -69,3 +68,4 @@ public:
 	void add_doors();
 };
 
+#endif //GAMEMAP_H

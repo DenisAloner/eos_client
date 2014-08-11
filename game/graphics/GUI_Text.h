@@ -1,4 +1,6 @@
-#pragma once
+#ifndef GUI_TEXT_H
+#define	GUI_TEXT_H
+
 #include "GUI_Object.h"
 #include <string>
 
@@ -32,3 +34,4 @@ private:
 	std::string m_text;
 };
 
+#endif //GUI_TEXT_H

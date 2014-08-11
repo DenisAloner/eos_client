@@ -1,16 +1,16 @@
-//
-// GLSAMPLE.CPP
-//  by Blaine Hodge
-//
-
 // Includes
-#include "Application.h"
-#include "Definiton.h"
-#include "utils/winlog.h"
 #include <windows.h>
 #include <thread>
 #include <chrono>
 #include <string>
+#include "game/Application.h"
+#include "game/ApplicationGUI.h"
+#include "game/MouseController.h"
+#include "game/GameObject.h"
+#include "game/utils/winlog.h"
+#include "game/graphics/GUI_MapViewer.h"
+#include "game/graphics/GUI_Timer.h"
+#include "game/graphics/GUI_TextBox.h"
 
 // Function Declarations
 

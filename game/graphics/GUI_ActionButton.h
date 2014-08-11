@@ -1,17 +1,19 @@
-#pragma once
+#ifndef GUI_ACTIONBUTTON_H
+#define	GUI_ACTIONBUTTON_H
+
 #include "GUI_Object.h"
-#include "ActionsDescription.h"
+#include "Action.h"
 #include "Application.h"
 
 class Application;
-class TAction;
+class Action;
 
 class GUI_ActionButton :
 	public GUI_Object
 {
 public:
 
-	TAction* m_action;
+	Action* m_action;
 
 	GUI_ActionButton();
 	~GUI_ActionButton();
@@ -21,3 +23,4 @@ public:
 	virtual bool check_region(MouseEventArgs const& e);
 };
 
+#endif //GUI_ACTIONBUTTON_H

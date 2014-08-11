@@ -1,6 +1,10 @@
-#pragma once
+#ifndef GUI_TIMER_H
+#define	GUI_TIMER_H
+
 #include "GUI_Container.h"
 #include "GUI_Text.h"
+
+
 class GUI_Timer :
 	public GUI_Container
 {
@@ -12,3 +16,4 @@ public:
 	void Update(int time);
 };
 
+#endif //GUI_TIMER_H

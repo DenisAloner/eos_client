@@ -1,4 +1,5 @@
-#include "GUI_ActionButton.h"
+#include <thread>
+#include "game/graphics/GUI_ActionButton.h"
 
 
 GUI_ActionButton::GUI_ActionButton()
@@ -38,7 +39,7 @@ void GUI_ActionButton::render(GraphicalController* Graph, int px, int py)
 void GUI_ActionButton::on_mouse_click(MouseEventArgs const& e)
 {
 	set_focus(true);
-	std::thread t(&TAction::interaction_handler,m_action);
+	std::thread t(&Action::interaction_handler,m_action);
 	t.detach();
 }
 

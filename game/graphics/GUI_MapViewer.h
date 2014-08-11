@@ -1,23 +1,24 @@
-#pragma once
+#ifndef GUI_MAPVIEWER_H
+#define	GUI_MAPVIEWER_H
+
 #include "GUI_Layer.h"
 #include "GUI_Object.h"
 #include "GameMap.h"
 #include "Application.h"
-#include "ActionsDescription.h"
-#include <thread>
-#include "TParameter.h"
+#include "Action.h"
+#include "Parameter.h"
+
 
 class Application;
-class TAction;
+class Action;
 class GUI_Object;
 class GUI_Layer;
-class TParameter;
+class Parameter;
 class MapCell;
 class GameMap;
 class GameObject;
 
-class GUI_MapViewer :
-	public GUI_Object
+class GUI_MapViewer : public GUI_Object
 { 
 public:
 
@@ -69,3 +70,5 @@ public:
 	void calculate();
 	virtual MouseEventArgs set_local_mouse_control(MouseEventArgs const& source);
 };
+
+#endif //GUI_MAPVIEWER_H

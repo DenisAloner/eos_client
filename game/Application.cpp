@@ -1,4 +1,16 @@
-#include "Application.h"
+#include "game/Application.h"
+#include "game/ApplicationGUI.h"
+#include "game/MouseController.h"
+#include "game/ActionManager.h"
+#include "game/GameObject.h"
+#include "game/graphics/GUI_ActionManager.h"
+#include "game/graphics/GUI_ActionPanel.h"
+#include "game/graphics/GUI_ActionButton.h"
+#include "game/graphics/GUI_Window.h"
+#include "game/graphics/GUI_MapViewer.h"
+#include "game/graphics/GUI_TextBox.h"
+#include "game/graphics/GUI_Timer.h"
+
 
 void my_audio_callback(void *userdata, uint8_t *stream, uint32_t len);
 
@@ -17,7 +29,7 @@ gui_MessageQueue::~gui_MessageQueue()
 {
 }
 
-void gui_MessageQueue::push(TParameter* p)
+void gui_MessageQueue::push(Parameter* p)
 {
 	std::unique_lock<std::mutex> lk(m_mutex);
 	m_read_message = true;
@@ -220,7 +232,7 @@ void Application::render()
 	glClear( GL_COLOR_BUFFER_BIT );
 	glPushMatrix();
 	m_GUI->render(m_graph,0,0);
-	position_t Mouse=Application::instance().m_mouse->get_mouse_position();
+	position_t Mouse = Application::instance().m_mouse->get_mouse_position();
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_2D);
@@ -253,7 +265,7 @@ void Application::initialization(HWND _hWnd)
 	m_mouse->mouse_down += std::bind(&Application::on_mouse_down, this, std::placeholders::_1);
 	m_mouse->mouse_wheel += std::bind(&Application::on_mouse_wheel, this, std::placeholders::_1);
 	m_mouse->mouse_move += std::bind(&Application::on_mouse_move, this, std::placeholders::_1);
-	m_action_manager = new TActionManager();
+	m_action_manager = new ActionManager();
 
 	m_actions[0] = new ActionClass_Move();
 	m_actions[1] = new ActionClass_Push();
@@ -281,19 +293,6 @@ void Application::initialization(HWND _hWnd)
 		m_GUI->MapViewer->m_map->add_object(m_game_object_manager.new_object("floor"), m_GUI->MapViewer->m_map->m_items[9][8]);
 	}
 	m_GUI->MapViewer->m_map->add_object(m_GUI->MapViewer->m_player, m_GUI->MapViewer->m_map->m_items[9][9]);
-	//TGCButton* Button;
-	//Button = new TGCButton();
-	//Button->x = 100;
-	//Button->y = 100;
-	//Button->width = 1024;
-	//Button->height =1024;
-	//TGCTextBox* TextBox1;
-	//TextBox1 = new TGCTextBox();
-	//TextBox1->Text = "";
-	//TextBox1->x = 0;
-	//TextBox1->y = 774 - 64;
-	//TextBox1->width = 640;
-	//TextBox1->height = 250;
 
 	GUI_ActionManager* AMTextBox;
 	AMTextBox = new GUI_ActionManager(m_action_manager);

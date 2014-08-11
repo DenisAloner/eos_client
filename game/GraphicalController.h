@@ -1,5 +1,6 @@
-#pragma once
-#include "glew.h"
+#ifndef GRAPHICALCONTROLLER_H
+#define	GRAPHICALCONTROLLER_H
+
 #include <iostream>
 #include <fstream>
 #include <Windows.h>
@@ -11,11 +12,6 @@
 
 #define WIDTH   640
 #define HEIGHT  480
-
-struct TPoint
-{
-	GLdouble x,y,z;
-};
 
 
 class GraphicalController
@@ -70,3 +66,4 @@ private:
 	bool LinkSuccessful(int obj);
 };
 
+#endif //GRAPHICALCONTROLLER_H

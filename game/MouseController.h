@@ -1,10 +1,10 @@
-#pragma once
+#ifndef MOUSECONTROLLER_H
+#define	MOUSECONTROLLER_H
+
+#include <chrono>
 #include "Event.h"
 #include "Definiton.h"
 #include "Timer.h"
-#include <thread>
-#include <chrono>
-#include "glew.h"
 #include "Application.h"
 
 class MouseController
@@ -48,3 +48,5 @@ public:
 	virtual position_t get_mouse_position();
 
 };
+
+#endif //MOUSECONTROLLER_H

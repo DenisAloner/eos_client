@@ -9,6 +9,7 @@ FileSystem::FileSystem()
 {
 }
 
+
 FileSystem::~FileSystem()
 {
 }
@@ -59,4 +60,3 @@ bool FileSystem::save_to_file(const std::string& path, bytearray& data)
 		return false;
 	}
 }
-

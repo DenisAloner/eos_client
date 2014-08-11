@@ -1,4 +1,6 @@
-#pragma once
+#ifndef GUI_CONTAINER_H
+#define	GUI_CONTAINER_H
+
 #include "GUI_Layer.h"
 
 class GUI_Container :
@@ -28,3 +30,4 @@ public:
 	virtual MouseEventArgs set_local_mouse_position(MouseEventArgs const& source);
 };
 
+#endif //GUI_CONTAINER_H

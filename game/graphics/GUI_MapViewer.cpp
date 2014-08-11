@@ -1,6 +1,8 @@
-#include "GUI_MapViewer.h"
-#include "GUI_Layer.h"
-#include "GUI_PopMenu.h"
+#include "game/graphics/GUI_MapViewer.h"
+#include "game/graphics/GUI_Layer.h"
+#include "game/graphics/GUI_PopMenu.h"
+#include "game/ActionManager.h"
+
 
 GUI_MapViewer::GUI_MapViewer(Application* app = nullptr)
 {
@@ -256,7 +258,7 @@ void GUI_MapViewer::on_key_press(WPARAM w)
 	case VK_SPACE:
 		if (Application::instance().m_message_queue.m_reader)
 		{
-			TParameter* p = new TParameter(ParameterKind_Cancel);
+			Parameter* p = new Parameter(ParameterKind_Cancel);
 			Application::instance().m_message_queue.push(p);
 		}
 		return;

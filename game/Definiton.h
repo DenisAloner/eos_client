@@ -1,7 +1,10 @@
-#pragma once
+#ifndef DEFINITION_H
+#define	DEFINITION_H
+
 #include <Windows.h>
 #include <functional>
-#include "glew.h"
+#include "graphics/gl.hpp"
+
 
 class GUI_Object;
 
@@ -144,9 +147,10 @@ struct light_t
 	light_t() : R(0), G(0), B(0){};
 };
 
-template <typename T,int width, int height>
+template <typename T, int width, int height>
 class matrix_t{
 	T data[height][width];
 	//...member functions
 };
 
+#endif //DEFINITION_H

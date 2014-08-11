@@ -1,9 +1,8 @@
-#pragma once
+#ifndef APPLICATIONGUI_H
+#define	APPLICATIONGUI_H
 
 #include "Description_GUI.h"
 #include "graphics/GUI_Layer.h"
-#include "graphics/GUI_MapViewer.h"
-#include "graphics/GUI_Timer.h"
 
 
 class GUI_MapViewer;
@@ -19,3 +18,5 @@ public:
 	GUI_TextBox* DescriptionBox;
 	GUI_Timer* Timer;
 };
+
+#endif //APPLICATIONGUI_H

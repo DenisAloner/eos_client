@@ -1,4 +1,5 @@
-#include "GUI_PopMenu.h"
+#include "game/graphics/GUI_PopMenu.h"
+#include "game/Parameter.h"
 
 
 GUI_PopMenu::GUI_PopMenu(void) :GUI_Container(0, 0, 0, 0)
