@@ -32,8 +32,26 @@ GameObjectProperty* MapCell::find_property(property_e kind,GameObject* excluded)
 	return nullptr;
 }
 
+bool MapCell::check_permit(property_e kind, GameObject* excluded)
+{
+	GameObjectProperty* result(nullptr);
+	for (std::list<GameObject*>::iterator item = m_items.begin(); item != m_items.end(); item++)
+	{
+		if (excluded != (*item))
+		{
+			result = (*item)->find_property(kind);
+			if (result == nullptr)
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
 GameMap::GameMap(dimension_t size)
 {
+	m_update = true;
 	GameObject* obj;
 	m_size = size;
 	m_items.resize(m_size.h);
@@ -53,18 +71,6 @@ GameMap::GameMap(dimension_t size)
 		for (int x = 0; x< 21; x++)
 		{
 			m_coefficient[y][x] = 5 * sqrt(x*x + y*y);
-		}
-	}
-}
-
-void GameMap::add_object(GameObject* Object0,MapCell* Cell0)
-{
-	Object0->m_cell=Cell0;
-	for(int i=0;i<Object0->m_size.y;i++)
-	{
-		for(int j=0;j<Object0->m_size.x;j++)
-		{
-			m_items[Cell0->y + i][Cell0->x - j]->add_object(Object0);
 		}
 	}
 }
@@ -89,16 +95,43 @@ void GameMap::generate_room(void)
 	}
 }
 
-void GameMap::move_object(GameObject* Obj,MapCell* Pos)
+
+void GameMap::add_object(GameObject* object, MapCell* cell)
 {
-	for (int i = 0; i<Obj->m_size.y; i++)
+	object->m_cell = cell;
+	for (int i = 0; i<object->m_size.y; i++)
 	{
-		for (int j = 0; j<Obj->m_size.x; j++)
+		for (int j = 0; j<object->m_size.x; j++)
 		{
-			m_items[Obj->m_cell->y + i][Obj->m_cell->x - j]->m_items.remove(Obj);
+			m_items[cell->y + i][cell->x - j]->add_object(object);
 		}
 	}
-	add_object(Obj,Pos);
+}
+
+void GameMap::remove_object(GameObject* object)
+{
+	for (int i = 0; i<object->m_size.y; i++)
+	{
+		for (int j = 0; j<object->m_size.x; j++)
+		{
+			m_items[object->m_cell->y + i][object->m_cell->x - j]->m_items.remove(object);
+		}
+	}
+	object->m_cell = nullptr;
+}
+
+void GameMap::move_object(GameObject* object,MapCell* cell)
+{
+	remove_object(object);
+	add_object(object, cell);
+}
+
+void  GameMap::turn_object(GameObject* object)
+{
+	MapCell* position = object->m_cell;
+	remove_object(object);
+	object->turn();
+	add_object(object, position);
 }
 
 void GameMap::add_light(GameObject* Object)
@@ -222,10 +255,16 @@ void GameMap::fill()
 				}
 			}
 		}
-		add_new_object(Application::instance().m_game_object_manager.new_object("torch"), m_items[block->rect.y + 1][block->rect.x + 1]);
-		add_new_object(Application::instance().m_game_object_manager.new_object("torch"), m_items[block->rect.y + 1][block->rect.x + block->rect.w - 1]);
-		add_new_object(Application::instance().m_game_object_manager.new_object("torch"), m_items[block->rect.y + block->rect.h - 1][block->rect.x + block->rect.w - 1]);
-		add_new_object(Application::instance().m_game_object_manager.new_object("torch"), m_items[block->rect.y + block->rect.h - 1][block->rect.x + 1]);
+		int tk;
+		std::string torch_kind[] = { "torch", "red torch", "green torch","blue torch"};
+		tk = rand() % 1;
+		add_new_object(Application::instance().m_game_object_manager.new_object(torch_kind[tk]), m_items[block->rect.y + 1][block->rect.x + 1]);
+		tk = rand() % 1;
+		add_new_object(Application::instance().m_game_object_manager.new_object(torch_kind[tk]), m_items[block->rect.y + 1][block->rect.x + block->rect.w - 1]);
+		tk = rand() % 1;
+		add_new_object(Application::instance().m_game_object_manager.new_object(torch_kind[tk]), m_items[block->rect.y + block->rect.h - 1][block->rect.x + block->rect.w - 1]);
+		tk = rand() % 1;
+		add_new_object(Application::instance().m_game_object_manager.new_object(torch_kind[tk]), m_items[block->rect.y + block->rect.h - 1][block->rect.x + 1]);
 	}
 }
 
@@ -405,7 +444,9 @@ void  GameMap::add_doors()
 				{
 					if (i - s == 5)
 					{
-						add_object(Application::instance().m_game_object_manager.new_object("door1"), m_items[i-5][rect.x]);
+						GameObject* obj = Application::instance().m_game_object_manager.new_object("door");
+						obj->set_tile_direction(ObjectDirection_Left);
+						add_object(obj, m_items[i-5][rect.x]);
 					}
 				}
 				b = false;
@@ -429,7 +470,9 @@ void  GameMap::add_doors()
 				{
 					if (i - s == 5)
 					{
-						add_object(Application::instance().m_game_object_manager.new_object("door1"), m_items[i - 5][rect.x + rect.w]);
+						GameObject* obj = Application::instance().m_game_object_manager.new_object("door");
+						obj->set_tile_direction(ObjectDirection_Left);
+						add_object(obj, m_items[i - 5][rect.x + rect.w]);
 					}
 				}
 				b = false;
@@ -438,16 +481,62 @@ void  GameMap::add_doors()
 	}
 }
 
+//void  GameMap::blur_lighting()
+//{
+//	light_t l;
+//	float Gauss[] = { 0.2270270270, 0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162 };
+//	for (int y = 0; y < 41; y++)
+//	{
+//		for (int x = 0; x < 41; x++)
+//		{
+//			l = light_t();
+//			for (int i = -4; i < 5; i++)
+//			{
+//				int mx = x + i;
+//				int my = y;
+//				if (mx < 0){ mx = 0; }
+//				if (mx > 40){ mx = 40; }
+//				if (my < 0){ my = 0; }
+//				if (my > 40){ my = 40; }
+//				l.R = l.R + m_local_light[0][my][mx].R*Gauss[abs(i)];
+//				l.G = l.G + m_local_light[0][my][mx].G*Gauss[abs(i)];
+//				l.B = l.B + m_local_light[0][my][mx].B*Gauss[abs(i)];
+//			}
+//			m_local_light[1][y][x] = l;
+//		}
+//	}
+//	for (int y = 0; y < 41; y++)
+//	{
+//		for (int x = 0; x < 41; x++)
+//		{
+//			l = light_t();
+//			for (int i = -4; i < 5; i++)
+//			{
+//				int mx = x;
+//				int my = y + i;
+//				if (mx < 0){ mx = 0; }
+//				if (mx > 40){ mx = 40; }
+//				if (my < 0){ my = 0; }
+//				if (my > 40){ my = 40; }
+//				l.R = l.R + m_local_light[1][my][mx].R*Gauss[abs(i)];
+//				l.G = l.G + m_local_light[1][my][mx].G*Gauss[abs(i)];
+//				l.B = l.B + m_local_light[1][my][mx].B*Gauss[abs(i)];
+//			}
+//			m_local_light[2][y][x] = l;
+//		}
+//	}
+//}
+
 void  GameMap::blur_lighting()
 {
 	light_t l;
-	float Gauss[] = { 0.2270270270, 0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162 };
+	float Gauss[] = { 0.39894228, 0.241970725, 0.053990967 };
 	for (int y = 0; y < 41; y++)
 	{
 		for (int x = 0; x < 41; x++)
 		{
 			l = light_t();
-			for (int i = -4; i < 5; i++)
+			for (int i = -2; i < 3; i++)
 			{
 				int mx = x + i;
 				int my = y;
@@ -467,7 +556,7 @@ void  GameMap::blur_lighting()
 		for (int x = 0; x < 41; x++)
 		{
 			l = light_t();
-			for (int i = -4; i < 5; i++)
+			for (int i = -2; i < 3; i++)
 			{
 				int mx = x;
 				int my = y + i;
@@ -482,7 +571,6 @@ void  GameMap::blur_lighting()
 			m_local_light[2][y][x] = l;
 		}
 	}
-
 }
 
 void  GameMap::calculate_lighting()
@@ -542,13 +630,16 @@ void  GameMap::calculate_lighting()
 			{
 				if (m_barrier_map[y][x])
 				{
-					for (int i = -1; i < 2; i++)
+					if (y > 20) //грубое прибллижение к модели освещения Ламберта (для всех объектов ниже источника освещения, косинус угла между нормалью и вектором из точки освещения будет меньше нуля, следовательно они будут в тени)
 					{
-						for (int j = -1; j < 2; j++)
+						for (int i = -1; i < 2; i++)
 						{
-							if (m_light_map[y + i][x + j])
+							for (int j = -1; j < 2; j++)
 							{
-								m_light_map2[y][x] = true;
+								if (m_light_map[y + i][x + j])
+								{
+									m_light_map2[y][x] = true;
+								}
 							}
 						}
 					}
@@ -624,6 +715,7 @@ void  GameMap::calculate_lighting()
 							m_items[ly][lx]->m_light.R += m_local_light[2][y][x].R;
 							m_items[ly][lx]->m_light.G += m_local_light[2][y][x].G;
 							m_items[ly][lx]->m_light.B += m_local_light[2][y][x].B;
+							/*m_items[ly][lx]->m_light = light_t(100,100,100);*/
 
 						}
 						else
@@ -631,6 +723,7 @@ void  GameMap::calculate_lighting()
 							m_items[ly][lx]->m_light.R += m_local_light[2][y][x].R;
 							m_items[ly][lx]->m_light.G += m_local_light[2][y][x].G;
 							m_items[ly][lx]->m_light.B += m_local_light[2][y][x].B;
+							/*m_items[ly][lx]->m_light = light_t(100,100,100);*/
 						}
 					}
 				}

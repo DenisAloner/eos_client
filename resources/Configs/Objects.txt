@@ -1,33 +1,64 @@
 object elf
-size 2 1 6
-tile_manager_map EoS_Elf
+size 1 2 5
+tile_manager_map no_tile 0 0
+tile_manager_map no_tile 0 1
+tile_manager_map no_tile 0 2
+tile_manager_map no_tile 0 3
+tile_manager_map elf_left_01 1 0
+tile_manager_map elf_left_02 1 1
+tile_manager_map elf_left_03 1 2
+tile_manager_map elf_left_04 1 3
+tile_manager_map no_tile 2 0
+tile_manager_map no_tile 2 1
+tile_manager_map no_tile 2 2
+tile_manager_map no_tile 2 3
+tile_manager_map elf_right_01 3 0
+tile_manager_map elf_right_02 3 1
+tile_manager_map elf_right_03 3 2
+tile_manager_map elf_right_04 3 3
 action_move
 property_container Мешок 2 4
 
 object floor
-size 1 1 1
+size 1 1 0
 tile_manager_single EoS_Floor_01
 property_permit_move
+layer 0
 
 object wall
-size 1 1 5
+size 1 1 4
 tile_manager_single EoS_Wall
 layer 2
 
 object dirt
-size 1 1 5
+size 1 1 0
 tile_manager_single Mud
 layer 2
 
 object torch
-size 1 1 4
+size 1 1 3
 tile_manager_single EoS_Torch
 light 80 80 80
 
-object door
-size 5 1 5
-tile_manager_single EoS_Door
+object red torch
+size 1 1 3
+tile_manager_single EoS_Torch
+light 80 0 0
 
-object door1
-size 1 5 9
-tile_manager_single EoS_Door_01
+object green torch
+size 1 1 3
+tile_manager_single EoS_Torch
+light 0 80 0
+
+object blue torch
+size 1 1 3
+tile_manager_single EoS_Torch
+light 0 0 80
+
+object door
+size 5 1 4
+tile_manager_rotating door_down 0
+tile_manager_rotating door_left 1
+tile_manager_rotating no_tile 2
+tile_manager_rotating no_tile 3
+layer 2

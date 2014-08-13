@@ -11,13 +11,15 @@ class GameObject;
 class TileManager
 {
 public:
-	GLuint m_unit;
+
+	GLuint* m_tiles;
 
 	TileManager();
 	~TileManager();
 
-	virtual bool load_from_file(const std::string& filename);
-	virtual void set_tile(tile_t& tile, GameObject* obj, unsigned int num);
+	virtual bool load_from_file(const std::string& filename, ObjectDirection direction, int frame);
+	virtual void set_tile(tile_t& tile, GameObject* obj, int frame, int shift);
+	virtual int get_tile_index(const ObjectDirection& direction, const int& frame) = 0;
 };
 
 class TileManager_Single :
@@ -27,7 +29,7 @@ public:
 
 	TileManager_Single();
 
-	virtual void set_tile(tile_t& tile, GameObject* obj, unsigned int num);
+	virtual int get_tile_index(const ObjectDirection& direction, const int& frame);
 };
 
 class TileManager_Map :
@@ -37,7 +39,17 @@ public:
 
 	TileManager_Map();
 
-	virtual void set_tile(tile_t& tile, GameObject* obj, unsigned int num);
+	virtual int get_tile_index(const ObjectDirection& direction, const int& frame);
+};
+
+class TileManager_rotating :
+	public TileManager
+{
+public:
+
+	TileManager_rotating();
+
+	virtual int get_tile_index(const ObjectDirection& direction, const int& frame);
 };
 
 #endif //TILEMANAGER_H

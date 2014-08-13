@@ -22,6 +22,7 @@ public:
 	int m_layer;
 	std::string m_name;
 	game_object_size_t m_size;
+	dimension_t m_tile_size;
 	light_t* m_light;
 	TileManager* m_tile_manager;
 	ObjectDirection m_direction;
@@ -40,7 +41,9 @@ public:
 	/*virtual bool ContainAction(Action* Action);*/
 	virtual Action* find_action(action_e kind);
 	virtual GameObjectProperty* find_property(property_e kind);
-	void Turn();
+	virtual void set_tile_size();
+	virtual void set_tile_direction(ObjectDirection dir);
+	void turn();
 
 };
 

@@ -16,8 +16,8 @@ GraphicalController::GraphicalController()
 		m_vertical_shader = load_shader("EoS_blur", "EoS_blur_vertical");
 		m_mask_shader = load_shader("EoS_mask", "EoS_mask");
 		m_tile_shader = load_shader("EoS_tile", "EoS_tile");
-		m_empty_01 = load_texture(FileSystem::instance().m_resource_path +  "Tiles\\EoS_Empty.bmp");
-		m_empty_02 = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Empty.bmp");
+		m_empty_01 = create_empty_texture(dimension_t(1024, 1024));
+		m_empty_02 = create_empty_texture(dimension_t(1024, 1024));
 		m_close = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Close.bmp");
 		m_select = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Select.bmp");
 		m_font = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Font.bmp");
@@ -30,12 +30,6 @@ GraphicalController::GraphicalController()
 
 	m_scissors.push_front(frectangle_t(0.0f, 0.0f, 1024.0f, 1024.0f));
 	glGenFramebuffersEXT(1, &m_FBO);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_FBO);
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_empty_01, 0);
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT1_EXT, GL_TEXTURE_2D, m_empty_02, 0);
-	GLenum buffers[] = { GL_COLOR_ATTACHMENT0_EXT, GL_COLOR_ATTACHMENT1_EXT };
-	glDrawBuffers(2, buffers);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
 
 void GraphicalController::draw_sprite(double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3)
@@ -52,9 +46,9 @@ void GraphicalController::draw_tile(tile_t& tile,double x0, double y0, double x1
 {
 	glBegin(GL_QUADS);
 	glTexCoord2d(tile.coordinat[0], tile.coordinat[1]); glVertex2d(x0, y0);
-	glTexCoord2d(tile.coordinat[2], tile.coordinat[3]); glVertex2d(x1, y1);
-	glTexCoord2d(tile.coordinat[4], tile.coordinat[5]); glVertex2d(x2, y2);
-	glTexCoord2d(tile.coordinat[6], tile.coordinat[7]); glVertex2d(x3, y3);
+	glTexCoord2d(tile.coordinat[0], tile.coordinat[3]); glVertex2d(x1, y1);
+	glTexCoord2d(tile.coordinat[2], tile.coordinat[3]); glVertex2d(x2, y2);
+	glTexCoord2d(tile.coordinat[2], tile.coordinat[1]); glVertex2d(x3, y3);
 	glEnd();
 }
 
@@ -425,3 +419,17 @@ GLhandleARB GraphicalController::load_shader(const std::string& vPath, const std
 	return Program;
 }
 
+GLint GraphicalController::create_empty_texture(dimension_t size)
+{
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.w, size.h, 0, GL_BGRA, GL_UNSIGNED_BYTE, nullptr);
+	glGenerateMipmapEXT(GL_TEXTURE_2D);
+	return texture;
+}

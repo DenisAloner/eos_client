@@ -60,6 +60,7 @@ public:
 	bool set_uniform_float(GLhandleARB program, const char * name, const float value);
 	void draw_tile(tile_t& tile, double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
 	void draw_tile_FBO(double tx1, double ty1, double tx2, double ty2, double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
+	GLint create_empty_texture(dimension_t size);
 
 private:
 	bool CompileSuccessful(int obj);

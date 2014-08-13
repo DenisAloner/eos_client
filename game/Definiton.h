@@ -75,6 +75,10 @@ enum mouse_key_e
 	mk_middle = 3
 };
 
+struct VoidEventArgs
+{
+};
+
 enum action_e
 {
 	move,
@@ -103,16 +107,16 @@ enum ParameterKind
 
 enum ObjectDirection
 {
-	ObjectDirection_Up,
-	ObjectDirection_Left,
 	ObjectDirection_Down,
+	ObjectDirection_Left,
+	ObjectDirection_Up,
 	ObjectDirection_Right
 };
 
 struct tile_t
 {
 	GLuint unit;
-	GLdouble coordinat[8];
+	GLdouble coordinat[4];
 };
 
 struct game_object_size_t
@@ -155,12 +159,6 @@ struct light_t
 
 	light_t(int R, int G, int B) : R(R), G(G), B(B){};
 	light_t() : R(0), G(0), B(0){};
-};
-
-template <typename T, int width, int height>
-class matrix_t{
-	T data[height][width];
-	//...member functions
 };
 
 #endif //DEFINITION_H

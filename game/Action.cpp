@@ -1,4 +1,4 @@
-#include "game/Action.h"
+п»ї#include "game/Action.h"
 #include "game/Application.h"
 #include "game/ApplicationGUI.h"
 #include "game/ActionManager.h"
@@ -11,7 +11,7 @@
 Action::Action(void)
 {
 	m_kind = action_e::move;
-	m_name = "Нет";
+	m_name = "РќРµС‚";
 }
 
 
@@ -49,7 +49,7 @@ void Action::interaction_handler()
 ActionClass_Move::ActionClass_Move()
 {
 	m_kind = action_e::move;
-	m_name = "Идти";
+	m_name = "РРґС‚Рё";
 }
 
 
@@ -67,11 +67,11 @@ void ActionClass_Move::interaction_handler()
 	p->m_map = Application::instance().m_GUI->MapViewer->m_map;
 	if (Application::instance().command_select_location(p->m_object, p->m_place))
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Р’С‹Р±СЂР°РЅР° РєР»РµС‚РєР° {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));
 	}
 	else
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Р”РµР№СЃС‚РІРёРµ РѕС‚РјРµРЅРµРЅРѕ."));
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
@@ -113,7 +113,7 @@ void ActionClass_Move::perfom(Parameter* parameter)
 std::string ActionClass_Move::get_description(Parameter* parameter)
 {
 	Parameter_Position* p = static_cast<Parameter_Position*>(parameter);
-	std::string s("Идти в X:");
+	std::string s("РРґС‚Рё РІ X:");
 	s += std::to_string(p->m_place->x);
 	s += ",Y:";
 	s += std::to_string(p->m_place->y);
@@ -124,7 +124,7 @@ std::string ActionClass_Move::get_description(Parameter* parameter)
 ActionClass_Push::ActionClass_Push(void)
 {
 	m_kind = action_e::push;
-	m_name = "Толкать";
+	m_name = "РўРѕР»РєР°С‚СЊ";
 }
 
 
@@ -136,9 +136,9 @@ ActionClass_Push::~ActionClass_Push(void)
 std::string ActionClass_Push::get_description(Parameter* parameter)
 {
 	Parameter_MoveObjectByUnit* p = static_cast<Parameter_MoveObjectByUnit*>(parameter);
-	std::string s("Переместить ");
+	std::string s("РџРµСЂРµРјРµСЃС‚РёС‚СЊ ");
 	s += p->m_object->m_name;
-	s += " в X:"+std::to_string(p->m_place->x);
+	s += " РІ X:"+std::to_string(p->m_place->x);
 	s += ",Y:";
 	s += std::to_string(p->m_place->y);
 	return s;
@@ -171,24 +171,24 @@ void ActionClass_Push::interaction_handler()
 	p->m_map = Application::instance().m_GUI->MapViewer->m_map;
 	if (Application::instance().command_select_object(p->m_object))
 	{
-		std::string a = "Выбран "; 
+		std::string a = "Р’С‹Р±СЂР°РЅ "; 
 		a.append(p->m_object->m_name);
 		a = a + ".";
 		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
 	}
 	else
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Р”РµР№СЃС‚РІРёРµ РѕС‚РјРµРЅРµРЅРѕ."));
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
 	if (Application::instance().command_select_location(p->m_object, p->m_place))
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Р’С‹Р±СЂР°РЅР° РєР»РµС‚РєР° {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));
 	}
 	else
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Р”РµР№СЃС‚РІРёРµ РѕС‚РјРµРЅРµРЅРѕ."));
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
@@ -200,7 +200,7 @@ void ActionClass_Push::interaction_handler()
 ActionClass_Turn::ActionClass_Turn(void)
 {
 	m_kind = action_e::turn;
-	m_name = "Повернуться";
+	m_name = "РџРѕРІРµСЂРЅСѓС‚СЊСЃСЏ";
 }
 
 
@@ -211,25 +211,26 @@ ActionClass_Turn::~ActionClass_Turn(void)
 
 std::string ActionClass_Turn::get_description(Parameter* parameter)
 {
-	Parameter_GameObject* p = static_cast<Parameter_GameObject*>(parameter);
-	std::string s("Повернуться");
+	Parameter_Position* p = static_cast<Parameter_Position*>(parameter);
+	std::string s("РџРѕРІРµСЂРЅСѓС‚СЊ ");
+	s += p->m_object->m_name + ".";
 	return s;
 }
 
 
 bool ActionClass_Turn::check(Parameter* parameter)
 {
-	Parameter_GameObject* p = static_cast<Parameter_GameObject*>(parameter);
+	Parameter_Position* p = static_cast<Parameter_Position*>(parameter);
 	return true;
 }
 
 
 void ActionClass_Turn::perfom(Parameter* parameter)
 {
-	Parameter_GameObject* p = static_cast<Parameter_GameObject*>(parameter);
+	Parameter_Position* p = static_cast<Parameter_Position*>(parameter);
 	if (check(p))
 	{
-		p->m_object->Turn();
+		p->m_map->turn_object(p->m_object);
 	}
 }
 
@@ -238,9 +239,21 @@ void ActionClass_Turn::interaction_handler()
 {
 	Action::interaction_handler();
 	Application::instance().m_message_queue.m_busy = true;
-	Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Вы разворачиваетесь."));
-	Parameter_GameObject* p = new Parameter_GameObject();
-	p->m_object = Application::instance().m_GUI->MapViewer->m_player;
+	Parameter_Position* p = new Parameter_Position();
+	p->m_map = Application::instance().m_GUI->MapViewer->m_map;
+	if (Application::instance().command_select_object(p->m_object))
+	{
+		std::string a = "Р’С‹Р±СЂР°РЅ ";
+		a.append(p->m_object->m_name);
+		a = a + ".";
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+	}
+	else
+	{
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Р”РµР№СЃС‚РІРёРµ РѕС‚РјРµРЅРµРЅРѕ."));
+		Application::instance().m_message_queue.m_busy = false;
+		return;
+	}
 	Application::instance().m_action_manager->add(new GameTask(this, p));
 	Application::instance().m_message_queue.m_busy = false;
 }
@@ -264,14 +277,14 @@ void Action_OpenInventory::interaction_handler()
 	Parameter_GameObject* p = new Parameter_GameObject();
 	if (Application::instance().command_select_object(p->m_object))
 	{
-		std::string a = "Выбран ";
+		std::string a = "Р’С‹Р±СЂР°РЅ ";
 		a.append(p->m_object->m_name);
 		a = a + ".";
 		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
 	}
 	else
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Р”РµР№СЃС‚РІРёРµ РѕС‚РјРµРЅРµРЅРѕ."));
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
@@ -311,16 +324,16 @@ void Action_CellInfo::interaction_handler()
 	Action::interaction_handler();
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter_Position* p = new Parameter_Position();
-	p->m_object = Application::instance().m_GUI->MapViewer->m_player;
+	p->m_object = nullptr;
 	p->m_map = Application::instance().m_GUI->MapViewer->m_map;
 	if (Application::instance().command_select_location(p->m_object, p->m_place))
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(" Освещение {" + std::to_string(p->m_place->m_light.R) + "," + std::to_string(p->m_place->m_light.G) + "," + std::to_string(p->m_place->m_light.B) + "}."));
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Р’С‹Р±СЂР°РЅР° РєР»РµС‚РєР° {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}:"));
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(" - РѕСЃРІРµС‰РµРЅРёРµ {" + std::to_string(p->m_place->m_light.R) + "," + std::to_string(p->m_place->m_light.G) + "," + std::to_string(p->m_place->m_light.B) + "}."));
 	}
 	else
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Не выбрана клетка карты."));
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("РќРµ РІС‹Р±СЂР°РЅР° РєР»РµС‚РєР° РєР°СЂС‚С‹."));
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}

@@ -12,8 +12,6 @@
 #include "game/graphics/GUI_Timer.h"
 #include "utils/log.h"
 
-
-
 void my_audio_callback(void *userdata, uint8_t *stream, uint32_t len);
 
 // variable declarations
@@ -82,6 +80,7 @@ void GameObjectManager::parser(const std::string& command)
 		pos = found + 1;
 		size.z = std::stoi(args.substr(pos));
 		m_object->m_size = size;
+		m_object->set_tile_direction(ObjectDirection_Down);
 		break;
 	}
 	case command_e::layer:
@@ -92,13 +91,44 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::tile_manager_single:
 	{
 		m_object->m_tile_manager = new TileManager_Single();
-		m_object->m_tile_manager->load_from_file(args);
+		m_object->m_tile_manager->load_from_file(args, ObjectDirection_Down, 0);
 		break;
 	}
 	case command_e::tile_manager_map:
+	{	
+		if (m_object->m_tile_manager == nullptr)
+		{
+			m_object->m_tile_manager = new TileManager_Map();
+		}
+		ObjectDirection dir;
+		int frame;
+		std::string name;
+		std::size_t pos = 0;
+		found = args.find(" ");
+		name = args.substr(0, found);
+		pos = found + 1;
+		found = args.find(" ", pos);
+		dir = static_cast<ObjectDirection>(std::stoi(args.substr(pos, found - pos)));
+		pos = found + 1;
+		frame = std::stoi(args.substr(pos));
+		m_object->m_tile_manager->load_from_file(name, dir, frame);
+		break;
+	}
+	case command_e::tile_manager_rotating:
 	{
-		m_object->m_tile_manager = new TileManager_Map();
-		m_object->m_tile_manager->load_from_file(args);
+		if (m_object->m_tile_manager == nullptr)
+		{
+			m_object->m_tile_manager = new TileManager_rotating();
+		}
+		ObjectDirection dir;
+		std::string name;
+		std::size_t pos = 0;
+		found = args.find(" ");
+		name = args.substr(0, found);
+		pos = found + 1;
+		found = args.find(" ", pos);
+		dir = static_cast<ObjectDirection>(std::stoi(args.substr(pos, found - pos)));
+		m_object->m_tile_manager->load_from_file(name, dir, 0);
 		break;
 	}
 	case command_e::light:
@@ -151,6 +181,7 @@ void GameObjectManager::init()
 	m_commands.insert(std::pair<std::string, command_e>("layer", command_e::layer));
 	m_commands.insert(std::pair<std::string, command_e>("tile_manager_single", command_e::tile_manager_single));
 	m_commands.insert(std::pair<std::string, command_e>("tile_manager_map", command_e::tile_manager_map));
+	m_commands.insert(std::pair<std::string, command_e>("tile_manager_rotating", command_e::tile_manager_rotating));
 	m_commands.insert(std::pair<std::string, command_e>("light", command_e::light));
 	m_commands.insert(std::pair<std::string, command_e>("action_move", command_e::action_move));
 	m_commands.insert(std::pair<std::string, command_e>("property_permit_move", command_e::property_permit_move));
@@ -235,8 +266,13 @@ void Application::render()
 	glClear(GL_COLOR_BUFFER_BIT);
 //#warning TODO Внедрить собственный стек матриц, если это необходимо, так как в мобильных платформах размер GL-стека существенно ограничен
 	glPushMatrix();
-	m_GUI->render(m_graph, 0, 0);
-	const position_t mouse = Application::instance().m_mouse->get_mouse_position();
+	if (Application::instance().m_GUI->MapViewer->m_map->m_update)
+	{
+		Application::instance().m_GUI->MapViewer->m_map->update(VoidEventArgs());
+		Application::instance().m_GUI->MapViewer->m_map->m_update = false;
+	}
+m_GUI->render(m_graph, 0, 0);
+const position_t mouse = Application::instance().m_mouse->get_mouse_position();
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_2D);
@@ -288,7 +324,9 @@ void Application::initialize()
 	
 	m_GUI->MapViewer->m_map = new GameMap(dimension_t(200,200));
 	m_GUI->MapViewer->m_map->generate_level();
-	m_GUI->MapViewer->m_player = m_game_object_manager.new_object("elf");
+	GameObject* obj = m_game_object_manager.new_object("elf");
+	obj->set_tile_direction(ObjectDirection_Left);
+	m_GUI->MapViewer->m_player = obj;
 	if (m_GUI->MapViewer->m_map->m_items[9][9] == nullptr)
 	{
 		m_GUI->MapViewer->m_map->m_items[9][9] = new MapCell(9, 9);
@@ -342,7 +380,12 @@ void Application::initialize()
 	MenuLayer->add(AMTextBox);
 	MenuLayer->add(ActionPanel);
 	MenuLayer->add(TextBox);
+	GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
+	GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), m_GUI->MapViewer);
+	MiniMap->add_item_control(mini_map);
 	MenuLayer->add(m_GUI->Timer);
+	MenuLayer->add(MiniMap);
+	
 	
 	//MenuLayer->add(new GUI_Item(0, 0, 100,21, "4565656"));
 	m_GUI->add(MenuLayer);
@@ -433,14 +476,24 @@ void Application::update(void)
 		m_action_manager->remove();
 	}
 	m_GUI->MapViewer->m_map->calculate_lighting();
+	Application::instance().m_GUI->MapViewer->update();
+	Application::instance().m_GUI->MapViewer->m_map->m_update = true;
 	m_update_mutex.unlock();
 }
 
 bool Application::command_select_location(GameObject* Object, MapCell*& Cell)
 {
 	bool Result = false;
-	m_GUI->MapViewer->m_cursor_x = Object->m_size.x;
-	m_GUI->MapViewer->m_cursor_y = Object->m_size.y;
+	if (Object)
+	{
+		m_GUI->MapViewer->m_cursor_x = Object->m_size.x;
+		m_GUI->MapViewer->m_cursor_y = Object->m_size.y;
+	}
+	else
+	{
+		m_GUI->MapViewer->m_cursor_x = 1;
+		m_GUI->MapViewer->m_cursor_y = 1;
+	}
 	m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выберите клетку."));
 	bool Exit = false;
 	while (Exit == false)
@@ -547,14 +600,14 @@ void Application::command_set_pickup_item_visibility(bool _Visibility)
 	m_mouse->m_show_pickup_item = _Visibility;
 }
 
-bool Application::command_check_position(GameObject*& _Object, MapCell*& _Position, GameMap*& _Map)
+bool Application::command_check_position(GameObject*& object, MapCell*& position, GameMap*& map)
 {
-	for (int i = 0; i<_Object->m_size.y; i++)
+	for (int i = 0; i<object->m_size.y; i++)
 	{
-		for (int j = 0; j<_Object->m_size.x; j++)
+		for (int j = 0; j<object->m_size.x; j++)
 		{
-			if (_Map->m_items[_Position->y + i][_Position->x - j] == nullptr){ return false; }
-			if (_Map->m_items[_Position->y + i][_Position->x - j]->find_property(property_e::permit_move, _Object) == nullptr)
+			if (map->m_items[position->y + i][position->x - j] == nullptr){ return false; }
+			if (!map->m_items[position->y + i][position->x - j]->check_permit(property_e::permit_move, object))
 			{
 				return false;
 			}

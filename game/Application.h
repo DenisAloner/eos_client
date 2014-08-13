@@ -15,6 +15,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <map>
+#include "game/graphics/GUI_MiniMap.h"
 
 
 class Action;
@@ -34,6 +35,7 @@ class GUI_PopMenu;
 class GUI_Item;
 class GUI_Window;
 class GUI_Timer;
+class GUI_MiniMap;
 
 
 class gui_MessageQueue
@@ -65,6 +67,7 @@ public:
 		layer,
 		tile_manager_single,
 		tile_manager_map,
+		tile_manager_rotating,
 		light,
 		action_move,
 		property_permit_move,
@@ -131,7 +134,7 @@ public:
 	bool command_select_location(GameObject* Object, MapCell*& Cell);
 	bool command_select_object(GameObject*& Object);
 	bool command_open_inventory(GameObject*& Object);
-	bool command_check_position(GameObject*& _Object, MapCell*& _Position,GameMap*& _Map);
+	bool command_check_position(GameObject*& object, MapCell*& position, GameMap*& map);
 	void command_set_cursor(GLuint _Tile);
 	void command_set_pickup_item(GLuint _Tile);
 	void command_set_cursor_visibility(bool _Visibility);

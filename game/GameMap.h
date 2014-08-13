@@ -7,7 +7,7 @@
 #include <conio.h>
 #include <list>
 #include "GraphicalController.h"
-
+#include "Event.h"
 
 class Application;
 class GameObject;
@@ -30,12 +30,16 @@ public:
 
 	void add_object(GameObject* Object);
 	virtual GameObjectProperty* find_property(property_e kind,GameObject* excluded);
+	bool check_permit(property_e kind, GameObject* excluded);
 
 };
 
 class GameMap
 {
 public:
+
+	bool m_update;
+	Event<VoidEventArgs> update;
 
 	struct block_t
 	{
@@ -59,11 +63,14 @@ public:
 
 	GameMap(dimension_t size);
 
-	void add_object(GameObject* Object0, MapCell* Cell0);
+	void add_object(GameObject* object, MapCell* cell);
+	void remove_object(GameObject* object);
+	void move_object(GameObject* object, MapCell* cell);
+	void turn_object(GameObject* object);
+
 	void generate_room(void);
 	bool divide_block(block_t* Block, int Depth, int Current);
 	void generate_level(void);
-	void move_object(GameObject* Obj,MapCell* Pos);
 	void add_light(GameObject* Object);
 	void add_new_object(GameObject* Object, MapCell* Element);
 	void fill();

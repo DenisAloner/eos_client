@@ -12,59 +12,52 @@ TileManager::~TileManager()
 }
 
 
-bool TileManager::load_from_file(const std::string& filename)
+bool TileManager::load_from_file(const std::string& filename, ObjectDirection direction, int frame)
 {
-	m_unit = Application::instance().m_graph->load_texture(FileSystem::instance().m_resource_path + "Tiles\\" + filename + ".bmp");
+	m_tiles[get_tile_index(direction,frame)] = Application::instance().m_graph->load_texture(FileSystem::instance().m_resource_path + "Tiles\\" + filename + ".bmp");
 	return true;
 }
 
 
-void  TileManager::set_tile(tile_t& tile, GameObject* obj, unsigned int num)
+void  TileManager::set_tile(tile_t& tile, GameObject* obj, int frame, int shift)
 {
+	tile.unit = m_tiles[get_tile_index(obj->m_direction, frame)];
+	double sx = 1.0 / obj->m_tile_size.w;
+	tile.coordinat[0] = (shift - 1)*sx;
+	tile.coordinat[1] = 1.0;
+	tile.coordinat[2] = shift*sx;
+	tile.coordinat[3] = 0.0;
 }
 
 
 TileManager_Single::TileManager_Single()
 {
+	m_tiles = new GLuint[1];
 }
 
-
-void  TileManager_Single::set_tile(tile_t& tile, GameObject* obj, unsigned int num)
+int TileManager_Single::get_tile_index(const ObjectDirection& direction, const int& frame)
 {
-	tile.unit = m_unit;
-	tile.coordinat[0] = 0.0;
-	tile.coordinat[1] = 1.0;
-	tile.coordinat[2] = 0.0;
-	tile.coordinat[3] = 0.0;
-	tile.coordinat[4] = 1.0;
-	tile.coordinat[5] = 0.0;
-	tile.coordinat[6] = 1.0;
-	tile.coordinat[7] = 1.0;
+	return 0;
 }
 
 
 TileManager_Map::TileManager_Map()
 {
+	m_tiles = new GLuint[16];
+}
+
+int TileManager_Map::get_tile_index(const ObjectDirection& direction, const int& frame)
+{
+	return direction*4+frame;
 }
 
 
-void  TileManager_Map::set_tile(tile_t& tile, GameObject* obj, unsigned int num)
+TileManager_rotating::TileManager_rotating()
 {
-	tile.unit = m_unit;
-	tile.coordinat[0] = (num*obj->m_size.x * 32) / 256.0;
-	tile.coordinat[1] = ((obj->m_direction + 1)*obj->m_size.z * 16) / 384.0;
-	tile.coordinat[2] = (num*obj->m_size.x * 32)/256.0;
-	tile.coordinat[3] = (obj->m_direction*obj->m_size.z * 16)/384.0;
-	tile.coordinat[4] = ((num + 1)*obj->m_size.x * 32) / 256.0;
-	tile.coordinat[5] = (obj->m_direction*obj->m_size.z * 16)/384.0;
-	tile.coordinat[6] = ((num+1)*obj->m_size.x * 32) / 256.0;
-	tile.coordinat[7] = ((obj->m_direction + 1)*obj->m_size.z * 16) / 384.0;
-	//tile.coordinat[0] = 0.0;
-	//tile.coordinat[1] = 0.5;
-	//tile.coordinat[2] = 0.0;
-	//tile.coordinat[3] = 0.0;
-	//tile.coordinat[4] = 0.5;
-	//tile.coordinat[5] = 0.0;
-	//tile.coordinat[6] = 0.5;
-	//tile.coordinat[7] = 0.5;
+	m_tiles = new GLuint[4];
+}
+
+int TileManager_rotating::get_tile_index(const ObjectDirection& direction, const int& frame)
+{
+	return direction;
 }

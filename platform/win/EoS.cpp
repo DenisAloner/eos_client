@@ -295,7 +295,6 @@ void GameThreadHandler()
 		if (time == 15)
 		{
 			Application::instance().update();
-			Application::instance().m_GUI->MapViewer->update();
 			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("’Ó‰ - " + std::to_string(Application::instance().m_game_turn) + ".", new GUI_TextFormat(10, 19, RGBA_t(0.0, 0.8, 0.0, 1.0))));
 			Application::instance().m_game_turn += 1;
 		}
