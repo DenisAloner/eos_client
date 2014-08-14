@@ -71,7 +71,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	// program main loop
 	glewInit();
 	//Map.GenerateLevel();
-	Application::instance().initialization(hWnd);
+	Application::instance().initialize();
 	std::thread GameThread(GameThreadHandler);
 	Application::instance().m_timer = new Timer(8, 75);
 	std::thread AnimationThread(&Timer::cycle, Application::instance().m_timer);
@@ -122,6 +122,34 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	struct Extractor
+	{
+		static position_t position(HWND hWnd, LPARAM lParam)
+		{
+			POINT mouse_pos;
+			mouse_pos.x = LOWORD(lParam);
+			mouse_pos.y = HIWORD(lParam);
+			return Application::instance().m_graph->get_OpenGL_position(mouse_pos.x, mouse_pos.y);
+		}
+
+		static int wheel_delta(WPARAM wParam)
+		{
+			return GET_WHEEL_DELTA_WPARAM(wParam);
+		}
+
+		static int key_pressed(WPARAM wParam)
+		{
+			if (wParam & MK_LBUTTON == MK_LBUTTON)
+				return mk_left;
+			else if (wParam & MK_RBUTTON == MK_RBUTTON)
+				return mk_right;
+			else if (wParam & MK_MBUTTON == MK_MBUTTON)
+				return mk_middle;
+			else
+				return mk_none;
+		}
+	};
+
 	switch (message)
 	{
 	case WM_CREATE:
@@ -136,40 +164,43 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_MOUSEWHEEL:
 	{
-		Application::instance().m_mouse->mouse_wheel(MouseEventArgs(Application::instance().m_mouse->m_position, wParam));
+		if (Application::instance().m_ready)
+			Application::instance().m_mouse->mouse_wheel(MouseEventArgs(Extractor::position(hWnd, lParam), mk_none, Extractor::wheel_delta(wParam)));
 		return 0;
 	}
 	
 	case WM_LBUTTONDOWN:
 	{
-		Application::instance().m_mouse->mouse_down(MouseEventArgs(Application::instance().m_mouse->m_position, MK_LBUTTON));
+		if (Application::instance().m_ready)
+			Application::instance().m_mouse->mouse_down(MouseEventArgs(Extractor::position(hWnd, lParam), mk_left));
 		return 0;
 	}
 	
 	case WM_RBUTTONDOWN:
 	{
-		Application::instance().m_mouse->mouse_down(MouseEventArgs(Application::instance().m_mouse->m_position, MK_RBUTTON));
+		if (Application::instance().m_ready)
+			Application::instance().m_mouse->mouse_down(MouseEventArgs(Extractor::position(hWnd, lParam), mk_right));
 		return 0;
 	}
 	
 	case WM_LBUTTONUP:
 	{
-		Application::instance().m_mouse->mouse_up(MouseEventArgs(Application::instance().m_mouse->m_position, MK_LBUTTON));
+		if (Application::instance().m_ready)
+			Application::instance().m_mouse->mouse_up(MouseEventArgs(Extractor::position(hWnd, lParam), mk_left));
 		return 0;
 	}
 	
 	case WM_RBUTTONUP:
 	{
-		Application::instance().m_mouse->mouse_up(MouseEventArgs(Application::instance().m_mouse->m_position, MK_RBUTTON));
+		if (Application::instance().m_ready)
+			Application::instance().m_mouse->mouse_up(MouseEventArgs(Extractor::position(hWnd, lParam), mk_right));
 		return 0;
 	}
 	
 	case WM_MOUSEMOVE:
 	{
 		if (Application::instance().m_ready)
-		{ 
-			Application::instance().m_mouse->mouse_move(MouseEventArgs(Application::instance().m_mouse->m_position, wParam));
-		}
+			Application::instance().m_mouse->mouse_move(MouseEventArgs(Extractor::position(hWnd, lParam), Extractor::key_pressed(wParam)));
 		return 0;
 	}
 

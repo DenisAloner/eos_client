@@ -210,17 +210,7 @@ void Application::on_key_press(WPARAM w)
 
 void Application::on_mouse_click(MouseEventArgs const& e)
 {
-	/*char buf2[32];
-	itoa(e.Position.x, buf2, 10);
-	MessageBox(NULL, buf2, "", MB_OK);*/
-	if (e.flags &MK_LBUTTON)
-	{
-		m_GUI->mouse_click(MouseEventArgs(position_t(e.position.x, e.position.y), MK_LBUTTON));
-	}
-	if (e.flags &MK_RBUTTON)
-	{
-		m_GUI->mouse_click(MouseEventArgs(position_t(e.position.x, e.position.y), MK_RBUTTON));
-	}
+	m_GUI->mouse_click(e);
 }
 
 void Application::on_mouse_down(MouseEventArgs const& e)
@@ -241,11 +231,12 @@ void Application::on_mouse_wheel(MouseEventArgs const& e)
 void Application::render()
 {
 	m_update_mutex.lock();
-	glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
-	glClear( GL_COLOR_BUFFER_BIT );
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+//#warning TODO Внедрить собственный стек матриц, если это необходимо, так как в мобильных платформах размер GL-стека существенно ограничен
 	glPushMatrix();
-	m_GUI->render(m_graph,0,0);
-	position_t Mouse = Application::instance().m_mouse->get_mouse_position();
+	m_GUI->render(m_graph, 0, 0);
+	const position_t mouse = Application::instance().m_mouse->get_mouse_position();
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_2D);
@@ -254,19 +245,20 @@ void Application::render()
 	{
 		glColor4d(1.0, 1.0, 1.0, 1.0);
 		glBindTexture(GL_TEXTURE_2D, m_mouse->m_cursor);
-		m_graph->draw_sprite(Mouse.x, Mouse.y, Mouse.x, Mouse.y + 48, Mouse.x + 48, Mouse.y + 48, Mouse.x + 48, Mouse.y);
+//#warning TODO Избавиться от магических чисел!
+		m_graph->draw_sprite(mouse.x, mouse.y, mouse.x, mouse.y + 48, mouse.x + 48, mouse.y + 48, mouse.x + 48, mouse.y);
 	}
 	glPopMatrix();
 	m_update_mutex.unlock();
 }
 
-void Application::initialization(HWND _hWnd)
+void Application::initialize()
 {
 	music = NULL;
 	m_game_turn = 1;
 	m_ready = false;
 	m_graph = new GraphicalController();
-	m_mouse = new MouseController_Windows(_hWnd);
+	m_mouse = new MouseController();
 	command_set_cursor(m_graph->m_cursor);
 	command_set_cursor_visibility(true);
 

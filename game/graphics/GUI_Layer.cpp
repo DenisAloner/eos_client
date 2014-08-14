@@ -13,7 +13,7 @@ GUI_Layer::~GUI_Layer(void)
 
 MouseEventArgs GUI_Layer::set_local_mouse_position(MouseEventArgs const& source)
 {
-	return MouseEventArgs(position_t(source.position.x - m_position.x, source.position.y - m_position.y), source.flags);
+	return MouseEventArgs(position_t(source.position.x - m_position.x, source.position.y - m_position.y), source.key, source.value);
 }
 
 void GUI_Layer::on_mouse_click(MouseEventArgs const& e)

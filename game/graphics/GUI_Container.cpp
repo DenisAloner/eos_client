@@ -107,8 +107,8 @@ void GUI_Container::render(GraphicalController* Graph, int px, int py)
 
 void GUI_Container::on_mouse_wheel(MouseEventArgs const& e)
 {
-	int delta = GET_WHEEL_DELTA_WPARAM(e.flags);
-	set_scroll(delta / 30);
+//#warning FIXME Создать дефайн или лучше статическую константу для значения 30, обозвать понятным образом
+	set_scroll(e.value / 30);
 }
 
 void GUI_Container::set_scroll(int dy)
@@ -157,7 +157,7 @@ void GUI_Container::add_managing_control(GUI_Object* object)
 
 MouseEventArgs GUI_Container::set_local_mouse_position(MouseEventArgs const& source)
 {
-	return MouseEventArgs(position_t(source.position.x - m_position.x - m_scroll.x, source.position.y - m_position.y - m_scroll.y), source.flags);
+	return MouseEventArgs(position_t(source.position.x - m_position.x - m_scroll.x, source.position.y - m_position.y - m_scroll.y), source.key, source.value);
 }
 
 void GUI_Container::resize(int _width, int _height)

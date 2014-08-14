@@ -10,11 +10,8 @@
 class MouseController
 {
 public:
-
 	GLuint m_cursor; 
 	GLuint m_pickup_item;
-
-	position_t m_position;
 
 	bool m_show_cursor;
 	bool m_show_pickup_item;
@@ -28,25 +25,15 @@ public:
 	MouseController();
 	~MouseController();
 
-	void on_mouse_down(MouseEventArgs const& e);
-	void on_mouse_up(MouseEventArgs const& e);
-	void on_mouse_move(MouseEventArgs const& e);
-	//void OnMouseWheel(MouseEventArgs const& e);
+	void on_mouse_down(const MouseEventArgs &e);
+	void on_mouse_up(const MouseEventArgs &e);
+	void on_mouse_move(const MouseEventArgs &e);
+	void on_mouse_wheel(const MouseEventArgs &e);
 
-	virtual position_t get_mouse_position();
+	inline position_t get_mouse_position() { return m_position; }
 
-};
-
-class MouseController_Windows :
-	public MouseController
-{
-public:
-
-	HWND hWnd;
-
-	MouseController_Windows(HWND _hWnd);
-	virtual position_t get_mouse_position();
-
+private:
+	position_t m_position;		///< текущая позиция указателя относительно окна с учетом видовой матрицы
 };
 
 #endif //MOUSECONTROLLER_H

@@ -249,7 +249,7 @@ void GUI_MapViewer::on_key_press(WPARAM w)
 
 void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
 {
-	if (e.flags &MK_LBUTTON)
+	if (e.key == mk_left)
 	{
 		position_t p = local_xy(position_t(e.position.x, e.position.y));
 		int x;
@@ -298,9 +298,9 @@ void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
 	}
 }
 
-void GUI_MapViewer :: on_mouse_down(MouseEventArgs const& e)
+void GUI_MapViewer::on_mouse_down(MouseEventArgs const& e)
 {
-	if ((e.flags &MK_LBUTTON) || (e.flags &MK_RBUTTON))
+	if (e.key == mk_left || e.key == mk_right)
 	{
 		position_t p =local_xy(e.position);
 		int x;
@@ -319,28 +319,25 @@ void GUI_MapViewer :: on_mouse_down(MouseEventArgs const& e)
 
 void GUI_MapViewer::on_mouse_wheel(MouseEventArgs const& e)
 {
-	int delta = GET_WHEEL_DELTA_WPARAM(e.flags);
-	if (delta>0)
+	if (e.value > 0)
 	{
 		m_tile_count_x += 2;
 		m_tile_count_y += 4;
-		if (m_tile_count_x > 64){ m_tile_count_x = 64; }
-		if (m_tile_count_y > 128){ m_tile_count_y = 128; }
+		if (m_tile_count_x > 64) m_tile_count_x = 64;
+		if (m_tile_count_y > 128) m_tile_count_y = 128;
 	}
 	else
 	{
 		m_tile_count_x -= 2;
 		m_tile_count_y -= 4;
-		if (m_tile_count_x < 16){ m_tile_count_x = 16; }
-		if (m_tile_count_y < 32){ m_tile_count_y = 32; }
+		if (m_tile_count_x < 16) m_tile_count_x = 16;
+		if (m_tile_count_y < 32) m_tile_count_y = 32;
 	}
 	calculate();
 	position_t p = local_xy(position_t(e.position.x, e.position.y));
-	int x;
-	int y;
-	x = m_center.x + p.x - m_tile_count_x / 2;
-	y = m_center.y + p.y - m_tile_count_y / 2;
-	if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
+	const int x = m_center.x + p.x - m_tile_count_x / 2;
+	const int y = m_center.y + p.y - m_tile_count_y / 2;
+	if (!(x < 0 || x > m_map->m_size.w - 1 || y < 0 || y > m_map->m_size.h - 1))
 	{
 		m_cursored = m_map->m_items[y][x];
 	}
@@ -398,29 +395,21 @@ position_t GUI_MapViewer::local_xy(position_t p)
 }
 void GUI_MapViewer::on_mouse_move(MouseEventArgs const& e)
 {
-	position_t p = local_xy(position_t(e.position.x, e.position.y));
-	int x;
-	int y;
-	x = m_center.x + p.x - m_tile_count_x / 2;
-	y = m_center.y + p.y - m_tile_count_y / 2;
-	if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
+	position_t p = local_xy(e.position);
+	const int x = m_center.x + p.x - m_tile_count_x / 2;
+	const int y = m_center.y + p.y - m_tile_count_y / 2;
+	if (!(x < 0 || x > m_map->m_size.w - 1 || y < 0 || y > m_map->m_size.h - 1))
 	{
 		m_cursored = m_map->m_items[y][x];
 	}
-	if (e.flags&MK_LBUTTON)
+	if (e.key == mk_left)
 	{
-		if (!m_is_moving)
-		{
-			start_moving(e);
-		}
+		if (!m_is_moving) start_moving(e);
 		move(e);
 	}
 	else
 	{
-		if (m_is_moving)
-		{
-			end_moving(e);
-		}
+		if (m_is_moving) end_moving(e);
 		MouseEventArgs LocalMouseEventArgs = set_local_mouse_control(e);
 		if (m_focus)
 		{
@@ -454,5 +443,5 @@ void GUI_MapViewer::on_end_moving(MouseEventArgs const& e)
 
 MouseEventArgs GUI_MapViewer::set_local_mouse_control(MouseEventArgs const& source)
 {
-	return MouseEventArgs(position_t(source.position.x - m_position.x, source.position.y - m_position.y), source.flags);
+	return MouseEventArgs(position_t(source.position.x - m_position.x, source.position.y - m_position.y), source.key, source.value);
 }

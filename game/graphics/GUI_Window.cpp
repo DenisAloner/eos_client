@@ -30,7 +30,7 @@ void GUI_Window::on_mouse_move(MouseEventArgs const& e)
 			return;
 		}
 	}
-	if (e.flags&MK_LBUTTON)
+	if (e.key == mk_left)
 	{
 		if (!m_is_moving)
 		{

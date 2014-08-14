@@ -91,6 +91,6 @@ void GUI_TextBox::set_scroll(int dy)
 
 void GUI_TextBox::on_mouse_wheel(MouseEventArgs const& e)
 {
-	int delta = GET_WHEEL_DELTA_WPARAM(e.flags);
-	set_scroll(delta/30);
+//#warning FIXME Что за магическое 30?
+	set_scroll(e.value / 30);
 }

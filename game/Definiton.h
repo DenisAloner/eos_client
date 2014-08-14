@@ -1,7 +1,6 @@
 #ifndef DEFINITION_H
 #define	DEFINITION_H
 
-#include <Windows.h>
 #include <functional>
 #include "graphics/gl.hpp"
 
@@ -29,7 +28,7 @@ struct dimension_t
 struct rectangle_t : public position_t, public dimension_t
 {
 	rectangle_t(int x, int y, int w, int h) : position_t(x, y), dimension_t(w, h) {}
-	rectangle_t(int x, int y, const dimension_t& dimension) : position_t(x, y), dimension_t(dimension) {}
+	rectangle_t(int x, int y, const dimension_t &dimension) : position_t(x, y), dimension_t(dimension) {}
 	rectangle_t() : position_t(), dimension_t() {}
 };
 
@@ -54,16 +53,26 @@ struct fdimension_t
 struct frectangle_t : public fposition_t, public fdimension_t
 {
 	frectangle_t(float x, float y, float w, float h) : fposition_t(x, y), fdimension_t(w, h) {}
-	frectangle_t(float x, float y, const fdimension_t& dimension) : fposition_t(x, y), fdimension_t(dimension) {}
+	frectangle_t(float x, float y, const fdimension_t &dimension) : fposition_t(x, y), fdimension_t(dimension) {}
 	frectangle_t() : fposition_t(), fdimension_t() {}
 };
 
 struct MouseEventArgs
 {
 	position_t position;
-	WPARAM flags;
+	int key;
+	int value;
 
-	MouseEventArgs(position_t position, WPARAM flags) : position(position), flags(flags) {}
+	MouseEventArgs(const position_t &position, int key) : position(position), key(key), value(0) {}
+	MouseEventArgs(const position_t &position, int key, int value) : position(position), key(key), value(value) {}
+};
+
+enum mouse_key_e
+{
+	mk_none = 0,
+	mk_left = 1,
+	mk_right = 2,
+	mk_middle = 3
 };
 
 enum action_e

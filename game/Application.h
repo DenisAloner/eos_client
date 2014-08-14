@@ -119,7 +119,7 @@ public:
 		return Singleton;
 	}
 
-	void initialization(HWND _hWnd);
+	void initialize();
 	void on_key_press(WPARAM w);
 	void on_mouse_click(MouseEventArgs const& e);
 	void on_mouse_down(MouseEventArgs const& e);
