@@ -85,6 +85,11 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->set_tile_direction(ObjectDirection_Down);
 		break;
 	}
+	case command_e::weight:
+	{
+		m_object->m_weight = std::stof(args);
+		break;
+	}
 	case command_e::layer:
 	{
 		m_object->m_layer = std::stoi(args);
@@ -173,6 +178,11 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->m_properties.push_back(new Property_Container(x, y, name));
 		break;
 	}
+	case command_e::property_strenght:
+	{
+		m_object->m_properties.push_back(new GameObjectParameter(property_e::strength, std::stof(args)));
+		break;
+	}
 	}
 }
 
@@ -180,6 +190,7 @@ void GameObjectManager::init()
 {
 	m_commands.insert(std::pair<std::string, command_e>("object", command_e::obj));
 	m_commands.insert(std::pair<std::string, command_e>("size", command_e::size));
+	m_commands.insert(std::pair<std::string, command_e>("weight", command_e::weight));
 	m_commands.insert(std::pair<std::string, command_e>("layer", command_e::layer));
 	m_commands.insert(std::pair<std::string, command_e>("tile_manager_single", command_e::tile_manager_single));
 	m_commands.insert(std::pair<std::string, command_e>("tile_manager_map", command_e::tile_manager_map));
@@ -188,6 +199,7 @@ void GameObjectManager::init()
 	m_commands.insert(std::pair<std::string, command_e>("action_move", command_e::action_move));
 	m_commands.insert(std::pair<std::string, command_e>("property_permit_move", command_e::property_permit_move));
 	m_commands.insert(std::pair<std::string, command_e>("property_container", command_e::property_container));
+	m_commands.insert(std::pair<std::string, command_e>("property_strength", command_e::property_strenght));
 
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);
@@ -320,7 +332,7 @@ void Application::initialize()
 	m_mouse->mouse_move += std::bind(&Application::on_mouse_move, this, std::placeholders::_1);
 	m_action_manager = new ActionManager();
 
-	m_actions[0] = new ActionClass_Move();
+	m_actions[0] = new action_move_step();
 	m_actions[1] = new ActionClass_Push();
 	m_actions[2] = new ActionClass_Turn();
 	m_actions[3] = new Action_OpenInventory();
@@ -338,17 +350,15 @@ void Application::initialize()
 	GameObject* obj = m_game_object_manager.new_object("elf");
 	obj->set_tile_direction(ObjectDirection_Left);
 	m_GUI->MapViewer->m_player = obj;
-	if (m_GUI->MapViewer->m_map->m_items[9][9] == nullptr)
-	{
-		m_GUI->MapViewer->m_map->m_items[9][9] = new MapCell(9, 9);
-		m_GUI->MapViewer->m_map->add_object(m_game_object_manager.new_object("floor"), m_GUI->MapViewer->m_map->m_items[9][9]);
-	}
-	if (m_GUI->MapViewer->m_map->m_items[9][8] == nullptr)
-	{
-		m_GUI->MapViewer->m_map->m_items[9][8] = new MapCell(8, 9);
-		m_GUI->MapViewer->m_map->add_object(m_game_object_manager.new_object("floor"), m_GUI->MapViewer->m_map->m_items[9][8]);
-	}
-	m_GUI->MapViewer->m_map->add_object(m_GUI->MapViewer->m_player, m_GUI->MapViewer->m_map->m_items[9][9]);
+
+	int index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
+	GameMap::block_t* room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);
+	int rx = rand() % room->rect.w;
+	int ry = rand() % room->rect.h;
+	m_GUI->MapViewer->m_map->add_object(m_GUI->MapViewer->m_player, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
+	rx = rand() % room->rect.w;
+	ry = rand() % room->rect.h;
+	m_GUI->MapViewer->m_map->add_object(Application::instance().m_game_object_manager.new_object("chest"), m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 
 	GUI_ActionManager* AMTextBox;
 	AMTextBox = new GUI_ActionManager(m_action_manager);
@@ -504,6 +514,10 @@ void Application::update()
 		GameTask* A;
 		A = m_action_manager->m_items.front();
 		A->m_action->perfom(A->m_parameter);
+		if (A->m_action->m_error != "")
+		{
+			m_GUI->DescriptionBox->add_item_control(new GUI_Text(A->m_action->m_error));
+		}
 		m_action_manager->remove();
 	}
 	m_GUI->MapViewer->m_map->calculate_lighting();

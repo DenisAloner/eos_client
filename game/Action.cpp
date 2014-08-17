@@ -12,6 +12,7 @@ Action::Action(void)
 {
 	m_kind = action_e::move;
 	m_name = "Нет";
+	m_error = "";
 }
 
 
@@ -64,6 +65,7 @@ void ActionClass_Move::interaction_handler()
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter_Position* p = new Parameter_Position();
 	p->m_object = Application::instance().m_GUI->MapViewer->m_player;
+	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_preselect_area(Application::instance().m_GUI->MapViewer,p->m_object->m_cell));
 	p->m_map = Application::instance().m_GUI->MapViewer->m_map;
 	if (Application::instance().command_select_location(p->m_object, p->m_place))
 	{
@@ -73,8 +75,10 @@ void ActionClass_Move::interaction_handler()
 	{
 		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
 		Application::instance().m_message_queue.m_busy = false;
+		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 		return;
 	}
+	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 	Application::instance().m_action_manager->add(new GameTask(this, p));
 	Application::instance().m_message_queue.m_busy = false;
 }
@@ -83,22 +87,18 @@ void ActionClass_Move::interaction_handler()
 bool ActionClass_Move::check(Parameter* parameter)
 {
 	Parameter_Position* p = static_cast<Parameter_Position*>(parameter);
-	//GameObjectProperty* result(nullptr);
-	//for (int i = 0; i<p->object->Area.y; i++)
-	//{
-	//	for (int j = 0; j<p->object->Area.x; j++)
-	//	{
-	//		if (p->map->Items[p->place->y + i][p->place->x - j] == nullptr){ return false; }
-	//		if (p->map->Items[p->place->y + i][p->place->x - j]->FindProperty(property_action_move, p->object) != nullptr)
-	//		{
-	//			return false;
-	//		}
-	//	}
-	//}
-	//return true;
 	return Application::instance().command_check_position(p->m_object,p->m_place,p->m_map);
 }
 
+bool action_move_step::check(Parameter* parameter)
+{
+	Parameter_Position* p = static_cast<Parameter_Position*>(parameter);
+	if (abs(p->m_object->m_cell->x - p->m_place->x) < 2 && abs(p->m_object->m_cell->y - p->m_place->y)< 2)
+	{
+		return Application::instance().command_check_position(p->m_object, p->m_place, p->m_map);
+	}
+	else return false;
+}
 
 void ActionClass_Move::perfom(Parameter* parameter)
 {
@@ -147,8 +147,64 @@ std::string ActionClass_Push::get_description(Parameter* parameter)
 
 bool ActionClass_Push::check(Parameter* parameter)
 {
+	m_error = "";
 	Parameter_MoveObjectByUnit* p = static_cast<Parameter_MoveObjectByUnit*>(parameter);
-	return Application::instance().command_check_position(p->m_object, p->m_place, p->m_map);
+	MapCell* cell;
+	GameObjectParameter* prop = static_cast<GameObjectParameter*>(p->m_unit->find_property(property_e::strength));
+	if (prop != nullptr)
+	{
+		if (prop->m_value * 10 < p->m_object->m_weight)
+		{
+			m_error = "Вы слишком слабы: нужно " + std::to_string(p->m_object->m_weight / 10) + " силы.";
+			return false;
+		}
+	}
+	else { return false; }
+	
+	if (abs(p->m_unit->m_cell->x - p->m_object->m_cell->x)<2 || abs(p->m_unit->m_cell->x - p->m_unit->m_size.x + 1 - p->m_object->m_cell->x)<2 || abs(p->m_unit->m_cell->x - p->m_unit->m_size.x + 1 - (p->m_object->m_cell->x - p->m_object->m_size.x + 1))<2 || abs(p->m_unit->m_cell->x- (p->m_object->m_cell->x - p->m_object->m_size.x + 1))<2)
+	{
+		if (abs(p->m_unit->m_cell->y - p->m_object->m_cell->y) < 2 || abs(p->m_unit->m_cell->y + p->m_unit->m_size.y - 1 - p->m_object->m_cell->y) < 2 || abs(p->m_unit->m_cell->y+ p->m_unit->m_size.y - 1 - (p->m_object->m_cell->y + p->m_object->m_size.y - 1)) < 2 || abs(p->m_unit->m_cell->y - (p->m_object->m_cell->y + p->m_object->m_size.y - 1)) < 2)
+		{
+			for (int i = 0; i < p->m_object->m_size.y; i++)
+			{
+				for (int j = 0; j < p->m_object->m_size.x; j++)
+				{
+					cell = p->m_map->m_items[p->m_place->y + i][p->m_place->x - j];
+					if (cell == nullptr){ return false; }
+					for (std::list<GameObject*>::iterator item = cell->m_items.begin(); item != cell->m_items.end(); item++)
+					{
+						if (p->m_object != (*item) && p->m_unit != (*item))
+						{
+							if ((*item)->find_property(property_e::permit_move) == nullptr)
+							{
+								return false;
+							}
+						}
+					}
+				}
+			}
+			for (int i = 0; i < p->m_unit->m_size.y; i++)
+			{
+				for (int j = 0; j < p->m_unit->m_size.x; j++)
+				{
+					cell == p->m_map->m_items[p->m_unit->m_cell->y + (p->m_place->y - p->m_object->m_cell->y) + i][p->m_unit->m_cell->x + (p->m_place->x - p->m_object->m_cell->x) - j];
+					if (cell == nullptr){ return false; }
+					for (std::list<GameObject*>::iterator item = cell->m_items.begin(); item != cell->m_items.end(); item++)
+					{
+						if (p->m_object != (*item) && p->m_unit != (*item))
+						{
+							if ((*item)->find_property(property_e::permit_move) == nullptr)
+							{
+								return false;
+							}
+						}
+					}
+				}
+			}
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -157,6 +213,7 @@ void ActionClass_Push::perfom(Parameter* parameter)
 	Parameter_MoveObjectByUnit* p = static_cast<Parameter_MoveObjectByUnit*>(parameter);
 	if (check(p))
 	{
+		p->m_map->move_object(p->m_unit, p->m_map->m_items[p->m_unit->m_cell->y + (p->m_place->y - p->m_object->m_cell->y)][p->m_unit->m_cell->x + (p->m_place->x - p->m_object->m_cell->x)]);
 		p->m_map->move_object(p->m_object, p->m_place);
 	}
 }
@@ -169,6 +226,7 @@ void ActionClass_Push::interaction_handler()
 	Parameter_MoveObjectByUnit* p = new Parameter_MoveObjectByUnit();
 	p->m_unit = Application::instance().m_GUI->MapViewer->m_player;
 	p->m_map = Application::instance().m_GUI->MapViewer->m_map;
+	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_preselect_area(Application::instance().m_GUI->MapViewer, p->m_unit->m_cell));
 	if (Application::instance().command_select_object(p->m_object))
 	{
 		std::string a = "Выбран "; 
@@ -180,8 +238,11 @@ void ActionClass_Push::interaction_handler()
 	{
 		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
 		Application::instance().m_message_queue.m_busy = false;
+		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 		return;
 	}
+	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_preselect_area(Application::instance().m_GUI->MapViewer, p->m_object->m_cell));
 	if (Application::instance().command_select_location(p->m_object, p->m_place))
 	{
 		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));
@@ -190,10 +251,12 @@ void ActionClass_Push::interaction_handler()
 	{
 		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
 		Application::instance().m_message_queue.m_busy = false;
+		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 		return;
 	}
 	Application::instance().m_action_manager->add(new GameTask(this, p));
 	Application::instance().m_message_queue.m_busy = false;
+	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 }
 
 

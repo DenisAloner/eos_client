@@ -18,6 +18,7 @@ tile_manager_map elf_right_03 3 2
 tile_manager_map elf_right_04 3 3
 action_move
 property_container Мешок 2 4
+property_strength 8.0
 
 object floor
 size 1 1 0
@@ -62,3 +63,11 @@ tile_manager_rotating door_left 1
 tile_manager_rotating no_tile 2
 tile_manager_rotating no_tile 3
 layer 2
+
+object chest
+size 2 1 2
+weight 25.0
+tile_manager_rotating chest 0
+tile_manager_rotating no_tile 1
+tile_manager_rotating no_tile 2
+tile_manager_rotating no_tile 3

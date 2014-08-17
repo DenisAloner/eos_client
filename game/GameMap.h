@@ -77,6 +77,7 @@ public:
 	void add_doors();
 	bool line2(int x1, int y1, int x2, int y2);
 	void blur_lighting();
+	void add_lighting();
 
 };
 

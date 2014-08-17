@@ -15,6 +15,7 @@ class Action
 public:
 	action_e m_kind;
 	std::string m_name;
+	std::string m_error;
 
 	Action(void);
 	~Action(void);
@@ -40,6 +41,14 @@ public:
 	virtual void interaction_handler();
 };
 
+class action_move_step :
+	public ActionClass_Move
+{
+public:
+
+	virtual bool check(Parameter* parameter);
+
+};
 
 class ActionClass_Push :
 	public Action

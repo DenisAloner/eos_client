@@ -29,6 +29,7 @@ public:
 	GLuint m_empty_02;
 	GLuint m_cursor;
 	GLuint m_close;
+	GLuint m_preselect;
 	GLuint m_select;
 	GLuint m_font;
 

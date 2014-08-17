@@ -10,6 +10,7 @@ GameObject::GameObject()
 	m_light = nullptr;
 	m_cell = nullptr;
 	m_tile_manager = nullptr;
+	m_weight = 0.0;
 }
 
 
@@ -30,7 +31,6 @@ GameObjectProperty* GameObject::find_property(property_e kind)
 	}
 	return nullptr;
 }
-
 
 Action* GameObject::find_action(action_e kind)
 {

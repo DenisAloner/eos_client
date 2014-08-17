@@ -4,6 +4,44 @@
 #include "game/ActionManager.h"
 
 
+gui_mapviewer_hint::gui_mapviewer_hint(GUI_MapViewer* owner) :m_owner(owner){}
+mapviewer_hint_preselect_area::mapviewer_hint_preselect_area(GUI_MapViewer* owner,MapCell* cell) : gui_mapviewer_hint(owner),m_cell(cell){}
+
+void mapviewer_hint_preselect_area::render()
+{
+	int px = 0;
+	int py = 0;
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
+	glUseProgramObjectARB(0);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_preselect);
+	double x0, y0, x1, y1, x2, y2, x3, y3;
+	MapCell* Item = m_cell;
+	for (int i = -1; i < 2; i++)
+	{
+		for (int j = -1; j < 2; j++)
+		{
+			if (!(i == 0 && j == 0))
+			{
+				int x = px + (Item->x + j) - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
+				int y = py + (Item->y + i) - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
+				x0 = x * m_owner->m_tile_size_x;
+				y0 = (m_owner->m_tile_count_y - y - 1) * m_owner->m_tile_size_y;
+				x1 = x0;
+				y1 = (m_owner->m_tile_count_y - y) * m_owner->m_tile_size_y;
+				x2 = (x + 1) * m_owner->m_tile_size_x;
+				y2 = y1;
+				x3 = x2;
+				y3 = y0;
+				glColor4f(1.0, 0.9, 0.0, 0.5);
+				Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+			}
+		}
+	}
+}
+
 GUI_MapViewer::GUI_MapViewer(Application* app = nullptr)
 {
 	m_tile_count_x = 32;
@@ -80,7 +118,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_02, 0);
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
-	double x0, y0, x1, y1, x2, y2, x3, y3;
+	int x0, y0, x1, y1, x2, y2, x3, y3;
 	bool IsDraw;
 	tile_t tile;
 	int x;
@@ -110,11 +148,11 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 					{
 						object_size = (*Current)->m_tile_size;
 						dx = object_size.w + m_map->m_items[y][x]->x - (*Current)->m_cell->x;
-						x0 = (px + gx)*m_tile_size_x;
-						y0 = (m_tile_count_y - py - gy - object_size.h)*m_tile_size_y;
+						x0 = (px + gx)*m_tile_size_x - 1;
+						y0 = (m_tile_count_y - py - gy - object_size.h)*m_tile_size_y - 1;
 						x1 = x0;
-						y1 = (m_tile_count_y - py - gy)*m_tile_size_y;
-						x2 = (px + gx + 1)*m_tile_size_x;
+						y1 = (m_tile_count_y - py - gy)*m_tile_size_y + 1;
+						x2 = (px + gx + 1)*m_tile_size_x + 1;
 						y2 = y1;
 						x3 = x2;
 						y3 = y0;
@@ -123,7 +161,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 					if (IsDraw)
 					{
 						glUseProgram(Graph->m_tile_shader);
-						(*Current)->m_tile_manager->set_tile(tile, (*Current), Application::instance().m_timer->m_tick / 2,dx);
+						(*Current)->m_tile_manager->set_tile(tile, (*Current), Application::instance().m_timer->m_tick /7.0*3.0,dx);
 						GLuint Sprite = tile.unit;
 						glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 						glActiveTexture(GL_TEXTURE0);
@@ -199,7 +237,11 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 		glEnable(GL_TEXTURE_2D);
 		glColor4f(1.0, 1.0, 1.0, 1.0);
 	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	for (std::list<gui_mapviewer_hint*>::iterator current = m_hints.begin(); current != m_hints.end(); current++)
+	{
+		(*current)->render();
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
 	glUseProgram(0);
 	glDisable(GL_BLEND);
 	glBindTexture(GL_TEXTURE_2D, Graph->m_empty_01);

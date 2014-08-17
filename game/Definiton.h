@@ -92,7 +92,8 @@ enum property_e
 {
 	none,
 	permit_move,
-	container
+	container,
+	strength
 };
 
 enum ParameterKind

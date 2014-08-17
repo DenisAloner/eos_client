@@ -18,6 +18,8 @@ class MapCell;
 class GameMap;
 class GameObject;
 
+class gui_mapviewer_hint;
+
 class GUI_MapViewer : public GUI_Object
 { 
 public:
@@ -51,7 +53,8 @@ public:
 	position_t m_center;
 	position_t m_initial_position;
 
-	
+	std::list<gui_mapviewer_hint*> m_hints;
+
 	virtual void on_key_press(WPARAM w);
 	virtual void on_mouse_click(MouseEventArgs const& e);
 	virtual void on_mouse_down(MouseEventArgs const& e);
@@ -71,4 +74,23 @@ public:
 	virtual MouseEventArgs set_local_mouse_control(MouseEventArgs const& source);
 };
 
+class gui_mapviewer_hint
+{
+public:
+
+	GUI_MapViewer* m_owner;
+
+	gui_mapviewer_hint(GUI_MapViewer* owner);
+	virtual void render() = 0;
+};
+
+class mapviewer_hint_preselect_area : public gui_mapviewer_hint
+{
+public:
+	MapCell* m_cell;
+	mapviewer_hint_preselect_area(GUI_MapViewer* owner, MapCell* cell);
+	virtual void render();
+};
+
 #endif //GUI_MAPVIEWER_H
+

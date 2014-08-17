@@ -155,6 +155,7 @@ void GameMap::generate_level(void)
 	connect_room();
 	add_wall();
 	add_doors();
+	add_lighting();
 }
 
 bool GameMap::divide_block(block_t* block, int Depth, int Current)
@@ -255,16 +256,6 @@ void GameMap::fill()
 				}
 			}
 		}
-		int tk;
-		std::string torch_kind[] = { "torch", "red torch", "green torch","blue torch"};
-		tk = rand() % 1;
-		add_new_object(Application::instance().m_game_object_manager.new_object(torch_kind[tk]), m_items[block->rect.y + 1][block->rect.x + 1]);
-		tk = rand() % 1;
-		add_new_object(Application::instance().m_game_object_manager.new_object(torch_kind[tk]), m_items[block->rect.y + 1][block->rect.x + block->rect.w - 1]);
-		tk = rand() % 1;
-		add_new_object(Application::instance().m_game_object_manager.new_object(torch_kind[tk]), m_items[block->rect.y + block->rect.h - 1][block->rect.x + block->rect.w - 1]);
-		tk = rand() % 1;
-		add_new_object(Application::instance().m_game_object_manager.new_object(torch_kind[tk]), m_items[block->rect.y + block->rect.h - 1][block->rect.x + 1]);
 	}
 }
 
@@ -343,9 +334,9 @@ void GameMap::link_room(block_t* a, block_t* b)
 		e = ac.x;
 		s = bc.x;
 	}
-	for (int i = s; i < e+3; i++)
+	for (int i = s; i < e+4; i++)
 	{
-		for (int j = -2; j < 3; j++)
+		for (int j = -3; j < 4; j++)
 		{
 			m_items[ac.y+j][i]->m_items.clear();
 			add_object(Application::instance().m_game_object_manager.new_object("floor"), m_items[ac.y+j][i]);
@@ -360,9 +351,9 @@ void GameMap::link_room(block_t* a, block_t* b)
 		e = ac.y;
 		s = bc.y;
 	}
-	for (int i = s; i < e+3; i++)
+	for (int i = s; i < e+4; i++)
 	{
-		for (int j = -2; j < 3; j++)
+		for (int j = -3; j < 4; j++)
 		{
 			m_items[i][bc.x+j]->m_items.clear();
 			add_object(Application::instance().m_game_object_manager.new_object("floor"), m_items[i][bc.x + j]);
@@ -394,9 +385,11 @@ void  GameMap::add_doors()
 			{
 				if (b)
 				{
-					if (i - s == 5)
+					if (i - s == 7)
 					{
-						add_object(Application::instance().m_game_object_manager.new_object("door"), m_items[rect.y][i-1]);
+						add_object(Application::instance().m_game_object_manager.new_object("wall"), m_items[rect.y][i - 1]);
+						add_object(Application::instance().m_game_object_manager.new_object("door"), m_items[rect.y][i - 2]);
+						add_object(Application::instance().m_game_object_manager.new_object("wall"), m_items[rect.y][i - 7]);
 					}
 				}
 				b = false;
@@ -418,9 +411,11 @@ void  GameMap::add_doors()
 			{
 				if (b)
 				{
-					if (i - s == 5)
+					if (i - s == 7)
 					{
-						add_object(Application::instance().m_game_object_manager.new_object("door"), m_items[rect.y + rect.h][i - 1]);
+						add_object(Application::instance().m_game_object_manager.new_object("wall"), m_items[rect.y + rect.h][i - 1]);
+						add_object(Application::instance().m_game_object_manager.new_object("door"), m_items[rect.y + rect.h][i - 2]);
+						add_object(Application::instance().m_game_object_manager.new_object("wall"), m_items[rect.y + rect.h][i - 7]);
 					}
 				}
 				b = false;
@@ -442,11 +437,13 @@ void  GameMap::add_doors()
 			{
 				if (b)
 				{
-					if (i - s == 5)
+					if (i - s == 7)
 					{
+						add_object(Application::instance().m_game_object_manager.new_object("wall"), m_items[i - 1][rect.x]);
 						GameObject* obj = Application::instance().m_game_object_manager.new_object("door");
 						obj->set_tile_direction(ObjectDirection_Left);
-						add_object(obj, m_items[i-5][rect.x]);
+						add_object(obj, m_items[i-6][rect.x]);
+						add_object(Application::instance().m_game_object_manager.new_object("wall"), m_items[i - 7][rect.x]);
 					}
 				}
 				b = false;
@@ -468,11 +465,13 @@ void  GameMap::add_doors()
 			{
 				if (b)
 				{
-					if (i - s == 5)
+					if (i - s == 7)
 					{
+						add_object(Application::instance().m_game_object_manager.new_object("wall"), m_items[i - 1][rect.x + rect.w]);
 						GameObject* obj = Application::instance().m_game_object_manager.new_object("door");
 						obj->set_tile_direction(ObjectDirection_Left);
-						add_object(obj, m_items[i - 5][rect.x + rect.w]);
+						add_object(obj, m_items[i - 6][rect.x + rect.w]);
+						add_object(Application::instance().m_game_object_manager.new_object("wall"), m_items[i - 7][rect.x + rect.w]);
 					}
 				}
 				b = false;
@@ -806,4 +805,49 @@ bool GameMap::line2(int x1, int y1, int x2, int y2)
 		}
 	}
 	return true;
+}
+
+void GameMap::add_lighting()
+{
+	block_t* block;
+	for (std::list<block_t*>::iterator Current = m_link_rooms.begin(); Current != m_link_rooms.end(); Current++)
+	{
+		block = (*Current);
+		int tk;
+		std::string torch_kind[] = { "torch", "red torch", "green torch", "blue torch" };
+		tk = rand() % 1;
+		add_new_object(Application::instance().m_game_object_manager.new_object(torch_kind[tk]), m_items[block->rect.y + 1][block->rect.x + 1]);
+		tk = rand() % 1;
+		add_new_object(Application::instance().m_game_object_manager.new_object(torch_kind[tk]), m_items[block->rect.y + 1][block->rect.x + block->rect.w - 1]);
+		tk = rand() % 1;
+		add_new_object(Application::instance().m_game_object_manager.new_object(torch_kind[tk]), m_items[block->rect.y + block->rect.h - 1][block->rect.x + block->rect.w - 1]);
+		tk = rand() % 1;
+		add_new_object(Application::instance().m_game_object_manager.new_object(torch_kind[tk]), m_items[block->rect.y + block->rect.h - 1][block->rect.x + 1]);
+		int j=0;
+		for (int i = block->rect.x + 1; i < block->rect.x + block->rect.w; i++)
+		{
+			if (j == 30)
+			{
+				tk = rand() % 4;
+				add_new_object(Application::instance().m_game_object_manager.new_object(torch_kind[tk]), m_items[block->rect.y + 1][i]);
+				tk = rand() % 4;
+				add_new_object(Application::instance().m_game_object_manager.new_object(torch_kind[tk]), m_items[block->rect.y + block->rect.h - 1][i]);
+				j = -1;
+			}
+			j = j + 1;
+		}
+		j = 0;
+		for (int i = block->rect.y + 1; i < block->rect.y + block->rect.h; i++)
+		{
+			if (j == 30)
+			{
+				tk = rand() % 4;
+				add_new_object(Application::instance().m_game_object_manager.new_object(torch_kind[tk]), m_items[i][block->rect.x + 1]);
+				tk = rand() % 4;
+				add_new_object(Application::instance().m_game_object_manager.new_object(torch_kind[tk]), m_items[i][block->rect.x + block->rect.w - 1]);
+				j = -1;
+			}
+			j = j + 1;
+		}
+	}
 }

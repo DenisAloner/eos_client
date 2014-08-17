@@ -22,6 +22,8 @@ public:
 	int m_layer;
 	std::string m_name;
 	game_object_size_t m_size;
+	float m_weight;
+
 	dimension_t m_tile_size;
 	light_t* m_light;
 	TileManager* m_tile_manager;

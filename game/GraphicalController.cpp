@@ -19,6 +19,7 @@ GraphicalController::GraphicalController()
 		m_empty_01 = create_empty_texture(dimension_t(1024, 1024));
 		m_empty_02 = create_empty_texture(dimension_t(1024, 1024));
 		m_close = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Close.bmp");
+		m_preselect = load_texture(FileSystem::instance().m_resource_path + "Tiles\\preselection.bmp");
 		m_select = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Select.bmp");
 		m_font = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Font.bmp");
 		m_cursor = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Cursor.bmp");

@@ -17,11 +17,16 @@ Timer::~Timer()
 
 void Timer::next()
 {
-	if (m_tick > m_tick_limit - 2)
+	if (m_tick > m_tick_limit-1)
+	{
 		m_tick = 0;
+	}
 	else
+	{
 		m_tick += 1;
+	}
 }
+
 
 void Timer::cycle()
 {

@@ -65,6 +65,7 @@ public:
 	{
 		obj,
 		size,
+		weight,
 		layer,
 		tile_manager_single,
 		tile_manager_map,
@@ -72,7 +73,8 @@ public:
 		light,
 		action_move,
 		property_permit_move,
-		property_container
+		property_container,
+		property_strenght
 	};
 
 	typedef std::map<std::string, GameObject*> items_t;

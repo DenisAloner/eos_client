@@ -14,4 +14,14 @@ public:
 	~GameObjectProperty(void);
 };
 
+class GameObjectParameter : public GameObjectProperty
+{
+public:
+
+	GameObjectParameter(property_e kind,float value);
+	float m_value;
+
+};
+
+
 #endif //GAMEOBJECTPROPERTY_H
