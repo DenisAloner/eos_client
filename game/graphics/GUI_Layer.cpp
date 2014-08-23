@@ -65,8 +65,8 @@ void GUI_Layer::render(GraphicalController* Graph, int px, int py)
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glUseProgramObjectARB(0);
-	for (std::list<GUI_Object*>::reverse_iterator Current =m_items.rbegin(); Current != m_items.rend(); Current++)
+	glUseProgram(0);
+	for (std::list<GUI_Object*>::reverse_iterator Current = m_items.rbegin(); Current != m_items.rend(); Current++)
 	{
 		(*Current)->render(Graph, px + (*Current)->m_position.x, py + (*Current)->m_position.y);
 	}

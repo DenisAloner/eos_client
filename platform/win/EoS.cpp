@@ -1,28 +1,20 @@
 // Includes
 #include <windows.h>
-#include <thread>
-#include <chrono>
 #include <string>
+#include "platform/win/Renderer.h"
 #include "game/Application.h"
-#include "game/ApplicationGUI.h"
 #include "game/MouseController.h"
-#include "game/GameObject.h"
+#include "game/GraphicalController.h"
 #include "game/utils/winlog.h"
-#include "game/graphics/GUI_MapViewer.h"
-#include "game/graphics/GUI_Timer.h"
-#include "game/graphics/GUI_TextBox.h"
 
 // Function Declarations
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-void EnableOpenGL(HWND hWnd, HDC * hDC, HGLRC * hRC);
-void DisableOpenGL(HWND hWnd, HDC hDC, HGLRC hRC);
-BOOL load_texture(char* filename,GLuint num_tex);
+void EnableGraphics(HWND hWnd, HDC &hDC);
+void DisableGraphics(HWND hWnd, HDC hDC);
+BOOL SetClientRect(HWND hWnd, int x, int y);
 
 // WinMain
-
-void GameThreadHandler();
-BOOL SetClientRect(HWND hWnd, int x, int y);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, 
 				   LPSTR lpCmdLine, int iCmdShow)
@@ -30,7 +22,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	WNDCLASS wc;
 	HWND hWnd;
 	HDC hDC;
-	HGLRC hRC;
 	MSG msg;
 	BOOL quit = FALSE;
 
@@ -47,75 +38,49 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = hInstance;
-	wc.hIcon = LoadIcon( NULL, IDI_APPLICATION );
-	wc.hCursor = LoadCursor( NULL, IDC_ARROW );
-	wc.hbrBackground = (HBRUSH)GetStockObject( BLACK_BRUSH );
+	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = "Explorers of Saarum";
-	RegisterClass( &wc );
+	RegisterClass(&wc);
 	
 	// create main window
-	hWnd = CreateWindow( 
+	const dimension_t win_size(1024, 1024);
+	hWnd = CreateWindow(
 		"Explorers of Saarum", "Explorers of Saarum", 
 		WS_CAPTION | WS_POPUPWINDOW | WS_VISIBLE,
 		0, 0, 1024, 1024,
-		NULL, NULL, hInstance, NULL );
+		NULL, NULL, hInstance, NULL);
+
 	// enable OpenGL for the window
-	SetClientRect(hWnd, 1024, 1024);
-	EnableOpenGL( hWnd, &hDC, &hRC );
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0,1024,1024,0,-1,1);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	// program main loop
-	glewInit();
+	SetClientRect(hWnd, win_size.w, win_size.h);
+	EnableGraphics(hWnd, hDC);
 	//Map.GenerateLevel();
-	Application::instance().initialize();
-	std::thread GameThread(GameThreadHandler);
-	Application::instance().m_timer = new Timer(8, 75);
-	std::thread AnimationThread(&Timer::cycle, Application::instance().m_timer);
-	Application::instance().m_GUI->MapViewer->m_center.x = Application::instance().m_GUI->MapViewer->m_player->m_cell->x;
-	Application::instance().m_GUI->MapViewer->m_center.y = Application::instance().m_GUI->MapViewer->m_player->m_cell->y;
-	while ( !quit )
+	Renderer renderer(hDC, win_size);
+	renderer.start();
+
+	// message handling loop in main thread
+	BOOL bRet;
+	while ((bRet = GetMessage(&msg, NULL, 0, 0)) != 0)
 	{
-		
-		// check for messages
-		if ( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE )  )
+		if (bRet == -1)
 		{
-			
-			// handle or dispatch messages
-			if ( msg.message == WM_QUIT ) 
-			{
-				quit = TRUE;
-			} 
-			else 
-			{
-				TranslateMessage( &msg );
-				DispatchMessage( &msg );
-			}
-			
-		} 
-		else 
-		{
-			//Player1->Sprite=2+FrameNum;
-			//Map.MoveObject(Player1,Player1->x+1,Player1->y+1);
-			Application::instance().m_GUI->MapViewer->update();
-			Application::instance().render();
-			SwapBuffers( hDC );
-			//MessageBox(NULL,"1","1",MB_OK);
+			// handle the error and possibly exit
 		}
-		
+		else
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
 	}
-	
-	// shutdown OpenGL
-	GameThread.detach();
-	AnimationThread.detach();
-	DisableOpenGL( hWnd, hDC, hRC );
+   
+ 	// shutdown OpenGL
+	renderer.stop();
+	DisableGraphics(hWnd, hDC);
 	// destroy the window explicitly
-	DestroyWindow( hWnd );
+	DestroyWindow(hWnd);
 	return msg.wParam;
-	
 }
 
 // Window Procedure
@@ -129,7 +94,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			POINT mouse_pos;
 			mouse_pos.x = LOWORD(lParam);
 			mouse_pos.y = HIWORD(lParam);
-			return Application::instance().m_graph->get_OpenGL_position(mouse_pos.x, mouse_pos.y);
+			return position_t(mouse_pos.x, mouse_pos.y);
 		}
 
 		static int wheel_delta(WPARAM wParam)
@@ -156,7 +121,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0;
 
 	case WM_CLOSE:
-		PostQuitMessage( 0 );
+		PostQuitMessage(0);
 		return 0;
 	
 	case WM_DESTROY:
@@ -236,71 +201,35 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0;
 	
 	default:
-		return DefWindowProc( hWnd, message, wParam, lParam );	
+		return DefWindowProc(hWnd, message, wParam, lParam);	
 	}
 	
 }
 
-// Enable OpenGL
-
-void EnableOpenGL(HWND hWnd, HDC * hDC, HGLRC * hRC)
+void EnableGraphics(HWND hWnd, HDC &hDC)
 {
 	PIXELFORMATDESCRIPTOR pfd;
 	int format;
 	
 	// get the device context (DC)
-	*hDC = GetDC( hWnd );
+	hDC = GetDC(hWnd);
 	
 	// set the pixel format for the DC
-	ZeroMemory( &pfd, sizeof( pfd ) );
-	pfd.nSize = sizeof( pfd );
+	ZeroMemory(&pfd, sizeof(pfd));
+	pfd.nSize = sizeof(pfd);
 	pfd.nVersion = 1;
 	pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
 	pfd.iPixelType = PFD_TYPE_RGBA;
 	pfd.cColorBits = 32;
 	pfd.cDepthBits = 16;
 	pfd.iLayerType = PFD_MAIN_PLANE;
-	format = ChoosePixelFormat( *hDC, &pfd );
-	SetPixelFormat( *hDC, format, &pfd );
-	
-	// create and enable the render context (RC)
-	*hRC = wglCreateContext( *hDC );
-	wglMakeCurrent( *hDC, *hRC );
-	
+	format = ChoosePixelFormat(hDC, &pfd);
+	SetPixelFormat(hDC, format, &pfd);
 }
 
-// Disable OpenGL
-
-void DisableOpenGL(HWND hWnd, HDC hDC, HGLRC hRC)
+void DisableGraphics(HWND hWnd, HDC hDC)
 {
-	wglMakeCurrent( NULL, NULL );
-	wglDeleteContext( hRC );
-	ReleaseDC( hWnd, hDC );
-}
-
-void GameThreadHandler()
-{
-	int time = 1;
-	while (true)
-	{
-		if (time == 1)
-		{
-			time = 15;
-		}
-		else
-		{
-			time -= 1;
-		}
-		Application::instance().m_GUI->Timer->Update(time);
-		if (time == 15)
-		{
-			Application::instance().update();
-			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("’Ó‰ - " + std::to_string(Application::instance().m_game_turn) + ".", new GUI_TextFormat(10, 19, RGBA_t(0.0, 0.8, 0.0, 1.0))));
-			Application::instance().m_game_turn += 1;
-		}
-		std::chrono::milliseconds Duration(250);
-		std::this_thread::sleep_for(Duration);
-	}
+	ReleaseDC(hWnd, hDC);
 }
 
 BOOL SetClientRect(HWND hWnd, int x, int y)

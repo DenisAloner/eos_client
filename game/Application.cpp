@@ -11,6 +11,8 @@
 #include "game/graphics/GUI_TextBox.h"
 #include "game/graphics/GUI_Timer.h"
 #include "utils/log.h"
+#include <chrono>
+
 
 void my_audio_callback(void *userdata, uint8_t *stream, uint32_t len);
 
@@ -187,7 +189,6 @@ void GameObjectManager::init()
 	m_commands.insert(std::pair<std::string, command_e>("property_permit_move", command_e::property_permit_move));
 	m_commands.insert(std::pair<std::string, command_e>("property_container", command_e::property_container));
 
-	GameObject* obj;
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);
 	std::string config(buffer);
@@ -226,37 +227,50 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 	return obj;
 }
 
+
 Application::Application()
+: m_timer(new Timer(8, 75))
 {
 }
 
 Application::~Application(void)
 {
+	stop();
 }
 
 void Application::on_key_press(WPARAM w)
 {
+	m_update_mutex.lock();
 	m_GUI->key_press(w);
+	m_update_mutex.unlock();
 }
 
 void Application::on_mouse_click(MouseEventArgs const& e)
 {
+	m_update_mutex.lock();
 	m_GUI->mouse_click(e);
+	m_update_mutex.unlock();
 }
 
 void Application::on_mouse_down(MouseEventArgs const& e)
 {
+	m_update_mutex.lock();
 	m_GUI->mouse_down(e);
+	m_update_mutex.unlock();
 }
 
 void Application::on_mouse_move(MouseEventArgs const& e)
 {
+	m_update_mutex.lock();
 	m_GUI->mouse_move(e);
+	m_update_mutex.unlock();
 }
 
 void Application::on_mouse_wheel(MouseEventArgs const& e)
 {
+	m_update_mutex.lock();
 	m_GUI->mouse_wheel(e);
+	m_update_mutex.unlock();
 }
 
 void Application::render()
@@ -264,19 +278,17 @@ void Application::render()
 	m_update_mutex.lock();
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-//#warning TODO Внедрить собственный стек матриц, если это необходимо, так как в мобильных платформах размер GL-стека существенно ограничен
-	glPushMatrix();
 	if (Application::instance().m_GUI->MapViewer->m_map->m_update)
 	{
 		Application::instance().m_GUI->MapViewer->m_map->update(VoidEventArgs());
 		Application::instance().m_GUI->MapViewer->m_map->m_update = false;
 	}
-m_GUI->render(m_graph, 0, 0);
-const position_t mouse = Application::instance().m_mouse->get_mouse_position();
+	m_GUI->render(m_graph, 0, 0);
+	const position_t mouse = Application::instance().m_mouse->get_mouse_position();
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_2D);
-	glActiveTextureARB(GL_TEXTURE0_ARB);
+	glActiveTexture(GL_TEXTURE0);
 	if (m_mouse->m_show_cursor)
 	{
 		glColor4d(1.0, 1.0, 1.0, 1.0);
@@ -284,7 +296,6 @@ const position_t mouse = Application::instance().m_mouse->get_mouse_position();
 //#warning TODO Избавиться от магических чисел!
 		m_graph->draw_sprite(mouse.x, mouse.y, mouse.x, mouse.y + 48, mouse.x + 48, mouse.y + 48, mouse.x + 48, mouse.y);
 	}
-	glPopMatrix();
 	m_update_mutex.unlock();
 }
 
@@ -300,7 +311,7 @@ void Application::initialize()
 
 	m_GUI = new ApplicationGUI();
 	m_GUI->m_position = position_t(0, 0);
-	m_GUI->m_size = dimension_t(1024,1024);
+	m_GUI->m_size = dimension_t(1024, 1024);
 	
 	key_press += std::bind(&Application::on_key_press, this, std::placeholders::_1);
 	m_mouse->mouse_click += std::bind(&Application::on_mouse_click, this, std::placeholders::_1);
@@ -460,18 +471,38 @@ void Application::initialize()
 	m_ready = true;
 }
 
+void Application::start()
+{
+	m_game_thread.reset(new std::thread(std::bind(&Application::process_game, this)));
+	m_animation_thread.reset(new std::thread(&Timer::cycle, m_timer));
+}
+
+void Application::stop()
+{
+	if (m_animation_thread)
+	{
+		m_animation_thread->detach();
+		m_animation_thread.reset();
+	}
+	if (m_game_thread)
+	{
+		m_game_thread->detach();
+		m_game_thread.reset();
+	}
+}
+
 void Application::PlaySound1()
 {
 	Mix_PlayChannel(-1, music, 0);
 }
 
-void Application::update(void)
+void Application::update()
 {
 	m_update_mutex.lock();
 	if(!m_action_manager->m_items.empty())
 	{
 		GameTask* A;
-		A=m_action_manager->m_items.front();
+		A = m_action_manager->m_items.front();
 		A->m_action->perfom(A->m_parameter);
 		m_action_manager->remove();
 	}
@@ -616,6 +647,31 @@ bool Application::command_check_position(GameObject*& object, MapCell*& position
 	return true;
 }
 
+void Application::process_game()
+{
+	int time = 1;
+	while (true)
+	{
+		if (time == 1)
+		{
+			time = 15;
+		}
+		else
+		{
+			time -= 1;
+		}
+		m_GUI->Timer->Update(time);
+		if (time == 15)
+		{
+			update();
+			m_GUI->DescriptionBox->add_item_control(new GUI_Text("Ход - " + std::to_string(m_game_turn) + ".", new GUI_TextFormat(10, 19, RGBA_t(0.0, 0.8, 0.0, 1.0))));
+			m_game_turn += 1;
+		}
+		std::chrono::milliseconds Duration(250);
+		std::this_thread::sleep_for(Duration);
+	}
+}
+
 void my_audio_callback(void *userdata, uint8_t *stream, uint32_t len) {
 
 	if (audio_len == 0)
@@ -628,3 +684,4 @@ void my_audio_callback(void *userdata, uint8_t *stream, uint32_t len) {
 	audio_pos += len;
 	audio_len -= len;
 }
+

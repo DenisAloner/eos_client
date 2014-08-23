@@ -15,9 +15,7 @@ class GameObjectProperty;
 
 class MapCell
 {
-
 public:
-
 	int x; 
 	int y;
 
@@ -25,19 +23,16 @@ public:
 	light_t m_light_blur;
 	std::list<GameObject*> m_items;
 
-
 	MapCell(int x0, int y0);
 
 	void add_object(GameObject* Object);
 	virtual GameObjectProperty* find_property(property_e kind,GameObject* excluded);
 	bool check_permit(property_e kind, GameObject* excluded);
-
 };
 
 class GameMap
 {
 public:
-
 	bool m_update;
 	Event<VoidEventArgs> update;
 

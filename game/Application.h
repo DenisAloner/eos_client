@@ -2,6 +2,7 @@
 #define	APPLICATION_H
 
 #include "game/graphics/GUI_Inventory.h"
+#include "game/graphics/GUI_MiniMap.h"
 #include "game/Event.h"
 #include "game/Definiton.h"
 #include "game/GraphicalController.h"
@@ -12,10 +13,10 @@
 #include "game/TileManager.h"
 #include "SDL.h"
 #include "SDL_mixer.h"
+#include <thread>
 #include <mutex>
 #include <condition_variable>
 #include <map>
-#include "game/graphics/GUI_MiniMap.h"
 
 
 class Action;
@@ -91,7 +92,6 @@ public:
 class Application
 {
 public:
-
 	int m_game_turn;
 	bool m_ready;
 
@@ -123,13 +123,16 @@ public:
 	}
 
 	void initialize();
+	void start();
+	void stop();
+
 	void on_key_press(WPARAM w);
 	void on_mouse_click(MouseEventArgs const& e);
 	void on_mouse_down(MouseEventArgs const& e);
 	void on_mouse_wheel(MouseEventArgs const& e);
 	void on_mouse_move(MouseEventArgs const& e);
 	void render();
-	void update(void);
+	void update();
 
 	bool command_select_location(GameObject* Object, MapCell*& Cell);
 	bool command_select_object(GameObject*& Object);
@@ -143,10 +146,14 @@ public:
 	void PlaySound1();
 
 private:
+	std::shared_ptr<std::thread> m_game_thread;
+	std::shared_ptr<std::thread> m_animation_thread;
+
 	Application();
 	Application(const Application& root);
 	Application& operator=(const Application&);
-	
+
+	void process_game();
 };
 
 #endif //APPLICATION_H

@@ -29,7 +29,7 @@ GraphicalController::GraphicalController()
 	}
 
 	m_scissors.push_front(frectangle_t(0.0f, 0.0f, 1024.0f, 1024.0f));
-	glGenFramebuffersEXT(1, &m_FBO);
+	glGenFramebuffers(1, &m_FBO);
 }
 
 void GraphicalController::draw_sprite(double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3)
@@ -63,6 +63,13 @@ bool GraphicalController::LinkSuccessful(int obj)
 {
 	int status;
 	glGetProgramiv(obj, GL_LINK_STATUS, &status);
+	return status == GL_TRUE;
+}
+
+bool GraphicalController::ValidateSuccessful(int obj)
+{
+	int status;
+	glGetProgramiv(obj, GL_VALIDATE_STATUS, &status);
 	return status == GL_TRUE;
 }
 
@@ -118,8 +125,8 @@ void GraphicalController::set_VSync(bool sync)
 void GraphicalController::output_text(int x, int y, std::string& Text, int sizex, int sizey)
 {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glUseProgramObjectARB(0);
-	glActiveTextureARB(GL_TEXTURE0_ARB);
+	glUseProgram(0);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_font);
 	int x0, y0, x1, y1, x2, y2, x3, y3;
 	double xt0, yt0, xt1, yt1, xt2, yt2, xt3, yt3;
@@ -187,99 +194,58 @@ void GraphicalController::blur_rect(int x, int y, int width, int height)
 	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, x, 1024 - y - height, width, height);
 	double Tx = width / 1024.0;
 	double Ty = height / 1024.0;
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_FBO);
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_empty_02, 0);
-	glUseProgramObjectARB(m_horizontal_shader);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_empty_02, 0);
+	glUseProgram(m_horizontal_shader);
 	set_uniform_sampler(m_horizontal_shader, "Map");
 	draw_sprite_FBO(Tx, Ty, 0, 1024 - height, 0, 1024, width, 1024, width, 1024 - height);
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_empty_01, 0);
-	glUseProgramObjectARB(m_vertical_shader);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_empty_01, 0);
+	glUseProgram(m_vertical_shader);
 	set_uniform_sampler(m_vertical_shader, "Map");
 	glBindTexture(GL_TEXTURE_2D, m_empty_02);
 	draw_sprite_FBO(Tx, Ty, 0, 1024 - height, 0, 1024, width, 1024, width, 1024 - height);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-	glUseProgramObjectARB(0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glUseProgram(0);
 	glEnable(GL_SCISSOR_TEST);
 	glBindTexture(GL_TEXTURE_2D, m_empty_01);
 	draw_sprite_FBO(Tx, Ty, x, y, x, y + height, x + width, y + height, x + width, y);
 	glColor4f(1.0, 1.0, 1.0, 1.0);
 }
 
-bool GraphicalController::set_uniform_vector(GLhandleARB program, const char * name, const float * value)
+bool GraphicalController::set_uniform_vector(GLuint program, const char * name, const float * value)
 {
-	int loc = glGetUniformLocationARB(program, name);
+	GLint loc = glGetUniformLocation(program, name);
 	if (loc < 0)
 		return false;
-	glUniform4fvARB(loc, 1, value);
+	glUniform4fv(loc, 1, value);
 	return true;
 }
 
-bool GraphicalController::set_uniform_sampler(GLhandleARB object, const char * name)
+bool GraphicalController::set_uniform_sampler(GLuint object, const char * name)
 {
-	int loc = glGetUniformLocationARB(object, name);
+	GLint loc = glGetUniformLocation(object, name);
 	if (loc < 0)
 		return false;
-	glUniform1iARB(loc, 0);
+	glUniform1i(loc, 0);
 	return true;
 }
 
-bool GraphicalController::set_uniform_ptr(GLhandleARB program, const char * name, const int value)
+bool GraphicalController::set_uniform_ptr(GLuint program, const char * name, const int value)
 {
-	int loc = glGetUniformLocationARB(program, name);
+	GLint loc = glGetUniformLocation(program, name);
 	if (loc < 0)
 		return false;
 	glUniform1iv(loc, 1, &value);
 	return true;
 }
 
-bool GraphicalController::set_uniform_float(GLhandleARB program, const char * name, const float value)
+bool GraphicalController::set_uniform_float(GLuint program, const char * name, const float value)
 {
-	int loc = glGetUniformLocationARB(program, name);
+	GLint loc = glGetUniformLocation(program, name);
 	if (loc < 0)
 		return false;
 	glUniform1f(loc,value);
 	return true;
-}
-
-void GraphicalController::unload_shader_source(GLcharARB* ShaderSource)
-{
-	if (ShaderSource != nullptr)
-	{
-		delete[] ShaderSource;
-		ShaderSource = nullptr;
-	}
-}
-
-bool GraphicalController::check_OpenGL_error()
-{
-	bool    retCode = true;
-
-	for (;;)
-	{
-		GLenum  glErr = glGetError();
-
-		if (glErr == GL_NO_ERROR)
-			return retCode;
-
-		printf("glError: %s\n", gluErrorString(glErr));
-		MessageBox(NULL, "glError: %s\n", "1", MB_OK);
-		retCode = false;
-		glErr = glGetError();
-	}
-
-	return retCode;
-}
-
-void GraphicalController::show_error(GLhandleARB object)
-{
-	GLint LogLen;
-	GLcharARB * infoLog;
-	int charsWritten = 0;
-	check_OpenGL_error();
-	glGetObjectParameterivARB(object, GL_OBJECT_INFO_LOG_LENGTH_ARB, &LogLen);
-	infoLog = new GLcharARB[LogLen];
-	glGetInfoLogARB(object, LogLen, &charsWritten, infoLog);
-	if (infoLog[0] != '\0'){ MessageBox(NULL, infoLog, "Error", MB_OK); }
 }
 
 position_t GraphicalController::get_OpenGL_position(float x, float y)
@@ -293,12 +259,12 @@ position_t GraphicalController::get_OpenGL_position(float x, float y)
 	{
 		GLdouble x, y, z;
 	} point;
-
+	// ВНИМАНИЕ! Нельзя вызывать функции gl вне графического потока!
 	glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
 	glGetDoublev(GL_PROJECTION_MATRIX, projection);
 	glGetIntegerv(GL_VIEWPORT, viewport);
-	winX = (float)x;
-	winY = (float)viewport[3] - (float)y;
+	winX = x;
+	winY = (float)viewport[3] - y;
 	glReadPixels(x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
 	gluUnProject(winX, winY, winZ, modelview, projection, viewport, &point.x, &point.y, &point.z);
 	return position_t(point.x, point.y);
@@ -370,52 +336,54 @@ GLuint GraphicalController::load_texture(const std::string& path)
 	return texture;
 }
 
-GLcharARB* GraphicalController::load_shader_source(const std::string& path)
+std::string GraphicalController::load_shader_source(const std::string& path)
 {
-	GLcharARB* ShaderSource;
-	std::ifstream ShaderFile(path, std::ifstream::binary);
-	if (ShaderFile)
-	{
-		ShaderFile.seekg(0, ShaderFile.end);
-		int length = ShaderFile.tellg();
-		ShaderFile.seekg(0, ShaderFile.beg);
-		ShaderSource = new GLcharARB[length + 1];
-		ShaderFile.read(ShaderSource, length);
-		ShaderSource[length] = '\0';
-		ShaderFile.close();
-	}
-	else {
-		return nullptr;
-	}
-	return ShaderSource;
+	std::ifstream fstream(path, std::ifstream::binary);
+	fstream.seekg(0, std::ios::end);
+	const int length = fstream.tellg();
+	fstream.seekg(0, std::ios::beg);
+
+	std::string ret;
+	ret.reserve(length);
+	ret.assign((std::istreambuf_iterator<char>(fstream)), std::istreambuf_iterator<char>());
+
+	fstream.close();
+	return ret;
 }
 
-GLhandleARB GraphicalController::load_shader(const std::string& vPath, const std::string& fPath)
+GLuint GraphicalController::load_shader(const std::string& vPath, const std::string& fPath)
 {
-	const GLcharARB* VertexShaderSource = load_shader_source(FileSystem::instance().m_resource_path + "Shaders\\" + vPath + ".vsh");
-	const GLcharARB* FragmentShaderSource = load_shader_source(FileSystem::instance().m_resource_path + "Shaders\\" + fPath + ".fsh");
-	GLhandleARB Program;
-	GLhandleARB VertexShader;
-	GLhandleARB FragmentShader;
-	Program = glCreateProgramObjectARB();
-	VertexShader = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
-	FragmentShader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
-	glShaderSourceARB(VertexShader, 1, &VertexShaderSource, NULL);
-	glCompileShaderARB(VertexShader);
+	const std::string v_src = load_shader_source(FileSystem::instance().m_resource_path + "Shaders\\" + vPath + ".vsh");
+	const std::string f_src = load_shader_source(FileSystem::instance().m_resource_path + "Shaders\\" + fPath + ".fsh");
+	const char *VertexShaderSource = v_src.c_str();
+	const char *FragmentShaderSource = f_src.c_str();
+	GLuint Program;
+	GLuint VertexShader;
+	GLuint FragmentShader;
+	Program = glCreateProgram();
+	VertexShader = glCreateShader(GL_VERTEX_SHADER);
+	FragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+
+	glShaderSource(VertexShader, 1, &VertexShaderSource, NULL);
+	glCompileShader(VertexShader);
 	GLint compileStatus;
-	glGetObjectParameterivARB(VertexShader, GL_OBJECT_COMPILE_STATUS_ARB, &compileStatus);
 	if (!CompileSuccessful(VertexShader))
 		LOG(FATAL) << "Не удалось скомпилировать вершинный шейдер `" << vPath << "`";
-	glShaderSourceARB(FragmentShader, 1, &FragmentShaderSource, NULL);
-	glCompileShaderARB(FragmentShader);
-	glGetObjectParameterivARB(FragmentShader, GL_OBJECT_COMPILE_STATUS_ARB, &compileStatus);
+
+	glShaderSource(FragmentShader, 1, &FragmentShaderSource, NULL);
+	glCompileShader(FragmentShader);
 	if (!CompileSuccessful(FragmentShader))
 		LOG(FATAL) << "Не удалось скомпилировать фрагментный шейдер `" << fPath << "`";
-	glAttachObjectARB(Program, VertexShader);
-	glAttachObjectARB(Program, FragmentShader);
-	glLinkProgramARB(Program);
+
+	glAttachShader(Program, VertexShader);
+	glAttachShader(Program, FragmentShader);
+	glLinkProgram(Program);
 	if (!LinkSuccessful(Program))
 		LOG(FATAL) << "Не удалось слинковать шейдерную программу!";
+	glValidateProgram(Program);
+	if (!ValidateSuccessful(Program))
+		LOG(FATAL) << "Ошибка при проверке шейдерной программы!";
+
 	return Program;
 }
 
@@ -430,6 +398,6 @@ GLint GraphicalController::create_empty_texture(dimension_t size)
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.w, size.h, 0, GL_BGRA, GL_UNSIGNED_BYTE, nullptr);
-	glGenerateMipmapEXT(GL_TEXTURE_2D);
+	glGenerateMipmap(GL_TEXTURE_2D);
 	return texture;
 }

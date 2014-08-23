@@ -7,7 +7,6 @@ GUI_MiniMap::GUI_MiniMap(position_t position, dimension_t size, GUI_MapViewer* m
 	m_size = size;
 	m_cell_size = fdimension_t(static_cast<float>(1024) / static_cast<float>(m_map_viewer->m_map->m_size.w), static_cast<float>(1024) / static_cast<float>(m_map_viewer->m_map->m_size.h));
 	m_canvas = Application::instance().m_graph->create_empty_texture(dimension_t(1024, 1024));
-	render_on_canvas();
 	m_map_viewer->m_map->update += std::bind(&GUI_MiniMap::render_on_canvas, this);
 }
 
@@ -22,8 +21,11 @@ void GUI_MiniMap::render_on_canvas()
 	glDisable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_SCISSOR_TEST);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, Application::instance().m_graph->m_FBO);
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_canvas, 0);
+	GLint default_fb = 0;
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &default_fb);
+	const GLuint fbo = Application::instance().m_graph->m_FBO;
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_canvas, 0);
 	glUseProgramObjectARB(0);
 	glClearColor(0.0, 0.0, 0.0, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT); 
@@ -72,7 +74,8 @@ void GUI_MiniMap::render_on_canvas()
 		}
 	}
 	glBindTexture(GL_TEXTURE_2D, m_canvas);
-	glGenerateMipmapEXT(GL_TEXTURE_2D);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBindFramebuffer(GL_FRAMEBUFFER, default_fb);
 }
 
 
@@ -81,10 +84,10 @@ void GUI_MiniMap::render(GraphicalController* Graph, int px, int py)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_2D);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-	glUseProgramObjectARB(0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glUseProgram(0);
 	//glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01);
-	//glGenerateMipmapEXT(GL_TEXTURE_2D);
+	//glGenerateMipmap(GL_TEXTURE_2D);
 	glColor4d(1.0, 1.0, 1.0, 1.0);
 	glBindTexture(GL_TEXTURE_2D, m_canvas);
 	Graph->draw_sprite(px, py, px, py + m_size.h, px + m_size.w, py + m_size.h, px + m_size.w, py);
