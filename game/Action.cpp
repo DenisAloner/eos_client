@@ -66,7 +66,7 @@ void ActionClass_Move::interaction_handler()
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter_Position* p = new Parameter_Position();
 	p->m_object = Application::instance().m_GUI->MapViewer->m_player;
-	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_preselect_area(Application::instance().m_GUI->MapViewer,p->m_object->m_cell));
+	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_object, false));
 	p->m_map = Application::instance().m_GUI->MapViewer->m_map;
 	if (Application::instance().command_select_location(p->m_object, p->m_place))
 	{
@@ -228,7 +228,7 @@ void ActionClass_Push::interaction_handler()
 	Parameter_MoveObjectByUnit* p = new Parameter_MoveObjectByUnit();
 	p->m_unit = Application::instance().m_GUI->MapViewer->m_player;
 	p->m_map = Application::instance().m_GUI->MapViewer->m_map;
-	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_preselect_area(Application::instance().m_GUI->MapViewer, p->m_unit->m_cell));
+	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_unit,true));
 	if (Application::instance().command_select_object(p->m_object))
 	{
 		std::string a = "Выбран "; 
@@ -244,7 +244,7 @@ void ActionClass_Push::interaction_handler()
 		return;
 	}
 	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
-	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_preselect_area(Application::instance().m_GUI->MapViewer, p->m_object->m_cell));
+	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_object,false));
 	if (Application::instance().command_select_location(p->m_object, p->m_place))
 	{
 		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));

@@ -5,10 +5,10 @@
 
 
 gui_mapviewer_hint::gui_mapviewer_hint(GUI_MapViewer* owner) :m_owner(owner){}
-mapviewer_hint_preselect_area::mapviewer_hint_preselect_area(GUI_MapViewer* owner,MapCell* cell) : gui_mapviewer_hint(owner),m_cell(cell){}
+mapviewer_hint_area::mapviewer_hint_area(GUI_MapViewer* owner, GameObject* object, bool consider_object_size) : gui_mapviewer_hint(owner), m_object(object),m_consider_object_size(consider_object_size){}
 mapviewer_hint_line::mapviewer_hint_line(GUI_MapViewer* owner, MapCell* cell) : gui_mapviewer_hint(owner), m_cell(cell){}
 
-void mapviewer_hint_preselect_area::render()
+void mapviewer_hint_area::render()
 {
 	int px = 0;
 	int py = 0;
@@ -19,12 +19,24 @@ void mapviewer_hint_preselect_area::render()
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_preselect);
 	double x0, y0, x1, y1, x2, y2, x3, y3;
-	MapCell* Item = m_cell;
-	for (int i = -1; i < 2; i++)
+	MapCell* Item = m_object->m_cell;
+	int bx;
+	int by;
+	if (m_consider_object_size)
 	{
-		for (int j = -1; j < 2; j++)
+		bx = m_object->m_size.x;
+		by = m_object->m_size.y;
+	}
+	else
+	{
+		bx = 1;
+		by = 1;
+	}
+	for (int i = -by; i < 2; i++)
+	{
+		for (int j = -bx; j <2; j++)
 		{
-			if (!(i == 0 && j == 0))
+			if (i == -by || j == -bx || i == 1 || j == 1)
 			{
 				int x = px + (Item->x + j) - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
 				int y = py + (Item->y + i) - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
@@ -58,8 +70,12 @@ void mapviewer_hint_line::draw_cell(MapCell* a)
 	y2 = y1;
 	x3 = x2;
 	y3 = y0;
+	glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_preselect);
 	glColor4f(1.0, 0.9, 0.0, 0.5);
 	Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+	glColor4f(1.0, 0.9, 0.0, 1.0);
+	Application::instance().m_graph->center_text((x0 + x2)*0.5, (y0 + y1) *0.5, std::to_string(m_step_count), 8, 17);
+	m_step_count += 1;
 }
 
 void mapviewer_hint_line::render()
@@ -71,9 +87,9 @@ void mapviewer_hint_line::render()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_preselect);
 	if (m_owner->m_cursored != nullptr)
 	{
+		m_step_count = 0;
 		m_owner->m_map->bresenham_line(m_cell, m_owner->m_cursored, std::bind(&mapviewer_hint_line::draw_cell, this, std::placeholders::_1));
 	}
 }

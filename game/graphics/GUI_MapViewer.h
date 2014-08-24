@@ -84,17 +84,23 @@ public:
 	virtual void render() = 0;
 };
 
-class mapviewer_hint_preselect_area : public gui_mapviewer_hint
+class mapviewer_hint_area : public gui_mapviewer_hint
 {
 public:
-	MapCell* m_cell;
-	mapviewer_hint_preselect_area(GUI_MapViewer* owner, MapCell* cell);
+
+	bool m_consider_object_size;
+
+	GameObject* m_object;
+	mapviewer_hint_area(GUI_MapViewer* owner, GameObject* object, bool consider_object_size);
 	virtual void render();
 };
 
 class mapviewer_hint_line : public gui_mapviewer_hint
 {
 public:
+	 
+	int m_step_count;
+
 	MapCell* m_cell;
 	mapviewer_hint_line(GUI_MapViewer* owner, MapCell* cell);
 	virtual void render();
