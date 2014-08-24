@@ -18,7 +18,7 @@ class GraphicalController
 {
 public:
 
-	GLuint m_actions[5];
+	GLuint m_actions[6];
 
 	GLuint m_horizontal_shader;
 	GLuint m_vertical_shader;

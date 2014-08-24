@@ -109,7 +109,7 @@ public:
 	GraphicalController* m_graph;
 	ActionManager* m_action_manager;
 
-	Action* m_actions[4];
+	Action* m_actions[6];
 
 	Event<WPARAM> key_press;
 	Event<MouseEventArgs> mouse_click;

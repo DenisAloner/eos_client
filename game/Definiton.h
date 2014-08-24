@@ -85,7 +85,8 @@ enum action_e
 	push,
 	turn,
 	open_inventory,
-	cell_info
+	cell_info,
+	set_motion_path
 };
 
 enum property_e
@@ -103,7 +104,7 @@ enum ParameterKind
 	ParameterKind_MapCell,
 	ParameterKind_MoveObjectByUnit,
 	ParameterKind_GameObject,
-	ParameterKind_Cancel
+	ParameterKind_Cancel,
 };
 
 enum ObjectDirection

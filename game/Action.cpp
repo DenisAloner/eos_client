@@ -50,6 +50,7 @@ void Action::interaction_handler()
 ActionClass_Move::ActionClass_Move()
 {
 	m_kind = action_e::move;
+	m_icon = Application::instance().m_graph->m_actions[0];
 	m_name = "Идти";
 }
 
@@ -124,6 +125,7 @@ std::string ActionClass_Move::get_description(Parameter* parameter)
 ActionClass_Push::ActionClass_Push(void)
 {
 	m_kind = action_e::push;
+	m_icon = Application::instance().m_graph->m_actions[1];
 	m_name = "Толкать";
 }
 
@@ -263,6 +265,7 @@ void ActionClass_Push::interaction_handler()
 ActionClass_Turn::ActionClass_Turn(void)
 {
 	m_kind = action_e::turn;
+	m_icon = Application::instance().m_graph->m_actions[2];
 	m_name = "Повернуться";
 }
 
@@ -324,7 +327,8 @@ void ActionClass_Turn::interaction_handler()
 
 Action_OpenInventory::Action_OpenInventory()
 {
-	m_kind = action_e::open_inventory;
+	m_kind = action_e::open_inventory; 
+	m_icon = Application::instance().m_graph->m_actions[3];
 }
 
 
@@ -375,11 +379,7 @@ std::string Action_OpenInventory::get_description(Parameter* parameter)
 Action_CellInfo::Action_CellInfo()
 {
 	m_kind = action_e::cell_info;
-}
-
-
-Action_CellInfo::~Action_CellInfo()
-{
+	m_icon = Application::instance().m_graph->m_actions[4];
 }
 
 void Action_CellInfo::interaction_handler()
@@ -418,3 +418,41 @@ std::string Action_CellInfo::get_description(Parameter* parameter)
 	return "";
 }
 
+action_set_motion_path::action_set_motion_path()
+{
+	m_kind = action_e::set_motion_path;
+	m_icon = Application::instance().m_graph->m_actions[5];
+}
+
+void action_set_motion_path::interaction_handler()
+{
+	Action::interaction_handler();
+	Application::instance().m_message_queue.m_busy = true;
+	Parameter_Position* p = new Parameter_Position();
+	p->m_object = Application::instance().m_GUI->MapViewer->m_player;
+	p->m_map = Application::instance().m_GUI->MapViewer->m_map;
+	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_line(Application::instance().m_GUI->MapViewer, p->m_object->m_cell));
+	if (Application::instance().command_select_location(p->m_object, p->m_place))
+	{
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));
+	}
+	else
+	{
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Не выбрана клетка карты."));
+		Application::instance().m_message_queue.m_busy = false;
+		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+		return;
+	}
+	p->m_map->bresenham_line(p->m_object->m_cell, p->m_place, [p](MapCell* a) { Application::instance().m_action_manager->add(new GameTask(Application::instance().m_actions[0], new Parameter_Position(p->m_object,a,p->m_map))); });
+	Application::instance().m_message_queue.m_busy = false;
+	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+}
+
+void action_set_motion_path::perfom(Parameter* parameter)
+{
+}
+
+std::string action_set_motion_path::get_description(Parameter* parameter)
+{
+	return "";
+}

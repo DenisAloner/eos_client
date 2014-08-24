@@ -20,7 +20,7 @@ void GUI_ActionButton::render(GraphicalController* Graph, int px, int py)
 	glColor4d(1, 1, 1, 1);
 	glEnable(GL_TEXTURE_2D);
 	glActiveTextureARB(GL_TEXTURE0_ARB);
-	glBindTexture(GL_TEXTURE_2D, Graph->m_actions[m_action->m_kind]);
+	glBindTexture(GL_TEXTURE_2D, m_action->m_icon);
 	Graph->draw_sprite(px, py, px, py + m_size.h, px + m_size.w, py +m_size.h, px + m_size.w, py);
 	glDisable(GL_TEXTURE_2D);
 	glBegin(GL_LINES);

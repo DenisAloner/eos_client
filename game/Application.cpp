@@ -332,11 +332,12 @@ void Application::initialize()
 	m_mouse->mouse_move += std::bind(&Application::on_mouse_move, this, std::placeholders::_1);
 	m_action_manager = new ActionManager();
 
-	m_actions[0] = new action_move_step();
-	m_actions[1] = new ActionClass_Push();
-	m_actions[2] = new ActionClass_Turn();
-	m_actions[3] = new Action_OpenInventory();
-	m_actions[4] = new Action_CellInfo();
+	m_actions[action_e::move] = new action_move_step();
+	m_actions[action_e::push] = new ActionClass_Push();
+	m_actions[action_e::turn] = new ActionClass_Turn();
+	m_actions[action_e::open_inventory] = new Action_OpenInventory();
+	m_actions[action_e::cell_info] = new Action_CellInfo();
+	m_actions[action_e::set_motion_path] = new action_set_motion_path();
 	m_game_object_manager.init();
 
 	m_GUI->MapViewer = new GUI_MapViewer(this);
@@ -382,6 +383,9 @@ void Application::initialize()
 	ActionPanel->add_item_control(ActionButton);
 	ActionButton = new GUI_ActionButton();
 	ActionButton->m_action = m_actions[action_e::cell_info];
+	ActionPanel->add_item_control(ActionButton);
+	ActionButton = new GUI_ActionButton();
+	ActionButton->m_action = m_actions[action_e::set_motion_path];
 	ActionPanel->add_item_control(ActionButton);
 	GUI_Layer* MenuLayer;
 	MenuLayer = new GUI_Layer();
@@ -549,7 +553,6 @@ bool Application::command_select_location(GameObject* Object, MapCell*& Cell)
 		{
 			m_message_queue.m_condition_variable.wait(lk);
 		}
-		//MessageBox(NULL, "Co", "", MB_OK);
 		m_message_queue.m_processed_message = true;
 		if (m_message_queue.m_items.front()->m_kind == ParameterKind_MapCell)
 		{

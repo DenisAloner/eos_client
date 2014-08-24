@@ -6,6 +6,7 @@
 
 gui_mapviewer_hint::gui_mapviewer_hint(GUI_MapViewer* owner) :m_owner(owner){}
 mapviewer_hint_preselect_area::mapviewer_hint_preselect_area(GUI_MapViewer* owner,MapCell* cell) : gui_mapviewer_hint(owner),m_cell(cell){}
+mapviewer_hint_line::mapviewer_hint_line(GUI_MapViewer* owner, MapCell* cell) : gui_mapviewer_hint(owner), m_cell(cell){}
 
 void mapviewer_hint_preselect_area::render()
 {
@@ -39,6 +40,41 @@ void mapviewer_hint_preselect_area::render()
 				Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
 			}
 		}
+	}
+}
+
+void mapviewer_hint_line::draw_cell(MapCell* a)
+{
+	double x0, y0, x1, y1, x2, y2, x3, y3;
+	int px = 0;
+	int py = 0;
+	int x = px + a->x - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
+	int y = py + a->y - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
+	x0 = x * m_owner->m_tile_size_x;
+	y0 = (m_owner->m_tile_count_y - y - 1) * m_owner->m_tile_size_y;
+	x1 = x0;
+	y1 = (m_owner->m_tile_count_y - y) * m_owner->m_tile_size_y;
+	x2 = (x + 1) * m_owner->m_tile_size_x;
+	y2 = y1;
+	x3 = x2;
+	y3 = y0;
+	glColor4f(1.0, 0.9, 0.0, 0.5);
+	Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+}
+
+void mapviewer_hint_line::render()
+{
+	int px = 0;
+	int py = 0;
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
+	glUseProgramObjectARB(0);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_preselect);
+	if (m_owner->m_cursored != nullptr)
+	{
+		m_owner->m_map->bresenham_line(m_cell, m_owner->m_cursored, std::bind(&mapviewer_hint_line::draw_cell, this, std::placeholders::_1));
 	}
 }
 

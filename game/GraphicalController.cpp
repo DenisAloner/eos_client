@@ -6,11 +6,12 @@ GraphicalController::GraphicalController()
 {
 	try
 	{
-		m_actions[action_e::move] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_0.bmp");
-		m_actions[action_e::push] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_1.bmp");
-		m_actions[action_e::turn] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_2.bmp");
-		m_actions[action_e::open_inventory] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_3.bmp");
-		m_actions[action_e::cell_info] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_4.bmp");
+		m_actions[0] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_0.bmp");
+		m_actions[1] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_1.bmp");
+		m_actions[2] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_2.bmp");
+		m_actions[3] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_3.bmp");
+		m_actions[4] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_4.bmp");
+		m_actions[5] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_5.bmp");
 
 		m_horizontal_shader = load_shader("EoS_blur", "EoS_blur_horizontal");
 		m_vertical_shader = load_shader("EoS_blur", "EoS_blur_vertical");

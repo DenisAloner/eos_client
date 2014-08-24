@@ -13,6 +13,8 @@ class Application;
 class Action
 {
 public:
+
+	GLuint m_icon;
 	action_e m_kind;
 	std::string m_name;
 	std::string m_error;
@@ -45,9 +47,7 @@ class action_move_step :
 	public ActionClass_Move
 {
 public:
-
 	virtual bool check(Parameter* parameter);
-
 };
 
 class ActionClass_Push :
@@ -95,16 +95,27 @@ public:
 
 };
 
-
 class Action_CellInfo :
 	public Action
 {
 public:
 
 	Action_CellInfo();
-	~Action_CellInfo();
 
 	virtual bool check(Parameter* parameter);
+	virtual void perfom(Parameter* parameter);
+	virtual std::string get_description(Parameter* parameter);
+	virtual void interaction_handler();
+
+};
+
+class action_set_motion_path :
+	public Action
+{
+public:
+
+	action_set_motion_path();
+
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler();

@@ -4,7 +4,6 @@
 #include <vector>
 #include "Definiton.h"
 
-
 class MapCell;
 class GameObject;
 class GameMap;
@@ -39,9 +38,12 @@ public:
 class Parameter_Position : public Parameter
 {
 public:
+
 	GameObject* m_object;
 	MapCell* m_place;
 	GameMap* m_map;
+
+	Parameter_Position(GameObject* object, MapCell* place, GameMap* map);
 
 	Parameter_Position(void);
 	~Parameter_Position(void);

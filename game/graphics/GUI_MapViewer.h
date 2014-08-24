@@ -92,5 +92,14 @@ public:
 	virtual void render();
 };
 
+class mapviewer_hint_line : public gui_mapviewer_hint
+{
+public:
+	MapCell* m_cell;
+	mapviewer_hint_line(GUI_MapViewer* owner, MapCell* cell);
+	virtual void render();
+	void draw_cell(MapCell* a);
+};
+
 #endif //GUI_MAPVIEWER_H
 

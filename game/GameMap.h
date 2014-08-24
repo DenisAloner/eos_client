@@ -8,6 +8,7 @@
 #include <list>
 #include "GraphicalController.h"
 #include "Event.h"
+#include <functional>
 
 class Application;
 class GameObject;
@@ -78,6 +79,7 @@ public:
 	bool line2(int x1, int y1, int x2, int y2);
 	void blur_lighting();
 	void add_lighting();
+	void bresenham_line(MapCell* a, MapCell* b, std::function<void(MapCell*)> f);
 
 };
 
