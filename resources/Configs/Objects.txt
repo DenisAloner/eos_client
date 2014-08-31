@@ -26,6 +26,12 @@ tile_manager_single EoS_Floor_01
 property_permit_move
 layer 0
 
+object health potion
+size 1 1 1
+icon health_potion
+tile_manager_single health_potion
+property_permit_pick
+
 object wall
 size 1 1 4
 tile_manager_single EoS_Wall
@@ -71,3 +77,4 @@ tile_manager_rotating chest 0
 tile_manager_rotating no_tile 1
 tile_manager_rotating no_tile 2
 tile_manager_rotating no_tile 3
+property_container Сундук 4 4

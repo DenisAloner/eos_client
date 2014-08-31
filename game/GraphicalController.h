@@ -18,7 +18,7 @@ class GraphicalController
 {
 public:
 
-	GLuint m_actions[6];
+	GLuint m_actions[7];
 
 	GLuint m_horizontal_shader;
 	GLuint m_vertical_shader;
@@ -32,6 +32,7 @@ public:
 	GLuint m_preselect;
 	GLuint m_select;
 	GLuint m_font;
+	GLuint m_no_image;
 
 	std::list<frectangle_t> m_scissors;
 

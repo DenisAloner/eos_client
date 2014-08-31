@@ -12,6 +12,7 @@ GraphicalController::GraphicalController()
 		m_actions[3] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_3.bmp");
 		m_actions[4] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_4.bmp");
 		m_actions[5] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_5.bmp");
+		m_actions[6] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_6.bmp");
 
 		m_horizontal_shader = load_shader("EoS_blur", "EoS_blur_horizontal");
 		m_vertical_shader = load_shader("EoS_blur", "EoS_blur_vertical");
@@ -24,6 +25,7 @@ GraphicalController::GraphicalController()
 		m_select = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Select.bmp");
 		m_font = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Font.bmp");
 		m_cursor = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Cursor.bmp");
+		m_no_image = load_texture(FileSystem::instance().m_resource_path + "Tiles\\no_tile.bmp");
 	}
 	catch(std::logic_error e)
 	{
@@ -314,7 +316,6 @@ position_t GraphicalController::get_OpenGL_position(float x, float y)
 GLuint GraphicalController::load_texture(const std::string& path)
 {
 	GLuint texture;
-	FILE* file;
 	BITMAPFILEHEADER* header;
 	BITMAPINFOHEADER* info;
 	char* data;
@@ -368,7 +369,6 @@ GLuint GraphicalController::load_shader(const std::string& vPath, const std::str
 
 	glShaderSource(VertexShader, 1, &VertexShaderSource, NULL);
 	glCompileShader(VertexShader);
-	GLint compileStatus;
 	if (!CompileSuccessful(VertexShader))
 		LOG(FATAL) << "Не удалось скомпилировать вершинный шейдер `" << vPath << "`";
 

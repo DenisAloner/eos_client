@@ -2,53 +2,6 @@
 #include "game/GameObject.h"
 #include "game/Application.h"
 
-
-MapCell::MapCell(int x0, int y0)
-{
-	x = x0;
-	y = y0;
-}
-
-
-void MapCell::add_object(GameObject* Object)
- {
-	 m_items.push_back(Object);
- }
-
-GameObjectProperty* MapCell::find_property(property_e kind,GameObject* excluded)
-{
-	GameObjectProperty* result(nullptr);
-	for(std::list<GameObject*>::iterator item=m_items.begin();item!=m_items.end();item++)
-	{
-		if(excluded!=(*item))
-		{
-			result = (*item)->find_property(kind);
-			if(result!=nullptr)
-			{
-				return result;
-			}
-		}
-	}
-	return nullptr;
-}
-
-bool MapCell::check_permit(property_e kind, GameObject* excluded)
-{
-	GameObjectProperty* result(nullptr);
-	for (std::list<GameObject*>::iterator item = m_items.begin(); item != m_items.end(); item++)
-	{
-		if (excluded != (*item))
-		{
-			result = (*item)->find_property(kind);
-			if (result == nullptr)
-			{
-				return false;
-			}
-		}
-	}
-	return true;
-}
-
 GameMap::GameMap(dimension_t size)
 {
 	m_update = true;
@@ -70,7 +23,7 @@ GameMap::GameMap(dimension_t size)
 	{
 		for (int x = 0; x< 21; x++)
 		{
-			m_coefficient[y][x] = 5 * sqrt(x*x + y*y);
+			m_coefficient[y][x] = (float)sqrt(x*x + y*y)*5;
 		}
 	}
 }
@@ -98,7 +51,7 @@ void GameMap::generate_room(void)
 
 void GameMap::add_object(GameObject* object, MapCell* cell)
 {
-	object->m_cell = cell;
+	object->m_owner = cell;
 	for (int i = 0; i<object->m_size.y; i++)
 	{
 		for (int j = 0; j<object->m_size.x; j++)
@@ -114,10 +67,10 @@ void GameMap::remove_object(GameObject* object)
 	{
 		for (int j = 0; j<object->m_size.x; j++)
 		{
-			m_items[object->m_cell->y + i][object->m_cell->x - j]->m_items.remove(object);
+			m_items[object->cell()->y + i][object->cell()->x - j]->m_items.remove(object);
 		}
 	}
-	object->m_cell = nullptr;
+	object->m_owner = nullptr;
 }
 
 void GameMap::move_object(GameObject* object,MapCell* cell)
@@ -128,7 +81,7 @@ void GameMap::move_object(GameObject* object,MapCell* cell)
 
 void  GameMap::turn_object(GameObject* object)
 {
-	MapCell* position = object->m_cell;
+	MapCell* position = object->cell();
 	remove_object(object);
 	object->turn();
 	add_object(object, position);
@@ -529,7 +482,7 @@ void  GameMap::add_doors()
 void  GameMap::blur_lighting()
 {
 	light_t l;
-	float Gauss[] = { 0.39894228, 0.241970725, 0.053990967 };
+	float Gauss[] = { 0.39894228F, 0.241970725F, 0.053990967F };
 	for (int y = 0; y < 41; y++)
 	{
 		for (int x = 0; x < 41; x++)
@@ -594,11 +547,11 @@ void  GameMap::calculate_lighting()
 				m_light_map[y][x] = false;
 			}
 		}
-		for (int y = (*Current)->m_cell->y - 20; y < (*Current)->m_cell->y + 21; y++)
+		for (int y = (*Current)->cell()->y - 20; y < (*Current)->cell()->y + 21; y++)
 		{
 			if (!((y<0) || (y>m_size.h - 1)))
 			{
-				for (int x = (*Current)->m_cell->x - 20; x < (*Current)->m_cell->x + 21; x++)
+				for (int x = (*Current)->cell()->x - 20; x < (*Current)->cell()->x + 21; x++)
 				{
 					if (!((x<0) || (x>m_size.w - 1)))
 					{
@@ -606,7 +559,7 @@ void  GameMap::calculate_lighting()
 						{
 							if ((*obj)->m_name != "floor")
 							{
-								m_barrier_map[y - ((*Current)->m_cell->y - 20)][x - ((*Current)->m_cell->x - 20)] = true;
+								m_barrier_map[y - ((*Current)->cell()->y - 20)][x - ((*Current)->cell()->x - 20)] = true;
 							}
 						}
 					}
@@ -701,12 +654,12 @@ void  GameMap::calculate_lighting()
 
 		for (int y = 0; y < 41; y++)
 		{
-			ly = (*Current)->m_cell->y + y - 20;
+			ly = (*Current)->cell()->y + y - 20;
 			if (!((ly<0) || (ly>m_size.h - 1)))
 			{
 				for (int x = 0; x < 41; x++)
 				{
-					lx = (*Current)->m_cell->x + x - 20;
+					lx = (*Current)->cell()->x + x - 20;
 					if (!((lx<0) || (lx>m_size.w - 1)))
 					{
 						if (m_light_map2[y][x])
@@ -735,7 +688,6 @@ void  GameMap::calculate_lighting()
 bool GameMap::line2(int x1, int y1, int x2, int y2)
 {
 	int e = 0;
-	int de;
 	int dx = abs(x2 - x1);
 	int dy = abs(y2 - y1);
 	int x;
@@ -810,7 +762,6 @@ bool GameMap::line2(int x1, int y1, int x2, int y2)
 void GameMap::bresenham_line(MapCell* a, MapCell* b, std::function<void(MapCell*)> f)
 {
 	int e = 0;
-	int de;
 	int dx = abs(b->x - a->x);
 	int dy = abs(b->y - a->y);
 	int x;

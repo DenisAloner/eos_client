@@ -2,15 +2,19 @@
 #define	TPARAMETER_H
 
 #include <vector>
+#include <list>
 #include "Definiton.h"
 
 class MapCell;
 class GameObject;
+class Game_object_owner;
 class GameMap;
+class Inventory_cell;
 
 class Parameter
 {
 public:
+
 	ParameterKind m_kind;
 
 	Parameter(ParameterKind _kind);
@@ -29,6 +33,7 @@ public:
 class Parameter_GameObject : public Parameter
 {
 public:
+
 	GameObject* m_object;
 
 	Parameter_GameObject();
@@ -59,6 +64,44 @@ public:
 
 	Parameter_MoveObjectByUnit(void);
 	~Parameter_MoveObjectByUnit(void);
+};
+
+class Parameter_destination : public Parameter
+{
+public:
+
+	GameObject* m_unit;
+	GameObject* m_object;
+	Game_object_owner* m_owner;
+
+	Parameter_destination();
+};
+
+class P_cell : public Parameter
+{
+public:
+	MapCell* m_cell;
+
+	P_cell();
+};
+
+class P_object : public Parameter
+{
+public:
+
+	GameObject* m_object;
+
+	P_object();
+};
+
+class P_inventory_cell : public Parameter
+{
+public:
+
+	Inventory_cell* m_cell;
+
+	P_inventory_cell();
+
 };
 
 #endif //TPARAMETER_H

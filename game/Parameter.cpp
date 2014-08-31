@@ -48,3 +48,19 @@ Parameter_MoveObjectByUnit::~Parameter_MoveObjectByUnit()
 Parameter_GameObject::Parameter_GameObject() : Parameter(ParameterKind_GameObject)
 {
 }
+
+Parameter_destination::Parameter_destination() : Parameter(ParameterKind_Destination)
+{
+}
+
+P_cell::P_cell() : Parameter(parameter_kind_cell)
+{
+}
+
+P_object::P_object() : Parameter(parameter_kind_object)
+{
+}
+
+P_inventory_cell::P_inventory_cell() : Parameter(parameter_kind_inventory_cell)
+{
+}

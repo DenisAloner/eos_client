@@ -2,15 +2,60 @@
 #include "game/Action.h"
 
 
+Game_object_owner::Game_object_owner(){}
+
+MapCell::MapCell(int x, int y) :x(x), y(y){
+	m_kind = entity_e::cell;
+}
+
+void MapCell::add_object(GameObject* Object)
+{
+	m_items.push_back(Object);
+}
+
+GameObjectProperty* MapCell::find_property(property_e kind, GameObject* excluded)
+{
+	GameObjectProperty* result(nullptr);
+	for (std::list<GameObject*>::iterator item = m_items.begin(); item != m_items.end(); item++)
+	{
+		if (excluded != (*item))
+		{
+			result = (*item)->find_property(kind);
+			if (result != nullptr)
+			{
+				return result;
+			}
+		}
+	}
+	return nullptr;
+}
+
+bool MapCell::check_permit(property_e kind, GameObject* excluded)
+{
+	GameObjectProperty* result(nullptr);
+	for (std::list<GameObject*>::iterator item = m_items.begin(); item != m_items.end(); item++)
+	{
+		if (excluded != (*item))
+		{
+			result = (*item)->find_property(kind);
+			if (result == nullptr)
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
 GameObject::GameObject()
 {
 	m_layer = 1;
 	m_direction = ObjectDirection_Down;
 	m_selected = false;
 	m_light = nullptr;
-	m_cell = nullptr;
 	m_tile_manager = nullptr;
 	m_weight = 0.0;
+	m_icon = Application::instance().m_graph->m_no_image;
 }
 
 
@@ -81,4 +126,37 @@ void GameObject::set_tile_direction(ObjectDirection dir)
 	}
 	set_tile_size();
 	m_direction = dir;
+}
+
+MapCell* GameObject::cell(){
+	return static_cast<MapCell*>(m_owner);
+}
+
+GameObjectProperty::GameObjectProperty(property_e _kind = property_e::none) : m_kind(_kind)
+{
+}
+
+
+GameObjectProperty::~GameObjectProperty(void)
+{
+}
+
+GameObjectParameter::GameObjectParameter(property_e kind = property_e::none, float value = 0) :GameObjectProperty(kind), m_value(value){}
+
+Inventory_cell::Inventory_cell(GameObject* item = nullptr) : m_item(item)
+{
+	m_kind = entity_e::inventory_cell;
+}
+
+Property_Container::Property_Container(int width, int height, std::string name) : GameObjectProperty(property_e::container), m_size(dimension_t(width, height)), m_name(name)
+{
+	m_items.resize(m_size.w*m_size.h, nullptr);
+	for (std::list<Inventory_cell*>::iterator item = m_items.begin(); item != m_items.end(); item++)
+	{
+		(*item) = new Inventory_cell();
+	}
+}
+
+Property_Container::~Property_Container()
+{
 }

@@ -79,6 +79,12 @@ struct VoidEventArgs
 {
 };
 
+enum entity_e
+{
+	cell,
+	inventory_cell
+};
+
 enum action_e
 {
 	move,
@@ -86,13 +92,15 @@ enum action_e
 	turn,
 	open_inventory,
 	cell_info,
-	set_motion_path
+	set_motion_path,
+	pick
 };
 
 enum property_e
 {
 	none,
 	permit_move,
+	permit_pick,
 	container,
 	strength
 };
@@ -105,6 +113,10 @@ enum ParameterKind
 	ParameterKind_MoveObjectByUnit,
 	ParameterKind_GameObject,
 	ParameterKind_Cancel,
+	ParameterKind_Destination,
+	parameter_kind_cell,
+	parameter_kind_object,
+	parameter_kind_inventory_cell
 };
 
 enum ObjectDirection

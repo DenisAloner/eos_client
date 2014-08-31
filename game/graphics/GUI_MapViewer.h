@@ -14,7 +14,7 @@ class Action;
 class GUI_Object;
 class GUI_Layer;
 class Parameter;
-class MapCell;
+class P_cell;
 class GameMap;
 class GameObject;
 

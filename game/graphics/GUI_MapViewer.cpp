@@ -19,7 +19,7 @@ void mapviewer_hint_area::render()
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_preselect);
 	double x0, y0, x1, y1, x2, y2, x3, y3;
-	MapCell* Item = m_object->m_cell;
+	MapCell* Item = m_object->cell();
 	int bx;
 	int by;
 	if (m_consider_object_size)
@@ -48,7 +48,7 @@ void mapviewer_hint_area::render()
 				y2 = y1;
 				x3 = x2;
 				y3 = y0;
-				glColor4f(1.0, 0.9, 0.0, 0.5);
+				glColor4f(1.0F, 0.9F, 0.0F, 0.5F);
 				Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
 			}
 		}
@@ -71,9 +71,9 @@ void mapviewer_hint_line::draw_cell(MapCell* a)
 	x3 = x2;
 	y3 = y0;
 	glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_preselect);
-	glColor4f(1.0, 0.9, 0.0, 0.5);
+	glColor4f(1.0F, 0.9F, 0.0F, 0.5F);
 	Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
-	glColor4f(1.0, 0.9, 0.0, 1.0);
+	glColor4f(1.0F, 0.9F, 0.0F, 1.0F);
 	Application::instance().m_graph->center_text((x0 + x2)*0.5, (y0 + y1) *0.5, std::to_string(m_step_count), 8, 17);
 	m_step_count += 1;
 }
@@ -189,17 +189,17 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 			}
 			else
 			{
-				light[0] = m_map->m_items[y][x]->m_light.R / 100.0;
-				light[1] = m_map->m_items[y][x]->m_light.G / 100.0;
-				light[2] = m_map->m_items[y][x]->m_light.B / 100.0;
+				light[0] = m_map->m_items[y][x]->m_light.R / 100.0F;
+				light[1] = m_map->m_items[y][x]->m_light.G / 100.0F;
+				light[2] = m_map->m_items[y][x]->m_light.B / 100.0F;
 				light[3] = 0.0;
 				for (std::list<GameObject*>::iterator Current = m_map->m_items[y][x]->m_items.begin(); Current != m_map->m_items[y][x]->m_items.end(); Current++)
 				{
 					IsDraw = false;
-					if ((*Current)->m_cell->y == m_map->m_items[y][x]->y)
+					if ((*Current)->cell()->y == m_map->m_items[y][x]->y)
 					{
 						object_size = (*Current)->m_tile_size;
-						dx = object_size.w + m_map->m_items[y][x]->x - (*Current)->m_cell->x;
+						dx = object_size.w + m_map->m_items[y][x]->x - (*Current)->cell()->x;
 						x0 = (px + gx)*m_tile_size_x - 1;
 						y0 = (m_tile_count_y - py - gy - object_size.h)*m_tile_size_y - 1;
 						x1 = x0;
@@ -313,7 +313,7 @@ void GUI_MapViewer::on_key_press(WPARAM w)
 	case VK_UP:
 		P = new Parameter_Position();
 		P->m_object=m_player;
-		P->m_place=m_map->m_items[m_player->m_cell->y+1][m_player->m_cell->x];
+		P->m_place=m_map->m_items[m_player->cell()->y+1][m_player->cell()->x];
 		P->m_map=m_map;
 		Application::instance().m_action_manager->m_items.push_back(new GameTask(Application::instance().m_actions[action_e::move], P));
 		P->~Parameter_Position();
@@ -322,7 +322,7 @@ void GUI_MapViewer::on_key_press(WPARAM w)
 	case VK_DOWN:
 		P = new Parameter_Position();
 		P->m_object=m_player;
-		P->m_place=m_map->m_items[m_player->m_cell->y-1][m_player->m_cell->x];
+		P->m_place=m_map->m_items[m_player->cell()->y-1][m_player->cell()->x];
 		P->m_map=m_map;
 		Application::instance().m_action_manager->m_items.push_back(new GameTask(Application::instance().m_actions[action_e::move], P));
 		P->~Parameter_Position();
@@ -331,7 +331,7 @@ void GUI_MapViewer::on_key_press(WPARAM w)
 	case VK_LEFT:
 		P = new Parameter_Position();
 		P->m_object=m_player;
-		P->m_place=m_map->m_items[m_player->m_cell->y][m_player->m_cell->x-1];
+		P->m_place=m_map->m_items[m_player->cell()->y][m_player->cell()->x-1];
 		P->m_map=m_map;
 		Application::instance().m_action_manager->m_items.push_back(new GameTask(Application::instance().m_actions[action_e::move], P));
 		P->~Parameter_Position();
@@ -340,7 +340,7 @@ void GUI_MapViewer::on_key_press(WPARAM w)
 	case VK_RIGHT:
 		P = new Parameter_Position();
 		P->m_object=m_player;
-		P->m_place=m_map->m_items[m_player->m_cell->y][m_player->m_cell->x+1];
+		P->m_place=m_map->m_items[m_player->cell()->y][m_player->cell()->x+1];
 		P->m_map=m_map;
 		Application::instance().m_action_manager->m_items.push_back(new GameTask(Application::instance().m_actions[action_e::move], P));
 		P->~Parameter_Position();
@@ -369,9 +369,8 @@ void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
 		{
 			if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
 			{
-				//m_map->m_items[p.y][p.x]->mouse_click(e);
-				Parameter_MapCell* pr = new Parameter_MapCell();
-				pr->m_place = m_map->m_items[y][x];
+				P_cell* pr = new P_cell();
+				pr->m_cell = m_map->m_items[y][x];
 				if (Application::instance().m_message_queue.m_reader)
 				{
 					Application::instance().m_message_queue.push(pr);

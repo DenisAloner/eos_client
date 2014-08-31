@@ -95,6 +95,11 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->m_layer = std::stoi(args);
 		break;
 	}
+	case command_e::icon:
+	{
+		m_object->m_icon = Application::instance().m_graph->load_texture(FileSystem::instance().m_resource_path + "Tiles\\" + args + ".bmp");
+		break;
+	}
 	case command_e::tile_manager_single:
 	{
 		m_object->m_tile_manager = new TileManager_Single();
@@ -162,6 +167,11 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->m_properties.push_back(new GameObjectProperty(property_e::permit_move));
 		break;
 	}
+	case command_e::property_permit_pick:
+	{
+		m_object->m_properties.push_back(new GameObjectProperty(property_e::permit_pick));
+		break;
+	}
 	case command_e::property_container:
 	{
 		std::size_t pos = 0;
@@ -186,18 +196,22 @@ void GameObjectManager::parser(const std::string& command)
 	}
 }
 
+game_clipboard::game_clipboard():m_item(nullptr){}
+
 void GameObjectManager::init()
 {
 	m_commands.insert(std::pair<std::string, command_e>("object", command_e::obj));
 	m_commands.insert(std::pair<std::string, command_e>("size", command_e::size));
 	m_commands.insert(std::pair<std::string, command_e>("weight", command_e::weight));
 	m_commands.insert(std::pair<std::string, command_e>("layer", command_e::layer));
+	m_commands.insert(std::pair<std::string, command_e>("icon", command_e::icon));
 	m_commands.insert(std::pair<std::string, command_e>("tile_manager_single", command_e::tile_manager_single));
 	m_commands.insert(std::pair<std::string, command_e>("tile_manager_map", command_e::tile_manager_map));
 	m_commands.insert(std::pair<std::string, command_e>("tile_manager_rotating", command_e::tile_manager_rotating));
 	m_commands.insert(std::pair<std::string, command_e>("light", command_e::light));
 	m_commands.insert(std::pair<std::string, command_e>("action_move", command_e::action_move));
 	m_commands.insert(std::pair<std::string, command_e>("property_permit_move", command_e::property_permit_move));
+	m_commands.insert(std::pair<std::string, command_e>("property_permit_pick", command_e::property_permit_pick));
 	m_commands.insert(std::pair<std::string, command_e>("property_container", command_e::property_container));
 	m_commands.insert(std::pair<std::string, command_e>("property_strength", command_e::property_strenght));
 
@@ -303,10 +317,32 @@ void Application::render()
 	glActiveTexture(GL_TEXTURE0);
 	if (m_mouse->m_show_cursor)
 	{
+		if (m_clipboard.m_item)
+		{
+			glColor4d(1.0, 1.0, 1.0, 0.5);
+			glBindTexture(GL_TEXTURE_2D, m_clipboard.m_item->m_icon);
+			m_graph->draw_sprite(mouse.x - 32, mouse.y - 32, mouse.x - 32, mouse.y + 32, mouse.x + 32, mouse.y + 32, mouse.x + 32, mouse.y - 32);
+			glDisable(GL_TEXTURE_2D);
+			glDisable(GL_BLEND);
+			glColor4f(1.0, 0.9, 0.0, 0.75);
+			glBegin(GL_LINES);
+			glVertex2d(mouse.x - 32, mouse.y - 32);
+			glVertex2d(mouse.x - 32, mouse.y + 32);
+			glVertex2d(mouse.x - 32, mouse.y + 32);
+			glVertex2d(mouse.x + 32, mouse.y + 32);
+			glVertex2d(mouse.x + 32, mouse.y + 32);
+			glVertex2d(mouse.x + 32, mouse.y - 32);
+			glVertex2d(mouse.x + 32, mouse.y - 32);
+			glVertex2d(mouse.x - 32, mouse.y - 32);
+			glEnd();
+			glEnable(GL_TEXTURE_2D);
+			glEnable(GL_BLEND);
+		}
 		glColor4d(1.0, 1.0, 1.0, 1.0);
 		glBindTexture(GL_TEXTURE_2D, m_mouse->m_cursor);
 //#warning TODO Избавиться от магических чисел!
 		m_graph->draw_sprite(mouse.x, mouse.y, mouse.x, mouse.y + 48, mouse.x + 48, mouse.y + 48, mouse.x + 48, mouse.y);
+		
 	}
 	m_update_mutex.unlock();
 }
@@ -338,6 +374,7 @@ void Application::initialize()
 	m_actions[action_e::open_inventory] = new Action_OpenInventory();
 	m_actions[action_e::cell_info] = new Action_CellInfo();
 	m_actions[action_e::set_motion_path] = new action_set_motion_path();
+	m_actions[action_e::pick] = new Action_pick();
 	m_game_object_manager.init();
 
 	m_GUI->MapViewer = new GUI_MapViewer(this);
@@ -360,6 +397,9 @@ void Application::initialize()
 	rx = rand() % room->rect.w;
 	ry = rand() % room->rect.h;
 	m_GUI->MapViewer->m_map->add_object(Application::instance().m_game_object_manager.new_object("chest"), m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
+	rx = rand() % room->rect.w;
+	ry = rand() % room->rect.h;
+	m_GUI->MapViewer->m_map->add_object(Application::instance().m_game_object_manager.new_object("health potion"), m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 
 	GUI_ActionManager* AMTextBox;
 	AMTextBox = new GUI_ActionManager(m_action_manager);
@@ -386,6 +426,9 @@ void Application::initialize()
 	ActionPanel->add_item_control(ActionButton);
 	ActionButton = new GUI_ActionButton();
 	ActionButton->m_action = m_actions[action_e::set_motion_path];
+	ActionPanel->add_item_control(ActionButton);
+	ActionButton = new GUI_ActionButton();
+	ActionButton->m_action = m_actions[action_e::pick];
 	ActionPanel->add_item_control(ActionButton);
 	GUI_Layer* MenuLayer;
 	MenuLayer = new GUI_Layer();
@@ -530,13 +573,13 @@ void Application::update()
 	m_update_mutex.unlock();
 }
 
-bool Application::command_select_location(GameObject* Object, MapCell*& Cell)
+Parameter* Application::command_select_location(GameObject* object)
 {
-	bool Result = false;
-	if (Object)
+	Parameter* Result = nullptr;
+	if (object)
 	{
-		m_GUI->MapViewer->m_cursor_x = Object->m_size.x;
-		m_GUI->MapViewer->m_cursor_y = Object->m_size.y;
+		m_GUI->MapViewer->m_cursor_x = object->m_size.x;
+		m_GUI->MapViewer->m_cursor_y = object->m_size.y;
 	}
 	else
 	{
@@ -554,11 +597,10 @@ bool Application::command_select_location(GameObject* Object, MapCell*& Cell)
 			m_message_queue.m_condition_variable.wait(lk);
 		}
 		m_message_queue.m_processed_message = true;
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind_MapCell)
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_cell)
 		{
-			Cell = static_cast<Parameter_MapCell*>(m_message_queue.m_items.front())->m_place;
+			Result = m_message_queue.m_items.front();
 			Exit = true;
-			Result = true;
 		}
 		if (m_message_queue.m_items.front()->m_kind == ParameterKind_Cancel)
 		{
@@ -574,9 +616,9 @@ bool Application::command_select_location(GameObject* Object, MapCell*& Cell)
 	return Result;
 }
 
-bool Application::command_select_object(GameObject*& Object)
+Parameter* Application::command_select_object_on_map()
 {
-	bool Result = false;
+	Parameter* Result = nullptr;
 	m_GUI->MapViewer->m_cursor_x = 1;
 	m_GUI->MapViewer->m_cursor_y = 1;
 	m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выберите обьект."));
@@ -590,12 +632,14 @@ bool Application::command_select_object(GameObject*& Object)
 			m_message_queue.m_condition_variable.wait(lk);
 		}
 		m_message_queue.m_processed_message = true;
-
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind_GameObject)
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_object)
 		{
-			Object = static_cast<Parameter_GameObject*>(m_message_queue.m_items.front())->m_object;
-			Exit = true;
-			Result = true;
+			Result = m_message_queue.m_items.front();
+			if(static_cast<P_object*>(Result)->m_object->m_owner->Game_object_owner::m_kind==entity_e::cell)
+			{
+				Exit = true;
+			}
+			else Result = nullptr;
 		}
 		if (m_message_queue.m_items.front()->m_kind == ParameterKind_Cancel)
 		{
@@ -617,7 +661,7 @@ bool Application::command_open_inventory(GameObject*& Object)
 	if (Property != nullptr)
 	{
 		//MessageBox(NULL, "In_2", "", MB_OK);
-		GUI_Window* Window = new GUI_Window(1024 / 2 - (Property->m_size.w * 48 + 2) / 2, 1024 / 2 - (Property->m_size.h * 48 + 2) / 2, Property->m_size.w * 48 + 4, Property->m_size.h * 48 + 27,Object->m_name+"::"+Property->m_name);
+		GUI_Window* Window = new GUI_Window(1024 / 2 - (Property->m_size.w * 64 + 2) / 2, 1024 / 2 - (Property->m_size.h * 64 + 2) / 2, Property->m_size.w * 64 + 4, Property->m_size.h * 64 + 27,Object->m_name+"::"+Property->m_name);
 		GUI_Inventory* Inv = new GUI_Inventory(Property);
 		Inv->m_position.x = 2;
 		Inv->m_position.y = Window->m_size.h - Inv->m_size.h-2;
@@ -702,3 +746,78 @@ void my_audio_callback(void *userdata, uint8_t *stream, uint32_t len) {
 	audio_len -= len;
 }
 
+Parameter* Application::command_select_transfer(Parameter_destination* parameter){
+	Parameter* Result = nullptr;
+	m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выберите назначение."));
+	bool Exit = false;
+	while (Exit == false)
+	{
+		std::unique_lock<std::mutex> lk(m_message_queue.m_mutex);
+		m_message_queue.m_reader = true;
+		while (!m_message_queue.m_read_message)
+		{
+			m_message_queue.m_condition_variable.wait(lk);
+		}
+		m_message_queue.m_processed_message = true;
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_inventory_cell)
+		{
+			Result = m_message_queue.m_items.front();
+			Exit = true;
+		}
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_cell)
+		{
+			Result = m_message_queue.m_items.front();
+			Exit = true;
+		}
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind_Cancel)
+		{
+			Exit = true;
+		}
+		m_message_queue.m_read_message = false;
+		lk.unlock();
+		m_message_queue.m_condition_variable.notify_one();
+		m_message_queue.m_reader = false;
+	}
+	return Result;
+}
+
+P_object* Application::command_select_transfer_source(Parameter_destination* parameter){
+	P_object* Result = nullptr;
+	m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выберите объект."));
+	bool Exit = false;
+	while (Exit == false)
+	{
+		std::unique_lock<std::mutex> lk(m_message_queue.m_mutex);
+		m_message_queue.m_reader = true;
+		while (!m_message_queue.m_read_message)
+		{
+			m_message_queue.m_condition_variable.wait(lk);
+		}
+		m_message_queue.m_processed_message = true;
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_object)
+		{
+			Result = static_cast<P_object*>(m_message_queue.m_items.front());
+			Exit = true;
+		}
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_inventory_cell)
+		{
+			P_inventory_cell* temp = static_cast<P_inventory_cell*>(m_message_queue.m_items.front());
+			if (temp->m_cell->m_item)
+			{
+				Result = new P_object();
+				Result->m_object = temp->m_cell->m_item;
+				Exit = true;
+			}
+			else Result = nullptr;
+		}
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind_Cancel)
+		{
+			Exit = true;
+		}
+		m_message_queue.m_read_message = false;
+		lk.unlock();
+		m_message_queue.m_condition_variable.notify_one();
+		m_message_queue.m_reader = false;
+	}
+	return Result;
+}

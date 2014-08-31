@@ -22,9 +22,11 @@
 class Action;
 class ActionManager;
 class GameObject;
+class Game_object_owner;
 class GameMap;
 class MapCell;
 class Parameter;
+class P_object;
 class Action_OpenInventory;
 class MouseController;
 class GUI_ActionPanel;
@@ -37,6 +39,7 @@ class GUI_Item;
 class GUI_Window;
 class GUI_Timer;
 class GUI_MiniMap;
+class Parameter_destination;
 
 
 class gui_MessageQueue
@@ -67,12 +70,14 @@ public:
 		size,
 		weight,
 		layer,
+		icon,
 		tile_manager_single,
 		tile_manager_map,
 		tile_manager_rotating,
 		light,
 		action_move,
 		property_permit_move,
+		property_permit_pick,
 		property_container,
 		property_strenght
 	};
@@ -91,15 +96,28 @@ public:
 
 };
 
+class game_clipboard
+{
+public:
+
+	std::list<GameObject*>* m_source;
+	GameObject* m_item;
+	 
+	game_clipboard();
+};
+
 class Application
 {
 public:
+
 	int m_game_turn;
 	bool m_ready;
 
 	Timer* m_timer;
 	MouseController* m_mouse;
 	gui_MessageQueue m_message_queue;
+
+	game_clipboard m_clipboard;
 
 	std::mutex m_update_mutex;
 
@@ -109,7 +127,7 @@ public:
 	GraphicalController* m_graph;
 	ActionManager* m_action_manager;
 
-	Action* m_actions[6];
+	Action* m_actions[7];
 
 	Event<WPARAM> key_press;
 	Event<MouseEventArgs> mouse_click;
@@ -136,14 +154,16 @@ public:
 	void render();
 	void update();
 
-	bool command_select_location(GameObject* Object, MapCell*& Cell);
-	bool command_select_object(GameObject*& Object);
+	Parameter* command_select_location(GameObject* object);
+	Parameter* command_select_object_on_map();
 	bool command_open_inventory(GameObject*& Object);
 	bool command_check_position(GameObject*& object, MapCell*& position, GameMap*& map);
 	void command_set_cursor(GLuint _Tile);
 	void command_set_pickup_item(GLuint _Tile);
 	void command_set_cursor_visibility(bool _Visibility);
 	void command_set_pickup_item_visibility(bool _Visibility);
+	P_object* command_select_transfer_source(Parameter_destination* parameter);
+	Parameter* command_select_transfer(Parameter_destination* parameter);
 	
 	void PlaySound1();
 

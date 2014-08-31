@@ -55,8 +55,8 @@ void Renderer::work()
 
 	// Инициализируем приложение
 	Application::instance().initialize();
-	Application::instance().m_GUI->MapViewer->m_center.x = Application::instance().m_GUI->MapViewer->m_player->m_cell->x;
-	Application::instance().m_GUI->MapViewer->m_center.y = Application::instance().m_GUI->MapViewer->m_player->m_cell->y;
+	Application::instance().m_GUI->MapViewer->m_center.x = Application::instance().m_GUI->MapViewer->m_player->cell()->x;
+	Application::instance().m_GUI->MapViewer->m_center.y = Application::instance().m_GUI->MapViewer->m_player->cell()->y;
 	// Запускаем потоки приложения
 	Application::instance().start();
 

@@ -82,7 +82,7 @@ void GUI_PopMenuItem::on_mouse_click(MouseEventArgs const& e)
 	set_focus(true);
 	if (Application::instance().m_message_queue.m_reader)
 	{
-		Parameter_GameObject* p = new Parameter_GameObject();
+		P_object* p = new P_object();
 		p->m_object = m_object;
 		Application::instance().m_message_queue.push(p);
 	}

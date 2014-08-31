@@ -104,11 +104,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		static int key_pressed(WPARAM wParam)
 		{
-			if (wParam & MK_LBUTTON == MK_LBUTTON)
+			if ((wParam & MK_LBUTTON) == MK_LBUTTON)
 				return mk_left;
-			else if (wParam & MK_RBUTTON == MK_RBUTTON)
+			else if ((wParam & MK_RBUTTON) == MK_RBUTTON)
 				return mk_right;
-			else if (wParam & MK_MBUTTON == MK_MBUTTON)
+			else if ((wParam & MK_MBUTTON) == MK_MBUTTON)
 				return mk_middle;
 			else
 				return mk_none;

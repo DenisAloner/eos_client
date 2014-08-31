@@ -122,4 +122,18 @@ public:
 
 };
 
+
+class Action_pick :
+	public Action
+{
+public:
+
+	Action_pick();
+
+	virtual void perfom(Parameter* parameter);
+	virtual std::string get_description(Parameter* parameter);
+	virtual void interaction_handler();
+
+};
+
 #endif //TACTION_H

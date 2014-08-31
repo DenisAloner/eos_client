@@ -6,6 +6,7 @@
 #include "game/Parameter.h"
 #include "game/graphics/GUI_MapViewer.h"
 #include "game/graphics/GUI_TextBox.h"
+#include "log.h"
 
 
 Action::Action(void)
@@ -64,12 +65,15 @@ void ActionClass_Move::interaction_handler()
 {
 	Action::interaction_handler();
 	Application::instance().m_message_queue.m_busy = true;
+	Parameter* result;
 	Parameter_Position* p = new Parameter_Position();
 	p->m_object = Application::instance().m_GUI->MapViewer->m_player;
 	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_object, false));
 	p->m_map = Application::instance().m_GUI->MapViewer->m_map;
-	if (Application::instance().command_select_location(p->m_object, p->m_place))
+	result = Application::instance().command_select_location(p->m_object);
+	if (result)
 	{
+		p->m_place = static_cast<P_cell*>(result)->m_cell;
 		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));
 	}
 	else
@@ -94,7 +98,7 @@ bool ActionClass_Move::check(Parameter* parameter)
 bool action_move_step::check(Parameter* parameter)
 {
 	Parameter_Position* p = static_cast<Parameter_Position*>(parameter);
-	if (abs(p->m_object->m_cell->x - p->m_place->x) < 2 && abs(p->m_object->m_cell->y - p->m_place->y)< 2)
+	if (abs(p->m_object->cell()->x - p->m_place->x) < 2 && abs(p->m_object->cell()->y - p->m_place->y)< 2)
 	{
 		return Application::instance().command_check_position(p->m_object, p->m_place, p->m_map);
 	}
@@ -163,9 +167,9 @@ bool ActionClass_Push::check(Parameter* parameter)
 	}
 	else { return false; }
 	
-	if (abs(p->m_unit->m_cell->x - p->m_object->m_cell->x)<2 || abs(p->m_unit->m_cell->x - p->m_unit->m_size.x + 1 - p->m_object->m_cell->x)<2 || abs(p->m_unit->m_cell->x - p->m_unit->m_size.x + 1 - (p->m_object->m_cell->x - p->m_object->m_size.x + 1))<2 || abs(p->m_unit->m_cell->x- (p->m_object->m_cell->x - p->m_object->m_size.x + 1))<2)
+	if (abs(p->m_unit->cell()->x - p->m_object->cell()->x)<2 || abs(p->m_unit->cell()->x - p->m_unit->m_size.x + 1 - p->m_object->cell()->x)<2 || abs(p->m_unit->cell()->x - p->m_unit->m_size.x + 1 - (p->m_object->cell()->x - p->m_object->m_size.x + 1))<2 || abs(p->m_unit->cell()->x- (p->m_object->cell()->x - p->m_object->m_size.x + 1))<2)
 	{
-		if (abs(p->m_unit->m_cell->y - p->m_object->m_cell->y) < 2 || abs(p->m_unit->m_cell->y + p->m_unit->m_size.y - 1 - p->m_object->m_cell->y) < 2 || abs(p->m_unit->m_cell->y+ p->m_unit->m_size.y - 1 - (p->m_object->m_cell->y + p->m_object->m_size.y - 1)) < 2 || abs(p->m_unit->m_cell->y - (p->m_object->m_cell->y + p->m_object->m_size.y - 1)) < 2)
+		if (abs(p->m_unit->cell()->y - p->m_object->cell()->y) < 2 || abs(p->m_unit->cell()->y + p->m_unit->m_size.y - 1 - p->m_object->cell()->y) < 2 || abs(p->m_unit->cell()->y+ p->m_unit->m_size.y - 1 - (p->m_object->cell()->y + p->m_object->m_size.y - 1)) < 2 || abs(p->m_unit->cell()->y - (p->m_object->cell()->y + p->m_object->m_size.y - 1)) < 2)
 		{
 			for (int i = 0; i < p->m_object->m_size.y; i++)
 			{
@@ -189,7 +193,7 @@ bool ActionClass_Push::check(Parameter* parameter)
 			{
 				for (int j = 0; j < p->m_unit->m_size.x; j++)
 				{
-					cell == p->m_map->m_items[p->m_unit->m_cell->y + (p->m_place->y - p->m_object->m_cell->y) + i][p->m_unit->m_cell->x + (p->m_place->x - p->m_object->m_cell->x) - j];
+					cell = p->m_map->m_items[p->m_unit->cell()->y + (p->m_place->y - p->m_object->cell()->y) + i][p->m_unit->cell()->x + (p->m_place->x - p->m_object->cell()->x) - j];
 					if (cell == nullptr){ return false; }
 					for (std::list<GameObject*>::iterator item = cell->m_items.begin(); item != cell->m_items.end(); item++)
 					{
@@ -215,7 +219,7 @@ void ActionClass_Push::perfom(Parameter* parameter)
 	Parameter_MoveObjectByUnit* p = static_cast<Parameter_MoveObjectByUnit*>(parameter);
 	if (check(p))
 	{
-		p->m_map->move_object(p->m_unit, p->m_map->m_items[p->m_unit->m_cell->y + (p->m_place->y - p->m_object->m_cell->y)][p->m_unit->m_cell->x + (p->m_place->x - p->m_object->m_cell->x)]);
+		p->m_map->move_object(p->m_unit, p->m_map->m_items[p->m_unit->cell()->y + (p->m_place->y - p->m_object->cell()->y)][p->m_unit->cell()->x + (p->m_place->x - p->m_object->cell()->x)]);
 		p->m_map->move_object(p->m_object, p->m_place);
 	}
 }
@@ -225,12 +229,15 @@ void ActionClass_Push::interaction_handler()
 {
 	Action::interaction_handler();
 	Application::instance().m_message_queue.m_busy = true;
+	Parameter* result;
 	Parameter_MoveObjectByUnit* p = new Parameter_MoveObjectByUnit();
 	p->m_unit = Application::instance().m_GUI->MapViewer->m_player;
 	p->m_map = Application::instance().m_GUI->MapViewer->m_map;
 	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_unit,true));
-	if (Application::instance().command_select_object(p->m_object))
+	result = Application::instance().command_select_object_on_map();
+	if (result)
 	{
+		p->m_object = static_cast<P_object*>(result)->m_object;
 		std::string a = "Выбран "; 
 		a.append(p->m_object->m_name);
 		a = a + ".";
@@ -245,8 +252,10 @@ void ActionClass_Push::interaction_handler()
 	}
 	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_object,false));
-	if (Application::instance().command_select_location(p->m_object, p->m_place))
+	result = Application::instance().command_select_location(p->m_object);
+	if (result)
 	{
+		p->m_place = static_cast<P_cell*>(result)->m_cell;
 		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));
 	}
 	else
@@ -305,10 +314,13 @@ void ActionClass_Turn::interaction_handler()
 {
 	Action::interaction_handler();
 	Application::instance().m_message_queue.m_busy = true;
+	Parameter* result;
 	Parameter_Position* p = new Parameter_Position();
 	p->m_map = Application::instance().m_GUI->MapViewer->m_map;
-	if (Application::instance().command_select_object(p->m_object))
+	result = Application::instance().command_select_object_on_map();
+	if (result)
 	{
+		p->m_object = static_cast<P_object*>(result)->m_object;
 		std::string a = "Выбран ";
 		a.append(p->m_object->m_name);
 		a = a + ".";
@@ -341,9 +353,12 @@ void Action_OpenInventory::interaction_handler()
 {
 	Action::interaction_handler();
 	Application::instance().m_message_queue.m_busy = true;
+	Parameter* result;
 	Parameter_GameObject* p = new Parameter_GameObject();
-	if (Application::instance().command_select_object(p->m_object))
+	result = Application::instance().command_select_object_on_map();
+	if (result)
 	{
+		p->m_object = static_cast<P_object*>(result)->m_object;
 		std::string a = "Выбран ";
 		a.append(p->m_object->m_name);
 		a = a + ".";
@@ -386,11 +401,14 @@ void Action_CellInfo::interaction_handler()
 {
 	Action::interaction_handler();
 	Application::instance().m_message_queue.m_busy = true;
+	Parameter* result;
 	Parameter_Position* p = new Parameter_Position();
 	p->m_object = nullptr;
 	p->m_map = Application::instance().m_GUI->MapViewer->m_map;
-	if (Application::instance().command_select_location(p->m_object, p->m_place))
+	result = Application::instance().command_select_location(p->m_object);
+	if (result)
 	{
+		p->m_place = static_cast<P_cell*>(result)->m_cell;
 		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}:"));
 		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(" - освещение {" + std::to_string(p->m_place->m_light.R) + "," + std::to_string(p->m_place->m_light.G) + "," + std::to_string(p->m_place->m_light.B) + "}."));
 	}
@@ -428,12 +446,15 @@ void action_set_motion_path::interaction_handler()
 {
 	Action::interaction_handler();
 	Application::instance().m_message_queue.m_busy = true;
+	Parameter* result;
 	Parameter_Position* p = new Parameter_Position();
 	p->m_object = Application::instance().m_GUI->MapViewer->m_player;
 	p->m_map = Application::instance().m_GUI->MapViewer->m_map;
-	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_line(Application::instance().m_GUI->MapViewer, p->m_object->m_cell));
-	if (Application::instance().command_select_location(p->m_object, p->m_place))
+	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_line(Application::instance().m_GUI->MapViewer, p->m_object->cell()));
+	result = Application::instance().command_select_location(p->m_object);
+	if (result)
 	{
+		p->m_place = static_cast<P_cell*>(result)->m_cell;
 		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));
 	}
 	else
@@ -443,7 +464,7 @@ void action_set_motion_path::interaction_handler()
 		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 		return;
 	}
-	p->m_map->bresenham_line(p->m_object->m_cell, p->m_place, [p](MapCell* a) { Application::instance().m_action_manager->add(new GameTask(Application::instance().m_actions[0], new Parameter_Position(p->m_object,a,p->m_map))); });
+	p->m_map->bresenham_line(p->m_object->cell(), p->m_place, [p](MapCell* a) { Application::instance().m_action_manager->add(new GameTask(Application::instance().m_actions[0], new Parameter_Position(p->m_object,a,p->m_map))); });
 	Application::instance().m_message_queue.m_busy = false;
 	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 }
@@ -455,4 +476,110 @@ void action_set_motion_path::perfom(Parameter* parameter)
 std::string action_set_motion_path::get_description(Parameter* parameter)
 {
 	return "";
+}
+
+Action_pick::Action_pick()
+{
+	m_kind = action_e::push;
+	m_icon = Application::instance().m_graph->m_actions[6];
+}
+
+void Action_pick::interaction_handler()
+{
+	Action::interaction_handler();
+	Application::instance().m_message_queue.m_busy = true;
+	Parameter* result;
+	Parameter_destination* p = new Parameter_destination();
+	p->m_unit = Application::instance().m_GUI->MapViewer->m_player;
+	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_unit, true));
+	P_object* object = Application::instance().command_select_transfer_source(p);
+	if (object)
+	{
+		p->m_object = object->m_object;
+		std::string a = "Выбран ";
+		a.append(p->m_object->m_name);
+		a = a + ".";
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+	}
+	else
+	{
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_message_queue.m_busy = false;
+		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+		return;
+	}
+	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+	Application::instance().m_clipboard.m_item = p->m_object;
+	result = Application::instance().command_select_transfer(p);
+	if (result)
+	{
+		switch (result->m_kind)
+		{
+		case ParameterKind::parameter_kind_cell:
+		{
+			p->m_owner = static_cast<P_cell*>(result)->m_cell;
+			break;
+		}
+		case ParameterKind::parameter_kind_inventory_cell:
+		{
+			p->m_owner = static_cast<P_inventory_cell*>(result)->m_cell;
+			break;
+		}
+		}
+		//Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));
+	}
+	else
+	{
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_message_queue.m_busy = false;
+		Application::instance().m_clipboard.m_item = nullptr;
+		return;
+	}
+	Application::instance().m_action_manager->add(new GameTask(this, p));
+	Application::instance().m_clipboard.m_item = nullptr;
+	Application::instance().m_message_queue.m_busy = false;
+}
+
+void Action_pick::perfom(Parameter* parameter)
+{
+	Parameter_destination* p = static_cast<Parameter_destination*>(parameter);
+	if (check(p))
+	{
+		switch (p->m_object->m_owner->m_kind)
+		{
+		case entity_e::cell:
+		{
+			static_cast<MapCell*>(p->m_object->m_owner)->m_items.remove(p->m_object);
+			break;
+		}
+		case entity_e::inventory_cell:
+		{
+			static_cast<Inventory_cell*>(p->m_object->m_owner)->m_item = nullptr;
+			break;
+		}
+		}
+		switch (p->m_owner->m_kind)
+		{
+		case entity_e::cell:
+		{
+			static_cast<MapCell*>(p->m_owner)->m_items.push_back(p->m_object);
+			p->m_object->m_owner =p->m_owner;
+			break;
+		}
+		case entity_e::inventory_cell:
+		{
+			static_cast<Inventory_cell*>(p->m_owner)->m_item = p->m_object;
+			p->m_object->m_owner = p->m_owner;
+			break;
+		}
+		}
+	}
+}
+
+std::string Action_pick::get_description(Parameter* parameter)
+{
+	Parameter_destination* p = static_cast<Parameter_destination*>(parameter);
+	std::string s("Поднять ");
+	s += p->m_object->m_name + ".";
+	return s;
 }
