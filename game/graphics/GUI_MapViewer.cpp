@@ -248,6 +248,27 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 						}
 					}
 				}
+				if (m_map->m_items[y][x]->m_path_info==4)
+				{
+					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
+					glUseProgram(0);
+					glEnable(GL_BLEND);
+					glDisable(GL_TEXTURE_2D);
+					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+					glDisable(GL_TEXTURE_2D);
+					x0 = (px + gx)*m_tile_size_x - 1;
+					y0 = (m_tile_count_y - py - gy - 1)*m_tile_size_y - 1;
+					x1 = x0;
+					y1 = (m_tile_count_y - py - gy)*m_tile_size_y + 1;
+					x2 = (px + gx + 1)*m_tile_size_x + 1;
+					y2 = y1;
+					x3 = x2;
+					y3 = y0;
+					glColor4f(1.0, 0.9, 0.0, 0.5);
+					Graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
+					glEnable(GL_TEXTURE_2D);
+				}
+				
 			}
 		}
 	}

@@ -9,11 +9,13 @@
 #include "GraphicalController.h"
 #include "Event.h"
 #include <functional>
+#include "AI.h"
 
 class Application;
 class GameObject;
 class GameObjectProperty;
 class MapCell;
+class AI;
 
 class GameMap
 {
@@ -38,6 +40,7 @@ public:
 	 
 	std::vector<std::vector<MapCell*> > m_items;
 	std::list<GameObject*> m_lights;
+	std::list<GameObject*> m_ai;
 	std::list<block_t*> m_rooms;
 	std::list<block_t*> m_link_rooms;
 
@@ -53,9 +56,11 @@ public:
 	void generate_level(void);
 	void add_light(GameObject* Object);
 	void add_new_object(GameObject* Object, MapCell* Element);
+	void add_ai_object(GameObject* Object, MapCell* Element);
 	void fill();
 	void random_block(block_t* block);
 	void calculate_lighting();
+	void calculate_ai();
 	void connect_room();
 	void link_room(block_t* a, block_t* b);
 	void add_wall();

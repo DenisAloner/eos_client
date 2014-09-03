@@ -98,6 +98,12 @@ void GameMap::add_new_object(GameObject* Object, MapCell* Element)
 	add_light(Object);
 }
 
+void GameMap::add_ai_object(GameObject* Object, MapCell* Element)
+{
+	add_object(Object, Element);
+	m_ai.push_front(Object);
+}
+
 void GameMap::generate_level(void)
 {
 	srand(time(0));
@@ -873,5 +879,23 @@ void GameMap::add_lighting()
 			}
 			j = j + 1;
 		}
+	}
+}
+
+void  GameMap::calculate_ai()
+{
+	AI obj;
+	obj.m_map = this;
+	for (std::list<GameObject*>::iterator Current = m_ai.begin(); Current != m_ai.end(); Current++)
+	{
+		for (int y = 0; y < m_size.h; y++)
+		{
+			for (int x = 0; x < m_size.w; x++)
+			{
+				m_items[y][x]->set_path_info();
+			}
+		}
+		obj.m_object = (*Current);
+		obj.create();
 	}
 }

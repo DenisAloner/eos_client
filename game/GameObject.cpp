@@ -47,6 +47,19 @@ bool MapCell::check_permit(property_e kind, GameObject* excluded)
 	return true;
 }
 
+void MapCell::set_path_info()
+{
+	m_path_info = 0;
+	for (std::list<GameObject*>::iterator item = m_items.begin(); item != m_items.end(); item++)
+	{
+		if ((*item)->m_name != "floor" && (*item)->m_name != "door")
+		{
+			m_path_info = 1;
+			return;
+		}
+	}
+}
+
 GameObject::GameObject()
 {
 	m_layer = 1;

@@ -399,7 +399,9 @@ void Application::initialize()
 	m_GUI->MapViewer->m_map->add_object(Application::instance().m_game_object_manager.new_object("chest"), m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 	rx = rand() % room->rect.w;
 	ry = rand() % room->rect.h;
-	m_GUI->MapViewer->m_map->add_object(Application::instance().m_game_object_manager.new_object("health potion"), m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
+	obj = m_game_object_manager.new_object("snake");
+	obj->set_tile_direction(ObjectDirection_Left);
+	m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 
 	GUI_ActionManager* AMTextBox;
 	AMTextBox = new GUI_ActionManager(m_action_manager);
@@ -568,6 +570,7 @@ void Application::update()
 		m_action_manager->remove();
 	}
 	m_GUI->MapViewer->m_map->calculate_lighting();
+	m_GUI->MapViewer->m_map->calculate_ai();
 	Application::instance().m_GUI->MapViewer->update();
 	Application::instance().m_GUI->MapViewer->m_map->m_update = true;
 	m_update_mutex.unlock();

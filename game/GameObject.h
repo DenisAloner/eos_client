@@ -35,6 +35,8 @@ public:
 
 	std::list<GameObject*> m_items;
 
+	unsigned int m_path_info;
+
 	light_t m_light;
 	light_t m_light_blur;
 
@@ -43,6 +45,7 @@ public:
 	void add_object(GameObject* Object);
 	virtual GameObjectProperty* find_property(property_e kind, GameObject* excluded);
 	bool check_permit(property_e kind, GameObject* excluded);
+	void set_path_info();
 };
 
 class GameObject
