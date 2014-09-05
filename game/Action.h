@@ -136,4 +136,17 @@ public:
 
 };
 
+class Action_open :
+	public Action
+{
+public:
+
+	Action_open();
+
+	virtual void perfom(Parameter* parameter);
+	virtual std::string get_description(Parameter* parameter);
+	virtual void interaction_handler();
+
+};
+
 #endif //TACTION_H

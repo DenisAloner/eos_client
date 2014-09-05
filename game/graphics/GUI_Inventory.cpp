@@ -45,7 +45,7 @@ void GUI_InventoryItem::render(GraphicalController* Graph, int px, int py)
 	{
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_BLEND);
-		glBindTexture(GL_TEXTURE_2D, m_item->m_item->m_icon);
+		glBindTexture(GL_TEXTURE_2D, m_item->m_item->m_active_state->m_icon);
 		Graph->draw_sprite(px, py, px, py + +m_size.h, px + m_size.w, py + +m_size.h, px + m_size.w, py);
 	}
 }

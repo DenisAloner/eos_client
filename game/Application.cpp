@@ -70,6 +70,27 @@ void GameObjectManager::parser(const std::string& command)
 		m_items.insert(std::pair<std::string, GameObject*>(args, m_object));
 		break;
 	}
+	case command_e::state_default:
+	{
+		m_object->m_active_state = new Game_state();
+		m_object->m_active_state->m_kind = state_e::default;
+		m_object->m_state.push_back(m_object->m_active_state);
+		break;
+	}
+	case command_e::state_on:
+	{
+		m_object->m_active_state = new Game_state();
+		m_object->m_active_state->m_kind = state_e::on;
+		m_object->m_state.push_back(m_object->m_active_state);
+		break;
+	}
+	case command_e::state_off:
+	{
+		m_object->m_active_state = new Game_state();
+		m_object->m_active_state->m_kind = state_e::off;
+		m_object->m_state.push_back(m_object->m_active_state);
+		break;
+	}
 	case command_e::size:
 	{
 		std::size_t pos = 0;
@@ -81,8 +102,8 @@ void GameObjectManager::parser(const std::string& command)
 		size.y = std::stoi(args.substr(pos, found - pos));
 		pos = found + 1;
 		size.z = std::stoi(args.substr(pos));
-		m_object->m_size = size;
-		m_object->set_tile_direction(ObjectDirection_Down);
+		m_object->m_active_state->m_size = size;
+		m_object->set_direction(ObjectDirection_Down);
 		break;
 	}
 	case command_e::weight:
@@ -92,25 +113,25 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	case command_e::layer:
 	{
-		m_object->m_layer = std::stoi(args);
+		m_object->m_active_state->m_layer = std::stoi(args);
 		break;
 	}
 	case command_e::icon:
 	{
-		m_object->m_icon = Application::instance().m_graph->load_texture(FileSystem::instance().m_resource_path + "Tiles\\" + args + ".bmp");
+		m_object->m_active_state->m_icon = Application::instance().m_graph->load_texture(FileSystem::instance().m_resource_path + "Tiles\\" + args + ".bmp");
 		break;
 	}
 	case command_e::tile_manager_single:
 	{
-		m_object->m_tile_manager = new TileManager_Single();
-		m_object->m_tile_manager->load_from_file(args, ObjectDirection_Down, 0);
+		m_object->m_active_state->m_tile_manager = new TileManager_Single();
+		m_object->m_active_state->m_tile_manager->load_from_file(args, ObjectDirection_Down, 0);
 		break;
 	}
 	case command_e::tile_manager_map:
 	{	
-		if (m_object->m_tile_manager == nullptr)
+		if (m_object->m_active_state->m_tile_manager == nullptr)
 		{
-			m_object->m_tile_manager = new TileManager_Map();
+			m_object->m_active_state->m_tile_manager = new TileManager_Map();
 		}
 		ObjectDirection dir;
 		int frame;
@@ -123,14 +144,14 @@ void GameObjectManager::parser(const std::string& command)
 		dir = static_cast<ObjectDirection>(std::stoi(args.substr(pos, found - pos)));
 		pos = found + 1;
 		frame = std::stoi(args.substr(pos));
-		m_object->m_tile_manager->load_from_file(name, dir, frame);
+		m_object->m_active_state->m_tile_manager->load_from_file(name, dir, frame);
 		break;
 	}
 	case command_e::tile_manager_rotating:
 	{
-		if (m_object->m_tile_manager == nullptr)
+		if (m_object->m_active_state->m_tile_manager == nullptr)
 		{
-			m_object->m_tile_manager = new TileManager_rotating();
+			m_object->m_active_state->m_tile_manager = new TileManager_rotating();
 		}
 		ObjectDirection dir;
 		std::string name;
@@ -140,7 +161,7 @@ void GameObjectManager::parser(const std::string& command)
 		pos = found + 1;
 		found = args.find(" ", pos);
 		dir = static_cast<ObjectDirection>(std::stoi(args.substr(pos, found - pos)));
-		m_object->m_tile_manager->load_from_file(name, dir, 0);
+		m_object->m_active_state->m_tile_manager->load_from_file(name, dir, 0);
 		break;
 	}
 	case command_e::light:
@@ -154,22 +175,22 @@ void GameObjectManager::parser(const std::string& command)
 		light->G = std::stoi(args.substr(pos, found - pos));
 		pos = found + 1;
 		light->B = std::stoi(args.substr(pos));
-		m_object->m_light = light;
+		m_object->m_active_state->m_light = light;
 		break;
 	}
 	case command_e::action_move:
 	{
-		m_object->m_actions.push_back(Application::instance().m_actions[action_e::move]);
+		m_object->m_active_state->m_actions.push_back(Application::instance().m_actions[action_e::move]);
 		break;
 	}
 	case command_e::property_permit_move:
 	{
-		m_object->m_properties.push_back(new GameObjectProperty(property_e::permit_move));
+		m_object->m_active_state->m_properties.push_back(new GameObjectProperty(property_e::permit_move));
 		break;
 	}
 	case command_e::property_permit_pick:
 	{
-		m_object->m_properties.push_back(new GameObjectProperty(property_e::permit_pick));
+		m_object->m_active_state->m_properties.push_back(new GameObjectProperty(property_e::permit_pick));
 		break;
 	}
 	case command_e::property_container:
@@ -185,12 +206,12 @@ void GameObjectManager::parser(const std::string& command)
 		x = std::stoi(args.substr(pos, found - pos));
 		pos = found + 1;
 		y = std::stoi(args.substr(pos));
-		m_object->m_properties.push_back(new Property_Container(x, y, name));
+		m_object->m_active_state->m_properties.push_back(new Property_Container(x, y, name));
 		break;
 	}
 	case command_e::property_strenght:
 	{
-		m_object->m_properties.push_back(new GameObjectParameter(property_e::strength, std::stof(args)));
+		m_object->m_active_state->m_properties.push_back(new GameObjectParameter(property_e::strength, std::stof(args)));
 		break;
 	}
 	}
@@ -201,6 +222,9 @@ game_clipboard::game_clipboard():m_item(nullptr){}
 void GameObjectManager::init()
 {
 	m_commands.insert(std::pair<std::string, command_e>("object", command_e::obj));
+	m_commands.insert(std::pair<std::string, command_e>("state_default", command_e::state_default));
+	m_commands.insert(std::pair<std::string, command_e>("state_on", command_e::state_on));
+	m_commands.insert(std::pair<std::string, command_e>("state_off", command_e::state_off));
 	m_commands.insert(std::pair<std::string, command_e>("size", command_e::size));
 	m_commands.insert(std::pair<std::string, command_e>("weight", command_e::weight));
 	m_commands.insert(std::pair<std::string, command_e>("layer", command_e::layer));
@@ -249,7 +273,17 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 		LOG(FATAL) << "Ёлемент `" << unit_name << "` отсутствует в m_items";
 	}
 	GameObject* config = m_items.find(unit_name)->second;
-	(*obj) = (*config);
+	obj->m_direction = config->m_direction;
+	obj->m_name = config->m_name;
+	obj->m_weight = config->m_weight;
+	Game_state* state;
+	for (std::list<Game_state*>::iterator item = config->m_state.begin(); item != config->m_state.end(); item++)
+	{
+		state = new Game_state();
+		obj->m_state.push_back(state);
+		(*state) = (*(*item));
+	}
+	obj->m_active_state = obj->m_state.front();
 	return obj;
 }
 
@@ -320,7 +354,7 @@ void Application::render()
 		if (m_clipboard.m_item)
 		{
 			glColor4d(1.0, 1.0, 1.0, 0.5);
-			glBindTexture(GL_TEXTURE_2D, m_clipboard.m_item->m_icon);
+			glBindTexture(GL_TEXTURE_2D, m_clipboard.m_item->m_active_state->m_icon);
 			m_graph->draw_sprite(mouse.x - 32, mouse.y - 32, mouse.x - 32, mouse.y + 32, mouse.x + 32, mouse.y + 32, mouse.x + 32, mouse.y - 32);
 			glDisable(GL_TEXTURE_2D);
 			glDisable(GL_BLEND);
@@ -375,6 +409,7 @@ void Application::initialize()
 	m_actions[action_e::cell_info] = new Action_CellInfo();
 	m_actions[action_e::set_motion_path] = new action_set_motion_path();
 	m_actions[action_e::pick] = new Action_pick();
+	m_actions[action_e::open] = new Action_open();
 	m_game_object_manager.init();
 
 	m_GUI->MapViewer = new GUI_MapViewer(this);
@@ -386,7 +421,7 @@ void Application::initialize()
 	m_GUI->MapViewer->m_map = new GameMap(dimension_t(200,200));
 	m_GUI->MapViewer->m_map->generate_level();
 	GameObject* obj = m_game_object_manager.new_object("elf");
-	obj->set_tile_direction(ObjectDirection_Left);
+	obj->set_direction(ObjectDirection_Left);
 	m_GUI->MapViewer->m_player = obj;
 
 	int index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
@@ -400,8 +435,8 @@ void Application::initialize()
 	rx = rand() % room->rect.w;
 	ry = rand() % room->rect.h;
 	obj = m_game_object_manager.new_object("snake");
-	obj->set_tile_direction(ObjectDirection_Left);
-	m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
+	obj->set_direction(ObjectDirection_Left);
+	//m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 
 	GUI_ActionManager* AMTextBox;
 	AMTextBox = new GUI_ActionManager(m_action_manager);
@@ -431,6 +466,9 @@ void Application::initialize()
 	ActionPanel->add_item_control(ActionButton);
 	ActionButton = new GUI_ActionButton();
 	ActionButton->m_action = m_actions[action_e::pick];
+	ActionPanel->add_item_control(ActionButton);
+	ActionButton = new GUI_ActionButton();
+	ActionButton->m_action = m_actions[action_e::open];
 	ActionPanel->add_item_control(ActionButton);
 	GUI_Layer* MenuLayer;
 	MenuLayer = new GUI_Layer();
@@ -581,8 +619,8 @@ Parameter* Application::command_select_location(GameObject* object)
 	Parameter* Result = nullptr;
 	if (object)
 	{
-		m_GUI->MapViewer->m_cursor_x = object->m_size.x;
-		m_GUI->MapViewer->m_cursor_y = object->m_size.y;
+		m_GUI->MapViewer->m_cursor_x = object->m_active_state->m_size.x;
+		m_GUI->MapViewer->m_cursor_y = object->m_active_state->m_size.y;
 	}
 	else
 	{
@@ -660,7 +698,7 @@ bool Application::command_open_inventory(GameObject*& Object)
 {
 	//MessageBox(NULL, "In_1", "", MB_OK);
 	bool Result = false;
-	Property_Container* Property = static_cast<Property_Container*>(Object->find_property(property_e::container));
+	Property_Container* Property = static_cast<Property_Container*>(Object->m_active_state->find_property(property_e::container));
 	if (Property != nullptr)
 	{
 		//MessageBox(NULL, "In_2", "", MB_OK);
@@ -697,9 +735,9 @@ void Application::command_set_pickup_item_visibility(bool _Visibility)
 
 bool Application::command_check_position(GameObject*& object, MapCell*& position, GameMap*& map)
 {
-	for (int i = 0; i<object->m_size.y; i++)
+	for (int i = 0; i<object->m_active_state->m_size.y; i++)
 	{
-		for (int j = 0; j<object->m_size.x; j++)
+		for (int j = 0; j<object->m_active_state->m_size.x; j++)
 		{
 			if (map->m_items[position->y + i][position->x - j] == nullptr){ return false; }
 			if (!map->m_items[position->y + i][position->x - j]->check_permit(property_e::permit_move, object))

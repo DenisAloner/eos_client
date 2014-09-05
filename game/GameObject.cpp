@@ -1,6 +1,45 @@
 #include "game/GameObject.h"
 #include "game/Action.h"
+#include "log.h"
 
+
+Game_state::Game_state()
+{
+	m_layer = 1;
+	m_light = nullptr;
+	m_tile_manager = nullptr;
+	m_icon = Application::instance().m_graph->m_no_image;
+}
+
+
+GameObjectProperty* Game_state::find_property(property_e kind)
+{
+	for (std::list<GameObjectProperty*>::iterator Current = m_properties.begin(); Current != m_properties.end(); Current++)
+	{
+		if ((*Current)->m_kind == kind)
+		{
+			return (*Current);
+		}
+	}
+	return nullptr;
+}
+
+Action* Game_state::find_action(action_e kind)
+{
+	for (std::list<Action*>::iterator Current = m_actions.begin(); Current != m_actions.end(); Current++)
+	{
+		if ((*Current)->m_kind == kind)
+		{
+			return (*Current);
+		}
+	}
+	return nullptr;
+}
+
+void Game_state::set_tile_size()
+{
+	m_tile_size = dimension_t(m_size.x, m_size.y + m_size.z);
+}
 
 Game_object_owner::Game_object_owner(){}
 
@@ -20,7 +59,7 @@ GameObjectProperty* MapCell::find_property(property_e kind, GameObject* excluded
 	{
 		if (excluded != (*item))
 		{
-			result = (*item)->find_property(kind);
+			result = (*item)->m_active_state->find_property(kind);
 			if (result != nullptr)
 			{
 				return result;
@@ -37,7 +76,7 @@ bool MapCell::check_permit(property_e kind, GameObject* excluded)
 	{
 		if (excluded != (*item))
 		{
-			result = (*item)->find_property(kind);
+			result = (*item)->m_active_state->find_property(kind);
 			if (result == nullptr)
 			{
 				return false;
@@ -62,46 +101,11 @@ void MapCell::set_path_info()
 
 GameObject::GameObject()
 {
-	m_layer = 1;
 	m_direction = ObjectDirection_Down;
 	m_selected = false;
-	m_light = nullptr;
-	m_tile_manager = nullptr;
+	m_active_state = nullptr;
 	m_weight = 0.0;
-	m_icon = Application::instance().m_graph->m_no_image;
 }
-
-
-//bool GameObject::ContainAction(Action* Action)
-//{
-//	return std::find(Actions.begin(), Actions.end(), 1)==Actions.end();
-//}
-
-
-GameObjectProperty* GameObject::find_property(property_e kind)
-{
-	for(std::list<GameObjectProperty*>::iterator Current=m_properties.begin();Current!=m_properties.end();Current++)
-	{
-		if((*Current)->m_kind==kind)
-		{
-			return (*Current);
-		}
-	}
-	return nullptr;
-}
-
-Action* GameObject::find_action(action_e kind)
-{
-	for(std::list<Action*>::iterator Current=m_actions.begin();Current!=m_actions.end();Current++)
-	{
-		if((*Current)->m_kind == kind)
-		{
-			return (*Current);
-		}
-	}
-	return nullptr;
-}
-
 
 void GameObject::turn()
 {
@@ -122,23 +126,35 @@ void GameObject::turn()
 	{
 		dir = ObjectDirection_Down;
 	}
-	set_tile_direction(dir);
+	set_direction(dir);
 }
 
-void GameObject::set_tile_size()
-{
-	m_tile_size = dimension_t(m_size.x, m_size.y + m_size.z);
-}
-
-
-void GameObject::set_tile_direction(ObjectDirection dir)
+void GameObject::set_direction(ObjectDirection dir)
 {
 	if (((m_direction == ObjectDirection_Left || m_direction == ObjectDirection_Right) && (dir == ObjectDirection_Up || dir == ObjectDirection_Down)) || ((dir == ObjectDirection_Left || dir == ObjectDirection_Right) && (m_direction == ObjectDirection_Up || m_direction == ObjectDirection_Down)))
 	{
-		m_size = game_object_size_t(m_size.y, m_size.x, m_size.z);
+		for (std::list<Game_state*>::iterator item = m_state.begin(); item != m_state.end(); item++)
+		{
+			(*item)->m_size = game_object_size_t((*item)->m_size.y, (*item)->m_size.x, (*item)->m_size.z);
+		}
 	}
-	set_tile_size();
+	for (std::list<Game_state*>::iterator item = m_state.begin(); item != m_state.end(); item++)
+	{
+		(*item)->set_tile_size();
+	}
 	m_direction = dir;
+}
+
+void GameObject::set_state(state_e state)
+{
+	for (std::list<Game_state*>::iterator item = m_state.begin(); item != m_state.end(); item++)
+	{
+		if ((*item)->m_kind == state)
+		{
+			m_active_state = (*item);
+			return;
+		}
+	}
 }
 
 MapCell* GameObject::cell(){

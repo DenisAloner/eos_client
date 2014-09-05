@@ -1,4 +1,5 @@
 object elf
+state_default
 size 1 2 5
 tile_manager_map no_tile 0 0
 tile_manager_map no_tile 0 1
@@ -21,6 +22,7 @@ property_container Мешок 2 4
 property_strength 8.0
 
 object snake
+state_default
 size 1 1 1
 tile_manager_map no_tile 0 0
 tile_manager_map no_tile 0 1
@@ -41,56 +43,74 @@ tile_manager_map snake_right_04 3 3
 action_move
 
 object floor
+state_default
 size 1 1 0
 tile_manager_single EoS_Floor_01
 property_permit_move
 layer 0
 
 object health potion
+state_default
 size 1 1 1
 icon health_potion
 tile_manager_single health_potion
 property_permit_pick
 
 object wall
+state_default
 size 1 1 4
 tile_manager_single EoS_Wall
 layer 2
 
 object dirt
+state_default
 size 1 1 0
 tile_manager_single Mud
 layer 2
 
 object torch
+state_default
 size 1 1 3
 tile_manager_single EoS_Torch
 light 80 80 80
 
 object red torch
+state_default
 size 1 1 3
 tile_manager_single EoS_Torch
 light 80 0 0
 
 object green torch
+state_default
 size 1 1 3
 tile_manager_single EoS_Torch
 light 0 80 0
 
 object blue torch
+state_default
 size 1 1 3
 tile_manager_single EoS_Torch
 light 0 0 80
 
 object door
+state_on
 size 5 1 4
 tile_manager_rotating door_down 0
 tile_manager_rotating door_left 1
 tile_manager_rotating no_tile 2
 tile_manager_rotating no_tile 3
 layer 2
+state_off
+size 5 1 0
+tile_manager_rotating door_close_down 0
+tile_manager_rotating door_close_left 1
+tile_manager_rotating no_tile 2
+tile_manager_rotating no_tile 3
+property_permit_move
+layer 2
 
 object chest
+state_default
 size 2 1 2
 weight 25.0
 tile_manager_rotating chest 0

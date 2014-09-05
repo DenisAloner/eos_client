@@ -156,7 +156,7 @@ bool ActionClass_Push::check(Parameter* parameter)
 	m_error = "";
 	Parameter_MoveObjectByUnit* p = static_cast<Parameter_MoveObjectByUnit*>(parameter);
 	MapCell* cell;
-	GameObjectParameter* prop = static_cast<GameObjectParameter*>(p->m_unit->find_property(property_e::strength));
+	GameObjectParameter* prop = static_cast<GameObjectParameter*>(p->m_unit->m_active_state->find_property(property_e::strength));
 	if (prop != nullptr)
 	{
 		if (prop->m_value * 10 < p->m_object->m_weight)
@@ -167,13 +167,13 @@ bool ActionClass_Push::check(Parameter* parameter)
 	}
 	else { return false; }
 	
-	if (abs(p->m_unit->cell()->x - p->m_object->cell()->x)<2 || abs(p->m_unit->cell()->x - p->m_unit->m_size.x + 1 - p->m_object->cell()->x)<2 || abs(p->m_unit->cell()->x - p->m_unit->m_size.x + 1 - (p->m_object->cell()->x - p->m_object->m_size.x + 1))<2 || abs(p->m_unit->cell()->x- (p->m_object->cell()->x - p->m_object->m_size.x + 1))<2)
+	if (abs(p->m_unit->cell()->x - p->m_object->cell()->x)<2 || abs(p->m_unit->cell()->x - p->m_unit->m_active_state->m_size.x + 1 - p->m_object->cell()->x)<2 || abs(p->m_unit->cell()->x - p->m_unit->m_active_state->m_size.x + 1 - (p->m_object->cell()->x - p->m_object->m_active_state->m_size.x + 1))<2 || abs(p->m_unit->cell()->x - (p->m_object->cell()->x - p->m_object->m_active_state->m_size.x + 1))<2)
 	{
-		if (abs(p->m_unit->cell()->y - p->m_object->cell()->y) < 2 || abs(p->m_unit->cell()->y + p->m_unit->m_size.y - 1 - p->m_object->cell()->y) < 2 || abs(p->m_unit->cell()->y+ p->m_unit->m_size.y - 1 - (p->m_object->cell()->y + p->m_object->m_size.y - 1)) < 2 || abs(p->m_unit->cell()->y - (p->m_object->cell()->y + p->m_object->m_size.y - 1)) < 2)
+		if (abs(p->m_unit->cell()->y - p->m_object->cell()->y) < 2 || abs(p->m_unit->cell()->y + p->m_unit->m_active_state->m_size.y - 1 - p->m_object->cell()->y) < 2 || abs(p->m_unit->cell()->y + p->m_unit->m_active_state->m_size.y - 1 - (p->m_object->cell()->y + p->m_object->m_active_state->m_size.y - 1)) < 2 || abs(p->m_unit->cell()->y - (p->m_object->cell()->y + p->m_object->m_active_state->m_size.y - 1)) < 2)
 		{
-			for (int i = 0; i < p->m_object->m_size.y; i++)
+			for (int i = 0; i < p->m_object->m_active_state->m_size.y; i++)
 			{
-				for (int j = 0; j < p->m_object->m_size.x; j++)
+				for (int j = 0; j < p->m_object->m_active_state->m_size.x; j++)
 				{
 					cell = p->m_map->m_items[p->m_place->y + i][p->m_place->x - j];
 					if (cell == nullptr){ return false; }
@@ -181,7 +181,7 @@ bool ActionClass_Push::check(Parameter* parameter)
 					{
 						if (p->m_object != (*item) && p->m_unit != (*item))
 						{
-							if ((*item)->find_property(property_e::permit_move) == nullptr)
+							if ((*item)->m_active_state->find_property(property_e::permit_move) == nullptr)
 							{
 								return false;
 							}
@@ -189,9 +189,9 @@ bool ActionClass_Push::check(Parameter* parameter)
 					}
 				}
 			}
-			for (int i = 0; i < p->m_unit->m_size.y; i++)
+			for (int i = 0; i < p->m_unit->m_active_state->m_size.y; i++)
 			{
-				for (int j = 0; j < p->m_unit->m_size.x; j++)
+				for (int j = 0; j < p->m_unit->m_active_state->m_size.x; j++)
 				{
 					cell = p->m_map->m_items[p->m_unit->cell()->y + (p->m_place->y - p->m_object->cell()->y) + i][p->m_unit->cell()->x + (p->m_place->x - p->m_object->cell()->x) - j];
 					if (cell == nullptr){ return false; }
@@ -199,7 +199,7 @@ bool ActionClass_Push::check(Parameter* parameter)
 					{
 						if (p->m_object != (*item) && p->m_unit != (*item))
 						{
-							if ((*item)->find_property(property_e::permit_move) == nullptr)
+							if ((*item)->m_active_state->find_property(property_e::permit_move) == nullptr)
 							{
 								return false;
 							}
@@ -580,6 +580,56 @@ std::string Action_pick::get_description(Parameter* parameter)
 {
 	Parameter_destination* p = static_cast<Parameter_destination*>(parameter);
 	std::string s("Поднять ");
+	s += p->m_object->m_name + ".";
+	return s;
+}
+
+Action_open::Action_open()
+{
+	m_kind = action_e::open;
+	m_icon = Application::instance().m_graph->m_actions[7];
+}
+
+void Action_open::interaction_handler()
+{
+	Action::interaction_handler();
+	Application::instance().m_message_queue.m_busy = true;
+	Parameter* result;
+	P_object* p = new P_object();
+	result = Application::instance().command_select_object_on_map();
+	if (result)
+	{
+		p->m_object = static_cast<P_object*>(result)->m_object;
+		std::string a = "Выбран ";
+		a.append(p->m_object->m_name);
+		a = a + ".";
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+	}
+	else
+	{
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_message_queue.m_busy = false;
+		return;
+	}
+	LOG(INFO) << p->m_object->m_name;
+	Application::instance().m_action_manager->add(new GameTask(this, p));
+	LOG(INFO) << "7";
+	Application::instance().m_message_queue.m_busy = false;
+}
+
+void Action_open::perfom(Parameter* parameter)
+{
+	P_object* p = static_cast<P_object*>(parameter);
+	if (check(p))
+	{
+		p->m_object->set_state(state_e::off);
+	}
+}
+
+std::string Action_open::get_description(Parameter* parameter)
+{
+	P_object* p = static_cast<P_object*>(parameter);
+	std::string s("Открыть ");
 	s += p->m_object->m_name + ".";
 	return s;
 }

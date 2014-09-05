@@ -93,7 +93,8 @@ enum action_e
 	open_inventory,
 	cell_info,
 	set_motion_path,
-	pick
+	pick,
+	open
 };
 
 enum property_e
@@ -103,6 +104,13 @@ enum property_e
 	permit_pick,
 	container,
 	strength
+};
+
+enum state_e
+{ 
+	default,
+	on,
+	off
 };
 
 enum ParameterKind

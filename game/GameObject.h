@@ -48,39 +48,50 @@ public:
 	void set_path_info();
 };
 
-class GameObject
+class Game_state
 {
 public:
 
+	state_e m_kind;
 	int m_layer;
-	std::string m_name;
-	game_object_size_t m_size;
-	float m_weight;
 
+	game_object_size_t m_size;
 	dimension_t m_tile_size;
-	light_t* m_light;
 	TileManager* m_tile_manager;
-	ObjectDirection m_direction;
-	bool m_selected;
-	Game_object_owner* m_owner;
+	light_t* m_light;
+	GLuint m_icon;
 
 	std::list<Action*> m_actions;
 	std::list<GameObjectProperty*> m_properties;
-	GLuint m_icon;
-
-	GameObject();
-
-	void Render(int x,int y)
-	{
-	}
 
 	virtual Action* find_action(action_e kind);
 	virtual GameObjectProperty* find_property(property_e kind);
 	virtual void set_tile_size();
-	virtual void set_tile_direction(ObjectDirection dir);
-	void turn();
-	MapCell* cell();
 
+	Game_state();
+
+};
+
+class GameObject
+{
+public:
+
+	std::string m_name;
+	float m_weight;
+	ObjectDirection m_direction;
+	bool m_selected;
+	Game_object_owner* m_owner;
+
+	Game_state* m_active_state;
+	std::list<Game_state*> m_state;
+
+	GameObject();
+
+	void set_direction(ObjectDirection dir);
+	void turn();
+	void set_state(state_e state);
+
+	MapCell* cell();
 
 };
 

@@ -24,8 +24,8 @@ void mapviewer_hint_area::render()
 	int by;
 	if (m_consider_object_size)
 	{
-		bx = m_object->m_size.x;
-		by = m_object->m_size.y;
+		bx = m_object->m_active_state->m_size.x;
+		by = m_object->m_active_state->m_size.y;
 	}
 	else
 	{
@@ -198,7 +198,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 					IsDraw = false;
 					if ((*Current)->cell()->y == m_map->m_items[y][x]->y)
 					{
-						object_size = (*Current)->m_tile_size;
+						object_size = (*Current)->m_active_state->m_tile_size;
 						dx = object_size.w + m_map->m_items[y][x]->x - (*Current)->cell()->x;
 						x0 = (px + gx)*m_tile_size_x - 1;
 						y0 = (m_tile_count_y - py - gy - object_size.h)*m_tile_size_y - 1;
@@ -213,7 +213,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 					if (IsDraw)
 					{
 						glUseProgram(Graph->m_tile_shader);
-						(*Current)->m_tile_manager->set_tile(tile, (*Current), Application::instance().m_timer->m_tick /7.0*3.0,dx);
+						(*Current)->m_active_state->m_tile_manager->set_tile(tile, (*Current), Application::instance().m_timer->m_tick / 7.0*3.0, dx);
 						GLuint Sprite = tile.unit;
 						glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 						glActiveTexture(GL_TEXTURE0);
@@ -222,12 +222,12 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 						Graph->set_uniform_vector(Graph->m_tile_shader, "light", light);
 						glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
 						Graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
-						if ((*Current)->m_layer == 1)
+						if ((*Current)->m_active_state->m_layer == 1)
 						{
 							glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_02, 0);
 							Graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
 						}
-						if ((*Current)->m_layer == 2)
+						if ((*Current)->m_active_state->m_layer == 2)
 						{
 							glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
 							glUseProgram(Graph->m_mask_shader);

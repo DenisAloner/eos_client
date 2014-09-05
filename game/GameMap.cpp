@@ -52,9 +52,9 @@ void GameMap::generate_room(void)
 void GameMap::add_object(GameObject* object, MapCell* cell)
 {
 	object->m_owner = cell;
-	for (int i = 0; i<object->m_size.y; i++)
+	for (int i = 0; i<object->m_active_state->m_size.y; i++)
 	{
-		for (int j = 0; j<object->m_size.x; j++)
+		for (int j = 0; j<object->m_active_state->m_size.x; j++)
 		{
 			m_items[cell->y + i][cell->x - j]->add_object(object);
 		}
@@ -63,9 +63,9 @@ void GameMap::add_object(GameObject* object, MapCell* cell)
 
 void GameMap::remove_object(GameObject* object)
 {
-	for (int i = 0; i<object->m_size.y; i++)
+	for (int i = 0; i<object->m_active_state->m_size.y; i++)
 	{
-		for (int j = 0; j<object->m_size.x; j++)
+		for (int j = 0; j<object->m_active_state->m_size.x; j++)
 		{
 			m_items[object->cell()->y + i][object->cell()->x - j]->m_items.remove(object);
 		}
@@ -400,7 +400,7 @@ void  GameMap::add_doors()
 					{
 						add_object(Application::instance().m_game_object_manager.new_object("wall"), m_items[i - 1][rect.x]);
 						GameObject* obj = Application::instance().m_game_object_manager.new_object("door");
-						obj->set_tile_direction(ObjectDirection_Left);
+						obj->set_direction(ObjectDirection_Left);
 						add_object(obj, m_items[i-6][rect.x]);
 						add_object(Application::instance().m_game_object_manager.new_object("wall"), m_items[i - 7][rect.x]);
 					}
@@ -428,7 +428,7 @@ void  GameMap::add_doors()
 					{
 						add_object(Application::instance().m_game_object_manager.new_object("wall"), m_items[i - 1][rect.x + rect.w]);
 						GameObject* obj = Application::instance().m_game_object_manager.new_object("door");
-						obj->set_tile_direction(ObjectDirection_Left);
+						obj->set_direction(ObjectDirection_Left);
 						add_object(obj, m_items[i - 6][rect.x + rect.w]);
 						add_object(Application::instance().m_game_object_manager.new_object("wall"), m_items[i - 7][rect.x + rect.w]);
 					}
@@ -639,13 +639,13 @@ void  GameMap::calculate_lighting()
 				{
 					lx = abs(x - 20);
 					ly = abs(y - 20);
-					c = (*Current)->m_light->R - m_coefficient[ly][lx];
+					c = (*Current)->m_active_state->m_light->R - m_coefficient[ly][lx];
 					if (c < 0){ c = 0; }
 					m_local_light[0][y][x].R = c;
-					c = (*Current)->m_light->G - m_coefficient[ly][lx];
+					c = (*Current)->m_active_state->m_light->G - m_coefficient[ly][lx];
 					if (c < 0){ c = 0; }
 					m_local_light[0][y][x].G = c;
-					c = (*Current)->m_light->B - m_coefficient[ly][lx];
+					c = (*Current)->m_active_state->m_light->B - m_coefficient[ly][lx];
 					if (c < 0){ c = 0; }
 					m_local_light[0][y][x].B = c;
 				}

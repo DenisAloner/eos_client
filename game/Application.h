@@ -67,6 +67,9 @@ public:
 	enum command_e
 	{
 		obj,
+		state_default,
+		state_on,
+		state_off,
 		size,
 		weight,
 		layer,
@@ -127,7 +130,7 @@ public:
 	GraphicalController* m_graph;
 	ActionManager* m_action_manager;
 
-	Action* m_actions[7];
+	Action* m_actions[8];
 
 	Event<WPARAM> key_press;
 	Event<MouseEventArgs> mouse_click;
