@@ -1,6 +1,7 @@
 #pragma once
 #include<iostream>
-#include<vector>
+#include <list>
+#include <vector>
 #include "GameMap.h"
 #include "GameObject.h"
 #include "Application.h"
@@ -9,55 +10,45 @@
 
 class GameMap;
 class GameObject;
+class MapCell;
 
-class Node
+struct Node
 {
-public:
-	Node(void);
-	~Node(void);
-};
+	MapCell* cell;
+	int g;
+	int h;
+	int f;
+	Node* parent;
 
-struct NODE
-{
-	int TotalCost;
-	int X, Y;
-	int StartCost;
-	int ParentX, ParentY;
-
+	Node(MapCell* c, int G, int H, Node* p = nullptr) : cell(c), g(G),h(H),parent(p),f(g+h) {}
 };
 
 class Path
 {
 private:
-	std::vector<NODE> OpenList, ClosedList;
+	std::list<Node*> OpenList, ClosedList;
 	
-	
-
 public:
-	int start_x, start_y;
-	int goal_x, goal_y;
+
+	MapCell* m_start;
+	MapCell* m_goal;
 	GameMap* m_map;
 
 	Path();
 	virtual ~Path();
-
-	void InsertIntoClosedList(int total_cost, int start_cost, int x, int y);
-	void InsertIntoOpenList(int x, int y);
-	std::vector<NODE> DeleteElement(std::vector<NODE> nodesList, int x, int y);
-	bool IsElementExits(int x, int y);
-	NODE MinNode(std::vector<NODE>);
-	void Create();
-	void ClearAll();
-	std::vector<NODE> BackTrack();
-	NODE GetNodeAt(int x, int y);
-
+	int manhattan(MapCell* A, MapCell* B);
+	Node* find_min();
+	std::vector<MapCell*>* get_path(MapCell* A, MapCell* B);
+	void insert_into_open(int x, int y, int dg, Node* p);
+	bool is_in_closed(MapCell* c);
+	Node* is_in_open(MapCell* c);
+	std::vector<MapCell*>* back(Node* c);
 };
 
 class AI
 {
 public:
 
-	std::vector<NODE> m_path;
 	Path m_path_creator;
 	GameObject* m_object;
 

@@ -91,7 +91,8 @@ void MapCell::set_path_info()
 	m_path_info = 0;
 	for (std::list<GameObject*>::iterator item = m_items.begin(); item != m_items.end(); item++)
 	{
-		if ((*item)->m_name != "floor" && (*item)->m_name != "door")
+		if (!(*item)->m_active_state->find_property(property_e::permit_move))
+		//if ((*item)->m_name != "floor" && (*item)->m_name != "door")
 		{
 			m_path_info = 1;
 			return;

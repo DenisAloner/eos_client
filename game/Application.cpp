@@ -429,14 +429,18 @@ void Application::initialize()
 	int rx = rand() % room->rect.w;
 	int ry = rand() % room->rect.h;
 	m_GUI->MapViewer->m_map->add_object(m_GUI->MapViewer->m_player, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
+
 	rx = rand() % room->rect.w;
 	ry = rand() % room->rect.h;
 	m_GUI->MapViewer->m_map->add_object(Application::instance().m_game_object_manager.new_object("chest"), m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
+
+	index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
+	room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);
 	rx = rand() % room->rect.w;
 	ry = rand() % room->rect.h;
 	obj = m_game_object_manager.new_object("snake");
 	obj->set_direction(ObjectDirection_Left);
-	//m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
+	m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 
 	GUI_ActionManager* AMTextBox;
 	AMTextBox = new GUI_ActionManager(m_action_manager);

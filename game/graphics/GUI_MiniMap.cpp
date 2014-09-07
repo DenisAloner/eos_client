@@ -54,7 +54,7 @@ void GUI_MiniMap::render_on_canvas()
 				}
 				if ((*obj)->m_name == "elf")
 				{
-					glColor4d(0.7, 0.0, 0.0, 1.0);
+					glColor4d(0.0, 0.7, 0.0, 1.0);
 				}
 				if ((*obj)->m_name == "door")
 				{
@@ -63,6 +63,10 @@ void GUI_MiniMap::render_on_canvas()
 				if ((*obj)->m_name == "torch")
 				{
 					glColor4d(0.9, 0.8, 0.0, 1.0);
+				}
+				if ((*obj)->m_name == "snake")
+				{
+					glColor4d(0.7, 0.0, 0.0, 1.0);
 				}
 				glBegin(GL_QUADS);
 				glVertex2d(x0, y0);
