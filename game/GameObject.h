@@ -36,6 +36,7 @@ public:
 	std::list<GameObject*> m_items;
 
 	unsigned int m_path_info;
+	bool m_closed;
 
 	light_t m_light;
 	light_t m_light_blur;

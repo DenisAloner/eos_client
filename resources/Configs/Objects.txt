@@ -42,6 +42,27 @@ tile_manager_map snake_right_03 3 2
 tile_manager_map snake_right_04 3 3
 action_move
 
+object bear
+state_default
+size 3 3 4
+tile_manager_map no_tile 0 0
+tile_manager_map no_tile 0 1
+tile_manager_map no_tile 0 2
+tile_manager_map no_tile 0 3
+tile_manager_map bear_left_01 1 0
+tile_manager_map bear_left_02 1 1
+tile_manager_map bear_left_03 1 2
+tile_manager_map bear_left_04 1 3
+tile_manager_map no_tile 2 0
+tile_manager_map no_tile 2 1
+tile_manager_map no_tile 2 2
+tile_manager_map no_tile 2 3
+tile_manager_map no_tile 3 0
+tile_manager_map no_tile 3 1
+tile_manager_map no_tile 3 2
+tile_manager_map no_tile 3 3
+action_move
+
 object floor
 state_default
 size 1 1 0

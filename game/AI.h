@@ -23,25 +23,42 @@ struct Node
 	Node(MapCell* c, int G, int H, Node* p = nullptr) : cell(c), g(G),h(H),parent(p),f(g+h) {}
 };
 
+class min_heap
+{
+private:
+
+	void sort_up(unsigned int index);
+	void sort_down(unsigned int index);
+
+public:
+	std::vector<Node*> m_items;
+	min_heap(void);
+
+	void push(Node* value);
+	Node* pop();
+	void edit(unsigned int index, int value);
+};
+
 class Path
 {
 private:
-	std::list<Node*> OpenList, ClosedList;
+
+	min_heap m_heap;
 	
 public:
 
 	MapCell* m_start;
 	MapCell* m_goal;
 	GameMap* m_map;
+	GameObject* m_object;
 
 	Path();
 	virtual ~Path();
 	int manhattan(MapCell* A, MapCell* B);
-	Node* find_min();
 	std::vector<MapCell*>* get_path(MapCell* A, MapCell* B);
 	void insert_into_open(int x, int y, int dg, Node* p);
 	bool is_in_closed(MapCell* c);
-	Node* is_in_open(MapCell* c);
+	int is_in_open(MapCell* c);
 	std::vector<MapCell*>* back(Node* c);
 };
 

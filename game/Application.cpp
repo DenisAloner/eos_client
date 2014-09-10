@@ -438,7 +438,7 @@ void Application::initialize()
 	room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);
 	rx = rand() % room->rect.w;
 	ry = rand() % room->rect.h;
-	obj = m_game_object_manager.new_object("snake");
+	obj = m_game_object_manager.new_object("bear");
 	obj->set_direction(ObjectDirection_Left);
 	m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 
