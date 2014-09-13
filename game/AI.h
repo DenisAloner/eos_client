@@ -7,6 +7,7 @@
 #include "Application.h"
 #include "ApplicationGUI.h"
 #include "ActionManager.h"
+#include "Game_algorithm.h"
 
 class GameMap;
 class GameObject;
@@ -41,9 +42,7 @@ public:
 
 class Path
 {
-private:
 
-	min_heap m_heap;
 	
 public:
 
@@ -51,6 +50,9 @@ public:
 	MapCell* m_goal;
 	GameMap* m_map;
 	GameObject* m_object;
+	game_object_size_t m_start_size;
+	game_object_size_t m_goal_size;
+	min_heap m_heap;
 
 	Path();
 	virtual ~Path();

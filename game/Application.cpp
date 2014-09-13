@@ -434,11 +434,17 @@ void Application::initialize()
 	ry = rand() % room->rect.h;
 	m_GUI->MapViewer->m_map->add_object(Application::instance().m_game_object_manager.new_object("chest"), m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 
-	index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
-	room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);
+	/*index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
+	room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);*/
 	rx = rand() % room->rect.w;
 	ry = rand() % room->rect.h;
 	obj = m_game_object_manager.new_object("bear");
+	obj->set_direction(ObjectDirection_Left);
+	m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
+
+	rx = rand() % room->rect.w;
+	ry = rand() % room->rect.h;
+	obj = m_game_object_manager.new_object("snake");
 	obj->set_direction(ObjectDirection_Left);
 	m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 
@@ -602,14 +608,20 @@ void Application::update()
 	m_update_mutex.lock();
 	if(!m_action_manager->m_items.empty())
 	{
-		GameTask* A;
-		A = m_action_manager->m_items.front();
-		A->m_action->perfom(A->m_parameter);
-		if (A->m_action->m_error != "")
+		for (std::map<GameObject*, std::list<GameTask*> >::iterator current = m_action_manager->m_items.begin(); current != m_action_manager->m_items.end(); current++)
 		{
-			m_GUI->DescriptionBox->add_item_control(new GUI_Text(A->m_action->m_error));
+			if (!current->second.empty())
+			{
+				GameTask* A;
+				A = current->second.front();
+				A->m_action->perfom(A->m_parameter);
+				if (A->m_action->m_error != "")
+				{
+					m_GUI->DescriptionBox->add_item_control(new GUI_Text(A->m_action->m_error));
+				}
+				m_action_manager->remove(current->first);
+			}
 		}
-		m_action_manager->remove();
 	}
 	m_GUI->MapViewer->m_map->calculate_lighting();
 	m_GUI->MapViewer->m_map->calculate_ai();

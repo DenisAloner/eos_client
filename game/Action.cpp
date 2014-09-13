@@ -84,7 +84,7 @@ void ActionClass_Move::interaction_handler()
 		return;
 	}
 	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
-	Application::instance().m_action_manager->add(new GameTask(this, p));
+	Application::instance().m_action_manager->add(p->m_object,new GameTask(this, p));
 	Application::instance().m_message_queue.m_busy = false;
 }
 
@@ -265,7 +265,7 @@ void ActionClass_Push::interaction_handler()
 		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 		return;
 	}
-	Application::instance().m_action_manager->add(new GameTask(this, p));
+	Application::instance().m_action_manager->add(p->m_unit, new GameTask(this, p));
 	Application::instance().m_message_queue.m_busy = false;
 	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 }
@@ -332,7 +332,7 @@ void ActionClass_Turn::interaction_handler()
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
-	Application::instance().m_action_manager->add(new GameTask(this, p));
+	Application::instance().m_action_manager->add(p->m_object,new GameTask(this, p));
 	Application::instance().m_message_queue.m_busy = false;
 }
 
@@ -464,7 +464,7 @@ void action_set_motion_path::interaction_handler()
 		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 		return;
 	}
-	p->m_map->bresenham_line(p->m_object->cell(), p->m_place, [p](MapCell* a) { Application::instance().m_action_manager->add(new GameTask(Application::instance().m_actions[0], new Parameter_Position(p->m_object,a,p->m_map))); });
+	p->m_map->bresenham_line(p->m_object->cell(), p->m_place, [p](MapCell* a) { Application::instance().m_action_manager->add(p->m_object, new GameTask(Application::instance().m_actions[0], new Parameter_Position(p->m_object, a, p->m_map))); });
 	Application::instance().m_message_queue.m_busy = false;
 	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 }
@@ -535,7 +535,7 @@ void Action_pick::interaction_handler()
 		Application::instance().m_clipboard.m_item = nullptr;
 		return;
 	}
-	Application::instance().m_action_manager->add(new GameTask(this, p));
+	Application::instance().m_action_manager->add(p->m_unit,new GameTask(this, p));
 	Application::instance().m_clipboard.m_item = nullptr;
 	Application::instance().m_message_queue.m_busy = false;
 }
@@ -611,9 +611,7 @@ void Action_open::interaction_handler()
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
-	LOG(INFO) << p->m_object->m_name;
-	Application::instance().m_action_manager->add(new GameTask(this, p));
-	LOG(INFO) << "7";
+	Application::instance().m_action_manager->add(Application::instance().m_GUI->MapViewer->m_player,new GameTask(this, p));
 	Application::instance().m_message_queue.m_busy = false;
 }
 

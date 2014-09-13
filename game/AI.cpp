@@ -172,7 +172,8 @@ std::vector<MapCell*>* Path::get_path(MapCell* A, MapCell* B){
 	while (!m_heap.m_items.empty())
 	{
 		current = m_heap.pop();
-		if (current->cell == m_goal)
+		if (Game_algorithm::check_distance(current->cell,m_start_size,m_goal,m_goal_size))
+		//if ((abs(current->cell->x - m_goal->x)<2 || abs(current->cell->x - (m_goal->x - (m_goal_size.x - 1)))<2 || abs((current->cell->x - (m_start_size.x - 1)) - m_goal->x)<2 || abs((current->cell->x - (m_start_size.x - 1)) - (m_goal->x - (m_goal_size.x - 1)))<2) && (abs(current->cell->y - m_goal->y)<2 || abs(current->cell->y - (m_goal->y + (m_goal_size.y - 1)))<2 || abs((current->cell->y + (m_start_size.y - 1)) - m_goal->y)<2 || abs((current->cell->y + (m_start_size.y - 1)) - (m_goal->y + (m_goal_size.y - 1)))<2))
 		{
 			return back(current);
 		}
@@ -200,6 +201,9 @@ AI::~AI()
 
 void AI::create()
 {
+	if (Game_algorithm::check_distance(static_cast<MapCell*>(m_object->m_owner), m_object->m_active_state->m_size, static_cast<MapCell*>(Application::instance().m_GUI->MapViewer->m_player->m_owner), Application::instance().m_GUI->MapViewer->m_player->m_active_state->m_size)){
+		return;
+	}
 	for (int y = 0; y < m_map->m_size.h; y++)
 	{
 		for (int x = 0; x < m_map->m_size.w; x++)
@@ -209,12 +213,12 @@ void AI::create()
 			{
 				m_map->m_items[y][x]->m_path_info = 0;
 			}
-				
 		}
 	}
 	MapCell* c = static_cast<MapCell*>(m_object->m_owner);
 	m_path_creator.m_map = m_map;
 	m_path_creator.m_object = m_object;
+	m_path_creator.m_start_size = m_object->m_active_state->m_size;
 	for (int i = 0; i < m_object->m_active_state->m_size.y; i++)
 	{
 		for (int j = 0; j < m_object->m_active_state->m_size.x; j++)
@@ -226,6 +230,7 @@ void AI::create()
 	m_path_creator.m_start->m_path_info = 0;
 	c = static_cast<MapCell*>(Application::instance().m_GUI->MapViewer->m_player->m_owner);
 	m_path_creator.m_goal = c;
+	m_path_creator.m_goal_size = Application::instance().m_GUI->MapViewer->m_player->m_active_state->m_size;
 	for (int i = 0; i < Application::instance().m_GUI->MapViewer->m_player->m_active_state->m_size.y; i++)
 	{
 		for (int j = 0; j < Application::instance().m_GUI->MapViewer->m_player->m_active_state->m_size.x; j++)
@@ -237,6 +242,7 @@ void AI::create()
 	path=m_path_creator.get_path(m_path_creator.m_start, m_path_creator.m_goal);
 	if (path)
 	{
+		LOG(INFO) << "Yes";
 		for (std::vector<MapCell*>::iterator item = path->begin(); item != path->end(); item++)
 		{
 			(*item)->m_path_info = 4;
@@ -246,6 +252,7 @@ void AI::create()
 		P->m_object = m_object;
 		P->m_place = (*path)[path->size()-2];
 		P->m_map = m_map;
-		Application::instance().m_action_manager->add(new GameTask(Application::instance().m_actions[action_e::move], P));
+		Application::instance().m_action_manager->add(m_object,new GameTask(Application::instance().m_actions[action_e::move], P));
 	}
+	m_path_creator.m_heap.m_items.clear();
 }

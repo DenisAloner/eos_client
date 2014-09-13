@@ -1,6 +1,7 @@
 #include "game/GameMap.h"
 #include "game/GameObject.h"
 #include "game/Application.h"
+#include "log.h"
 
 GameMap::GameMap(dimension_t size)
 {
@@ -896,6 +897,7 @@ void  GameMap::calculate_ai()
 			}
 		}
 		obj.m_object = (*Current);
+		LOG(INFO) << obj.m_object->m_name;
 		obj.create();
 	}
 }
