@@ -18,7 +18,6 @@
 #include <condition_variable>
 #include <map>
 
-
 class Action;
 class ActionManager;
 class GameObject;

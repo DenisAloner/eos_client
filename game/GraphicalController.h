@@ -33,7 +33,7 @@ public:
 	GLuint m_select;
 	GLuint m_font;
 	GLuint m_no_image;
-
+	GLuint m_blur;
 	std::list<frectangle_t> m_scissors;
 
 	GLuint m_FBO;

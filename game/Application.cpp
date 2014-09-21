@@ -625,6 +625,7 @@ void Application::update()
 	}
 	m_GUI->MapViewer->m_map->calculate_lighting();
 	m_GUI->MapViewer->m_map->calculate_ai();
+	m_GUI->MapViewer->m_player_fov->calculate(10, m_GUI->MapViewer->m_player, m_GUI->MapViewer->m_map);
 	Application::instance().m_GUI->MapViewer->update();
 	Application::instance().m_GUI->MapViewer->m_map->m_update = true;
 	m_update_mutex.unlock();

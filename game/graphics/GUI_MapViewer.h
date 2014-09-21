@@ -7,7 +7,7 @@
 #include "Application.h"
 #include "Action.h"
 #include "Parameter.h"
-
+#include "FOV.h"
 
 class Application;
 class Action;
@@ -17,8 +17,8 @@ class Parameter;
 class P_cell;
 class GameMap;
 class GameObject;
-
 class gui_mapviewer_hint;
+class FOV;
 
 class GUI_MapViewer : public GUI_Object
 { 
@@ -47,6 +47,7 @@ public:
 	int m_cursor_y;
 
 	GameObject* m_player;
+	FOV* m_player_fov;
 	GameMap* m_map;
 	GUI_Layer* m_GUI;
 
