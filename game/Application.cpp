@@ -420,34 +420,17 @@ void Application::initialize()
 	
 	m_GUI->MapViewer->m_map = new GameMap(dimension_t(200,200));
 	m_GUI->MapViewer->m_map->generate_level();
-	GameObject* obj = m_game_object_manager.new_object("elf");
-	obj->set_direction(ObjectDirection_Left);
-	m_GUI->MapViewer->m_player = obj;
+	
 
 	int index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
 	GameMap::block_t* room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);
 	int rx = rand() % room->rect.w;
 	int ry = rand() % room->rect.h;
-	m_GUI->MapViewer->m_map->add_object(m_GUI->MapViewer->m_player, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
-
-	rx = rand() % room->rect.w;
-	ry = rand() % room->rect.h;
-	m_GUI->MapViewer->m_map->add_object(Application::instance().m_game_object_manager.new_object("chest"), m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
-
-	/*index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
-	room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);*/
-	rx = rand() % room->rect.w;
-	ry = rand() % room->rect.h;
-	obj = m_game_object_manager.new_object("bear");
+	GameObject* obj = m_game_object_manager.new_object("elf");
 	obj->set_direction(ObjectDirection_Left);
-	m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
-
-	rx = rand() % room->rect.w;
-	ry = rand() % room->rect.h;
-	obj = m_game_object_manager.new_object("snake");
-	obj->set_direction(ObjectDirection_Left);
-	m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
-
+	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
+	m_GUI->MapViewer->m_player = new Player(obj, m_GUI->MapViewer->m_map);
+	
 	GUI_ActionManager* AMTextBox;
 	AMTextBox = new GUI_ActionManager(m_action_manager);
 	AMTextBox->m_position.x = 650;
@@ -501,6 +484,12 @@ void Application::initialize()
 	GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
 	GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), m_GUI->MapViewer);
 	MiniMap->add_item_control(mini_map);
+	MenuLayer->add(MiniMap);
+
+	MiniMap = new GUI_Window(300, 0, 400, 400, "Поле зрения");
+	GUI_FOV* fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), m_GUI->MapViewer->m_player->m_fov);
+	MiniMap->add_item_control(fov);
+
 	MenuLayer->add(m_GUI->Timer);
 	MenuLayer->add(MiniMap);
 	
@@ -575,6 +564,30 @@ void Application::initialize()
 		have it just play once) */
 	}
 
+	int ru;
+	for (int i = 0; i <15; i++){
+		index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
+		room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);
+		ru = rand() % 2;
+		rx = rand() % room->rect.w;
+		ry = rand() % room->rect.h;
+		switch (ru)
+		{
+		case 0:
+		{
+			obj = m_game_object_manager.new_object("snake");
+			break;
+		}
+		case 1:
+		{
+			obj = m_game_object_manager.new_object("bear");
+			break;
+		}
+		}
+		obj->set_direction(ObjectDirection_Left);
+		m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
+	}
+
 	m_ready = true;
 }
 
@@ -625,7 +638,7 @@ void Application::update()
 	}
 	m_GUI->MapViewer->m_map->calculate_lighting();
 	m_GUI->MapViewer->m_map->calculate_ai();
-	m_GUI->MapViewer->m_player_fov->calculate(10, m_GUI->MapViewer->m_player, m_GUI->MapViewer->m_map);
+	m_GUI->MapViewer->m_player->m_fov->calculate(20, m_GUI->MapViewer->m_player->m_object, m_GUI->MapViewer->m_map);
 	Application::instance().m_GUI->MapViewer->update();
 	Application::instance().m_GUI->MapViewer->m_map->m_update = true;
 	m_update_mutex.unlock();
@@ -786,7 +799,7 @@ void Application::process_game()
 			m_GUI->DescriptionBox->add_item_control(new GUI_Text("Ход - " + std::to_string(m_game_turn) + ".", new GUI_TextFormat(10, 19, RGBA_t(0.0, 0.8, 0.0, 1.0))));
 			m_game_turn += 1;
 		}
-		std::chrono::milliseconds Duration(250);
+		std::chrono::milliseconds Duration(50);
 		std::this_thread::sleep_for(Duration);
 	}
 }

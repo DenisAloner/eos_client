@@ -67,7 +67,7 @@ void ActionClass_Move::interaction_handler()
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
 	Parameter_Position* p = new Parameter_Position();
-	p->m_object = Application::instance().m_GUI->MapViewer->m_player;
+	p->m_object = Application::instance().m_GUI->MapViewer->m_player->m_object;
 	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_object, false));
 	p->m_map = Application::instance().m_GUI->MapViewer->m_map;
 	result = Application::instance().command_select_location(p->m_object);
@@ -231,7 +231,7 @@ void ActionClass_Push::interaction_handler()
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
 	Parameter_MoveObjectByUnit* p = new Parameter_MoveObjectByUnit();
-	p->m_unit = Application::instance().m_GUI->MapViewer->m_player;
+	p->m_unit = Application::instance().m_GUI->MapViewer->m_player->m_object;
 	p->m_map = Application::instance().m_GUI->MapViewer->m_map;
 	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_unit,true));
 	result = Application::instance().command_select_object_on_map();
@@ -448,7 +448,7 @@ void action_set_motion_path::interaction_handler()
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
 	Parameter_Position* p = new Parameter_Position();
-	p->m_object = Application::instance().m_GUI->MapViewer->m_player;
+	p->m_object = Application::instance().m_GUI->MapViewer->m_player->m_object;
 	p->m_map = Application::instance().m_GUI->MapViewer->m_map;
 	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_line(Application::instance().m_GUI->MapViewer, p->m_object->cell()));
 	result = Application::instance().command_select_location(p->m_object);
@@ -490,7 +490,7 @@ void Action_pick::interaction_handler()
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
 	Parameter_destination* p = new Parameter_destination();
-	p->m_unit = Application::instance().m_GUI->MapViewer->m_player;
+	p->m_unit = Application::instance().m_GUI->MapViewer->m_player->m_object;
 	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_unit, true));
 	P_object* object = Application::instance().command_select_transfer_source(p);
 	if (object)
@@ -611,7 +611,7 @@ void Action_open::interaction_handler()
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
-	Application::instance().m_action_manager->add(Application::instance().m_GUI->MapViewer->m_player,new GameTask(this, p));
+	Application::instance().m_action_manager->add(Application::instance().m_GUI->MapViewer->m_player->m_object,new GameTask(this, p));
 	Application::instance().m_message_queue.m_busy = false;
 }
 

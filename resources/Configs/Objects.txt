@@ -28,10 +28,10 @@ tile_manager_map no_tile 0 0
 tile_manager_map no_tile 0 1
 tile_manager_map no_tile 0 2
 tile_manager_map no_tile 0 3
-tile_manager_map snake_left_01 1 0
-tile_manager_map snake_left_02 1 1
-tile_manager_map snake_left_03 1 2
-tile_manager_map snake_left_04 1 3
+tile_manager_map snake_left_1_01 1 0
+tile_manager_map snake_left_1_01 1 1
+tile_manager_map snake_left_2_01 1 2
+tile_manager_map snake_left_2_01 1 3
 tile_manager_map no_tile 2 0
 tile_manager_map no_tile 2 1
 tile_manager_map no_tile 2 2

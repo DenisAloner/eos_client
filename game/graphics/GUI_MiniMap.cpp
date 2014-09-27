@@ -1,4 +1,5 @@
 #include "game\graphics\GUI_MiniMap.h"
+#include "log.h"
 
 
 GUI_MiniMap::GUI_MiniMap(position_t position, dimension_t size, GUI_MapViewer* map_viewer) :m_map_viewer(map_viewer)
@@ -111,4 +112,57 @@ void GUI_MiniMap::render(GraphicalController* Graph, int px, int py)
 	if (y1 > py + m_size.h){ y1 = py + m_size.h; }
 	glColor4d(0.0, 1.0, 0.5, 0.3);
 	Graph->draw_sprite(x0, y0, x0, y1, x1, y1, x1, y0);
+}
+
+GUI_FOV::GUI_FOV(position_t position, dimension_t size, FOV* fov) :m_fov(fov)
+{
+	m_position = position;
+	m_size = size;
+	m_cell_size = fdimension_t(static_cast<float>(m_size.w) / static_cast<float>(2 * m_fov->m_radius+1), static_cast<float>(m_size.h) / static_cast<float>(2 * m_fov->m_radius+1));
+}
+
+void GUI_FOV::render(GraphicalController* Graph, int px, int py)
+{
+	double x0, y0, x1, y1, x2, y2, x3, y3;
+	glDisable(GL_BLEND);
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_SCISSOR_TEST);
+	GLint default_fb = 0;
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &default_fb);
+	const GLuint fbo = Application::instance().m_graph->m_FBO;
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	for (int y = 0; y < 2 * m_fov->m_radius + 1; y++)
+	{
+		for (int x = 0; x < 2 * m_fov->m_radius + 1; x++)
+		{
+			x0 = px+ x*m_cell_size.w;
+			y0 = py + (2 * m_fov->m_radius+1 - y)*m_cell_size.h;
+			x1 = x0;
+			y1 = py + (2 * m_fov->m_radius+1 - (y + 1))*m_cell_size.h;
+			x2 = px + (x + 1)*m_cell_size.w;
+			y2 = y1;
+			x3 = x2;
+			y3 = y0;
+			glColor4d(0.0, 0.0, 0.0, 1.0);
+			if (m_fov->m_map[m_fov->m_middle - m_fov->m_radius + y][m_fov->m_middle - m_fov->m_radius + x].opaque){
+				if (m_fov->m_map[m_fov->m_middle - m_fov->m_radius + y][m_fov->m_middle - m_fov->m_radius + x].visible){
+					glColor4d(1.0, 0.0, 0.0, 1.0);
+				} else glColor4d(0.5, 0.0, 0.0, 1.0);
+			}
+			else {
+				if (m_fov->m_map[m_fov->m_middle - m_fov->m_radius + y][m_fov->m_middle - m_fov->m_radius + x].visible){
+					glColor4d(0.9, 0.9, 0.9, 1.0);
+				}
+				else glColor4d(0.5, 0.5, 0.5, 1.0);
+			}
+			glBegin(GL_QUADS);
+			glVertex2d(x0, y0);
+			glVertex2d(x1, y1);
+			glVertex2d(x2, y2);
+			glVertex2d(x3, y3);
+			glEnd();
+		}
+	}
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBindFramebuffer(GL_FRAMEBUFFER, default_fb);
 }

@@ -2,48 +2,59 @@
 #include <cmath>
 #include "GameObject.h"
 #include "GameMap.h"
+typedef unsigned int uint;
 
 class GameObject;
 class GameMap;
 
-struct fov_cell{
-	bool visible;
-	bool opaque;
-};
+//struct value{
+//	float angle;
+//	float shift_x;
+//	float shift_y;
+//	int distance;
+//};
 
-struct value{
-	float angle;
-	float shift_x;
-	float shift_y;
-	int distance;
-};
+//const int multipliers[4][2] = { { 1, 1 }, { 1, -1 }, { -1, -1 }, { -1, 1 } };
 
-const int max_size = 71;
-const int middle = (max_size - 1) >> 1;
-const int multipliers[4][2] = { { 1, 1 }, { 1, -1 }, { -1, -1 }, { -1, 1 } };
+//float calculate_angle(float x, float y);
 
-float calculate_angle(float x, float y);
-
-struct values{
-	value item[middle + 1][middle + 1];
-	values();
-};
+//struct values{
+//	value item[middle + 1][middle + 1];
+//	values();
+//};
 
 class FOV
 {
 public:
 
-	static const values m_values;
+	struct cell{
+		bool visible;
+		bool opaque;
+	};
 
-	fov_cell m_map[max_size][max_size];
+	static const int m_max_size = 101;
+	static const int m_middle = (m_max_size - 1) >> 1;
 
-	int m_radius;
-	int m_sqr_radius;
-	int m_quarter;
+	cell m_map[m_max_size][m_max_size];
 
 	FOV();
 
-	void quarter(int start_x, int start_y, float start_angle, float end_angle);
+	
+
+	//static const values m_values;
+
+	
+
+	int m_radius;
+	//int m_sqr_radius;
+	//int m_quarter;
+
+	/*void quarter(int start_x, int start_y, float start_angle, float end_angle);
+	void cast_shadow(int start_x, int start_y, float start_angle, float end_angle);
+	void light_quarter(int start_x, int start_y, float start_angle, float end_angle);*/
 	void calculate(int radius, GameObject* unit, GameMap* map);
+	void cast_light(uint x, uint y, uint radius, uint row, float start_slope, float end_slope, uint xx, uint xy, uint yx, uint yy);
+	void do_fov(uint x, uint y, uint radius);
+
 };
 

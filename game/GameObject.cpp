@@ -86,20 +86,6 @@ bool MapCell::check_permit(property_e kind, GameObject* excluded)
 	return true;
 }
 
-void MapCell::set_path_info()
-{
-	m_path_info = 0;
-	for (std::list<GameObject*>::iterator item = m_items.begin(); item != m_items.end(); item++)
-	{
-		if (!(*item)->m_active_state->find_property(property_e::permit_move))
-		//if ((*item)->m_name != "floor" && (*item)->m_name != "door")
-		{
-			m_path_info = 1;
-			return;
-		}
-	}
-}
-
 GameObject::GameObject()
 {
 	m_direction = ObjectDirection_Down;
@@ -160,6 +146,12 @@ void GameObject::set_state(state_e state)
 
 MapCell* GameObject::cell(){
 	return static_cast<MapCell*>(m_owner);
+}
+
+Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
+{
+	m_fov = new FOV();
+	m_fov->calculate(20, m_object, m_map);
 }
 
 GameObjectProperty::GameObjectProperty(property_e _kind = property_e::none) : m_kind(_kind)

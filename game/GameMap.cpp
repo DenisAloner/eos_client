@@ -889,13 +889,6 @@ void  GameMap::calculate_ai()
 	obj.m_map = this;
 	for (std::list<GameObject*>::iterator Current = m_ai.begin(); Current != m_ai.end(); Current++)
 	{
-		for (int y = 0; y < m_size.h; y++)
-		{
-			for (int x = 0; x < m_size.w; x++)
-			{
-				m_items[y][x]->set_path_info();
-			}
-		}
 		obj.m_object = (*Current);
 		LOG(INFO) << obj.m_object->m_name;
 		obj.create();

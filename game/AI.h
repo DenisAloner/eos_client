@@ -8,20 +8,30 @@
 #include "ApplicationGUI.h"
 #include "ActionManager.h"
 #include "Game_algorithm.h"
+#include "FOV.h"
 
 class GameMap;
 class GameObject;
 class MapCell;
+class FOV;
+
+struct Path_cell
+{
+	int state;
+	bool closed;
+	position_t pos;
+};
+
 
 struct Node
 {
-	MapCell* cell;
+	Path_cell* cell;
 	int g;
 	int h;
 	int f;
 	Node* parent;
 
-	Node(MapCell* c, int G, int H, Node* p = nullptr) : cell(c), g(G),h(H),parent(p),f(g+h) {}
+	Node(Path_cell* c, int G, int H, Node* p = nullptr) : cell(c), g(G), h(H), parent(p), f(g + h) {}
 };
 
 class min_heap
@@ -43,34 +53,49 @@ public:
 class Path
 {
 
-	
 public:
 
-	MapCell* m_start;
-	MapCell* m_goal;
-	GameMap* m_map;
-	GameObject* m_object;
+	static Path& instance()
+	{
+		static Path Singleton;
+		return Singleton;
+	}
+
+	static const int m_max_size = 101;
+	static const int m_middle = (m_max_size - 1) >> 1;
+
+	Path_cell m_map[m_max_size][m_max_size];
+	GameObject* m_unit;
+	GameMap* m_game_map;
+	Path_cell* m_start_cell;
+	Path_cell* m_goal_cell;
 	game_object_size_t m_start_size;
 	game_object_size_t m_goal_size;
 	min_heap m_heap;
 
-	Path();
-	virtual ~Path();
-	int manhattan(MapCell* A, MapCell* B);
-	std::vector<MapCell*>* get_path(MapCell* A, MapCell* B);
+	void calculate(GameMap* map, GameObject* object, GameObject* goal, int radius);
+	int manhattan(Path_cell* a, Path_cell* b);
+	std::vector<MapCell*>* get_path();
 	void insert_into_open(int x, int y, int dg, Node* p);
-	bool is_in_closed(MapCell* c);
-	int is_in_open(MapCell* c);
+	int is_in_open(Path_cell* c);
 	std::vector<MapCell*>* back(Node* c);
+
+private:
+
+	Path();
+	Path(const Path& root);
+	Path& operator=(const Path&);
 };
 
 class AI
 {
 public:
 
-	Path m_path_creator;
+	FOV* m_fov;
 	GameObject* m_object;
 
+
+	GameObject* find_goal();
 	void create();
 
 	GameMap* m_map;

@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <Application.h>
 #include "GameObjectProperty.h"
+#include "FOV.h"
 
 class GameObjectProperty;
 class Game_object_owner;
@@ -36,7 +37,6 @@ public:
 	std::list<GameObject*> m_items;
 
 	unsigned int m_path_info;
-	bool m_closed;
 
 	light_t m_light;
 	light_t m_light_blur;
@@ -46,7 +46,6 @@ public:
 	void add_object(GameObject* Object);
 	virtual GameObjectProperty* find_property(property_e kind, GameObject* excluded);
 	bool check_permit(property_e kind, GameObject* excluded);
-	void set_path_info();
 };
 
 class Game_state
@@ -96,6 +95,17 @@ public:
 
 };
 
+class Player
+{
+public:
+
+	GameObject* m_object;
+	GameMap* m_map;
+	FOV* m_fov;
+	Player(GameObject* object, GameMap* map);
+
+};
+
 class GameObjectProperty
 {
 public:
@@ -134,5 +144,7 @@ public:
 	~Property_Container();
 
 };
+
+
 
 #endif //GAMEOBJECT_H

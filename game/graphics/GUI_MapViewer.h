@@ -19,6 +19,7 @@ class GameMap;
 class GameObject;
 class gui_mapviewer_hint;
 class FOV;
+class Player;
 
 class GUI_MapViewer : public GUI_Object
 { 
@@ -46,8 +47,7 @@ public:
 	int m_cursor_x;
 	int m_cursor_y;
 
-	GameObject* m_player;
-	FOV* m_player_fov;
+	Player* m_player;
 	GameMap* m_map;
 	GUI_Layer* m_GUI;
 

@@ -91,22 +91,60 @@ Path::Path()
 
 }
 
-Path::~Path()
+void Path::calculate(GameMap* map, GameObject* object, GameObject* goal, int radius)
 {
-
+	for (int y = m_middle - radius; y < m_middle + radius + 1; y++)
+	{
+		for (int x = m_middle - radius; x < m_middle + radius + 1; x++)
+		{
+			m_map[y][x].closed = false;
+			m_map[y][x].state = 1;
+			m_map[y][x].pos.y = y;
+			m_map[y][x].pos.x = x;
+		}
+	}
+	Path_cell* pc;
+	MapCell* mc;
+	MapCell* c2;
+	m_game_map = map;
+	m_unit = object;
+	m_start_cell = &m_map[m_middle][m_middle];
+	m_start_size = object->m_active_state->m_size;
+	mc = static_cast<MapCell*>(object->m_owner);
+	c2 = static_cast<MapCell*>(goal->m_owner);
+	m_goal_cell = &m_map[c2->y - mc->y + m_middle][c2->x - mc->x +m_middle];
+	m_goal_size = goal->m_active_state->m_size;
+	for (int y = -radius; y < radius + 1; y++)
+	{
+		if ((object->cell()->y + y >= 0) && (object->cell()->y + y < map->m_size.h))
+		{
+			for (int x = -radius; x < radius + 1; x++)
+			{
+				if ((object->cell()->x + x >= 0) && (object->cell()->x + x < map->m_size.w))
+				{
+					pc = &m_map[m_middle + y][m_middle + x];
+					mc = map->m_items[object->cell()->y + y][object->cell()->x + x];
+					pc->state = 0;
+					for (std::list<GameObject*>::iterator item = mc->m_items.begin(); item != mc->m_items.end(); item++)
+					{
+						if ((!(*item)->m_active_state->find_property(property_e::permit_move)) && ((*item) != object) && ((*item) != goal))
+						{
+							pc->state = 1;
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 
-int Path::manhattan(MapCell* A, MapCell* B) {
-	return abs(A->x - B->x) + abs(A->y - B->y);
+int Path::manhattan(Path_cell* a, Path_cell* b) {
+	return abs(a->pos.x - b->pos.x) + abs(a->pos.y - b->pos.y);
 }
 
-bool Path::is_in_closed(MapCell* c)
-{
-	return c->m_closed;
-}
-
-int Path::is_in_open(MapCell* c)
+int Path::is_in_open(Path_cell* c)
 {
 	for (int i = 0; i < m_heap.m_items.size();i++)
 	{
@@ -120,13 +158,13 @@ int Path::is_in_open(MapCell* c)
 
 void Path::insert_into_open(int x, int y, int dg, Node* p)
 {
-	for (int i = 0; i < m_object->m_active_state->m_size.y; i++)
+	for (int i = 0; i < m_start_size.y; i++)
 	{
-		for (int j = 0; j < m_object->m_active_state->m_size.x; j++)
+		for (int j = 0; j < m_start_size.x; j++)
 		{
-			if (x - j >= 0 && y + i >= 0 && x - j < m_map->m_size.w&&y + i < m_map->m_size.h)
+			if (x - j >= 0 && y + i >= 0 && x - j < m_max_size&&y + i < m_max_size)
 			{
-				if (m_map->m_items[y + i][x - j]->m_path_info != 0)
+				if (m_map[y + i][x - j].state != 0)
 				{
 					return;
 				}
@@ -134,19 +172,19 @@ void Path::insert_into_open(int x, int y, int dg, Node* p)
 			else return;
 		}
 	}
-	MapCell* c = m_map->m_items[y][x];
-	if (!is_in_closed(c))
+	Path_cell* c = &m_map[y][x];
+	if (!c->closed)
 	{
 		int n = is_in_open(c);
 		if (n == -1)
 		{
-			m_heap.push(new Node(c, p->g + dg, manhattan(c, m_goal) * 10, p));
+			m_heap.push(new Node(c, p->g + dg, manhattan(c, m_goal_cell) * 10, p));
 		}
 		else {
 			if (p->g + dg < m_heap.m_items[n]->g){
 				m_heap.m_items[n]->parent = p;
 				m_heap.m_items[n]->g = p->g + dg;
-				m_heap.m_items[n]->h = manhattan(m_heap.m_items[n]->cell, m_goal) * 10;
+				m_heap.m_items[n]->h = manhattan(m_heap.m_items[n]->cell, m_goal_cell) * 10;
 				m_heap.edit(n, m_heap.m_items[n]->g + m_heap.m_items[n]->h);
 			}
 		}
@@ -155,43 +193,46 @@ void Path::insert_into_open(int x, int y, int dg, Node* p)
 
 std::vector<MapCell*>* Path::back(Node* c)
 {
+	MapCell* cell = static_cast<MapCell*>(m_unit->m_owner);
 	std::vector<MapCell*>* result = new std::vector<MapCell*>();
 	Node* current=c;
 	while (current)
 	{
-		result->push_back(current->cell);
+		result->push_back(m_game_map->m_items[cell->y + current->cell->pos.y - m_middle][cell->x + current->cell->pos.x - m_middle]);
 		current = current->parent;
 	}
 	return result;
 }
 
-std::vector<MapCell*>* Path::get_path(MapCell* A, MapCell* B){
+std::vector<MapCell*>* Path::get_path(){
 	Node* current;
-	m_heap.push(new Node(A,0,manhattan(A,B)*10));
-	bool closed;
+	m_heap.push(new Node(m_start_cell, 0, manhattan(m_start_cell, m_goal_cell) * 10));
+	LOG(INFO) << m_start_cell->pos.x << " " << m_start_cell->pos.y;
+	LOG(INFO) << m_goal_cell->pos.x << " " << m_goal_cell->pos.y;
 	while (!m_heap.m_items.empty())
 	{
 		current = m_heap.pop();
-		if (Game_algorithm::check_distance(current->cell,m_start_size,m_goal,m_goal_size))
-		//if ((abs(current->cell->x - m_goal->x)<2 || abs(current->cell->x - (m_goal->x - (m_goal_size.x - 1)))<2 || abs((current->cell->x - (m_start_size.x - 1)) - m_goal->x)<2 || abs((current->cell->x - (m_start_size.x - 1)) - (m_goal->x - (m_goal_size.x - 1)))<2) && (abs(current->cell->y - m_goal->y)<2 || abs(current->cell->y - (m_goal->y + (m_goal_size.y - 1)))<2 || abs((current->cell->y + (m_start_size.y - 1)) - m_goal->y)<2 || abs((current->cell->y + (m_start_size.y - 1)) - (m_goal->y + (m_goal_size.y - 1)))<2))
+		if (Game_algorithm::check_distance(&current->cell->pos,m_start_size,&m_goal_cell->pos,m_goal_size))
 		{
+			LOG(INFO) << "New step";
 			return back(current);
 		}
-		current->cell->m_closed = true;
-		insert_into_open(current->cell->x + 1, current->cell->y, 10, current);
-		insert_into_open(current->cell->x - 1, current->cell->y, 10, current);
-		insert_into_open(current->cell->x, current->cell->y + 1, 10, current);
-		insert_into_open(current->cell->x, current->cell->y - 1, 10, current);
-		insert_into_open(current->cell->x + 1, current->cell->y+1, 14, current);
-		insert_into_open(current->cell->x + 1, current->cell->y-1, 14, current);
-		insert_into_open(current->cell->x - 1, current->cell->y + 1, 14, current);
-		insert_into_open(current->cell->x - 1, current->cell->y - 1, 14, current);
+		current->cell->closed = true;
+		insert_into_open(current->cell->pos.x + 1, current->cell->pos.y, 10, current);
+		insert_into_open(current->cell->pos.x - 1, current->cell->pos.y, 10, current);
+		insert_into_open(current->cell->pos.x, current->cell->pos.y + 1, 10, current);
+		insert_into_open(current->cell->pos.x, current->cell->pos.y - 1, 10, current);
+		insert_into_open(current->cell->pos.x + 1, current->cell->pos.y + 1, 14, current);
+		insert_into_open(current->cell->pos.x + 1, current->cell->pos.y - 1, 14, current);
+		insert_into_open(current->cell->pos.x - 1, current->cell->pos.y + 1, 14, current);
+		insert_into_open(current->cell->pos.x - 1, current->cell->pos.y - 1, 14, current);
 	}
 	return nullptr;
 }
 
 AI::AI()
 {
+	m_fov = new FOV();
 }
 
 
@@ -199,60 +240,63 @@ AI::~AI()
 {
 }
 
-void AI::create()
+GameObject* AI::find_goal()
 {
-	if (Game_algorithm::check_distance(static_cast<MapCell*>(m_object->m_owner), m_object->m_active_state->m_size, static_cast<MapCell*>(Application::instance().m_GUI->MapViewer->m_player->m_owner), Application::instance().m_GUI->MapViewer->m_player->m_active_state->m_size)){
-		return;
-	}
-	for (int y = 0; y < m_map->m_size.h; y++)
+	m_fov->calculate(20, m_object, m_map);
+	FOV::cell* fc;
+	MapCell* mc;
+	for (int y = -m_fov->m_radius; y < m_fov->m_radius + 1; y++)
 	{
-		for (int x = 0; x < m_map->m_size.w; x++)
+		if ((m_object->cell()->y + y >= 0) && (m_object->cell()->y + y < m_map->m_size.h))
 		{
-			m_map->m_items[y][x]->m_closed = false;
-			if (m_map->m_items[y][x]->m_path_info == 4)
+			for (int x = -m_fov->m_radius; x < m_fov->m_radius + 1; x++)
 			{
-				m_map->m_items[y][x]->m_path_info = 0;
+				if ((m_object->cell()->x + x >= 0) && (m_object->cell()->x + x < m_map->m_size.w))
+				{
+					fc = &m_fov->m_map[m_fov->m_middle + y][m_fov->m_middle + x];
+					if ((!fc->opaque) && fc->visible)
+					{
+						mc = m_map->m_items[m_object->cell()->y + y][m_object->cell()->x + x];
+						for (std::list<GameObject*>::iterator item = mc->m_items.begin(); item != mc->m_items.end(); item++)
+						{
+							if ((*item) == Application::instance().m_GUI->MapViewer->m_player->m_object)
+							{
+								return Application::instance().m_GUI->MapViewer->m_player->m_object;
+							}
+						}
+					}
+				}
 			}
 		}
 	}
-	MapCell* c = static_cast<MapCell*>(m_object->m_owner);
-	m_path_creator.m_map = m_map;
-	m_path_creator.m_object = m_object;
-	m_path_creator.m_start_size = m_object->m_active_state->m_size;
-	for (int i = 0; i < m_object->m_active_state->m_size.y; i++)
-	{
-		for (int j = 0; j < m_object->m_active_state->m_size.x; j++)
-		{
-			m_map->m_items[c->y + i][c->x - j]->m_path_info = 0;
+	return nullptr;
+}
+
+void AI::create()
+{
+
+		GameObject* goal = find_goal();
+		if (goal == nullptr) {
+			return;
 		}
-	}
-	m_path_creator.m_start = c;
-	m_path_creator.m_start->m_path_info = 0;
-	c = static_cast<MapCell*>(Application::instance().m_GUI->MapViewer->m_player->m_owner);
-	m_path_creator.m_goal = c;
-	m_path_creator.m_goal_size = Application::instance().m_GUI->MapViewer->m_player->m_active_state->m_size;
-	for (int i = 0; i < Application::instance().m_GUI->MapViewer->m_player->m_active_state->m_size.y; i++)
-	{
-		for (int j = 0; j < Application::instance().m_GUI->MapViewer->m_player->m_active_state->m_size.x; j++)
+		else
 		{
-			m_map->m_items[c->y + i][c->x - j]->m_path_info = 0;
+			LOG(INFO) << "VISIBLE";
 		}
-	}
-	std::vector<MapCell*>* path;
-	path=m_path_creator.get_path(m_path_creator.m_start, m_path_creator.m_goal);
-	if (path)
-	{
-		LOG(INFO) << "Yes";
-		for (std::vector<MapCell*>::iterator item = path->begin(); item != path->end(); item++)
+		if (Game_algorithm::check_distance(static_cast<MapCell*>(m_object->m_owner), m_object->m_active_state->m_size, static_cast<MapCell*>(goal->m_owner), goal->m_active_state->m_size)){
+			return;
+		}
+		Path::instance().calculate(m_map, m_object, goal, 20);
+		std::vector<MapCell*>* path;
+		path = Path::instance().get_path();
+		if (path)
 		{
-			(*item)->m_path_info = 4;
+			Parameter_Position* P;
+			P = new Parameter_Position();
+			P->m_object = m_object;
+			P->m_place = (*path)[path->size() - 2];
+			P->m_map = m_map;
+			Application::instance().m_action_manager->add(m_object, new GameTask(Application::instance().m_actions[action_e::move], P));
 		}
-		Parameter_Position* P;
-		P = new Parameter_Position();
-		P->m_object = m_object;
-		P->m_place = (*path)[path->size()-2];
-		P->m_map = m_map;
-		Application::instance().m_action_manager->add(m_object,new GameTask(Application::instance().m_actions[action_e::move], P));
-	}
-	m_path_creator.m_heap.m_items.clear();
+		Path::instance().m_heap.m_items.clear();
 }
