@@ -83,7 +83,8 @@ public:
 		property_permit_move,
 		property_permit_pick,
 		property_container,
-		property_strenght
+		property_strenght,
+		property_health
 	};
 
 	typedef std::map<std::string, GameObject*> items_t;
@@ -131,7 +132,7 @@ public:
 	GraphicalController* m_graph;
 	ActionManager* m_action_manager;
 
-	Action* m_actions[8];
+	Action* m_actions[9];
 
 	AI_manager* m_ai_manager;
 

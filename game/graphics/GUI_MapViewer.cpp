@@ -2,6 +2,7 @@
 #include "game/graphics/GUI_Layer.h"
 #include "game/graphics/GUI_PopMenu.h"
 #include "game/ActionManager.h"
+#include "log.h"
 
 
 gui_mapviewer_hint::gui_mapviewer_hint(GUI_MapViewer* owner) :m_owner(owner){}
@@ -230,6 +231,42 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 								Graph->set_uniform_vector(Graph->m_tile_shader, "light", light);
 								glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
 								Graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
+								if ((*Current)->cell()->x == m_map->m_items[y][x]->x)
+								{
+									Game_object_feature* feat = static_cast<Game_object_feature*>((*Current)->m_active_state->find_property(property_e::health));
+									if (feat)
+									{
+										float x0, y0, x1, y1, x2, y2, x3, y3;
+										float h = feat->m_value / 100.0;
+										x0 = (px + gx - object_size.w / 2.0 + 1)*m_tile_size_x - 32;
+										y0 = (m_tile_count_y - py - gy - object_size.h)*m_tile_size_y-8;
+										x1 = x0;
+										y1 = (m_tile_count_y - py - gy - object_size.h)*m_tile_size_y;
+										x2 = (px + gx - object_size.w / 2.0 + 1)*m_tile_size_x + 32;
+										y2 = y1;
+										x3 = x2;
+										y3 = y0;
+										glUseProgram(0);
+										glDisable(GL_TEXTURE_2D);
+										glColor4d(1.0-h, h, 0.0, 0.5);
+										glBegin(GL_LINES);
+										glVertex2d(x0, y0);
+										glVertex2d(x1, y1);
+										glVertex2d(x1, y1);
+										glVertex2d(x2, y2);
+										glVertex2d(x2, y2);
+										glVertex2d(x3, y3);
+										glVertex2d(x3, y3);
+										glVertex2d(x0, y0);
+										glEnd();
+										x0 = (px + gx - object_size.w / 2.0 + 1)*m_tile_size_x - 32;
+										x1 = x0;
+										x2 = x0 + (h) * 64;
+										x3 = x2;
+										Graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+										glEnable(GL_TEXTURE_2D);
+									}
+								}
 								if ((*Current)->m_active_state->m_layer == 1)
 								{
 									glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_02, 0);

@@ -21,6 +21,7 @@ tile_manager_map elf_right_04 3 3
 action_move
 property_container Мешок 2 4
 property_strength 8.0
+property_health 100
 
 object snake
 state_default
@@ -43,6 +44,7 @@ tile_manager_map snake_right_02 3 1
 tile_manager_map snake_right_03 3 2
 tile_manager_map snake_right_04 3 3
 action_move
+property_health 100
 
 object bear
 state_default
@@ -65,6 +67,7 @@ tile_manager_map no_tile 3 1
 tile_manager_map no_tile 3 2
 tile_manager_map no_tile 3 3
 action_move
+property_health 100
 
 object ghost
 state_default
@@ -74,6 +77,7 @@ tile_manager_rotating no_tile 0
 tile_manager_rotating ghost_left 1
 tile_manager_rotating no_tile 2
 tile_manager_rotating no_tile 3
+property_health 100
 
 object floor
 state_default

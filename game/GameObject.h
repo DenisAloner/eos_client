@@ -137,6 +137,15 @@ public:
 
 };
 
+class Game_object_feature : public GameObjectProperty
+{
+public:
+
+	Game_object_feature(property_e kind, int value);
+	int m_value;
+
+};
+
 class Inventory_cell: public Game_object_owner
 {
 public:

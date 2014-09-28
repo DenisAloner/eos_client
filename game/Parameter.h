@@ -104,4 +104,14 @@ public:
 
 };
 
+class P_unit_interaction : public Parameter
+{
+public:
+
+	GameObject* m_unit;
+	GameObject* m_object;
+
+	P_unit_interaction();
+};
+
 #endif //TPARAMETER_H

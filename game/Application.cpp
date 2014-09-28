@@ -228,6 +228,11 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->m_active_state->m_properties.push_back(new GameObjectParameter(property_e::strength, std::stof(args)));
 		break;
 	}
+	case command_e::property_health:
+	{
+		m_object->m_active_state->m_properties.push_back(new Game_object_feature(property_e::health, std::stoi(args)));
+		break;
+	}
 	}
 }
 
@@ -253,6 +258,7 @@ void GameObjectManager::init()
 	m_commands.insert(std::pair<std::string, command_e>("property_permit_pick", command_e::property_permit_pick));
 	m_commands.insert(std::pair<std::string, command_e>("property_container", command_e::property_container));
 	m_commands.insert(std::pair<std::string, command_e>("property_strength", command_e::property_strenght));
+	m_commands.insert(std::pair<std::string, command_e>("property_health", command_e::property_health));
 
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);
@@ -425,6 +431,7 @@ void Application::initialize()
 	m_actions[action_e::set_motion_path] = new action_set_motion_path();
 	m_actions[action_e::pick] = new Action_pick();
 	m_actions[action_e::open] = new Action_open();
+	m_actions[action_e::hit] = new Action_hit();
 	m_ai_manager = new AI_manager();
 	m_game_object_manager.init();
 
@@ -478,6 +485,9 @@ void Application::initialize()
 	ActionPanel->add_item_control(ActionButton);
 	ActionButton = new GUI_ActionButton();
 	ActionButton->m_action = m_actions[action_e::open];
+	ActionPanel->add_item_control(ActionButton);
+	ActionButton = new GUI_ActionButton();
+	ActionButton->m_action = m_actions[action_e::hit];
 	ActionPanel->add_item_control(ActionButton);
 	GUI_Layer* MenuLayer;
 	MenuLayer = new GUI_Layer();

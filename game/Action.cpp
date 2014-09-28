@@ -631,3 +631,70 @@ std::string Action_open::get_description(Parameter* parameter)
 	s += p->m_object->m_name + ".";
 	return s;
 }
+
+Action_hit::Action_hit()
+{
+	m_kind = action_e::hit;
+	m_icon = Application::instance().m_graph->m_actions[8];
+}
+
+void Action_hit::interaction_handler()
+{
+	Action::interaction_handler();
+	Application::instance().m_message_queue.m_busy = true;
+	Parameter* result;
+	P_unit_interaction* p = new P_unit_interaction();
+	p->m_unit = Application::instance().m_GUI->MapViewer->m_player->m_object;
+	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_unit, true));
+	result = Application::instance().command_select_object_on_map();
+	if (result)
+	{
+		p->m_object = static_cast<P_object*>(result)->m_object;
+		std::string a = "Выбран ";
+		a.append(p->m_object->m_name);
+		a = a + ".";
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+	}
+	else
+	{
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_message_queue.m_busy = false;
+		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+		return;
+	}
+	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+	Application::instance().m_action_manager->add(p->m_unit, new GameTask(this, p));
+	Application::instance().m_message_queue.m_busy = false;
+}
+
+bool Action_hit::check(Parameter* parameter)
+{
+	m_error = "";
+	P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
+	MapCell* cell;
+	if (!Game_algorithm::check_distance(p->m_unit->cell(), p->m_unit->m_active_state->m_size, p->m_object->cell(), p->m_object->m_active_state->m_size))
+	{
+		m_error = "Вы слишком далеко от " + p->m_object->m_name;
+		return false;
+	};
+	return true;
+}
+
+
+void Action_hit::perfom(Parameter* parameter)
+{
+	P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
+	if (check(p))
+	{
+		Game_object_feature* prop = static_cast<Game_object_feature*>(p->m_object->m_active_state->find_property(property_e::health));
+		prop->m_value -= 10;
+	}
+}
+
+std::string Action_hit::get_description(Parameter* parameter)
+{
+	P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
+	std::string s("Атаковать ");
+	s += p->m_object->m_name + ".";
+	return s;
+}

@@ -94,7 +94,8 @@ enum action_e
 	cell_info,
 	set_motion_path,
 	pick,
-	open
+	open,
+	hit
 };
 
 enum property_e
@@ -103,7 +104,8 @@ enum property_e
 	permit_move,
 	permit_pick,
 	container,
-	strength
+	strength,
+	health
 };
 
 enum state_e
@@ -124,7 +126,8 @@ enum ParameterKind
 	ParameterKind_Destination,
 	parameter_kind_cell,
 	parameter_kind_object,
-	parameter_kind_inventory_cell
+	parameter_kind_inventory_cell,
+	parameter_kind_unit_interaction
 };
 
 enum ObjectDirection

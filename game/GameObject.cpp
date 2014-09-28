@@ -164,6 +164,7 @@ GameObjectProperty::~GameObjectProperty(void)
 }
 
 GameObjectParameter::GameObjectParameter(property_e kind = property_e::none, float value = 0) :GameObjectProperty(kind), m_value(value){}
+Game_object_feature::Game_object_feature(property_e kind = property_e::none, int value = 0) : GameObjectProperty(kind), m_value(value){}
 
 Inventory_cell::Inventory_cell(GameObject* item = nullptr) : m_item(item)
 {
