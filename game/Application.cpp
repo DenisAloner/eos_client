@@ -73,22 +73,36 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::state_default:
 	{
 		m_object->m_active_state = new Game_state();
-		m_object->m_active_state->m_kind = state_e::default;
+		m_object->m_active_state->m_state = state_e::default;
 		m_object->m_state.push_back(m_object->m_active_state);
 		break;
 	}
 	case command_e::state_on:
 	{
 		m_object->m_active_state = new Game_state();
-		m_object->m_active_state->m_kind = state_e::on;
+		m_object->m_active_state->m_state = state_e::on;
 		m_object->m_state.push_back(m_object->m_active_state);
 		break;
 	}
 	case command_e::state_off:
 	{
 		m_object->m_active_state = new Game_state();
-		m_object->m_active_state->m_kind = state_e::off;
+		m_object->m_active_state->m_state = state_e::off;
 		m_object->m_state.push_back(m_object->m_active_state);
+		break;
+	}
+	case command_e::ai:
+	{
+		AI_configuration* ai = new AI_configuration;
+		std::size_t pos = 0;
+		found = args.find(" ");
+		ai->m_fov_radius = std::stoi(args.substr(0, found));
+		pos = found + 1;
+		found = args.find(" ", pos);
+		ai->m_fov_qualifier = Application::instance().m_ai_manager->m_fov_qualifiers[std::stoi(args.substr(pos, found - pos))];
+		pos = found + 1;
+		ai->m_path_qualifier = Application::instance().m_ai_manager->m_path_qualifiers[std::stoi(args.substr(pos))];
+		m_object->m_active_state->m_ai = ai;
 		break;
 	}
 	case command_e::size:
@@ -226,6 +240,7 @@ void GameObjectManager::init()
 	m_commands.insert(std::pair<std::string, command_e>("state_on", command_e::state_on));
 	m_commands.insert(std::pair<std::string, command_e>("state_off", command_e::state_off));
 	m_commands.insert(std::pair<std::string, command_e>("size", command_e::size));
+	m_commands.insert(std::pair<std::string, command_e>("ai", command_e::ai));
 	m_commands.insert(std::pair<std::string, command_e>("weight", command_e::weight));
 	m_commands.insert(std::pair<std::string, command_e>("layer", command_e::layer));
 	m_commands.insert(std::pair<std::string, command_e>("icon", command_e::icon));
@@ -410,6 +425,7 @@ void Application::initialize()
 	m_actions[action_e::set_motion_path] = new action_set_motion_path();
 	m_actions[action_e::pick] = new Action_pick();
 	m_actions[action_e::open] = new Action_open();
+	m_ai_manager = new AI_manager();
 	m_game_object_manager.init();
 
 	m_GUI->MapViewer = new GUI_MapViewer(this);
@@ -568,7 +584,7 @@ void Application::initialize()
 	for (int i = 0; i <15; i++){
 		index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
 		room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);
-		ru = rand() % 2;
+		ru = rand() % 3;
 		rx = rand() % room->rect.w;
 		ry = rand() % room->rect.h;
 		switch (ru)
@@ -581,6 +597,11 @@ void Application::initialize()
 		case 1:
 		{
 			obj = m_game_object_manager.new_object("bear");
+			break;
+		}
+		case 2:
+		{
+			obj = m_game_object_manager.new_object("ghost");
 			break;
 		}
 		}
@@ -638,7 +659,8 @@ void Application::update()
 	}
 	m_GUI->MapViewer->m_map->calculate_lighting();
 	m_GUI->MapViewer->m_map->calculate_ai();
-	m_GUI->MapViewer->m_player->m_fov->calculate(20, m_GUI->MapViewer->m_player->m_object, m_GUI->MapViewer->m_map);
+	LOG(INFO) << "Player radius " << m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_fov_radius;
+	m_GUI->MapViewer->m_player->m_fov->calculate(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_fov_radius, m_GUI->MapViewer->m_player->m_object, m_GUI->MapViewer->m_map);
 	Application::instance().m_GUI->MapViewer->update();
 	Application::instance().m_GUI->MapViewer->m_map->m_update = true;
 	m_update_mutex.unlock();
@@ -765,14 +787,18 @@ void Application::command_set_pickup_item_visibility(bool _Visibility)
 
 bool Application::command_check_position(GameObject*& object, MapCell*& position, GameMap*& map)
 {
+	std::function<bool(GameObject*)> qualifier = object->m_active_state->m_ai->m_path_qualifier;
 	for (int i = 0; i<object->m_active_state->m_size.y; i++)
 	{
 		for (int j = 0; j<object->m_active_state->m_size.x; j++)
 		{
 			if (map->m_items[position->y + i][position->x - j] == nullptr){ return false; }
-			if (!map->m_items[position->y + i][position->x - j]->check_permit(property_e::permit_move, object))
+			for (std::list<GameObject*>::iterator item = map->m_items[position->y + i][position->x - j]->m_items.begin(); item != map->m_items[position->y + i][position->x - j]->m_items.end(); item++)
 			{
-				return false;
+				if (((*item) != object) && qualifier((*item)))
+				{
+					return false;
+				}
 			}
 		}
 	}

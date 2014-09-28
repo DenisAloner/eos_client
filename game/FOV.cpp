@@ -152,7 +152,7 @@ FOV::FOV()
 void FOV::calculate(int radius,GameObject* unit, GameMap* map)
 {
 	m_radius = radius;
-	//m_sqr_radius = radius*radius;
+	std::function<bool(GameObject*)> qualifier = unit->m_active_state->m_ai->m_fov_qualifier;
 	for (int y = 0; y <m_max_size; y++)
 	{
 		for (int x = 0; x <m_max_size; x++)
@@ -172,7 +172,7 @@ void FOV::calculate(int radius,GameObject* unit, GameMap* map)
 					for (std::list<GameObject*>::iterator obj = map->m_items[y][x]->m_items.begin(); obj != map->m_items[y][x]->m_items.end(); obj++)
 					{
 						//if ((!(*obj)->m_active_state->find_property(property_e::permit_move))&&(*obj)!=unit)
-						if (((*obj)->m_name=="wall")&&(*obj)!=unit)
+						if ((*obj) != unit&&qualifier((*obj)))
 						{
 							m_map[m_middle + (y - unit->cell()->y)][m_middle + (x - unit->cell()->x)].opaque = true;
 						}
@@ -254,4 +254,5 @@ void FOV::do_fov(uint x, uint y, uint radius)
 	for (uint i = 0; i < 8; i++) {
 		cast_light(x, y, radius, 1, 1.0, 0.0, multipliers1[0][i],multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
 	}
+	m_map[m_middle][m_middle].visible = true;
 }

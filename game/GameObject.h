@@ -9,6 +9,7 @@
 #include <Application.h>
 #include "GameObjectProperty.h"
 #include "FOV.h"
+#include <vector>
 
 class GameObjectProperty;
 class Game_object_owner;
@@ -48,11 +49,21 @@ public:
 	bool check_permit(property_e kind, GameObject* excluded);
 };
 
+struct AI_configuration
+{
+public:
+
+	int m_fov_radius;
+	std::function<bool(GameObject*)> m_fov_qualifier;
+	std::function<bool(GameObject*)> m_path_qualifier;
+
+};
+
 class Game_state
 {
 public:
 
-	state_e m_kind;
+	state_e m_state;
 	int m_layer;
 
 	game_object_size_t m_size;
@@ -63,6 +74,8 @@ public:
 
 	std::list<Action*> m_actions;
 	std::list<GameObjectProperty*> m_properties;
+
+	AI_configuration* m_ai;
 
 	virtual Action* find_action(action_e kind);
 	virtual GameObjectProperty* find_property(property_e kind);
@@ -145,6 +158,14 @@ public:
 
 };
 
+class AI_manager
+{
+public:
 
+	std::vector<std::function<bool(GameObject*)> > m_fov_qualifiers;
+	std::vector<std::function<bool(GameObject*)> > m_path_qualifiers;
+
+	AI_manager();
+};
 
 #endif //GAMEOBJECT_H

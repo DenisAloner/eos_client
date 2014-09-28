@@ -114,6 +114,7 @@ void Path::calculate(GameMap* map, GameObject* object, GameObject* goal, int rad
 	c2 = static_cast<MapCell*>(goal->m_owner);
 	m_goal_cell = &m_map[c2->y - mc->y + m_middle][c2->x - mc->x +m_middle];
 	m_goal_size = goal->m_active_state->m_size;
+	std::function<bool(GameObject*)> qualifier = object->m_active_state->m_ai->m_path_qualifier;
 	for (int y = -radius; y < radius + 1; y++)
 	{
 		if ((object->cell()->y + y >= 0) && (object->cell()->y + y < map->m_size.h))
@@ -127,7 +128,7 @@ void Path::calculate(GameMap* map, GameObject* object, GameObject* goal, int rad
 					pc->state = 0;
 					for (std::list<GameObject*>::iterator item = mc->m_items.begin(); item != mc->m_items.end(); item++)
 					{
-						if ((!(*item)->m_active_state->find_property(property_e::permit_move)) && ((*item) != object) && ((*item) != goal))
+						if (((*item) != object) && ((*item) != goal) && qualifier((*item)))
 						{
 							pc->state = 1;
 							break;
@@ -242,7 +243,7 @@ AI::~AI()
 
 GameObject* AI::find_goal()
 {
-	m_fov->calculate(20, m_object, m_map);
+	m_fov->calculate(m_object->m_active_state->m_ai->m_fov_radius, m_object, m_map);
 	FOV::cell* fc;
 	MapCell* mc;
 	for (int y = -m_fov->m_radius; y < m_fov->m_radius + 1; y++)
@@ -286,7 +287,7 @@ void AI::create()
 		if (Game_algorithm::check_distance(static_cast<MapCell*>(m_object->m_owner), m_object->m_active_state->m_size, static_cast<MapCell*>(goal->m_owner), goal->m_active_state->m_size)){
 			return;
 		}
-		Path::instance().calculate(m_map, m_object, goal, 20);
+		Path::instance().calculate(m_map, m_object, goal, m_object->m_active_state->m_ai->m_fov_radius);
 		std::vector<MapCell*>* path;
 		path = Path::instance().get_path();
 		if (path)

@@ -22,7 +22,6 @@ struct Path_cell
 	position_t pos;
 };
 
-
 struct Node
 {
 	Path_cell* cell;

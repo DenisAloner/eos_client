@@ -39,6 +39,7 @@ class GUI_Window;
 class GUI_Timer;
 class GUI_MiniMap;
 class Parameter_destination;
+class AI_manager;
 
 
 class gui_MessageQueue
@@ -69,6 +70,7 @@ public:
 		state_default,
 		state_on,
 		state_off,
+		ai,
 		size,
 		weight,
 		layer,
@@ -130,6 +132,8 @@ public:
 	ActionManager* m_action_manager;
 
 	Action* m_actions[8];
+
+	AI_manager* m_ai_manager;
 
 	Event<WPARAM> key_press;
 	Event<MouseEventArgs> mouse_click;

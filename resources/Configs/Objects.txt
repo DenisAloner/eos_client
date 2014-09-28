@@ -1,5 +1,6 @@
 object elf
 state_default
+ai 20 0 0
 size 1 2 5
 tile_manager_map no_tile 0 0
 tile_manager_map no_tile 0 1
@@ -23,6 +24,7 @@ property_strength 8.0
 
 object snake
 state_default
+ai 20 0 0
 size 1 1 1
 tile_manager_map no_tile 0 0
 tile_manager_map no_tile 0 1
@@ -44,6 +46,7 @@ action_move
 
 object bear
 state_default
+ai 20 0 0
 size 3 3 4
 tile_manager_map no_tile 0 0
 tile_manager_map no_tile 0 1
@@ -62,6 +65,15 @@ tile_manager_map no_tile 3 1
 tile_manager_map no_tile 3 2
 tile_manager_map no_tile 3 3
 action_move
+
+object ghost
+state_default
+ai 20 1 1
+size 1 2 4
+tile_manager_rotating no_tile 0
+tile_manager_rotating ghost_left 1
+tile_manager_rotating no_tile 2
+tile_manager_rotating no_tile 3
 
 object floor
 state_default

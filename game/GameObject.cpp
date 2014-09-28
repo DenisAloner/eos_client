@@ -136,7 +136,7 @@ void GameObject::set_state(state_e state)
 {
 	for (std::list<Game_state*>::iterator item = m_state.begin(); item != m_state.end(); item++)
 	{
-		if ((*item)->m_kind == state)
+		if ((*item)->m_state == state)
 		{
 			m_active_state = (*item);
 			return;
@@ -151,7 +151,7 @@ MapCell* GameObject::cell(){
 Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 {
 	m_fov = new FOV();
-	m_fov->calculate(20, m_object, m_map);
+	m_fov->calculate(object->m_active_state->m_ai->m_fov_radius, m_object, m_map);
 }
 
 GameObjectProperty::GameObjectProperty(property_e _kind = property_e::none) : m_kind(_kind)
@@ -181,4 +181,13 @@ Property_Container::Property_Container(int width, int height, std::string name) 
 
 Property_Container::~Property_Container()
 {
+}
+
+AI_manager::AI_manager()
+{
+	m_fov_qualifiers.push_back([](GameObject* object)->bool{return object->m_name == "wall"; });
+	m_fov_qualifiers.push_back([](GameObject* object)->bool{return false; });
+
+	m_path_qualifiers.push_back([](GameObject* object)->bool{return !object->m_active_state->find_property(property_e::permit_move);});
+	m_path_qualifiers.push_back([](GameObject* object)->bool{return !object->m_active_state->find_property(property_e::permit_move) && object->m_name != "wall"; });
 }
