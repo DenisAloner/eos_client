@@ -70,10 +70,17 @@ void GameObjectManager::parser(const std::string& command)
 		m_items.insert(std::pair<std::string, GameObject*>(args, m_object));
 		break;
 	}
-	case command_e::state_default:
+	case command_e::state_alive:
 	{
 		m_object->m_active_state = new Game_state();
-		m_object->m_active_state->m_state = state_e::default;
+		m_object->m_active_state->m_state = state_e::alive;
+		m_object->m_state.push_back(m_object->m_active_state);
+		break;
+	}
+	case command_e::state_dead:
+	{
+		m_object->m_active_state = new Game_state();
+		m_object->m_active_state->m_state = state_e::dead;
 		m_object->m_state.push_back(m_object->m_active_state);
 		break;
 	}
@@ -233,6 +240,14 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->m_active_state->m_properties.push_back(new Game_object_feature(property_e::health, std::stoi(args)));
 		break;
 	}
+	case command_e::reaction_get_damage:
+	{
+		Reaction* r = new Reaction();
+		r->m_kind = reaction_e::get_damage;
+		r->apply = Application::instance().m_reaction_manager->m_items[reaction_applicator_e::check_health];
+		m_object->m_reaction.push_back(r);
+		break;
+	}
 	}
 }
 
@@ -241,7 +256,8 @@ game_clipboard::game_clipboard():m_item(nullptr){}
 void GameObjectManager::init()
 {
 	m_commands.insert(std::pair<std::string, command_e>("object", command_e::obj));
-	m_commands.insert(std::pair<std::string, command_e>("state_default", command_e::state_default));
+	m_commands.insert(std::pair<std::string, command_e>("state_alive", command_e::state_alive));
+	m_commands.insert(std::pair<std::string, command_e>("state_dead", command_e::state_dead));
 	m_commands.insert(std::pair<std::string, command_e>("state_on", command_e::state_on));
 	m_commands.insert(std::pair<std::string, command_e>("state_off", command_e::state_off));
 	m_commands.insert(std::pair<std::string, command_e>("size", command_e::size));
@@ -259,6 +275,7 @@ void GameObjectManager::init()
 	m_commands.insert(std::pair<std::string, command_e>("property_container", command_e::property_container));
 	m_commands.insert(std::pair<std::string, command_e>("property_strength", command_e::property_strenght));
 	m_commands.insert(std::pair<std::string, command_e>("property_health", command_e::property_health));
+	m_commands.insert(std::pair<std::string, command_e>("reaction_get_damage", command_e::reaction_get_damage));
 
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);
@@ -305,6 +322,7 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 		(*state) = (*(*item));
 	}
 	obj->m_active_state = obj->m_state.front();
+	obj->m_reaction = config->m_reaction;
 	return obj;
 }
 
@@ -433,6 +451,7 @@ void Application::initialize()
 	m_actions[action_e::open] = new Action_open();
 	m_actions[action_e::hit] = new Action_hit();
 	m_ai_manager = new AI_manager();
+	m_reaction_manager = new Reaction_manager();
 	m_game_object_manager.init();
 
 	m_GUI->MapViewer = new GUI_MapViewer(this);
@@ -589,7 +608,11 @@ void Application::initialize()
 		times you want it to loop (use -1 for infinite, and 0 to
 		have it just play once) */
 	}
-
+	rx = rx+1;
+	ry =ry+1;
+	obj = m_game_object_manager.new_object("snake");
+	obj->set_direction(ObjectDirection_Left);
+	m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 	int ru;
 	for (int i = 0; i <15; i++){
 		index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
@@ -669,8 +692,10 @@ void Application::update()
 	}
 	m_GUI->MapViewer->m_map->calculate_lighting();
 	m_GUI->MapViewer->m_map->calculate_ai();
-	LOG(INFO) << "Player radius " << m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_fov_radius;
-	m_GUI->MapViewer->m_player->m_fov->calculate(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_fov_radius, m_GUI->MapViewer->m_player->m_object, m_GUI->MapViewer->m_map);
+	if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
+	{
+		m_GUI->MapViewer->m_player->m_fov->calculate(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_fov_radius, m_GUI->MapViewer->m_player->m_object, m_GUI->MapViewer->m_map);
+	}
 	Application::instance().m_GUI->MapViewer->update();
 	Application::instance().m_GUI->MapViewer->m_map->m_update = true;
 	m_update_mutex.unlock();

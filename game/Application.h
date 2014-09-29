@@ -40,6 +40,7 @@ class GUI_Timer;
 class GUI_MiniMap;
 class Parameter_destination;
 class AI_manager;
+class Reaction_manager;
 
 
 class gui_MessageQueue
@@ -67,7 +68,8 @@ public:
 	enum command_e
 	{
 		obj,
-		state_default,
+		state_alive,
+		state_dead,
 		state_on,
 		state_off,
 		ai,
@@ -84,7 +86,8 @@ public:
 		property_permit_pick,
 		property_container,
 		property_strenght,
-		property_health
+		property_health,
+		reaction_get_damage
 	};
 
 	typedef std::map<std::string, GameObject*> items_t;
@@ -135,6 +138,7 @@ public:
 	Action* m_actions[9];
 
 	AI_manager* m_ai_manager;
+	Reaction_manager* m_reaction_manager;
 
 	Event<WPARAM> key_press;
 	Event<MouseEventArgs> mouse_click;

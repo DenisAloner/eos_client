@@ -10,6 +10,7 @@
 #include "GameObjectProperty.h"
 #include "FOV.h"
 #include <vector>
+#include <map>
 
 class GameObjectProperty;
 class Game_object_owner;
@@ -18,6 +19,7 @@ class Application;
 class TileManager;
 class GameObject;
 class GameObjectProperty;
+struct Reaction;
 
 class Game_object_owner{
 
@@ -97,6 +99,7 @@ public:
 
 	Game_state* m_active_state;
 	std::list<Game_state*> m_state;
+	std::list<Reaction*> m_reaction;
 
 	GameObject();
 
@@ -107,6 +110,8 @@ public:
 	MapCell* cell();
 
 };
+
+typedef std::function<void(GameObject*)> func_void;
 
 class Player
 {
@@ -175,6 +180,22 @@ public:
 	std::vector<std::function<bool(GameObject*)> > m_path_qualifiers;
 
 	AI_manager();
+};
+
+struct Reaction
+{
+	reaction_e m_kind;
+	func_void apply;
+};
+
+class Reaction_manager
+{
+public:
+
+	void check_health(GameObject* object);
+
+	std::map<reaction_applicator_e, func_void> m_items;
+	Reaction_manager();
 };
 
 #endif //GAMEOBJECT_H

@@ -890,7 +890,6 @@ void  GameMap::calculate_ai()
 	for (std::list<GameObject*>::iterator Current = m_ai.begin(); Current != m_ai.end(); Current++)
 	{
 		obj.m_object = (*Current);
-		LOG(INFO) << obj.m_object->m_name;
 		obj.create();
 	}
 }

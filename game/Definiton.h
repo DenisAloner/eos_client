@@ -110,7 +110,8 @@ enum property_e
 
 enum state_e
 { 
-	default,
+	alive,
+	dead,
 	on,
 	off
 };
@@ -136,6 +137,16 @@ enum ObjectDirection
 	ObjectDirection_Left,
 	ObjectDirection_Up,
 	ObjectDirection_Right
+};
+
+enum reaction_e
+{
+	get_damage
+};
+
+enum reaction_applicator_e
+{
+	check_health
 };
 
 struct tile_t

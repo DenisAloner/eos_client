@@ -687,7 +687,17 @@ void Action_hit::perfom(Parameter* parameter)
 	if (check(p))
 	{
 		Game_object_feature* prop = static_cast<Game_object_feature*>(p->m_object->m_active_state->find_property(property_e::health));
-		prop->m_value -= 10;
+		if (prop)
+		{
+			prop->m_value -= 10;
+			for (std::list<Reaction*>::iterator item = p->m_object->m_reaction.begin(); item != p->m_object->m_reaction.end(); item++)
+			{
+				if ((*item)->m_kind == reaction_e::get_damage)
+				{
+					(*item)->apply(p->m_object);
+				}
+			}
+		}
 	}
 }
 

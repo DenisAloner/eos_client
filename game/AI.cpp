@@ -208,14 +208,11 @@ std::vector<MapCell*>* Path::back(Node* c)
 std::vector<MapCell*>* Path::get_path(){
 	Node* current;
 	m_heap.push(new Node(m_start_cell, 0, manhattan(m_start_cell, m_goal_cell) * 10));
-	LOG(INFO) << m_start_cell->pos.x << " " << m_start_cell->pos.y;
-	LOG(INFO) << m_goal_cell->pos.x << " " << m_goal_cell->pos.y;
 	while (!m_heap.m_items.empty())
 	{
 		current = m_heap.pop();
 		if (Game_algorithm::check_distance(&current->cell->pos,m_start_size,&m_goal_cell->pos,m_goal_size))
 		{
-			LOG(INFO) << "New step";
 			return back(current);
 		}
 		current->cell->closed = true;
@@ -275,16 +272,15 @@ GameObject* AI::find_goal()
 
 void AI::create()
 {
-
 		GameObject* goal = find_goal();
 		if (goal == nullptr) {
 			return;
 		}
-		else
-		{
-			LOG(INFO) << "VISIBLE";
-		}
 		if (Game_algorithm::check_distance(static_cast<MapCell*>(m_object->m_owner), m_object->m_active_state->m_size, static_cast<MapCell*>(goal->m_owner), goal->m_active_state->m_size)){
+			P_unit_interaction* p = new P_unit_interaction();
+			p->m_unit = m_object;
+			p->m_object = goal;
+			Application::instance().m_action_manager->add(p->m_unit, new GameTask(Application::instance().m_actions[action_e::hit], p));
 			return;
 		}
 		Path::instance().calculate(m_map, m_object, goal, m_object->m_active_state->m_ai->m_fov_radius);
