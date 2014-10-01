@@ -194,21 +194,3 @@ AI_manager::AI_manager()
 	m_path_qualifiers.push_back([](GameObject* object)->bool{return !object->m_active_state->find_property(property_e::permit_move) && object->m_name != "wall"; });
 }
 
-void Reaction_manager::check_health(GameObject* object)
-{
-	Game_object_feature* prop = static_cast<Game_object_feature*>(object->m_active_state->find_property(property_e::health));
-	if (prop)
-	{
-		if (prop->m_value < 1)
-		{
-			Application::instance().m_GUI->MapViewer->m_map->m_ai.remove(object);
-			object->set_state(state_e::dead);
-		}
-	}
-}
-
-Reaction_manager::Reaction_manager()
-{
-	m_items.insert(std::pair<reaction_applicator_e, func_void>(reaction_applicator_e::check_health, std::bind(&Reaction_manager::check_health, this, std::placeholders::_1)));
-}
-

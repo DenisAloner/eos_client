@@ -686,16 +686,12 @@ void Action_hit::perfom(Parameter* parameter)
 	P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
 	if (check(p))
 	{
-		Game_object_feature* prop = static_cast<Game_object_feature*>(p->m_object->m_active_state->find_property(property_e::health));
-		if (prop)
+		auto reaction = p->m_unit->m_effect.find(effect_e::damage);
+		if (reaction != p->m_unit->m_effect.end())
 		{
-			prop->m_value -= 10;
-			for (std::list<Reaction*>::iterator item = p->m_object->m_reaction.begin(); item != p->m_object->m_reaction.end(); item++)
+			for (auto current = (*reaction).second.begin(); current != (*reaction).second.end(); current++)
 			{
-				if ((*item)->m_kind == reaction_e::get_damage)
-				{
-					(*item)->apply(p->m_object);
-				}
+				(*current)->apply(p->m_object, (*current));
 			}
 		}
 	}

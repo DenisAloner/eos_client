@@ -26,6 +26,7 @@ state_dead
 size 1 2 0
 tile_manager_single elf_corpse
 reaction_get_damage
+effect_physical_damage 10
 
 object snake
 state_alive
@@ -53,6 +54,7 @@ state_dead
 size 1 1 0
 tile_manager_single snake_corpse
 reaction_get_damage
+effect_physical_damage 1
 
 object bear
 state_alive
@@ -76,6 +78,7 @@ tile_manager_map no_tile 3 2
 tile_manager_map no_tile 3 3
 action_move
 property_health 100
+effect_physical_damage 1
 
 object ghost
 state_alive
@@ -86,6 +89,7 @@ tile_manager_rotating ghost_left 1
 tile_manager_rotating no_tile 2
 tile_manager_rotating no_tile 3
 property_health 100
+effect_physical_damage 1
 
 object floor
 state_alive

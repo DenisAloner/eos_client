@@ -139,16 +139,6 @@ enum ObjectDirection
 	ObjectDirection_Right
 };
 
-enum reaction_e
-{
-	get_damage
-};
-
-enum reaction_applicator_e
-{
-	check_health
-};
-
 struct tile_t
 {
 	GLuint unit;
@@ -195,6 +185,23 @@ struct light_t
 
 	light_t(int R, int G, int B) : R(R), G(G), B(B){};
 	light_t() : R(0), G(0), B(0){};
+};
+
+enum class reaction_e
+{
+	get_damage,
+	get_physical_damage
+};
+
+enum class reaction_applicator_e
+{
+	get_physical_damage,
+	check_health
+};
+
+enum class effect_e
+{
+	damage
 };
 
 #endif //DEFINITION_H

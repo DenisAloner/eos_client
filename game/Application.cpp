@@ -242,10 +242,21 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	case command_e::reaction_get_damage:
 	{
-		Reaction* r = new Reaction();
-		r->m_kind = reaction_e::get_damage;
-		r->apply = Application::instance().m_reaction_manager->m_items[reaction_applicator_e::check_health];
-		m_object->m_reaction.push_back(r);
+		Reaction* r;
+		r = new Reaction();
+		r->m_items.push_back(Application::instance().m_reaction_manager->m_items[reaction_applicator_e::get_physical_damage]);
+		m_object->m_reaction[reaction_e::get_physical_damage] = r;
+		r = new Reaction();
+		r->m_items.push_back(Application::instance().m_reaction_manager->m_items[reaction_applicator_e::check_health]);
+		m_object->m_reaction[reaction_e::get_damage] = r;
+		break;
+	}
+	case command_e::effect_physical_damage:
+	{
+		Effect_damage* e = new Effect_damage();
+		e->m_kind = reaction_e::get_physical_damage;
+		e->m_value = std::stof(args);
+		m_object->m_effect[effect_e::damage].push_back(e);
 		break;
 	}
 	}
@@ -276,6 +287,7 @@ void GameObjectManager::init()
 	m_commands.insert(std::pair<std::string, command_e>("property_strength", command_e::property_strenght));
 	m_commands.insert(std::pair<std::string, command_e>("property_health", command_e::property_health));
 	m_commands.insert(std::pair<std::string, command_e>("reaction_get_damage", command_e::reaction_get_damage));
+	m_commands.insert(std::pair<std::string, command_e>("effect_physical_damage", command_e::effect_physical_damage));
 
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);
@@ -323,6 +335,7 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 	}
 	obj->m_active_state = obj->m_state.front();
 	obj->m_reaction = config->m_reaction;
+	obj->m_effect = config->m_effect;
 	return obj;
 }
 

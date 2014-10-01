@@ -87,7 +87,8 @@ public:
 		property_container,
 		property_strenght,
 		property_health,
-		reaction_get_damage
+		reaction_get_damage,
+		effect_physical_damage
 	};
 
 	typedef std::map<std::string, GameObject*> items_t;
