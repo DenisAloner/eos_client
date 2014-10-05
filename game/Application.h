@@ -17,6 +17,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <map>
+#include "Game_object_manager.h"
 
 class Action;
 class ActionManager;
@@ -41,7 +42,7 @@ class GUI_MiniMap;
 class Parameter_destination;
 class AI_manager;
 class Reaction_manager;
-
+class GameObjectManager;
 
 class gui_MessageQueue
 {
@@ -59,50 +60,6 @@ public:
 	~gui_MessageQueue();
 
 	void push(Parameter* p);
-};
-
-class GameObjectManager
-{
-public:
-
-	enum command_e
-	{
-		obj,
-		state_alive,
-		state_dead,
-		state_on,
-		state_off,
-		ai,
-		size,
-		weight,
-		layer,
-		icon,
-		tile_manager_single,
-		tile_manager_map,
-		tile_manager_rotating,
-		light,
-		action_move,
-		property_permit_move,
-		property_permit_pick,
-		property_container,
-		property_strenght,
-		property_health,
-		reaction_get_damage,
-		effect_physical_damage
-	};
-
-	typedef std::map<std::string, GameObject*> items_t;
-	typedef std::map<std::string, command_e> commands_t;
-	items_t m_items;
-	commands_t m_commands;
-
-	GameObject* m_object;
-
-	void parser(const std::string& command);
-	GameObject* new_object(std::string unit_name);
-
-	void init();
-
 };
 
 class game_clipboard
@@ -130,13 +87,13 @@ public:
 
 	std::mutex m_update_mutex;
 
-	GameObjectManager m_game_object_manager;
+	GameObjectManager* m_game_object_manager;
 
 	ApplicationGUI* m_GUI;
 	GraphicalController* m_graph;
 	ActionManager* m_action_manager;
 
-	Action* m_actions[9];
+	Action* m_actions[10];
 
 	AI_manager* m_ai_manager;
 	Reaction_manager* m_reaction_manager;

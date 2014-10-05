@@ -704,3 +704,68 @@ std::string Action_hit::get_description(Parameter* parameter)
 	s += p->m_object->m_name + ".";
 	return s;
 }
+
+Action_equip::Action_equip()
+{
+	m_kind = action_e::equip;
+	m_icon = Application::instance().m_graph->m_actions[9];
+}
+
+void Action_equip::interaction_handler()
+{
+	Action::interaction_handler();
+	Application::instance().m_message_queue.m_busy = true;
+	Parameter* result;
+	Parameter_destination* p = new Parameter_destination();
+	p->m_unit = Application::instance().m_GUI->MapViewer->m_player->m_object;
+	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_unit, true));
+	P_object* object = Application::instance().command_select_transfer_source(p);
+	if (object)
+	{
+		p->m_object = object->m_object;
+		std::string a = "Выбран ";
+		a.append(p->m_object->m_name);
+		a = a + ".";
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+	}
+	else
+	{
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_message_queue.m_busy = false;
+		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+		return;
+	}
+	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+	Application::instance().m_action_manager->add(p->m_unit, new GameTask(this, p));
+	Application::instance().m_message_queue.m_busy = false;
+}
+
+bool Action_equip::check(Parameter* parameter)
+{
+	m_error = "";
+	return true;
+}
+
+
+void Action_equip::perfom(Parameter* parameter)
+{
+	P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
+	if (check(p))
+	{
+		for (auto kind = p->m_object->m_effect.begin(); kind != p->m_object->m_effect.end(); kind++)
+		{
+			for (auto effect = (*kind).second.begin(); effect != (*kind).second.end(); effect++)
+			{
+				p->m_unit->add_effect(kind->first, *effect);
+			}
+		}
+	}
+}
+
+std::string Action_equip::get_description(Parameter* parameter)
+{
+	P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
+	std::string s("Одеть ");
+	s += p->m_object->m_name + ".";
+	return s;
+}

@@ -49,7 +49,7 @@ tile_manager_map snake_right_02 3 1
 tile_manager_map snake_right_03 3 2
 tile_manager_map snake_right_04 3 3
 action_move
-property_health 20
+property_health 100
 state_dead
 size 1 1 0
 tile_manager_single snake_corpse
@@ -104,6 +104,14 @@ size 1 1 1
 icon health_potion
 tile_manager_single health_potion
 property_permit_pick
+
+object sword
+state_alive
+size 1 1 1
+icon sword
+tile_manager_single sword
+property_permit_pick
+effect_physical_damage 50
 
 object wall
 state_alive

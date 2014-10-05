@@ -95,7 +95,8 @@ enum action_e
 	set_motion_path,
 	pick,
 	open,
-	hit
+	hit,
+	equip
 };
 
 enum property_e
@@ -105,7 +106,8 @@ enum property_e
 	permit_pick,
 	container,
 	strength,
-	health
+	health,
+	wield
 };
 
 enum state_e

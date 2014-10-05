@@ -109,6 +109,7 @@ public:
 	void set_direction(ObjectDirection dir);
 	void turn();
 	void set_state(state_e state);
+	void add_effect(effect_e kind, Effect* effect);
 
 	MapCell* cell();
 
@@ -152,6 +153,16 @@ public:
 
 	Game_object_feature(property_e kind, int value);
 	int m_value;
+	GameObjectProperty* clone();
+
+};
+
+class GameObjectLink : public GameObjectProperty
+{
+public:
+
+	GameObjectLink(property_e kind, GameObject* object);
+	GameObject* m_object;
 	GameObjectProperty* clone();
 
 };

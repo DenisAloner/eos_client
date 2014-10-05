@@ -163,4 +163,18 @@ public:
 
 };
 
+class Action_equip :
+	public Action
+{
+public:
+
+	Action_equip();
+
+	virtual bool check(Parameter* parameter);
+	virtual void perfom(Parameter* parameter);
+	virtual std::string get_description(Parameter* parameter);
+	virtual void interaction_handler();
+
+};
+
 #endif //TACTION_H

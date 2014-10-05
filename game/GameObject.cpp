@@ -145,6 +145,11 @@ void GameObject::set_state(state_e state)
 	}
 }
 
+void GameObject::add_effect(effect_e kind, Effect* effect)
+{
+	m_effect[kind].push_back(effect);
+}
+
 MapCell* GameObject::cell(){
 	return static_cast<MapCell*>(m_owner);
 }
@@ -187,6 +192,16 @@ GameObjectProperty* Game_object_feature::clone()
 	Game_object_feature* result = new Game_object_feature();
 	result->m_kind = m_kind;
 	result->m_value = m_value;
+	return result;
+}
+
+GameObjectLink::GameObjectLink(property_e kind = property_e::none, GameObject* object = nullptr) : GameObjectProperty(kind), m_object(object){}
+
+GameObjectProperty* GameObjectLink::clone()
+{
+	GameObjectLink* result = new GameObjectLink();
+	result->m_kind = m_kind;
+	result->m_object = m_object;
 	return result;
 }
 
