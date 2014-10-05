@@ -132,6 +132,8 @@ public:
 
 	GameObjectProperty(property_e _kind);
 	~GameObjectProperty(void);
+
+	virtual GameObjectProperty* clone();
 };
 
 class GameObjectParameter : public GameObjectProperty
@@ -140,6 +142,7 @@ public:
 
 	GameObjectParameter(property_e kind, float value);
 	float m_value;
+	GameObjectProperty* clone();
 
 };
 
@@ -149,6 +152,7 @@ public:
 
 	Game_object_feature(property_e kind, int value);
 	int m_value;
+	GameObjectProperty* clone();
 
 };
 
@@ -170,7 +174,7 @@ public:
 
 	Property_Container(int width, int height, std::string name);
 	~Property_Container();
-
+	GameObjectProperty* clone();
 };
 
 class AI_manager

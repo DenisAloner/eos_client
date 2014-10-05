@@ -159,13 +159,36 @@ GameObjectProperty::GameObjectProperty(property_e _kind = property_e::none) : m_
 {
 }
 
+GameObjectProperty* GameObjectProperty::clone()
+{
+	GameObjectProperty* result = new GameObjectProperty();
+	result->m_kind = m_kind;
+	return result;
+}
 
 GameObjectProperty::~GameObjectProperty(void)
 {
 }
 
 GameObjectParameter::GameObjectParameter(property_e kind = property_e::none, float value = 0) :GameObjectProperty(kind), m_value(value){}
+
+GameObjectProperty* GameObjectParameter::clone()
+{
+	GameObjectParameter* result = new GameObjectParameter();
+	result->m_kind = m_kind;
+	result->m_value = m_value;
+	return result;
+}
+
 Game_object_feature::Game_object_feature(property_e kind = property_e::none, int value = 0) : GameObjectProperty(kind), m_value(value){}
+
+GameObjectProperty* Game_object_feature::clone()
+{
+	Game_object_feature* result = new Game_object_feature();
+	result->m_kind = m_kind;
+	result->m_value = m_value;
+	return result;
+}
 
 Inventory_cell::Inventory_cell(GameObject* item = nullptr) : m_item(item)
 {
@@ -179,6 +202,12 @@ Property_Container::Property_Container(int width, int height, std::string name) 
 	{
 		(*item) = new Inventory_cell();
 	}
+}
+
+GameObjectProperty* Property_Container::clone()
+{
+	Property_Container* result = new Property_Container(m_size.w,m_size.h,m_name);
+	return result;
 }
 
 Property_Container::~Property_Container()

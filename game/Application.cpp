@@ -242,19 +242,20 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	case command_e::reaction_get_damage:
 	{
-		Reaction* r;
-		r = new Reaction();
-		r->m_items.push_back(Application::instance().m_reaction_manager->m_items[reaction_applicator_e::get_physical_damage]);
-		m_object->m_reaction[reaction_e::get_physical_damage] = r;
-		r = new Reaction();
-		r->m_items.push_back(Application::instance().m_reaction_manager->m_items[reaction_applicator_e::check_health]);
+		Reaction_subtype* r;
+		r = new Reaction_subtype();
+		r->m_applicator = Application::instance().m_reaction_manager->m_items[reaction_applicator_e::get_damage];
 		m_object->m_reaction[reaction_e::get_damage] = r;
+		Reaction_mods* r1 = new Reaction_mods();
+		r1->m_applicator = Application::instance().m_reaction_manager->m_items[reaction_applicator_e::change_health];
+		m_object->m_reaction[reaction_e::change_health] = r1;
 		break;
 	}
 	case command_e::effect_physical_damage:
 	{
-		Effect_damage* e = new Effect_damage();
-		e->m_kind = reaction_e::get_physical_damage;
+		Effect* e = new Effect();
+		e->m_kind = reaction_e::get_damage;
+		e->m_subtype = effect_subtype_e::physical_damage;
 		e->m_value = std::stof(args);
 		m_object->m_effect[effect_e::damage].push_back(e);
 		break;
@@ -330,8 +331,25 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 	for (std::list<Game_state*>::iterator item = config->m_state.begin(); item != config->m_state.end(); item++)
 	{
 		state = new Game_state();
+		state->m_state = (*item)->m_state;
+		state->m_layer = (*item)->m_layer;
+		state->m_size = (*item)->m_size;
+		state->m_tile_size = (*item)->m_tile_size;
+		state->m_tile_manager = (*item)->m_tile_manager;
+		state->m_light = (*item)->m_light;
+		state->m_icon = (*item)->m_icon;
+		state->m_actions = (*item)->m_actions;
+		state->m_ai = (*item)->m_ai;
+		for (auto prop = (*item)->m_properties.begin(); prop != (*item)->m_properties.end(); prop++)
+		{
+			state->m_properties.push_back((*prop)->clone());
+		}
 		obj->m_state.push_back(state);
-		(*state) = (*(*item));
+	}
+	Reaction* reaction;
+	for (auto item = config->m_reaction.begin(); item != config->m_reaction.end(); item++)
+	{
+		obj->m_reaction[item->first] = item->second->clone();
 	}
 	obj->m_active_state = obj->m_state.front();
 	obj->m_reaction = config->m_reaction;
@@ -621,8 +639,13 @@ void Application::initialize()
 		times you want it to loop (use -1 for infinite, and 0 to
 		have it just play once) */
 	}
-	rx = rx+1;
-	ry =ry+1;
+	rx = rx + 1;
+	ry = ry + 1;
+	obj = m_game_object_manager.new_object("snake");
+	obj->set_direction(ObjectDirection_Left);
+	m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
+	rx = rx - 1;
+	ry = ry -2;
 	obj = m_game_object_manager.new_object("snake");
 	obj->set_direction(ObjectDirection_Left);
 	m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
