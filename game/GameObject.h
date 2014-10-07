@@ -198,6 +198,22 @@ public:
 	AI_manager();
 };
 
+struct Body_part_t
+{
+	std::string* m_name;
+	body_part_e m_kind;
+	GameObject* m_equip;
+};
+
+class Property_body : public GameObjectProperty
+{
+public:
+
+	std::list<Body_part_t> m_item;
+
+	Property_body();
+
+};
 
 
 #endif //GAMEOBJECT_H

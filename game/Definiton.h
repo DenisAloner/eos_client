@@ -107,6 +107,7 @@ enum property_e
 	container,
 	strength,
 	health,
+	body,
 	wield
 };
 
@@ -209,6 +210,13 @@ enum class effect_e
 enum class effect_subtype_e
 {
 	physical_damage
+};
+
+enum class body_part_e
+{
+	head,
+	hand,
+	foot
 };
 
 #endif //DEFINITION_H

@@ -105,7 +105,7 @@ void GUI_Layer::set_focus(bool state)
 void GUI_Layer::add(GUI_Object* object)
 {
 	m_items.push_back(object);
-	object->get_focus+=std::bind(&GUI_Layer::on_item_get_focus,this,std::placeholders::_1);
+	object->get_focus += std::bind(&GUI_Layer::on_item_get_focus, this, std::placeholders::_1);
 	object->destroy += std::bind(&GUI_Layer::remove, this, std::placeholders::_1);
 }
 

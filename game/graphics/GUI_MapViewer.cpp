@@ -435,8 +435,8 @@ void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
 		}
 		m_just_focused = false;
 	} else {
-		GUI_PopMenu* PopMenu;
-		PopMenu=new GUI_PopMenu;
+		Select_object_popmenu *PopMenu;
+		PopMenu = new Select_object_popmenu();
 		PopMenu->m_position.x = e.position.x;
 		PopMenu->m_position.y = e.position.y;
 		position_t p = local_xy(position_t(e.position.x, e.position.y));

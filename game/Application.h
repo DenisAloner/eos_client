@@ -34,7 +34,6 @@ class GUI_ActionButton;
 class GUI_ActionManager;
 class GUI_Layer;
 class GUI_Object;
-class GUI_PopMenu;
 class GUI_Item;
 class GUI_Window;
 class GUI_Timer;

@@ -8,6 +8,7 @@
 #include "Action.h"
 #include "Parameter.h"
 #include "FOV.h"
+#include "graphics\GUI_PopMenu.h"
 
 class Application;
 class Action;
