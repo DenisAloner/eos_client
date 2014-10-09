@@ -434,7 +434,8 @@ void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
 			}
 		}
 		m_just_focused = false;
-	} else {
+	}
+	else {
 		Select_object_popmenu *PopMenu;
 		PopMenu = new Select_object_popmenu();
 		PopMenu->m_position.x = e.position.x;
@@ -447,16 +448,16 @@ void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
 		if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
 		{
 			//UnderCursor(CursorEventArgs(e.x, e.y));
-			for (std::list<GameObject*>::iterator Current = m_map->m_items[y][x]->m_items.begin(); Current !=m_map->m_items[y][x]->m_items.end(); Current++)
+			for (std::list<GameObject*>::iterator Current = m_map->m_items[y][x]->m_items.begin(); Current != m_map->m_items[y][x]->m_items.end(); Current++)
 			{
 				PopMenu->add((*Current)->m_name, (*Current));
 			}
 		}
-		if(PopMenu->m_items.size()==0)
+		if (PopMenu->m_items.size() == 0)
 		{
-			PopMenu->add("Нет действий",nullptr);
+			PopMenu->add("Нет действий", nullptr);
 		}
-		PopMenu->destroy+=std::bind(&GUI_Layer::remove,m_GUI,std::placeholders::_1);
+		PopMenu->destroy += std::bind(&GUI_Layer::remove, m_GUI, std::placeholders::_1);
 		m_GUI->add_front(PopMenu);
 		PopMenu->m_items.front()->set_focus(true);
 	}

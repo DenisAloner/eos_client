@@ -5,6 +5,7 @@
 #include <iterator>
 #include <string>
 #include "Definiton.h"
+#include "MouseController.h"
 
 
 class Parameter;

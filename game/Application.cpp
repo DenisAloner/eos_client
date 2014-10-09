@@ -252,6 +252,7 @@ void Application::initialize()
 	MenuLayer->add(AMTextBox);
 	MenuLayer->add(ActionPanel);
 	MenuLayer->add(TextBox);
+	command_open_body(m_GUI->MapViewer->m_player->m_object);
 	GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
 	GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), m_GUI->MapViewer);
 	MiniMap->add_item_control(mini_map);
@@ -519,10 +520,29 @@ bool Application::command_open_inventory(GameObject*& Object)
 	if (Property != nullptr)
 	{
 		//MessageBox(NULL, "In_2", "", MB_OK);
-		GUI_Window* Window = new GUI_Window(1024 / 2 - (Property->m_size.w * 64 + 2) / 2, 1024 / 2 - (Property->m_size.h * 64 + 2) / 2, Property->m_size.w * 64 + 4, Property->m_size.h * 64 + 27,Object->m_name+"::"+Property->m_name);
+		GUI_Window* Window = new GUI_Window(1024 / 2 - (Property->m_size.w * 64 + 2) / 2, 1024 / 2 - (Property->m_size.h * 64 + 2) / 2, Property->m_size.w * 64 + 4, 2 * 64 + 27,Object->m_name+"::"+Property->m_name);
 		GUI_Inventory* Inv = new GUI_Inventory(Property);
 		Inv->m_position.x = 2;
 		Inv->m_position.y = Window->m_size.h - Inv->m_size.h-2;
+		Window->add_item_control(Inv);
+		m_GUI->add_front(Window);
+		Result = true;
+	}
+	return Result;
+}
+
+bool Application::command_open_body(GameObject*& Object)
+{
+	//MessageBox(NULL, "In_1", "", MB_OK);
+	bool Result = false;
+	Property_body* Property = static_cast<Property_body*>(Object->m_active_state->find_property(property_e::body));
+	if (Property != nullptr)
+	{
+		//MessageBox(NULL, "In_2", "", MB_OK);
+		GUI_Window* Window = new GUI_Window(1024 / 2 - (192 + 2) / 2, 1024 / 2 - (4 * 64 + 2) / 2, 192 + 4,4 * 64 + 27, Object->m_name + "::body");
+		GUI_Body* Inv = new GUI_Body(Property);
+		Inv->m_position.x = 2;
+		Inv->m_position.y = Window->m_size.h - Inv->m_size.h - 2;
 		Window->add_item_control(Inv);
 		m_GUI->add_front(Window);
 		Result = true;

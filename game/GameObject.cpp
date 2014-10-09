@@ -238,7 +238,17 @@ AI_manager::AI_manager()
 	m_path_qualifiers.push_back([](GameObject* object)->bool{return !object->m_active_state->find_property(property_e::permit_move) && object->m_name != "wall"; });
 }
 
-Property_body::Property_body()
+Property_body::Property_body() : GameObjectProperty(property_e::body)
 {
 
+}
+
+GameObjectProperty* Property_body::clone()
+{
+	Property_body* result = new Property_body();
+	for (auto part = m_item.begin(); part != m_item.end(); part++)
+	{
+		result->m_item.push_back((*part));
+	}
+	return result;
 }

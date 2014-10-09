@@ -87,3 +87,11 @@ void GUI_Window::resize(int _width, int _height)
 	//ItemControls->width = width;
 	//ItemControls->height = height;
 }
+
+void GUI_Window::on_mouse_wheel(MouseEventArgs const& e)
+{
+	if (m_focus)
+	{
+		m_focus->mouse_wheel(e);
+	}
+}

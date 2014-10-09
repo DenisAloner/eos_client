@@ -7,8 +7,8 @@ class GameObjectManager
 {
 public:
 
-	enum command_e
-	{
+	enum class command_e
+	{ 
 		obj,
 		state_alive,
 		state_dead,
@@ -29,14 +29,25 @@ public:
 		property_container,
 		property_strenght,
 		property_health,
+		property_body,
 		reaction_get_damage,
 		effect_physical_damage
 	};
 
+	enum class parameter_e
+	{
+		head,
+		hand,
+		foot
+	};
+
 	typedef std::map<std::string, GameObject*> items_t;
 	typedef std::map<std::string, command_e> commands_t;
+	typedef std::map<std::string, parameter_e> parameters_t;
+
 	items_t m_items;
 	commands_t m_commands;
+	parameters_t m_parameters;
 
 	GameObject* m_object;
 

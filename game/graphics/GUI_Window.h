@@ -28,6 +28,7 @@ public:
 	virtual void on_close(GUI_Object* e);
 	virtual void on_header_close();
 	virtual void resize(int _width, int _height);
+	virtual void on_mouse_wheel(MouseEventArgs const& e);
 
 };
 

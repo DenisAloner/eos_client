@@ -125,6 +125,7 @@ public:
 	Parameter* command_select_location(GameObject* object);
 	Parameter* command_select_object_on_map();
 	bool command_open_inventory(GameObject*& Object);
+	bool command_open_body(GameObject*& Object);
 	bool command_check_position(GameObject*& object, MapCell*& position, GameMap*& map);
 	void command_set_cursor(GLuint _Tile);
 	void command_set_pickup_item(GLuint _Tile);

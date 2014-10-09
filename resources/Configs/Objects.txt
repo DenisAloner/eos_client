@@ -22,6 +22,11 @@ action_move
 property_container Мешок 2 4
 property_strength 8.0
 property_health 100
+property_body head,голова
+property_body hand,левая рука
+property_body hand,правая рука
+property_body foot,левая нога
+property_body foot,правая нога
 state_dead
 size 1 2 0
 tile_manager_single elf_corpse

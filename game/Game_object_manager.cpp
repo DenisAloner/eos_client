@@ -184,6 +184,45 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->m_active_state->m_properties.push_back(new Property_Container(x, y, name));
 		break;
 	}
+	case command_e::property_body:
+	{
+		std::size_t pos = 0;
+		Body_part_t part;
+		found = args.find(",");
+		auto kind = m_parameters.find(args.substr(0, found));
+		if (kind != m_parameters.end())
+		{
+			switch (kind->second)
+			{
+			case parameter_e::head:
+			{
+				part.m_kind = body_part_e::head;
+				break;
+			}
+			case parameter_e::hand:
+			{
+				part.m_kind = body_part_e::hand;
+				break;
+			}
+			case parameter_e::foot:
+			{
+				part.m_kind = body_part_e::foot;
+				break;
+			}
+			}
+		}
+		pos = found + 1;
+		part.m_name = args.substr(pos);
+		Property_body* prop = static_cast<Property_body*>(m_object->m_active_state->find_property(property_e::body));
+		if (!prop)
+		{
+			prop = new Property_body();
+			m_object->m_active_state->m_properties.push_back(prop);
+			LOG(INFO) << "Есть такое свойство";
+		}
+		prop->m_item.push_back(part);
+		break;
+	}
 	case command_e::property_strenght:
 	{
 		m_object->m_active_state->m_properties.push_back(new GameObjectParameter(property_e::strength, std::stof(args)));
@@ -239,6 +278,7 @@ void GameObjectManager::init()
 	m_commands.insert(std::pair<std::string, command_e>("property_container", command_e::property_container));
 	m_commands.insert(std::pair<std::string, command_e>("property_strength", command_e::property_strenght));
 	m_commands.insert(std::pair<std::string, command_e>("property_health", command_e::property_health));
+	m_commands["property_body"] = command_e::property_body;
 	m_commands.insert(std::pair<std::string, command_e>("reaction_get_damage", command_e::reaction_get_damage));
 	m_commands.insert(std::pair<std::string, command_e>("effect_physical_damage", command_e::effect_physical_damage));
 

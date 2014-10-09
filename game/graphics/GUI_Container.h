@@ -26,7 +26,7 @@ public:
 	virtual void remove_item_control(GUI_Object* object);
 	virtual void add_managing_control(GUI_Object* object);
 	virtual void resize(int _width, int _height);
-	void set_scroll(int dy);
+	virtual void set_scroll(int dy);
 	virtual MouseEventArgs set_local_mouse_position(MouseEventArgs const& source);
 };
 

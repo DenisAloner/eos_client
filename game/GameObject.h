@@ -200,9 +200,10 @@ public:
 
 struct Body_part_t
 {
-	std::string* m_name;
 	body_part_e m_kind;
-	GameObject* m_equip;
+	std::string m_name;
+	Inventory_cell m_equip;
+	Body_part_t() :m_equip(nullptr){};
 };
 
 class Property_body : public GameObjectProperty
@@ -212,7 +213,7 @@ public:
 	std::list<Body_part_t> m_item;
 
 	Property_body();
-
+	GameObjectProperty* clone();
 };
 
 

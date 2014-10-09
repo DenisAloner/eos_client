@@ -37,8 +37,9 @@ public:
 		}
 
 		virtual void on_mouse_move(MouseEventArgs const& e) { set_focus(true); }
-		virtual void on_get_focus(GUI_Object* sender) { m_object->m_selected = true; }
-		virtual void on_lose_focus(GUI_Object* sender) { m_object->m_selected = false; }
+		/*virtual void on_get_focus(GUI_Object* sender) { m_object->m_selected = true; }
+		virtual void on_lose_focus(GUI_Object* sender) { m_object->m_selected = false; }*/
+
 
 		virtual void render(GraphicalController* Graph, int px, int py)
 		{
