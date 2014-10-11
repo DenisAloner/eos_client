@@ -252,7 +252,7 @@ void Application::initialize()
 	MenuLayer->add(AMTextBox);
 	MenuLayer->add(ActionPanel);
 	MenuLayer->add(TextBox);
-	command_open_body(m_GUI->MapViewer->m_player->m_object);
+
 	GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
 	GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), m_GUI->MapViewer);
 	MiniMap->add_item_control(mini_map);
@@ -520,7 +520,7 @@ bool Application::command_open_inventory(GameObject*& Object)
 	if (Property != nullptr)
 	{
 		//MessageBox(NULL, "In_2", "", MB_OK);
-		GUI_Window* Window = new GUI_Window(1024 / 2 - (Property->m_size.w * 64 + 2) / 2, 1024 / 2 - (Property->m_size.h * 64 + 2) / 2, Property->m_size.w * 64 + 4, 2 * 64 + 27,Object->m_name+"::"+Property->m_name);
+		GUI_Window* Window = new GUI_Window(1024 / 2 - (Property->m_size.w * 64 + 2) / 2, 1024 / 2 - (Property->m_size.h * 64 + 2) / 2, Property->m_size.w * 64 + 4, Property->m_size.h * 64 + 27, Object->m_name + "::" + Property->m_name);
 		GUI_Inventory* Inv = new GUI_Inventory(Property);
 		Inv->m_position.x = 2;
 		Inv->m_position.y = Window->m_size.h - Inv->m_size.h-2;
@@ -641,6 +641,11 @@ Parameter* Application::command_select_transfer(Parameter_destination* parameter
 			m_message_queue.m_condition_variable.wait(lk);
 		}
 		m_message_queue.m_processed_message = true;
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_body_part)
+		{
+			Result = m_message_queue.m_items.front();
+			Exit = true;
+		}
 		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_inventory_cell)
 		{
 			Result = m_message_queue.m_items.front();
@@ -683,11 +688,22 @@ P_object* Application::command_select_transfer_source(Parameter_destination* par
 		}
 		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_inventory_cell)
 		{
-			P_inventory_cell* temp = static_cast<P_inventory_cell*>(m_message_queue.m_items.front());
-			if (temp->m_cell->m_item)
+			P_object_owner* temp = static_cast<P_object_owner*>(m_message_queue.m_items.front());
+			if (static_cast<Inventory_cell*>(temp->m_cell)->m_item)
 			{
 				Result = new P_object();
-				Result->m_object = temp->m_cell->m_item;
+				Result->m_object = static_cast<Inventory_cell*>(temp->m_cell)->m_item;
+				Exit = true;
+			}
+			else Result = nullptr;
+		}
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_body_part)
+		{
+			P_object_owner* temp = static_cast<P_object_owner*>(m_message_queue.m_items.front());
+			if (static_cast<Body_part*>(temp->m_cell)->m_item)
+			{
+				Result = new P_object();
+				Result->m_object = static_cast<Body_part*>(temp->m_cell)->m_item;
 				Exit = true;
 			}
 			else Result = nullptr;
@@ -702,4 +718,30 @@ P_object* Application::command_select_transfer_source(Parameter_destination* par
 		m_message_queue.m_reader = false;
 	}
 	return Result;
+}
+
+void Application::command_equip(GameObject*& unit, Body_part* part, GameObject*& object)
+{
+	part->m_item = object;
+	object->m_owner = part;
+	for (auto kind = object->m_effect.begin(); kind != object->m_effect.end(); kind++)
+	{
+		for (auto effect = (*kind).second.begin(); effect != (*kind).second.end(); effect++)
+		{
+			unit->add_effect(kind->first, *effect);
+		}
+	}
+}
+
+void Application::command_unequip(GameObject*& unit, Body_part* part, GameObject*& object)
+{
+	part->m_item = nullptr;
+	object->m_owner = nullptr;
+	for (auto kind = object->m_effect.begin(); kind != object->m_effect.end(); kind++)
+	{
+		for (auto effect = (*kind).second.begin(); effect != (*kind).second.end(); effect++)
+		{
+			unit->remove_effect(kind->first, *effect);
+		}
+	}
 }

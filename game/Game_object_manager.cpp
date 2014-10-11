@@ -187,7 +187,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::property_body:
 	{
 		std::size_t pos = 0;
-		Body_part_t part;
+		Body_part part;
 		found = args.find(",");
 		auto kind = m_parameters.find(args.substr(0, found));
 		if (kind != m_parameters.end())
@@ -196,17 +196,17 @@ void GameObjectManager::parser(const std::string& command)
 			{
 			case parameter_e::head:
 			{
-				part.m_kind = body_part_e::head;
+				part.m_part_kind = body_part_e::head;
 				break;
 			}
 			case parameter_e::hand:
 			{
-				part.m_kind = body_part_e::hand;
+				part.m_part_kind = body_part_e::hand;
 				break;
 			}
 			case parameter_e::foot:
 			{
-				part.m_kind = body_part_e::foot;
+				part.m_part_kind = body_part_e::foot;
 				break;
 			}
 			}

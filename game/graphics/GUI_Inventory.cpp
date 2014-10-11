@@ -60,7 +60,7 @@ void GUI_InventoryItem::on_mouse_down(MouseEventArgs const& e)
 	set_focus(true);
 	if (Application::instance().m_message_queue.m_reader)
 	{
-		P_inventory_cell* p = new P_inventory_cell();
+		P_object_owner* p = new P_object_owner(ParameterKind::parameter_kind_inventory_cell);
 		p->m_cell = m_item;
 		Application::instance().m_message_queue.push(p);
 	}
@@ -105,7 +105,7 @@ GUI_Inventory::~GUI_Inventory()
 {
 }
 
-GUI_body_cell::GUI_body_cell(int width, int height, Body_part_t* item, GUI_Body* owner) : m_item(item), m_owner(owner)
+GUI_body_cell::GUI_body_cell(int width, int height, Body_part* item, GUI_Body* owner) : m_item(item), m_owner(owner)
 {
 	m_size.w = width;
 	m_size.h = height;
@@ -149,11 +149,11 @@ void GUI_body_cell::render(GraphicalController* Graph, int px, int py)
 	glVertex2d(px + 64, py);
 	glVertex2d(px, py);
 	glEnd();
-	if (m_item->m_equip.m_item)
+	if (m_item->m_item)
 	{
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_BLEND);
-		glBindTexture(GL_TEXTURE_2D, m_item->m_equip.m_item->m_active_state->m_icon);
+		glBindTexture(GL_TEXTURE_2D, m_item->m_item->m_active_state->m_icon);
 		Graph->draw_sprite(px, py, px, py + m_size.h, px + 64, py + m_size.h, px + 64, py);
 	}
 	glEnable(GL_TEXTURE_2D);
@@ -172,8 +172,8 @@ void GUI_body_cell::on_mouse_down(MouseEventArgs const& e)
 	set_focus(true);
 	if (Application::instance().m_message_queue.m_reader)
 	{
-		P_inventory_cell* p = new P_inventory_cell();
-		p->m_cell =& m_item->m_equip;
+		P_object_owner* p = new P_object_owner(ParameterKind::parameter_kind_body_part);
+		p->m_cell = m_item;
 		Application::instance().m_message_queue.push(p);
 	}
 }

@@ -150,6 +150,15 @@ void GameObject::add_effect(effect_e kind, Effect* effect)
 	m_effect[kind].push_back(effect);
 }
 
+void GameObject::remove_effect(effect_e kind, Effect* effect)
+{
+	m_effect[kind].push_back(effect);
+	if (m_effect.find(kind)!=m_effect.end())
+	{
+		m_effect[kind].remove(effect);
+	}
+}
+
 MapCell* GameObject::cell(){
 	return static_cast<MapCell*>(m_owner);
 }

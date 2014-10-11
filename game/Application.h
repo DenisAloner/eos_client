@@ -42,6 +42,7 @@ class Parameter_destination;
 class AI_manager;
 class Reaction_manager;
 class GameObjectManager;
+class Body_part;
 
 class gui_MessageQueue
 {
@@ -127,6 +128,8 @@ public:
 	bool command_open_inventory(GameObject*& Object);
 	bool command_open_body(GameObject*& Object);
 	bool command_check_position(GameObject*& object, MapCell*& position, GameMap*& map);
+	void command_equip(GameObject*& unit, Body_part* part, GameObject*& object);
+	void command_unequip(GameObject*& unit, Body_part* part, GameObject*& object);
 	void command_set_cursor(GLuint _Tile);
 	void command_set_pickup_item(GLuint _Tile);
 	void command_set_cursor_visibility(bool _Visibility);

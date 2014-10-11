@@ -53,15 +53,11 @@ Parameter_destination::Parameter_destination() : Parameter(ParameterKind_Destina
 {
 }
 
-P_cell::P_cell() : Parameter(parameter_kind_cell)
+P_object_owner::P_object_owner(ParameterKind kind) : Parameter(kind)
 {
 }
 
 P_object::P_object() : Parameter(parameter_kind_object)
-{
-}
-
-P_inventory_cell::P_inventory_cell() : Parameter(parameter_kind_inventory_cell)
 {
 }
 

@@ -82,7 +82,8 @@ struct VoidEventArgs
 enum entity_e
 {
 	cell,
-	inventory_cell
+	inventory_cell,
+	body_part
 };
 
 enum action_e
@@ -131,6 +132,7 @@ enum ParameterKind
 	parameter_kind_cell,
 	parameter_kind_object,
 	parameter_kind_inventory_cell,
+	parameter_kind_body_part,
 	parameter_kind_unit_interaction
 };
 

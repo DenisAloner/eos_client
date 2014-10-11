@@ -110,6 +110,7 @@ public:
 	void turn();
 	void set_state(state_e state);
 	void add_effect(effect_e kind, Effect* effect);
+	void remove_effect(effect_e kind, Effect* effect);
 
 	MapCell* cell();
 
@@ -198,19 +199,20 @@ public:
 	AI_manager();
 };
 
-struct Body_part_t
+class Body_part : public Inventory_cell
 {
-	body_part_e m_kind;
+public:
+
+	body_part_e m_part_kind;
 	std::string m_name;
-	Inventory_cell m_equip;
-	Body_part_t() :m_equip(nullptr){};
+	Body_part(GameObject* item = nullptr) :Inventory_cell(item){ m_kind = entity_e::body_part; };
 };
 
 class Property_body : public GameObjectProperty
 {
 public:
 
-	std::list<Body_part_t> m_item;
+	std::list<Body_part> m_item;
 
 	Property_body();
 	GameObjectProperty* clone();

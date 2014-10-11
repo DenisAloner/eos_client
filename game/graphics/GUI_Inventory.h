@@ -10,7 +10,7 @@ class Property_Container;
 class Property_body;
 class Inventory_cell;
 class GameObject;
-struct Body_part_t;
+class Body_part;
 
 class GUI_Inventory;
 
@@ -53,10 +53,10 @@ class GUI_body_cell :
 {
 public:
 
-	Body_part_t* m_item;
+	Body_part* m_item;
 	GUI_Body* m_owner;
 
-	GUI_body_cell(int width, int height, Body_part_t* item, GUI_Body* owner);
+	GUI_body_cell(int width, int height, Body_part* item, GUI_Body* owner);
 
 	virtual void render(GraphicalController* Graph, int px, int py);
 	virtual void on_mouse_move(MouseEventArgs const& e);

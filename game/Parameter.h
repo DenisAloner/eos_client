@@ -77,14 +77,6 @@ public:
 	Parameter_destination();
 };
 
-class P_cell : public Parameter
-{
-public:
-	MapCell* m_cell;
-
-	P_cell();
-};
-
 class P_object : public Parameter
 {
 public:
@@ -94,14 +86,12 @@ public:
 	P_object();
 };
 
-class P_inventory_cell : public Parameter
+class P_object_owner : public Parameter
 {
 public:
 
-	Inventory_cell* m_cell;
-
-	P_inventory_cell();
-
+	Game_object_owner* m_cell;
+	P_object_owner(ParameterKind kind);
 };
 
 class P_unit_interaction : public Parameter
