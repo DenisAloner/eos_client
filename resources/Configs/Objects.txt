@@ -1,3 +1,7 @@
+label sword
+add_to_label permit_equip_hand
+add_to_label permit_move
+
 object elf
 state_alive
 ai 20 0 0
@@ -112,6 +116,7 @@ property_permit_pick
 
 object sword
 state_alive
+add_label sword
 size 1 1 1
 icon sword
 tile_manager_single sword

@@ -209,11 +209,11 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 							{
 								object_size = (*Current)->m_active_state->m_tile_size;
 								dx = object_size.w + m_map->m_items[y][x]->x - (*Current)->cell()->x;
-								x0 = (px + gx)*m_tile_size_x - 1;
-								y0 = (m_tile_count_y - py - gy - object_size.h)*m_tile_size_y - 1;
+								x0 = (px + gx)*m_tile_size_x;
+								y0 = (m_tile_count_y - py - gy - object_size.h)*m_tile_size_y;
 								x1 = x0;
-								y1 = (m_tile_count_y - py - gy)*m_tile_size_y + 1;
-								x2 = (px + gx + 1)*m_tile_size_x + 1;
+								y1 = (m_tile_count_y - py - gy)*m_tile_size_y;
+								x2 = (px + gx + 1)*m_tile_size_x;
 								y2 = y1;
 								x3 = x2;
 								y3 = y0;
@@ -231,6 +231,21 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 								Graph->set_uniform_vector(Graph->m_tile_shader, "light", light);
 								glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
 								Graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
+							/*	glDisable(GL_BLEND);
+								glDisable(GL_TEXTURE_2D);
+								glColor4d(1.0, 1.0, 1.0, 1.0);
+								glBegin(GL_LINES);
+								glVertex2d(x0, y0);
+								glVertex2d(x1, y1);
+								glVertex2d(x1, y1);
+								glVertex2d(x2, y2);
+								glVertex2d(x2, y2);
+								glVertex2d(x3, y3);
+								glVertex2d(x3, y3);
+								glVertex2d(x0, y0);
+								glEnd();
+								glEnable(GL_BLEND);
+								glEnable(GL_TEXTURE_2D);*/
 								if ((*Current)->cell()->x == m_map->m_items[y][x]->x)
 								{
 									Game_object_feature* feat = static_cast<Game_object_feature*>((*Current)->m_active_state->find_property(property_e::health));

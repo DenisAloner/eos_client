@@ -1,5 +1,15 @@
 #include "Game_object_manager.h"
 
+property_e GameObjectManager::get_property_e(const std::string& key)
+{
+	auto value = m_to_property_e.find(key);
+	if (value == m_to_property_e.end())
+	{
+		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
+	}
+	return value->second;
+}
+
 void GameObjectManager::parser(const std::string& command)
 {
 	std::size_t found = 0;
@@ -17,6 +27,17 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	switch (key)
 	{
+	case command_e::label:
+	{
+		m_label = new label_t(args);
+		m_labels[args] = m_label;
+		break;
+	}
+	case command_e::add_to_label:
+	{
+		m_label->m_property.push_back(get_property_e(args));
+		break;
+	}
 	case command_e::obj:
 	{
 		m_object = new GameObject();
@@ -50,6 +71,16 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->m_active_state = new Game_state();
 		m_object->m_active_state->m_state = state_e::off;
 		m_object->m_state.push_back(m_object->m_active_state);
+		break;
+	}
+	case command_e::add_label:
+	{
+		auto value = m_labels.find(args);
+		if (value == m_labels.end())
+		{
+			LOG(FATAL) << "Ёлемент `" << args << "` отсутствует в m_labels";
+		}
+		m_object->m_active_state->m_labels.push_back(value->second);
 		break;
 	}
 	case command_e::ai:
@@ -258,11 +289,14 @@ void GameObjectManager::parser(const std::string& command)
 
 void GameObjectManager::init()
 {
+	m_commands["label"] = command_e::label;
+	m_commands["add_to_label"] = command_e::add_to_label;
 	m_commands.insert(std::pair<std::string, command_e>("object", command_e::obj));
 	m_commands.insert(std::pair<std::string, command_e>("state_alive", command_e::state_alive));
 	m_commands.insert(std::pair<std::string, command_e>("state_dead", command_e::state_dead));
 	m_commands.insert(std::pair<std::string, command_e>("state_on", command_e::state_on));
 	m_commands.insert(std::pair<std::string, command_e>("state_off", command_e::state_off));
+	m_commands["add_label"] = command_e::add_label;
 	m_commands.insert(std::pair<std::string, command_e>("size", command_e::size));
 	m_commands.insert(std::pair<std::string, command_e>("ai", command_e::ai));
 	m_commands.insert(std::pair<std::string, command_e>("weight", command_e::weight));
@@ -281,6 +315,9 @@ void GameObjectManager::init()
 	m_commands["property_body"] = command_e::property_body;
 	m_commands.insert(std::pair<std::string, command_e>("reaction_get_damage", command_e::reaction_get_damage));
 	m_commands.insert(std::pair<std::string, command_e>("effect_physical_damage", command_e::effect_physical_damage));
+
+	m_to_property_e["permit_equip_hand"] = property_e::permit_equip_hand;
+	m_to_property_e["permit_move"] = property_e::permit_move;
 
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);
@@ -332,6 +369,7 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 		state->m_icon = (*item)->m_icon;
 		state->m_actions = (*item)->m_actions;
 		state->m_ai = (*item)->m_ai;
+		state->m_labels = (*item)->m_labels;
 		for (auto prop = (*item)->m_properties.begin(); prop != (*item)->m_properties.end(); prop++)
 		{
 			state->m_properties.push_back((*prop)->clone());

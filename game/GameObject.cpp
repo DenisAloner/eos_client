@@ -22,6 +22,16 @@ GameObjectProperty* Game_state::find_property(property_e kind)
 			return (*Current);
 		}
 	}
+	for (auto label = m_labels.begin(); label != m_labels.end(); label++)
+	{
+		for (auto prop = (*label)->m_property.begin(); prop != (*label)->m_property.end(); prop++)
+		{
+			if ((*prop) == kind)
+			{
+				return (new GameObjectProperty(kind));
+			}
+		}
+	}
 	return nullptr;
 }
 
@@ -261,3 +271,4 @@ GameObjectProperty* Property_body::clone()
 	}
 	return result;
 }
+

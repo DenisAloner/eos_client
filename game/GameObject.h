@@ -23,6 +23,13 @@ class GameObjectProperty;
 class Effect;
 class Reaction;
 
+struct label_t
+{
+	std::string m_name;
+	std::vector<property_e> m_property;
+	label_t(std::string name) :m_name(name){};
+};
+
 class Game_object_owner{
 
 public:
@@ -78,6 +85,7 @@ public:
 
 	std::list<Action*> m_actions;
 	std::list<GameObjectProperty*> m_properties;
+	std::list<label_t*> m_labels;
 
 	AI_configuration* m_ai;
 
@@ -217,6 +225,5 @@ public:
 	Property_body();
 	GameObjectProperty* clone();
 };
-
 
 #endif //GAMEOBJECT_H

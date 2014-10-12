@@ -105,6 +105,7 @@ enum property_e
 	none,
 	permit_move,
 	permit_pick,
+	permit_equip_hand,
 	container,
 	strength,
 	health,
