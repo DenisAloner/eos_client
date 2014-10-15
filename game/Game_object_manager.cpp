@@ -1,9 +1,63 @@
 #include "Game_object_manager.h"
 
+void Reaction_manager::change_health(Reaction* reaction, GameObject* object, Effect* effect)
+{
+	Game_object_feature* prop = static_cast<Game_object_feature*>(object->m_active_state->find_property(property_e::health));
+	if (prop)
+	{
+		if (prop->m_value < 1)
+		{
+			Application::instance().m_GUI->MapViewer->m_map->m_ai.remove(object);
+			object->set_state(state_e::dead);
+		}
+	}
+}
+
+void Reaction_manager::get_damage(Reaction* reaction, GameObject* object, Effect* effect)
+{
+	Game_object_feature* prop = static_cast<Game_object_feature*>(object->m_active_state->find_property(property_e::health));
+	if (prop)
+	{
+		prop->m_value -= reaction->m_value;
+	}
+	auto r = object->m_reaction.find(reaction_e::change_health);
+	if (r != object->m_reaction.end())
+	{
+		r->second->apply(effect->m_value, object, effect);
+	}
+}
+
+Reaction_manager::Reaction_manager()
+{
+	m_items.insert(std::pair<reaction_applicator_e, Reaction::func>(reaction_applicator_e::change_health, std::bind(&Reaction_manager::change_health, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+	m_items.insert(std::pair<reaction_applicator_e, Reaction::func>(reaction_applicator_e::get_damage, std::bind(&Reaction_manager::get_damage, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+}
+
+
 property_e GameObjectManager::get_property_e(const std::string& key)
 {
 	auto value = m_to_property_e.find(key);
 	if (value == m_to_property_e.end())
+	{
+		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
+	}
+	return value->second;
+}
+
+reaction_e GameObjectManager::get_reaction_e(const std::string& key)
+{
+	auto value = m_to_reaction_e.find(key);
+	if (value == m_to_reaction_e.end())
+	{
+		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
+	}
+	return value->second;
+}
+
+reaction_applicator_e GameObjectManager::get_reaction_applicator_e(const std::string& key)
+{
+	auto value = m_to_reaction_applicator_e.find(key);
+	if (value == m_to_reaction_applicator_e.end())
 	{
 		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
 	}
@@ -264,17 +318,6 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->m_active_state->m_properties.push_back(new Game_object_feature(property_e::health, std::stoi(args)));
 		break;
 	}
-	case command_e::reaction_get_damage:
-	{
-		Reaction_subtype* r;
-		r = new Reaction_subtype();
-		r->m_applicator = Application::instance().m_reaction_manager->m_items[reaction_applicator_e::get_damage];
-		m_object->m_reaction[reaction_e::get_damage] = r;
-		Reaction_mods* r1 = new Reaction_mods();
-		r1->m_applicator = Application::instance().m_reaction_manager->m_items[reaction_applicator_e::change_health];
-		m_object->m_reaction[reaction_e::change_health] = r1;
-		break;
-	}
 	case command_e::effect_physical_damage:
 	{
 		Effect* e = new Effect();
@@ -284,11 +327,22 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->m_effect[effect_e::damage].push_back(e);
 		break;
 	}
+	case command_e::reaction:
+	{
+		m_reaction = new Reaction();
+		std::size_t pos = 0;
+		found = args.find(",");
+		m_object->m_reaction[get_reaction_e(args.substr(0, found))] = m_reaction;
+		pos = found + 1;
+		m_reaction->m_applicator = m_reaction_manager->m_items[get_reaction_applicator_e(args.substr(pos))];
+		break;
+	}
 	}
 }
 
 void GameObjectManager::init()
 {
+	m_reaction_manager = new Reaction_manager();
 	m_commands["label"] = command_e::label;
 	m_commands["add_to_label"] = command_e::add_to_label;
 	m_commands.insert(std::pair<std::string, command_e>("object", command_e::obj));
@@ -313,11 +367,17 @@ void GameObjectManager::init()
 	m_commands.insert(std::pair<std::string, command_e>("property_strength", command_e::property_strenght));
 	m_commands.insert(std::pair<std::string, command_e>("property_health", command_e::property_health));
 	m_commands["property_body"] = command_e::property_body;
-	m_commands.insert(std::pair<std::string, command_e>("reaction_get_damage", command_e::reaction_get_damage));
 	m_commands.insert(std::pair<std::string, command_e>("effect_physical_damage", command_e::effect_physical_damage));
+	m_commands["reaction"] = command_e::reaction;
 
 	m_to_property_e["permit_equip_hand"] = property_e::permit_equip_hand;
 	m_to_property_e["permit_move"] = property_e::permit_move;
+
+	m_to_reaction_e["get_damage"] = reaction_e::get_damage;
+	m_to_reaction_e["change_health"] = reaction_e::change_health;
+
+	m_to_reaction_applicator_e["get_damage"] = reaction_applicator_e::get_damage;
+	m_to_reaction_applicator_e["change_health"] = reaction_applicator_e::change_health;
 
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);

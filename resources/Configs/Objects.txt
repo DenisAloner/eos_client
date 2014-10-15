@@ -34,7 +34,8 @@ property_body foot,правая нога
 state_dead
 size 1 2 0
 tile_manager_single elf_corpse
-reaction_get_damage
+reaction get_damage,get_damage
+reaction change_health,change_health
 effect_physical_damage 10
 
 object snake
@@ -62,7 +63,8 @@ property_health 100
 state_dead
 size 1 1 0
 tile_manager_single snake_corpse
-reaction_get_damage
+reaction get_damage,get_damage
+reaction change_health,change_health
 effect_physical_damage 1
 
 object bear

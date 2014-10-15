@@ -196,6 +196,7 @@ struct light_t
 enum class reaction_e
 {
 	get_damage,
+	get_buff,
 	change_health
 };
 
@@ -207,7 +208,8 @@ enum class reaction_applicator_e
 
 enum class effect_e
 {
-	damage
+	damage,
+	buff
 };
 
 enum class effect_subtype_e

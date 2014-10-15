@@ -173,7 +173,6 @@ void Application::initialize()
 	m_actions[action_e::hit] = new Action_hit();
 	m_actions[action_e::equip] = new Action_equip();
 	m_ai_manager = new AI_manager();
-	m_reaction_manager = new Reaction_manager();
 	m_game_object_manager = new GameObjectManager();
 	m_game_object_manager->init();
 

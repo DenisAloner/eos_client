@@ -22,17 +22,29 @@ GameObjectProperty* Game_state::find_property(property_e kind)
 			return (*Current);
 		}
 	}
+	return nullptr;
+}
+
+bool Game_state::check_property(property_e kind)
+{
+	for (std::list<GameObjectProperty*>::iterator Current = m_properties.begin(); Current != m_properties.end(); Current++)
+	{
+		if ((*Current)->m_kind == kind)
+		{
+			return true;
+		}
+	}
 	for (auto label = m_labels.begin(); label != m_labels.end(); label++)
 	{
 		for (auto prop = (*label)->m_property.begin(); prop != (*label)->m_property.end(); prop++)
 		{
 			if ((*prop) == kind)
 			{
-				return (new GameObjectProperty(kind));
+				return true;
 			}
 		}
 	}
-	return nullptr;
+	return false;
 }
 
 Action* Game_state::find_action(action_e kind)
@@ -63,39 +75,22 @@ void MapCell::add_object(GameObject* Object)
 	m_items.push_back(Object);
 }
 
-GameObjectProperty* MapCell::find_property(property_e kind, GameObject* excluded)
-{
-	GameObjectProperty* result(nullptr);
-	for (std::list<GameObject*>::iterator item = m_items.begin(); item != m_items.end(); item++)
-	{
-		if (excluded != (*item))
-		{
-			result = (*item)->m_active_state->find_property(kind);
-			if (result != nullptr)
-			{
-				return result;
-			}
-		}
-	}
-	return nullptr;
-}
-
-bool MapCell::check_permit(property_e kind, GameObject* excluded)
-{
-	GameObjectProperty* result(nullptr);
-	for (std::list<GameObject*>::iterator item = m_items.begin(); item != m_items.end(); item++)
-	{
-		if (excluded != (*item))
-		{
-			result = (*item)->m_active_state->find_property(kind);
-			if (result == nullptr)
-			{
-				return false;
-			}
-		}
-	}
-	return true;
-}
+//GameObjectProperty* MapCell::find_property(property_e kind, GameObject* excluded)
+//{
+//	GameObjectProperty* result(nullptr);
+//	for (std::list<GameObject*>::iterator item = m_items.begin(); item != m_items.end(); item++)
+//	{
+//		if (excluded != (*item))
+//		{
+//			result = (*item)->m_active_state->find_property(kind);
+//			if (result != nullptr)
+//			{
+//				return result;
+//			}
+//		}
+//	}
+//	return nullptr;
+//}
 
 GameObject::GameObject()
 {
@@ -253,8 +248,8 @@ AI_manager::AI_manager()
 	m_fov_qualifiers.push_back([](GameObject* object)->bool{return object->m_name == "wall"; });
 	m_fov_qualifiers.push_back([](GameObject* object)->bool{return false; });
 
-	m_path_qualifiers.push_back([](GameObject* object)->bool{return !object->m_active_state->find_property(property_e::permit_move);});
-	m_path_qualifiers.push_back([](GameObject* object)->bool{return !object->m_active_state->find_property(property_e::permit_move) && object->m_name != "wall"; });
+	m_path_qualifiers.push_back([](GameObject* object)->bool{return !object->m_active_state->check_property(property_e::permit_move);});
+	m_path_qualifiers.push_back([](GameObject* object)->bool{return !object->m_active_state->check_property(property_e::permit_move) && object->m_name != "wall"; });
 }
 
 Property_body::Property_body() : GameObjectProperty(property_e::body)

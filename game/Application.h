@@ -96,8 +96,7 @@ public:
 	Action* m_actions[10];
 
 	AI_manager* m_ai_manager;
-	Reaction_manager* m_reaction_manager;
-
+	
 	Event<WPARAM> key_press;
 	Event<MouseEventArgs> mouse_click;
 
