@@ -13,17 +13,13 @@ public:
 	virtual void apply(GameObject* object, Effect* effect);
 };
 
-class Buff
+class Buff : public Effect
 {
 public:
 
-	reaction_e m_kind;
-	effect_subtype_e m_subtype;
-	int m_value;
 	int m_duration;
 
 	Buff();
-	virtual void apply(GameObject* object, Effect* effect);
 };
 
 class Reaction

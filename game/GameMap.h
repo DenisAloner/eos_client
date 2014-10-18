@@ -37,7 +37,6 @@ public:
 	light_t m_local_light[3][41][41];
 	bool m_barrier_map[41][41];
 
-	 
 	std::vector<std::vector<MapCell*> > m_items;
 	std::list<GameObject*> m_lights;
 	std::list<GameObject*> m_ai;

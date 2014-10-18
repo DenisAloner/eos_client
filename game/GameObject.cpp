@@ -164,6 +164,16 @@ void GameObject::remove_effect(effect_e kind, Effect* effect)
 	}
 }
 
+std::list<Effect*>* GameObject::find_effect(effect_e key)
+{
+	auto value = m_effect.find(key);
+	if (value != m_effect.end())
+	{
+		return &value->second;
+	}
+	return nullptr;
+}
+
 MapCell* GameObject::cell(){
 	return static_cast<MapCell*>(m_owner);
 }
@@ -266,4 +276,3 @@ GameObjectProperty* Property_body::clone()
 	}
 	return result;
 }
-

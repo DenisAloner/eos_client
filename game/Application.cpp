@@ -426,6 +426,7 @@ void Application::update()
 	{
 		m_GUI->MapViewer->m_player->m_fov->calculate(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_fov_radius, m_GUI->MapViewer->m_player->m_object, m_GUI->MapViewer->m_map);
 	}
+	Application::instance().m_game_object_manager->update_buff();
 	Application::instance().m_GUI->MapViewer->update();
 	Application::instance().m_GUI->MapViewer->m_map->m_update = true;
 	m_update_mutex.unlock();

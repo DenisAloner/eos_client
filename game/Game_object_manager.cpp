@@ -337,6 +337,16 @@ void GameObjectManager::parser(const std::string& command)
 		m_reaction->m_applicator = m_reaction_manager->m_items[get_reaction_applicator_e(args.substr(pos))];
 		break;
 	}
+	case command_e::buff:
+	{
+		m_buff = new Buff();
+		m_buff->m_kind = reaction_e::get_damage;
+		m_buff->m_subtype = effect_subtype_e::physical_damage;
+		m_buff->m_value = 10;
+		m_buff->m_duration = 2;
+		m_object->m_effect[effect_e::buff].push_back(m_buff);
+		break;
+	}
 	}
 }
 
@@ -369,6 +379,7 @@ void GameObjectManager::init()
 	m_commands["property_body"] = command_e::property_body;
 	m_commands.insert(std::pair<std::string, command_e>("effect_physical_damage", command_e::effect_physical_damage));
 	m_commands["reaction"] = command_e::reaction;
+	m_commands["buff"] = command_e::buff;
 
 	m_to_property_e["permit_equip_hand"] = property_e::permit_equip_hand;
 	m_to_property_e["permit_move"] = property_e::permit_move;
@@ -444,5 +455,31 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 	obj->m_active_state = obj->m_state.front();
 	obj->m_reaction = config->m_reaction;
 	obj->m_effect = config->m_effect;
+	m_objects.push_back(obj);
 	return obj;
+}
+
+
+void GameObjectManager::update_buff()
+{
+	std::list<Effect*>* list;
+	Buff* b;
+	for (auto object = m_objects.begin(); object != m_objects.end(); object++)
+	{
+		list=(*object)->find_effect(effect_e::buff);
+		if (list)
+		{
+			for (auto buff = list->begin(); buff != list->end();)
+			{
+				(*buff)->apply((*object), (*buff));
+				b = static_cast<Buff*>(*buff);
+				b->m_duration -= 1;
+				if (b->m_duration < 0)
+				{
+					buff=list->erase(buff);
+				}
+				else ++buff;
+			}
+		}
+	}
 }

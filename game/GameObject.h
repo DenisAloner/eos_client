@@ -119,6 +119,7 @@ public:
 	void set_state(state_e state);
 	void add_effect(effect_e kind, Effect* effect);
 	void remove_effect(effect_e kind, Effect* effect);
+	std::list<Effect*>* find_effect(effect_e key);
 
 	MapCell* cell();
 

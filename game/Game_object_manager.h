@@ -7,6 +7,7 @@
 struct label_t;
 class Reaction;
 class Effect;
+class Buff;
 
 class Reaction_manager
 {
@@ -53,7 +54,8 @@ public:
 		property_health,
 		property_body,
 		effect_physical_damage,
-		reaction
+		reaction,
+		buff
 	};
 
 	enum class parameter_e
@@ -80,6 +82,9 @@ public:
 	GameObject* m_object;
 	label_t* m_label;
 	Reaction* m_reaction;
+	Buff* m_buff;
+
+	std::list<GameObject*> m_objects;
 
 	Reaction_manager* m_reaction_manager;
 
@@ -88,9 +93,7 @@ public:
 	reaction_applicator_e get_reaction_applicator_e(const std::string& key);
 
 	void parser(const std::string& command);
-
-	GameObject* new_object(std::string unit_name);
-
 	void init();
-
+	GameObject* new_object(std::string unit_name);
+	void update_buff();
 };

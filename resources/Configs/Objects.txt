@@ -37,6 +37,7 @@ tile_manager_single elf_corpse
 reaction get_damage,get_damage
 reaction change_health,change_health
 effect_physical_damage 10
+buff
 
 object snake
 state_alive

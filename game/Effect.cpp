@@ -14,6 +14,10 @@ void Effect::apply(GameObject* object, Effect* effect)
 	}
 }
 
+Buff::Buff()
+{
+}
+
 void Reaction::apply(int value, GameObject* object, Effect* effect)
 {
 	m_value = value;
