@@ -34,10 +34,9 @@ property_body foot,правая нога
 state_dead
 size 1 2 0
 tile_manager_single elf_corpse
-reaction get_damage,get_damage
-reaction change_health,change_health
-effect_physical_damage 10
-buff
+reaction get_damage,get_damage_basic
+reaction change_health,change_health_basic
+effect get_damage,physical_damage,10,damage
 
 object snake
 state_alive
@@ -64,9 +63,10 @@ property_health 100
 state_dead
 size 1 1 0
 tile_manager_single snake_corpse
-reaction get_damage,get_damage
-reaction change_health,change_health
-effect_physical_damage 1
+reaction get_damage,get_damage_basic
+reaction change_health,change_health_basic
+reaction get_buff,get_buff_basic
+effect get_damage,physical_damage,1,damage
 
 object bear
 state_alive
@@ -90,7 +90,7 @@ tile_manager_map no_tile 3 2
 tile_manager_map no_tile 3 3
 action_move
 property_health 100
-effect_physical_damage 1
+effect get_damage,physical_damage,1,damage
 
 object ghost
 state_alive
@@ -101,7 +101,7 @@ tile_manager_rotating ghost_left 1
 tile_manager_rotating no_tile 2
 tile_manager_rotating no_tile 3
 property_health 100
-effect_physical_damage 1
+effect get_damage,physical_damage,1,damage
 
 object floor
 state_alive
@@ -124,7 +124,8 @@ size 1 1 1
 icon sword
 tile_manager_single sword
 property_permit_pick
-effect_physical_damage 50
+effect get_damage,physical_damage,10,damage
+buff get_buff,poison_damage,5,5,damage
 
 object wall
 state_alive

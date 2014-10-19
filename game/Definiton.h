@@ -202,8 +202,9 @@ enum class reaction_e
 
 enum class reaction_applicator_e
 {
-	get_damage,
-	change_health
+	get_damage_basic,
+	change_health_basic,
+	get_buff_basic
 };
 
 enum class effect_e
@@ -214,7 +215,8 @@ enum class effect_e
 
 enum class effect_subtype_e
 {
-	physical_damage
+	physical_damage,
+	poison_damage
 };
 
 enum class body_part_e

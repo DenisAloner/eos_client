@@ -14,8 +14,38 @@ void Effect::apply(GameObject* object, Effect* effect)
 	}
 }
 
+bool Effect::on_turn()
+{
+	return false;
+}
+
+Effect* Effect::clone()
+{
+	return nullptr;
+}
+
 Buff::Buff()
 {
+}
+
+bool Buff::on_turn()
+{
+	m_duration -= 1;
+	if (m_duration < 1)
+	{
+		return true;
+	}
+	return false;
+}
+
+Effect* Buff::clone()
+{
+	Buff* effect = new Buff();
+	effect->m_kind = m_kind;
+	effect->m_subtype = m_subtype;
+	effect->m_value = m_value;
+	effect->m_duration = m_duration;
+	return effect;
 }
 
 void Reaction::apply(int value, GameObject* object, Effect* effect)

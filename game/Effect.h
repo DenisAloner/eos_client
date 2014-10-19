@@ -11,6 +11,8 @@ public:
 	
 	Effect();
 	virtual void apply(GameObject* object, Effect* effect);
+	virtual bool on_turn();
+	virtual Effect* clone();
 };
 
 class Buff : public Effect
@@ -20,6 +22,8 @@ public:
 	int m_duration;
 
 	Buff();
+	virtual bool on_turn();
+	virtual Effect* clone();
 };
 
 class Reaction
