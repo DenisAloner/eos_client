@@ -135,6 +135,7 @@ public:
 	void command_set_pickup_item_visibility(bool _Visibility);
 	P_object* command_select_transfer_source(Parameter_destination* parameter);
 	Parameter* command_select_transfer(Parameter_destination* parameter);
+	void console(std::string text);
 	
 	void PlaySound1();
 

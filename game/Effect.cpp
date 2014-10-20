@@ -24,6 +24,11 @@ Effect* Effect::clone()
 	return nullptr;
 }
 
+std::string Effect::get_description()
+{
+	return "";
+}
+
 Buff::Buff()
 {
 }
@@ -45,6 +50,27 @@ Effect* Buff::clone()
 	effect->m_subtype = m_subtype;
 	effect->m_value = m_value;
 	effect->m_duration = m_duration;
+	return effect;
+}
+
+std::string Buff::get_description()
+{
+	return "<" + std::to_string(m_value) + " урона от яда, " + std::to_string(m_duration) + " ход(а/ов)>";
+}
+
+
+Buff_chance::Buff_chance()
+{
+}
+
+Effect* Buff_chance::clone()
+{
+	Buff_chance* effect = new Buff_chance();
+	effect->m_kind = m_kind;
+	effect->m_subtype = m_subtype;
+	effect->m_value = m_value;
+	effect->m_duration = m_duration;
+	effect->m_chance = m_chance;
 	return effect;
 }
 

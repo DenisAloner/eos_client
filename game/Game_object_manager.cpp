@@ -9,6 +9,7 @@ void Reaction_manager::change_health_basic(Reaction* reaction, GameObject* objec
 		{
 			Application::instance().m_GUI->MapViewer->m_map->m_ai.remove(object);
 			object->set_state(state_e::dead);
+			Application::instance().console(object->m_name + ": смерть");
 		}
 	}
 }
@@ -19,6 +20,19 @@ void Reaction_manager::get_damage_basic(Reaction* reaction, GameObject* object, 
 	if (prop)
 	{
 		prop->m_value -= reaction->m_value;
+		switch (effect->m_subtype)
+		{
+		case effect_subtype_e::physical_damage:
+		{
+			Application::instance().console(object->m_name + ": нанесено " + std::to_string(reaction->m_value) + " физического урона, здоровье - " + std::to_string(prop->m_value));
+			break;
+		}
+		case effect_subtype_e::poison_damage:
+		{
+			Application::instance().console(object->m_name + ": нанесено " + std::to_string(reaction->m_value) + " урона от яда,здоровье - "+std::to_string(prop->m_value));
+			break;
+		}
+		}
 	}
 	auto r = object->m_reaction.find(reaction_e::change_health);
 	if (r != object->m_reaction.end())
@@ -33,6 +47,7 @@ void Reaction_manager::get_buff_basic(Reaction* reaction, GameObject* object, Ef
 	Effect* e = effect->clone();
 	e->m_kind = reaction_e::get_damage;
 	object->add_effect(effect_e::buff, e);
+	Application::instance().console(object->m_name + ": наложен бафф <Отравление> ");
 }
 
 Reaction_manager::Reaction_manager()
@@ -508,7 +523,6 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 	return obj;
 }
 
-
 void GameObjectManager::update_buff()
 {
 	std::list<Effect*>* list;
@@ -519,10 +533,13 @@ void GameObjectManager::update_buff()
 		{
 			for (auto buff = list->begin(); buff != list->end();)
 			{
+				Application::instance().console((*object)->m_name + ": активирован бафф " + (*buff)->get_description());
 				(*buff)->apply((*object), (*buff));
 				if ((*buff)->on_turn())
 				{
+					Application::instance().console((*object)->m_name + ": бафф " + (*buff)->get_description() + " исчез");
 					buff = list->erase(buff);
+					
 				}
 				else
 				{

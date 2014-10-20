@@ -13,6 +13,7 @@ public:
 	virtual void apply(GameObject* object, Effect* effect);
 	virtual bool on_turn();
 	virtual Effect* clone();
+	virtual std::string get_description();
 };
 
 class Buff : public Effect
@@ -23,6 +24,17 @@ public:
 
 	Buff();
 	virtual bool on_turn();
+	virtual Effect* clone();
+	virtual std::string get_description();
+};
+
+class Buff_chance: public Buff
+{
+public:
+
+	int m_chance;
+
+	Buff_chance();
 	virtual Effect* clone();
 };
 

@@ -745,3 +745,8 @@ void Application::command_unequip(GameObject*& unit, Body_part* part, GameObject
 		}
 	}
 }
+
+void Application::console(std::string text)
+{
+	m_GUI->DescriptionBox->add_item_control(new GUI_Text(text,new GUI_TextFormat(8,17,RGBA_t(1.0,1.0,1.0,1.0))));
+}
