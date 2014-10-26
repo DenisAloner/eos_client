@@ -1,9 +1,8 @@
 label sword
-add_to_label permit_equip_hand
-add_to_label permit_move
+add_to_label pass_able
 
 object elf
-state_alive
+state alive
 ai 20 0 0
 size 1 2 5
 tile_manager_map no_tile 0 0
@@ -24,22 +23,22 @@ tile_manager_map elf_right_03 3 2
 tile_manager_map elf_right_04 3 3
 action_move
 property_container Мешок 2 4
-property_strength 8.0
-property_health 100
+parameter health,100,100
+parameter strength,8,100
 property_body head,голова
 property_body hand,левая рука
 property_body hand,правая рука
 property_body foot,левая нога
 property_body foot,правая нога
-state_dead
-size 1 2 0
-tile_manager_single elf_corpse
 reaction get_damage,get_damage_basic
 reaction change_health,change_health_basic
 effect get_damage,physical_damage,10,damage
+state dead
+size 1 2 0
+tile_manager_single elf_corpse
 
 object snake
-state_alive
+state alive
 ai 20 0 0
 size 1 1 1
 tile_manager_map no_tile 0 0
@@ -59,17 +58,17 @@ tile_manager_map snake_right_02 3 1
 tile_manager_map snake_right_03 3 2
 tile_manager_map snake_right_04 3 3
 action_move
-property_health 100
-state_dead
-size 1 1 0
-tile_manager_single snake_corpse
+parameter health,100,100
 reaction get_damage,get_damage_basic
 reaction change_health,change_health_basic
 reaction get_buff,get_buff_basic
 effect get_damage,physical_damage,1,damage
+state dead
+size 1 1 0
+tile_manager_single snake_corpse
 
 object bear
-state_alive
+state alive
 ai 20 0 0
 size 3 3 4
 tile_manager_map no_tile 0 0
@@ -89,99 +88,99 @@ tile_manager_map no_tile 3 1
 tile_manager_map no_tile 3 2
 tile_manager_map no_tile 3 3
 action_move
-property_health 100
+parameter health,100,100
 effect get_damage,physical_damage,1,damage
 
 object ghost
-state_alive
+state alive
 ai 20 1 1
 size 1 2 4
 tile_manager_rotating no_tile 0
 tile_manager_rotating ghost_left 1
 tile_manager_rotating no_tile 2
 tile_manager_rotating no_tile 3
-property_health 100
+parameter health,100,100
 effect get_damage,physical_damage,1,damage
 
 object floor
-state_alive
+state alive
 size 1 1 0
 tile_manager_single EoS_Floor_01
-property_permit_move
+attribute pass_able
 layer 0
 
 object health potion
-state_alive
+state alive
 size 1 1 1
 icon health_potion
 tile_manager_single health_potion
-property_permit_pick
+attribute pick_able
 
 object sword
-state_alive
+state equip
 add_label sword
 size 1 1 1
 icon sword
 tile_manager_single sword
-property_permit_pick
+attribute pick_able
 effect get_damage,physical_damage,10,damage
 buff get_buff,poison_damage,5,5,damage
 
 object wall
-state_alive
+state alive
 size 1 1 4
 tile_manager_single EoS_Wall
 layer 2
 
 object dirt
-state_alive
+state alive
 size 1 1 0
 tile_manager_single Mud
 layer 2
 
 object torch
-state_alive
+state alive
 size 1 1 3
 tile_manager_single EoS_Torch
 light 80 80 80
 
 object red torch
-state_alive
+state alive
 size 1 1 3
 tile_manager_single EoS_Torch
 light 80 0 0
 
 object green torch
-state_alive
+state alive
 size 1 1 3
 tile_manager_single EoS_Torch
 light 0 80 0
 
 object blue torch
-state_alive
+state alive
 size 1 1 3
 tile_manager_single EoS_Torch
 light 0 0 80
 
 object door
-state_on
+state on
 size 5 1 4
 tile_manager_rotating door_down 0
 tile_manager_rotating door_left 1
 tile_manager_rotating no_tile 2
 tile_manager_rotating no_tile 3
 layer 2
-state_off
+state off
 size 5 1 0
 tile_manager_rotating door_close_down 0
 tile_manager_rotating door_close_left 1
 tile_manager_rotating no_tile 2
 tile_manager_rotating no_tile 3
-property_permit_move
+attribute pass_able
 layer 2
 
 object chest
-state_alive
+state alive
 size 2 1 2
 weight 25.0
 tile_manager_rotating chest 0

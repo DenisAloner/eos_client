@@ -3,7 +3,7 @@
 #include "log.h"
 
 
-Game_state::Game_state()
+Object_state::Object_state()
 {
 	m_layer = 1;
 	m_light = nullptr;
@@ -12,42 +12,7 @@ Game_state::Game_state()
 	m_ai = nullptr;
 }
 
-
-GameObjectProperty* Game_state::find_property(property_e kind)
-{
-	for (std::list<GameObjectProperty*>::iterator Current = m_properties.begin(); Current != m_properties.end(); Current++)
-	{
-		if ((*Current)->m_kind == kind)
-		{
-			return (*Current);
-		}
-	}
-	return nullptr;
-}
-
-bool Game_state::check_property(property_e kind)
-{
-	for (std::list<GameObjectProperty*>::iterator Current = m_properties.begin(); Current != m_properties.end(); Current++)
-	{
-		if ((*Current)->m_kind == kind)
-		{
-			return true;
-		}
-	}
-	for (auto label = m_labels.begin(); label != m_labels.end(); label++)
-	{
-		for (auto prop = (*label)->m_property.begin(); prop != (*label)->m_property.end(); prop++)
-		{
-			if ((*prop) == kind)
-			{
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-Action* Game_state::find_action(action_e kind)
+Action* Object_state::find_action(action_e kind)
 {
 	for (std::list<Action*>::iterator Current = m_actions.begin(); Current != m_actions.end(); Current++)
 	{
@@ -59,7 +24,7 @@ Action* Game_state::find_action(action_e kind)
 	return nullptr;
 }
 
-void Game_state::set_tile_size()
+void Object_state::set_tile_size()
 {
 	m_tile_size = dimension_t(m_size.x, m_size.y + m_size.z);
 }
@@ -75,9 +40,9 @@ void MapCell::add_object(GameObject* Object)
 	m_items.push_back(Object);
 }
 
-//GameObjectProperty* MapCell::find_property(property_e kind, GameObject* excluded)
+//Object_feature* MapCell::find_property(property_e kind, GameObject* excluded)
 //{
-//	GameObjectProperty* result(nullptr);
+//	Object_feature* result(nullptr);
 //	for (std::list<GameObject*>::iterator item = m_items.begin(); item != m_items.end(); item++)
 //	{
 //		if (excluded != (*item))
@@ -126,21 +91,21 @@ void GameObject::set_direction(ObjectDirection dir)
 {
 	if (((m_direction == ObjectDirection_Left || m_direction == ObjectDirection_Right) && (dir == ObjectDirection_Up || dir == ObjectDirection_Down)) || ((dir == ObjectDirection_Left || dir == ObjectDirection_Right) && (m_direction == ObjectDirection_Up || m_direction == ObjectDirection_Down)))
 	{
-		for (std::list<Game_state*>::iterator item = m_state.begin(); item != m_state.end(); item++)
+		for (std::list<Object_state*>::iterator item = m_state.begin(); item != m_state.end(); item++)
 		{
 			(*item)->m_size = game_object_size_t((*item)->m_size.y, (*item)->m_size.x, (*item)->m_size.z);
 		}
 	}
-	for (std::list<Game_state*>::iterator item = m_state.begin(); item != m_state.end(); item++)
+	for (std::list<Object_state*>::iterator item = m_state.begin(); item != m_state.end(); item++)
 	{
 		(*item)->set_tile_size();
 	}
 	m_direction = dir;
 }
 
-void GameObject::set_state(state_e state)
+void GameObject::set_state(object_state_e state)
 {
-	for (std::list<Game_state*>::iterator item = m_state.begin(); item != m_state.end(); item++)
+	for (std::list<Object_state*>::iterator item = m_state.begin(); item != m_state.end(); item++)
 	{
 		if ((*item)->m_state == state)
 		{
@@ -150,28 +115,207 @@ void GameObject::set_state(state_e state)
 	}
 }
 
-void GameObject::add_effect(effect_e kind, Effect* effect)
+Object_state* GameObject::get_state(object_state_e state)
 {
-	m_effect[kind].push_back(effect);
-}
-
-void GameObject::remove_effect(effect_e kind, Effect* effect)
-{
-	m_effect[kind].push_back(effect);
-	if (m_effect.find(kind)!=m_effect.end())
+	for (std::list<Object_state*>::iterator item = m_state.begin(); item != m_state.end(); item++)
 	{
-		m_effect[kind].remove(effect);
-	}
-}
-
-std::list<Effect*>* GameObject::find_effect(effect_e key)
-{
-	auto value = m_effect.find(key);
-	if (value != m_effect.end())
-	{
-		return &value->second;
+		if ((*item)->m_state == state)
+		{
+			return (*item);
+		}
 	}
 	return nullptr;
+}
+
+Object_feature* GameObject::get_feature(object_feature_e key)
+{
+	if (m_active_state)
+	{
+		auto value = m_active_state->m_feature.find(key);
+		if (value != m_active_state->m_feature.end())
+		{
+			return value->second;
+		}
+	}
+	return nullptr;
+}
+
+void GameObject::add_attribute(object_attribute_e key)
+{
+	Attribute_list* list = static_cast<Attribute_list*>(get_feature(object_feature_e::stat));
+	if (list)
+	{
+		list->m_stat.push_back(key);
+	}
+	else
+	{
+		if (m_active_state)
+		{
+			list = new Attribute_list();
+			list->m_stat.push_back(key);
+			m_active_state->m_feature[object_feature_e::stat] = list;
+		}
+	}
+}
+
+void GameObject::add_label(const std::string& key)
+{
+	Attribute_list* list = static_cast<Attribute_list*>(get_feature(object_feature_e::stat));
+	if (list)
+	{
+		auto value = Application::instance().m_game_object_manager->m_labels.find(key);
+		if (value != Application::instance().m_game_object_manager->m_labels.end())
+		{
+			list->m_label.push_back(value->second);
+		}
+	}
+	else
+	{
+		if (m_active_state)
+		{
+			auto value = Application::instance().m_game_object_manager->m_labels.find(key);
+			if (value != Application::instance().m_game_object_manager->m_labels.end())
+			{
+				list = new Attribute_list();
+				list->m_label.push_back(value->second);
+				m_active_state->m_feature[object_feature_e::stat] = list;
+			}
+		}
+	}
+}
+
+void GameObject::add_effect(effect_e key, Effect* item)
+{
+	Effect_list* list = static_cast<Effect_list*>(get_feature(object_feature_e::effect));
+	if (list)
+	{
+		list->m_effect[key].push_back(item);
+	}
+	else
+	{
+		if (m_active_state)
+		{
+			list = new Effect_list();
+			list->m_effect[key].push_back(item);
+			m_active_state->m_feature[object_feature_e::effect] = list;
+		}
+	}
+}
+
+void GameObject::add_reaction(reaction_e key, Reaction* item)
+{
+	auto list = static_cast<Reaction_list*>(get_feature(object_feature_e::reaction));
+	if (list)
+	{
+		list->m_reaction[key] = *item;
+	}
+	else
+	{
+		if (m_active_state)
+		{
+			list = new Reaction_list();
+			list->m_reaction[key] = *item;
+			m_active_state->m_feature[object_feature_e::reaction] = list;
+		}
+	}
+}
+
+void GameObject::add_parameter(object_parameter_e key, object_parameter_t* item)
+{
+	Parameter_list* list = static_cast<Parameter_list*>(get_feature(object_feature_e::parameter));
+	if (list)
+	{
+		list->m_parameter[key] = *item;
+	}
+	else
+	{
+		if (m_active_state)
+		{
+			list = new Parameter_list();
+			list->m_parameter[key] = *item;
+			m_active_state->m_feature[object_feature_e::parameter] = list;
+		}
+	}
+}
+
+void GameObject::remove_effect(effect_e key, Effect* item)
+{
+	Effect_list* list = static_cast<Effect_list*>(get_feature(object_feature_e::effect));
+	if (list)
+	{
+		if (list->m_effect.find(key) != list->m_effect.end())
+		{
+			list->m_effect[key].remove(item);
+		}
+	}
+}
+
+std::list<Effect*>* GameObject::get_effect(effect_e key)
+{
+	Effect_list* list = static_cast<Effect_list*>(get_feature(object_feature_e::effect));
+	if (list)
+	{
+		auto value = list->m_effect.find(key);
+		if (value != list->m_effect.end())
+		{
+			return &value->second;
+		}
+	}
+	return nullptr;
+}
+
+object_parameter_t* GameObject::get_parameter(object_parameter_e key)
+{
+	Parameter_list* list = static_cast<Parameter_list*>(get_feature(object_feature_e::parameter));
+	if (list)
+	{
+		auto value = list->m_parameter.find(key);
+		if (value != list->m_parameter.end())
+		{
+			return &value->second;
+		}
+	}
+	return nullptr;
+}
+
+Reaction* GameObject::get_reaction(reaction_e key)
+{
+	Reaction_list* list = static_cast<Reaction_list*>(get_feature(object_feature_e::reaction));
+	if (list)
+	{
+		auto value = list->m_reaction.find(key);
+		if (value != list->m_reaction.end())
+		{
+			return &value->second;
+		}
+	}
+	return nullptr;
+}
+
+bool GameObject::get_stat(object_attribute_e key)
+{
+	Attribute_list* list = static_cast<Attribute_list*>(get_feature(object_feature_e::stat));
+	if (list)
+	{
+		for (auto item = list->m_stat.begin(); item != list->m_stat.end();item++)
+		{
+			if (*item == key)
+			{
+				return true;
+			}
+		}
+		for (auto label = list->m_label.begin(); label != list->m_label.end(); label++)
+		{
+			for (auto stat = (*label)->m_stat.begin(); stat != (*label)->m_stat.end(); stat++)
+			{
+				if (*stat == key)
+				{
+					return true;
+				}
+			}
+		}
+	}
+	return false;
 }
 
 MapCell* GameObject::cell(){
@@ -184,48 +328,14 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 	m_fov->calculate(object->m_active_state->m_ai->m_fov_radius, m_object, m_map);
 }
 
-GameObjectProperty::GameObjectProperty(property_e _kind = property_e::none) : m_kind(_kind)
+Object_feature::Object_feature(object_feature_e kind) : m_kind(kind)
 {
 }
 
-GameObjectProperty* GameObjectProperty::clone()
+Object_feature* Object_feature::clone()
 {
-	GameObjectProperty* result = new GameObjectProperty();
+	Object_feature* result = new Object_feature(object_feature_e::none);
 	result->m_kind = m_kind;
-	return result;
-}
-
-GameObjectProperty::~GameObjectProperty(void)
-{
-}
-
-GameObjectParameter::GameObjectParameter(property_e kind = property_e::none, float value = 0) :GameObjectProperty(kind), m_value(value){}
-
-GameObjectProperty* GameObjectParameter::clone()
-{
-	GameObjectParameter* result = new GameObjectParameter();
-	result->m_kind = m_kind;
-	result->m_value = m_value;
-	return result;
-}
-
-Game_object_feature::Game_object_feature(property_e kind = property_e::none, int value = 0) : GameObjectProperty(kind), m_value(value){}
-
-GameObjectProperty* Game_object_feature::clone()
-{
-	Game_object_feature* result = new Game_object_feature();
-	result->m_kind = m_kind;
-	result->m_value = m_value;
-	return result;
-}
-
-GameObjectLink::GameObjectLink(property_e kind = property_e::none, GameObject* object = nullptr) : GameObjectProperty(kind), m_object(object){}
-
-GameObjectProperty* GameObjectLink::clone()
-{
-	GameObjectLink* result = new GameObjectLink();
-	result->m_kind = m_kind;
-	result->m_object = m_object;
 	return result;
 }
 
@@ -234,7 +344,7 @@ Inventory_cell::Inventory_cell(GameObject* item = nullptr) : m_item(item)
 	m_kind = entity_e::inventory_cell;
 }
 
-Property_Container::Property_Container(int width, int height, std::string name) : GameObjectProperty(property_e::container), m_size(dimension_t(width, height)), m_name(name)
+Property_Container::Property_Container(int width, int height, std::string name) : Object_feature(object_feature_e::container), m_size(dimension_t(width, height)), m_name(name)
 {
 	m_items.resize(m_size.w*m_size.h, nullptr);
 	for (std::list<Inventory_cell*>::iterator item = m_items.begin(); item != m_items.end(); item++)
@@ -243,7 +353,7 @@ Property_Container::Property_Container(int width, int height, std::string name) 
 	}
 }
 
-GameObjectProperty* Property_Container::clone()
+Object_feature* Property_Container::clone()
 {
 	Property_Container* result = new Property_Container(m_size.w,m_size.h,m_name);
 	return result;
@@ -258,21 +368,69 @@ AI_manager::AI_manager()
 	m_fov_qualifiers.push_back([](GameObject* object)->bool{return object->m_name == "wall"; });
 	m_fov_qualifiers.push_back([](GameObject* object)->bool{return false; });
 
-	m_path_qualifiers.push_back([](GameObject* object)->bool{return !object->m_active_state->check_property(property_e::permit_move);});
-	m_path_qualifiers.push_back([](GameObject* object)->bool{return !object->m_active_state->check_property(property_e::permit_move) && object->m_name != "wall"; });
+	m_path_qualifiers.push_back([](GameObject* object)->bool{return !object->get_stat(object_attribute_e::pass_able);});
+	m_path_qualifiers.push_back([](GameObject* object)->bool{return !object->get_stat(object_attribute_e::pass_able) && object->m_name != "wall"; });
 }
 
-Property_body::Property_body() : GameObjectProperty(property_e::body)
+Property_body::Property_body() : Object_feature(object_feature_e::body)
 {
 
 }
 
-GameObjectProperty* Property_body::clone()
+Object_feature* Property_body::clone()
 {
 	Property_body* result = new Property_body();
 	for (auto part = m_item.begin(); part != m_item.end(); part++)
 	{
 		result->m_item.push_back((*part));
+	}
+	return result;
+}
+
+Attribute_list::Attribute_list() : Object_feature(object_feature_e::stat)
+{
+}
+
+Object_feature* Attribute_list::clone()
+{
+	Attribute_list* result = new Attribute_list();
+	std::copy(m_label.begin(), m_label.end(), std::back_inserter(result->m_label));
+	std::copy(m_stat.begin(), m_stat.end(), std::back_inserter(result->m_stat));
+	return result;
+}
+
+Parameter_list::Parameter_list() : Object_feature(object_feature_e::parameter)
+{
+}
+
+Object_feature* Parameter_list::clone()
+{
+	Parameter_list* result = new Parameter_list();
+	result->m_parameter.insert(m_parameter.begin(), m_parameter.end());
+	return result;
+}
+
+Effect_list::Effect_list() : Object_feature(object_feature_e::effect)
+{
+}
+
+Object_feature* Effect_list::clone()
+{
+	Effect_list* result = new Effect_list();
+	result->m_effect.insert(m_effect.begin(), m_effect.end());
+	return result;
+}
+
+Reaction_list::Reaction_list() : Object_feature(object_feature_e::reaction)
+{
+}
+
+Object_feature* Reaction_list::clone()
+{
+	Reaction_list* result = new Reaction_list();
+	for (auto reaction = m_reaction.begin(); reaction != m_reaction.end(); reaction++)
+	{
+		result->m_reaction[reaction->first] = *reaction->second.clone();
 	}
 	return result;
 }

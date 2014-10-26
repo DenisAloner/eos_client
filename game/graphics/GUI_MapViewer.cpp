@@ -248,7 +248,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 								glEnable(GL_TEXTURE_2D);*/
 								if ((*Current)->cell()->x == m_map->m_items[y][x]->x)
 								{
-									Game_object_feature* feat = static_cast<Game_object_feature*>((*Current)->m_active_state->find_property(property_e::health));
+									object_parameter_t* feat = (*Current)->get_parameter(object_parameter_e::health);
 									if (feat)
 									{
 										float x0, y0, x1, y1, x2, y2, x3, y3;

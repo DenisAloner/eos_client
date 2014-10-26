@@ -13,7 +13,7 @@
 
 class Application;
 class GameObject;
-class GameObjectProperty;
+class Object_feature;
 class MapCell;
 class AI;
 

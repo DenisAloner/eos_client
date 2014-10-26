@@ -7,26 +7,25 @@
 #include <list>
 #include <algorithm>
 #include <Application.h>
-#include "GameObjectProperty.h"
 #include "FOV.h"
 #include <vector>
 #include <map>
 #include "Effect.h"
 
-class GameObjectProperty;
+class Object_feature;
 class Game_object_owner;
 class Action;
 class Application;
 class TileManager;
 class GameObject;
-class GameObjectProperty;
+class Object_feature;
 class Effect;
 class Reaction;
 
 struct label_t
 {
 	std::string m_name;
-	std::vector<property_e> m_property;
+	std::vector<object_attribute_e> m_stat;
 	label_t(std::string name) :m_name(name){};
 };
 
@@ -56,7 +55,7 @@ public:
 	MapCell(int x, int y);
 
 	void add_object(GameObject* Object);
-	//virtual GameObjectProperty* find_property(property_e kind, GameObject* excluded);
+	//virtual Object_feature* find_property(property_e kind, GameObject* excluded);
 };
 
 struct AI_configuration
@@ -69,11 +68,11 @@ public:
 
 };
 
-class Game_state
+class Object_state
 {
 public:
 
-	state_e m_state;
+	object_state_e m_state;
 	int m_layer;
 
 	game_object_size_t m_size;
@@ -83,17 +82,14 @@ public:
 	GLuint m_icon;
 
 	std::list<Action*> m_actions;
-	std::list<GameObjectProperty*> m_properties;
-	std::list<label_t*> m_labels;
-
+	std::map<object_feature_e,Object_feature*> m_feature;
+	
 	AI_configuration* m_ai;
 
 	virtual Action* find_action(action_e kind);
-	virtual GameObjectProperty* find_property(property_e kind);
-	virtual bool check_property(property_e kind);
 	virtual void set_tile_size();
 
-	Game_state();
+	Object_state();
 
 };
 
@@ -107,20 +103,26 @@ public:
 	bool m_selected;
 	Game_object_owner* m_owner;
 
-	Game_state* m_active_state;
-	std::list<Game_state*> m_state;
-	std::map<effect_e, std::list<Effect*> > m_effect;
-	std::map<reaction_e, Reaction*> m_reaction;
-
+	Object_state* m_active_state;
+	std::list<Object_state*> m_state;
+	
 	GameObject();
 
-	void set_direction(ObjectDirection dir);
 	void turn();
-	void set_state(state_e state);
-	void add_effect(effect_e kind, Effect* effect);
-	void remove_effect(effect_e kind, Effect* effect);
-	std::list<Effect*>* find_effect(effect_e key);
-
+	void set_direction(ObjectDirection dir);
+	void set_state(object_state_e state);
+	Object_state* get_state(object_state_e state);
+	void add_attribute(object_attribute_e key);
+	void add_label(const std::string& key);
+	void add_parameter(object_parameter_e key, object_parameter_t* item);
+	void add_effect(effect_e key, Effect* item);
+	void add_reaction(reaction_e key, Reaction* item);
+	void remove_effect(effect_e key, Effect* item);
+	Object_feature* get_feature(object_feature_e key);
+	bool get_stat(object_attribute_e key);
+	std::list<Effect*>* get_effect(effect_e key);
+	object_parameter_t* get_parameter(object_parameter_e key);
+	Reaction* get_reaction(reaction_e key);
 	MapCell* cell();
 
 };
@@ -136,45 +138,14 @@ public:
 
 };
 
-class GameObjectProperty
-{
-public:
-	property_e m_kind;
-
-	GameObjectProperty(property_e _kind);
-	~GameObjectProperty(void);
-
-	virtual GameObjectProperty* clone();
-};
-
-class GameObjectParameter : public GameObjectProperty
+class Object_feature
 {
 public:
 
-	GameObjectParameter(property_e kind, float value);
-	float m_value;
-	GameObjectProperty* clone();
+	object_feature_e m_kind;
 
-};
-
-class Game_object_feature : public GameObjectProperty
-{
-public:
-
-	Game_object_feature(property_e kind, int value);
-	int m_value;
-	GameObjectProperty* clone();
-
-};
-
-class GameObjectLink : public GameObjectProperty
-{
-public:
-
-	GameObjectLink(property_e kind, GameObject* object);
-	GameObject* m_object;
-	GameObjectProperty* clone();
-
+	Object_feature(object_feature_e kind);
+	virtual Object_feature* clone();
 };
 
 class Inventory_cell: public Game_object_owner
@@ -184,7 +155,7 @@ public:
 	Inventory_cell(GameObject* item);
 };
 
-class Property_Container : public GameObjectProperty
+class Property_Container : public Object_feature
 {
 public:
 
@@ -195,7 +166,7 @@ public:
 
 	Property_Container(int width, int height, std::string name);
 	~Property_Container();
-	GameObjectProperty* clone();
+	Object_feature* clone();
 };
 
 class AI_manager
@@ -217,14 +188,55 @@ public:
 	Body_part(GameObject* item = nullptr) :Inventory_cell(item){ m_kind = entity_e::body_part; };
 };
 
-class Property_body : public GameObjectProperty
+class Property_body : public Object_feature
 {
 public:
 
 	std::list<Body_part> m_item;
 
 	Property_body();
-	GameObjectProperty* clone();
+	Object_feature* clone();
+};
+
+class Attribute_list : public Object_feature
+{
+public:
+
+	std::list<label_t*> m_label;
+	std::list<object_attribute_e> m_stat;
+
+	Attribute_list();
+	Object_feature* clone();
+};
+
+class Parameter_list : public Object_feature
+{
+public:
+
+	std::map<object_parameter_e, object_parameter_t > m_parameter;
+
+	Parameter_list();
+	Object_feature* clone();
+};
+
+class Effect_list : public Object_feature
+{
+public:
+
+	std::map<effect_e, std::list<Effect*> > m_effect;
+
+	Effect_list();
+	Object_feature* clone();
+};
+
+class Reaction_list : public Object_feature
+{
+public:
+
+	std::map<reaction_e, Reaction> m_reaction;
+
+	Reaction_list();
+	Object_feature* clone();
 };
 
 #endif //GAMEOBJECT_H

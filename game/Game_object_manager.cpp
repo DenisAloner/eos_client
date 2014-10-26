@@ -2,13 +2,13 @@
 
 void Reaction_manager::change_health_basic(Reaction* reaction, GameObject* object, Effect* effect)
 {
-	Game_object_feature* prop = static_cast<Game_object_feature*>(object->m_active_state->find_property(property_e::health));
-	if (prop)
+	auto item = object->get_parameter(object_parameter_e::health);
+	if (item)
 	{
-		if (prop->m_value < 1)
+		if (item->m_value < 1)
 		{
 			Application::instance().m_GUI->MapViewer->m_map->m_ai.remove(object);
-			object->set_state(state_e::dead);
+			object->set_state(object_state_e::dead);
 			Application::instance().console(object->m_name + ": смерть");
 		}
 	}
@@ -16,28 +16,28 @@ void Reaction_manager::change_health_basic(Reaction* reaction, GameObject* objec
 
 void Reaction_manager::get_damage_basic(Reaction* reaction, GameObject* object, Effect* effect)
 {
-	Game_object_feature* prop = static_cast<Game_object_feature*>(object->m_active_state->find_property(property_e::health));
-	if (prop)
+	auto item = object->get_parameter(object_parameter_e::health);
+	if (item)
 	{
-		prop->m_value -= reaction->m_value;
+		item->m_value -= reaction->m_value;
 		switch (effect->m_subtype)
 		{
 		case effect_subtype_e::physical_damage:
 		{
-			Application::instance().console(object->m_name + ": нанесено " + std::to_string(reaction->m_value) + " физического урона, здоровье - " + std::to_string(prop->m_value));
+			Application::instance().console(object->m_name + ": нанесено " + std::to_string(reaction->m_value) + " физического урона, здоровье - " + std::to_string(item->m_value));
 			break;
 		}
 		case effect_subtype_e::poison_damage:
 		{
-			Application::instance().console(object->m_name + ": нанесено " + std::to_string(reaction->m_value) + " урона от яда,здоровье - "+std::to_string(prop->m_value));
+			Application::instance().console(object->m_name + ": нанесено " + std::to_string(reaction->m_value) + " урона от яда,здоровье - "+std::to_string(item->m_value));
 			break;
 		}
 		}
 	}
-	auto r = object->m_reaction.find(reaction_e::change_health);
-	if (r != object->m_reaction.end())
+	auto obj_reaction = object->get_reaction(reaction_e::change_health);
+	if (obj_reaction)
 	{
-		r->second->apply(effect->m_value, object, effect);
+		obj_reaction->apply(effect->m_value, object, effect);
 	}
 }
 
@@ -58,10 +58,10 @@ Reaction_manager::Reaction_manager()
 }
 
 
-property_e GameObjectManager::get_property_e(const std::string& key)
+object_feature_e GameObjectManager::get_object_feature_e(const std::string& key)
 {
-	auto value = m_to_property_e.find(key);
-	if (value == m_to_property_e.end())
+	auto value = m_to_object_feature_e.find(key);
+	if (value == m_to_object_feature_e.end())
 	{
 		LOG(FATAL) << "Элемент `" << key << "` отсутствует в m_items";
 	}
@@ -98,10 +98,40 @@ effect_subtype_e GameObjectManager::get_effect_subtype_e(const std::string& key)
 	return value->second;
 }
 
+object_state_e GameObjectManager::get_object_state_e(const std::string& key)
+{
+	auto value = m_to_object_state_e.find(key);
+	if (value == m_to_object_state_e.end())
+	{
+		LOG(FATAL) << "Элемент `" << key << "` отсутствует в m_items";
+	}
+	return value->second;
+}
+
 reaction_applicator_e GameObjectManager::get_reaction_applicator_e(const std::string& key)
 {
 	auto value = m_to_reaction_applicator_e.find(key);
 	if (value == m_to_reaction_applicator_e.end())
+	{
+		LOG(FATAL) << "Элемент `" << key << "` отсутствует в m_items";
+	}
+	return value->second;
+}
+
+object_attribute_e GameObjectManager::get_object_attribute_e(const std::string& key)
+{
+	auto value = m_to_object_attribute_e.find(key);
+	if (value == m_to_object_attribute_e.end())
+	{
+		LOG(FATAL) << "Элемент `" << key << "` отсутствует в m_items";
+	}
+	return value->second;
+}
+
+object_parameter_e GameObjectManager::get_object_parameter_e(const std::string& key)
+{
+	auto value = m_to_object_parameter_e.find(key);
+	if (value == m_to_object_parameter_e.end())
 	{
 		LOG(FATAL) << "Элемент `" << key << "` отсутствует в m_items";
 	}
@@ -145,7 +175,7 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	case command_e::add_to_label:
 	{
-		m_label->m_property.push_back(get_property_e(args));
+		m_label->m_stat.push_back(get_object_attribute_e(arg[0]));
 		break;
 	}
 	case command_e::obj:
@@ -155,42 +185,16 @@ void GameObjectManager::parser(const std::string& command)
 		m_items.insert(std::pair<std::string, GameObject*>(args, m_object));
 		break;
 	}
-	case command_e::state_alive:
+	case command_e::state:
 	{
-		m_object->m_active_state = new Game_state();
-		m_object->m_active_state->m_state = state_e::alive;
-		m_object->m_state.push_back(m_object->m_active_state);
-		break;
-	}
-	case command_e::state_dead:
-	{
-		m_object->m_active_state = new Game_state();
-		m_object->m_active_state->m_state = state_e::dead;
-		m_object->m_state.push_back(m_object->m_active_state);
-		break;
-	}
-	case command_e::state_on:
-	{
-		m_object->m_active_state = new Game_state();
-		m_object->m_active_state->m_state = state_e::on;
-		m_object->m_state.push_back(m_object->m_active_state);
-		break;
-	}
-	case command_e::state_off:
-	{
-		m_object->m_active_state = new Game_state();
-		m_object->m_active_state->m_state = state_e::off;
+		m_object->m_active_state = new Object_state();
+		m_object->m_active_state->m_state = get_object_state_e(arg[0]);
 		m_object->m_state.push_back(m_object->m_active_state);
 		break;
 	}
 	case command_e::add_label:
 	{
-		auto value = m_labels.find(args);
-		if (value == m_labels.end())
-		{
-			LOG(FATAL) << "Элемент `" << args << "` отсутствует в m_labels";
-		}
-		m_object->m_active_state->m_labels.push_back(value->second);
+		m_object->add_label(arg[0]);
 		break;
 	}
 	case command_e::ai:
@@ -299,14 +303,9 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->m_active_state->m_actions.push_back(Application::instance().m_actions[action_e::move]);
 		break;
 	}
-	case command_e::property_permit_move:
+	case command_e::attribute:
 	{
-		m_object->m_active_state->m_properties.push_back(new GameObjectProperty(property_e::permit_move));
-		break;
-	}
-	case command_e::property_permit_pick:
-	{
-		m_object->m_active_state->m_properties.push_back(new GameObjectProperty(property_e::permit_pick));
+		m_object->add_attribute(get_object_attribute_e(arg[0]));
 		break;
 	}
 	case command_e::property_container:
@@ -322,7 +321,7 @@ void GameObjectManager::parser(const std::string& command)
 		x = std::stoi(args.substr(pos, found - pos));
 		pos = found + 1;
 		y = std::stoi(args.substr(pos));
-		m_object->m_active_state->m_properties.push_back(new Property_Container(x, y, name));
+		m_object->m_active_state->m_feature[object_feature_e::container] = new Property_Container(x, y, name);
 		break;
 	}
 	case command_e::property_body:
@@ -354,24 +353,18 @@ void GameObjectManager::parser(const std::string& command)
 		}
 		pos = found + 1;
 		part.m_name = args.substr(pos);
-		Property_body* prop = static_cast<Property_body*>(m_object->m_active_state->find_property(property_e::body));
+		auto prop =static_cast<Property_body*>(m_object->get_feature(object_feature_e::body));
 		if (!prop)
 		{
 			prop = new Property_body();
-			m_object->m_active_state->m_properties.push_back(prop);
-			LOG(INFO) << "Есть такое свойство";
+			m_object->m_active_state->m_feature[object_feature_e::body] = prop;
 		}
 		prop->m_item.push_back(part);
 		break;
 	}
-	case command_e::property_strenght:
+	case command_e::parameter:
 	{
-		m_object->m_active_state->m_properties.push_back(new GameObjectParameter(property_e::strength, std::stof(args)));
-		break;
-	}
-	case command_e::property_health:
-	{
-		m_object->m_active_state->m_properties.push_back(new Game_object_feature(property_e::health, std::stoi(args)));
+		m_object->add_parameter(get_object_parameter_e(arg[0]), new object_parameter_t(std::stoi(arg[1]), std::stoi(arg[2])));
 		break;
 	}
 	case command_e::effect:
@@ -380,7 +373,7 @@ void GameObjectManager::parser(const std::string& command)
 		m_effect->m_kind = get_reaction_e(arg[0]);
 		m_effect->m_subtype = get_effect_subtype_e(arg[1]);
 		m_effect->m_value = std::stoi(arg[2]);
-		m_object->m_effect[get_effect_e(arg[3])].push_back(m_effect);
+		m_object->add_effect(get_effect_e(arg[3]), m_effect);
 		break;
 	}
 	case command_e::buff:
@@ -390,17 +383,14 @@ void GameObjectManager::parser(const std::string& command)
 		m_buff->m_subtype = get_effect_subtype_e(arg[1]);
 		m_buff->m_value = std::stoi(arg[2]);
 		m_buff->m_duration = std::stoi(arg[3]);
-		m_object->m_effect[get_effect_e(arg[4])].push_back(m_buff);
+		m_object->add_effect(get_effect_e(arg[4]), m_buff);
 		break;
 	}
 	case command_e::reaction:
 	{
 		m_reaction = new Reaction();
-		std::size_t pos = 0;
-		found = args.find(",");
-		m_object->m_reaction[get_reaction_e(args.substr(0, found))] = m_reaction;
-		pos = found + 1;
-		m_reaction->m_applicator = m_reaction_manager->m_items[get_reaction_applicator_e(args.substr(pos))];
+		m_reaction->m_applicator = m_reaction_manager->m_items[get_reaction_applicator_e(arg[1])];
+		m_object->add_reaction(get_reaction_e(arg[0]),m_reaction);
 		break;
 	}
 	}
@@ -412,10 +402,6 @@ void GameObjectManager::init()
 	m_commands["label"] = command_e::label;
 	m_commands["add_to_label"] = command_e::add_to_label;
 	m_commands.insert(std::pair<std::string, command_e>("object", command_e::obj));
-	m_commands.insert(std::pair<std::string, command_e>("state_alive", command_e::state_alive));
-	m_commands.insert(std::pair<std::string, command_e>("state_dead", command_e::state_dead));
-	m_commands.insert(std::pair<std::string, command_e>("state_on", command_e::state_on));
-	m_commands.insert(std::pair<std::string, command_e>("state_off", command_e::state_off));
 	m_commands["add_label"] = command_e::add_label;
 	m_commands.insert(std::pair<std::string, command_e>("size", command_e::size));
 	m_commands.insert(std::pair<std::string, command_e>("ai", command_e::ai));
@@ -427,18 +413,20 @@ void GameObjectManager::init()
 	m_commands.insert(std::pair<std::string, command_e>("tile_manager_rotating", command_e::tile_manager_rotating));
 	m_commands.insert(std::pair<std::string, command_e>("light", command_e::light));
 	m_commands.insert(std::pair<std::string, command_e>("action_move", command_e::action_move));
-	m_commands.insert(std::pair<std::string, command_e>("property_permit_move", command_e::property_permit_move));
-	m_commands.insert(std::pair<std::string, command_e>("property_permit_pick", command_e::property_permit_pick));
 	m_commands.insert(std::pair<std::string, command_e>("property_container", command_e::property_container));
-	m_commands.insert(std::pair<std::string, command_e>("property_strength", command_e::property_strenght));
-	m_commands.insert(std::pair<std::string, command_e>("property_health", command_e::property_health));
 	m_commands["property_body"] = command_e::property_body;
 	m_commands["effect"] = command_e::effect;
 	m_commands["buff"] = command_e::buff;
 	m_commands["reaction"] = command_e::reaction;
+	m_commands["attribute"] = command_e::attribute;
+	m_commands["parameter"] = command_e::parameter;
+	m_commands["state"] = command_e::state;
 
-	m_to_property_e["permit_equip_hand"] = property_e::permit_equip_hand;
-	m_to_property_e["permit_move"] = property_e::permit_move;
+	m_to_object_state_e["alive"] = object_state_e::alive;
+	m_to_object_state_e["dead"] = object_state_e::dead;
+	m_to_object_state_e["on"] = object_state_e::on;
+	m_to_object_state_e["off"] = object_state_e::off;
+	m_to_object_state_e["equip"] = object_state_e::equip;
 
 	m_to_effect_e["damage"] = effect_e::damage;
 	m_to_effect_e["buff"] = effect_e::buff;
@@ -453,6 +441,12 @@ void GameObjectManager::init()
 	m_to_reaction_applicator_e["get_damage_basic"] = reaction_applicator_e::get_damage_basic;
 	m_to_reaction_applicator_e["change_health_basic"] = reaction_applicator_e::change_health_basic;
 	m_to_reaction_applicator_e["get_buff_basic"] = reaction_applicator_e::get_buff_basic;
+
+	m_to_object_parameter_e["health"] = object_parameter_e::health;
+	m_to_object_parameter_e["strength"] = object_parameter_e::strength;
+
+	m_to_object_attribute_e["pass_able"] = object_attribute_e::pass_able;
+	m_to_object_attribute_e["pick_able"] = object_attribute_e::pick_able;
 
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);
@@ -491,10 +485,10 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 	obj->m_direction = config->m_direction;
 	obj->m_name = config->m_name;
 	obj->m_weight = config->m_weight;
-	Game_state* state;
-	for (std::list<Game_state*>::iterator item = config->m_state.begin(); item != config->m_state.end(); item++)
+	Object_state* state;
+	for (std::list<Object_state*>::iterator item = config->m_state.begin(); item != config->m_state.end(); item++)
 	{
-		state = new Game_state();
+		state = new Object_state();
 		state->m_state = (*item)->m_state;
 		state->m_layer = (*item)->m_layer;
 		state->m_size = (*item)->m_size;
@@ -504,21 +498,14 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 		state->m_icon = (*item)->m_icon;
 		state->m_actions = (*item)->m_actions;
 		state->m_ai = (*item)->m_ai;
-		state->m_labels = (*item)->m_labels;
-		for (auto prop = (*item)->m_properties.begin(); prop != (*item)->m_properties.end(); prop++)
+		for (auto prop = (*item)->m_feature.begin(); prop != (*item)->m_feature.end(); prop++)
 		{
-			state->m_properties.push_back((*prop)->clone());
+			state->m_feature[prop->first] = prop->second->clone();
 		}
 		obj->m_state.push_back(state);
 	}
 	Reaction* reaction;
-	for (auto item = config->m_reaction.begin(); item != config->m_reaction.end(); item++)
-	{
-		obj->m_reaction[item->first] = item->second->clone();
-	}
 	obj->m_active_state = obj->m_state.front();
-	obj->m_reaction = config->m_reaction;
-	obj->m_effect = config->m_effect;
 	m_objects.push_back(obj);
 	return obj;
 }
@@ -528,13 +515,13 @@ void GameObjectManager::update_buff()
 	std::list<Effect*>* list;
 	for (auto object = m_objects.begin(); object != m_objects.end(); object++)
 	{
-		list=(*object)->find_effect(effect_e::buff);
+		list=(*object)->get_effect(effect_e::buff);
 		if (list)
 		{
 			for (auto buff = list->begin(); buff != list->end();)
 			{
 				Application::instance().console((*object)->m_name + ": активирован бафф " + (*buff)->get_description());
-				(*buff)->apply((*object), (*buff));
+				(*buff)->apply((*object), *buff);
 				if ((*buff)->on_turn())
 				{
 					Application::instance().console((*object)->m_name + ": бафф " + (*buff)->get_description() + " исчез");

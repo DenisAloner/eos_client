@@ -7,10 +7,10 @@ Effect::Effect()
 
 void Effect::apply(GameObject* object, Effect* effect)
 {
-	auto reaction = object->m_reaction.find(m_kind);
-	if (reaction != object->m_reaction.end())
+	auto reaction = object->get_reaction(m_kind);
+	if (reaction)
 	{
-		reaction->second->apply(m_value, object, effect);
+		reaction->apply(m_value, object, effect);
 	}
 }
 

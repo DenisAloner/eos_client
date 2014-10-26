@@ -516,7 +516,7 @@ bool Application::command_open_inventory(GameObject*& Object)
 {
 	//MessageBox(NULL, "In_1", "", MB_OK);
 	bool Result = false;
-	Property_Container* Property = static_cast<Property_Container*>(Object->m_active_state->find_property(property_e::container));
+	Property_Container* Property = static_cast<Property_Container*>(Object->get_feature(object_feature_e::container));
 	if (Property != nullptr)
 	{
 		//MessageBox(NULL, "In_2", "", MB_OK);
@@ -535,7 +535,7 @@ bool Application::command_open_body(GameObject*& Object)
 {
 	//MessageBox(NULL, "In_1", "", MB_OK);
 	bool Result = false;
-	Property_body* Property = static_cast<Property_body*>(Object->m_active_state->find_property(property_e::body));
+	Property_body* Property = static_cast<Property_body*>(Object->get_feature(object_feature_e::body));
 	if (Property != nullptr)
 	{
 		//MessageBox(NULL, "In_2", "", MB_OK);
@@ -724,11 +724,19 @@ void Application::command_equip(GameObject*& unit, Body_part* part, GameObject*&
 {
 	part->m_item = object;
 	object->m_owner = part;
-	for (auto kind = object->m_effect.begin(); kind != object->m_effect.end(); kind++)
+	Object_state* obj_state = object->get_state(object_state_e::equip);
+	if (obj_state)
 	{
-		for (auto effect = (*kind).second.begin(); effect != (*kind).second.end(); effect++)
+		Effect_list* list = static_cast<Effect_list*>(object->get_feature(object_feature_e::effect));
+		if (list)
 		{
-			unit->add_effect(kind->first, *effect);
+			for (auto kind = list->m_effect.begin(); kind != list->m_effect.end(); kind++)
+			{
+				for (auto effect = (*kind).second.begin(); effect != (*kind).second.end(); effect++)
+				{
+					unit->add_effect(kind->first, *effect);
+				}
+			}
 		}
 	}
 }
@@ -737,11 +745,19 @@ void Application::command_unequip(GameObject*& unit, Body_part* part, GameObject
 {
 	part->m_item = nullptr;
 	object->m_owner = nullptr;
-	for (auto kind = object->m_effect.begin(); kind != object->m_effect.end(); kind++)
+	Object_state* obj_state = object->get_state(object_state_e::equip);
+	if (obj_state)
 	{
-		for (auto effect = (*kind).second.begin(); effect != (*kind).second.end(); effect++)
+		Effect_list* list = static_cast<Effect_list*>(object->get_feature(object_feature_e::effect));
+		if (list)
 		{
-			unit->remove_effect(kind->first, *effect);
+			for (auto kind = list->m_effect.begin(); kind != list->m_effect.end(); kind++)
+			{
+				for (auto effect = (*kind).second.begin(); effect != (*kind).second.end(); effect++)
+				{
+					unit->remove_effect(kind->first, *effect);
+				}
+			}
 		}
 	}
 }

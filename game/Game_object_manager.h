@@ -33,10 +33,7 @@ public:
 		label,
 		add_to_label,
 		obj,
-		state_alive,
-		state_dead,
-		state_on,
-		state_off,
+		state,
 		add_label,
 		ai,
 		size,
@@ -48,12 +45,10 @@ public:
 		tile_manager_rotating,
 		light,
 		action_move,
-		property_permit_move,
-		property_permit_pick,
+		attribute,
 		property_container,
-		property_strenght,
-		property_health,
 		property_body,
+		parameter,
 		effect,
 		reaction,
 		buff
@@ -72,11 +67,14 @@ public:
 	 
 	std::map<std::string, label_t*> m_labels;
 
-	std::map<std::string, property_e> m_to_property_e;
+	std::map<std::string, object_feature_e> m_to_object_feature_e;
 	std::map<std::string, reaction_e> m_to_reaction_e;
 	std::map<std::string, effect_e> m_to_effect_e;
 	std::map<std::string, effect_subtype_e> m_to_effect_subtype_e;
 	std::map<std::string, reaction_applicator_e> m_to_reaction_applicator_e;
+	std::map<std::string, object_attribute_e> m_to_object_attribute_e;
+	std::map<std::string, object_parameter_e> m_to_object_parameter_e;
+	std::map<std::string, object_state_e> m_to_object_state_e;
 
 	items_t m_items;
 	commands_t m_commands;
@@ -92,11 +90,14 @@ public:
 
 	Reaction_manager* m_reaction_manager;
 
-	property_e get_property_e(const std::string& key);
+	object_feature_e get_object_feature_e(const std::string& key);
 	reaction_e get_reaction_e(const std::string& key);
 	effect_e get_effect_e(const std::string& key);
 	effect_subtype_e get_effect_subtype_e(const std::string& key);
 	reaction_applicator_e get_reaction_applicator_e(const std::string& key);
+	object_attribute_e get_object_attribute_e(const std::string& key);
+	object_parameter_e get_object_parameter_e(const std::string& key);
+	object_state_e get_object_state_e(const std::string& key);
 
 	void parser(const std::string& command);
 	void init();

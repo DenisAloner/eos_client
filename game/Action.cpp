@@ -156,7 +156,7 @@ bool ActionClass_Push::check(Parameter* parameter)
 	m_error = "";
 	Parameter_MoveObjectByUnit* p = static_cast<Parameter_MoveObjectByUnit*>(parameter);
 	MapCell* cell;
-	GameObjectParameter* prop = static_cast<GameObjectParameter*>(p->m_unit->m_active_state->find_property(property_e::strength));
+	object_parameter_t* prop = p->m_unit->get_parameter(object_parameter_e::strength);
 	if (prop != nullptr)
 	{
 		if (prop->m_value * 10 < p->m_object->m_weight)
@@ -181,7 +181,7 @@ bool ActionClass_Push::check(Parameter* parameter)
 					{
 						if (p->m_object != (*item) && p->m_unit != (*item))
 						{
-							if ((*item)->m_active_state->find_property(property_e::permit_move) == nullptr)
+							if (!(*item)->get_stat(object_attribute_e::pass_able))
 							{
 								return false;
 							}
@@ -199,7 +199,7 @@ bool ActionClass_Push::check(Parameter* parameter)
 					{
 						if (p->m_object != (*item) && p->m_unit != (*item))
 						{
-							if ((*item)->m_active_state->find_property(property_e::permit_move) == nullptr)
+							if (!(*item)->get_stat(object_attribute_e::pass_able))
 							{
 								return false;
 							}
@@ -635,7 +635,7 @@ void Action_open::perfom(Parameter* parameter)
 	P_object* p = static_cast<P_object*>(parameter);
 	if (check(p))
 	{
-		p->m_object->set_state(state_e::off);
+		p->m_object->set_state(object_state_e::off);
 	}
 }
 
@@ -701,12 +701,12 @@ void Action_hit::perfom(Parameter* parameter)
 	P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
 	if (check(p))
 	{
-		auto reaction = p->m_unit->m_effect.find(effect_e::damage);
-		if (reaction != p->m_unit->m_effect.end())
+		auto reaction = p->m_unit->get_effect(effect_e::damage);
+		if (reaction)
 		{
-			for (auto current = (*reaction).second.begin(); current != (*reaction).second.end(); current++)
+			for (auto current = reaction->begin(); current != reaction->end(); current++)
 			{
-				(*current)->apply(p->m_object, (*current));
+				(*current)->apply(p->m_object, *current);
 			}
 		}
 	}

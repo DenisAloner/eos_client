@@ -100,25 +100,13 @@ enum action_e
 	equip
 };
 
-enum property_e
-{
-	none,
-	permit_move,
-	permit_pick,
-	permit_equip_hand,
-	container,
-	strength,
-	health,
-	body,
-	wield
-};
-
-enum state_e
+enum class object_state_e
 { 
 	alive,
 	dead,
 	on,
-	off
+	off,
+	equip
 };
 
 enum ParameterKind
@@ -226,4 +214,34 @@ enum class body_part_e
 	foot
 };
 
+enum class object_feature_e
+{
+	none,
+	stat,
+	parameter,
+	effect,
+	reaction,
+	body,
+	container
+};
+
+enum class object_attribute_e
+{
+	pass_able,
+	pick_able
+};
+
+enum class object_parameter_e
+{
+	health,
+	strength
+};
+
+struct object_parameter_t
+{
+	int m_value;
+	int m_limit;
+	object_parameter_t(int value, int limit) :m_value(value), m_limit(limit){};
+	object_parameter_t() :m_value(0), m_limit(0){};
+};
 #endif //DEFINITION_H
