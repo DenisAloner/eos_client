@@ -8,7 +8,6 @@
 #include "game/GraphicalController.h"
 #include "game/Timer.h"
 #include "game/Description_GUI.h"
-#include "game/Property_Container.h"
 #include "game/FileSystem.h"
 #include "game/TileManager.h"
 #include "SDL.h"

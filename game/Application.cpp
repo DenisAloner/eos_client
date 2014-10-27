@@ -727,7 +727,7 @@ void Application::command_equip(GameObject*& unit, Body_part* part, GameObject*&
 	Object_state* obj_state = object->get_state(object_state_e::equip);
 	if (obj_state)
 	{
-		Effect_list* list = static_cast<Effect_list*>(object->get_feature(object_feature_e::effect));
+		Interaction_feature* list = static_cast<Interaction_feature*>(object->get_feature(object_feature_e::interaction_feature));
 		if (list)
 		{
 			for (auto kind = list->m_effect.begin(); kind != list->m_effect.end(); kind++)
@@ -748,7 +748,7 @@ void Application::command_unequip(GameObject*& unit, Body_part* part, GameObject
 	Object_state* obj_state = object->get_state(object_state_e::equip);
 	if (obj_state)
 	{
-		Effect_list* list = static_cast<Effect_list*>(object->get_feature(object_feature_e::effect));
+		Interaction_feature* list = static_cast<Interaction_feature*>(object->get_feature(object_feature_e::interaction_feature));
 		if (list)
 		{
 			for (auto kind = list->m_effect.begin(); kind != list->m_effect.end(); kind++)

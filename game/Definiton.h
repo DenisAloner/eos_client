@@ -217,10 +217,10 @@ enum class body_part_e
 enum class object_feature_e
 {
 	none,
-	stat,
-	parameter,
-	effect,
-	reaction,
+	attribute_feature,
+	parameter_feature,
+	interaction_feature,
+	reaction_feature,
 	body,
 	container
 };

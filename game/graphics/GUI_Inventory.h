@@ -2,7 +2,6 @@
 #define	GUI_INVENTORY_H
 
 #include "GUI_Container.h"
-#include "Property_Container.h"
 #include <list>
 #include "GameObject.h"
 

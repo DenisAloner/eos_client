@@ -18,7 +18,6 @@ class Action;
 class Application;
 class TileManager;
 class GameObject;
-class Object_feature;
 class Effect;
 class Reaction;
 
@@ -198,44 +197,44 @@ public:
 	Object_feature* clone();
 };
 
-class Attribute_list : public Object_feature
+class Attribute_feature : public Object_feature
 {
 public:
 
 	std::list<label_t*> m_label;
 	std::list<object_attribute_e> m_stat;
 
-	Attribute_list();
+	Attribute_feature();
 	Object_feature* clone();
 };
 
-class Parameter_list : public Object_feature
+class Parameter_feature : public Object_feature
 {
 public:
 
 	std::map<object_parameter_e, object_parameter_t > m_parameter;
 
-	Parameter_list();
+	Parameter_feature();
 	Object_feature* clone();
 };
 
-class Effect_list : public Object_feature
+class Interaction_feature : public Object_feature
 {
 public:
 
 	std::map<effect_e, std::list<Effect*> > m_effect;
 
-	Effect_list();
+	Interaction_feature();
 	Object_feature* clone();
 };
 
-class Reaction_list : public Object_feature
+class Reaction_feature : public Object_feature
 {
 public:
 
 	std::map<reaction_e, Reaction> m_reaction;
 
-	Reaction_list();
+	Reaction_feature();
 	Object_feature* clone();
 };
 

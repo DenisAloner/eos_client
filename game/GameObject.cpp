@@ -142,7 +142,7 @@ Object_feature* GameObject::get_feature(object_feature_e key)
 
 void GameObject::add_attribute(object_attribute_e key)
 {
-	Attribute_list* list = static_cast<Attribute_list*>(get_feature(object_feature_e::stat));
+	Attribute_feature* list = static_cast<Attribute_feature*>(get_feature(object_feature_e::attribute_feature));
 	if (list)
 	{
 		list->m_stat.push_back(key);
@@ -151,16 +151,16 @@ void GameObject::add_attribute(object_attribute_e key)
 	{
 		if (m_active_state)
 		{
-			list = new Attribute_list();
+			list = new Attribute_feature();
 			list->m_stat.push_back(key);
-			m_active_state->m_feature[object_feature_e::stat] = list;
+			m_active_state->m_feature[object_feature_e::attribute_feature] = list;
 		}
 	}
 }
 
 void GameObject::add_label(const std::string& key)
 {
-	Attribute_list* list = static_cast<Attribute_list*>(get_feature(object_feature_e::stat));
+	Attribute_feature* list = static_cast<Attribute_feature*>(get_feature(object_feature_e::attribute_feature));
 	if (list)
 	{
 		auto value = Application::instance().m_game_object_manager->m_labels.find(key);
@@ -176,9 +176,9 @@ void GameObject::add_label(const std::string& key)
 			auto value = Application::instance().m_game_object_manager->m_labels.find(key);
 			if (value != Application::instance().m_game_object_manager->m_labels.end())
 			{
-				list = new Attribute_list();
+				list = new Attribute_feature();
 				list->m_label.push_back(value->second);
-				m_active_state->m_feature[object_feature_e::stat] = list;
+				m_active_state->m_feature[object_feature_e::attribute_feature] = list;
 			}
 		}
 	}
@@ -186,7 +186,7 @@ void GameObject::add_label(const std::string& key)
 
 void GameObject::add_effect(effect_e key, Effect* item)
 {
-	Effect_list* list = static_cast<Effect_list*>(get_feature(object_feature_e::effect));
+	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
 	if (list)
 	{
 		list->m_effect[key].push_back(item);
@@ -195,16 +195,16 @@ void GameObject::add_effect(effect_e key, Effect* item)
 	{
 		if (m_active_state)
 		{
-			list = new Effect_list();
+			list = new Interaction_feature();
 			list->m_effect[key].push_back(item);
-			m_active_state->m_feature[object_feature_e::effect] = list;
+			m_active_state->m_feature[object_feature_e::interaction_feature] = list;
 		}
 	}
 }
 
 void GameObject::add_reaction(reaction_e key, Reaction* item)
 {
-	auto list = static_cast<Reaction_list*>(get_feature(object_feature_e::reaction));
+	auto list = static_cast<Reaction_feature*>(get_feature(object_feature_e::reaction_feature));
 	if (list)
 	{
 		list->m_reaction[key] = *item;
@@ -213,16 +213,16 @@ void GameObject::add_reaction(reaction_e key, Reaction* item)
 	{
 		if (m_active_state)
 		{
-			list = new Reaction_list();
+			list = new Reaction_feature();
 			list->m_reaction[key] = *item;
-			m_active_state->m_feature[object_feature_e::reaction] = list;
+			m_active_state->m_feature[object_feature_e::reaction_feature] = list;
 		}
 	}
 }
 
 void GameObject::add_parameter(object_parameter_e key, object_parameter_t* item)
 {
-	Parameter_list* list = static_cast<Parameter_list*>(get_feature(object_feature_e::parameter));
+	Parameter_feature* list = static_cast<Parameter_feature*>(get_feature(object_feature_e::parameter_feature));
 	if (list)
 	{
 		list->m_parameter[key] = *item;
@@ -231,16 +231,16 @@ void GameObject::add_parameter(object_parameter_e key, object_parameter_t* item)
 	{
 		if (m_active_state)
 		{
-			list = new Parameter_list();
+			list = new Parameter_feature();
 			list->m_parameter[key] = *item;
-			m_active_state->m_feature[object_feature_e::parameter] = list;
+			m_active_state->m_feature[object_feature_e::parameter_feature] = list;
 		}
 	}
 }
 
 void GameObject::remove_effect(effect_e key, Effect* item)
 {
-	Effect_list* list = static_cast<Effect_list*>(get_feature(object_feature_e::effect));
+	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
 	if (list)
 	{
 		if (list->m_effect.find(key) != list->m_effect.end())
@@ -252,7 +252,7 @@ void GameObject::remove_effect(effect_e key, Effect* item)
 
 std::list<Effect*>* GameObject::get_effect(effect_e key)
 {
-	Effect_list* list = static_cast<Effect_list*>(get_feature(object_feature_e::effect));
+	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
 	if (list)
 	{
 		auto value = list->m_effect.find(key);
@@ -266,7 +266,7 @@ std::list<Effect*>* GameObject::get_effect(effect_e key)
 
 object_parameter_t* GameObject::get_parameter(object_parameter_e key)
 {
-	Parameter_list* list = static_cast<Parameter_list*>(get_feature(object_feature_e::parameter));
+	Parameter_feature* list = static_cast<Parameter_feature*>(get_feature(object_feature_e::parameter_feature));
 	if (list)
 	{
 		auto value = list->m_parameter.find(key);
@@ -280,7 +280,7 @@ object_parameter_t* GameObject::get_parameter(object_parameter_e key)
 
 Reaction* GameObject::get_reaction(reaction_e key)
 {
-	Reaction_list* list = static_cast<Reaction_list*>(get_feature(object_feature_e::reaction));
+	Reaction_feature* list = static_cast<Reaction_feature*>(get_feature(object_feature_e::reaction_feature));
 	if (list)
 	{
 		auto value = list->m_reaction.find(key);
@@ -294,7 +294,7 @@ Reaction* GameObject::get_reaction(reaction_e key)
 
 bool GameObject::get_stat(object_attribute_e key)
 {
-	Attribute_list* list = static_cast<Attribute_list*>(get_feature(object_feature_e::stat));
+	Attribute_feature* list = static_cast<Attribute_feature*>(get_feature(object_feature_e::attribute_feature));
 	if (list)
 	{
 		for (auto item = list->m_stat.begin(); item != list->m_stat.end();item++)
@@ -387,47 +387,47 @@ Object_feature* Property_body::clone()
 	return result;
 }
 
-Attribute_list::Attribute_list() : Object_feature(object_feature_e::stat)
+Attribute_feature::Attribute_feature() : Object_feature(object_feature_e::attribute_feature)
 {
 }
 
-Object_feature* Attribute_list::clone()
+Object_feature* Attribute_feature::clone()
 {
-	Attribute_list* result = new Attribute_list();
+	Attribute_feature* result = new Attribute_feature();
 	std::copy(m_label.begin(), m_label.end(), std::back_inserter(result->m_label));
 	std::copy(m_stat.begin(), m_stat.end(), std::back_inserter(result->m_stat));
 	return result;
 }
 
-Parameter_list::Parameter_list() : Object_feature(object_feature_e::parameter)
+Parameter_feature::Parameter_feature() : Object_feature(object_feature_e::parameter_feature)
 {
 }
 
-Object_feature* Parameter_list::clone()
+Object_feature* Parameter_feature::clone()
 {
-	Parameter_list* result = new Parameter_list();
+	Parameter_feature* result = new Parameter_feature();
 	result->m_parameter.insert(m_parameter.begin(), m_parameter.end());
 	return result;
 }
 
-Effect_list::Effect_list() : Object_feature(object_feature_e::effect)
+Interaction_feature::Interaction_feature() : Object_feature(object_feature_e::interaction_feature)
 {
 }
 
-Object_feature* Effect_list::clone()
+Object_feature* Interaction_feature::clone()
 {
-	Effect_list* result = new Effect_list();
+	Interaction_feature* result = new Interaction_feature();
 	result->m_effect.insert(m_effect.begin(), m_effect.end());
 	return result;
 }
 
-Reaction_list::Reaction_list() : Object_feature(object_feature_e::reaction)
+Reaction_feature::Reaction_feature() : Object_feature(object_feature_e::reaction_feature)
 {
 }
 
-Object_feature* Reaction_list::clone()
+Object_feature* Reaction_feature::clone()
 {
-	Reaction_list* result = new Reaction_list();
+	Reaction_feature* result = new Reaction_feature();
 	for (auto reaction = m_reaction.begin(); reaction != m_reaction.end(); reaction++)
 	{
 		result->m_reaction[reaction->first] = *reaction->second.clone();

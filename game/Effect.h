@@ -1,6 +1,14 @@
 #pragma once
 #include "GameObject.h"
 
+class Object_interaction
+{
+	virtual void apply(GameObject* object, Object_interaction* oi) = 0;
+	virtual bool on_turn() = 0;
+};
+ 
+//class OI_list
+
 class Effect
 {
 public:
