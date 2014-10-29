@@ -184,19 +184,24 @@ void GameObject::add_label(const std::string& key)
 	}
 }
 
-void GameObject::add_effect(effect_e key, Effect* item)
+void GameObject::add_effect(effect_e key, Object_interaction* item)
 {
 	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
 	if (list)
 	{
-		list->m_effect[key].push_back(item);
+		if (list->m_effect.find(key) == list->m_effect.end())
+		{
+			list->m_effect[key] = new Effect_list;
+		}
+		list->m_effect[key]->m_effect.push_back(item);
 	}
 	else
 	{
 		if (m_active_state)
 		{
 			list = new Interaction_feature();
-			list->m_effect[key].push_back(item);
+			list->m_effect[key] = new Effect_list();
+			list->m_effect[key]->m_effect.push_back(item);
 			m_active_state->m_feature[object_feature_e::interaction_feature] = list;
 		}
 	}
@@ -238,19 +243,19 @@ void GameObject::add_parameter(object_parameter_e key, object_parameter_t* item)
 	}
 }
 
-void GameObject::remove_effect(effect_e key, Effect* item)
+void GameObject::remove_effect(effect_e key, Object_interaction* item)
 {
 	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
 	if (list)
 	{
 		if (list->m_effect.find(key) != list->m_effect.end())
 		{
-			list->m_effect[key].remove(item);
+			list->m_effect[key]->m_effect.remove(item);
 		}
 	}
 }
 
-std::list<Effect*>* GameObject::get_effect(effect_e key)
+Effect_list* GameObject::get_effect(effect_e key)
 {
 	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
 	if (list)
@@ -258,7 +263,7 @@ std::list<Effect*>* GameObject::get_effect(effect_e key)
 		auto value = list->m_effect.find(key);
 		if (value != list->m_effect.end())
 		{
-			return &value->second;
+			return value->second;
 		}
 	}
 	return nullptr;

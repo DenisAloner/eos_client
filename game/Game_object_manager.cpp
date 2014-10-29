@@ -512,21 +512,20 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 
 void GameObjectManager::update_buff()
 {
-	std::list<Effect*>* list;
+	Effect_list* list;
 	for (auto object = m_objects.begin(); object != m_objects.end(); object++)
 	{
-		list=(*object)->get_effect(effect_e::buff);
+		list = (*object)->get_effect(effect_e::buff);
 		if (list)
 		{
-			for (auto buff = list->begin(); buff != list->end();)
+			for (auto buff = list->m_effect.begin(); buff != list->m_effect.end();)
 			{
-				Application::instance().console((*object)->m_name + ": активирован бафф " + (*buff)->get_description());
-				(*buff)->apply((*object), *buff);
+				//Application::instance().console((*object)->m_name + ": активирован бафф " + (*buff)->get_description());
+				(*buff)->apply(*object);
 				if ((*buff)->on_turn())
 				{
-					Application::instance().console((*object)->m_name + ": бафф " + (*buff)->get_description() + " исчез");
-					buff = list->erase(buff);
-					
+					//Application::instance().console((*object)->m_name + ": бафф " + (*buff)->get_description() + " исчез");
+					buff = list->m_effect.erase(buff);
 				}
 				else
 				{

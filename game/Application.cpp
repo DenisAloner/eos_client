@@ -732,10 +732,7 @@ void Application::command_equip(GameObject*& unit, Body_part* part, GameObject*&
 		{
 			for (auto kind = list->m_effect.begin(); kind != list->m_effect.end(); kind++)
 			{
-				for (auto effect = (*kind).second.begin(); effect != (*kind).second.end(); effect++)
-				{
-					unit->add_effect(kind->first, *effect);
-				}
+					unit->add_effect(kind->first, kind->second);
 			}
 		}
 	}
@@ -753,10 +750,7 @@ void Application::command_unequip(GameObject*& unit, Body_part* part, GameObject
 		{
 			for (auto kind = list->m_effect.begin(); kind != list->m_effect.end(); kind++)
 			{
-				for (auto effect = (*kind).second.begin(); effect != (*kind).second.end(); effect++)
-				{
-					unit->remove_effect(kind->first, *effect);
-				}
+					unit->remove_effect(kind->first, kind->second);
 			}
 		}
 	}

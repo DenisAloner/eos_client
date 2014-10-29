@@ -5,12 +5,12 @@ Effect::Effect()
 {
 }
 
-void Effect::apply(GameObject* object, Effect* effect)
+void Effect::apply(GameObject* object)
 {
 	auto reaction = object->get_reaction(m_kind);
 	if (reaction)
 	{
-		reaction->apply(m_value, object, effect);
+		reaction->apply(m_value, object, this);
 	}
 }
 
@@ -27,6 +27,19 @@ Effect* Effect::clone()
 std::string Effect::get_description()
 {
 	return "";
+}
+
+void Effect_list::apply(GameObject* object)
+{
+	for (auto item = m_effect.begin(); item != m_effect.end();item++)
+	{
+		(*item)->apply(object);
+	}
+}
+
+bool Effect_list::on_turn()
+{
+	return false;
 }
 
 Buff::Buff()

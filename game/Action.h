@@ -10,7 +10,7 @@
 
 class Parameter;
 class Application;
-	
+
 class Action
 {
 public:

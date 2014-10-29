@@ -3,25 +3,36 @@
 
 class Object_interaction
 {
-	virtual void apply(GameObject* object, Object_interaction* oi) = 0;
+public:
+
+	virtual void apply(GameObject* object) = 0;
 	virtual bool on_turn() = 0;
+
 };
  
-//class OI_list
-
-class Effect
+class Effect :public Object_interaction
 {
 public:
 
 	reaction_e m_kind;
 	effect_subtype_e m_subtype;
 	int m_value;
-	
+
 	Effect();
-	virtual void apply(GameObject* object, Effect* effect);
+	virtual void apply(GameObject* object);
 	virtual bool on_turn();
 	virtual Effect* clone();
 	virtual std::string get_description();
+};
+
+class Effect_list :public Object_interaction
+{
+public:
+
+	std::list<Object_interaction*> m_effect;
+
+	virtual void apply(GameObject* object);
+	virtual bool on_turn();
 };
 
 class Buff : public Effect

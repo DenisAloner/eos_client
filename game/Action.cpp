@@ -704,9 +704,9 @@ void Action_hit::perfom(Parameter* parameter)
 		auto reaction = p->m_unit->get_effect(effect_e::damage);
 		if (reaction)
 		{
-			for (auto current = reaction->begin(); current != reaction->end(); current++)
+			for (auto current = reaction->m_effect.begin(); current != reaction->m_effect.end(); current++)
 			{
-				(*current)->apply(p->m_object, *current);
+				(*current)->apply(p->m_object);
 			}
 		}
 	}

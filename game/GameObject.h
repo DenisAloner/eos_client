@@ -20,6 +20,8 @@ class TileManager;
 class GameObject;
 class Effect;
 class Reaction;
+class Object_interaction;
+class Effect_list;
 
 struct label_t
 {
@@ -114,12 +116,12 @@ public:
 	void add_attribute(object_attribute_e key);
 	void add_label(const std::string& key);
 	void add_parameter(object_parameter_e key, object_parameter_t* item);
-	void add_effect(effect_e key, Effect* item);
+	void add_effect(effect_e key, Object_interaction* item);
 	void add_reaction(reaction_e key, Reaction* item);
-	void remove_effect(effect_e key, Effect* item);
+	void remove_effect(effect_e key, Object_interaction* item);
 	Object_feature* get_feature(object_feature_e key);
 	bool get_stat(object_attribute_e key);
-	std::list<Effect*>* get_effect(effect_e key);
+	Effect_list* get_effect(effect_e key);
 	object_parameter_t* get_parameter(object_parameter_e key);
 	Reaction* get_reaction(reaction_e key);
 	MapCell* cell();
@@ -222,7 +224,7 @@ class Interaction_feature : public Object_feature
 {
 public:
 
-	std::map<effect_e, std::list<Effect*> > m_effect;
+	std::map<effect_e, Effect_list* > m_effect;
 
 	Interaction_feature();
 	Object_feature* clone();
