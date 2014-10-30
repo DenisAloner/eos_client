@@ -5,6 +5,7 @@ void Reaction_manager::change_health_basic(Reaction* reaction, GameObject* objec
 	auto item = object->get_parameter(object_parameter_e::health);
 	if (item)
 	{
+		Application::instance().console(object->m_name + ": измененен параметр <" + Application::instance().m_game_object_manager->get_object_parameter_string(object_parameter_e::health) + ":" + std::to_string(item->m_value) + ">");
 		if (item->m_value < 1)
 		{
 			Application::instance().m_GUI->MapViewer->m_map->m_ai.remove(object);
@@ -20,19 +21,7 @@ void Reaction_manager::get_damage_basic(Reaction* reaction, GameObject* object, 
 	if (item)
 	{
 		item->m_value -= reaction->m_value;
-		switch (effect->m_subtype)
-		{
-		case effect_subtype_e::physical_damage:
-		{
-			Application::instance().console(object->m_name + ": нанесено " + std::to_string(reaction->m_value) + " физического урона, здоровье - " + std::to_string(item->m_value));
-			break;
-		}
-		case effect_subtype_e::poison_damage:
-		{
-			Application::instance().console(object->m_name + ": нанесено " + std::to_string(reaction->m_value) + " урона от яда,здоровье - "+std::to_string(item->m_value));
-			break;
-		}
-		}
+		Application::instance().console(object->m_name + ": получен эффект <" + Application::instance().m_game_object_manager->get_effect_string(effect->m_subtype) + ":" + std::to_string(reaction->m_value) + ">");
 	}
 	auto obj_reaction = object->get_reaction(reaction_e::change_health);
 	if (obj_reaction)
@@ -448,6 +437,12 @@ void GameObjectManager::init()
 	m_to_object_attribute_e["pass_able"] = object_attribute_e::pass_able;
 	m_to_object_attribute_e["pick_able"] = object_attribute_e::pick_able;
 
+	m_effect_string[effect_subtype_e::physical_damage] = "физический урон";
+	m_effect_string[effect_subtype_e::poison_damage] = "урон от яда";
+
+	m_object_parameter_string[object_parameter_e::health] = "здоровье";
+	m_object_parameter_string[object_parameter_e::strength] = "сила";
+
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);
 	std::string config(buffer);
@@ -534,4 +529,23 @@ void GameObjectManager::update_buff()
 			}
 		}
 	}
+}
+std::string GameObjectManager::get_effect_string(effect_subtype_e key)
+{
+	auto value = m_effect_string.find(key);
+	if (value != m_effect_string.end())
+	{
+		return value->second;
+	}
+	return "неизвестный тип";
+}
+
+std::string GameObjectManager::get_object_parameter_string(object_parameter_e key)
+{
+	auto value = m_object_parameter_string.find(key);
+	if (value != m_object_parameter_string.end())
+	{
+		return value->second;
+	}
+	return "неизвестный тип";
 }

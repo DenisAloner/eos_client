@@ -76,6 +76,10 @@ public:
 	std::map<std::string, object_parameter_e> m_to_object_parameter_e;
 	std::map<std::string, object_state_e> m_to_object_state_e;
 
+
+	std::map<effect_subtype_e, std::string> m_effect_string;
+	std::map<object_parameter_e, std::string> m_object_parameter_string;
+
 	items_t m_items;
 	commands_t m_commands;
 	parameters_t m_parameters;
@@ -103,4 +107,6 @@ public:
 	void init();
 	GameObject* new_object(std::string unit_name);
 	void update_buff();
+	std::string get_effect_string(effect_subtype_e key);
+	std::string get_object_parameter_string(object_parameter_e key);
 };
