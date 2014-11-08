@@ -7,6 +7,7 @@ public:
 
 	virtual void apply(GameObject* object) = 0;
 	virtual bool on_turn() = 0;
+	virtual std::string get_description() = 0;
 
 };
  
@@ -33,6 +34,7 @@ public:
 
 	virtual void apply(GameObject* object);
 	virtual bool on_turn();
+	virtual std::string get_description();
 };
 
 class Buff : public Effect

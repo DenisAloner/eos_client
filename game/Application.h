@@ -125,6 +125,7 @@ public:
 	Parameter* command_select_object_on_map();
 	bool command_open_inventory(GameObject*& Object);
 	bool command_open_body(GameObject*& Object);
+	void command_gui_show_characterization(GameObject*& object);
 	bool command_check_position(GameObject*& object, MapCell*& position, GameMap*& map);
 	void command_equip(GameObject*& unit, Body_part* part, GameObject*& object);
 	void command_unequip(GameObject*& unit, Body_part* part, GameObject*& object);

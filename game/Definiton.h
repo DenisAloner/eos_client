@@ -237,11 +237,4 @@ enum class object_parameter_e
 	strength
 };
 
-struct object_parameter_t
-{
-	int m_value;
-	int m_limit;
-	object_parameter_t(int value, int limit) :m_value(value), m_limit(limit){};
-	object_parameter_t() :m_value(0), m_limit(0){};
-};
 #endif //DEFINITION_H

@@ -21,7 +21,7 @@ void Reaction_manager::get_damage_basic(Reaction* reaction, GameObject* object, 
 	if (item)
 	{
 		item->m_value -= reaction->m_value;
-		Application::instance().console(object->m_name + ": получен эффект <" + Application::instance().m_game_object_manager->get_effect_string(effect->m_subtype) + ":" + std::to_string(reaction->m_value) + ">");
+		Application::instance().console(object->m_name + ": получен эффект <" + Application::instance().m_game_object_manager->get_effect_subtype_string(effect->m_subtype) + ":" + std::to_string(reaction->m_value) + ">");
 	}
 	auto obj_reaction = object->get_reaction(reaction_e::change_health);
 	if (obj_reaction)
@@ -437,8 +437,11 @@ void GameObjectManager::init()
 	m_to_object_attribute_e["pass_able"] = object_attribute_e::pass_able;
 	m_to_object_attribute_e["pick_able"] = object_attribute_e::pick_able;
 
-	m_effect_string[effect_subtype_e::physical_damage] = "физический урон";
-	m_effect_string[effect_subtype_e::poison_damage] = "урон от яда";
+	m_effect_string[effect_e::damage] = "урон";
+	m_effect_string[effect_e::buff] = "баффы";
+
+	m_effect_subtype_string[effect_subtype_e::physical_damage] = "физический урон";
+	m_effect_subtype_string[effect_subtype_e::poison_damage] = "урон от яда";
 
 	m_object_parameter_string[object_parameter_e::health] = "здоровье";
 	m_object_parameter_string[object_parameter_e::strength] = "сила";
@@ -530,10 +533,21 @@ void GameObjectManager::update_buff()
 		}
 	}
 }
-std::string GameObjectManager::get_effect_string(effect_subtype_e key)
+
+std::string GameObjectManager::get_effect_string(effect_e key)
 {
 	auto value = m_effect_string.find(key);
 	if (value != m_effect_string.end())
+	{
+		return value->second;
+	}
+	return "неизвестный тип";
+}
+
+std::string GameObjectManager::get_effect_subtype_string(effect_subtype_e key)
+{
+	auto value = m_effect_subtype_string.find(key);
+	if (value != m_effect_subtype_string.end())
 	{
 		return value->second;
 	}

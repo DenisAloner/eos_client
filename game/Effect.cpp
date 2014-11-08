@@ -26,7 +26,7 @@ Effect* Effect::clone()
 
 std::string Effect::get_description()
 {
-	return "";
+	return Application::instance().m_game_object_manager->get_effect_subtype_string(m_subtype) + ":" + std::to_string(m_value);
 }
 
 void Effect_list::apply(GameObject* object)
@@ -40,6 +40,16 @@ void Effect_list::apply(GameObject* object)
 bool Effect_list::on_turn()
 {
 	return false;
+}
+
+std::string Effect_list::get_description()
+{
+	std::string result = "";
+	for (auto current = m_effect.begin(); current != m_effect.end(); current++)
+	{
+		result += (*current)->get_description()+",";
+	}
+	return result;
 }
 
 Buff::Buff()
