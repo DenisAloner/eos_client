@@ -701,7 +701,7 @@ void Action_hit::perfom(Parameter* parameter)
 	P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
 	if (check(p))
 	{
-		auto reaction = p->m_unit->get_effect(effect_e::damage);
+		auto reaction = p->m_unit->get_effect(interaction_e::damage);
 		if (reaction)
 		{
 			for (auto current = reaction->m_effect.begin(); current != reaction->m_effect.end(); current++)

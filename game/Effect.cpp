@@ -1,5 +1,17 @@
 #include "Effect.h"
 
+Parameter_modification::Parameter_modification()
+{
+}
+
+//void Parameter_modification::apply(GameObject* object)
+//{
+//	auto reaction = object->get_reaction(m_kind);
+//	if (reaction)
+//	{
+//		reaction->apply(m_value, object, this);
+//	}
+//}
 
 Effect::Effect()
 {
@@ -10,7 +22,8 @@ void Effect::apply(GameObject* object)
 	auto reaction = object->get_reaction(m_kind);
 	if (reaction)
 	{
-		reaction->apply(m_value, object, this);
+		static_cast<Reaction_effect*>(reaction)->m_value = m_value;
+		reaction->apply(object, this);
 	}
 }
 
@@ -29,7 +42,7 @@ std::string Effect::get_description()
 	return Application::instance().m_game_object_manager->get_effect_subtype_string(m_subtype) + ":" + std::to_string(m_value);
 }
 
-void Effect_list::apply(GameObject* object)
+void Interaction_list::apply(GameObject* object)
 {
 	for (auto item = m_effect.begin(); item != m_effect.end();item++)
 	{
@@ -37,12 +50,12 @@ void Effect_list::apply(GameObject* object)
 	}
 }
 
-bool Effect_list::on_turn()
+bool Interaction_list::on_turn()
 {
 	return false;
 }
 
-std::string Effect_list::get_description()
+std::string Interaction_list::get_description()
 {
 	std::string result = "";
 	for (auto current = m_effect.begin(); current != m_effect.end(); current++)
@@ -97,10 +110,36 @@ Effect* Buff_chance::clone()
 	return effect;
 }
 
-void Reaction::apply(int value, GameObject* object, Effect* effect)
+Reaction::Reaction()
 {
-	m_value = value;
-	auto reaction = m_items.find(effect->m_subtype);
+}
+
+Reaction_effect::Reaction_effect()
+{
+}
+
+
+Reaction* Reaction_effect::clone()
+{
+	Reaction_effect* result = new Reaction_effect();
+	result->handler = handler;
+	for (auto sub = m_items.begin(); sub != m_items.end(); sub++)
+	{
+		for (auto current = sub->second.begin(); current != sub->second.end(); current++)
+		{
+			result->m_items[sub->first].push_back(*current);
+		}
+	}
+	for (auto current = m_list.begin(); current != m_list.end(); current++)
+	{
+		result->m_list.push_back(*current);
+	}
+	return result;
+}
+
+void Reaction_effect::apply(GameObject* object, Object_interaction* effect)
+{
+	auto reaction = m_items.find(static_cast<Effect*>(effect)->m_subtype);
 	if (reaction != m_items.end())
 	{
 		for (auto current = reaction->second.begin(); current != reaction->second.end(); current++)
@@ -108,17 +147,38 @@ void Reaction::apply(int value, GameObject* object, Effect* effect)
 			(*current)(this, object, effect);
 		}
 	}
-	m_applicator(this, object, effect);
+	handler(this, object, effect);
 	for (auto current = m_list.begin(); current != m_list.end(); current++)
 	{
 		(*current)(this, object, effect);
 	}
 }
 
-Reaction* Reaction::clone()
+Reaction_parameter::Reaction_parameter()
 {
-	Reaction* result = new Reaction();
-	result->m_applicator = m_applicator;
+}
+
+void Reaction_parameter::apply(GameObject* object, Object_interaction* effect)
+{
+	auto reaction = m_items.find(static_cast<Effect*>(effect)->m_subtype);
+	if (reaction != m_items.end())
+	{
+		for (auto current = reaction->second.begin(); current != reaction->second.end(); current++)
+		{
+			(*current)(this, object, effect);
+		}
+	}
+	handler(this, object, effect);
+	for (auto current = m_list.begin(); current != m_list.end(); current++)
+	{
+		(*current)(this, object, effect);
+	}
+}
+
+Reaction* Reaction_parameter::clone()
+{
+	Reaction_effect* result = new Reaction_effect();
+	result->handler = handler;
 	for (auto sub = m_items.begin(); sub != m_items.end(); sub++)
 	{
 		for (auto current = sub->second.begin(); current != sub->second.end(); current++)

@@ -1,6 +1,6 @@
 #include "Game_object_manager.h"
 
-void Reaction_manager::change_health_basic(Reaction* reaction, GameObject* object, Effect* effect)
+void Reaction_manager::change_health_basic(Reaction* reaction, GameObject* object, Object_interaction* effect)
 {
 	auto item = object->get_parameter(object_parameter_e::health);
 	if (item)
@@ -15,27 +15,28 @@ void Reaction_manager::change_health_basic(Reaction* reaction, GameObject* objec
 	}
 }
 
-void Reaction_manager::get_damage_basic(Reaction* reaction, GameObject* object, Effect* effect)
+void Reaction_manager::get_damage_basic(Reaction* reaction, GameObject* object, Object_interaction* effect)
 {
 	auto item = object->get_parameter(object_parameter_e::health);
 	if (item)
 	{
-		item->m_value -= reaction->m_value;
-		Application::instance().console(object->m_name + ": получен эффект <" + Application::instance().m_game_object_manager->get_effect_subtype_string(effect->m_subtype) + ":" + std::to_string(reaction->m_value) + ">");
+		item->m_value -= static_cast<Reaction_effect*>(reaction)->m_value;
+		Application::instance().console(object->m_name + ": получен эффект <" + Application::instance().m_game_object_manager->get_effect_subtype_string(static_cast<Effect*>(effect)->m_subtype) + ":" + std::to_string(static_cast<Reaction_effect*>(reaction)->m_value) + ">");
 	}
 	auto obj_reaction = object->get_reaction(reaction_e::change_health);
 	if (obj_reaction)
 	{
-		obj_reaction->apply(effect->m_value, object, effect);
+		static_cast<Reaction_effect*>(obj_reaction)->m_value = static_cast<Effect*>(effect)->m_value;
+		obj_reaction->apply(object, effect);
 	}
 }
 
-void Reaction_manager::get_buff_basic(Reaction* reaction, GameObject* object, Effect* effect)
+void Reaction_manager::get_buff_basic(Reaction* reaction, GameObject* object, Object_interaction* effect)
 {
 	//LOG(INFO) << object->m_name;
-	Effect* e = effect->clone();
+	Effect* e = static_cast<Effect*>(effect)->clone();
 	e->m_kind = reaction_e::get_damage;
-	object->add_effect(effect_e::buff, e);
+	object->add_effect(interaction_e::buff, e);
 	Application::instance().console(object->m_name + ": наложен бафф <ќтравление> ");
 }
 
@@ -67,20 +68,20 @@ reaction_e GameObjectManager::get_reaction_e(const std::string& key)
 	return value->second;
 }
 
-effect_e GameObjectManager::get_effect_e(const std::string& key)
+interaction_e GameObjectManager::get_interaction_e(const std::string& key)
 {
-	auto value = m_to_effect_e.find(key);
-	if (value == m_to_effect_e.end())
+	auto value = m_to_interaction_e.find(key);
+	if (value == m_to_interaction_e.end())
 	{
 		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
 	}
 	return value->second;
 }
 
-effect_subtype_e GameObjectManager::get_effect_subtype_e(const std::string& key)
+effect_e GameObjectManager::get_effect_e(const std::string& key)
 {
-	auto value = m_to_effect_subtype_e.find(key);
-	if (value == m_to_effect_subtype_e.end())
+	auto value = m_to_effect_e.find(key);
+	if (value == m_to_effect_e.end())
 	{
 		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
 	}
@@ -360,25 +361,25 @@ void GameObjectManager::parser(const std::string& command)
 	{
 		m_effect = new Effect();
 		m_effect->m_kind = get_reaction_e(arg[0]);
-		m_effect->m_subtype = get_effect_subtype_e(arg[1]);
+		m_effect->m_subtype = get_effect_e(arg[1]);
 		m_effect->m_value = std::stoi(arg[2]);
-		m_object->add_effect(get_effect_e(arg[3]), m_effect);
+		m_object->add_effect(get_interaction_e(arg[3]), m_effect);
 		break;
 	}
 	case command_e::buff:
 	{
 		m_buff = new Buff();
 		m_buff->m_kind = get_reaction_e(arg[0]);
-		m_buff->m_subtype = get_effect_subtype_e(arg[1]);
+		m_buff->m_subtype = get_effect_e(arg[1]);
 		m_buff->m_value = std::stoi(arg[2]);
 		m_buff->m_duration = std::stoi(arg[3]);
-		m_object->add_effect(get_effect_e(arg[4]), m_buff);
+		m_object->add_effect(get_interaction_e(arg[4]), m_buff);
 		break;
 	}
-	case command_e::reaction:
+	case command_e::reaction_effect:
 	{
-		m_reaction = new Reaction();
-		m_reaction->m_applicator = m_reaction_manager->m_items[get_reaction_applicator_e(arg[1])];
+		m_reaction = new Reaction_effect();
+		m_reaction->handler= m_reaction_manager->m_items[get_reaction_applicator_e(arg[1])];
 		m_object->add_reaction(get_reaction_e(arg[0]),m_reaction);
 		break;
 	}
@@ -406,7 +407,7 @@ void GameObjectManager::init()
 	m_commands["property_body"] = command_e::property_body;
 	m_commands["effect"] = command_e::effect;
 	m_commands["buff"] = command_e::buff;
-	m_commands["reaction"] = command_e::reaction;
+	m_commands["reaction"] = command_e::reaction_effect;
 	m_commands["attribute"] = command_e::attribute;
 	m_commands["parameter"] = command_e::parameter;
 	m_commands["state"] = command_e::state;
@@ -417,11 +418,11 @@ void GameObjectManager::init()
 	m_to_object_state_e["off"] = object_state_e::off;
 	m_to_object_state_e["equip"] = object_state_e::equip;
 
-	m_to_effect_e["damage"] = effect_e::damage;
-	m_to_effect_e["buff"] = effect_e::buff;
+	m_to_interaction_e["damage"] = interaction_e::damage;
+	m_to_interaction_e["buff"] = interaction_e::buff;
 
-	m_to_effect_subtype_e["physical_damage"] = effect_subtype_e::physical_damage;
-	m_to_effect_subtype_e["poison_damage"] = effect_subtype_e::poison_damage;
+	m_to_effect_e["physical_damage"] = effect_e::physical_damage;
+	m_to_effect_e["poison_damage"] = effect_e::poison_damage;
 
 	m_to_reaction_e["get_damage"] = reaction_e::get_damage;
 	m_to_reaction_e["get_buff"] = reaction_e::get_buff;
@@ -437,11 +438,11 @@ void GameObjectManager::init()
 	m_to_object_attribute_e["pass_able"] = object_attribute_e::pass_able;
 	m_to_object_attribute_e["pick_able"] = object_attribute_e::pick_able;
 
-	m_effect_string[effect_e::damage] = "урон";
-	m_effect_string[effect_e::buff] = "баффы";
+	m_effect_string[interaction_e::damage] = "урон";
+	m_effect_string[interaction_e::buff] = "баффы";
 
-	m_effect_subtype_string[effect_subtype_e::physical_damage] = "физический урон";
-	m_effect_subtype_string[effect_subtype_e::poison_damage] = "урон от €да";
+	m_effect_subtype_string[effect_e::physical_damage] = "физический урон";
+	m_effect_subtype_string[effect_e::poison_damage] = "урон от €да";
 
 	m_object_parameter_string[object_parameter_e::health] = "здоровье";
 	m_object_parameter_string[object_parameter_e::strength] = "сила";
@@ -510,10 +511,10 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 
 void GameObjectManager::update_buff()
 {
-	Effect_list* list;
+	Interaction_list* list;
 	for (auto object = m_objects.begin(); object != m_objects.end(); object++)
 	{
-		list = (*object)->get_effect(effect_e::buff);
+		list = (*object)->get_effect(interaction_e::buff);
 		if (list)
 		{
 			for (auto buff = list->m_effect.begin(); buff != list->m_effect.end();)
@@ -534,7 +535,7 @@ void GameObjectManager::update_buff()
 	}
 }
 
-std::string GameObjectManager::get_effect_string(effect_e key)
+std::string GameObjectManager::get_effect_string(interaction_e key)
 {
 	auto value = m_effect_string.find(key);
 	if (value != m_effect_string.end())
@@ -544,7 +545,7 @@ std::string GameObjectManager::get_effect_string(effect_e key)
 	return "неизвестный тип";
 }
 
-std::string GameObjectManager::get_effect_subtype_string(effect_subtype_e key)
+std::string GameObjectManager::get_effect_subtype_string(effect_e key)
 {
 	auto value = m_effect_subtype_string.find(key);
 	if (value != m_effect_subtype_string.end())

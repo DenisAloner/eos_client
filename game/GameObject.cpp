@@ -184,14 +184,14 @@ void GameObject::add_label(const std::string& key)
 	}
 }
 
-void GameObject::add_effect(effect_e key, Object_interaction* item)
+void GameObject::add_effect(interaction_e key, Object_interaction* item)
 {
 	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
 	if (list)
 	{
 		if (list->m_effect.find(key) == list->m_effect.end())
 		{
-			list->m_effect[key] = new Effect_list;
+			list->m_effect[key] = new Interaction_list;
 		}
 		list->m_effect[key]->m_effect.push_back(item);
 	}
@@ -200,7 +200,7 @@ void GameObject::add_effect(effect_e key, Object_interaction* item)
 		if (m_active_state)
 		{
 			list = new Interaction_feature();
-			list->m_effect[key] = new Effect_list();
+			list->m_effect[key] = new Interaction_list();
 			list->m_effect[key]->m_effect.push_back(item);
 			m_active_state->m_feature[object_feature_e::interaction_feature] = list;
 		}
@@ -212,14 +212,14 @@ void GameObject::add_reaction(reaction_e key, Reaction* item)
 	auto list = static_cast<Reaction_feature*>(get_feature(object_feature_e::reaction_feature));
 	if (list)
 	{
-		list->m_reaction[key] = *item;
+		list->m_reaction[key] = item;
 	}
 	else
 	{
 		if (m_active_state)
 		{
 			list = new Reaction_feature();
-			list->m_reaction[key] = *item;
+			list->m_reaction[key] = item;
 			m_active_state->m_feature[object_feature_e::reaction_feature] = list;
 		}
 	}
@@ -243,7 +243,7 @@ void GameObject::add_parameter(object_parameter_e key, object_parameter_t* item)
 	}
 }
 
-void GameObject::remove_effect(effect_e key, Object_interaction* item)
+void GameObject::remove_effect(interaction_e key, Object_interaction* item)
 {
 	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
 	if (list)
@@ -255,7 +255,7 @@ void GameObject::remove_effect(effect_e key, Object_interaction* item)
 	}
 }
 
-Effect_list* GameObject::get_effect(effect_e key)
+Interaction_list* GameObject::get_effect(interaction_e key)
 {
 	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
 	if (list)
@@ -291,7 +291,7 @@ Reaction* GameObject::get_reaction(reaction_e key)
 		auto value = list->m_reaction.find(key);
 		if (value != list->m_reaction.end())
 		{
-			return &value->second;
+			return value->second;
 		}
 	}
 	return nullptr;
@@ -435,7 +435,9 @@ Object_feature* Reaction_feature::clone()
 	Reaction_feature* result = new Reaction_feature();
 	for (auto reaction = m_reaction.begin(); reaction != m_reaction.end(); reaction++)
 	{
-		result->m_reaction[reaction->first] = *reaction->second.clone();
+		LOG(INFO) << "1";
+		result->m_reaction[reaction->first] = reaction->second->clone();
+		LOG(INFO) << "2";
 	}
 	return result;
 }

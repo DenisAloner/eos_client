@@ -195,13 +195,13 @@ enum class reaction_applicator_e
 	get_buff_basic
 };
 
-enum class effect_e
+enum class interaction_e
 {
 	damage,
 	buff
 };
 
-enum class effect_subtype_e
+enum class effect_e
 {
 	physical_damage,
 	poison_damage

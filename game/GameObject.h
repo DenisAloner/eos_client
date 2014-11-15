@@ -21,7 +21,7 @@ class GameObject;
 class Effect;
 class Reaction;
 class Object_interaction;
-class Effect_list;
+class Interaction_list;
 struct object_parameter_t;
 
 struct label_t
@@ -117,12 +117,12 @@ public:
 	void add_attribute(object_attribute_e key);
 	void add_label(const std::string& key);
 	void add_parameter(object_parameter_e key, object_parameter_t* item);
-	void add_effect(effect_e key, Object_interaction* item);
+	void add_effect(interaction_e key, Object_interaction* item);
 	void add_reaction(reaction_e key, Reaction* item);
-	void remove_effect(effect_e key, Object_interaction* item);
+	void remove_effect(interaction_e key, Object_interaction* item);
 	Object_feature* get_feature(object_feature_e key);
 	bool get_stat(object_attribute_e key);
-	Effect_list* get_effect(effect_e key);
+	Interaction_list* get_effect(interaction_e key);
 	object_parameter_t* get_parameter(object_parameter_e key);
 	Reaction* get_reaction(reaction_e key);
 	MapCell* cell();
@@ -235,7 +235,6 @@ public:
 class object_parameter_t
 {
 public:
-
 	int m_value;
 	int m_limit;
 	Object_parameter_modifier_list m_modifier;
@@ -256,7 +255,7 @@ class Interaction_feature : public Object_feature
 {
 public:
 
-	std::map<effect_e, Effect_list* > m_effect;
+	std::map<interaction_e, Interaction_list* > m_effect;
 
 	Interaction_feature();
 	Object_feature* clone();
@@ -266,7 +265,7 @@ class Reaction_feature : public Object_feature
 {
 public:
 
-	std::map<reaction_e, Reaction> m_reaction;
+	std::map<reaction_e, Reaction*> m_reaction;
 
 	Reaction_feature();
 	Object_feature* clone();
