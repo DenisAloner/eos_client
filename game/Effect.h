@@ -21,6 +21,15 @@ public:
 	virtual void apply(GameObject* object);
 	virtual bool on_turn();
 	virtual std::string get_description();
+	//virtual void add(Object_interaction* item);
+};
+
+class Parameter_list :public Interaction_list
+{
+public:
+
+	int m_value;
+	int m_limit;
 };
  
 class Parameter_modification :public Object_interaction
@@ -96,28 +105,15 @@ public:
 	virtual Reaction* clone();
 };
 
-class Reaction_effect :public Reaction
-{
-public:
-
-	int m_value;
-	std::map < effect_e, list > m_items;
-	list m_list;
-
-	Reaction_effect();
-	virtual void apply(GameObject* object, Object_interaction* effect);
-	virtual Reaction* clone();
-};
-
-class Reaction_parameter :public Reaction
-{
-public:
-
-	int m_value;
-	std::map < object_parameter_e, list > m_items;
-	list m_list;
-
-	Reaction_parameter();
-	virtual void apply(GameObject* object, Object_interaction* effect);
-	virtual Reaction* clone();
-};
+//class Reaction_parameter :public Reaction
+//{
+//public:
+//
+//	int m_value;
+//	std::map < object_parameter_e, list > m_items;
+//	list m_list;
+//
+//	Reaction_parameter();
+//	virtual void apply(GameObject* object, Object_interaction* effect);
+//	virtual Reaction* clone();
+//};

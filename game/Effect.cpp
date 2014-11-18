@@ -65,6 +65,14 @@ std::string Interaction_list::get_description()
 	return result;
 }
 
+//void Interaction_list::add(Object_interaction* item)
+//{
+//	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+//	{
+//		(*item)->apply(object);
+//	}
+//}
+
 Buff::Buff()
 {
 }
@@ -154,41 +162,41 @@ void Reaction_effect::apply(GameObject* object, Object_interaction* effect)
 	}
 }
 
-Reaction_parameter::Reaction_parameter()
-{
-}
-
-void Reaction_parameter::apply(GameObject* object, Object_interaction* effect)
-{
-	auto reaction = m_items.find(static_cast<Effect*>(effect)->m_subtype);
-	if (reaction != m_items.end())
-	{
-		for (auto current = reaction->second.begin(); current != reaction->second.end(); current++)
-		{
-			(*current)(this, object, effect);
-		}
-	}
-	handler(this, object, effect);
-	for (auto current = m_list.begin(); current != m_list.end(); current++)
-	{
-		(*current)(this, object, effect);
-	}
-}
-
-Reaction* Reaction_parameter::clone()
-{
-	Reaction_effect* result = new Reaction_effect();
-	result->handler = handler;
-	for (auto sub = m_items.begin(); sub != m_items.end(); sub++)
-	{
-		for (auto current = sub->second.begin(); current != sub->second.end(); current++)
-		{
-			result->m_items[sub->first].push_back(*current);
-		}
-	}
-	for (auto current = m_list.begin(); current != m_list.end(); current++)
-	{
-		result->m_list.push_back(*current);
-	}
-	return result;
-}
+//Reaction_parameter::Reaction_parameter()
+//{
+//}
+//
+//void Reaction_parameter::apply(GameObject* object, Object_interaction* effect)
+//{
+//	auto reaction = m_items.find(static_cast<Effect*>(effect)->m_subtype);
+//	if (reaction != m_items.end())
+//	{
+//		for (auto current = reaction->second.begin(); current != reaction->second.end(); current++)
+//		{
+//			(*current)(this, object, effect);
+//		}
+//	}
+//	handler(this, object, effect);
+//	for (auto current = m_list.begin(); current != m_list.end(); current++)
+//	{
+//		(*current)(this, object, effect);
+//	}
+//}
+//
+//Reaction* Reaction_parameter::clone()
+//{
+//	Reaction_parameter* result = new Reaction_parameter();
+//	result->handler = handler;
+//	for (auto sub = m_items.begin(); sub != m_items.end(); sub++)
+//	{
+//		for (auto current = sub->second.begin(); current != sub->second.end(); current++)
+//		{
+//			result->m_items[sub->first].push_back(*current);
+//		}
+//	}
+//	for (auto current = m_list.begin(); current != m_list.end(); current++)
+//	{
+//		result->m_list.push_back(*current);
+//	}
+//	return result;
+//}
