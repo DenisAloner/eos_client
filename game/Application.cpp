@@ -555,15 +555,15 @@ void Application::command_gui_show_characterization(GameObject*& object)
 	item->resize(Window->m_size.w - 4, Window->m_size.h - 25 - 2);
 	Window->add_item_control(item);
 	m_GUI->add_front(Window);
-	Parameter_feature* obj_feat_parameter= static_cast<Parameter_feature*>(object->get_feature(object_feature_e::parameter_feature));
-	if (obj_feat_parameter != nullptr)
-	{
-		item->add_item_control(new GUI_Text("параметры:", new GUI_TextFormat(8, 17, RGBA_t(0.7, 0.9, 1.0, 1.0))));
-		for (auto current = obj_feat_parameter->m_parameter.begin(); current != obj_feat_parameter->m_parameter.end(); current++)
-		{
-			item->add_item_control(new GUI_Text(" " + m_game_object_manager->get_object_parameter_string(current->first) + ":" + std::to_string(current->second.m_value) + "/" + std::to_string(current->second.m_limit), new GUI_TextFormat(8, 17, RGBA_t(1.0, 1.0, 1.0, 1.0))));
-		}
-	}
+	//Parameter_list* obj_feat_parameter= static_cast<Parameter_feature*>(object->get_feature(object_feature_e::parameter_feature));
+	//if (obj_feat_parameter != nullptr)
+	//{
+	//	item->add_item_control(new GUI_Text("параметры:", new GUI_TextFormat(8, 17, RGBA_t(0.7, 0.9, 1.0, 1.0))));
+	//	for (auto current = obj_feat_parameter->m_parameter.begin(); current != obj_feat_parameter->m_parameter.end(); current++)
+	//	{
+	//		item->add_item_control(new GUI_Text(" " + m_game_object_manager->get_object_parameter_string(current->first) + ":" + std::to_string(current->second.m_value) + "/" + std::to_string(current->second.m_limit), new GUI_TextFormat(8, 17, RGBA_t(1.0, 1.0, 1.0, 1.0))));
+	//	}
+	//}
 	Interaction_feature* obj_feat_effect = static_cast<Interaction_feature*>(object->get_feature(object_feature_e::interaction_feature));
 	if (obj_feat_effect != nullptr)
 	{

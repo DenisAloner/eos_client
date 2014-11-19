@@ -65,6 +65,16 @@ std::string Interaction_list::get_description()
 	return result;
 }
 
+std::string Parameter_list::get_description()
+{
+	std::string result = std::to_string(m_value) + "/" + std::to_string(m_limit)+",";
+	for (auto current = m_effect.begin(); current != m_effect.end(); current++)
+	{
+		result += (*current)->get_description() + ",";
+	}
+	return result;
+}
+
 //void Interaction_list::add(Object_interaction* item)
 //{
 //	for (auto item = m_effect.begin(); item != m_effect.end(); item++)

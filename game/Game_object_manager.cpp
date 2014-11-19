@@ -2,7 +2,7 @@
 
 void Reaction_manager::change_health_basic(Reaction* reaction, GameObject* object, Object_interaction* effect)
 {
-	auto item = object->get_parameter(object_parameter_e::health);
+	auto item = object->get_parameter(interaction_e::health);
 	if (item)
 	{
 		Application::instance().console(object->m_name + ": измененен параметр <" + Application::instance().m_game_object_manager->get_object_parameter_string(object_parameter_e::health) + ":" + std::to_string(item->m_value) + ">");
@@ -17,7 +17,7 @@ void Reaction_manager::change_health_basic(Reaction* reaction, GameObject* objec
 
 void Reaction_manager::get_damage_basic(Reaction* reaction, GameObject* object, Object_interaction* effect)
 {
-	auto item = object->get_parameter(object_parameter_e::health);
+	auto item = object->get_parameter(interaction_e::health);
 	if (item)
 	{
 		item->m_value -= static_cast<Reaction_effect*>(reaction)->m_value;
@@ -354,7 +354,7 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	case command_e::parameter:
 	{
-		m_object->add_parameter(get_object_parameter_e(arg[0]), new object_parameter_t(std::stoi(arg[1]), std::stoi(arg[2])));
+		m_object->add_parameter(get_interaction_e(arg[0]), std::stoi(arg[1]), std::stoi(arg[2]));
 		break;
 	}
 	case command_e::effect:
@@ -420,6 +420,8 @@ void GameObjectManager::init()
 
 	m_to_interaction_e["damage"] = interaction_e::damage;
 	m_to_interaction_e["buff"] = interaction_e::buff;
+	m_to_interaction_e["health"] = interaction_e::health;
+	m_to_interaction_e["strength"] = interaction_e::strength;
 
 	m_to_effect_e["physical_damage"] = effect_e::physical_damage;
 	m_to_effect_e["poison_damage"] = effect_e::poison_damage;
@@ -440,6 +442,8 @@ void GameObjectManager::init()
 
 	m_effect_string[interaction_e::damage] = "урон";
 	m_effect_string[interaction_e::buff] = "баффы";
+	m_effect_string[interaction_e::health] = "здоровье";
+	m_effect_string[interaction_e::strength] = "сила";
 
 	m_effect_subtype_string[effect_e::physical_damage] = "физический урон";
 	m_effect_subtype_string[effect_e::poison_damage] = "урон от яда";

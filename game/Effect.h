@@ -30,6 +30,7 @@ public:
 
 	int m_value;
 	int m_limit;
+	virtual std::string get_description();
 };
  
 class Parameter_modification :public Object_interaction

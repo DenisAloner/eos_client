@@ -156,7 +156,7 @@ bool ActionClass_Push::check(Parameter* parameter)
 	m_error = "";
 	Parameter_MoveObjectByUnit* p = static_cast<Parameter_MoveObjectByUnit*>(parameter);
 	MapCell* cell;
-	object_parameter_t* prop = p->m_unit->get_parameter(object_parameter_e::strength);
+	auto* prop = p->m_unit->get_parameter(interaction_e::strength);
 	if (prop != nullptr)
 	{
 		if (prop->m_value * 10 < p->m_object->m_weight)

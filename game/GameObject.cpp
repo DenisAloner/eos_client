@@ -207,6 +207,30 @@ void GameObject::add_effect(interaction_e key, Object_interaction* item)
 	}
 }
 
+void GameObject::add_parameter(interaction_e key, int value, int limit)
+{
+	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
+	if (list)
+	{
+		Parameter_list* pl = new Parameter_list();
+		pl->m_value = value;
+		pl->m_limit = limit;
+		list->m_effect[key] = pl;
+	}
+	else
+	{
+		if (m_active_state)
+		{
+			list = new Interaction_feature();
+			Parameter_list* pl = new Parameter_list();
+			pl->m_value = value;
+			pl->m_limit = limit;
+			list->m_effect[key] = pl;
+			m_active_state->m_feature[object_feature_e::interaction_feature] = list;
+		}
+	}
+}
+
 void GameObject::add_reaction(reaction_e key, Reaction* item)
 {
 	auto list = static_cast<Reaction_feature*>(get_feature(object_feature_e::reaction_feature));
@@ -225,20 +249,25 @@ void GameObject::add_reaction(reaction_e key, Reaction* item)
 	}
 }
 
-void GameObject::add_parameter(object_parameter_e key, object_parameter_t* item)
+void GameObject::add_to_parameter(interaction_e key, Object_interaction* item)
 {
-	Parameter_feature* list = static_cast<Parameter_feature*>(get_feature(object_feature_e::parameter_feature));
+	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
 	if (list)
 	{
-		list->m_parameter[key] = *item;
+		if (list->m_effect.find(key) == list->m_effect.end())
+		{
+			list->m_effect[key] = new Parameter_list();
+		}
+		list->m_effect[key]->m_effect.push_back(item);
 	}
 	else
 	{
 		if (m_active_state)
 		{
-			list = new Parameter_feature();
-			list->m_parameter[key] = *item;
-			m_active_state->m_feature[object_feature_e::parameter_feature] = list;
+			list = new Interaction_feature();
+			list->m_effect[key] = new Parameter_list();
+			list->m_effect[key]->m_effect.push_back(item);
+			m_active_state->m_feature[object_feature_e::interaction_feature] = list;
 		}
 	}
 }
@@ -269,15 +298,15 @@ Interaction_list* GameObject::get_effect(interaction_e key)
 	return nullptr;
 }
 
-object_parameter_t* GameObject::get_parameter(object_parameter_e key)
+Parameter_list* GameObject::get_parameter(interaction_e key)
 {
-	Parameter_feature* list = static_cast<Parameter_feature*>(get_feature(object_feature_e::parameter_feature));
+	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
 	if (list)
 	{
-		auto value = list->m_parameter.find(key);
-		if (value != list->m_parameter.end())
+		auto value = list->m_effect.find(key);
+		if (value != list->m_effect.end())
 		{
-			return &value->second;
+			return static_cast<Parameter_list*>(value->second);
 		}
 	}
 	return nullptr;
@@ -404,16 +433,16 @@ Object_feature* Attribute_feature::clone()
 	return result;
 }
 
-Parameter_feature::Parameter_feature() : Object_feature(object_feature_e::parameter_feature)
-{
-}
-
-Object_feature* Parameter_feature::clone()
-{
-	Parameter_feature* result = new Parameter_feature();
-	result->m_parameter.insert(m_parameter.begin(), m_parameter.end());
-	return result;
-}
+//Parameter_feature::Parameter_feature() : Object_feature(object_feature_e::parameter_feature)
+//{
+//}
+//
+//Object_feature* Parameter_feature::clone()
+//{
+//	Parameter_feature* result = new Parameter_feature();
+//	result->m_parameter.insert(m_parameter.begin(), m_parameter.end());
+//	return result;
+//}
 
 Interaction_feature::Interaction_feature() : Object_feature(object_feature_e::interaction_feature)
 {

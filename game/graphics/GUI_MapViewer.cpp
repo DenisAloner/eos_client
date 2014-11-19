@@ -248,7 +248,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 								glEnable(GL_TEXTURE_2D);*/
 								if ((*Current)->cell()->x == m_map->m_items[y][x]->x)
 								{
-									object_parameter_t* feat = (*Current)->get_parameter(object_parameter_e::health);
+									auto* feat = (*Current)->get_parameter(interaction_e::health);
 									if (feat)
 									{
 										float x0, y0, x1, y1, x2, y2, x3, y3;

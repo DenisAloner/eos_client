@@ -198,7 +198,9 @@ enum class reaction_applicator_e
 enum class interaction_e
 {
 	damage,
-	buff
+	buff,
+	health,
+	strength
 };
 
 enum class effect_e
