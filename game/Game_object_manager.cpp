@@ -82,7 +82,7 @@ effect_e GameObjectManager::get_effect_e(const std::string& key)
 {
 	auto value = m_to_effect_e.find(key);
 	if (value == m_to_effect_e.end())
-	{
+	{ 
 		LOG(FATAL) << "Элемент `" << key << "` отсутствует в m_items";
 	}
 	return value->second;
@@ -425,10 +425,13 @@ void GameObjectManager::init()
 
 	m_to_effect_e["physical_damage"] = effect_e::physical_damage;
 	m_to_effect_e["poison_damage"] = effect_e::poison_damage;
+	m_to_effect_e["value"] = effect_e::value;
+	m_to_effect_e["limit"] = effect_e::limit;
 
 	m_to_reaction_e["get_damage"] = reaction_e::get_damage;
 	m_to_reaction_e["get_buff"] = reaction_e::get_buff;
 	m_to_reaction_e["change_health"] = reaction_e::change_health;
+	m_to_reaction_e["change_parameter"] = reaction_e::change_parameter;
 
 	m_to_reaction_applicator_e["get_damage_basic"] = reaction_applicator_e::get_damage_basic;
 	m_to_reaction_applicator_e["change_health_basic"] = reaction_applicator_e::change_health_basic;
@@ -447,6 +450,9 @@ void GameObjectManager::init()
 
 	m_effect_subtype_string[effect_e::physical_damage] = "физический урон";
 	m_effect_subtype_string[effect_e::poison_damage] = "урон от яда";
+	m_effect_subtype_string[effect_e::value] = "модификатор значения";
+	m_effect_subtype_string[effect_e::limit] = "модификатор лимита";
+	m_effect_subtype_string[effect_e::list] = "список";
 
 	m_object_parameter_string[object_parameter_e::health] = "здоровье";
 	m_object_parameter_string[object_parameter_e::strength] = "сила";
@@ -510,6 +516,7 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 	Reaction* reaction;
 	obj->m_active_state = obj->m_state.front();
 	m_objects.push_back(obj);
+	obj->update_interaction();
 	return obj;
 }
 

@@ -1,17 +1,10 @@
 #include "Effect.h"
 
-Parameter_modification::Parameter_modification()
-{
-}
 
-//void Parameter_modification::apply(GameObject* object)
-//{
-//	auto reaction = object->get_reaction(m_kind);
-//	if (reaction)
-//	{
-//		reaction->apply(m_value, object, this);
-//	}
-//}
+Object_interaction::Object_interaction() :m_subtype(effect_e::poison_damage)
+{
+
+}
 
 Effect::Effect()
 {
@@ -42,6 +35,11 @@ std::string Effect::get_description()
 	return Application::instance().m_game_object_manager->get_effect_subtype_string(m_subtype) + ":" + std::to_string(m_value);
 }
 
+Interaction_list::Interaction_list()
+{
+	m_subtype = effect_e::list;
+}
+
 void Interaction_list::apply(GameObject* object)
 {
 	for (auto item = m_effect.begin(); item != m_effect.end();item++)
@@ -60,9 +58,54 @@ std::string Interaction_list::get_description()
 	std::string result = "";
 	for (auto current = m_effect.begin(); current != m_effect.end(); current++)
 	{
-		result += (*current)->get_description()+",";
+		result += (*current)->get_description() + ",";
 	}
 	return result;
+}
+
+void Interaction_list::update()
+{
+
+}
+
+void Interaction_list::add(Object_interaction* item)
+{
+}
+
+void Parameter_list::update_list(Interaction_list* list)
+{
+	Effect* item;
+	Interaction_list* list_item;
+	for (auto current = list->m_effect.begin(); current != list->m_effect.end(); current++)
+	{
+		switch ((*current)->m_subtype)
+		{
+		case effect_e::value:
+		{
+			item = static_cast<Effect*>(*current);
+			m_value = m_value + item->m_value;
+			break;
+		}
+		case effect_e::limit:
+		{
+			item = static_cast<Effect*>(*current);
+			m_limit = m_limit + item->m_value;
+			break;
+		}
+		case effect_e::list:
+		{
+			update_list(static_cast<Interaction_list*>(*current));
+			break;
+		}
+		}
+	}
+}
+
+void Parameter_list::update()
+{
+	m_value = m_basic_value;
+	m_limit = m_basic_limit;
+	update_list(this);
 }
 
 std::string Parameter_list::get_description()
@@ -73,6 +116,10 @@ std::string Parameter_list::get_description()
 		result += (*current)->get_description() + ",";
 	}
 	return result;
+}
+
+void Parameter_list::add(Object_interaction* item)
+{
 }
 
 //void Interaction_list::add(Object_interaction* item)

@@ -6,7 +6,8 @@ class Object_interaction
 public:
 
 	reaction_e m_kind;
-
+	effect_e m_subtype;
+	Object_interaction();
 	virtual void apply(GameObject* object) = 0;
 	virtual bool on_turn() = 0;
 	virtual std::string get_description() = 0;
@@ -16,39 +17,40 @@ class Interaction_list :public Object_interaction
 {
 public:
 
+
 	std::list<Object_interaction*> m_effect;
 
+	Interaction_list();
 	virtual void apply(GameObject* object);
 	virtual bool on_turn();
 	virtual std::string get_description();
-	//virtual void add(Object_interaction* item);
+	virtual void add(Object_interaction* item);
+	virtual void update();
 };
 
 class Parameter_list :public Interaction_list
 {
 public:
 
+	int m_basic_value;
+	int m_basic_limit;
+
 	int m_value;
 	int m_limit;
+
+
 	virtual std::string get_description();
+	virtual void update();
+	virtual void add(Object_interaction* item);
+
+private:
+	void update_list(Interaction_list* list);
 };
  
-class Parameter_modification :public Object_interaction
-{
-public:
-
-	//Object_parameter_modifier* m_modifier;
-	Parameter_modification();
-	//virtual void apply(GameObject* object) = 0;
-	//virtual bool on_turn() = 0;
-	//virtual std::string get_description() = 0;
-};
-
 class Effect :public Object_interaction
 {
 public:
 
-	effect_e m_subtype;
 	int m_value;
 
 	Effect();

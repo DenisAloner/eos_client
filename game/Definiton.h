@@ -97,7 +97,8 @@ enum action_e
 	pick,
 	open,
 	hit,
-	equip
+	equip,
+	show_parameters
 };
 
 enum class object_state_e
@@ -185,7 +186,8 @@ enum class reaction_e
 {
 	get_damage,
 	get_buff,
-	change_health
+	change_health,
+	change_parameter
 };
 
 enum class reaction_applicator_e
@@ -206,7 +208,10 @@ enum class interaction_e
 enum class effect_e
 {
 	physical_damage,
-	poison_damage
+	poison_damage,
+	value,
+	limit,
+	list
 };
 
 enum class body_part_e

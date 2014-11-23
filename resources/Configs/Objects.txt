@@ -124,6 +124,7 @@ icon sword
 tile_manager_single sword
 attribute pick_able
 effect get_damage,physical_damage,10,damage
+effect change_parameter,value,1,strength
 buff get_buff,poison_damage,5,5,damage
 
 object wall

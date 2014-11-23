@@ -128,6 +128,7 @@ public:
 	Parameter_list* get_parameter(interaction_e key);
 	Reaction* get_reaction(reaction_e key);
 	MapCell* cell();
+	void update_interaction();
 
 };
 

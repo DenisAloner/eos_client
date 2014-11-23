@@ -178,4 +178,16 @@ public:
 
 };
 
+class Action_show_parameters :
+	public Action
+{
+public:
+
+	Action_show_parameters();
+
+	virtual std::string get_description(Parameter* parameter);
+	virtual void interaction_handler();
+
+};
+
 #endif //TACTION_H

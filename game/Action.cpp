@@ -766,3 +766,42 @@ std::string Action_equip::get_description(Parameter* parameter)
 {
 	return "";
 }
+
+Action_show_parameters::Action_show_parameters()
+{
+	m_kind = action_e::show_parameters;
+	m_icon = Application::instance().m_graph->m_actions[10];
+}
+
+void Action_show_parameters::interaction_handler()
+{
+	Action::interaction_handler();
+	Application::instance().m_message_queue.m_busy = true;
+	Parameter* result;
+	P_object* p = new P_object();
+	result = Application::instance().command_select_object_on_map();
+	if (result)
+	{
+		p->m_object = static_cast<P_object*>(result)->m_object;
+		std::string a = "Выбран ";
+		a.append(p->m_object->m_name);
+		a = a + ".";
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+	}
+	else
+	{
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_message_queue.m_busy = false;
+		return;
+	}
+	Application::instance().command_gui_show_characterization(p->m_object);
+	Application::instance().m_message_queue.m_busy = false;
+}
+
+std::string Action_show_parameters::get_description(Parameter* parameter)
+{
+	P_object* p = static_cast<P_object*>(parameter);
+	std::string s("Показать меню характеристик для ");
+	s += p->m_object->m_name + ".";
+	return s;
+}

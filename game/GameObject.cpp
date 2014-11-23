@@ -213,8 +213,8 @@ void GameObject::add_parameter(interaction_e key, int value, int limit)
 	if (list)
 	{
 		Parameter_list* pl = new Parameter_list();
-		pl->m_value = value;
-		pl->m_limit = limit;
+		pl->m_basic_value = value;
+		pl->m_basic_limit = limit;
 		list->m_effect[key] = pl;
 	}
 	else
@@ -223,8 +223,8 @@ void GameObject::add_parameter(interaction_e key, int value, int limit)
 		{
 			list = new Interaction_feature();
 			Parameter_list* pl = new Parameter_list();
-			pl->m_value = value;
-			pl->m_limit = limit;
+			pl->m_basic_value = value;
+			pl->m_basic_limit = limit;
 			list->m_effect[key] = pl;
 			m_active_state->m_feature[object_feature_e::interaction_feature] = list;
 		}
@@ -356,6 +356,18 @@ MapCell* GameObject::cell(){
 	return static_cast<MapCell*>(m_owner);
 }
 
+void GameObject::update_interaction()
+{
+	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
+	if (list)
+	{
+		for (auto item = list->m_effect.begin(); item != list->m_effect.end(); item++)
+		{
+			item->second->update();
+		}
+	}
+}
+
 Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 {
 	m_fov = new FOV();
@@ -464,9 +476,7 @@ Object_feature* Reaction_feature::clone()
 	Reaction_feature* result = new Reaction_feature();
 	for (auto reaction = m_reaction.begin(); reaction != m_reaction.end(); reaction++)
 	{
-		LOG(INFO) << "1";
 		result->m_reaction[reaction->first] = reaction->second->clone();
-		LOG(INFO) << "2";
 	}
 	return result;
 }

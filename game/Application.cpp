@@ -172,6 +172,7 @@ void Application::initialize()
 	m_actions[action_e::open] = new Action_open();
 	m_actions[action_e::hit] = new Action_hit();
 	m_actions[action_e::equip] = new Action_equip();
+	m_actions[action_e::show_parameters] = new Action_show_parameters();
 	m_ai_manager = new AI_manager();
 	m_game_object_manager = new GameObjectManager();
 	m_game_object_manager->init();
@@ -194,7 +195,6 @@ void Application::initialize()
 	obj->set_direction(ObjectDirection_Left);
 	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 	m_GUI->MapViewer->m_player = new Player(obj, m_GUI->MapViewer->m_map);
-	command_gui_show_characterization(m_GUI->MapViewer->m_player->m_object);
 	GUI_ActionManager* AMTextBox;
 	AMTextBox = new GUI_ActionManager(m_action_manager);
 	AMTextBox->m_position.x = 650;
@@ -232,6 +232,9 @@ void Application::initialize()
 	ActionPanel->add_item_control(ActionButton);
 	ActionButton = new GUI_ActionButton();
 	ActionButton->m_action = m_actions[action_e::equip];
+	ActionPanel->add_item_control(ActionButton);
+	ActionButton = new GUI_ActionButton();
+	ActionButton->m_action = m_actions[action_e::show_parameters];
 	ActionPanel->add_item_control(ActionButton);
 	GUI_Layer* MenuLayer;
 	MenuLayer = new GUI_Layer();
@@ -548,7 +551,7 @@ bool Application::command_open_body(GameObject*& Object)
 
 void Application::command_gui_show_characterization(GameObject*& object)
 {
-	GUI_Window* Window = new GUI_Window(1024 / 2 - (192 + 2) / 2, 1024 / 2 - (4 * 64 + 2) / 2, 192 + 4, 4 * 64 + 27, object->m_name + "::Характеристика");
+	GUI_Window* Window = new GUI_Window(1024 / 2 - (192 + 2) / 2, 1024 / 2 - (4 * 64 + 2) / 2, 800 + 4, 4 * 64 + 27, object->m_name + "::Характеристика");
 	GUI_TextBox* item = new GUI_TextBox();
 	item->m_position.x = 2;
 	item->m_position.y = 25;
@@ -564,6 +567,7 @@ void Application::command_gui_show_characterization(GameObject*& object)
 	//		item->add_item_control(new GUI_Text(" " + m_game_object_manager->get_object_parameter_string(current->first) + ":" + std::to_string(current->second.m_value) + "/" + std::to_string(current->second.m_limit), new GUI_TextFormat(8, 17, RGBA_t(1.0, 1.0, 1.0, 1.0))));
 	//	}
 	//}
+	object->update_interaction();
 	Interaction_feature* obj_feat_effect = static_cast<Interaction_feature*>(object->get_feature(object_feature_e::interaction_feature));
 	if (obj_feat_effect != nullptr)
 	{
@@ -762,6 +766,7 @@ void Application::command_equip(GameObject*& unit, Body_part* part, GameObject*&
 			}
 		}
 	}
+	unit->update_interaction();
 }
 
 void Application::command_unequip(GameObject*& unit, Body_part* part, GameObject*& object)
@@ -780,6 +785,7 @@ void Application::command_unequip(GameObject*& unit, Body_part* part, GameObject
 			}
 		}
 	}
+	unit->update_interaction();
 }
 
 void Application::console(std::string text)
