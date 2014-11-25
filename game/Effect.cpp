@@ -1,9 +1,39 @@
 #include "Effect.h"
 
 
-Object_interaction::Object_interaction() :m_subtype(effect_e::poison_damage)
+Object_interaction::Object_interaction()
 {
 
+}
+
+Interaction_slot::Interaction_slot()
+{
+
+}
+
+void Interaction_slot::apply(GameObject* object)
+{
+	auto reaction = object->get_reaction(m_kind);
+	if (reaction)
+	{
+		reaction->apply(object, this);
+	}
+}
+
+bool Interaction_slot::on_turn()
+{
+	return false;
+}
+
+std::string Interaction_slot::get_description()
+{
+	return "slot";
+}
+
+Object_interaction* Interaction_slot::clone()
+{
+	LOG(INFO) << "1";
+	return nullptr;
 }
 
 Effect::Effect()
@@ -25,9 +55,13 @@ bool Effect::on_turn()
 	return false;
 }
 
-Effect* Effect::clone()
+Object_interaction* Effect::clone()
 {
-	return nullptr;
+	Effect* effect = new Effect();
+	effect->m_kind = m_kind;
+	effect->m_subtype = m_subtype;
+	effect->m_value = m_value;
+	return effect;
 }
 
 std::string Effect::get_description()
@@ -37,7 +71,7 @@ std::string Effect::get_description()
 
 Interaction_list::Interaction_list()
 {
-	m_subtype = effect_e::list;
+	m_kind = reaction_e::list;
 }
 
 void Interaction_list::apply(GameObject* object)
@@ -72,30 +106,40 @@ void Interaction_list::add(Object_interaction* item)
 {
 }
 
+Object_interaction* Interaction_list::clone()
+{
+	return nullptr;
+}
+
 void Parameter_list::update_list(Interaction_list* list)
 {
 	Effect* item;
 	Interaction_list* list_item;
 	for (auto current = list->m_effect.begin(); current != list->m_effect.end(); current++)
 	{
-		switch ((*current)->m_subtype)
+		switch ((*current)->m_kind)
 		{
-		case effect_e::value:
-		{
-			item = static_cast<Effect*>(*current);
-			m_value = m_value + item->m_value;
-			break;
-		}
-		case effect_e::limit:
-		{
-			item = static_cast<Effect*>(*current);
-			m_limit = m_limit + item->m_value;
-			break;
-		}
-		case effect_e::list:
+		case reaction_e::list:
 		{
 			update_list(static_cast<Interaction_list*>(*current));
 			break;
+		}
+		default:
+		{
+			item = static_cast<Effect*>(*current);
+			switch (item->m_subtype)
+			{
+			case effect_e::value:
+			{
+				m_value = m_value + item->m_value;
+				break;
+			}
+			case effect_e::limit:
+			{
+				m_limit = m_limit + item->m_value;
+				break;
+			}
+			}
 		}
 		}
 	}
@@ -144,7 +188,7 @@ bool Buff::on_turn()
 	return false;
 }
 
-Effect* Buff::clone()
+Object_interaction* Buff::clone()
 {
 	Buff* effect = new Buff();
 	effect->m_kind = m_kind;
@@ -164,7 +208,7 @@ Buff_chance::Buff_chance()
 {
 }
 
-Effect* Buff_chance::clone()
+Object_interaction* Buff_chance::clone()
 {
 	Buff_chance* effect = new Buff_chance();
 	effect->m_kind = m_kind;

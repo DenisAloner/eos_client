@@ -187,14 +187,16 @@ enum class reaction_e
 	get_damage,
 	get_buff,
 	change_health,
-	change_parameter
+	change_parameter,
+	list
 };
 
 enum class reaction_applicator_e
 {
 	get_damage_basic,
 	change_health_basic,
-	get_buff_basic
+	get_buff_basic,
+	add_modificator_generic
 };
 
 enum class interaction_e
@@ -211,7 +213,6 @@ enum class effect_e
 	poison_damage,
 	value,
 	limit,
-	list
 };
 
 enum class body_part_e

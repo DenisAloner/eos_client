@@ -6,26 +6,28 @@ class Object_interaction
 public:
 
 	reaction_e m_kind;
-	effect_e m_subtype;
 	Object_interaction();
 	virtual void apply(GameObject* object) = 0;
 	virtual bool on_turn() = 0;
 	virtual std::string get_description() = 0;
+	virtual Object_interaction* clone() = 0;
 };
+
+
 
 class Interaction_list :public Object_interaction
 {
 public:
 
-
 	std::list<Object_interaction*> m_effect;
-
 	Interaction_list();
 	virtual void apply(GameObject* object);
 	virtual bool on_turn();
 	virtual std::string get_description();
 	virtual void add(Object_interaction* item);
 	virtual void update();
+	virtual Object_interaction* clone();
+
 };
 
 class Parameter_list :public Interaction_list
@@ -46,17 +48,30 @@ public:
 private:
 	void update_list(Interaction_list* list);
 };
+
+class Interaction_slot :public Object_interaction
+{
+public:
+
+	Object_interaction* m_value;
+	interaction_e m_subtype;
+	Interaction_slot();
+	virtual void apply(GameObject* object);
+	virtual bool on_turn();
+	virtual std::string get_description();
+	virtual Object_interaction* clone();
+};
  
 class Effect :public Object_interaction
 {
 public:
 
 	int m_value;
-
+	effect_e m_subtype;
 	Effect();
 	virtual void apply(GameObject* object);
 	virtual bool on_turn();
-	virtual Effect* clone();
+	virtual Object_interaction* clone();
 	virtual std::string get_description();
 };
 
@@ -68,7 +83,7 @@ public:
 
 	Buff();
 	virtual bool on_turn();
-	virtual Effect* clone();
+	virtual Object_interaction* clone();
 	virtual std::string get_description();
 };
 
@@ -79,7 +94,7 @@ public:
 	int m_chance;
 
 	Buff_chance();
-	virtual Effect* clone();
+	virtual Object_interaction* clone();
 };
 
 class Reaction
@@ -120,3 +135,4 @@ public:
 //	virtual void apply(GameObject* object, Object_interaction* effect);
 //	virtual Reaction* clone();
 //};
+

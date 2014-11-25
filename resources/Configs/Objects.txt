@@ -59,8 +59,10 @@ tile_manager_map snake_right_03 3 2
 tile_manager_map snake_right_04 3 3
 action_move
 parameter health,100,100
+parameter strength,5,100
 reaction get_damage,get_damage_basic
 reaction change_health,change_health_basic
+reaction change_parameter,add_modificator_generic
 reaction get_buff,get_buff_basic
 effect get_damage,physical_damage,1,damage
 state dead
@@ -124,7 +126,7 @@ icon sword
 tile_manager_single sword
 attribute pick_able
 effect get_damage,physical_damage,10,damage
-effect change_parameter,value,1,strength
+slot change_parameter,value,1,damage
 buff get_buff,poison_damage,5,5,damage
 
 object wall
