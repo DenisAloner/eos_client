@@ -32,8 +32,11 @@ std::string Interaction_slot::get_description()
 
 Object_interaction* Interaction_slot::clone()
 {
-	LOG(INFO) << "1";
-	return nullptr;
+	Interaction_slot* effect = new Interaction_slot();
+	effect->m_kind = m_kind;
+	effect->m_subtype = m_subtype;
+	effect->m_value = m_value->clone();
+	return effect;
 }
 
 Effect::Effect()
@@ -102,13 +105,26 @@ void Interaction_list::update()
 
 }
 
-void Interaction_list::add(Object_interaction* item)
-{
-}
 
 Object_interaction* Interaction_list::clone()
 {
-	return nullptr;
+	Interaction_list* result = new Interaction_list();
+	//result->m_effect.insert(m_effect.begin(), m_effect.end());
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		result->m_effect.push_back((*item)->clone());
+	}
+	return result;
+}
+
+Interaction_list* Interaction_list::clone_list()
+{
+	Interaction_list* result = new Interaction_list();
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		result->m_effect.push_back((*item)->clone());
+	}
+	return result;
 }
 
 void Parameter_list::update_list(Interaction_list* list)
@@ -164,6 +180,34 @@ std::string Parameter_list::get_description()
 
 void Parameter_list::add(Object_interaction* item)
 {
+}
+
+Object_interaction* Parameter_list::clone()
+{
+	Parameter_list* result = new Parameter_list();
+	result->m_basic_limit = m_basic_limit;
+	result->m_basic_value = m_basic_value;
+	result->m_value = m_value;
+	result->m_limit = m_limit;
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		result->add((*item)->clone());
+	}
+	return result;
+}
+
+Interaction_list* Parameter_list::clone_list()
+{
+	Parameter_list* result = new Parameter_list();
+	result->m_basic_limit = m_basic_limit;
+	result->m_basic_value = m_basic_value;
+	result->m_value = m_value;
+	result->m_limit = m_limit;
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		result->add((*item)->clone());
+	}
+	return result;
 }
 
 //void Interaction_list::add(Object_interaction* item)
@@ -226,7 +270,6 @@ Reaction::Reaction()
 Reaction_effect::Reaction_effect()
 {
 }
-
 
 Reaction* Reaction_effect::clone()
 {

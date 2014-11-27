@@ -193,7 +193,7 @@ void GameObject::add_effect(interaction_e key, Object_interaction* item)
 		{
 			list->m_effect[key] = new Interaction_list;
 		}
-		list->m_effect[key]->m_effect.push_back(item);
+		static_cast<Interaction_list*>(list->m_effect[key])->m_effect.push_back(item);
 	}
 	else
 	{
@@ -201,7 +201,7 @@ void GameObject::add_effect(interaction_e key, Object_interaction* item)
 		{
 			list = new Interaction_feature();
 			list->m_effect[key] = new Interaction_list();
-			list->m_effect[key]->m_effect.push_back(item);
+			static_cast<Interaction_list*>(list->m_effect[key])->m_effect.push_back(item);
 			m_active_state->m_feature[object_feature_e::interaction_feature] = list;
 		}
 	}
@@ -258,7 +258,7 @@ void GameObject::add_to_parameter(interaction_e key, Object_interaction* item)
 		{
 			list->m_effect[key] = new Parameter_list();
 		}
-		list->m_effect[key]->m_effect.push_back(item);
+		static_cast<Parameter_list*>(list->m_effect[key])->m_effect.push_back(item);
 	}
 	else
 	{
@@ -266,7 +266,7 @@ void GameObject::add_to_parameter(interaction_e key, Object_interaction* item)
 		{
 			list = new Interaction_feature();
 			list->m_effect[key] = new Parameter_list();
-			list->m_effect[key]->m_effect.push_back(item);
+			static_cast<Parameter_list*>(list->m_effect[key])->m_effect.push_back(item);
 			m_active_state->m_feature[object_feature_e::interaction_feature] = list;
 		}
 	}
@@ -279,7 +279,7 @@ void GameObject::remove_effect(interaction_e key, Object_interaction* item)
 	{
 		if (list->m_effect.find(key) != list->m_effect.end())
 		{
-			list->m_effect[key]->m_effect.remove(item);
+			static_cast<Interaction_list*>(list->m_effect[key])->m_effect.remove(item);
 		}
 	}
 }
@@ -463,7 +463,11 @@ Interaction_feature::Interaction_feature() : Object_feature(object_feature_e::in
 Object_feature* Interaction_feature::clone()
 {
 	Interaction_feature* result = new Interaction_feature();
-	result->m_effect.insert(m_effect.begin(), m_effect.end());
+	//result->m_effect.insert(m_effect.begin(), m_effect.end());
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		result->m_effect[item->first] = item->second->clone_list();
+	}
 	return result;
 }
 

@@ -252,7 +252,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 									if (feat)
 									{
 										float x0, y0, x1, y1, x2, y2, x3, y3;
-										float h = feat->m_value / 100.0;
+										float h = feat->m_basic_value / 100.0;
 										x0 = (px + gx - object_size.w / 2.0 + 1)*m_tile_size_x - 32;
 										y0 = (m_tile_count_y - py - gy - object_size.h)*m_tile_size_y-8;
 										x1 = x0;

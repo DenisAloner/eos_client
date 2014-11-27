@@ -13,8 +13,6 @@ public:
 	virtual Object_interaction* clone() = 0;
 };
 
-
-
 class Interaction_list :public Object_interaction
 {
 public:
@@ -24,13 +22,12 @@ public:
 	virtual void apply(GameObject* object);
 	virtual bool on_turn();
 	virtual std::string get_description();
-	virtual void add(Object_interaction* item);
 	virtual void update();
 	virtual Object_interaction* clone();
-
+	virtual Interaction_list* clone_list();
 };
 
-class Parameter_list :public Interaction_list
+class Parameter_list :public  Interaction_list
 {
 public:
 
@@ -44,6 +41,8 @@ public:
 	virtual std::string get_description();
 	virtual void update();
 	virtual void add(Object_interaction* item);
+	virtual Object_interaction* clone();
+	virtual Interaction_list* clone_list();
 
 private:
 	void update_list(Interaction_list* list);

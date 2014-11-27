@@ -5,8 +5,8 @@ void Reaction_manager::change_health_basic(Reaction* reaction, GameObject* objec
 	auto item = object->get_parameter(interaction_e::health);
 	if (item)
 	{
-		Application::instance().console(object->m_name + ": измененен параметр <" + Application::instance().m_game_object_manager->get_object_parameter_string(object_parameter_e::health) + ":" + std::to_string(item->m_value) + ">");
-		if (item->m_value < 1)
+		Application::instance().console(object->m_name + ": измененен параметр <" + Application::instance().m_game_object_manager->get_object_parameter_string(object_parameter_e::health) + ":" + std::to_string(item->m_basic_value) + ">");
+		if (item->m_basic_value < 1)
 		{
 			Application::instance().m_GUI->MapViewer->m_map->m_ai.remove(object);
 			object->set_state(object_state_e::dead);
@@ -20,7 +20,7 @@ void Reaction_manager::get_damage_basic(Reaction* reaction, GameObject* object, 
 	auto item = object->get_parameter(interaction_e::health);
 	if (item)
 	{
-		item->m_value -= static_cast<Reaction_effect*>(reaction)->m_value;
+		item->m_basic_value -= static_cast<Reaction_effect*>(reaction)->m_value;
 		Application::instance().console(object->m_name + ": получен эффект <" + Application::instance().m_game_object_manager->get_effect_subtype_string(static_cast<Effect*>(effect)->m_subtype) + ":" + std::to_string(static_cast<Reaction_effect*>(reaction)->m_value) + ">");
 	}
 	auto obj_reaction = object->get_reaction(reaction_e::change_health);

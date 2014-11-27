@@ -342,8 +342,11 @@ void Application::initialize()
 	obj = m_game_object_manager->new_object("snake");
 	obj->set_direction(ObjectDirection_Left);
 	m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
-	rx = rx - 3;
 	ry = ry - 1;
+	obj = m_game_object_manager->new_object("snake");
+	obj->set_direction(ObjectDirection_Left);
+	m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
+	rx = rx - 3;
 	obj = m_game_object_manager->new_object("sword");
 	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 	int ru;
