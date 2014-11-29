@@ -395,7 +395,11 @@ void GameObjectManager::parser(const std::string& command)
 		m_effect->m_subtype = get_effect_e(arg[1]);
 		m_effect->m_value = std::stoi(arg[2]);
 		m_slot->m_value = m_effect;
-		m_object->add_effect(get_interaction_e(arg[3]), m_slot);
+		Interaction_slot* a = new Interaction_slot();
+		a->m_kind = reaction_e::change_parameter;
+		a->m_subtype = interaction_e::damage;
+		a->m_value = m_slot;
+		m_object->add_effect(get_interaction_e(arg[3]), a);
 		break;
 	}
 	case command_e::reaction_effect:

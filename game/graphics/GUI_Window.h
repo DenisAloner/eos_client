@@ -4,6 +4,7 @@
 #include "GUI_Container.h"
 #include "GUI_Item.h"
 #include <list>
+#include "GUI_TextBox.h"
 
 class GUI_Window :
 	public GUI_Container
@@ -29,6 +30,19 @@ public:
 	virtual void on_header_close();
 	virtual void resize(int _width, int _height);
 	virtual void on_mouse_wheel(MouseEventArgs const& e);
+
+};
+
+class GUI_description_window :
+	public GUI_Window
+{
+public:
+
+	GameObject* m_object;
+	GUI_TextBox* m_textbox;
+	GUI_description_window(int x, int y, int width, int height, std::string Name, GameObject*& object);
+	std::list<std::string> m_text;
+	void update_info();
 
 };
 

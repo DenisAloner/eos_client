@@ -463,10 +463,9 @@ Interaction_feature::Interaction_feature() : Object_feature(object_feature_e::in
 Object_feature* Interaction_feature::clone()
 {
 	Interaction_feature* result = new Interaction_feature();
-	//result->m_effect.insert(m_effect.begin(), m_effect.end());
 	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
 	{
-		result->m_effect[item->first] = item->second->clone_list();
+		result->m_effect[item->first] = item->second->clone();
 	}
 	return result;
 }

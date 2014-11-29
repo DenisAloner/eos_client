@@ -33,9 +33,27 @@ property_body foot,правая нога
 reaction get_damage,get_damage_basic
 reaction change_health,change_health_basic
 effect get_damage,physical_damage,10,damage
+reaction change_parameter,add_modificator_generic
 state dead
 size 1 2 0
 tile_manager_single elf_corpse
+
+object rat
+state alive
+ai 20 0 0
+size 1 1 1
+tile_manager_single rat_left
+action_move
+parameter health,100,100
+parameter strength,1,100
+reaction get_damage,get_damage_basic
+reaction change_health,change_health_basic
+reaction change_parameter,add_modificator_generic
+reaction get_buff,get_buff_basic
+effect get_damage,physical_damage,1,damage
+state dead
+size 1 1 0
+tile_manager_single snake_corpse
 
 object snake
 state alive
@@ -125,7 +143,7 @@ size 1 1 1
 icon sword
 tile_manager_single sword
 attribute pick_able
-effect get_damage,physical_damage,10,damage
+effect get_damage,physical_damage,50,damage
 slot change_parameter,value,1,damage
 buff get_buff,poison_damage,5,5,damage
 

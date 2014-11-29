@@ -11,6 +11,7 @@ public:
 	virtual bool on_turn() = 0;
 	virtual std::string get_description() = 0;
 	virtual Object_interaction* clone() = 0;
+	virtual void description(std::list<std::string>* info,int level) = 0;
 };
 
 class Interaction_list :public Object_interaction
@@ -23,8 +24,8 @@ public:
 	virtual bool on_turn();
 	virtual std::string get_description();
 	virtual void update();
-	virtual Object_interaction* clone();
-	virtual Interaction_list* clone_list();
+	virtual Interaction_list* clone();
+	virtual void description(std::list<std::string>* info, int level);
 };
 
 class Parameter_list :public  Interaction_list
@@ -41,8 +42,8 @@ public:
 	virtual std::string get_description();
 	virtual void update();
 	virtual void add(Object_interaction* item);
-	virtual Object_interaction* clone();
-	virtual Interaction_list* clone_list();
+	virtual Parameter_list* clone();
+	virtual void description(std::list<std::string>* info, int level);
 
 private:
 	void update_list(Interaction_list* list);
@@ -59,6 +60,7 @@ public:
 	virtual bool on_turn();
 	virtual std::string get_description();
 	virtual Object_interaction* clone();
+	virtual void description(std::list<std::string>* info, int level);
 };
  
 class Effect :public Object_interaction
@@ -72,6 +74,7 @@ public:
 	virtual bool on_turn();
 	virtual Object_interaction* clone();
 	virtual std::string get_description();
+	virtual void description(std::list<std::string>* info, int level);
 };
 
 class Buff : public Effect
@@ -84,6 +87,7 @@ public:
 	virtual bool on_turn();
 	virtual Object_interaction* clone();
 	virtual std::string get_description();
+	virtual void description(std::list<std::string>* info, int level);
 };
 
 class Buff_chance: public Buff
@@ -94,6 +98,7 @@ public:
 
 	Buff_chance();
 	virtual Object_interaction* clone();
+	virtual void description(std::list<std::string>* info, int level);
 };
 
 class Reaction

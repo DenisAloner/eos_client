@@ -95,3 +95,37 @@ void GUI_Window::on_mouse_wheel(MouseEventArgs const& e)
 		m_focus->mouse_wheel(e);
 	}
 }
+
+GUI_description_window::GUI_description_window(int x, int y, int width, int height, std::string Name, GameObject*& object) :GUI_Window(x, y, width, height, Name), m_object(object)
+{
+	m_textbox = new GUI_TextBox();
+	m_textbox->m_position.x = 2;
+	m_textbox->m_position.y = 25;
+	m_textbox->resize(m_size.w - 4, m_size.h - 25 - 2);
+	add_item_control(m_textbox);
+	update_info();
+	object->event_update += std::bind(&GUI_description_window::update_info, this);
+}
+
+void GUI_description_window::update_info()
+{
+	m_text.clear();
+	while (m_textbox->m_item_controls->m_items.begin()!= m_textbox->m_item_controls->m_items.end())
+	{
+		m_textbox->remove_item_control((*m_textbox->m_item_controls->m_items.begin()));
+	}
+	Interaction_feature* obj_feat_effect = static_cast<Interaction_feature*>(m_object->get_feature(object_feature_e::interaction_feature));
+	if (obj_feat_effect != nullptr)
+	{
+		m_text.push_back("эффекты:");
+		for (auto current = obj_feat_effect->m_effect.begin(); current != obj_feat_effect->m_effect.end(); current++)
+		{
+			m_text.push_back("." + Application::instance().m_game_object_manager->get_effect_string(current->first) + ":");
+			current->second->description(&m_text,2);
+		}
+	}
+	for (auto item = m_text.begin(); item != m_text.end(); item++)
+	{
+		m_textbox->add_item_control(new GUI_Text((*item), new GUI_TextFormat(8, 17, RGBA_t(0.7, 0.9, 1.0, 1.0))));
+	}
+}

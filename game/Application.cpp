@@ -343,7 +343,7 @@ void Application::initialize()
 	obj->set_direction(ObjectDirection_Left);
 	m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 	ry = ry - 1;
-	obj = m_game_object_manager->new_object("snake");
+	obj = m_game_object_manager->new_object("rat");
 	obj->set_direction(ObjectDirection_Left);
 	m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 	rx = rx - 3;
@@ -554,33 +554,26 @@ bool Application::command_open_body(GameObject*& Object)
 
 void Application::command_gui_show_characterization(GameObject*& object)
 {
-	GUI_Window* Window = new GUI_Window(1024 / 2 - (192 + 2) / 2, 1024 / 2 - (4 * 64 + 2) / 2, 800 + 4, 4 * 64 + 27, object->m_name + "::Характеристика");
-	GUI_TextBox* item = new GUI_TextBox();
-	item->m_position.x = 2;
-	item->m_position.y = 25;
-	item->resize(Window->m_size.w - 4, Window->m_size.h - 25 - 2);
-	Window->add_item_control(item);
-	m_GUI->add_front(Window);
-	//Parameter_list* obj_feat_parameter= static_cast<Parameter_feature*>(object->get_feature(object_feature_e::parameter_feature));
-	//if (obj_feat_parameter != nullptr)
+	//GUI_Window* Window = new GUI_Window(1024 / 2 - (192 + 2) / 2, 1024 / 2 - (4 * 64 + 2) / 2, 800 + 4, 4 * 64 + 27, object->m_name + "::Характеристика");
+	//GUI_TextBox* item = new GUI_TextBox();
+	//item->m_position.x = 2;
+	//item->m_position.y = 25;
+	//item->resize(Window->m_size.w - 4, Window->m_size.h - 25 - 2);
+	//Window->add_item_control(item);
+	//m_GUI->add_front(Window);
+	////object->update_interaction();
+	//Interaction_feature* obj_feat_effect = static_cast<Interaction_feature*>(object->get_feature(object_feature_e::interaction_feature));
+	//if (obj_feat_effect != nullptr)
 	//{
-	//	item->add_item_control(new GUI_Text("параметры:", new GUI_TextFormat(8, 17, RGBA_t(0.7, 0.9, 1.0, 1.0))));
-	//	for (auto current = obj_feat_parameter->m_parameter.begin(); current != obj_feat_parameter->m_parameter.end(); current++)
+	//	item->add_item_control(new GUI_Text("эффекты:", new GUI_TextFormat(8, 17, RGBA_t(0.7, 0.9, 1.0, 1.0))));
+	//	for (auto current = obj_feat_effect->m_effect.begin(); current != obj_feat_effect->m_effect.end(); current++)
 	//	{
-	//		item->add_item_control(new GUI_Text(" " + m_game_object_manager->get_object_parameter_string(current->first) + ":" + std::to_string(current->second.m_value) + "/" + std::to_string(current->second.m_limit), new GUI_TextFormat(8, 17, RGBA_t(1.0, 1.0, 1.0, 1.0))));
+	//		item->add_item_control(new GUI_Text(" " + m_game_object_manager->get_effect_string(current->first)+":", new GUI_TextFormat(8, 17, RGBA_t(0.7, 0.9, 1.0, 1.0))));
+	//		item->add_item_control(new GUI_Text("  " + current->second->get_description(), new GUI_TextFormat(8, 17, RGBA_t(1.0, 1.0, 1.0, 1.0))));
 	//	}
 	//}
-	object->update_interaction();
-	Interaction_feature* obj_feat_effect = static_cast<Interaction_feature*>(object->get_feature(object_feature_e::interaction_feature));
-	if (obj_feat_effect != nullptr)
-	{
-		item->add_item_control(new GUI_Text("эффекты:", new GUI_TextFormat(8, 17, RGBA_t(0.7, 0.9, 1.0, 1.0))));
-		for (auto current = obj_feat_effect->m_effect.begin(); current != obj_feat_effect->m_effect.end(); current++)
-		{
-			item->add_item_control(new GUI_Text(" " + m_game_object_manager->get_effect_string(current->first)+":", new GUI_TextFormat(8, 17, RGBA_t(0.7, 0.9, 1.0, 1.0))));
-			item->add_item_control(new GUI_Text("  " + current->second->get_description(), new GUI_TextFormat(8, 17, RGBA_t(1.0, 1.0, 1.0, 1.0))));
-		}
-	}
+	GUI_description_window* Window = new GUI_description_window(1024 / 2 - (192 + 2) / 2, 1024 / 2 - (4 * 64 + 2) / 2, 800 + 4, 4 * 64 + 27, object->m_name + "::Характеристика",object);
+	m_GUI->add_front(Window);
 }
 
 void Application::command_set_cursor(GLuint _Tile)
@@ -770,6 +763,7 @@ void Application::command_equip(GameObject*& unit, Body_part* part, GameObject*&
 		}
 	}
 	unit->update_interaction();
+	unit->event_update(VoidEventArgs());
 }
 
 void Application::command_unequip(GameObject*& unit, Body_part* part, GameObject*& object)
@@ -789,6 +783,7 @@ void Application::command_unequip(GameObject*& unit, Body_part* part, GameObject
 		}
 	}
 	unit->update_interaction();
+	unit->event_update(VoidEventArgs());
 }
 
 void Application::console(std::string text)

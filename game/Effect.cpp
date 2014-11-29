@@ -102,24 +102,12 @@ std::string Interaction_list::get_description()
 
 void Interaction_list::update()
 {
-
 }
 
-
-Object_interaction* Interaction_list::clone()
+Interaction_list* Interaction_list::clone()
 {
 	Interaction_list* result = new Interaction_list();
 	//result->m_effect.insert(m_effect.begin(), m_effect.end());
-	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
-	{
-		result->m_effect.push_back((*item)->clone());
-	}
-	return result;
-}
-
-Interaction_list* Interaction_list::clone_list()
-{
-	Interaction_list* result = new Interaction_list();
 	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
 	{
 		result->m_effect.push_back((*item)->clone());
@@ -170,7 +158,7 @@ void Parameter_list::update()
 
 std::string Parameter_list::get_description()
 {
-	std::string result = std::to_string(m_value) + "/" + std::to_string(m_limit)+",";
+	std::string result = std::to_string(m_value) + "/" + std::to_string(m_limit) + ",";
 	for (auto current = m_effect.begin(); current != m_effect.end(); current++)
 	{
 		result += (*current)->get_description() + ",";
@@ -182,21 +170,7 @@ void Parameter_list::add(Object_interaction* item)
 {
 }
 
-Object_interaction* Parameter_list::clone()
-{
-	Parameter_list* result = new Parameter_list();
-	result->m_basic_limit = m_basic_limit;
-	result->m_basic_value = m_basic_value;
-	result->m_value = m_value;
-	result->m_limit = m_limit;
-	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
-	{
-		result->add((*item)->clone());
-	}
-	return result;
-}
-
-Interaction_list* Parameter_list::clone_list()
+Parameter_list* Parameter_list::clone()
 {
 	Parameter_list* result = new Parameter_list();
 	result->m_basic_limit = m_basic_limit;
@@ -344,3 +318,41 @@ void Reaction_effect::apply(GameObject* object, Object_interaction* effect)
 //	}
 //	return result;
 //}
+
+void Effect::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level,'.')+Application::instance().m_game_object_manager->get_effect_subtype_string(m_subtype) + ":" + std::to_string(m_value));
+}
+
+void Buff::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.')+"<" + Application::instance().m_game_object_manager->get_effect_subtype_string(m_subtype) + ":" + std::to_string(m_value) + ", время:" + std::to_string(m_duration) + ">");
+}
+
+void Buff_chance::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "<описание отсутствует>");
+}
+
+void Interaction_slot::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "<наложение эффекта>");
+	m_value->description(info,level+1);
+}
+
+void Interaction_list::description(std::list<std::string>* info, int level)
+{
+	for (auto current = m_effect.begin(); current != m_effect.end(); current++)
+	{
+		(*current)->description(info,level);
+	}
+}
+
+void Parameter_list::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + std::to_string(m_value) + "/" + std::to_string(m_limit) + ":");
+	for (auto current = m_effect.begin(); current != m_effect.end(); current++)
+	{
+		(*current)->description(info,level+1);
+	}
+}

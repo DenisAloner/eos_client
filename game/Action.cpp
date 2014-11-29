@@ -709,6 +709,8 @@ void Action_hit::perfom(Parameter* parameter)
 				(*current)->apply(p->m_object);
 			}
 		}
+		p->m_object->update_interaction();
+		p->m_object->event_update(VoidEventArgs());
 	}
 }
 

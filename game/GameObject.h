@@ -100,6 +100,8 @@ class GameObject
 {
 public:
 
+	Event<VoidEventArgs> event_update;
+
 	std::string m_name;
 	float m_weight;
 	ObjectDirection m_direction;
