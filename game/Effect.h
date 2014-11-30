@@ -12,6 +12,7 @@ public:
 	virtual std::string get_description() = 0;
 	virtual Object_interaction* clone() = 0;
 	virtual void description(std::list<std::string>* info,int level) = 0;
+	virtual void apply_effect(Object_interaction* object);
 };
 
 class Interaction_list :public Object_interaction
@@ -44,6 +45,7 @@ public:
 	virtual void add(Object_interaction* item);
 	virtual Parameter_list* clone();
 	virtual void description(std::list<std::string>* info, int level);
+	virtual void apply_effect(Object_interaction* object);
 
 private:
 	void update_list(Interaction_list* list);

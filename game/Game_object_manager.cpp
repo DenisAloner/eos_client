@@ -41,11 +41,19 @@ void Reaction_manager::get_buff_basic(Reaction* reaction, GameObject* object, Ob
 
 void Reaction_manager::add_modificator_generic(Reaction* reaction, GameObject* object, Object_interaction* effect)
 {
-	LOG(INFO) << "DONE";
 	Interaction_slot* e = static_cast<Interaction_slot*>(effect);
 	object->add_effect(e->m_subtype, e->m_value->clone());
 	object->update_interaction();
-	//Application::instance().console(object->m_name + ": наложен бафф <Отравление> ");
+}
+
+void Reaction_manager::apply_effect_generic(Reaction* reaction, GameObject* object, Object_interaction* effect)
+{
+	Interaction_slot* e = static_cast<Interaction_slot*>(effect);
+	auto item = object->get_effect(e->m_subtype);
+	if (item)
+	{
+		item->apply_effect(e->m_value);
+	}
 }
 
 Reaction_manager::Reaction_manager()
@@ -54,6 +62,7 @@ Reaction_manager::Reaction_manager()
 	m_items[reaction_applicator_e::get_damage_basic] = std::bind(&Reaction_manager::get_damage_basic, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 	m_items[reaction_applicator_e::get_buff_basic] = std::bind(&Reaction_manager::get_buff_basic, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 	m_items[reaction_applicator_e::add_modificator_generic] = std::bind(&Reaction_manager::add_modificator_generic, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+	m_items[reaction_applicator_e::apply_effect_generic] = std::bind(&Reaction_manager::apply_effect_generic, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 }
 
 
@@ -375,6 +384,14 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->add_effect(get_interaction_e(arg[3]), m_effect);
 		break;
 	}
+	case command_e::mem_effect:
+	{
+		m_effect = new Effect();
+		m_effect->m_kind = get_reaction_e(arg[0]);
+		m_effect->m_subtype = get_effect_e(arg[1]);
+		m_effect->m_value = std::stoi(arg[2]);
+		break;
+	}
 	case command_e::buff:
 	{
 		m_buff = new Buff();
@@ -388,18 +405,10 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::slot:
 	{
 		m_slot = new Interaction_slot();
-		m_slot->m_kind = reaction_e::change_parameter;
-		m_slot->m_subtype = interaction_e::strength;
-		m_effect = new Effect();
-		m_effect->m_kind = get_reaction_e(arg[0]);
-		m_effect->m_subtype = get_effect_e(arg[1]);
-		m_effect->m_value = std::stoi(arg[2]);
+		m_slot->m_kind = get_reaction_e(arg[0]);
+		m_slot->m_subtype = get_interaction_e(arg[1]);
 		m_slot->m_value = m_effect;
-		Interaction_slot* a = new Interaction_slot();
-		a->m_kind = reaction_e::change_parameter;
-		a->m_subtype = interaction_e::damage;
-		a->m_value = m_slot;
-		m_object->add_effect(get_interaction_e(arg[3]), a);
+		m_object->add_effect(get_interaction_e(arg[2]), m_slot);
 		break;
 	}
 	case command_e::reaction_effect:
@@ -438,6 +447,7 @@ void GameObjectManager::init()
 	m_commands["parameter"] = command_e::parameter;
 	m_commands["state"] = command_e::state;
 	m_commands["slot"] = command_e::slot;
+	m_commands["mem_effect"] = command_e::mem_effect;
 
 	m_to_object_state_e["alive"] = object_state_e::alive;
 	m_to_object_state_e["dead"] = object_state_e::dead;
@@ -459,11 +469,13 @@ void GameObjectManager::init()
 	m_to_reaction_e["get_buff"] = reaction_e::get_buff;
 	m_to_reaction_e["change_health"] = reaction_e::change_health;
 	m_to_reaction_e["change_parameter"] = reaction_e::change_parameter;
+	m_to_reaction_e["apply_effect"] = reaction_e::apply_effect;
 
 	m_to_reaction_applicator_e["get_damage_basic"] = reaction_applicator_e::get_damage_basic;
 	m_to_reaction_applicator_e["change_health_basic"] = reaction_applicator_e::change_health_basic;
 	m_to_reaction_applicator_e["get_buff_basic"] = reaction_applicator_e::get_buff_basic;
 	m_to_reaction_applicator_e["add_modificator_generic"] = reaction_applicator_e::add_modificator_generic;
+	m_to_reaction_applicator_e["apply_effect_generic"] = reaction_applicator_e::apply_effect_generic;
 
 	m_to_object_parameter_e["health"] = object_parameter_e::health;
 	m_to_object_parameter_e["strength"] = object_parameter_e::strength;

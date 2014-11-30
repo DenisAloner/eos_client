@@ -34,6 +34,9 @@ reaction get_damage,get_damage_basic
 reaction change_health,change_health_basic
 effect get_damage,physical_damage,10,damage
 reaction change_parameter,add_modificator_generic
+reaction apply_effect,apply_effect_generic
+mem_effect change_parameter,value,1
+slot apply_effect,health,buff
 state dead
 size 1 2 0
 tile_manager_single elf_corpse
@@ -144,7 +147,9 @@ icon sword
 tile_manager_single sword
 attribute pick_able
 effect get_damage,physical_damage,50,damage
-slot change_parameter,value,1,damage
+mem_effect change_parameter,value,1
+slot change_parameter,strength,damage
+effect change_parameter,value,1,strength
 buff get_buff,poison_damage,5,5,damage
 
 object wall

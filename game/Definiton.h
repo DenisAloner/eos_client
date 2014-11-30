@@ -188,7 +188,8 @@ enum class reaction_e
 	get_buff,
 	change_health,
 	change_parameter,
-	list
+	list,
+	apply_effect
 };
 
 enum class reaction_applicator_e
@@ -196,7 +197,8 @@ enum class reaction_applicator_e
 	get_damage_basic,
 	change_health_basic,
 	get_buff_basic,
-	add_modificator_generic
+	add_modificator_generic,
+	apply_effect_generic
 };
 
 enum class interaction_e

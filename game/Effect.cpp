@@ -11,6 +11,10 @@ Interaction_slot::Interaction_slot()
 
 }
 
+void Object_interaction::apply_effect(Object_interaction* object)
+{
+}
+
 void Interaction_slot::apply(GameObject* object)
 {
 	auto reaction = object->get_reaction(m_kind);
@@ -336,7 +340,7 @@ void Buff_chance::description(std::list<std::string>* info, int level)
 
 void Interaction_slot::description(std::list<std::string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + "<наложение эффекта>");
+	info->push_back(std::string(level, '.') + "<наложение эффекта:" + Application::instance().m_game_object_manager->get_effect_string(m_subtype) + ">:");
 	m_value->description(info,level+1);
 }
 
@@ -350,9 +354,45 @@ void Interaction_list::description(std::list<std::string>* info, int level)
 
 void Parameter_list::description(std::list<std::string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + std::to_string(m_value) + "/" + std::to_string(m_limit) + ":");
+	info->push_back(std::string(level, '.') + std::to_string(m_value) + "(" + std::to_string(m_basic_value) + ")/" + std::to_string(m_limit) + "(" + std::to_string(m_basic_limit) + "):");
 	for (auto current = m_effect.begin(); current != m_effect.end(); current++)
 	{
-		(*current)->description(info,level+1);
+		(*current)->description(info,level);
 	}
+}
+
+void Parameter_list::apply_effect(Object_interaction* object)
+{
+	Effect* item;
+	Interaction_list* list_item;
+
+		switch (object->m_kind)
+		{
+		case reaction_e::list:
+		{
+			list_item = static_cast<Interaction_list*>(object);
+			for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); current++)
+			{
+				apply_effect(*current);
+			}
+			break;
+		}
+		default:
+		{
+			item = static_cast<Effect*>(object);
+			switch (item->m_subtype)
+			{
+			case effect_e::value:
+			{
+				m_basic_value = m_basic_value + item->m_value;
+				break;
+			}
+			case effect_e::limit:
+			{
+				m_basic_limit = m_basic_limit + item->m_value;
+				break;
+			}
+			}
+		}
+		}
 }

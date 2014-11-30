@@ -23,6 +23,7 @@ public:
 	void change_health_basic(Reaction* reaction, GameObject* object, Object_interaction* effect);
 	void get_buff_basic(Reaction* reaction, GameObject* object, Object_interaction* effect);
 	void add_modificator_generic(Reaction* reaction, GameObject* object, Object_interaction* effect);
+	void apply_effect_generic(Reaction* reaction, GameObject* object, Object_interaction* effect);
 
 	std::map<reaction_applicator_e, func> m_items;
 	Reaction_manager();
@@ -56,7 +57,8 @@ public:
 		effect,
 		reaction_effect,
 		buff,
-		slot
+		slot,
+		mem_effect
 	};
 
 	enum class parameter_e
