@@ -5,7 +5,7 @@ void Reaction_manager::change_health_basic(Reaction* reaction, GameObject* objec
 	auto item = object->get_parameter(interaction_e::health);
 	if (item)
 	{
-		Application::instance().console(object->m_name + ": измененен параметр <" + Application::instance().m_game_object_manager->get_object_parameter_string(object_parameter_e::health) + ":" + std::to_string(item->m_basic_value) + ">");
+		Application::instance().console(object->m_name + ": измененен параметр <" + Application::instance().m_game_object_manager->get_effect_string(interaction_e::health) + ":" + std::to_string(item->m_basic_value) + ">");
 		if (item->m_basic_value < 1)
 		{
 			Application::instance().m_GUI->MapViewer->m_map->m_ai.remove(object);
@@ -41,18 +41,18 @@ void Reaction_manager::get_buff_basic(Reaction* reaction, GameObject* object, Ob
 
 void Reaction_manager::add_modificator_generic(Reaction* reaction, GameObject* object, Object_interaction* effect)
 {
-	Interaction_slot* e = static_cast<Interaction_slot*>(effect);
+	Interaction_copyist* e = static_cast<Interaction_copyist*>(effect);
 	object->add_effect(e->m_subtype, e->m_value->clone());
 	object->update_interaction();
 }
 
 void Reaction_manager::apply_effect_generic(Reaction* reaction, GameObject* object, Object_interaction* effect)
 {
-	Interaction_slot* e = static_cast<Interaction_slot*>(effect);
+	Interaction_copyist* e = static_cast<Interaction_copyist*>(effect);
 	auto item = object->get_effect(e->m_subtype);
 	if (item)
 	{
-		item->apply_effect(e->m_value);
+		effect->apply_effect(item);
 	}
 }
 
@@ -136,15 +136,15 @@ object_attribute_e GameObjectManager::get_object_attribute_e(const std::string& 
 	return value->second;
 }
 
-object_parameter_e GameObjectManager::get_object_parameter_e(const std::string& key)
-{
-	auto value = m_to_object_parameter_e.find(key);
-	if (value == m_to_object_parameter_e.end())
-	{
-		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
-	}
-	return value->second;
-}
+//object_parameter_e GameObjectManager::get_object_parameter_e(const std::string& key)
+//{
+//	auto value = m_to_object_parameter_e.find(key);
+//	if (value == m_to_object_parameter_e.end())
+//	{
+//		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
+//	}
+//	return value->second;
+//}
 
 void GameObjectManager::parser(const std::string& command)
 {
@@ -386,10 +386,21 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	case command_e::mem_effect:
 	{
-		m_effect = new Effect();
-		m_effect->m_kind = get_reaction_e(arg[0]);
-		m_effect->m_subtype = get_effect_e(arg[1]);
-		m_effect->m_value = std::stoi(arg[2]);
+		Effect* item = new Effect();
+		item->m_kind = get_reaction_e(arg[0]);
+		item->m_subtype = get_effect_e(arg[1]);
+		item->m_value = std::stoi(arg[2]);
+		m_slot = item;
+		break;
+	}
+	case command_e::mem_slot_timer:
+	{
+		Interaction_timer* item = new Interaction_timer();
+		//item->m_kind = get_reaction_e(arg[0]);
+		item->m_period = std::stoi(arg[0]);
+		item->m_value = m_slot;
+		item->m_turn = 0;
+		m_slot = item;
 		break;
 	}
 	case command_e::buff:
@@ -402,13 +413,13 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->add_effect(get_interaction_e(arg[4]), m_buff);
 		break;
 	}
-	case command_e::slot:
+	case command_e::slot_copyist:
 	{
-		m_slot = new Interaction_slot();
-		m_slot->m_kind = get_reaction_e(arg[0]);
-		m_slot->m_subtype = get_interaction_e(arg[1]);
-		m_slot->m_value = m_effect;
-		m_object->add_effect(get_interaction_e(arg[2]), m_slot);
+		m_slot_copyist = new Interaction_copyist();
+		m_slot_copyist->m_kind = get_reaction_e(arg[0]);
+		m_slot_copyist->m_subtype = get_interaction_e(arg[1]);
+		m_slot_copyist->m_value = m_slot;
+		m_object->add_effect(get_interaction_e(arg[2]), m_slot_copyist);
 		break;
 	}
 	case command_e::reaction_effect:
@@ -446,8 +457,9 @@ void GameObjectManager::init()
 	m_commands["attribute"] = command_e::attribute;
 	m_commands["parameter"] = command_e::parameter;
 	m_commands["state"] = command_e::state;
-	m_commands["slot"] = command_e::slot;
+	m_commands["slot_copyist"] = command_e::slot_copyist;
 	m_commands["mem_effect"] = command_e::mem_effect;
+	m_commands["mem_slot_timer"] = command_e::mem_slot_timer;
 
 	m_to_object_state_e["alive"] = object_state_e::alive;
 	m_to_object_state_e["dead"] = object_state_e::dead;
@@ -459,6 +471,8 @@ void GameObjectManager::init()
 	m_to_interaction_e["buff"] = interaction_e::buff;
 	m_to_interaction_e["health"] = interaction_e::health;
 	m_to_interaction_e["strength"] = interaction_e::strength;
+	m_to_interaction_e["hunger"] = interaction_e::hunger;
+	m_to_interaction_e["thirst"] = interaction_e::thirst;
 
 	m_to_effect_e["physical_damage"] = effect_e::physical_damage;
 	m_to_effect_e["poison_damage"] = effect_e::poison_damage;
@@ -477,9 +491,6 @@ void GameObjectManager::init()
 	m_to_reaction_applicator_e["add_modificator_generic"] = reaction_applicator_e::add_modificator_generic;
 	m_to_reaction_applicator_e["apply_effect_generic"] = reaction_applicator_e::apply_effect_generic;
 
-	m_to_object_parameter_e["health"] = object_parameter_e::health;
-	m_to_object_parameter_e["strength"] = object_parameter_e::strength;
-
 	m_to_object_attribute_e["pass_able"] = object_attribute_e::pass_able;
 	m_to_object_attribute_e["pick_able"] = object_attribute_e::pick_able;
 
@@ -487,14 +498,16 @@ void GameObjectManager::init()
 	m_effect_string[interaction_e::buff] = "баффы";
 	m_effect_string[interaction_e::health] = "здоровье";
 	m_effect_string[interaction_e::strength] = "сила";
+	m_effect_string[interaction_e::hunger] = "голод";
+	m_effect_string[interaction_e::thirst] = "жажда";
 
 	m_effect_subtype_string[effect_e::physical_damage] = "физический урон";
 	m_effect_subtype_string[effect_e::poison_damage] = "урон от €да";
 	m_effect_subtype_string[effect_e::value] = "модификатор значени€";
 	m_effect_subtype_string[effect_e::limit] = "модификатор лимита";
 
-	m_object_parameter_string[object_parameter_e::health] = "здоровье";
-	m_object_parameter_string[object_parameter_e::strength] = "сила";
+	//m_object_parameter_string[object_parameter_e::health] = "здоровье";
+	//m_object_parameter_string[object_parameter_e::strength] = "сила";
 
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);
@@ -605,12 +618,12 @@ std::string GameObjectManager::get_effect_subtype_string(effect_e key)
 	return "неизвестный тип";
 }
 
-std::string GameObjectManager::get_object_parameter_string(object_parameter_e key)
-{
-	auto value = m_object_parameter_string.find(key);
-	if (value != m_object_parameter_string.end())
-	{
-		return value->second;
-	}
-	return "неизвестный тип";
-}
+//std::string GameObjectManager::get_object_parameter_string(object_parameter_e key)
+//{
+//	auto value = m_object_parameter_string.find(key);
+//	if (value != m_object_parameter_string.end())
+//	{
+//		return value->second;
+//	}
+//	return "неизвестный тип";
+//}

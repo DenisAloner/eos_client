@@ -15,7 +15,7 @@ void Object_interaction::apply_effect(Object_interaction* object)
 {
 }
 
-void Interaction_slot::apply(GameObject* object)
+void Interaction_copyist::apply(GameObject* object)
 {
 	auto reaction = object->get_reaction(m_kind);
 	if (reaction)
@@ -26,17 +26,17 @@ void Interaction_slot::apply(GameObject* object)
 
 bool Interaction_slot::on_turn()
 {
-	return false;
+	return m_value->on_turn();
 }
 
-std::string Interaction_slot::get_description()
+std::string Interaction_copyist::get_description()
 {
 	return "slot";
 }
 
-Object_interaction* Interaction_slot::clone()
+Object_interaction* Interaction_copyist::clone()
 {
-	Interaction_slot* effect = new Interaction_slot();
+	Interaction_copyist* effect = new Interaction_copyist();
 	effect->m_kind = m_kind;
 	effect->m_subtype = m_subtype;
 	effect->m_value = m_value->clone();
@@ -76,6 +76,25 @@ std::string Effect::get_description()
 	return Application::instance().m_game_object_manager->get_effect_subtype_string(m_subtype) + ":" + std::to_string(m_value);
 }
 
+void Effect::apply_effect(Object_interaction* object)
+{
+	switch (m_subtype)
+	{
+	case effect_e::value:
+	{
+		Parameter_list* item = static_cast<Parameter_list*>(object);
+		item->m_basic_value = item->m_basic_value + m_value;
+		break;
+	}
+	case effect_e::limit:
+	{
+		Parameter_list* item = static_cast<Parameter_list*>(object);
+		item->m_basic_limit = item->m_basic_limit + m_value;
+		break;
+	}
+	}
+}
+
 Interaction_list::Interaction_list()
 {
 	m_kind = reaction_e::list;
@@ -91,7 +110,15 @@ void Interaction_list::apply(GameObject* object)
 
 bool Interaction_list::on_turn()
 {
-	return false;
+	bool result = false;
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		if ((*item)->on_turn())
+		{
+			result = true;
+		}
+	}
+	return result;
 }
 
 std::string Interaction_list::get_description()
@@ -111,7 +138,6 @@ void Interaction_list::update()
 Interaction_list* Interaction_list::clone()
 {
 	Interaction_list* result = new Interaction_list();
-	//result->m_effect.insert(m_effect.begin(), m_effect.end());
 	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
 	{
 		result->m_effect.push_back((*item)->clone());
@@ -158,6 +184,14 @@ void Parameter_list::update()
 	m_value = m_basic_value;
 	m_limit = m_basic_limit;
 	update_list(this);
+}
+
+void Interaction_list::apply_effect(Object_interaction* object)
+{
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		(*item)->apply_effect(object);
+	}
 }
 
 std::string Parameter_list::get_description()
@@ -338,7 +372,7 @@ void Buff_chance::description(std::list<std::string>* info, int level)
 	info->push_back(std::string(level, '.') + "<описание отсутствует>");
 }
 
-void Interaction_slot::description(std::list<std::string>* info, int level)
+void Interaction_copyist::description(std::list<std::string>* info, int level)
 {
 	info->push_back(std::string(level, '.') + "<наложение эффекта:" + Application::instance().m_game_object_manager->get_effect_string(m_subtype) + ">:");
 	m_value->description(info,level+1);
@@ -361,38 +395,64 @@ void Parameter_list::description(std::list<std::string>* info, int level)
 	}
 }
 
-void Parameter_list::apply_effect(Object_interaction* object)
+Interaction_timer::Interaction_timer()
 {
-	Effect* item;
-	Interaction_list* list_item;
 
-		switch (object->m_kind)
-		{
-		case reaction_e::list:
-		{
-			list_item = static_cast<Interaction_list*>(object);
-			for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); current++)
-			{
-				apply_effect(*current);
-			}
-			break;
-		}
-		default:
-		{
-			item = static_cast<Effect*>(object);
-			switch (item->m_subtype)
-			{
-			case effect_e::value:
-			{
-				m_basic_value = m_basic_value + item->m_value;
-				break;
-			}
-			case effect_e::limit:
-			{
-				m_basic_limit = m_basic_limit + item->m_value;
-				break;
-			}
-			}
-		}
-		}
+}
+
+void Interaction_timer::apply(GameObject* object)
+{
+	auto reaction = object->get_reaction(m_kind);
+	if (reaction)
+	{
+		reaction->apply(object, this);
+	}
+}
+
+bool Interaction_timer::on_turn()
+{
+	m_turn += 1;
+	if (m_turn > m_period)
+	{
+		m_turn = 0;
+	}
+	return m_value->on_turn();
+}
+
+std::string Interaction_timer::get_description()
+{
+	return "slot";
+}
+
+Object_interaction* Interaction_timer::clone()
+{
+	Interaction_timer* effect = new Interaction_timer();
+	effect->m_kind = m_kind;
+	effect->m_turn = m_turn;
+	effect->m_period = m_period;
+	effect->m_value = m_value->clone();
+	return effect;
+}
+
+void Interaction_timer::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "<цикличное наложение эффекта:" + std::to_string(m_turn) + "(" + std::to_string(m_period) + ")>:");
+	m_value->description(info, level + 1);
+}
+
+void Interaction_copyist::apply_effect(Object_interaction* object)
+{
+	m_value->apply_effect(object);
+}
+
+void Interaction_timer::apply_effect(Object_interaction* object)
+{
+	if (m_turn == m_period)
+	{
+		m_value->apply_effect(object);
+	}
+}
+
+Interaction_copyist::Interaction_copyist()
+{
 }

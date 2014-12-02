@@ -25,6 +25,8 @@ action_move
 property_container Мешок 2 4
 parameter health,100,100
 parameter strength,8,100
+parameter hunger,0,1000
+parameter thirst,0,1000
 property_body head,голова
 property_body hand,левая рука
 property_body hand,правая рука
@@ -36,7 +38,12 @@ effect get_damage,physical_damage,10,damage
 reaction change_parameter,add_modificator_generic
 reaction apply_effect,apply_effect_generic
 mem_effect change_parameter,value,1
-slot apply_effect,health,buff
+mem_slot_timer 5
+slot_copyist apply_effect,health,buff
+mem_effect change_parameter,value,1
+slot_copyist apply_effect,hunger,buff
+mem_effect change_parameter,value,1
+slot_copyist apply_effect,thirst,buff
 state dead
 size 1 2 0
 tile_manager_single elf_corpse
@@ -147,8 +154,8 @@ icon sword
 tile_manager_single sword
 attribute pick_able
 effect get_damage,physical_damage,50,damage
-mem_effect change_parameter,value,1
-slot change_parameter,strength,damage
+mem_effect change_parameter,value,-1
+slot_copyist change_parameter,strength,damage
 effect change_parameter,value,1,strength
 buff get_buff,poison_damage,5,5,damage
 

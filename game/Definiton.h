@@ -206,7 +206,9 @@ enum class interaction_e
 	damage,
 	buff,
 	health,
-	strength
+	strength,
+	hunger,
+	thirst
 };
 
 enum class effect_e
@@ -239,12 +241,6 @@ enum class object_attribute_e
 {
 	pass_able,
 	pick_able
-};
-
-enum class object_parameter_e
-{
-	health,
-	strength
 };
 
 #endif //DEFINITION_H

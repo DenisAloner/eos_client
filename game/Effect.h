@@ -27,6 +27,7 @@ public:
 	virtual void update();
 	virtual Interaction_list* clone();
 	virtual void description(std::list<std::string>* info, int level);
+	virtual void apply_effect(Object_interaction* object);
 };
 
 class Parameter_list :public  Interaction_list
@@ -39,13 +40,11 @@ public:
 	int m_value;
 	int m_limit;
 
-
 	virtual std::string get_description();
 	virtual void update();
 	virtual void add(Object_interaction* item);
 	virtual Parameter_list* clone();
 	virtual void description(std::list<std::string>* info, int level);
-	virtual void apply_effect(Object_interaction* object);
 
 private:
 	void update_list(Interaction_list* list);
@@ -56,13 +55,36 @@ class Interaction_slot :public Object_interaction
 public:
 
 	Object_interaction* m_value;
-	interaction_e m_subtype;
 	Interaction_slot();
+	virtual bool on_turn();
+};
+
+class Interaction_copyist :public Interaction_slot
+{
+public:
+
+	interaction_e m_subtype;
+	Interaction_copyist();
+	virtual void apply(GameObject* object);
+	virtual std::string get_description();
+	virtual Object_interaction* clone();
+	virtual void description(std::list<std::string>* info, int level);
+	virtual void apply_effect(Object_interaction* object);
+};
+
+class Interaction_timer :public Interaction_slot
+{
+public:
+
+	int m_turn;
+	int m_period;
+	Interaction_timer();
 	virtual void apply(GameObject* object);
 	virtual bool on_turn();
 	virtual std::string get_description();
 	virtual Object_interaction* clone();
 	virtual void description(std::list<std::string>* info, int level);
+	virtual void apply_effect(Object_interaction* object);
 };
  
 class Effect :public Object_interaction
@@ -77,6 +99,7 @@ public:
 	virtual Object_interaction* clone();
 	virtual std::string get_description();
 	virtual void description(std::list<std::string>* info, int level);
+	virtual void apply_effect(Object_interaction* object);
 };
 
 class Buff : public Effect

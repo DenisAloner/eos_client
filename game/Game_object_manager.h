@@ -11,6 +11,7 @@ class Effect;
 class Buff;
 class Object_interaction;
 class Interaction_slot;
+class Interaction_copyist;
 
 class Reaction_manager
 {
@@ -57,7 +58,8 @@ public:
 		effect,
 		reaction_effect,
 		buff,
-		slot,
+		slot_copyist,
+		mem_slot_timer,
 		mem_effect
 	};
 
@@ -80,12 +82,12 @@ public:
 	std::map<std::string, effect_e> m_to_effect_e;
 	std::map<std::string, reaction_applicator_e> m_to_reaction_applicator_e;
 	std::map<std::string, object_attribute_e> m_to_object_attribute_e;
-	std::map<std::string, object_parameter_e> m_to_object_parameter_e;
+	//std::map<std::string, object_parameter_e> m_to_object_parameter_e;
 	std::map<std::string, object_state_e> m_to_object_state_e;
 
 	std::map<interaction_e, std::string> m_effect_string;
 	std::map<effect_e, std::string> m_effect_subtype_string;
-	std::map<object_parameter_e, std::string> m_object_parameter_string;
+	//std::map<object_parameter_e, std::string> m_object_parameter_string;
 
 	items_t m_items;
 	commands_t m_commands;
@@ -96,7 +98,8 @@ public:
 	Reaction_effect* m_reaction;
 	Effect* m_effect;
 	Buff* m_buff;
-	Interaction_slot* m_slot;
+	Interaction_copyist* m_slot_copyist;
+	Object_interaction* m_slot;
 
 	std::list<GameObject*> m_objects;
 
@@ -108,7 +111,7 @@ public:
 	effect_e get_effect_e(const std::string& key);
 	reaction_applicator_e get_reaction_applicator_e(const std::string& key);
 	object_attribute_e get_object_attribute_e(const std::string& key);
-	object_parameter_e get_object_parameter_e(const std::string& key);
+	//object_parameter_e get_object_parameter_e(const std::string& key);
 	object_state_e get_object_state_e(const std::string& key);
 
 	void parser(const std::string& command);
@@ -118,5 +121,5 @@ public:
 
 	std::string get_effect_string(interaction_e key);
 	std::string get_effect_subtype_string(effect_e key);
-	std::string get_object_parameter_string(object_parameter_e key);
+	//std::string get_object_parameter_string(object_parameter_e key);
 };
