@@ -1,6 +1,5 @@
 #include "Effect.h"
 
-
 Object_interaction::Object_interaction()
 {
 
@@ -230,51 +229,6 @@ Parameter_list* Parameter_list::clone()
 //	}
 //}
 
-Buff::Buff()
-{
-}
-
-bool Buff::on_turn()
-{
-	m_duration -= 1;
-	if (m_duration < 1)
-	{
-		return true;
-	}
-	return false;
-}
-
-Object_interaction* Buff::clone()
-{
-	Buff* effect = new Buff();
-	effect->m_kind = m_kind;
-	effect->m_subtype = m_subtype;
-	effect->m_value = m_value;
-	effect->m_duration = m_duration;
-	return effect;
-}
-
-std::string Buff::get_description()
-{
-	return "<" + std::to_string(m_value) + " урона от яда, " + std::to_string(m_duration) + " ход(а/ов)>";
-}
-
-
-Buff_chance::Buff_chance()
-{
-}
-
-Object_interaction* Buff_chance::clone()
-{
-	Buff_chance* effect = new Buff_chance();
-	effect->m_kind = m_kind;
-	effect->m_subtype = m_subtype;
-	effect->m_value = m_value;
-	effect->m_duration = m_duration;
-	effect->m_chance = m_chance;
-	return effect;
-}
-
 Reaction::Reaction()
 {
 }
@@ -362,16 +316,6 @@ void Effect::description(std::list<std::string>* info, int level)
 	info->push_back(std::string(level,'.')+Application::instance().m_game_object_manager->get_effect_subtype_string(m_subtype) + ":" + std::to_string(m_value));
 }
 
-void Buff::description(std::list<std::string>* info, int level)
-{
-	info->push_back(std::string(level, '.')+"<" + Application::instance().m_game_object_manager->get_effect_subtype_string(m_subtype) + ":" + std::to_string(m_value) + ", время:" + std::to_string(m_duration) + ">");
-}
-
-void Buff_chance::description(std::list<std::string>* info, int level)
-{
-	info->push_back(std::string(level, '.') + "<описание отсутствует>");
-}
-
 void Interaction_copyist::description(std::list<std::string>* info, int level)
 {
 	info->push_back(std::string(level, '.') + "<наложение эффекта:" + Application::instance().m_game_object_manager->get_effect_string(m_subtype) + ">:");
@@ -402,10 +346,9 @@ Interaction_timer::Interaction_timer()
 
 void Interaction_timer::apply(GameObject* object)
 {
-	auto reaction = object->get_reaction(m_kind);
-	if (reaction)
+	if (m_turn == m_period)
 	{
-		reaction->apply(object, this);
+		m_value->apply(object);
 	}
 }
 
@@ -455,4 +398,48 @@ void Interaction_timer::apply_effect(Object_interaction* object)
 
 Interaction_copyist::Interaction_copyist()
 {
+}
+
+Interaction_time::Interaction_time()
+{
+
+}
+
+void Interaction_time::apply(GameObject* object)
+{
+	if (m_turn != 0)
+	{
+		m_value->apply(object);
+	}
+}
+
+bool Interaction_time::on_turn()
+{
+	m_turn -= 1;
+	return m_turn == 0;
+}
+
+std::string Interaction_time::get_description()
+{
+	return "slot";
+}
+
+Object_interaction* Interaction_time::clone()
+{
+	Interaction_time* effect = new Interaction_time();
+	effect->m_kind = m_kind;
+	effect->m_turn = m_turn;
+	effect->m_value = m_value->clone();
+	return effect;
+}
+
+void Interaction_time::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "<длительное наложение эффекта:" + std::to_string(m_turn) + ">:");
+	m_value->description(info, level + 1);
+}
+
+void Interaction_time::apply_effect(Object_interaction* object)
+{
+	m_value->apply_effect(object);
 }

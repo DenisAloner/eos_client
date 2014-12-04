@@ -59,8 +59,7 @@ parameter strength,1,100
 reaction get_damage,get_damage_basic
 reaction change_health,change_health_basic
 reaction change_parameter,add_modificator_generic
-reaction get_buff,get_buff_basic
-effect get_damage,physical_damage,1,damage
+effect get_damage,physical_damage,0,damage
 state dead
 size 1 1 0
 tile_manager_single snake_corpse
@@ -91,8 +90,7 @@ parameter strength,5,100
 reaction get_damage,get_damage_basic
 reaction change_health,change_health_basic
 reaction change_parameter,add_modificator_generic
-reaction get_buff,get_buff_basic
-effect get_damage,physical_damage,1,damage
+effect get_damage,physical_damage,0,damage
 state dead
 size 1 1 0
 tile_manager_single snake_corpse
@@ -157,7 +155,9 @@ effect get_damage,physical_damage,50,damage
 mem_effect change_parameter,value,-1
 slot_copyist change_parameter,strength,damage
 effect change_parameter,value,1,strength
-buff get_buff,poison_damage,5,5,damage
+mem_effect get_damage,poison_damage,5
+mem_slot_time 5
+slot_copyist change_parameter,buff,damage
 
 object wall
 state alive

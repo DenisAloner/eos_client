@@ -185,7 +185,6 @@ struct light_t
 enum class reaction_e
 {
 	get_damage,
-	get_buff,
 	change_health,
 	change_parameter,
 	list,
@@ -196,7 +195,6 @@ enum class reaction_applicator_e
 {
 	get_damage_basic,
 	change_health_basic,
-	get_buff_basic,
 	add_modificator_generic,
 	apply_effect_generic
 };

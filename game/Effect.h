@@ -72,6 +72,20 @@ public:
 	virtual void apply_effect(Object_interaction* object);
 };
 
+class Interaction_time :public Interaction_slot
+{
+public:
+
+	int m_turn;
+	Interaction_time();
+	virtual void apply(GameObject* object);
+	virtual bool on_turn();
+	virtual std::string get_description();
+	virtual Object_interaction* clone();
+	virtual void description(std::list<std::string>* info, int level);
+	virtual void apply_effect(Object_interaction* object);
+};
+
 class Interaction_timer :public Interaction_slot
 {
 public:
@@ -100,30 +114,6 @@ public:
 	virtual std::string get_description();
 	virtual void description(std::list<std::string>* info, int level);
 	virtual void apply_effect(Object_interaction* object);
-};
-
-class Buff : public Effect
-{
-public:
-
-	int m_duration;
-
-	Buff();
-	virtual bool on_turn();
-	virtual Object_interaction* clone();
-	virtual std::string get_description();
-	virtual void description(std::list<std::string>* info, int level);
-};
-
-class Buff_chance: public Buff
-{
-public:
-
-	int m_chance;
-
-	Buff_chance();
-	virtual Object_interaction* clone();
-	virtual void description(std::list<std::string>* info, int level);
 };
 
 class Reaction

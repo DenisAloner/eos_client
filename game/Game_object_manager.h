@@ -22,7 +22,6 @@ public:
 
 	void get_damage_basic(Reaction* reaction, GameObject* object, Object_interaction* effect);
 	void change_health_basic(Reaction* reaction, GameObject* object, Object_interaction* effect);
-	void get_buff_basic(Reaction* reaction, GameObject* object, Object_interaction* effect);
 	void add_modificator_generic(Reaction* reaction, GameObject* object, Object_interaction* effect);
 	void apply_effect_generic(Reaction* reaction, GameObject* object, Object_interaction* effect);
 
@@ -57,10 +56,10 @@ public:
 		parameter,
 		effect,
 		reaction_effect,
-		buff,
 		slot_copyist,
 		mem_slot_timer,
-		mem_effect
+		mem_effect,
+		mem_slot_time
 	};
 
 	enum class parameter_e
@@ -97,7 +96,6 @@ public:
 	label_t* m_label;
 	Reaction_effect* m_reaction;
 	Effect* m_effect;
-	Buff* m_buff;
 	Interaction_copyist* m_slot_copyist;
 	Object_interaction* m_slot;
 
