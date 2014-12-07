@@ -116,6 +116,22 @@ public:
 	virtual void apply_effect(Object_interaction* object);
 };
 
+class Effect_reaction
+{
+public:
+
+	typedef std::function<void(Effect_reaction*, GameObject*, Object_interaction*)> reation_handler;
+	typedef std::list < reation_handler > handler_list;
+
+	int m_value;
+	std::map < effect_e, handler_list > m_items;
+
+	Effect_reaction();
+	reation_handler handler;
+	virtual void apply(GameObject* object, Object_interaction* effect);
+	virtual Effect_reaction* clone();
+};
+
 class Reaction
 {
 public:

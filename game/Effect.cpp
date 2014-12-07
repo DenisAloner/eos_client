@@ -443,3 +443,34 @@ void Interaction_time::apply_effect(Object_interaction* object)
 {
 	m_value->apply_effect(object);
 }
+
+Effect_reaction::Effect_reaction()
+{
+}
+
+Effect_reaction* Effect_reaction::clone()
+{
+	Effect_reaction* result = new Effect_reaction();
+	result->handler = handler;
+	for (auto sub = m_items.begin(); sub != m_items.end(); sub++)
+	{
+		for (auto current = sub->second.begin(); current != sub->second.end(); current++)
+		{
+			result->m_items[sub->first].push_back(*current);
+		}
+	}
+	return result;
+}
+
+void Effect_reaction::apply(GameObject* object, Object_interaction* effect)
+{
+	auto reaction = m_items.find(static_cast<Effect*>(effect)->m_subtype);
+	if (reaction != m_items.end())
+	{
+		for (auto current = reaction->second.begin(); current != reaction->second.end(); current++)
+		{
+			(*current)(this, object, effect);
+		}
+	}
+	handler(this, object, effect);
+}

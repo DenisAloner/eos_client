@@ -493,9 +493,6 @@ void GameObjectManager::init()
 	m_effect_subtype_string[effect_e::value] = "модификатор значения";
 	m_effect_subtype_string[effect_e::limit] = "модификатор лимита";
 
-	//m_object_parameter_string[object_parameter_e::health] = "здоровье";
-	//m_object_parameter_string[object_parameter_e::strength] = "сила";
-
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);
 	std::string config(buffer);
