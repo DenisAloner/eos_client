@@ -706,7 +706,7 @@ void Action_hit::perfom(Parameter* parameter)
 		{
 			for (auto current = reaction->m_effect.begin(); current != reaction->m_effect.end(); current++)
 			{
-				(*current)->apply(p->m_object);
+				//(*current)->apply(p->m_object);
 			}
 		}
 		p->m_object->update_interaction();

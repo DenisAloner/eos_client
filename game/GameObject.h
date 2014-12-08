@@ -122,13 +122,11 @@ public:
 	void add_parameter(interaction_e key, int value, int limit);
 	void add_to_parameter(interaction_e key, Object_interaction* item);
 	void add_effect(interaction_e key, Object_interaction* item);
-	void add_reaction(reaction_e key, Reaction* item);
 	void remove_effect(interaction_e key, Object_interaction* item);
 	Object_feature* get_feature(object_feature_e key);
 	bool get_stat(object_attribute_e key);
 	Interaction_list* get_effect(interaction_e key);
 	Parameter_list* get_parameter(interaction_e key);
-	Reaction* get_reaction(reaction_e key);
 	MapCell* cell();
 	void update_interaction();
 
@@ -263,16 +261,6 @@ public:
 	std::map<interaction_e, Interaction_list* > m_effect;
 
 	Interaction_feature();
-	Object_feature* clone();
-};
-
-class Reaction_feature : public Object_feature
-{
-public:
-
-	std::map<reaction_e, Reaction*> m_reaction;
-
-	Reaction_feature();
 	Object_feature* clone();
 };
 

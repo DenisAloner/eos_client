@@ -7,12 +7,11 @@ public:
 
 	reaction_e m_kind;
 	Object_interaction();
-	virtual void apply(GameObject* object) = 0;
 	virtual bool on_turn() = 0;
 	virtual std::string get_description() = 0;
 	virtual Object_interaction* clone() = 0;
 	virtual void description(std::list<std::string>* info,int level) = 0;
-	virtual void apply_effect(Object_interaction* object);
+	virtual void apply_effect(GameObject* unit,Object_interaction* object);
 };
 
 class Interaction_list :public Object_interaction
@@ -21,13 +20,12 @@ public:
 
 	std::list<Object_interaction*> m_effect;
 	Interaction_list();
-	virtual void apply(GameObject* object);
 	virtual bool on_turn();
 	virtual std::string get_description();
 	virtual void update();
 	virtual Interaction_list* clone();
 	virtual void description(std::list<std::string>* info, int level);
-	virtual void apply_effect(Object_interaction* object);
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 };
 
 class Parameter_list :public  Interaction_list
@@ -65,11 +63,10 @@ public:
 
 	interaction_e m_subtype;
 	Interaction_copyist();
-	virtual void apply(GameObject* object);
 	virtual std::string get_description();
 	virtual Object_interaction* clone();
 	virtual void description(std::list<std::string>* info, int level);
-	virtual void apply_effect(Object_interaction* object);
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 };
 
 class Interaction_time :public Interaction_slot
@@ -78,12 +75,11 @@ public:
 
 	int m_turn;
 	Interaction_time();
-	virtual void apply(GameObject* object);
 	virtual bool on_turn();
 	virtual std::string get_description();
 	virtual Object_interaction* clone();
 	virtual void description(std::list<std::string>* info, int level);
-	virtual void apply_effect(Object_interaction* object);
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 };
 
 class Interaction_timer :public Interaction_slot
@@ -93,12 +89,11 @@ public:
 	int m_turn;
 	int m_period;
 	Interaction_timer();
-	virtual void apply(GameObject* object);
 	virtual bool on_turn();
 	virtual std::string get_description();
 	virtual Object_interaction* clone();
 	virtual void description(std::list<std::string>* info, int level);
-	virtual void apply_effect(Object_interaction* object);
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 };
  
 class Effect :public Object_interaction
@@ -108,66 +103,12 @@ public:
 	int m_value;
 	effect_e m_subtype;
 	Effect();
-	virtual void apply(GameObject* object);
 	virtual bool on_turn();
 	virtual Object_interaction* clone();
 	virtual std::string get_description();
 	virtual void description(std::list<std::string>* info, int level);
-	virtual void apply_effect(Object_interaction* object);
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 };
 
-class Effect_reaction
-{
-public:
 
-	typedef std::function<void(Effect_reaction*, GameObject*, Object_interaction*)> reation_handler;
-	typedef std::list < reation_handler > handler_list;
-
-	int m_value;
-	std::map < effect_e, handler_list > m_items;
-
-	Effect_reaction();
-	reation_handler handler;
-	virtual void apply(GameObject* object, Object_interaction* effect);
-	virtual Effect_reaction* clone();
-};
-
-class Reaction
-{
-public:
-
-	typedef std::function<void(Reaction*, GameObject*, Object_interaction*)> func;
-	typedef std::list < func > list;
-
-	Reaction();
-	func handler;
-	virtual void apply(GameObject* object, Object_interaction* effect)=0;
-	virtual Reaction* clone()=0;
-};
-
-class Reaction_effect :public Reaction
-{
-public:
-
-	int m_value;
-	std::map < effect_e, list > m_items;
-	list m_list;
-
-	Reaction_effect();
-	virtual void apply(GameObject* object, Object_interaction* effect);
-	virtual Reaction* clone();
-};
-
-//class Reaction_parameter :public Reaction
-//{
-//public:
-//
-//	int m_value;
-//	std::map < object_parameter_e, list > m_items;
-//	list m_list;
-//
-//	Reaction_parameter();
-//	virtual void apply(GameObject* object, Object_interaction* effect);
-//	virtual Reaction* clone();
-//};
 

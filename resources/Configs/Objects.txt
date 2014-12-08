@@ -32,18 +32,9 @@ property_body hand,левая рука
 property_body hand,правая рука
 property_body foot,левая нога
 property_body foot,правая нога
-reaction get_damage,get_damage_basic
-reaction change_health,change_health_basic
-effect get_damage,physical_damage,10,damage
-reaction change_parameter,add_modificator_generic
-reaction apply_effect,apply_effect_generic
 mem_effect change_parameter,value,1
 mem_slot_timer 5
 slot_copyist apply_effect,health,buff
-mem_effect change_parameter,value,1
-slot_copyist apply_effect,hunger,buff
-mem_effect change_parameter,value,1
-slot_copyist apply_effect,thirst,buff
 state dead
 size 1 2 0
 tile_manager_single elf_corpse
@@ -56,9 +47,6 @@ tile_manager_single rat_left
 action_move
 parameter health,100,100
 parameter strength,1,100
-reaction get_damage,get_damage_basic
-reaction change_health,change_health_basic
-reaction change_parameter,add_modificator_generic
 effect get_damage,physical_damage,0,damage
 state dead
 size 1 1 0
@@ -87,9 +75,6 @@ tile_manager_map snake_right_04 3 3
 action_move
 parameter health,100,100
 parameter strength,5,100
-reaction get_damage,get_damage_basic
-reaction change_health,change_health_basic
-reaction change_parameter,add_modificator_generic
 effect get_damage,physical_damage,0,damage
 state dead
 size 1 1 0

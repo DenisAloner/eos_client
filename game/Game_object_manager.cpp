@@ -1,62 +1,5 @@
 #include "Game_object_manager.h"
 
-void Reaction_manager::change_health_basic(Reaction* reaction, GameObject* object, Object_interaction* effect)
-{
-	auto item = object->get_parameter(interaction_e::health);
-	if (item)
-	{
-		Application::instance().console(object->m_name + ": измененен параметр <" + Application::instance().m_game_object_manager->get_effect_string(interaction_e::health) + ":" + std::to_string(item->m_basic_value) + ">");
-		if (item->m_basic_value < 1)
-		{
-			Application::instance().m_GUI->MapViewer->m_map->m_ai.remove(object);
-			object->set_state(object_state_e::dead);
-			Application::instance().console(object->m_name + ": смерть");
-		}
-	}
-}
-
-void Reaction_manager::get_damage_basic(Reaction* reaction, GameObject* object, Object_interaction* effect)
-{
-	auto item = object->get_parameter(interaction_e::health);
-	if (item)
-	{
-		item->m_basic_value -= static_cast<Reaction_effect*>(reaction)->m_value;
-		Application::instance().console(object->m_name + ": получен эффект <" + Application::instance().m_game_object_manager->get_effect_subtype_string(static_cast<Effect*>(effect)->m_subtype) + ":" + std::to_string(static_cast<Reaction_effect*>(reaction)->m_value) + ">");
-	}
-	auto obj_reaction = object->get_reaction(reaction_e::change_health);
-	if (obj_reaction)
-	{
-		static_cast<Reaction_effect*>(obj_reaction)->m_value = static_cast<Effect*>(effect)->m_value;
-		obj_reaction->apply(object, effect);
-	}
-}
-
-void Reaction_manager::add_modificator_generic(Reaction* reaction, GameObject* object, Object_interaction* effect)
-{
-	Interaction_copyist* e = static_cast<Interaction_copyist*>(effect);
-	object->add_effect(e->m_subtype, e->m_value->clone());
-	object->update_interaction();
-}
-
-void Reaction_manager::apply_effect_generic(Reaction* reaction, GameObject* object, Object_interaction* effect)
-{
-	Interaction_copyist* e = static_cast<Interaction_copyist*>(effect);
-	auto item = object->get_effect(e->m_subtype);
-	if (item)
-	{
-		effect->apply_effect(item);
-	}
-}
-
-Reaction_manager::Reaction_manager()
-{
-	m_items[reaction_applicator_e::change_health_basic] = std::bind(&Reaction_manager::change_health_basic, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-	m_items[reaction_applicator_e::get_damage_basic] = std::bind(&Reaction_manager::get_damage_basic, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-	m_items[reaction_applicator_e::add_modificator_generic] = std::bind(&Reaction_manager::add_modificator_generic, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-	m_items[reaction_applicator_e::apply_effect_generic] = std::bind(&Reaction_manager::apply_effect_generic, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-}
-
-
 object_feature_e GameObjectManager::get_object_feature_e(const std::string& key)
 {
 	auto value = m_to_object_feature_e.find(key);
@@ -411,19 +354,11 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->add_effect(get_interaction_e(arg[2]), m_slot_copyist);
 		break;
 	}
-	case command_e::reaction_effect:
-	{
-		m_reaction = new Reaction_effect();
-		m_reaction->handler= m_reaction_manager->m_items[get_reaction_applicator_e(arg[1])];
-		m_object->add_reaction(get_reaction_e(arg[0]),m_reaction);
-		break;
-	}
 	}
 }
 
 void GameObjectManager::init()
 {
-	m_reaction_manager = new Reaction_manager();
 	m_commands["label"] = command_e::label;
 	m_commands["add_to_label"] = command_e::add_to_label;
 	m_commands.insert(std::pair<std::string, command_e>("object", command_e::obj));
@@ -441,7 +376,6 @@ void GameObjectManager::init()
 	m_commands.insert(std::pair<std::string, command_e>("property_container", command_e::property_container));
 	m_commands["property_body"] = command_e::property_body;
 	m_commands["effect"] = command_e::effect;
-	m_commands["reaction"] = command_e::reaction_effect;
 	m_commands["attribute"] = command_e::attribute;
 	m_commands["parameter"] = command_e::parameter;
 	m_commands["state"] = command_e::state;
@@ -567,7 +501,12 @@ void GameObjectManager::update_buff()
 			for (auto buff = list->m_effect.begin(); buff != list->m_effect.end();)
 			{
 				//Application::instance().console((*object)->m_name + ": активирован бафф " + (*buff)->get_description());
-				(*buff)->apply(*object);
+				Interaction_copyist* e = static_cast<Interaction_copyist*>(*buff);
+				auto item = (*object)->get_effect(e->m_subtype);
+				if (item)
+				{
+					(*buff)->apply_effect(*object,item);
+				}
 				if ((*buff)->on_turn())
 				{
 					//Application::instance().console((*object)->m_name + ": бафф " + (*buff)->get_description() + " исчез");

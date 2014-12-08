@@ -231,24 +231,6 @@ void GameObject::add_parameter(interaction_e key, int value, int limit)
 	}
 }
 
-void GameObject::add_reaction(reaction_e key, Reaction* item)
-{
-	auto list = static_cast<Reaction_feature*>(get_feature(object_feature_e::reaction_feature));
-	if (list)
-	{
-		list->m_reaction[key] = item;
-	}
-	else
-	{
-		if (m_active_state)
-		{
-			list = new Reaction_feature();
-			list->m_reaction[key] = item;
-			m_active_state->m_feature[object_feature_e::reaction_feature] = list;
-		}
-	}
-}
-
 void GameObject::add_to_parameter(interaction_e key, Object_interaction* item)
 {
 	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
@@ -307,20 +289,6 @@ Parameter_list* GameObject::get_parameter(interaction_e key)
 		if (value != list->m_effect.end())
 		{
 			return static_cast<Parameter_list*>(value->second);
-		}
-	}
-	return nullptr;
-}
-
-Reaction* GameObject::get_reaction(reaction_e key)
-{
-	Reaction_feature* list = static_cast<Reaction_feature*>(get_feature(object_feature_e::reaction_feature));
-	if (list)
-	{
-		auto value = list->m_reaction.find(key);
-		if (value != list->m_reaction.end())
-		{
-			return value->second;
 		}
 	}
 	return nullptr;
@@ -466,20 +434,6 @@ Object_feature* Interaction_feature::clone()
 	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
 	{
 		result->m_effect[item->first] = item->second->clone();
-	}
-	return result;
-}
-
-Reaction_feature::Reaction_feature() : Object_feature(object_feature_e::reaction_feature)
-{
-}
-
-Object_feature* Reaction_feature::clone()
-{
-	Reaction_feature* result = new Reaction_feature();
-	for (auto reaction = m_reaction.begin(); reaction != m_reaction.end(); reaction++)
-	{
-		result->m_reaction[reaction->first] = reaction->second->clone();
 	}
 	return result;
 }

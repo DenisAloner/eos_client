@@ -5,29 +5,11 @@
 #include "Effect.h"
 
 struct label_t;
-class Reaction;
-class Reaction_effect;
 class Effect;
 class Buff;
 class Object_interaction;
 class Interaction_slot;
 class Interaction_copyist;
-
-class Reaction_manager
-{
-public:
-
-	typedef std::function<void(Reaction*, GameObject*, Object_interaction*)> func;
-	typedef std::list < func > list;
-
-	void get_damage_basic(Reaction* reaction, GameObject* object, Object_interaction* effect);
-	void change_health_basic(Reaction* reaction, GameObject* object, Object_interaction* effect);
-	void add_modificator_generic(Reaction* reaction, GameObject* object, Object_interaction* effect);
-	void apply_effect_generic(Reaction* reaction, GameObject* object, Object_interaction* effect);
-
-	std::map<reaction_applicator_e, func> m_items;
-	Reaction_manager();
-};
 
 class GameObjectManager
 {
@@ -55,11 +37,10 @@ public:
 		property_body,
 		parameter,
 		effect,
-		reaction_effect,
 		slot_copyist,
 		mem_slot_timer,
 		mem_effect,
-		mem_slot_time
+		mem_slot_time,
 	};
 
 	enum class parameter_e
@@ -94,14 +75,11 @@ public:
 
 	GameObject* m_object;
 	label_t* m_label;
-	Reaction_effect* m_reaction;
 	Effect* m_effect;
 	Interaction_copyist* m_slot_copyist;
 	Object_interaction* m_slot;
 
 	std::list<GameObject*> m_objects;
-
-	Reaction_manager* m_reaction_manager;
 
 	object_feature_e get_object_feature_e(const std::string& key);
 	reaction_e get_reaction_e(const std::string& key);
