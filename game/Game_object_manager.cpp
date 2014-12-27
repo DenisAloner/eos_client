@@ -354,6 +354,15 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->add_effect(get_interaction_e(arg[2]), m_slot_copyist);
 		break;
 	}
+	case command_e::tag:
+	{
+		Tag_list* tag = new Tag_list();
+		//m_effect->m_kind = get_reaction_e(arg[0]);
+		//m_effect->m_subtype = get_effect_e(arg[1]);
+		//m_effect->m_value = std::stoi(arg[2]);
+		m_object->add_effect(interaction_e::tag,tag);
+		break;
+	}
 	}
 }
 
@@ -383,6 +392,7 @@ void GameObjectManager::init()
 	m_commands["mem_effect"] = command_e::mem_effect;
 	m_commands["mem_slot_timer"] = command_e::mem_slot_timer;
 	m_commands["mem_slot_time"] = command_e::mem_slot_time;
+	m_commands["tag"] = command_e::tag;
 
 	m_to_object_state_e["alive"] = object_state_e::alive;
 	m_to_object_state_e["dead"] = object_state_e::dead;
@@ -421,6 +431,7 @@ void GameObjectManager::init()
 	m_effect_string[interaction_e::strength] = "сила";
 	m_effect_string[interaction_e::hunger] = "голод";
 	m_effect_string[interaction_e::thirst] = "жажда";
+	m_effect_string[interaction_e::tag] = "метки";
 
 	m_effect_subtype_string[effect_e::physical_damage] = "физический урон";
 	m_effect_subtype_string[effect_e::poison_damage] = "урон от яда";

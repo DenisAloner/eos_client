@@ -117,6 +117,21 @@ Interaction_list* Interaction_list::clone()
 	return result;
 }
 
+Tag_list::Tag_list()
+{
+	m_kind = reaction_e::list;
+}
+
+Tag_list* Tag_list::clone()
+{
+	Tag_list* result = new Tag_list();
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		result->m_effect.push_back((*item)->clone());
+	}
+	return result;
+}
+
 void Parameter_list::update_list(Interaction_list* list)
 {
 	Effect* item;

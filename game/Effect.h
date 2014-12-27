@@ -48,6 +48,15 @@ private:
 	void update_list(Interaction_list* list);
 };
 
+class Tag_list :public  Interaction_list
+{
+public:
+
+	Tag_list();
+	virtual Tag_list* clone();
+	//virtual void apply_effect(GameObject* unit, Object_interaction* object);
+};
+
 class Interaction_slot :public Object_interaction
 {
 public:

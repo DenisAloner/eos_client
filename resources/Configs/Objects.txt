@@ -22,6 +22,7 @@ tile_manager_map elf_right_02 3 1
 tile_manager_map elf_right_03 3 2
 tile_manager_map elf_right_04 3 3
 action_move
+tag
 property_container Мешок 2 4
 parameter health,100,100
 parameter strength,8,100

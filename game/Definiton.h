@@ -206,7 +206,8 @@ enum class interaction_e
 	health,
 	strength,
 	hunger,
-	thirst
+	thirst,
+	tag
 };
 
 enum class effect_e

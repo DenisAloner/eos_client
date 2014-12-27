@@ -41,6 +41,7 @@ public:
 		mem_slot_timer,
 		mem_effect,
 		mem_slot_time,
+		tag
 	};
 
 	enum class parameter_e
