@@ -284,7 +284,11 @@ void Interaction_timer::description(std::list<std::string>* info, int level)
 
 void Interaction_copyist::apply_effect(GameObject* unit, Object_interaction* object)
 {
-	m_value->apply_effect(unit,object);
+	auto i = unit->get_effect(m_subtype);
+	if (i)
+	{
+		m_value->apply_effect(unit, i);
+	}
 }
 
 void Interaction_timer::apply_effect(GameObject* unit, Object_interaction* object)

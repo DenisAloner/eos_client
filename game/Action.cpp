@@ -704,10 +704,11 @@ void Action_hit::perfom(Parameter* parameter)
 		auto reaction = p->m_unit->get_effect(interaction_e::damage);
 		if (reaction)
 		{
-			for (auto current = reaction->m_effect.begin(); current != reaction->m_effect.end(); current++)
-			{
-				//(*current)->apply(p->m_object);
-			}
+			//for (auto current = reaction->m_effect.begin(); current != reaction->m_effect.end(); current++)
+			//{
+			//	//(*current)->apply(p->m_object);
+			//}
+			reaction->apply_effect(p->m_object, nullptr);
 		}
 		p->m_object->update_interaction();
 		p->m_object->event_update(VoidEventArgs());
