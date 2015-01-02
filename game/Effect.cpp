@@ -338,3 +338,81 @@ void Interaction_time::apply_effect(GameObject* unit, Object_interaction* object
 {
 	m_value->apply_effect(unit,object);
 }
+
+std::string Interaction_prefix::get_description()
+{
+	return "none";
+}
+
+Interaction_prefix::Interaction_prefix(){};
+
+void Interaction_prefix::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "<тип эффекта:" + Application::instance().m_game_object_manager->get_effect_prefix_string(m_subtype) + ">:");
+	m_value->description(info, level + 1);
+}
+
+Interaction_prefix* Interaction_prefix::clone()
+{
+	Interaction_prefix* effect = new Interaction_prefix();
+	effect->m_subtype = m_subtype;
+	effect->m_value = m_value->clone();
+	return effect;
+}
+
+void Interaction_prefix::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	Tag_list* i = static_cast<Tag_list*>(unit->get_effect(interaction_e::tag));
+	if (i)
+	{
+		for (auto item = i->m_effect.begin(); item != i->m_effect.end(); item++)
+		{
+			(*item)->apply_effect(unit, this);
+		}
+	}
+	m_value->apply_effect(unit, object);
+}
+
+Object_tag::Object_tag(object_tag_e key) :m_type(key){};
+
+void Object_tag::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "<" + Application::instance().m_game_object_manager->get_object_tag_string(m_type) + ">");
+}
+
+std::string Object_tag::get_description()
+{
+	return "none";
+}
+
+Object_tag* Object_tag::clone()
+{
+	Object_tag* effect = new Object_tag(m_type);
+	return effect;
+}
+
+bool Object_tag::on_turn()
+{
+	return false;
+}
+
+Object_tag_poison_resist::Object_tag_poison_resist() :Object_tag(object_tag_e::poison_resist){};
+
+Object_tag_poison_resist* Object_tag_poison_resist::clone()
+{
+	Object_tag_poison_resist* effect = new Object_tag_poison_resist();
+	return effect;
+}
+
+void Object_tag_poison_resist::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	Interaction_prefix* prefix = static_cast<Interaction_prefix*>(object);
+	switch (prefix->m_subtype)
+	{
+	case effect_prefix_e::poison_damage:
+	{
+		static_cast<Effect*>(prefix->m_value)->m_value /= 2;
+		break;
+	}
+	}
+}

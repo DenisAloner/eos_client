@@ -242,4 +242,15 @@ enum class object_attribute_e
 	pick_able
 };
 
+enum class effect_prefix_e
+{
+	physical_damage,
+	poison_damage
+};
+
+enum class object_tag_e
+{
+	poison_resist
+};
+
 #endif //DEFINITION_H

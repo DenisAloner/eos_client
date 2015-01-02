@@ -207,6 +207,29 @@ void GameObject::add_effect(interaction_e key, Object_interaction* item)
 	}
 }
 
+void GameObject::add_tag(Object_interaction* item)
+{
+	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
+	if (list)
+	{
+		if (list->m_effect.find(interaction_e::tag) == list->m_effect.end())
+		{
+			list->m_effect[interaction_e::tag] = new Tag_list;
+		}
+		static_cast<Interaction_list*>(list->m_effect[interaction_e::tag])->m_effect.push_back(item);
+	}
+	else
+	{
+		if (m_active_state)
+		{
+			list = new Interaction_feature();
+			list->m_effect[interaction_e::tag] = new Interaction_list();
+			static_cast<Interaction_list*>(list->m_effect[interaction_e::tag])->m_effect.push_back(item);
+			m_active_state->m_feature[object_feature_e::interaction_feature] = list;
+		}
+	}
+}
+
 void GameObject::add_parameter(interaction_e key, int value, int limit)
 {
 	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));

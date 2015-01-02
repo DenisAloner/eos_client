@@ -66,6 +66,18 @@ public:
 	virtual bool on_turn();
 };
 
+class Interaction_prefix :public Interaction_slot
+{
+public:
+
+	effect_prefix_e m_subtype;
+	Interaction_prefix();
+	virtual std::string get_description();
+	virtual Interaction_prefix* clone();
+	virtual void description(std::list<std::string>* info, int level);
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+};
+
 class Interaction_copyist :public Interaction_slot
 {
 public:
@@ -119,5 +131,23 @@ public:
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 };
 
+class Object_tag :public Object_interaction
+{
+public:
 
+	object_tag_e m_type;
+	Object_tag(object_tag_e key);
+	virtual void description(std::list<std::string>* info, int level);
+	virtual std::string get_description();
+	virtual Object_tag* clone();
+	virtual bool on_turn();
+};
+
+class Object_tag_poison_resist :public Object_tag
+{
+public:
+	Object_tag_poison_resist();
+	virtual Object_tag_poison_resist* clone();
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+};
 

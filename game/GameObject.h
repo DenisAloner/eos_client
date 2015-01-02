@@ -23,6 +23,7 @@ class Reaction;
 class Object_interaction;
 class Interaction_list;
 class Parameter_list;
+class Tag_list;
 struct object_parameter_t;
 
 struct label_t
@@ -122,6 +123,7 @@ public:
 	void add_parameter(interaction_e key, int value, int limit);
 	void add_to_parameter(interaction_e key, Object_interaction* item);
 	void add_effect(interaction_e key, Object_interaction* item);
+	void add_tag(Object_interaction* item);
 	void remove_effect(interaction_e key, Object_interaction* item);
 	Object_feature* get_feature(object_feature_e key);
 	bool get_stat(object_attribute_e key);

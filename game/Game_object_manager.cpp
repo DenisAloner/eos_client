@@ -354,12 +354,25 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->add_effect(get_interaction_e(arg[2]), m_slot_copyist);
 		break;
 	}
+	case command_e::mem_slot_prefix:
+	{
+		Interaction_prefix* item = new Interaction_prefix();
+		item->m_subtype = get_effect_prefix_e(arg[0]);
+		item->m_value = m_slot;
+		m_slot = item;
+		break;
+	}
 	case command_e::tag:
 	{
-		Tag_list* tag = new Tag_list();
-		//m_effect->m_kind = get_reaction_e(arg[0]);
-		//m_effect->m_subtype = get_effect_e(arg[1]);
-		//m_effect->m_value = std::stoi(arg[2]);
+		Object_tag* tag;
+		switch (get_object_tag_e(arg[0]))
+		{
+		case object_tag_e::poison_resist:
+		{
+			tag = new Object_tag_poison_resist();
+			break;
+		}
+		}
 		m_object->add_effect(interaction_e::tag,tag);
 		break;
 	}
@@ -392,6 +405,7 @@ void GameObjectManager::init()
 	m_commands["mem_effect"] = command_e::mem_effect;
 	m_commands["mem_slot_timer"] = command_e::mem_slot_timer;
 	m_commands["mem_slot_time"] = command_e::mem_slot_time;
+	m_commands["mem_slot_prefix"] = command_e::mem_slot_prefix;
 	m_commands["tag"] = command_e::tag;
 
 	m_to_object_state_e["alive"] = object_state_e::alive;
@@ -437,6 +451,17 @@ void GameObjectManager::init()
 	m_effect_subtype_string[effect_e::poison_damage] = "урон от €да";
 	m_effect_subtype_string[effect_e::value] = "модификатор значени€";
 	m_effect_subtype_string[effect_e::limit] = "модификатор лимита";
+
+	m_effect_prefix_string[effect_prefix_e::physical_damage] = "физический урон";
+	m_effect_prefix_string[effect_prefix_e::poison_damage] = "урон от €да";
+
+	m_to_effect_prefix_e["physical_damage"] = effect_prefix_e::physical_damage;
+	m_to_effect_prefix_e["poison_damage"] = effect_prefix_e::poison_damage;
+
+	m_to_object_tag_e["poison_resist"] = object_tag_e::poison_resist;
+
+	m_object_tag_string[object_tag_e::poison_resist] = "сопротивление к €ду";
+
 
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);
@@ -554,12 +579,42 @@ std::string GameObjectManager::get_effect_subtype_string(effect_e key)
 	return "неизвестный тип";
 }
 
-//std::string GameObjectManager::get_object_parameter_string(object_parameter_e key)
-//{
-//	auto value = m_object_parameter_string.find(key);
-//	if (value != m_object_parameter_string.end())
-//	{
-//		return value->second;
-//	}
-//	return "неизвестный тип";
-//}
+std::string GameObjectManager::get_object_tag_string(object_tag_e key)
+{
+	auto value = m_object_tag_string.find(key);
+	if (value != m_object_tag_string.end())
+	{
+		return value->second;
+	}
+	return "неизвестный тип";
+}
+
+std::string GameObjectManager::get_effect_prefix_string(effect_prefix_e key)
+{
+	auto value = m_effect_prefix_string.find(key);
+	if (value != m_effect_prefix_string.end())
+	{
+		return value->second;
+	}
+	return "неизвестный тип";
+}
+
+object_tag_e GameObjectManager::get_object_tag_e(const std::string& key)
+{
+	auto value = m_to_object_tag_e.find(key);
+	if (value == m_to_object_tag_e.end())
+	{
+		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
+	}
+	return value->second;
+}
+
+effect_prefix_e GameObjectManager::get_effect_prefix_e(const std::string& key)
+{
+	auto value = m_to_effect_prefix_e.find(key);
+	if (value == m_to_effect_prefix_e.end())
+	{
+		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
+	}
+	return value->second;
+}
