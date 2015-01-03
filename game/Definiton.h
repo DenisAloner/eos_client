@@ -245,12 +245,14 @@ enum class object_attribute_e
 enum class effect_prefix_e
 {
 	physical_damage,
-	poison_damage
+	poison_damage,
+	parameter_change
 };
 
 enum class object_tag_e
 {
-	poison_resist
+	poison_resist,
+	mortal
 };
 
 #endif //DEFINITION_H

@@ -235,7 +235,7 @@ void GameObject::add_parameter(interaction_e key, int value, int limit)
 	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
 	if (list)
 	{
-		Parameter_list* pl = new Parameter_list();
+		Parameter_list* pl = new Parameter_list(key);
 		pl->m_basic_value = value;
 		pl->m_basic_limit = limit;
 		list->m_effect[key] = pl;
@@ -245,7 +245,7 @@ void GameObject::add_parameter(interaction_e key, int value, int limit)
 		if (m_active_state)
 		{
 			list = new Interaction_feature();
-			Parameter_list* pl = new Parameter_list();
+			Parameter_list* pl = new Parameter_list(key);
 			pl->m_basic_value = value;
 			pl->m_basic_limit = limit;
 			list->m_effect[key] = pl;
@@ -261,7 +261,7 @@ void GameObject::add_to_parameter(interaction_e key, Object_interaction* item)
 	{
 		if (list->m_effect.find(key) == list->m_effect.end())
 		{
-			list->m_effect[key] = new Parameter_list();
+			list->m_effect[key] = new Parameter_list(key);
 		}
 		static_cast<Parameter_list*>(list->m_effect[key])->m_effect.push_back(item);
 	}
@@ -270,7 +270,7 @@ void GameObject::add_to_parameter(interaction_e key, Object_interaction* item)
 		if (m_active_state)
 		{
 			list = new Interaction_feature();
-			list->m_effect[key] = new Parameter_list();
+			list->m_effect[key] = new Parameter_list(key);
 			static_cast<Parameter_list*>(list->m_effect[key])->m_effect.push_back(item);
 			m_active_state->m_feature[object_feature_e::interaction_feature] = list;
 		}

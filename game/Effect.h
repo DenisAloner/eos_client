@@ -32,12 +32,14 @@ class Parameter_list :public  Interaction_list
 {
 public:
 
+	interaction_e m_subtype;
 	int m_basic_value;
 	int m_basic_limit;
 
 	int m_value;
 	int m_limit;
 
+	Parameter_list(interaction_e subtype);
 	virtual std::string get_description();
 	virtual void update();
 	virtual void add(Object_interaction* item);
@@ -76,6 +78,13 @@ public:
 	virtual Interaction_prefix* clone();
 	virtual void description(std::list<std::string>* info, int level);
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+};
+
+class Interaction_prefix_ex :public Interaction_prefix
+{
+public:
+	Object_interaction* m_effect;
+	virtual Interaction_prefix_ex* clone();
 };
 
 class Interaction_copyist :public Interaction_slot
@@ -139,15 +148,25 @@ public:
 	Object_tag(object_tag_e key);
 	virtual void description(std::list<std::string>* info, int level);
 	virtual std::string get_description();
-	virtual Object_tag* clone();
+	virtual Object_tag* clone()=0;
 	virtual bool on_turn();
 };
 
-class Object_tag_poison_resist :public Object_tag
+namespace ObjectTag
 {
-public:
-	Object_tag_poison_resist();
-	virtual Object_tag_poison_resist* clone();
-	virtual void apply_effect(GameObject* unit, Object_interaction* object);
-};
+	class Poison_resist :public Object_tag
+	{
+	public:
+		Poison_resist();
+		virtual Poison_resist* clone();
+		virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	};
 
+	class Mortal :public Object_tag
+	{
+	public:
+		Mortal();
+		virtual Mortal* clone();
+		virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	};
+}

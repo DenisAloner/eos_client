@@ -35,7 +35,7 @@ property_body foot,правая нога
 mem_effect change_parameter,value,1
 mem_slot_timer 5
 slot_copyist apply_effect,health,buff
-mem_effect change_parameter,value,-6
+mem_effect change_parameter,value,-51
 mem_slot_prefix poison_damage
 slot_copyist apply_effect,health,damage
 state dead
@@ -52,6 +52,7 @@ parameter health,100,100
 parameter strength,1,100
 mem_effect change_parameter,value,-1
 slot_copyist apply_effect,health,damage
+tag mortal
 state dead
 size 1 1 0
 tile_manager_single snake_corpse
@@ -80,7 +81,8 @@ action_move
 tag poison_resist
 parameter health,100,100
 parameter strength,5,100
-effect get_damage,physical_damage,1,damage
+mem_effect change_parameter,value,-1
+slot_copyist apply_effect,health,damage
 state dead
 size 1 1 0
 tile_manager_single snake_corpse

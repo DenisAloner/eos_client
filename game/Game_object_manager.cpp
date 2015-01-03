@@ -132,6 +132,7 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->m_active_state = new Object_state();
 		m_object->m_active_state->m_state = get_object_state_e(arg[0]);
 		m_object->m_state.push_back(m_object->m_active_state);
+		m_object->m_active_state->m_ai = nullptr;
 		break;
 	}
 	case command_e::add_label:
@@ -369,7 +370,12 @@ void GameObjectManager::parser(const std::string& command)
 		{
 		case object_tag_e::poison_resist:
 		{
-			tag = new Object_tag_poison_resist();
+			tag = new ObjectTag::Poison_resist();
+			break;
+		}
+		case object_tag_e::mortal:
+		{
+			tag = new ObjectTag::Mortal();
 			break;
 		}
 		}
@@ -459,8 +465,10 @@ void GameObjectManager::init()
 	m_to_effect_prefix_e["poison_damage"] = effect_prefix_e::poison_damage;
 
 	m_to_object_tag_e["poison_resist"] = object_tag_e::poison_resist;
+	m_to_object_tag_e["mortal"] = object_tag_e::mortal;
 
 	m_object_tag_string[object_tag_e::poison_resist] = "сопротивление к яду";
+	m_object_tag_string[object_tag_e::mortal] = "смертное существо";
 
 
 	bytearray buffer;

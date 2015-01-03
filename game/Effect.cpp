@@ -64,6 +64,15 @@ void Effect::apply_effect(GameObject* unit, Object_interaction* object)
 	{
 		Parameter_list* item = static_cast<Parameter_list*>(object);
 		item->m_basic_value = item->m_basic_value + m_value;
+		if (item->m_basic_value <=1)
+		{ 
+			item->m_basic_value = 0;
+			Interaction_prefix_ex* prefix = new Interaction_prefix_ex();
+			prefix->m_value = object;
+			prefix->m_subtype = effect_prefix_e::parameter_change;
+			prefix->m_effect = clone();
+			prefix->apply_effect(unit, object);
+		}
 		break;
 	}
 	case effect_e::limit:
@@ -132,6 +141,8 @@ Tag_list* Tag_list::clone()
 	return result;
 }
 
+Parameter_list::Parameter_list(interaction_e subtype) :m_subtype(subtype){};
+
 void Parameter_list::update_list(Interaction_list* list)
 {
 	Effect* item;
@@ -197,7 +208,7 @@ void Parameter_list::add(Object_interaction* item)
 
 Parameter_list* Parameter_list::clone()
 {
-	Parameter_list* result = new Parameter_list();
+	Parameter_list* result = new Parameter_list(m_subtype);
 	result->m_basic_limit = m_basic_limit;
 	result->m_basic_value = m_basic_value;
 	result->m_value = m_value;
@@ -360,6 +371,15 @@ Interaction_prefix* Interaction_prefix::clone()
 	return effect;
 }
 
+Interaction_prefix_ex* Interaction_prefix_ex::clone()
+{
+	Interaction_prefix_ex* effect = new Interaction_prefix_ex();
+	effect->m_subtype = m_subtype;
+	effect->m_value = m_value;
+	effect->m_effect = m_effect;
+	return effect;
+}
+
 void Interaction_prefix::apply_effect(GameObject* unit, Object_interaction* object)
 {
 	Tag_list* i = static_cast<Tag_list*>(unit->get_effect(interaction_e::tag));
@@ -370,7 +390,7 @@ void Interaction_prefix::apply_effect(GameObject* unit, Object_interaction* obje
 			(*item)->apply_effect(unit, this);
 		}
 	}
-	m_value->apply_effect(unit, object);
+	if (m_value){ m_value->apply_effect(unit, object); }
 }
 
 Object_tag::Object_tag(object_tag_e key) :m_type(key){};
@@ -385,26 +405,26 @@ std::string Object_tag::get_description()
 	return "none";
 }
 
-Object_tag* Object_tag::clone()
-{
-	Object_tag* effect = new Object_tag(m_type);
-	return effect;
-}
+//Object_tag* Object_tag::clone()
+//{
+//	LOG(FATAL) << " лонирование абстрактного класса запрещено.";
+//	return
+//}
 
 bool Object_tag::on_turn()
 {
 	return false;
 }
 
-Object_tag_poison_resist::Object_tag_poison_resist() :Object_tag(object_tag_e::poison_resist){};
+ObjectTag::Poison_resist::Poison_resist() :Object_tag(object_tag_e::poison_resist){};
 
-Object_tag_poison_resist* Object_tag_poison_resist::clone()
+ObjectTag::Poison_resist* ObjectTag::Poison_resist::clone()
 {
-	Object_tag_poison_resist* effect = new Object_tag_poison_resist();
+	ObjectTag::Poison_resist* effect = new ObjectTag::Poison_resist();
 	return effect;
 }
 
-void Object_tag_poison_resist::apply_effect(GameObject* unit, Object_interaction* object)
+void ObjectTag::Poison_resist::apply_effect(GameObject* unit, Object_interaction* object)
 {
 	Interaction_prefix* prefix = static_cast<Interaction_prefix*>(object);
 	switch (prefix->m_subtype)
@@ -412,6 +432,36 @@ void Object_tag_poison_resist::apply_effect(GameObject* unit, Object_interaction
 	case effect_prefix_e::poison_damage:
 	{
 		static_cast<Effect*>(prefix->m_value)->m_value /= 2;
+		break;
+	}
+	}
+}
+
+ObjectTag::Mortal::Mortal() :Object_tag(object_tag_e::mortal){};
+
+ObjectTag::Mortal* ObjectTag::Mortal::clone()
+{
+	ObjectTag::Mortal* effect = new ObjectTag::Mortal();
+	return effect;
+}
+
+void ObjectTag::Mortal::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	Interaction_prefix* prefix = static_cast<Interaction_prefix*>(object);
+	switch (prefix->m_subtype)
+	{
+	case effect_prefix_e::parameter_change:
+	{
+		Interaction_prefix_ex* prefix_ex = static_cast<Interaction_prefix_ex*>(object);
+		if (static_cast<Parameter_list*>(prefix_ex->m_value)->m_subtype == interaction_e::health)
+		{
+			if (static_cast<Parameter_list*>(prefix_ex->m_value)->m_basic_value == 0)
+			{
+				LOG(INFO) << "in";
+				unit->set_state(object_state_e::dead);
+				LOG(INFO) << "out";
+			}
+		}
 		break;
 	}
 	}

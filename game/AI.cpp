@@ -240,6 +240,7 @@ AI::~AI()
 
 GameObject* AI::find_goal()
 {
+	if (m_object->m_active_state->m_ai == nullptr){ return nullptr; }
 	m_fov->calculate(m_object->m_active_state->m_ai->m_fov_radius, m_object, m_map);
 	FOV::cell* fc;
 	MapCell* mc;
