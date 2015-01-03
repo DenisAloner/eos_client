@@ -457,11 +457,44 @@ void ObjectTag::Mortal::apply_effect(GameObject* unit, Object_interaction* objec
 		{
 			if (static_cast<Parameter_list*>(prefix_ex->m_value)->m_basic_value == 0)
 			{
-				LOG(INFO) << "in";
 				unit->set_state(object_state_e::dead);
-				LOG(INFO) << "out";
 			}
 		}
+		break;
+	}
+	}
+}
+
+ObjectTag::Purification_from_poison::Purification_from_poison() :Object_tag(object_tag_e::purification_from_poison){};
+
+ObjectTag::Purification_from_poison* ObjectTag::Purification_from_poison::clone()
+{
+	ObjectTag::Purification_from_poison* effect = new ObjectTag::Purification_from_poison();
+	return effect;
+}
+
+void ObjectTag::Purification_from_poison::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	Interaction_prefix* prefix = static_cast<Interaction_prefix*>(object);
+	switch (prefix->m_subtype)
+	{
+	case effect_prefix_e::poison_damage:
+	{
+		Parameter_list* p = unit->get_parameter(interaction_e::poison);
+			if (p)
+			{
+				Effect* e = static_cast<Effect*>(prefix->m_value);
+				p->m_basic_value -= e->m_value;
+				if (p->m_basic_value > p->m_basic_limit)
+				{
+					e->m_value = p->m_basic_limit - p->m_basic_value;
+					p->m_basic_value = p->m_basic_limit;
+				}
+				else
+				{
+					e->m_value = 0;
+				}
+			}
 		break;
 	}
 	}

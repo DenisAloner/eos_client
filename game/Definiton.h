@@ -207,7 +207,8 @@ enum class interaction_e
 	strength,
 	hunger,
 	thirst,
-	tag
+	tag,
+	poison
 };
 
 enum class effect_e
@@ -252,7 +253,8 @@ enum class effect_prefix_e
 enum class object_tag_e
 {
 	poison_resist,
-	mortal
+	purification_from_poison,
+	mortal,
 };
 
 #endif //DEFINITION_H

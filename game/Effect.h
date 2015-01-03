@@ -169,4 +169,12 @@ namespace ObjectTag
 		virtual Mortal* clone();
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
 	};
+
+	class Purification_from_poison: public Object_tag
+	{
+	public:
+		Purification_from_poison();
+		virtual Purification_from_poison* clone();
+		virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	};
 }

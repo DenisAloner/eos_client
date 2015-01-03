@@ -378,6 +378,11 @@ void GameObjectManager::parser(const std::string& command)
 			tag = new ObjectTag::Mortal();
 			break;
 		}
+		case object_tag_e::purification_from_poison:
+		{
+			tag = new ObjectTag::Purification_from_poison();
+			break;
+		}
 		}
 		m_object->add_effect(interaction_e::tag,tag);
 		break;
@@ -426,6 +431,7 @@ void GameObjectManager::init()
 	m_to_interaction_e["strength"] = interaction_e::strength;
 	m_to_interaction_e["hunger"] = interaction_e::hunger;
 	m_to_interaction_e["thirst"] = interaction_e::thirst;
+	m_to_interaction_e["poison"] = interaction_e::poison;
 
 	m_to_effect_e["physical_damage"] = effect_e::physical_damage;
 	m_to_effect_e["poison_damage"] = effect_e::poison_damage;
@@ -452,6 +458,7 @@ void GameObjectManager::init()
 	m_effect_string[interaction_e::hunger] = "голод";
 	m_effect_string[interaction_e::thirst] = "жажда";
 	m_effect_string[interaction_e::tag] = "метки";
+	m_effect_string[interaction_e::poison] = "яд";
 
 	m_effect_subtype_string[effect_e::physical_damage] = "физический урон";
 	m_effect_subtype_string[effect_e::poison_damage] = "урон от яда";
@@ -464,10 +471,13 @@ void GameObjectManager::init()
 	m_to_effect_prefix_e["physical_damage"] = effect_prefix_e::physical_damage;
 	m_to_effect_prefix_e["poison_damage"] = effect_prefix_e::poison_damage;
 
+
 	m_to_object_tag_e["poison_resist"] = object_tag_e::poison_resist;
+	m_to_object_tag_e["purification_from_poison"] = object_tag_e::purification_from_poison;
 	m_to_object_tag_e["mortal"] = object_tag_e::mortal;
 
 	m_object_tag_string[object_tag_e::poison_resist] = "сопротивление к яду";
+	m_object_tag_string[object_tag_e::purification_from_poison] = "очищение от яда";
 	m_object_tag_string[object_tag_e::mortal] = "смертное существо";
 
 

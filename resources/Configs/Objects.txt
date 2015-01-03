@@ -50,9 +50,11 @@ tile_manager_single rat_left
 action_move
 parameter health,100,100
 parameter strength,1,100
+parameter poison,0,100
 mem_effect change_parameter,value,-1
 slot_copyist apply_effect,health,damage
 tag mortal
+tag purification_from_poison
 state dead
 size 1 1 0
 tile_manager_single snake_corpse
