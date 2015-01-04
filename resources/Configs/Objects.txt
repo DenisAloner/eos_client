@@ -89,6 +89,36 @@ state dead
 size 1 1 0
 tile_manager_single snake_corpse
 
+object slime
+state alive
+ai 20 0 0
+size 1 2 4
+tile_manager_map no_tile 0 0
+tile_manager_map no_tile 0 1
+tile_manager_map no_tile 0 2
+tile_manager_map no_tile 0 3
+tile_manager_map slime_right_01 1 0
+tile_manager_map slime_right_02 1 1
+tile_manager_map slime_right_03 1 2
+tile_manager_map slime_right_04 1 3
+tile_manager_map no_tile 2 0
+tile_manager_map no_tile 2 1
+tile_manager_map no_tile 2 2
+tile_manager_map no_tile 2 3
+tile_manager_map slime_right_01 3 0
+tile_manager_map slime_right_02 3 1
+tile_manager_map slime_right_03 3 2
+tile_manager_map slime_right_04 3 3
+action_move
+tag poison_resist
+parameter health,100,100
+parameter strength,5,100
+mem_effect change_parameter,value,-1
+slot_copyist apply_effect,health,damage
+state dead
+size 1 2 0
+tile_manager_single snake_corpse
+
 object bear
 state alive
 ai 20 0 0

@@ -344,7 +344,7 @@ void Application::initialize()
 	m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 	rx = rx -1;
 	ry = ry -4;
-	obj = m_game_object_manager->new_object("rat");
+	obj = m_game_object_manager->new_object("slime");
 	obj->set_direction(ObjectDirection_Left);
 	m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 	rx = rx - 2;
@@ -355,7 +355,7 @@ void Application::initialize()
 	for (int i = 0; i <15; i++){
 		index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
 		room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);
-		ru = rand() % 3;
+		ru = rand() % 4;
 		rx = rand() % room->rect.w;
 		ry = rand() % room->rect.h;
 		switch (ru)
@@ -373,6 +373,11 @@ void Application::initialize()
 		case 2:
 		{
 			obj = m_game_object_manager->new_object("ghost");
+			break;
+		}
+		case 3:
+		{
+			obj = m_game_object_manager->new_object("slime");
 			break;
 		}
 		}
