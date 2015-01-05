@@ -19,7 +19,6 @@ class Application;
 class TileManager;
 class GameObject;
 class Effect;
-class Reaction;
 class Object_interaction;
 class Interaction_list;
 class Parameter_list;

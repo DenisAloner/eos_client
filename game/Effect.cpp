@@ -86,7 +86,7 @@ void Effect::apply_effect(GameObject* unit, Object_interaction* object)
 
 Interaction_list::Interaction_list()
 {
-	m_kind = reaction_e::list;
+	m_kind = interaction_message_type_e::list;
 }
 
 bool Interaction_list::on_turn()
@@ -128,7 +128,7 @@ Interaction_list* Interaction_list::clone()
 
 Tag_list::Tag_list()
 {
-	m_kind = reaction_e::list;
+	m_kind = interaction_message_type_e::list;
 }
 
 Tag_list* Tag_list::clone()
@@ -151,7 +151,7 @@ void Parameter_list::update_list(Interaction_list* list)
 	{
 		switch ((*current)->m_kind)
 		{
-		case reaction_e::list:
+		case interaction_message_type_e::list:
 		{
 			update_list(static_cast<Interaction_list*>(*current));
 			break;

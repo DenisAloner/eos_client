@@ -38,17 +38,20 @@ property_body hand,левая рука
 property_body hand,правая рука
 property_body foot,левая нога
 property_body foot,правая нога
-mem_effect change_parameter,value,1
+mem_effect value,1
 mem_slot_timer 5
-slot_copyist apply_effect,health,buff
-mem_effect change_parameter,value,-10
+mem_slot_copyist health
+add_slot buff
+mem_effect value,-10
 mem_slot_prefix physical_damage
-slot_copyist apply_effect,health,damage
-mem_effect change_parameter,value,-10
+mem_slot_copyist health
+add_slot damage
+mem_effect value,-10
 mem_slot_prefix poison_damage
-mem_slot_copyist apply_effect,health
+mem_slot_copyist health
 mem_slot_time 5
-slot_addon change_parameter,buff,damage
+mem_slot_addon buff
+add_slot damage
 state dead
 size 1 2 0
 tile_manager_single elf_corpse
@@ -62,8 +65,9 @@ add_action move
 parameter health,100,100
 parameter strength,1,100
 parameter poison,0,100
-mem_effect change_parameter,value,-1
-slot_copyist apply_effect,health,damage
+mem_effect value,-1
+mem_slot_copyist health
+add_slot damage
 tag mortal
 tag purification_from_poison
 state dead
@@ -94,8 +98,9 @@ add_action move
 tag poison_resist
 parameter health,100,100
 parameter strength,5,100
-mem_effect change_parameter,value,-1
-slot_copyist apply_effect,health,damage
+mem_effect value,-1
+mem_slot_copyist health
+add_slot damage
 state dead
 size 1 1 0
 tile_manager_single snake_corpse
@@ -124,8 +129,9 @@ add_action move
 tag poison_resist
 parameter health,100,100
 parameter strength,5,100
-mem_effect change_parameter,value,-1
-slot_copyist apply_effect,health,damage
+mem_effect value,-1
+mem_slot_copyist health
+add_slot damage
 state dead
 size 1 2 0
 tile_manager_single snake_corpse
@@ -184,11 +190,14 @@ size 1 1 1
 icon sword
 tile_manager_single sword
 attribute pick_able
-mem_effect change_parameter,value,-50
-slot_copyist apply_effect,health,damage
-mem_effect change_parameter,value,-1
-slot_copyist change_parameter,strength,damage
-effect change_parameter,value,1,strength
+mem_effect value,-50
+mem_slot_copyist health
+add_slot damage
+mem_effect value,-1
+mem_slot_addon strength
+add_slot damage
+mem_effect value,1
+add_slot strength
 
 object wall
 state alive

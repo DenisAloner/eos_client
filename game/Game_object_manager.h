@@ -38,15 +38,13 @@ public:
 		property_container,
 		property_body,
 		parameter,
-		effect,
-		slot_copyist,
 		mem_slot_timer,
 		mem_effect,
 		mem_slot_time,
 		mem_slot_copyist,
 		mem_slot_prefix,
 		mem_slot_addon,
-		slot_addon,
+		add_slot,
 		tag,
 	};
 
@@ -64,10 +62,8 @@ public:
 	std::map<std::string, label_t*> m_labels;
 
 	std::map<std::string, object_feature_e> m_to_object_feature_e;
-	std::map<std::string, reaction_e> m_to_reaction_e;
 	std::map<std::string, interaction_e> m_to_interaction_e;
 	std::map<std::string, effect_e> m_to_effect_e;
-	std::map<std::string, reaction_applicator_e> m_to_reaction_applicator_e;
 	std::map<std::string, object_attribute_e> m_to_object_attribute_e;
 	std::map<std::string, object_state_e> m_to_object_state_e;
 	std::map<std::string, object_tag_e> m_to_object_tag_e;
@@ -86,16 +82,14 @@ public:
 	GameObject* m_object;
 	label_t* m_label;
 	Effect* m_effect;
-	Interaction_copyist* m_slot_copyist;
+	//Interaction_copyist* m_slot_copyist;
 	Object_interaction* m_slot;
 
 	std::list<GameObject*> m_objects;
 
 	object_feature_e get_object_feature_e(const std::string& key);
-	reaction_e get_reaction_e(const std::string& key);
 	interaction_e get_interaction_e(const std::string& key);
 	effect_e get_effect_e(const std::string& key);
-	reaction_applicator_e get_reaction_applicator_e(const std::string& key);
 	object_attribute_e get_object_attribute_e(const std::string& key);
 	object_state_e get_object_state_e(const std::string& key);
 	object_tag_e get_object_tag_e(const std::string& key);

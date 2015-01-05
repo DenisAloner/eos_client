@@ -182,22 +182,10 @@ struct light_t
 	light_t() : R(0), G(0), B(0){};
 };
 
-enum class reaction_e
+enum class interaction_message_type_e
 {
-	get_damage,
-	change_health,
-	change_parameter,
+	single,
 	list,
-	apply_effect,
-	none
-};
-
-enum class reaction_applicator_e
-{
-	get_damage_basic,
-	change_health_basic,
-	add_modificator_generic,
-	apply_effect_generic
 };
 
 enum class interaction_e
@@ -232,7 +220,6 @@ enum class object_feature_e
 	attribute_feature,
 	parameter_feature,
 	interaction_feature,
-	reaction_feature,
 	body,
 	container
 };

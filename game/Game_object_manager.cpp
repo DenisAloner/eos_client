@@ -10,16 +10,6 @@ object_feature_e GameObjectManager::get_object_feature_e(const std::string& key)
 	return value->second;
 }
 
-reaction_e GameObjectManager::get_reaction_e(const std::string& key)
-{
-	auto value = m_to_reaction_e.find(key);
-	if (value == m_to_reaction_e.end())
-	{
-		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
-	}
-	return value->second;
-}
-
 interaction_e GameObjectManager::get_interaction_e(const std::string& key)
 {
 	auto value = m_to_interaction_e.find(key);
@@ -44,16 +34,6 @@ object_state_e GameObjectManager::get_object_state_e(const std::string& key)
 {
 	auto value = m_to_object_state_e.find(key);
 	if (value == m_to_object_state_e.end())
-	{
-		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
-	}
-	return value->second;
-}
-
-reaction_applicator_e GameObjectManager::get_reaction_applicator_e(const std::string& key)
-{
-	auto value = m_to_reaction_applicator_e.find(key);
-	if (value == m_to_reaction_applicator_e.end())
 	{
 		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
 	}
@@ -310,28 +290,24 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->add_parameter(get_interaction_e(arg[0]), std::stoi(arg[1]), std::stoi(arg[2]));
 		break;
 	}
-	case command_e::effect:
+	case command_e::add_slot:
 	{
-		m_effect = new Effect();
-		m_effect->m_kind = get_reaction_e(arg[0]);
-		m_effect->m_subtype = get_effect_e(arg[1]);
-		m_effect->m_value = std::stoi(arg[2]);
-		m_object->add_effect(get_interaction_e(arg[3]), m_effect);
+		m_object->add_effect(get_interaction_e(arg[0]), m_slot);
 		break;
 	}
 	case command_e::mem_effect:
 	{
 		Effect* item = new Effect();
-		item->m_kind = get_reaction_e(arg[0]);
-		item->m_subtype = get_effect_e(arg[1]);
-		item->m_value = std::stoi(arg[2]);
+		item->m_kind = interaction_message_type_e::single;
+		item->m_subtype = get_effect_e(arg[0]);
+		item->m_value = std::stoi(arg[1]);
 		m_slot = item;
 		break;
 	}
 	case command_e::mem_slot_timer:
 	{
 		Interaction_timer* item = new Interaction_timer();
-		//item->m_kind = get_reaction_e(arg[0]);
+		item->m_kind = interaction_message_type_e::single;
 		item->m_period = std::stoi(arg[0]);
 		item->m_value = m_slot;
 		item->m_turn = 0;
@@ -341,34 +317,17 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::mem_slot_time:
 	{
 		Interaction_time* item = new Interaction_time();
+		item->m_kind = interaction_message_type_e::single;
 		item->m_turn = std::stoi(arg[0]);
 		item->m_value = m_slot;
 		m_slot = item;
 		break;
 	}
-	case command_e::slot_copyist:
-	{
-		m_slot_copyist = new Interaction_copyist();
-		m_slot_copyist->m_kind = get_reaction_e(arg[0]);
-		m_slot_copyist->m_subtype = get_interaction_e(arg[1]);
-		m_slot_copyist->m_value = m_slot;
-		m_object->add_effect(get_interaction_e(arg[2]), m_slot_copyist);
-		break;
-	}
-	case command_e::slot_addon:
-	{
-		Interaction_addon* item = new Interaction_addon();
-		item->m_kind = get_reaction_e(arg[0]);
-		item->m_subtype = get_interaction_e(arg[1]);
-		item->m_value = m_slot;
-		m_object->add_effect(get_interaction_e(arg[2]), item);
-		break;
-	}
 	case command_e::mem_slot_copyist:
 	{
 		Interaction_copyist* item = new Interaction_copyist();
-		item->m_kind = get_reaction_e(arg[0]);
-		item->m_subtype = get_interaction_e(arg[1]);
+		item->m_kind = interaction_message_type_e::single;
+		item->m_subtype = get_interaction_e(arg[0]);
 		item->m_value = m_slot;
 		m_slot = item;
 		break;
@@ -376,7 +335,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::mem_slot_addon:
 	{
 		Interaction_addon* item = new Interaction_addon();
-		item->m_kind = reaction_e::none;
+		item->m_kind = interaction_message_type_e::single;
 		item->m_subtype = get_interaction_e(arg[0]);
 		item->m_value = m_slot;
 		m_slot = item;
@@ -385,6 +344,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::mem_slot_prefix:
 	{
 		Interaction_prefix* item = new Interaction_prefix();
+		item->m_kind = interaction_message_type_e::single;
 		item->m_subtype = get_effect_prefix_e(arg[0]);
 		item->m_value = m_slot;
 		m_slot = item;
@@ -435,18 +395,16 @@ void GameObjectManager::init()
 	m_commands["add_action"] = command_e::add_action;
 	m_commands.insert(std::pair<std::string, command_e>("property_container", command_e::property_container));
 	m_commands["property_body"] = command_e::property_body;
-	m_commands["effect"] = command_e::effect;
+	m_commands["add_slot"] = command_e::add_slot;
 	m_commands["attribute"] = command_e::attribute;
 	m_commands["parameter"] = command_e::parameter;
 	m_commands["state"] = command_e::state;
-	m_commands["slot_copyist"] = command_e::slot_copyist;
 	m_commands["mem_effect"] = command_e::mem_effect;
 	m_commands["mem_slot_timer"] = command_e::mem_slot_timer;
 	m_commands["mem_slot_time"] = command_e::mem_slot_time;
 	m_commands["mem_slot_prefix"] = command_e::mem_slot_prefix;
 	m_commands["mem_slot_copyist"] = command_e::mem_slot_copyist;
 	m_commands["mem_slot_addon"] = command_e::mem_slot_addon;
-	m_commands["slot_addon"] = command_e::slot_addon;
 	m_commands["tag"] = command_e::tag;
 
 	m_to_object_state_e["alive"] = object_state_e::alive;
@@ -466,16 +424,6 @@ void GameObjectManager::init()
 
 	m_to_effect_e["value"] = effect_e::value;
 	m_to_effect_e["limit"] = effect_e::limit;
-
-	m_to_reaction_e["get_damage"] = reaction_e::get_damage;
-	m_to_reaction_e["change_health"] = reaction_e::change_health;
-	m_to_reaction_e["change_parameter"] = reaction_e::change_parameter;
-	m_to_reaction_e["apply_effect"] = reaction_e::apply_effect;
-
-	m_to_reaction_applicator_e["get_damage_basic"] = reaction_applicator_e::get_damage_basic;
-	m_to_reaction_applicator_e["change_health_basic"] = reaction_applicator_e::change_health_basic;
-	m_to_reaction_applicator_e["add_modificator_generic"] = reaction_applicator_e::add_modificator_generic;
-	m_to_reaction_applicator_e["apply_effect_generic"] = reaction_applicator_e::apply_effect_generic;
 
 	m_to_object_attribute_e["pass_able"] = object_attribute_e::pass_able;
 	m_to_object_attribute_e["pick_able"] = object_attribute_e::pick_able;
@@ -572,7 +520,6 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 		}
 		obj->m_state.push_back(state);
 	}
-	Reaction* reaction;
 	obj->m_active_state = obj->m_state.front();
 	m_objects.push_back(obj);
 	obj->update_interaction();

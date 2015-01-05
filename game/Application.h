@@ -39,7 +39,6 @@ class GUI_Timer;
 class GUI_MiniMap;
 class Parameter_destination;
 class AI_manager;
-class Reaction_manager;
 class GameObjectManager;
 class Body_part;
 
