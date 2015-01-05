@@ -120,6 +120,7 @@ public:
 	void on_mouse_move(MouseEventArgs const& e);
 	void render();
 	void update();
+	void update_action_panel();
 
 	Parameter* command_select_location(GameObject* object);
 	Parameter* command_select_object_on_map();

@@ -21,7 +21,13 @@ tile_manager_map elf_right_01 3 0
 tile_manager_map elf_right_02 3 1
 tile_manager_map elf_right_03 3 2
 tile_manager_map elf_right_04 3 3
-action_move
+add_action equip
+add_action hit
+add_action move
+add_action open
+add_action pick
+add_action push
+add_action turn
 property_container Мешок 2 4
 parameter health,100,100
 parameter strength,8,100
@@ -35,9 +41,14 @@ property_body foot,правая нога
 mem_effect change_parameter,value,1
 mem_slot_timer 5
 slot_copyist apply_effect,health,buff
-mem_effect change_parameter,value,-51
-mem_slot_prefix poison_damage
+mem_effect change_parameter,value,-10
+mem_slot_prefix physical_damage
 slot_copyist apply_effect,health,damage
+mem_effect change_parameter,value,-10
+mem_slot_prefix poison_damage
+mem_slot_copyist apply_effect,health
+mem_slot_time 5
+slot_addon change_parameter,buff,damage
 state dead
 size 1 2 0
 tile_manager_single elf_corpse
@@ -47,7 +58,7 @@ state alive
 ai 20 0 0
 size 1 1 1
 tile_manager_single rat_left
-action_move
+add_action move
 parameter health,100,100
 parameter strength,1,100
 parameter poison,0,100
@@ -79,7 +90,7 @@ tile_manager_map snake_right_01 3 0
 tile_manager_map snake_right_02 3 1
 tile_manager_map snake_right_03 3 2
 tile_manager_map snake_right_04 3 3
-action_move
+add_action move
 tag poison_resist
 parameter health,100,100
 parameter strength,5,100
@@ -109,7 +120,7 @@ tile_manager_map slime_right_01 3 0
 tile_manager_map slime_right_02 3 1
 tile_manager_map slime_right_03 3 2
 tile_manager_map slime_right_04 3 3
-action_move
+add_action move
 tag poison_resist
 parameter health,100,100
 parameter strength,5,100
@@ -139,9 +150,8 @@ tile_manager_map no_tile 3 0
 tile_manager_map no_tile 3 1
 tile_manager_map no_tile 3 2
 tile_manager_map no_tile 3 3
-action_move
+add_action move
 parameter health,100,100
-effect get_damage,physical_damage,1,damage
 
 object ghost
 state alive
@@ -152,7 +162,6 @@ tile_manager_rotating ghost_left 1
 tile_manager_rotating no_tile 2
 tile_manager_rotating no_tile 3
 parameter health,100,100
-effect get_damage,physical_damage,1,damage
 
 object floor
 state alive
@@ -180,9 +189,6 @@ slot_copyist apply_effect,health,damage
 mem_effect change_parameter,value,-1
 slot_copyist change_parameter,strength,damage
 effect change_parameter,value,1,strength
-mem_effect get_damage,poison_damage,5
-mem_slot_time 5
-slot_copyist change_parameter,buff,damage
 
 object wall
 state alive

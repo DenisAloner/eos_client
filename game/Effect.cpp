@@ -236,7 +236,7 @@ void Effect::description(std::list<std::string>* info, int level)
 
 void Interaction_copyist::description(std::list<std::string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + "<наложение эффекта:" + Application::instance().m_game_object_manager->get_effect_string(m_subtype) + ">:");
+	info->push_back(std::string(level, '.') + "<тип параметра:" + Application::instance().m_game_object_manager->get_effect_string(m_subtype) + ">:");
 	m_value->description(info,level+1);
 }
 
@@ -393,6 +393,33 @@ void Interaction_prefix::apply_effect(GameObject* unit, Object_interaction* obje
 	if (m_value){ m_value->apply_effect(unit, object); }
 }
 
+Interaction_addon::Interaction_addon(){};
+
+std::string Interaction_addon::get_description()
+{
+	return "slot";
+}
+
+Object_interaction* Interaction_addon::clone()
+{
+	Interaction_addon* effect = new Interaction_addon();
+	effect->m_kind = m_kind;
+	effect->m_subtype = m_subtype;
+	effect->m_value = m_value->clone();
+	return effect;
+}
+
+void Interaction_addon::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "<наложение эффекта:" + Application::instance().m_game_object_manager->get_effect_string(m_subtype) + ">:");
+	m_value->description(info, level + 1);
+}
+
+void Interaction_addon::apply_effect(GameObject* unit, Object_interaction* object)
+{
+unit->add_effect(m_subtype, m_value->clone());
+}
+
 Object_tag::Object_tag(object_tag_e key) :m_type(key){};
 
 void Object_tag::description(std::list<std::string>* info, int level)
@@ -404,12 +431,6 @@ std::string Object_tag::get_description()
 {
 	return "none";
 }
-
-//Object_tag* Object_tag::clone()
-//{
-//	LOG(FATAL) << "Клонирование абстрактного класса запрещено.";
-//	return
-//}
 
 bool Object_tag::on_turn()
 {

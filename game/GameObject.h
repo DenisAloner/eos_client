@@ -138,6 +138,7 @@ class Player
 {
 public:
 
+	std::list<Action*> m_actions;
 	GameObject* m_object;
 	GameMap* m_map;
 	FOV* m_fov;

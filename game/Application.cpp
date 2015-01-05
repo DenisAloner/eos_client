@@ -202,40 +202,8 @@ void Application::initialize()
 	AMTextBox->resize(372, 263);
 	GUI_ActionPanel* ActionPanel;
 	ActionPanel = new GUI_ActionPanel(2,975,898,47);
-	GUI_ActionButton* ActionButton;
-	ActionButton = new GUI_ActionButton();
-	ActionButton->m_action = m_actions[action_e::move];
-	ActionPanel->add_item_control(ActionButton);
-	ActionButton = new GUI_ActionButton();
-	ActionButton->m_action = m_actions[action_e::push];
-	ActionPanel->add_item_control(ActionButton);
-	ActionButton = new GUI_ActionButton();
-	ActionButton->m_action = m_actions[action_e::turn];
-	ActionPanel->add_item_control(ActionButton);
-	ActionButton = new GUI_ActionButton();
-	ActionButton->m_action = m_actions[action_e::open_inventory];
-	ActionPanel->add_item_control(ActionButton);
-	ActionButton = new GUI_ActionButton();
-	ActionButton->m_action = m_actions[action_e::cell_info];
-	ActionPanel->add_item_control(ActionButton);
-	ActionButton = new GUI_ActionButton();
-	ActionButton->m_action = m_actions[action_e::set_motion_path];
-	ActionPanel->add_item_control(ActionButton);
-	ActionButton = new GUI_ActionButton();
-	ActionButton->m_action = m_actions[action_e::pick];
-	ActionPanel->add_item_control(ActionButton);
-	ActionButton = new GUI_ActionButton();
-	ActionButton->m_action = m_actions[action_e::open];
-	ActionPanel->add_item_control(ActionButton);
-	ActionButton = new GUI_ActionButton();
-	ActionButton->m_action = m_actions[action_e::hit];
-	ActionPanel->add_item_control(ActionButton);
-	ActionButton = new GUI_ActionButton();
-	ActionButton->m_action = m_actions[action_e::equip];
-	ActionPanel->add_item_control(ActionButton);
-	ActionButton = new GUI_ActionButton();
-	ActionButton->m_action = m_actions[action_e::show_parameters];
-	ActionPanel->add_item_control(ActionButton);
+	m_GUI->m_action_panel = ActionPanel;
+	update_action_panel();
 	GUI_Layer* MenuLayer;
 	MenuLayer = new GUI_Layer();
 	MenuLayer->m_position.x = 0;
@@ -386,6 +354,30 @@ void Application::initialize()
 	}
 
 	m_ready = true;
+}
+
+void Application::update_action_panel()
+{
+	GUI_ActionButton* ActionButton;
+	GUI_Layer* panel = m_GUI->m_action_panel->m_item_controls;
+	while (!panel->m_items.empty())
+	{
+		panel->remove(panel->m_items.front());
+	}
+	auto player_action_list = m_GUI->MapViewer->m_player->m_actions;
+	for (auto item = player_action_list.begin(); item != player_action_list.end(); item++)
+	{
+		ActionButton = new GUI_ActionButton();
+		ActionButton->m_action = (*item);
+		m_GUI->m_action_panel->add_item_control(ActionButton);
+	}
+	player_action_list= m_GUI->MapViewer->m_player->m_object->m_active_state->m_actions;
+	for (auto item = player_action_list.begin(); item != player_action_list.end(); item++)
+	{
+		ActionButton = new GUI_ActionButton();
+		ActionButton->m_action = (*item);
+		m_GUI->m_action_panel->add_item_control(ActionButton);
+	}
 }
 
 void Application::start()

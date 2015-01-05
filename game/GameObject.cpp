@@ -363,6 +363,9 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 {
 	m_fov = new FOV();
 	m_fov->calculate(object->m_active_state->m_ai->m_fov_radius, m_object, m_map);
+	m_actions.push_front(Application::instance().m_actions[action_e::open_inventory]);
+	m_actions.push_front(Application::instance().m_actions[action_e::cell_info]);
+	m_actions.push_front(Application::instance().m_actions[action_e::show_parameters]);
 }
 
 Object_feature::Object_feature(object_feature_e kind) : m_kind(kind)

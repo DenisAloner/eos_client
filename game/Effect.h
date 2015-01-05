@@ -99,6 +99,18 @@ public:
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 };
 
+class Interaction_addon :public Interaction_slot
+{
+public:
+
+	interaction_e m_subtype;
+	Interaction_addon();
+	virtual std::string get_description();
+	virtual Object_interaction* clone();
+	virtual void description(std::list<std::string>* info, int level);
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+};
+
 class Interaction_time :public Interaction_slot
 {
 public:

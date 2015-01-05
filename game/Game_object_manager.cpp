@@ -241,9 +241,9 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->m_active_state->m_light = light;
 		break;
 	}
-	case command_e::action_move:
+	case command_e::add_action:
 	{
-		m_object->m_active_state->m_actions.push_back(Application::instance().m_actions[action_e::move]);
+		m_object->m_active_state->m_actions.push_back(Application::instance().m_actions[get_action_e(arg[0])]);
 		break;
 	}
 	case command_e::attribute:
@@ -355,6 +355,33 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->add_effect(get_interaction_e(arg[2]), m_slot_copyist);
 		break;
 	}
+	case command_e::slot_addon:
+	{
+		Interaction_addon* item = new Interaction_addon();
+		item->m_kind = get_reaction_e(arg[0]);
+		item->m_subtype = get_interaction_e(arg[1]);
+		item->m_value = m_slot;
+		m_object->add_effect(get_interaction_e(arg[2]), item);
+		break;
+	}
+	case command_e::mem_slot_copyist:
+	{
+		Interaction_copyist* item = new Interaction_copyist();
+		item->m_kind = get_reaction_e(arg[0]);
+		item->m_subtype = get_interaction_e(arg[1]);
+		item->m_value = m_slot;
+		m_slot = item;
+		break;
+	}
+	case command_e::mem_slot_addon:
+	{
+		Interaction_addon* item = new Interaction_addon();
+		item->m_kind = reaction_e::none;
+		item->m_subtype = get_interaction_e(arg[0]);
+		item->m_value = m_slot;
+		m_slot = item;
+		break;
+	}
 	case command_e::mem_slot_prefix:
 	{
 		Interaction_prefix* item = new Interaction_prefix();
@@ -405,7 +432,7 @@ void GameObjectManager::init()
 	m_commands.insert(std::pair<std::string, command_e>("tile_manager_map", command_e::tile_manager_map));
 	m_commands.insert(std::pair<std::string, command_e>("tile_manager_rotating", command_e::tile_manager_rotating));
 	m_commands.insert(std::pair<std::string, command_e>("light", command_e::light));
-	m_commands.insert(std::pair<std::string, command_e>("action_move", command_e::action_move));
+	m_commands["add_action"] = command_e::add_action;
 	m_commands.insert(std::pair<std::string, command_e>("property_container", command_e::property_container));
 	m_commands["property_body"] = command_e::property_body;
 	m_commands["effect"] = command_e::effect;
@@ -417,6 +444,9 @@ void GameObjectManager::init()
 	m_commands["mem_slot_timer"] = command_e::mem_slot_timer;
 	m_commands["mem_slot_time"] = command_e::mem_slot_time;
 	m_commands["mem_slot_prefix"] = command_e::mem_slot_prefix;
+	m_commands["mem_slot_copyist"] = command_e::mem_slot_copyist;
+	m_commands["mem_slot_addon"] = command_e::mem_slot_addon;
+	m_commands["slot_addon"] = command_e::slot_addon;
 	m_commands["tag"] = command_e::tag;
 
 	m_to_object_state_e["alive"] = object_state_e::alive;
@@ -432,9 +462,8 @@ void GameObjectManager::init()
 	m_to_interaction_e["hunger"] = interaction_e::hunger;
 	m_to_interaction_e["thirst"] = interaction_e::thirst;
 	m_to_interaction_e["poison"] = interaction_e::poison;
+	m_to_interaction_e["action"] = interaction_e::action;
 
-	m_to_effect_e["physical_damage"] = effect_e::physical_damage;
-	m_to_effect_e["poison_damage"] = effect_e::poison_damage;
 	m_to_effect_e["value"] = effect_e::value;
 	m_to_effect_e["limit"] = effect_e::limit;
 
@@ -459,9 +488,8 @@ void GameObjectManager::init()
 	m_effect_string[interaction_e::thirst] = "жажда";
 	m_effect_string[interaction_e::tag] = "метки";
 	m_effect_string[interaction_e::poison] = "€д";
+	m_effect_string[interaction_e::action] = "действи€";
 
-	m_effect_subtype_string[effect_e::physical_damage] = "физический урон";
-	m_effect_subtype_string[effect_e::poison_damage] = "урон от €да";
 	m_effect_subtype_string[effect_e::value] = "модификатор значени€";
 	m_effect_subtype_string[effect_e::limit] = "модификатор лимита";
 
@@ -471,7 +499,6 @@ void GameObjectManager::init()
 	m_to_effect_prefix_e["physical_damage"] = effect_prefix_e::physical_damage;
 	m_to_effect_prefix_e["poison_damage"] = effect_prefix_e::poison_damage;
 
-
 	m_to_object_tag_e["poison_resist"] = object_tag_e::poison_resist;
 	m_to_object_tag_e["purification_from_poison"] = object_tag_e::purification_from_poison;
 	m_to_object_tag_e["mortal"] = object_tag_e::mortal;
@@ -480,6 +507,14 @@ void GameObjectManager::init()
 	m_object_tag_string[object_tag_e::purification_from_poison] = "очищение от €да";
 	m_object_tag_string[object_tag_e::mortal] = "смертное существо";
 
+	m_to_action_e["equip"] = action_e::equip;
+	m_to_action_e["hit"] = action_e::hit;
+	m_to_action_e["move"] = action_e::move;
+	m_to_action_e["open"] = action_e::open;
+	m_to_action_e["pick"] = action_e::pick;
+	m_to_action_e["push"] = action_e::push;
+	m_to_action_e["set_motion_path"] = action_e::set_motion_path;
+	m_to_action_e["turn"] = action_e::turn;
 
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);
@@ -547,6 +582,7 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 void GameObjectManager::update_buff()
 {
 	Interaction_list* list;
+	Object_interaction* e;
 	for (auto object = m_objects.begin(); object != m_objects.end(); object++)
 	{
 		list = (*object)->get_effect(interaction_e::buff);
@@ -554,16 +590,10 @@ void GameObjectManager::update_buff()
 		{
 			for (auto buff = list->m_effect.begin(); buff != list->m_effect.end();)
 			{
-				//Application::instance().console((*object)->m_name + ": активирован бафф " + (*buff)->get_description());
-				Interaction_copyist* e = static_cast<Interaction_copyist*>(*buff);
-				auto item = (*object)->get_effect(e->m_subtype);
-				if (item)
-				{
-					(*buff)->apply_effect(*object,item);
-				}
+				e = (*buff)->clone();
+				e->apply_effect(*object,nullptr);
 				if ((*buff)->on_turn())
 				{
-					//Application::instance().console((*object)->m_name + ": бафф " + (*buff)->get_description() + " исчез");
 					buff = list->m_effect.erase(buff);
 				}
 				else
@@ -631,6 +661,16 @@ effect_prefix_e GameObjectManager::get_effect_prefix_e(const std::string& key)
 {
 	auto value = m_to_effect_prefix_e.find(key);
 	if (value == m_to_effect_prefix_e.end())
+	{
+		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
+	}
+	return value->second;
+}
+
+action_e GameObjectManager::get_action_e(const std::string& key)
+{
+	auto value = m_to_action_e.find(key);
+	if (value == m_to_action_e.end())
 	{
 		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
 	}

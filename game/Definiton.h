@@ -188,7 +188,8 @@ enum class reaction_e
 	change_health,
 	change_parameter,
 	list,
-	apply_effect
+	apply_effect,
+	none
 };
 
 enum class reaction_applicator_e
@@ -208,13 +209,12 @@ enum class interaction_e
 	hunger,
 	thirst,
 	tag,
-	poison
+	poison,
+	action
 };
 
 enum class effect_e
 {
-	physical_damage,
-	poison_damage,
 	value,
 	limit,
 };
