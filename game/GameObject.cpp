@@ -12,6 +12,50 @@ Object_state::Object_state()
 	m_ai = nullptr;
 }
 
+Object_state* Object_state::clone()
+{
+	Object_state* state = new Object_state();
+	state->m_state = m_state;
+	state->m_layer = m_layer;
+	state->m_size = m_size;
+	state->m_tile_size = m_tile_size;
+	state->m_tile_manager = m_tile_manager;
+	state->m_light = m_light;
+	state->m_icon = m_icon;
+	state->m_actions = m_actions;
+	state->m_ai = m_ai;
+	for (auto prop = m_feature.begin(); prop != m_feature.end(); prop++)
+	{
+		state->m_feature[prop->first] = prop->second->clone();
+	}
+	return state;
+}
+
+Object_state_equip::Object_state_equip()
+{
+	m_state = object_state_e::equip;
+}
+
+Object_state* Object_state_equip::clone()
+{
+	Object_state_equip* state = new Object_state_equip();
+	state->m_body_part = m_body_part;
+	state->m_state = m_state;
+	state->m_layer = m_layer;
+	state->m_size = m_size;
+	state->m_tile_size = m_tile_size;
+	state->m_tile_manager = m_tile_manager;
+	state->m_light = m_light;
+	state->m_icon = m_icon;
+	state->m_actions = m_actions;
+	state->m_ai = m_ai;
+	for (auto prop = m_feature.begin(); prop != m_feature.end(); prop++)
+	{
+		state->m_feature[prop->first] = prop->second->clone();
+	}
+	return state;
+}
+
 Action* Object_state::find_action(action_e kind)
 {
 	for (std::list<Action*>::iterator Current = m_actions.begin(); Current != m_actions.end(); Current++)
@@ -193,7 +237,7 @@ void GameObject::add_effect(interaction_e key, Object_interaction* item)
 		{
 			list->m_effect[key] = new Interaction_list;
 		}
-		static_cast<Interaction_list*>(list->m_effect[key])->m_effect.push_back(item);
+		static_cast<Interaction_list*>(list->m_effect[key])->m_effect.push_back(static_cast<Object_interaction*>(item));
 	}
 	else
 	{
@@ -201,7 +245,7 @@ void GameObject::add_effect(interaction_e key, Object_interaction* item)
 		{
 			list = new Interaction_feature();
 			list->m_effect[key] = new Interaction_list();
-			static_cast<Interaction_list*>(list->m_effect[key])->m_effect.push_back(item);
+			static_cast<Interaction_list*>(list->m_effect[key])->m_effect.push_back(static_cast<Object_interaction*>(item));
 			m_active_state->m_feature[object_feature_e::interaction_feature] = list;
 		}
 	}
@@ -279,14 +323,14 @@ void GameObject::add_to_parameter(interaction_e key, Object_interaction* item)
 
 void GameObject::remove_effect(interaction_e key, Object_interaction* item)
 {
-	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
-	if (list)
-	{
-		if (list->m_effect.find(key) != list->m_effect.end())
+		Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
+		if (list)
 		{
-			static_cast<Interaction_list*>(list->m_effect[key])->m_effect.remove(item);
+			if (list->m_effect.find(key) != list->m_effect.end())
+			{
+				static_cast<Interaction_list*>(list->m_effect[key])->m_effect.remove(item);
+			}
 		}
-	}
 }
 
 Interaction_list* GameObject::get_effect(interaction_e key)

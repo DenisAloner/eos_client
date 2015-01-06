@@ -727,6 +727,37 @@ P_object* Application::command_select_transfer_source(Parameter_destination* par
 	return Result;
 }
 
+Parameter* Application::command_select_body_part()
+{
+	Parameter* Result = nullptr;
+	m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выберите назначение."));
+	bool Exit = false;
+	while (Exit == false)
+	{
+		std::unique_lock<std::mutex> lk(m_message_queue.m_mutex);
+		m_message_queue.m_reader = true;
+		while (!m_message_queue.m_read_message)
+		{
+			m_message_queue.m_condition_variable.wait(lk);
+		}
+		m_message_queue.m_processed_message = true;
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_body_part)
+		{
+			Result = m_message_queue.m_items.front();
+			Exit = true;
+		}
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind_Cancel)
+		{
+			Exit = true;
+		}
+		m_message_queue.m_read_message = false;
+		lk.unlock();
+		m_message_queue.m_condition_variable.notify_one();
+		m_message_queue.m_reader = false;
+	}
+	return Result;
+}
+
 void Application::command_equip(GameObject*& unit, Body_part* part, GameObject*& object)
 {
 	part->m_item = object;
@@ -739,12 +770,17 @@ void Application::command_equip(GameObject*& unit, Body_part* part, GameObject*&
 		{
 			for (auto kind = list->m_effect.begin(); kind != list->m_effect.end(); kind++)
 			{
+				if (kind->first != interaction_e::damage)
+				{
 					unit->add_effect(kind->first, kind->second);
+				}
 			}
 		}
+		unit->m_active_state->m_actions.insert(unit->m_active_state->m_actions.end(), obj_state->m_actions.begin(), obj_state->m_actions.end());
 	}
 	unit->update_interaction();
 	unit->event_update(VoidEventArgs());
+	if (m_GUI->MapViewer->m_player->m_object == unit) { update_action_panel(); }
 }
 
 void Application::command_unequip(GameObject*& unit, Body_part* part, GameObject*& object)
@@ -759,12 +795,20 @@ void Application::command_unequip(GameObject*& unit, Body_part* part, GameObject
 		{
 			for (auto kind = list->m_effect.begin(); kind != list->m_effect.end(); kind++)
 			{
+				if (kind->first != interaction_e::damage)
+				{
 					unit->remove_effect(kind->first, kind->second);
+				}
 			}
+		}
+		for (auto item = obj_state->m_actions.begin(); item != obj_state->m_actions.end(); item++)
+		{
+			unit->m_active_state->m_actions.remove(*item);
 		}
 	}
 	unit->update_interaction();
 	unit->event_update(VoidEventArgs());
+	if (m_GUI->MapViewer->m_player->m_object == unit) { update_action_panel(); }
 }
 
 void Application::console(std::string text)

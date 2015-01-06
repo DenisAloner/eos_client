@@ -4,6 +4,7 @@
 #include <vector>
 #include <list>
 #include "Definiton.h"
+#include "GameObject.h"
 
 class MapCell;
 class GameObject;
@@ -99,6 +100,7 @@ class P_unit_interaction : public Parameter
 public:
 
 	GameObject* m_unit;
+	Body_part* m_unit_body_part;
 	GameObject* m_object;
 
 	P_unit_interaction();

@@ -6,10 +6,11 @@
 #include <string>
 #include "Definiton.h"
 #include "MouseController.h"
-
+#include "GameObject.h"
 
 class Parameter;
 class Application;
+class Body_part;
 
 class Action
 {
@@ -28,7 +29,6 @@ public:
 	virtual std::string get_description(Parameter* parameter) = 0;
 	virtual void interaction_handler();
 };
-
 
 class ActionClass_Move :
 	public Action
@@ -156,7 +156,6 @@ class Action_hit :
 public:
 
 	Action_hit();
-
 	virtual bool check(Parameter* parameter);
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);

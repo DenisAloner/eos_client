@@ -5,7 +5,7 @@ class Object_interaction
 {
 public:
 
-	interaction_message_type_e m_kind;
+	interaction_message_type_e m_interaction_message_type;
 	Object_interaction();
 	virtual bool on_turn() = 0;
 	virtual std::string get_description() = 0;

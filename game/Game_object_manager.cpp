@@ -108,9 +108,24 @@ void GameObjectManager::parser(const std::string& command)
 		break;
 	}
 	case command_e::state:
-	{
-		m_object->m_active_state = new Object_state();
-		m_object->m_active_state->m_state = get_object_state_e(arg[0]);
+	{  
+		object_state_e state = get_object_state_e(arg[0]);
+		switch (state)
+		{
+		case object_state_e::equip:
+		{
+			Object_state_equip* obj_state = new Object_state_equip();
+			obj_state->m_body_part = get_body_part_e(arg[1]);
+			m_object->m_active_state = obj_state;
+			break;
+		}
+		default:
+		{
+			m_object->m_active_state = new Object_state();
+			break;
+		}
+		}
+		m_object->m_active_state->m_state = state;
 		m_object->m_state.push_back(m_object->m_active_state);
 		m_object->m_active_state->m_ai = nullptr;
 		break;
@@ -223,7 +238,21 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	case command_e::add_action:
 	{
-		m_object->m_active_state->m_actions.push_back(Application::instance().m_actions[get_action_e(arg[0])]);
+		action_e action = get_action_e(arg[0]);
+		switch (action)
+		{
+		case action_e::hit:
+		{
+			Action_hit* a = new Action_hit();
+			m_object->m_active_state->m_actions.push_back(a);
+			break;
+		}
+		default:
+		{
+			m_object->m_active_state->m_actions.push_back(Application::instance().m_actions[action]);
+			break;
+		}
+		}
 		break;
 	}
 	case command_e::attribute:
@@ -298,7 +327,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::mem_effect:
 	{
 		Effect* item = new Effect();
-		item->m_kind = interaction_message_type_e::single;
+		item->m_interaction_message_type = interaction_message_type_e::single;
 		item->m_subtype = get_effect_e(arg[0]);
 		item->m_value = std::stoi(arg[1]);
 		m_slot = item;
@@ -307,7 +336,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::mem_slot_timer:
 	{
 		Interaction_timer* item = new Interaction_timer();
-		item->m_kind = interaction_message_type_e::single;
+		item->m_interaction_message_type = interaction_message_type_e::single;
 		item->m_period = std::stoi(arg[0]);
 		item->m_value = m_slot;
 		item->m_turn = 0;
@@ -317,7 +346,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::mem_slot_time:
 	{
 		Interaction_time* item = new Interaction_time();
-		item->m_kind = interaction_message_type_e::single;
+		item->m_interaction_message_type = interaction_message_type_e::single;
 		item->m_turn = std::stoi(arg[0]);
 		item->m_value = m_slot;
 		m_slot = item;
@@ -326,7 +355,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::mem_slot_copyist:
 	{
 		Interaction_copyist* item = new Interaction_copyist();
-		item->m_kind = interaction_message_type_e::single;
+		item->m_interaction_message_type = interaction_message_type_e::single;
 		item->m_subtype = get_interaction_e(arg[0]);
 		item->m_value = m_slot;
 		m_slot = item;
@@ -335,7 +364,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::mem_slot_addon:
 	{
 		Interaction_addon* item = new Interaction_addon();
-		item->m_kind = interaction_message_type_e::single;
+		item->m_interaction_message_type = interaction_message_type_e::single;
 		item->m_subtype = get_interaction_e(arg[0]);
 		item->m_value = m_slot;
 		m_slot = item;
@@ -344,7 +373,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::mem_slot_prefix:
 	{
 		Interaction_prefix* item = new Interaction_prefix();
-		item->m_kind = interaction_message_type_e::single;
+		item->m_interaction_message_type = interaction_message_type_e::single;
 		item->m_subtype = get_effect_prefix_e(arg[0]);
 		item->m_value = m_slot;
 		m_slot = item;
@@ -420,7 +449,6 @@ void GameObjectManager::init()
 	m_to_interaction_e["hunger"] = interaction_e::hunger;
 	m_to_interaction_e["thirst"] = interaction_e::thirst;
 	m_to_interaction_e["poison"] = interaction_e::poison;
-	m_to_interaction_e["action"] = interaction_e::action;
 
 	m_to_effect_e["value"] = effect_e::value;
 	m_to_effect_e["limit"] = effect_e::limit;
@@ -436,7 +464,6 @@ void GameObjectManager::init()
 	m_effect_string[interaction_e::thirst] = "жажда";
 	m_effect_string[interaction_e::tag] = "метки";
 	m_effect_string[interaction_e::poison] = "яд";
-	m_effect_string[interaction_e::action] = "действия";
 
 	m_effect_subtype_string[effect_e::value] = "модификатор значения";
 	m_effect_subtype_string[effect_e::limit] = "модификатор лимита";
@@ -463,6 +490,10 @@ void GameObjectManager::init()
 	m_to_action_e["push"] = action_e::push;
 	m_to_action_e["set_motion_path"] = action_e::set_motion_path;
 	m_to_action_e["turn"] = action_e::turn;
+
+	m_to_body_part_e["head"] = body_part_e::head;
+	m_to_body_part_e["hand"] = body_part_e::hand;
+	m_to_body_part_e["foot"] = body_part_e::foot;
 
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);
@@ -504,20 +535,7 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 	Object_state* state;
 	for (std::list<Object_state*>::iterator item = config->m_state.begin(); item != config->m_state.end(); item++)
 	{
-		state = new Object_state();
-		state->m_state = (*item)->m_state;
-		state->m_layer = (*item)->m_layer;
-		state->m_size = (*item)->m_size;
-		state->m_tile_size = (*item)->m_tile_size;
-		state->m_tile_manager = (*item)->m_tile_manager;
-		state->m_light = (*item)->m_light;
-		state->m_icon = (*item)->m_icon;
-		state->m_actions = (*item)->m_actions;
-		state->m_ai = (*item)->m_ai;
-		for (auto prop = (*item)->m_feature.begin(); prop != (*item)->m_feature.end(); prop++)
-		{
-			state->m_feature[prop->first] = prop->second->clone();
-		}
+		state = (*item)->clone();
 		obj->m_state.push_back(state);
 	}
 	obj->m_active_state = obj->m_state.front();
@@ -618,6 +636,16 @@ action_e GameObjectManager::get_action_e(const std::string& key)
 {
 	auto value = m_to_action_e.find(key);
 	if (value == m_to_action_e.end())
+	{
+		LOG(FATAL) << "Элемент `" << key << "` отсутствует в m_items";
+	}
+	return value->second;
+}
+
+body_part_e GameObjectManager::get_body_part_e(const std::string& key)
+{
+	auto value = m_to_body_part_e.find(key);
+	if (value == m_to_body_part_e.end())
 	{
 		LOG(FATAL) << "Элемент `" << key << "` отсутствует в m_items";
 	}

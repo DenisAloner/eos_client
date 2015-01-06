@@ -16,11 +16,9 @@ Action::Action(void)
 	m_error = "";
 }
 
-
 Action::~Action(void)
 {
 }
-
 
 bool Action::check(Parameter* parameter)
 {
@@ -660,6 +658,18 @@ void Action_hit::interaction_handler()
 	Parameter* result;
 	P_unit_interaction* p = new P_unit_interaction();
 	p->m_unit = Application::instance().m_GUI->MapViewer->m_player->m_object;
+	result = Application::instance().command_select_body_part();
+	if (result)
+	{
+		p->m_unit_body_part = static_cast<Body_part*>(static_cast<P_object_owner*>(result)->m_cell);
+	}
+	else
+	{
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_message_queue.m_busy = false;
+		Application::instance().m_clipboard.m_item = nullptr;
+		return;
+	}
 	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_unit, true));
 	result = Application::instance().command_select_object_on_map();
 	if (result)
@@ -695,13 +705,12 @@ bool Action_hit::check(Parameter* parameter)
 	return true;
 }
 
-
 void Action_hit::perfom(Parameter* parameter)
 {
 	P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
-	if (check(p))
+	if (check(p) && p->m_unit_body_part)
 	{
-		auto reaction = p->m_unit->get_effect(interaction_e::damage);
+		auto reaction = p->m_unit_body_part->m_item->get_effect(interaction_e::damage);
 		if (reaction)
 		{
 			Object_interaction* msg = reaction->clone();

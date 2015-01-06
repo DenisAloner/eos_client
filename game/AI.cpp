@@ -281,6 +281,7 @@ void AI::create()
 			P_unit_interaction* p = new P_unit_interaction();
 			p->m_unit = m_object;
 			p->m_object = goal;
+			p->m_unit_body_part = nullptr;
 			Application::instance().m_action_manager->add(p->m_unit, new GameTask(Application::instance().m_actions[action_e::hit], p));
 			return;
 		}

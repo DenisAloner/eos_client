@@ -46,12 +46,6 @@ mem_effect value,-10
 mem_slot_prefix physical_damage
 mem_slot_copyist health
 add_slot damage
-mem_effect value,-10
-mem_slot_prefix poison_damage
-mem_slot_copyist health
-mem_slot_time 5
-mem_slot_addon buff
-add_slot damage
 state dead
 size 1 2 0
 tile_manager_single elf_corpse
@@ -184,7 +178,7 @@ tile_manager_single health_potion
 attribute pick_able
 
 object sword
-state equip
+state equip,hand
 add_label sword
 size 1 1 1
 icon sword
@@ -198,6 +192,12 @@ mem_slot_addon strength
 add_slot damage
 mem_effect value,1
 add_slot strength
+mem_effect value,-10
+mem_slot_prefix poison_damage
+mem_slot_copyist health
+mem_slot_time 5
+mem_slot_addon buff
+add_slot damage
 
 object wall
 state alive

@@ -2,12 +2,10 @@
 
 Object_interaction::Object_interaction()
 {
-
 }
 
 Interaction_slot::Interaction_slot()
 {
-
 }
 
 void Object_interaction::apply_effect(GameObject* unit, Object_interaction* object)
@@ -27,7 +25,7 @@ std::string Interaction_copyist::get_description()
 Object_interaction* Interaction_copyist::clone()
 {
 	Interaction_copyist* effect = new Interaction_copyist();
-	effect->m_kind = m_kind;
+	effect->m_interaction_message_type = m_interaction_message_type;
 	effect->m_subtype = m_subtype;
 	effect->m_value = m_value->clone();
 	return effect;
@@ -45,7 +43,7 @@ bool Effect::on_turn()
 Object_interaction* Effect::clone()
 {
 	Effect* effect = new Effect();
-	effect->m_kind = m_kind;
+	effect->m_interaction_message_type = m_interaction_message_type;
 	effect->m_subtype = m_subtype;
 	effect->m_value = m_value;
 	return effect;
@@ -86,7 +84,7 @@ void Effect::apply_effect(GameObject* unit, Object_interaction* object)
 
 Interaction_list::Interaction_list()
 {
-	m_kind = interaction_message_type_e::list;
+	m_interaction_message_type = interaction_message_type_e::list;
 }
 
 bool Interaction_list::on_turn()
@@ -128,7 +126,7 @@ Interaction_list* Interaction_list::clone()
 
 Tag_list::Tag_list()
 {
-	m_kind = interaction_message_type_e::list;
+	m_interaction_message_type = interaction_message_type_e::list;
 }
 
 Tag_list* Tag_list::clone()
@@ -149,7 +147,7 @@ void Parameter_list::update_list(Interaction_list* list)
 	Interaction_list* list_item;
 	for (auto current = list->m_effect.begin(); current != list->m_effect.end(); current++)
 	{
-		switch ((*current)->m_kind)
+		switch ((*current)->m_interaction_message_type)
 		{
 		case interaction_message_type_e::list:
 		{
@@ -280,7 +278,7 @@ std::string Interaction_timer::get_description()
 Object_interaction* Interaction_timer::clone()
 {
 	Interaction_timer* effect = new Interaction_timer();
-	effect->m_kind = m_kind;
+	effect->m_interaction_message_type = m_interaction_message_type;
 	effect->m_turn = m_turn;
 	effect->m_period = m_period;
 	effect->m_value = m_value->clone();
@@ -333,7 +331,7 @@ std::string Interaction_time::get_description()
 Object_interaction* Interaction_time::clone()
 {
 	Interaction_time* effect = new Interaction_time();
-	effect->m_kind = m_kind;
+	effect->m_interaction_message_type = m_interaction_message_type;
 	effect->m_turn = m_turn;
 	effect->m_value = m_value->clone();
 	return effect;
@@ -403,7 +401,7 @@ std::string Interaction_addon::get_description()
 Object_interaction* Interaction_addon::clone()
 {
 	Interaction_addon* effect = new Interaction_addon();
-	effect->m_kind = m_kind;
+	effect->m_interaction_message_type = m_interaction_message_type;
 	effect->m_subtype = m_subtype;
 	effect->m_value = m_value->clone();
 	return effect;
@@ -520,3 +518,4 @@ void ObjectTag::Purification_from_poison::apply_effect(GameObject* unit, Object_
 	}
 	}
 }
+

@@ -68,7 +68,6 @@ public:
 	int m_fov_radius;
 	std::function<bool(GameObject*)> m_fov_qualifier;
 	std::function<bool(GameObject*)> m_path_qualifier;
-
 };
 
 class Object_state
@@ -91,8 +90,17 @@ public:
 
 	virtual Action* find_action(action_e kind);
 	virtual void set_tile_size();
-
 	Object_state();
+	virtual Object_state* clone();
+};
+
+class Object_state_equip :public Object_state
+{
+public:
+
+	body_part_e m_body_part;
+	Object_state_equip();
+	virtual Object_state* clone();
 
 };
 

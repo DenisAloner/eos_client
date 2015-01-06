@@ -197,8 +197,7 @@ enum class interaction_e
 	hunger,
 	thirst,
 	tag,
-	poison,
-	action
+	poison
 };
 
 enum class effect_e
