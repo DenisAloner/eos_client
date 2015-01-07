@@ -442,6 +442,7 @@ void GameObjectManager::init()
 	m_to_object_state_e["off"] = object_state_e::off;
 	m_to_object_state_e["equip"] = object_state_e::equip;
 
+	m_to_interaction_e["total_damage"] = interaction_e::total_damage;
 	m_to_interaction_e["damage"] = interaction_e::damage;
 	m_to_interaction_e["buff"] = interaction_e::buff;
 	m_to_interaction_e["health"] = interaction_e::health;
@@ -456,6 +457,7 @@ void GameObjectManager::init()
 	m_to_object_attribute_e["pass_able"] = object_attribute_e::pass_able;
 	m_to_object_attribute_e["pick_able"] = object_attribute_e::pick_able;
 
+	m_effect_string[interaction_e::total_damage] = "общий дополнительный урон";
 	m_effect_string[interaction_e::damage] = "урон";
 	m_effect_string[interaction_e::buff] = "баффы";
 	m_effect_string[interaction_e::health] = "здоровье";

@@ -710,7 +710,13 @@ void Action_hit::perfom(Parameter* parameter)
 	P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
 	if (check(p) && p->m_unit_body_part)
 	{
-		auto reaction = p->m_unit_body_part->m_item->get_effect(interaction_e::damage);
+		auto reaction = p->m_unit->get_effect(interaction_e::total_damage);
+		if (reaction)
+		{
+			Object_interaction* msg = reaction->clone();
+			msg->apply_effect(p->m_object, nullptr);
+		}
+		reaction = p->m_unit_body_part->m_item->get_effect(interaction_e::damage);
 		if (reaction)
 		{
 			Object_interaction* msg = reaction->clone();

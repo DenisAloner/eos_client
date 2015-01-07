@@ -190,6 +190,7 @@ enum class interaction_message_type_e
 
 enum class interaction_e
 {
+	total_damage,
 	damage,
 	buff,
 	health,
