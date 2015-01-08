@@ -2,6 +2,7 @@
 #include "game/Action.h"
 #include "log.h"
 
+Object_state_generic::Object_state_generic(){};
 
 Object_state::Object_state()
 {
@@ -506,20 +507,4 @@ Object_feature* Interaction_feature::clone()
 		result->m_effect[item->first] = item->second->clone();
 	}
 	return result;
-}
-
-Object_parameter_modifier::Object_parameter_modifier()
-{
-}
-
-Object_parameter_modifier_single::Object_parameter_modifier_single(int value = 0, int duration = 0) :m_value(value), m_duration(duration)
-{
-}
-
-Object_parameter_modifier_list::Object_parameter_modifier_list()
-{
-}
-
-object_parameter_t::object_parameter_t(int value = 0, int limit = 0) : m_value(value), m_limit(limit)
-{
 }

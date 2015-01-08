@@ -70,7 +70,17 @@ public:
 	std::function<bool(GameObject*)> m_path_qualifier;
 };
 
-class Object_state
+class Object_state_generic
+{
+public:
+
+	std::list<Action*> m_actions;
+	std::map<object_feature_e, Object_feature*> m_feature;
+
+	Object_state_generic();
+};
+
+class Object_state : public Object_state_generic
 {
 public:
 
@@ -83,9 +93,6 @@ public:
 	light_t* m_light;
 	GLuint m_icon;
 
-	std::list<Action*> m_actions;
-	std::map<object_feature_e,Object_feature*> m_feature;
-	
 	AI_configuration* m_ai;
 
 	virtual Action* find_action(action_e kind);
@@ -198,6 +205,7 @@ class Body_part : public Inventory_cell
 {
 public:
 
+	Object_state_generic* m_object_state;
 	body_part_e m_part_kind;
 	std::string m_name;
 	Body_part(GameObject* item = nullptr) :Inventory_cell(item){ m_kind = entity_e::body_part; };
@@ -223,46 +231,6 @@ public:
 	Attribute_feature();
 	Object_feature* clone();
 };
-
-class Object_parameter_modifier
-{
-public:
-	Object_parameter_modifier();
-};
-
-class Object_parameter_modifier_single: public Object_parameter_modifier
-{
-public:
-	int m_value;
-	int m_duration;
-	Object_parameter_modifier_single(int value, int duration);
-};
-
-class Object_parameter_modifier_list : public Object_parameter_modifier
-{
-public:
-	std::list<Object_parameter_modifier*> m_item;
-	Object_parameter_modifier_list();
-};
-
-class object_parameter_t
-{
-public:
-	int m_value;
-	int m_limit;
-	Object_parameter_modifier_list m_modifier;
-	object_parameter_t(int value, int limit);
-};
-
-//class Parameter_feature : public Object_feature
-//{
-//public:
-//
-//	std::map<object_parameter_e, object_parameter_t > m_parameter;
-//
-//	Parameter_feature();
-//	Object_feature* clone();
-//};
 
 class Interaction_feature : public Object_feature
 {
