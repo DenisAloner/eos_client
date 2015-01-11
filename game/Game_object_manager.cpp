@@ -241,15 +241,15 @@ void GameObjectManager::parser(const std::string& command)
 		action_e action = get_action_e(arg[0]);
 		switch (action)
 		{
-		case action_e::hit:
-		{
-			Action_hit* a = new Action_hit();
-			m_object->m_active_state->m_actions.push_back(a);
-			break;
-		}
+		//case action_e::hit:
+		//{
+		//	Action_hit* a = new Action_hit();
+		//	m_object->m_active_state->m_actions.push_back(a);
+		//	break;
+		//}
 		default:
 		{
-			m_object->m_active_state->m_actions.push_back(Application::instance().m_actions[action]);
+			m_object->add_effect(interaction_e::action, Application::instance().m_actions[action]);
 			break;
 		}
 		}
@@ -450,6 +450,7 @@ void GameObjectManager::init()
 	m_to_interaction_e["hunger"] = interaction_e::hunger;
 	m_to_interaction_e["thirst"] = interaction_e::thirst;
 	m_to_interaction_e["poison"] = interaction_e::poison;
+	m_to_interaction_e["action"] = interaction_e::action;
 
 	m_to_effect_e["value"] = effect_e::value;
 	m_to_effect_e["limit"] = effect_e::limit;
@@ -466,6 +467,7 @@ void GameObjectManager::init()
 	m_effect_string[interaction_e::thirst] = "жажда";
 	m_effect_string[interaction_e::tag] = "метки";
 	m_effect_string[interaction_e::poison] = "яд";
+	m_effect_string[interaction_e::action] = "действия";
 
 	m_effect_subtype_string[effect_e::value] = "модификатор значения";
 	m_effect_subtype_string[effect_e::limit] = "модификатор лимита";
@@ -552,7 +554,7 @@ void GameObjectManager::update_buff()
 	Object_interaction* e;
 	for (auto object = m_objects.begin(); object != m_objects.end(); object++)
 	{
-		list = (*object)->get_effect(interaction_e::buff);
+		list =static_cast<Interaction_list*>((*object)->get_effect(interaction_e::buff));
 		if (list)
 		{
 			for (auto buff = list->m_effect.begin(); buff != list->m_effect.end();)

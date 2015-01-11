@@ -6,11 +6,11 @@
 #include "Definiton.h"
 #include "GameObject.h"
 
-class MapCell;
-class GameObject;
 class Game_object_owner;
+class MapCell;
 class GameMap;
-class Inventory_cell;
+class Body_part;
+class Action;
 
 class Parameter
 {

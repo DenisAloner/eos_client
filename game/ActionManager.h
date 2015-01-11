@@ -9,6 +9,7 @@
 class Parameter;
 class Action;
 class GameObject;
+class Action;
 
 class GameTask
 {

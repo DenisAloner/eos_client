@@ -11,10 +11,9 @@
 #include <vector>
 #include <map>
 #include "Effect.h"
+#include "Action.h"
 
 class Object_feature;
-class Game_object_owner;
-class Action;
 class Application;
 class TileManager;
 class GameObject;
@@ -24,6 +23,7 @@ class Interaction_list;
 class Parameter_list;
 class Tag_list;
 struct object_parameter_t;
+class Action;
 
 struct label_t
 {
@@ -74,7 +74,7 @@ class Object_state_generic
 {
 public:
 
-	std::list<Action*> m_actions;
+	//std::list<Action*> m_actions;
 	std::map<object_feature_e, Object_feature*> m_feature;
 
 	Object_state_generic();
@@ -95,7 +95,7 @@ public:
 
 	AI_configuration* m_ai;
 
-	virtual Action* find_action(action_e kind);
+	//virtual Action* find_action(action_e kind);
 	virtual void set_tile_size();
 	Object_state();
 	virtual Object_state* clone();
@@ -137,14 +137,14 @@ public:
 	void add_parameter(interaction_e key, int value, int limit);
 	void add_to_parameter(interaction_e key, Object_interaction* item);
 	void add_effect(interaction_e key, Object_interaction* item);
-	void add_tag(Object_interaction* item);
+	Interaction_list* get_effect(interaction_e key);
 	void remove_effect(interaction_e key, Object_interaction* item);
 	Object_feature* get_feature(object_feature_e key);
 	bool get_stat(object_attribute_e key);
-	Interaction_list* get_effect(interaction_e key);
 	Parameter_list* get_parameter(interaction_e key);
 	MapCell* cell();
 	void update_interaction();
+	Interaction_list* feature(interaction_e key);
 
 };
 

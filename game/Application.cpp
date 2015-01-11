@@ -356,6 +356,16 @@ void Application::initialize()
 	m_ready = true;
 }
 
+void Application::get_action_predicat(Object_interaction* object)
+{
+	if (object->m_interaction_message_type == interaction_message_type_e::action)
+	{
+		GUI_ActionButton* ActionButton = new GUI_ActionButton();
+		ActionButton->m_action = static_cast<Action*>(object);
+		m_GUI->m_action_panel->add_item_control(ActionButton);
+	}
+}
+
 void Application::update_action_panel()
 {
 	GUI_ActionButton* ActionButton;
@@ -371,13 +381,13 @@ void Application::update_action_panel()
 		ActionButton->m_action = (*item);
 		m_GUI->m_action_panel->add_item_control(ActionButton);
 	}
-	player_action_list= m_GUI->MapViewer->m_player->m_object->m_active_state->m_actions;
-	for (auto item = player_action_list.begin(); item != player_action_list.end(); item++)
+	//Action_feature* list = static_cast<Action_feature*>(m_GUI->MapViewer->m_player->m_object->get_feature(object_feature_e::action_feature));
+	Action_list* l = static_cast<Action_list*>(m_GUI->MapViewer->m_player->m_object->get_effect(interaction_e::action));
+	/*for (auto item = l->m_effect.begin(); item != l->m_effect.end(); item++)
 	{
-		ActionButton = new GUI_ActionButton();
-		ActionButton->m_action = (*item);
-		m_GUI->m_action_panel->add_item_control(ActionButton);
-	}
+
+	}*/
+	l->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));
 }
 
 void Application::start()
@@ -776,7 +786,6 @@ void Application::command_equip(GameObject*& unit, Body_part* part, GameObject*&
 				}
 			}
 		}
-		unit->m_active_state->m_actions.insert(unit->m_active_state->m_actions.end(), obj_state->m_actions.begin(), obj_state->m_actions.end());
 	}
 	unit->update_interaction();
 	unit->event_update(VoidEventArgs());
@@ -801,10 +810,6 @@ void Application::command_unequip(GameObject*& unit, Body_part* part, GameObject
 				}
 			}
 		}
-		for (auto item = obj_state->m_actions.begin(); item != obj_state->m_actions.end(); item++)
-		{
-			unit->m_active_state->m_actions.remove(*item);
-		}
 	}
 	unit->update_interaction();
 	unit->event_update(VoidEventArgs());
@@ -815,3 +820,4 @@ void Application::console(std::string text)
 {
 	m_GUI->DescriptionBox->add_item_control(new GUI_Text(text,new GUI_TextFormat(8,17,RGBA_t(1.0,1.0,1.0,1.0))));
 }
+

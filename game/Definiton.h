@@ -3,6 +3,7 @@
 
 #include <functional>
 #include "graphics/gl.hpp"
+#include <list>
 
 
 class GUI_Object;
@@ -186,6 +187,7 @@ enum class interaction_message_type_e
 {
 	single,
 	list,
+	action
 };
 
 enum class interaction_e
@@ -198,7 +200,8 @@ enum class interaction_e
 	hunger,
 	thirst,
 	tag,
-	poison
+	poison,
+	action
 };
 
 enum class effect_e

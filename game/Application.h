@@ -41,6 +41,7 @@ class Parameter_destination;
 class AI_manager;
 class GameObjectManager;
 class Body_part;
+class Object_interaction;
 
 class gui_MessageQueue
 {
@@ -139,6 +140,8 @@ public:
 	void console(std::string text);
 	
 	void PlaySound1();
+
+	void get_action_predicat(Object_interaction* object);
 
 private:
 	std::shared_ptr<std::thread> m_game_thread;

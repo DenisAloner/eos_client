@@ -11,7 +11,6 @@ class Object_interaction;
 class Interaction_slot;
 class Interaction_copyist;
 class Object_tag;
-//class Object_ObjectTag::Poison_resist;
 
 class GameObjectManager
 {
