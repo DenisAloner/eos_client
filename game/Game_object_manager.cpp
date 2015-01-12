@@ -379,6 +379,22 @@ void GameObjectManager::parser(const std::string& command)
 		m_slot = item;
 		break;
 	}
+	case command_e::feature_list:
+	{
+		feature_list_type_e list_type = get_feature_list_type_e(arg[0]);
+		Interaction_list* list = m_object->create_feature_list(list_type, get_interaction_e(arg[1]));
+		switch (list_type)
+		{
+		case feature_list_type_e::parameter:
+			{
+				Parameter_list* parameter_list = static_cast<Parameter_list*>(list);
+				parameter_list->m_basic_value = std::stoi(arg[2]);
+				parameter_list->m_basic_limit = std::stoi(arg[3]);
+				break;
+			}
+		}
+		break;
+	}
 	case command_e::tag:
 	{
 		Object_tag* tag;
@@ -435,6 +451,7 @@ void GameObjectManager::init()
 	m_commands["mem_slot_copyist"] = command_e::mem_slot_copyist;
 	m_commands["mem_slot_addon"] = command_e::mem_slot_addon;
 	m_commands["tag"] = command_e::tag;
+	m_commands["feature_list"] = command_e::feature_list;
 
 	m_to_object_state_e["alive"] = object_state_e::alive;
 	m_to_object_state_e["dead"] = object_state_e::dead;
@@ -451,6 +468,7 @@ void GameObjectManager::init()
 	m_to_interaction_e["thirst"] = interaction_e::thirst;
 	m_to_interaction_e["poison"] = interaction_e::poison;
 	m_to_interaction_e["action"] = interaction_e::action;
+	m_to_interaction_e["tag"] = interaction_e::tag;
 
 	m_to_effect_e["value"] = effect_e::value;
 	m_to_effect_e["limit"] = effect_e::limit;
@@ -498,6 +516,11 @@ void GameObjectManager::init()
 	m_to_body_part_e["head"] = body_part_e::head;
 	m_to_body_part_e["hand"] = body_part_e::hand;
 	m_to_body_part_e["foot"] = body_part_e::foot;
+
+	m_to_feature_list_type_e["action"] = feature_list_type_e::action;
+	m_to_feature_list_type_e["tag"] = feature_list_type_e::tag;
+	m_to_feature_list_type_e["generic"] = feature_list_type_e::generic;
+	m_to_feature_list_type_e["parameter"] = feature_list_type_e::parameter;
 
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);
@@ -650,6 +673,16 @@ body_part_e GameObjectManager::get_body_part_e(const std::string& key)
 {
 	auto value = m_to_body_part_e.find(key);
 	if (value == m_to_body_part_e.end())
+	{
+		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
+	}
+	return value->second;
+}
+
+feature_list_type_e GameObjectManager::get_feature_list_type_e(const std::string& key)
+{
+	auto value = m_to_feature_list_type_e.find(key);
+	if (value == m_to_feature_list_type_e.end())
 	{
 		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
 	}

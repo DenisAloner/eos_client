@@ -21,17 +21,20 @@ tile_manager_map elf_right_01 3 0
 tile_manager_map elf_right_02 3 1
 tile_manager_map elf_right_03 3 2
 tile_manager_map elf_right_04 3 3
+feature_list action,action
 add_action equip
 add_action move
 add_action open
 add_action pick
 add_action push
 add_action turn
+feature_list parameter,health,100,100
+feature_list parameter,strength,8,100
+feature_list parameter,hunger,0,1000
+feature_list parameter,thirst,0,1000
+feature_list generic,buff
+feature_list generic,damage
 property_container Мешок 2 4
-parameter health,100,100
-parameter strength,8,100
-parameter hunger,0,1000
-parameter thirst,0,1000
 property_body head,голова
 property_body hand,левая рука
 property_body hand,правая рука
@@ -54,10 +57,13 @@ state alive
 ai 20 0 0
 size 1 1 1
 tile_manager_single rat_left
+feature_list action,action
 add_action move
-parameter health,100,100
-parameter strength,1,100
-parameter poison,0,100
+feature_list parameter,health,100,100
+feature_list parameter,strength,1,100
+feature_list parameter,poison,0,100
+feature_list generic,damage
+feature_list tag,tag
 mem_effect value,-1
 mem_slot_copyist health
 add_slot damage
@@ -87,10 +93,13 @@ tile_manager_map snake_right_01 3 0
 tile_manager_map snake_right_02 3 1
 tile_manager_map snake_right_03 3 2
 tile_manager_map snake_right_04 3 3
+feature_list action,action
 add_action move
+feature_list parameter,health,100,100
+feature_list parameter,strength,5,100
+feature_list generic,damage
+feature_list tag,tag
 tag poison_resist
-parameter health,100,100
-parameter strength,5,100
 mem_effect value,-1
 mem_slot_copyist health
 add_slot damage
@@ -118,10 +127,13 @@ tile_manager_map slime_right_01 3 0
 tile_manager_map slime_right_02 3 1
 tile_manager_map slime_right_03 3 2
 tile_manager_map slime_right_04 3 3
+feature_list action,action
 add_action move
+feature_list parameter,health,100,100
+feature_list parameter,strength,5,100
+feature_list generic,damage
+feature_list tag,tag
 tag poison_resist
-parameter health,100,100
-parameter strength,5,100
 mem_effect value,-1
 mem_slot_copyist health
 add_slot damage
@@ -149,8 +161,9 @@ tile_manager_map no_tile 3 0
 tile_manager_map no_tile 3 1
 tile_manager_map no_tile 3 2
 tile_manager_map no_tile 3 3
+feature_list action,action
 add_action move
-parameter health,100,100
+feature_list parameter,health,100,100
 
 object ghost
 state alive
@@ -160,7 +173,9 @@ tile_manager_rotating no_tile 0
 tile_manager_rotating ghost_left 1
 tile_manager_rotating no_tile 2
 tile_manager_rotating no_tile 3
-parameter health,100,100
+feature_list action,action
+add_action move
+feature_list parameter,health,100,100
 
 object floor
 state alive
@@ -183,6 +198,10 @@ size 1 1 1
 icon sword
 tile_manager_single sword
 attribute pick_able
+feature_list generic,action
+add_action hit
+feature_list generic,damage
+feature_list generic,strength
 mem_effect value,-50
 mem_slot_copyist health
 add_slot damage
@@ -197,7 +216,6 @@ mem_slot_copyist health
 mem_slot_time 5
 mem_slot_addon buff
 add_slot damage
-add_action hit
 
 object wall
 state alive

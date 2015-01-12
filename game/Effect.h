@@ -80,7 +80,6 @@ public:
 	Parameter_list(interaction_e subtype);
 	virtual std::string get_description();
 	virtual void update();
-	virtual void add(Object_interaction* item);
 	virtual Parameter_list* clone();
 	virtual void description(std::list<std::string>* info, int level);
 

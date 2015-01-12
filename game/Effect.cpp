@@ -221,10 +221,6 @@ std::string Parameter_list::get_description()
 	return result;
 }
 
-void Parameter_list::add(Object_interaction* item)
-{
-}
-
 Parameter_list* Parameter_list::clone()
 {
 	Parameter_list* result = new Parameter_list(m_subtype);

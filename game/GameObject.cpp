@@ -11,6 +11,8 @@ Object_state::Object_state()
 	m_tile_manager = nullptr;
 	m_icon = Application::instance().m_graph->m_no_image;
 	m_ai = nullptr;
+	Interaction_feature* list = new Interaction_feature();
+	m_feature[object_feature_e::interaction_feature] = list;
 }
 
 Object_state* Object_state::clone()
@@ -227,46 +229,36 @@ void GameObject::add_label(const std::string& key)
 	}
 }
 
-Interaction_list* GameObject::feature(interaction_e key)
+Interaction_list* GameObject::create_feature_list(feature_list_type_e key, interaction_e name)
 {
 	Interaction_list* result;
 	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
 	if (list)
 	{
-		auto item = list->m_effect.find(key);
-		if ( item == list->m_effect.end())
+		switch (key)
 		{
-			switch (key)
-			{
-			case interaction_e::total_damage:
-			case interaction_e::damage:
-			case interaction_e::buff:
-			{
-				result = new Interaction_list();
-				break;
-			}
-			case interaction_e::tag: 
-			{
-				result = new Tag_list();
-				break;
-			}
-			case interaction_e::action:
-			{
-				result = new Action_list();
-				break;
-			}
-			default:
-			{
-				result = new Parameter_list(key);
-				break;
-			}
-			}
-			list->m_effect[key] = result;
-		}
-		else 
+		case feature_list_type_e::generic:
 		{
-			result = item->second;
+			result = new Interaction_list();
+			break;
 		}
+		case feature_list_type_e::tag:
+		{
+			result = new Tag_list();
+			break;
+		}
+		case feature_list_type_e::action:
+		{
+			result = new Action_list();
+			break;
+		}
+		case feature_list_type_e::parameter:
+		{
+			result = new Parameter_list(name);
+			break;
+		}
+		}
+		list->m_effect[name] = result;
 	}
 	return result;
 }
@@ -276,17 +268,11 @@ void GameObject::add_effect(interaction_e key, Object_interaction* item)
 	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
 	if (list)
 	{
-		LOG(INFO) << "1";
-		feature(key)->add(item);
-		LOG(INFO) << "2";
-	}
-	else
-	{
-		if (m_active_state)
+		LOG(INFO) << "in";
+		if (list->m_effect.find(key) != list->m_effect.end())
 		{
-			list = new Interaction_feature();
-			m_active_state->m_feature[object_feature_e::interaction_feature] = list;
-			feature(key)->add(item);
+			LOG(INFO) << "out";
+			list->m_effect[key]->add(item);
 		}
 	}
 }
@@ -302,8 +288,6 @@ void GameObject::remove_effect(interaction_e key, Object_interaction* item)
 		}
 	}
 }
-
-
 
 void GameObject::add_parameter(interaction_e key, int value, int limit)
 {

@@ -782,6 +782,7 @@ void Application::command_equip(GameObject*& unit, Body_part* part, GameObject*&
 			{
 				if (kind->first != interaction_e::damage)
 				{
+					LOG(INFO) << "1";
 					unit->add_effect(kind->first, kind->second);
 				}
 			}

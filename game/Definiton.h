@@ -247,4 +247,12 @@ enum class object_tag_e
 	mortal,
 };
 
+enum class feature_list_type_e
+{
+	generic,
+	parameter,
+	tag,
+	action
+};
+
 #endif //DEFINITION_H

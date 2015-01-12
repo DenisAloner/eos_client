@@ -33,6 +33,7 @@ public:
 		tile_manager_rotating,
 		light,
 		add_action,
+		feature_list,
 		attribute,
 		property_container,
 		property_body,
@@ -69,6 +70,7 @@ public:
 	std::map<std::string, effect_prefix_e> m_to_effect_prefix_e;
 	std::map<std::string, action_e> m_to_action_e;
 	std::map<std::string, body_part_e> m_to_body_part_e;
+	std::map<std::string, feature_list_type_e> m_to_feature_list_type_e;
 
 	std::map<interaction_e, std::string> m_effect_string;
 	std::map<effect_e, std::string> m_effect_subtype_string;
@@ -96,6 +98,7 @@ public:
 	effect_prefix_e get_effect_prefix_e(const std::string& key);
 	action_e get_action_e(const std::string& key);
 	body_part_e get_body_part_e(const std::string& key);
+	feature_list_type_e get_feature_list_type_e(const std::string& key);
 
 	void parser(const std::string& command);
 	void init();
