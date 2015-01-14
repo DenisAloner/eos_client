@@ -268,11 +268,26 @@ void GameObject::add_effect(interaction_e key, Object_interaction* item)
 	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
 	if (list)
 	{
-		LOG(INFO) << "in";
 		if (list->m_effect.find(key) != list->m_effect.end())
 		{
-			LOG(INFO) << "out";
 			list->m_effect[key]->add(item);
+		}
+	}
+}
+
+void GameObject::add_from(interaction_e key, Interaction_list* feature)
+{
+	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
+	if (list)
+	{
+		if (list->m_effect.find(key) == list->m_effect.end())
+		{
+			list->m_effect[key] = feature;
+		}
+		else
+		{
+			list->m_effect[key]->add(feature);
+	
 		}
 	}
 }
@@ -285,6 +300,26 @@ void GameObject::remove_effect(interaction_e key, Object_interaction* item)
 		if (list->m_effect.find(key) != list->m_effect.end())
 		{
 			list->m_effect[key]->remove(item);
+		}
+	}
+}
+
+void GameObject::remove_from(interaction_e key, Interaction_list* feature)
+{
+	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
+	if (list)
+	{
+		auto item = list->m_effect.find(key);
+		if ( item == list->m_effect.end())
+		{
+			if (item->second == feature)
+			{
+				list->m_effect.erase(key);
+			}
+			else
+			{
+				list->m_effect[key]->remove(feature);
+			}
 		}
 	}
 }

@@ -145,7 +145,8 @@ public:
 	MapCell* cell();
 	void update_interaction();
 	Interaction_list* create_feature_list(feature_list_type_e key, interaction_e name);
-
+	void add_from(interaction_e key, Interaction_list* feature);
+	void remove_from(interaction_e key, Interaction_list* feature);
 };
 
 class Player

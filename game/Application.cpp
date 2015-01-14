@@ -782,8 +782,8 @@ void Application::command_equip(GameObject*& unit, Body_part* part, GameObject*&
 			{
 				if (kind->first != interaction_e::damage)
 				{
-					LOG(INFO) << "1";
-					unit->add_effect(kind->first, kind->second);
+					//unit->add_effect(kind->first, kind->second);
+					unit->add_from(kind->first, static_cast<Interaction_list*>(kind->second));
 				}
 			}
 		}
@@ -807,7 +807,8 @@ void Application::command_unequip(GameObject*& unit, Body_part* part, GameObject
 			{
 				if (kind->first != interaction_e::damage)
 				{
-					unit->remove_effect(kind->first, kind->second);
+					//unit->remove_effect(kind->first, kind->second);
+					unit->remove_from(kind->first, static_cast<Interaction_list*>(kind->second));
 				}
 			}
 		}
