@@ -252,7 +252,8 @@ enum class feature_list_type_e
 	generic,
 	parameter,
 	tag,
-	action
+	action,
+	parts
 };
 
 #endif //DEFINITION_H

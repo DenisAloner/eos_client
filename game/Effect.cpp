@@ -151,6 +151,21 @@ Tag_list* Tag_list::clone()
 	return result;
 }
 
+Parts_list::Parts_list()
+{
+	m_interaction_message_type = interaction_message_type_e::list;
+}
+
+Parts_list* Parts_list::clone()
+{
+	Parts_list* result = new Parts_list();
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		result->m_effect.push_back((*item)->clone());
+	}
+	return result;
+}
+
 Parameter_list::Parameter_list(interaction_e subtype) :m_subtype(subtype){};
 
 void Parameter_list::update_list(Interaction_list* list)
@@ -483,7 +498,7 @@ ObjectTag::Mortal* ObjectTag::Mortal::clone()
 
 void ObjectTag::Mortal::apply_effect(GameObject* unit, Object_interaction* object)
 {
-	/*Interaction_prefix* prefix = static_cast<Interaction_prefix*>(object);
+	Interaction_prefix* prefix = static_cast<Interaction_prefix*>(object);
 	switch (prefix->m_subtype)
 	{
 	case effect_prefix_e::parameter_change:
@@ -498,7 +513,7 @@ void ObjectTag::Mortal::apply_effect(GameObject* unit, Object_interaction* objec
 		}
 		break;
 	}
-	}*/
+	}
 }
 
 ObjectTag::Purification_from_poison::Purification_from_poison() :Object_tag(object_tag_e::purification_from_poison){};

@@ -37,7 +37,6 @@ public:
 		attribute,
 		property_container,
 		property_body,
-		parameter,
 		mem_slot_timer,
 		mem_effect,
 		mem_slot_time,

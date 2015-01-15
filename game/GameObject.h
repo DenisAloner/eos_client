@@ -134,8 +134,6 @@ public:
 	Object_state* get_state(object_state_e state);
 	void add_attribute(object_attribute_e key);
 	void add_label(const std::string& key);
-	void add_parameter(interaction_e key, int value, int limit);
-	void add_to_parameter(interaction_e key, Object_interaction* item);
 	void add_effect(interaction_e key, Object_interaction* item);
 	Interaction_list* get_effect(interaction_e key);
 	void remove_effect(interaction_e key, Object_interaction* item);

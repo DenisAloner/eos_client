@@ -314,11 +314,6 @@ void GameObjectManager::parser(const std::string& command)
 		prop->m_item.push_back(part);
 		break;
 	}
-	case command_e::parameter:
-	{
-		m_object->add_parameter(get_interaction_e(arg[0]), std::stoi(arg[1]), std::stoi(arg[2]));
-		break;
-	}
 	case command_e::add_slot:
 	{
 		m_object->add_effect(get_interaction_e(arg[0]), m_slot);
@@ -442,7 +437,6 @@ void GameObjectManager::init()
 	m_commands["property_body"] = command_e::property_body;
 	m_commands["add_slot"] = command_e::add_slot;
 	m_commands["attribute"] = command_e::attribute;
-	m_commands["parameter"] = command_e::parameter;
 	m_commands["state"] = command_e::state;
 	m_commands["mem_effect"] = command_e::mem_effect;
 	m_commands["mem_slot_timer"] = command_e::mem_slot_timer;
@@ -521,6 +515,7 @@ void GameObjectManager::init()
 	m_to_feature_list_type_e["tag"] = feature_list_type_e::tag;
 	m_to_feature_list_type_e["generic"] = feature_list_type_e::generic;
 	m_to_feature_list_type_e["parameter"] = feature_list_type_e::parameter;
+	m_to_feature_list_type_e["parts"] = feature_list_type_e::parts;
 
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);

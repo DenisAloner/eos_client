@@ -257,6 +257,11 @@ Interaction_list* GameObject::create_feature_list(feature_list_type_e key, inter
 			result = new Parameter_list(name);
 			break;
 		}
+		case feature_list_type_e::parts:
+		{
+			result = new Parts_list();
+			break;
+		}
 		}
 		list->m_effect[name] = result;
 	}
@@ -320,53 +325,6 @@ void GameObject::remove_from(interaction_e key, Interaction_list* feature)
 			{
 				list->m_effect[key]->remove(feature);
 			}
-		}
-	}
-}
-
-void GameObject::add_parameter(interaction_e key, int value, int limit)
-{
-	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
-	if (list)
-	{
-		Parameter_list* pl = new Parameter_list(key);
-		pl->m_basic_value = value;
-		pl->m_basic_limit = limit;
-		list->m_effect[key] = pl;
-	}
-	else
-	{
-		if (m_active_state)
-		{
-			list = new Interaction_feature();
-			Parameter_list* pl = new Parameter_list(key);
-			pl->m_basic_value = value;
-			pl->m_basic_limit = limit;
-			list->m_effect[key] = pl;
-			m_active_state->m_feature[object_feature_e::interaction_feature] = list;
-		}
-	}
-}
-
-void GameObject::add_to_parameter(interaction_e key, Object_interaction* item)
-{
-	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
-	if (list)
-	{
-		if (list->m_effect.find(key) == list->m_effect.end())
-		{
-			list->m_effect[key] = new Parameter_list(key);
-		}
-		static_cast<Parameter_list*>(list->m_effect[key])->m_effect.push_back(item);
-	}
-	else
-	{
-		if (m_active_state)
-		{
-			list = new Interaction_feature();
-			list->m_effect[key] = new Parameter_list(key);
-			static_cast<Parameter_list*>(list->m_effect[key])->m_effect.push_back(item);
-			m_active_state->m_feature[object_feature_e::interaction_feature] = list;
 		}
 	}
 }

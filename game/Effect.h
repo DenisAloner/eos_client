@@ -96,6 +96,15 @@ public:
 	//virtual void apply_effect(GameObject* unit, Object_interaction* object);
 };
 
+class  Parts_list :public  Interaction_list
+{
+public:
+
+	Parts_list();
+	virtual Parts_list* clone();
+
+};
+
 class Interaction_slot :public Object_interaction
 {
 public:
