@@ -5,6 +5,7 @@
 #include "graphics/gl.hpp"
 #include <list>
 
+class GameObject;
 
 class GUI_Object;
 
@@ -201,7 +202,8 @@ enum class interaction_e
 	thirst,
 	tag,
 	poison,
-	action
+	action,
+	body
 };
 
 enum class effect_e
@@ -254,6 +256,22 @@ enum class feature_list_type_e
 	tag,
 	action,
 	parts
+};
+
+class Object_interaction
+{
+public:
+
+	typedef std::function<void(Object_interaction*)> predicat;
+
+	interaction_message_type_e m_interaction_message_type;
+	Object_interaction(){};
+	virtual bool on_turn() = 0;
+	virtual std::string get_description() = 0;
+	virtual Object_interaction* clone() = 0;
+	virtual void description(std::list<std::string>* info, int level) = 0;
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	virtual void do_predicat(predicat func);
 };
 
 #endif //DEFINITION_H

@@ -34,6 +34,9 @@ feature_list parameter,hunger,0,1000
 feature_list parameter,thirst,0,1000
 feature_list generic,buff
 feature_list generic,damage
+feature_list parts,body
+mem_part foot,щупальце
+add_slot body
 property_container Мешок 2 4
 property_body head,голова
 property_body hand,левая рука

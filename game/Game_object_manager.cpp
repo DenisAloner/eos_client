@@ -319,6 +319,15 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->add_effect(get_interaction_e(arg[0]), m_slot);
 		break;
 	}
+	case command_e::mem_part:
+	{
+		Object_part* item = new Object_part();
+		item->m_interaction_message_type = interaction_message_type_e::single;
+		item->m_part_kind = get_body_part_e(arg[0]);
+		item->m_name = arg[1];
+		m_slot = item;
+		break;
+	}
 	case command_e::mem_effect:
 	{
 		Effect* item = new Effect();
@@ -439,6 +448,7 @@ void GameObjectManager::init()
 	m_commands["attribute"] = command_e::attribute;
 	m_commands["state"] = command_e::state;
 	m_commands["mem_effect"] = command_e::mem_effect;
+	m_commands["mem_part"] = command_e::mem_part;
 	m_commands["mem_slot_timer"] = command_e::mem_slot_timer;
 	m_commands["mem_slot_time"] = command_e::mem_slot_time;
 	m_commands["mem_slot_prefix"] = command_e::mem_slot_prefix;
@@ -463,6 +473,7 @@ void GameObjectManager::init()
 	m_to_interaction_e["poison"] = interaction_e::poison;
 	m_to_interaction_e["action"] = interaction_e::action;
 	m_to_interaction_e["tag"] = interaction_e::tag;
+	m_to_interaction_e["body"] = interaction_e::body;
 
 	m_to_effect_e["value"] = effect_e::value;
 	m_to_effect_e["limit"] = effect_e::limit;
@@ -480,6 +491,7 @@ void GameObjectManager::init()
 	m_effect_string[interaction_e::tag] = "метки";
 	m_effect_string[interaction_e::poison] = "яд";
 	m_effect_string[interaction_e::action] = "действия";
+	m_effect_string[interaction_e::body] = "тело";
 
 	m_effect_subtype_string[effect_e::value] = "модификатор значения";
 	m_effect_subtype_string[effect_e::limit] = "модификатор лимита";

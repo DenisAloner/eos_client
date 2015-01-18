@@ -2,7 +2,11 @@
 #include "game/Action.h"
 #include "log.h"
 
-Object_state_generic::Object_state_generic(){};
+Object_state_generic::Object_state_generic()
+{
+	Interaction_feature* list = new Interaction_feature();
+	m_feature[object_feature_e::interaction_feature] = list;
+};
 
 Object_state::Object_state()
 {
@@ -11,8 +15,6 @@ Object_state::Object_state()
 	m_tile_manager = nullptr;
 	m_icon = Application::instance().m_graph->m_no_image;
 	m_ai = nullptr;
-	Interaction_feature* list = new Interaction_feature();
-	m_feature[object_feature_e::interaction_feature] = list;
 }
 
 Object_state* Object_state::clone()
@@ -489,4 +491,40 @@ Object_feature* Interaction_feature::clone()
 		result->m_effect[item->first] = item->second->clone();
 	}
 	return result;
+}
+
+Object_part::Object_part(GameObject* item) :Inventory_cell(item)
+{
+	m_kind = entity_e::body_part;
+	m_object_state = new Object_state_generic();
+};
+
+Object_part* Object_part::clone()
+{
+	Object_part* effect = new Object_part();
+	effect->m_interaction_message_type = m_interaction_message_type;
+	effect->m_kind = m_kind;
+	effect->m_name = m_name;
+	effect->m_part_kind = m_part_kind;
+	effect->m_item = nullptr;
+	for (auto prop = m_object_state->m_feature.begin(); prop != m_object_state->m_feature.end(); prop++)
+	{
+		effect->m_object_state->m_feature[prop->first] = prop->second->clone();
+	}
+	return effect;
+}
+
+bool Object_part::on_turn()
+{
+	return false;
+}
+
+std::string Object_part::get_description()
+{
+	return "slot";
+}
+
+void Object_part::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "<" + m_name + ">:");
 }

@@ -241,4 +241,18 @@ public:
 	Object_feature* clone();
 };
 
+class Object_part : public Inventory_cell, public Object_interaction
+{
+public:
+
+	Object_state_generic* m_object_state;
+	body_part_e m_part_kind;
+	std::string m_name;
+	Object_part(GameObject* item=nullptr);
+	virtual bool on_turn();
+	virtual std::string get_description();
+	virtual Object_part* clone();
+	virtual void description(std::list<std::string>* info, int level);
+};
+
 #endif //GAMEOBJECT_H
