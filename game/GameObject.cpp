@@ -454,20 +454,20 @@ AI_manager::AI_manager()
 	m_path_qualifiers.push_back([](GameObject* object)->bool{return !object->get_stat(object_attribute_e::pass_able) && object->m_name != "wall"; });
 }
 
-Property_body::Property_body() : Object_feature(object_feature_e::body)
-{
-
-}
-
-Object_feature* Property_body::clone()
-{
-	Property_body* result = new Property_body();
-	for (auto part = m_item.begin(); part != m_item.end(); part++)
-	{
-		result->m_item.push_back((*part));
-	}
-	return result;
-}
+//Property_body::Property_body() : Object_feature(object_feature_e::body)
+//{
+//
+//}
+//
+//Object_feature* Property_body::clone()
+//{
+//	Property_body* result = new Property_body();
+//	for (auto part = m_item.begin(); part != m_item.end(); part++)
+//	{
+//		result->m_item.push_back((*part));
+//	}
+//	return result;
+//}
 
 Attribute_feature::Attribute_feature() : Object_feature(object_feature_e::attribute_feature)
 {

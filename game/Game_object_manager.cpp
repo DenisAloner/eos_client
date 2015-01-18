@@ -276,44 +276,6 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->m_active_state->m_feature[object_feature_e::container] = new Property_Container(x, y, name);
 		break;
 	}
-	case command_e::property_body:
-	{
-		std::size_t pos = 0;
-		Body_part part;
-		found = args.find(",");
-		auto kind = m_parameters.find(args.substr(0, found));
-		if (kind != m_parameters.end())
-		{
-			switch (kind->second)
-			{
-			case parameter_e::head:
-			{
-				part.m_part_kind = body_part_e::head;
-				break;
-			}
-			case parameter_e::hand:
-			{
-				part.m_part_kind = body_part_e::hand;
-				break;
-			}
-			case parameter_e::foot:
-			{
-				part.m_part_kind = body_part_e::foot;
-				break;
-			}
-			}
-		}
-		pos = found + 1;
-		part.m_name = args.substr(pos);
-		auto prop =static_cast<Property_body*>(m_object->get_feature(object_feature_e::body));
-		if (!prop)
-		{
-			prop = new Property_body();
-			m_object->m_active_state->m_feature[object_feature_e::body] = prop;
-		}
-		prop->m_item.push_back(part);
-		break;
-	}
 	case command_e::add_slot:
 	{
 		m_object->add_effect(get_interaction_e(arg[0]), m_slot);
@@ -443,7 +405,6 @@ void GameObjectManager::init()
 	m_commands.insert(std::pair<std::string, command_e>("light", command_e::light));
 	m_commands["add_action"] = command_e::add_action;
 	m_commands.insert(std::pair<std::string, command_e>("property_container", command_e::property_container));
-	m_commands["property_body"] = command_e::property_body;
 	m_commands["add_slot"] = command_e::add_slot;
 	m_commands["attribute"] = command_e::attribute;
 	m_commands["state"] = command_e::state;

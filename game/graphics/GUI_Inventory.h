@@ -6,10 +6,10 @@
 #include "GameObject.h"
 
 class Property_Container;
-class Property_body;
+class Parts_list;
 class Inventory_cell;
 class GameObject;
-class Body_part;
+class Object_part;
 
 class GUI_Inventory;
 
@@ -52,10 +52,10 @@ class GUI_body_cell :
 {
 public:
 
-	Body_part* m_item;
+	Object_part* m_item;
 	GUI_Body* m_owner;
 
-	GUI_body_cell(int width, int height, Body_part* item, GUI_Body* owner);
+	GUI_body_cell(int width, int height, Object_part* item, GUI_Body* owner);
 
 	virtual void render(GraphicalController* Graph, int px, int py);
 	virtual void on_mouse_move(MouseEventArgs const& e);
@@ -69,7 +69,7 @@ class GUI_Body :
 public:
 
 	bool m_already_active;
-	GUI_Body(Property_body* property);
+	GUI_Body(Parts_list* property);
 
 	//virtual void Render(GraphicalController* Graph);
 	virtual void add_item_control(GUI_Object* object);

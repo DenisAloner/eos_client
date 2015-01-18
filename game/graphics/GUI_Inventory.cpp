@@ -105,7 +105,7 @@ GUI_Inventory::~GUI_Inventory()
 {
 }
 
-GUI_body_cell::GUI_body_cell(int width, int height, Body_part* item, GUI_Body* owner) : m_item(item), m_owner(owner)
+GUI_body_cell::GUI_body_cell(int width, int height, Object_part* item, GUI_Body* owner) : m_item(item), m_owner(owner)
 {
 	m_size.w = width;
 	m_size.h = height;
@@ -179,14 +179,14 @@ void GUI_body_cell::on_mouse_down(MouseEventArgs const& e)
 }
 
 
-GUI_Body::GUI_Body(Property_body* property) :GUI_Container(0, 0, 192, 4 * 64)
+GUI_Body::GUI_Body(Parts_list* property) :GUI_Container(0, 0, 192, 4 * 64)
 {
 	m_already_active = false;
 	GUI_body_cell* item;
 	int i = 0;
-	for (auto part = property->m_item.begin(); part != property->m_item.end(); part++)
+	for (auto part = property->m_effect.begin(); part != property->m_effect.end(); part++)
 	{
-		item = new GUI_body_cell(192, 64, &(*part), this);
+		item = new GUI_body_cell(192, 64,static_cast<Object_part*>(*part), this);
 		item->m_position.x = 0;
 		item->m_position.y = i;
 		i += 64;

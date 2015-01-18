@@ -567,7 +567,7 @@ void Action_pick::perfom(Parameter* parameter)
 		}
 		case entity_e::body_part:
 		{
-			Application::instance().command_unequip(p->m_unit, static_cast<Body_part*>(p->m_object->m_owner), p->m_object);
+			Application::instance().command_unequip(p->m_unit, static_cast<Object_part*>(p->m_object->m_owner), p->m_object);
 			break;
 		}
 		}
@@ -587,7 +587,7 @@ void Action_pick::perfom(Parameter* parameter)
 		}
 		case entity_e::body_part:
 		{
-			Application::instance().command_equip(p->m_unit, static_cast<Body_part*>(p->m_owner), p->m_object);
+			Application::instance().command_equip(p->m_unit, static_cast<Object_part*>(p->m_owner), p->m_object);
 			break;
 		}
 		}
@@ -666,7 +666,7 @@ void Action_hit::interaction_handler()
 	result = Application::instance().command_select_body_part();
 	if (result)
 	{
-		p->m_unit_body_part = static_cast<Body_part*>(static_cast<P_object_owner*>(result)->m_cell);
+		p->m_unit_body_part = static_cast<Object_part*>(static_cast<P_object_owner*>(result)->m_cell);
 	}
 	else
 	{

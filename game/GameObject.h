@@ -200,25 +200,25 @@ public:
 	AI_manager();
 };
 
-class Body_part : public Inventory_cell
-{
-public:
-
-	Object_state_generic* m_object_state;
-	body_part_e m_part_kind;
-	std::string m_name;
-	Body_part(GameObject* item = nullptr) :Inventory_cell(item){ m_kind = entity_e::body_part; };
-};
-
-class Property_body : public Object_feature
-{
-public:
-
-	std::list<Body_part> m_item;
-
-	Property_body();
-	Object_feature* clone();
-};
+//class Body_part : public Inventory_cell
+//{
+//public:
+//
+//	Object_state_generic* m_object_state;
+//	body_part_e m_part_kind;
+//	std::string m_name;
+//	Body_part(GameObject* item = nullptr) :Inventory_cell(item){ m_kind = entity_e::body_part; };
+//};
+//
+//class Property_body : public Object_feature
+//{
+//public:
+//
+//	std::list<Body_part> m_item;
+//
+//	Property_body();
+//	Object_feature* clone();
+//};
 
 class Attribute_feature : public Object_feature
 {

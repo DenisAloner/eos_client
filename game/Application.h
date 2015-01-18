@@ -40,7 +40,7 @@ class GUI_MiniMap;
 class Parameter_destination;
 class AI_manager;
 class GameObjectManager;
-class Body_part;
+class Object_part;
 class Object_interaction;
 
 class gui_MessageQueue
@@ -128,8 +128,8 @@ public:
 	bool command_open_body(GameObject*& Object);
 	void command_gui_show_characterization(GameObject*& object);
 	bool command_check_position(GameObject*& object, MapCell*& position, GameMap*& map);
-	void command_equip(GameObject*& unit, Body_part* part, GameObject*& object);
-	void command_unequip(GameObject*& unit, Body_part* part, GameObject*& object);
+	void command_equip(GameObject*& unit, Object_part* part, GameObject*& object);
+	void command_unequip(GameObject*& unit, Object_part* part, GameObject*& object);
 	void command_set_cursor(GLuint _Tile);
 	void command_set_pickup_item(GLuint _Tile);
 	void command_set_cursor_visibility(bool _Visibility);

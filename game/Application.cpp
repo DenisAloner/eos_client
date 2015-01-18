@@ -547,7 +547,7 @@ bool Application::command_open_inventory(GameObject*& Object)
 bool Application::command_open_body(GameObject*& Object)
 {
 	bool Result = false;
-	Property_body* Property = static_cast<Property_body*>(Object->get_feature(object_feature_e::body));
+	Parts_list* Property = static_cast<Parts_list*>(Object->get_effect(interaction_e::body));
 	if (Property != nullptr)
 	{
 		GUI_Window* Window = new GUI_Window(1024 / 2 - (192 + 2) / 2, 1024 / 2 - (4 * 64 + 2) / 2, 192 + 4,4 * 64 + 27, Object->m_name + "::body");
@@ -717,10 +717,10 @@ P_object* Application::command_select_transfer_source(Parameter_destination* par
 		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_body_part)
 		{
 			P_object_owner* temp = static_cast<P_object_owner*>(m_message_queue.m_items.front());
-			if (static_cast<Body_part*>(temp->m_cell)->m_item)
+			if (static_cast<Object_part*>(temp->m_cell)->m_item)
 			{
 				Result = new P_object();
-				Result->m_object = static_cast<Body_part*>(temp->m_cell)->m_item;
+				Result->m_object = static_cast<Object_part*>(temp->m_cell)->m_item;
 				Exit = true;
 			}
 			else Result = nullptr;
@@ -768,7 +768,7 @@ Parameter* Application::command_select_body_part()
 	return Result;
 }
 
-void Application::command_equip(GameObject*& unit, Body_part* part, GameObject*& object)
+void Application::command_equip(GameObject*& unit, Object_part* part, GameObject*& object)
 {
 	part->m_item = object;
 	object->m_owner = part;
@@ -793,7 +793,7 @@ void Application::command_equip(GameObject*& unit, Body_part* part, GameObject*&
 	if (m_GUI->MapViewer->m_player->m_object == unit) { update_action_panel(); }
 }
 
-void Application::command_unequip(GameObject*& unit, Body_part* part, GameObject*& object)
+void Application::command_unequip(GameObject*& unit, Object_part* part, GameObject*& object)
 {
 	part->m_item = nullptr;
 	object->m_owner = nullptr;

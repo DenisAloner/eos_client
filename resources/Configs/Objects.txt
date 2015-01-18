@@ -35,14 +35,9 @@ feature_list parameter,thirst,0,1000
 feature_list generic,buff
 feature_list generic,damage
 feature_list parts,body
-mem_part foot,щупальце
+mem_part hand,руки
 add_slot body
 property_container Мешок 2 4
-property_body head,голова
-property_body hand,левая рука
-property_body hand,правая рука
-property_body foot,левая нога
-property_body foot,правая нога
 mem_effect value,1
 mem_slot_timer 5
 mem_slot_copyist health
@@ -97,6 +92,7 @@ tile_manager_map snake_right_02 3 1
 tile_manager_map snake_right_03 3 2
 tile_manager_map snake_right_04 3 3
 feature_list action,action
+feature_list generic,buff
 add_action move
 feature_list parameter,health,100,100
 feature_list parameter,strength,5,100

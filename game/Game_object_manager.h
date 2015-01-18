@@ -36,7 +36,6 @@ public:
 		feature_list,
 		attribute,
 		property_container,
-		property_body,
 		mem_part,
 		mem_slot_timer,
 		mem_effect,

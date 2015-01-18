@@ -9,7 +9,7 @@
 class Game_object_owner;
 class MapCell;
 class GameMap;
-class Body_part;
+class Object_part;
 class Action;
 
 class Parameter
@@ -100,7 +100,7 @@ class P_unit_interaction : public Parameter
 public:
 
 	GameObject* m_unit;
-	Body_part* m_unit_body_part;
+	Object_part* m_unit_body_part;
 	GameObject* m_object;
 
 	P_unit_interaction();
