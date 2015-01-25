@@ -381,13 +381,13 @@ void Application::update_action_panel()
 		ActionButton->m_action = (*item);
 		m_GUI->m_action_panel->add_item_control(ActionButton);
 	}
-	//Action_feature* list = static_cast<Action_feature*>(m_GUI->MapViewer->m_player->m_object->get_feature(object_feature_e::action_feature));
-	Action_list* l = static_cast<Action_list*>(m_GUI->MapViewer->m_player->m_object->get_effect(interaction_e::action));
-	/*for (auto item = l->m_effect.begin(); item != l->m_effect.end(); item++)
+	/*Action_list* l = static_cast<Action_list*>(m_GUI->MapViewer->m_player->m_object->get_effect(interaction_e::action));
+	l->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));*/
+	Interaction_feature* list = static_cast<Interaction_feature*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_feature[object_feature_e::interaction_feature]);
+	for (auto item = list->m_effect.begin(); item != list->m_effect.end(); item++)
 	{
-
-	}*/
-	l->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));
+		item->second->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));
+	}
 }
 
 void Application::start()

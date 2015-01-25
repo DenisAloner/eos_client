@@ -281,6 +281,18 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->add_effect(get_interaction_e(arg[0]), m_slot);
 		break;
 	}
+	case command_e::add_slot_mem:
+	{
+		m_mem_state->add_effect(get_interaction_e(arg[0]), m_slot);
+		break;
+	}
+	case command_e::mem_action:
+	{
+		action_e action = get_action_e(arg[0]);
+		Action* item = Application::instance().m_actions[action];
+		m_slot = item;
+		break;
+	}
 	case command_e::mem_part:
 	{
 		Object_part* item = new Object_part();
@@ -288,6 +300,7 @@ void GameObjectManager::parser(const std::string& command)
 		item->m_part_kind = get_body_part_e(arg[0]);
 		item->m_name = arg[1];
 		m_slot = item;
+		m_mem_state = item->m_object_state;
 		break;
 	}
 	case command_e::mem_effect:
@@ -361,6 +374,22 @@ void GameObjectManager::parser(const std::string& command)
 		}
 		break;
 	}
+	case command_e::feature_list_mem:
+	{
+		feature_list_type_e list_type = get_feature_list_type_e(arg[0]);
+		Interaction_list* list= m_mem_state->create_feature_list(list_type, get_interaction_e(arg[1]));
+		switch (list_type)
+		{
+		case feature_list_type_e::parameter:
+		{
+			Parameter_list* parameter_list = static_cast<Parameter_list*>(list);
+			parameter_list->m_basic_value = std::stoi(arg[2]);
+			parameter_list->m_basic_limit = std::stoi(arg[3]);
+			break;
+		}
+		}
+		break;
+	}
 	case command_e::tag:
 	{
 		Object_tag* tag;
@@ -406,6 +435,7 @@ void GameObjectManager::init()
 	m_commands["add_action"] = command_e::add_action;
 	m_commands.insert(std::pair<std::string, command_e>("property_container", command_e::property_container));
 	m_commands["add_slot"] = command_e::add_slot;
+	m_commands["add_slot_mem"] = command_e::add_slot_mem;
 	m_commands["attribute"] = command_e::attribute;
 	m_commands["state"] = command_e::state;
 	m_commands["mem_effect"] = command_e::mem_effect;
@@ -415,8 +445,10 @@ void GameObjectManager::init()
 	m_commands["mem_slot_prefix"] = command_e::mem_slot_prefix;
 	m_commands["mem_slot_copyist"] = command_e::mem_slot_copyist;
 	m_commands["mem_slot_addon"] = command_e::mem_slot_addon;
+	m_commands["mem_action"] = command_e::mem_action;
 	m_commands["tag"] = command_e::tag;
 	m_commands["feature_list"] = command_e::feature_list;
+	m_commands["feature_list_mem"] = command_e::feature_list_mem;
 
 	m_to_object_state_e["alive"] = object_state_e::alive;
 	m_to_object_state_e["dead"] = object_state_e::dead;

@@ -23,9 +23,7 @@ tile_manager_map elf_right_03 3 2
 tile_manager_map elf_right_04 3 3
 feature_list action,action
 add_action equip
-add_action move
 add_action open
-add_action pick
 add_action push
 add_action turn
 feature_list parameter,health,100,100
@@ -37,6 +35,14 @@ feature_list generic,damage
 feature_list parts,body
 mem_part hand,руки
 add_slot body
+feature_list_mem action,action
+mem_action pick
+add_slot_mem action
+mem_part foot,ноги
+add_slot body
+feature_list_mem action,action
+mem_action move
+add_slot_mem action
 property_container Мешок 2 4
 mem_effect value,1
 mem_slot_timer 5

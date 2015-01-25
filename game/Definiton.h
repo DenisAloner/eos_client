@@ -270,8 +270,8 @@ public:
 	virtual std::string get_description() = 0;
 	virtual Object_interaction* clone() = 0;
 	virtual void description(std::list<std::string>* info, int level) = 0;
-	virtual void apply_effect(GameObject* unit, Object_interaction* object);
-	virtual void do_predicat(predicat func);
+	virtual void apply_effect(GameObject* unit, Object_interaction* object){};
+	virtual void do_predicat(predicat func){ func(this); };
 };
 
 #endif //DEFINITION_H

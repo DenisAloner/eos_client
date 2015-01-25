@@ -11,6 +11,7 @@ class Object_interaction;
 class Interaction_slot;
 class Interaction_copyist;
 class Object_tag;
+class Object_state_generic;
 
 class GameObjectManager
 {
@@ -34,6 +35,7 @@ public:
 		light,
 		add_action,
 		feature_list,
+		feature_list_mem,
 		attribute,
 		property_container,
 		mem_part,
@@ -43,7 +45,9 @@ public:
 		mem_slot_copyist,
 		mem_slot_prefix,
 		mem_slot_addon,
+		mem_action,
 		add_slot,
+		add_slot_mem,
 		tag,
 	};
 
@@ -83,8 +87,8 @@ public:
 	GameObject* m_object;
 	label_t* m_label;
 	Effect* m_effect;
-	//Interaction_copyist* m_slot_copyist;
 	Object_interaction* m_slot;
+	Object_state_generic* m_mem_state;
 
 	std::list<GameObject*> m_objects;
 

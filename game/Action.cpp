@@ -602,6 +602,11 @@ std::string Action_pick::get_description(Parameter* parameter)
 	return s;
 }
 
+void Action_pick::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "<взять>");
+}
+
 Action_open::Action_open()
 {
 	m_kind = action_e::open;

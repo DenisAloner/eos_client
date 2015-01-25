@@ -58,7 +58,7 @@ public:
 	//virtual void apply_effect(GameObject* unit, Object_interaction* object);
 };
 
-class  Parts_list :public  Interaction_list
+class Parts_list :public  Interaction_list
 {
 public:
 

@@ -146,6 +146,7 @@ public:
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler();
 	virtual Object_interaction* clone(){ return new Action_pick(); };
+	virtual void description(std::list<std::string>* info, int level);
 
 };
 

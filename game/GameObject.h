@@ -74,10 +74,12 @@ class Object_state_generic
 {
 public:
 
-	//std::list<Action*> m_actions;
 	std::map<object_feature_e, Object_feature*> m_feature;
 
 	Object_state_generic();
+	void add_effect(interaction_e key, Object_interaction* item);
+	Interaction_list* create_feature_list(feature_list_type_e key, interaction_e name);
+
 };
 
 class Object_state : public Object_state_generic
@@ -253,6 +255,7 @@ public:
 	virtual std::string get_description();
 	virtual Object_part* clone();
 	virtual void description(std::list<std::string>* info, int level);
+	virtual void do_predicat(predicat func);
 };
 
 #endif //GAMEOBJECT_H

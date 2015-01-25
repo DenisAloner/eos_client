@@ -8,12 +8,6 @@ Interaction_slot::Interaction_slot()
 {
 }
 
-void Object_interaction::do_predicat(predicat func){ func(this); };
-
-void Object_interaction::apply_effect(GameObject* unit, Object_interaction* object)
-{
-}
-
 bool Interaction_slot::on_turn()
 {
 	return m_value->on_turn();

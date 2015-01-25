@@ -8,6 +8,57 @@ Object_state_generic::Object_state_generic()
 	m_feature[object_feature_e::interaction_feature] = list;
 };
 
+Interaction_list* Object_state_generic::create_feature_list(feature_list_type_e key, interaction_e name)
+{
+	Interaction_list* result;
+	Interaction_feature* list = static_cast<Interaction_feature*>(m_feature[object_feature_e::interaction_feature]);
+	if (list)
+	{
+		switch (key)
+		{
+		case feature_list_type_e::generic:
+		{
+			result = new Interaction_list();
+			break;
+		}
+		case feature_list_type_e::tag:
+		{
+			result = new Tag_list();
+			break;
+		}
+		case feature_list_type_e::action:
+		{
+			result = new Action_list();
+			break;
+		}
+		case feature_list_type_e::parameter:
+		{
+			result = new Parameter_list(name);
+			break;
+		}
+		case feature_list_type_e::parts:
+		{
+			result = new Parts_list();
+			break;
+		}
+		}
+		list->m_effect[name] = result;
+	}
+	return result;
+}
+
+void Object_state_generic::add_effect(interaction_e key, Object_interaction* item)
+{
+	Interaction_feature* list = static_cast<Interaction_feature*>(m_feature[object_feature_e::interaction_feature]);
+	if (list)
+	{
+		if (list->m_effect.find(key) != list->m_effect.end())
+		{
+			list->m_effect[key]->add(item);
+		}
+	}
+}
+
 Object_state::Object_state()
 {
 	m_layer = 1;
@@ -527,4 +578,24 @@ std::string Object_part::get_description()
 void Object_part::description(std::list<std::string>* info, int level)
 {
 	info->push_back(std::string(level, '.') + "<" + m_name + ">:");
+	Interaction_feature* obj_feat_effect = static_cast<Interaction_feature*>(m_object_state->m_feature[object_feature_e::interaction_feature]);
+	if (obj_feat_effect != nullptr)
+	{
+		info->push_back(std::string(level, '.') + "<эффекты>:");
+		for (auto current = obj_feat_effect->m_effect.begin(); current != obj_feat_effect->m_effect.end(); current++)
+		{
+			info->push_back(std::string(level + 1, '.') + Application::instance().m_game_object_manager->get_effect_string(current->first) + ":");
+			current->second->description(info, level + 2);
+		}
+	}
 }
+
+void Object_part::do_predicat(predicat func)
+{ 
+	func(this);
+	Interaction_feature* list = static_cast<Interaction_feature*>(m_object_state->m_feature[object_feature_e::interaction_feature]);
+	for (auto item = list->m_effect.begin(); item != list->m_effect.end(); item++)
+	{
+		item->second->do_predicat(func);
+	}
+};
