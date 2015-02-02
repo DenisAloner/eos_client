@@ -381,8 +381,6 @@ void Application::update_action_panel()
 		ActionButton->m_action = (*item);
 		m_GUI->m_action_panel->add_item_control(ActionButton);
 	}
-	/*Action_list* l = static_cast<Action_list*>(m_GUI->MapViewer->m_player->m_object->get_effect(interaction_e::action));
-	l->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));*/
 	Interaction_feature* list = static_cast<Interaction_feature*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_feature[object_feature_e::interaction_feature]);
 	for (auto item = list->m_effect.begin(); item != list->m_effect.end(); item++)
 	{
@@ -550,11 +548,11 @@ bool Application::command_open_body(GameObject*& Object)
 	Parts_list* Property = static_cast<Parts_list*>(Object->get_effect(interaction_e::body));
 	if (Property != nullptr)
 	{
-		GUI_Window* Window = new GUI_Window(1024 / 2 - (192 + 2) / 2, 1024 / 2 - (4 * 64 + 2) / 2, 192 + 4,4 * 64 + 27, Object->m_name + "::body");
-		GUI_Body* Inv = new GUI_Body(Property);
+		GUI_body_window* Window = new GUI_body_window(1024 / 2 - (192 + 2) / 2, 1024 / 2 - (4 * 64 + 2) / 2, 192 + 4, 4 * 64 + 27, Object->m_name + "::body",Object);
+		/*GUI_Body* Inv = new GUI_Body(static_cast<Interaction_feature*>(Object->get_feature(object_feature_e::interaction_feature)));
 		Inv->m_position.x = 2;
 		Inv->m_position.y = Window->m_size.h - Inv->m_size.h - 2;
-		Window->add_item_control(Inv);
+		Window->add_item_control(Inv);*/
 		m_GUI->add_front(Window);
 		Result = true;
 	}

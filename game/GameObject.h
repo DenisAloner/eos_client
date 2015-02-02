@@ -113,7 +113,7 @@ public:
 
 };
 
-class GameObject
+class GameObject : public  Object_interaction
 {
 public:
 
@@ -147,6 +147,13 @@ public:
 	Interaction_list* create_feature_list(feature_list_type_e key, interaction_e name);
 	void add_from(interaction_e key, Interaction_list* feature);
 	void remove_from(interaction_e key, Interaction_list* feature);
+
+	virtual bool on_turn();
+	virtual std::string get_description();
+	virtual Object_interaction* clone();
+	virtual void description(std::list<std::string>* info, int level);
+	virtual void do_predicat(predicat func);
+
 };
 
 class Player

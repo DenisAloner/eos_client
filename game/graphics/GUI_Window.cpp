@@ -129,3 +129,19 @@ void GUI_description_window::update_info()
 		m_textbox->add_item_control(new GUI_Text((*item), new GUI_TextFormat(8, 17, RGBA_t(0.7, 0.9, 1.0, 1.0))));
 	}
 }
+
+GUI_body_window::GUI_body_window(int x, int y, int width, int height, std::string Name, GameObject*& object) :GUI_Window(x, y, width, height, Name), m_object(object)
+{
+	m_item = new GUI_Body(static_cast<Interaction_feature*>(m_object->get_feature(object_feature_e::interaction_feature)));
+	m_item->m_position.x = 2;
+	m_item->m_position.y = m_size.h - m_item->m_size.h - 2;
+	//m_item->resize(m_size.w - 4, m_size.h - 25 - 2);
+	add_item_control(m_item);
+	update_info();
+	object->event_update += std::bind(&GUI_body_window::update_info, this);
+}
+
+void GUI_body_window::update_info()
+{
+	m_item->update(static_cast<Interaction_feature*>(m_object->get_feature(object_feature_e::interaction_feature)));
+}

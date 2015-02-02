@@ -188,7 +188,8 @@ enum class interaction_message_type_e
 {
 	single,
 	list,
-	action
+	action,
+	part
 };
 
 enum class interaction_e
@@ -266,11 +267,11 @@ public:
 
 	interaction_message_type_e m_interaction_message_type;
 	Object_interaction(){};
+	virtual void apply_effect(GameObject* unit, Object_interaction* object){};
 	virtual bool on_turn() = 0;
 	virtual std::string get_description() = 0;
 	virtual Object_interaction* clone() = 0;
 	virtual void description(std::list<std::string>* info, int level) = 0;
-	virtual void apply_effect(GameObject* unit, Object_interaction* object){};
 	virtual void do_predicat(predicat func){ func(this); };
 };
 

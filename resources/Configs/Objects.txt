@@ -221,6 +221,9 @@ mem_slot_copyist health
 mem_slot_time 5
 mem_slot_addon buff
 add_slot damage
+feature_list parts,body
+mem_part hand,€чейка
+add_slot body
 
 object wall
 state alive

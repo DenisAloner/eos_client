@@ -163,6 +163,35 @@ GameObject::GameObject()
 	m_weight = 0.0;
 }
 
+bool GameObject::on_turn()
+{
+	LOG(FATAL)<<"Метод не описан.";
+	return false;
+}
+
+std::string GameObject::get_description()
+{
+	LOG(FATAL) << "Метод не описан.";
+	return "";
+}
+
+Object_interaction* GameObject::clone()
+{
+	LOG(FATAL) << "Метод не описан.";
+	return nullptr;
+}
+
+void GameObject::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "<" + m_name + ">");
+}
+
+void GameObject::do_predicat(predicat func)
+{ 
+	func(this); 
+	LOG(FATAL) << "Метод не описан.";
+};
+
 void GameObject::turn()
 {
 	ObjectDirection dir;
@@ -368,7 +397,7 @@ void GameObject::remove_from(interaction_e key, Interaction_list* feature)
 	if (list)
 	{
 		auto item = list->m_effect.find(key);
-		if ( item == list->m_effect.end())
+		if ( item != list->m_effect.end())
 		{
 			if (item->second == feature)
 			{
@@ -546,6 +575,7 @@ Object_feature* Interaction_feature::clone()
 
 Object_part::Object_part(GameObject* item) :Inventory_cell(item)
 {
+	m_interaction_message_type = interaction_message_type_e::part;
 	m_kind = entity_e::body_part;
 	m_object_state = new Object_state_generic();
 };
@@ -553,7 +583,7 @@ Object_part::Object_part(GameObject* item) :Inventory_cell(item)
 Object_part* Object_part::clone()
 {
 	Object_part* effect = new Object_part();
-	effect->m_interaction_message_type = m_interaction_message_type;
+	//effect->m_interaction_message_type = m_interaction_message_type;
 	effect->m_kind = m_kind;
 	effect->m_name = m_name;
 	effect->m_part_kind = m_part_kind;

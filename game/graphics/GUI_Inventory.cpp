@@ -178,20 +178,32 @@ void GUI_body_cell::on_mouse_down(MouseEventArgs const& e)
 	}
 }
 
+void GUI_Body::get_part_predicat(Object_interaction* object)
+{
+	GUI_body_cell* item;
+	if (object->m_interaction_message_type == interaction_message_type_e::part)
+	{
+		item = new GUI_body_cell(192, 64, static_cast<Object_part*>(object), this);
+		add_item_control(item);
+	}
+}
 
-GUI_Body::GUI_Body(Parts_list* property) :GUI_Container(0, 0, 192, 4 * 64)
+void GUI_Body::update(Interaction_feature* feature)
+{
+	while (m_item_controls->m_items.begin() != m_item_controls->m_items.end())
+	{
+		remove_item_control((*m_item_controls->m_items.begin()));
+	}
+	for (auto item = feature->m_effect.begin(); item != feature->m_effect.end(); item++)
+	{
+		item->second->do_predicat(std::bind(&GUI_Body::get_part_predicat, this, std::placeholders::_1));
+	}
+}
+
+GUI_Body::GUI_Body(Interaction_feature* feature) :GUI_Container(0, 0, 192, 4 * 64)
 {
 	m_already_active = false;
-	GUI_body_cell* item;
-	int i = 0;
-	for (auto part = property->m_effect.begin(); part != property->m_effect.end(); part++)
-	{
-		item = new GUI_body_cell(192, 64,static_cast<Object_part*>(*part), this);
-		item->m_position.x = 0;
-		item->m_position.y = i;
-		i += 64;
-		add(item);
-	}
+	update(feature);
 }
 
 void GUI_Body::add_item_control(GUI_Object* object)
@@ -216,7 +228,6 @@ void GUI_Body::add_item_control(GUI_Object* object)
 
 void GUI_Body::set_scroll(int dy)
 {
-	
 	if (!m_items.empty())
 	{
 		GUI_body_cell* Item;

@@ -46,4 +46,17 @@ public:
 
 };
 
+class GUI_body_window :
+	public GUI_Window
+{
+public:
+
+	GameObject* m_object;
+	GUI_Body* m_item;
+	GUI_body_window(int x, int y, int width, int height, std::string Name, GameObject*& object);
+	std::list<std::string> m_text;
+	void update_info();
+
+};
+
 #endif GUI_WINDOW_H
