@@ -198,4 +198,12 @@ namespace ObjectTag
 		virtual Purification_from_poison* clone();
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
 	};
+
+	class Label : public Object_tag
+	{
+	public:
+		Label(object_tag_e type);
+		virtual Label* clone();
+		virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	};
 }

@@ -19,11 +19,8 @@ public:
 
 	enum class command_e
 	{ 
-		label,
-		add_to_label,
 		obj,
 		state,
-		add_label,
 		ai,
 		size,
 		weight,
@@ -36,8 +33,6 @@ public:
 		add_action,
 		feature_list,
 		feature_list_mem,
-		attribute,
-		property_container,
 		mem_part,
 		mem_slot_timer,
 		mem_effect,
@@ -67,7 +62,6 @@ public:
 	std::map<std::string, object_feature_e> m_to_object_feature_e;
 	std::map<std::string, interaction_e> m_to_interaction_e;
 	std::map<std::string, effect_e> m_to_effect_e;
-	std::map<std::string, object_attribute_e> m_to_object_attribute_e;
 	std::map<std::string, object_state_e> m_to_object_state_e;
 	std::map<std::string, object_tag_e> m_to_object_tag_e;
 	std::map<std::string, effect_prefix_e> m_to_effect_prefix_e;
@@ -95,7 +89,6 @@ public:
 	object_feature_e get_object_feature_e(const std::string& key);
 	interaction_e get_interaction_e(const std::string& key);
 	effect_e get_effect_e(const std::string& key);
-	object_attribute_e get_object_attribute_e(const std::string& key);
 	object_state_e get_object_state_e(const std::string& key);
 	object_tag_e get_object_tag_e(const std::string& key);
 	effect_prefix_e get_effect_prefix_e(const std::string& key);

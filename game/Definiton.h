@@ -223,17 +223,7 @@ enum class body_part_e
 enum class object_feature_e
 {
 	none,
-	attribute_feature,
-	parameter_feature,
 	interaction_feature,
-	body,
-	container
-};
-
-enum class object_attribute_e
-{
-	pass_able,
-	pick_able
 };
 
 enum class effect_prefix_e
@@ -248,6 +238,8 @@ enum class object_tag_e
 	poison_resist,
 	purification_from_poison,
 	mortal,
+	pass_able,
+	pick_able
 };
 
 enum class feature_list_type_e

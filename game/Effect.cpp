@@ -552,3 +552,13 @@ Interaction_list* Action_list::clone()
 	}
 	return result;
 }
+
+ObjectTag::Label::Label(object_tag_e type) :Object_tag(type){};
+
+ObjectTag::Label* ObjectTag::Label::clone()
+{
+	ObjectTag::Label* effect = new ObjectTag::Label(m_type);
+	return effect;
+}
+
+void ObjectTag::Label::apply_effect(GameObject* unit, Object_interaction* object){};

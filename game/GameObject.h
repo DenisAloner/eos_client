@@ -25,12 +25,6 @@ class Tag_list;
 struct object_parameter_t;
 class Action;
 
-struct label_t
-{
-	std::string m_name;
-	std::vector<object_attribute_e> m_stat;
-	label_t(std::string name) :m_name(name){};
-};
 
 class Game_object_owner{
 
@@ -134,13 +128,11 @@ public:
 	void set_direction(ObjectDirection dir);
 	void set_state(object_state_e state);
 	Object_state* get_state(object_state_e state);
-	void add_attribute(object_attribute_e key);
-	void add_label(const std::string& key);
 	void add_effect(interaction_e key, Object_interaction* item);
 	Interaction_list* get_effect(interaction_e key);
 	void remove_effect(interaction_e key, Object_interaction* item);
 	Object_feature* get_feature(object_feature_e key);
-	bool get_stat(object_attribute_e key);
+	bool get_stat(object_tag_e key);
 	Parameter_list* get_parameter(interaction_e key);
 	MapCell* cell();
 	void update_interaction();
@@ -185,20 +177,6 @@ public:
 	Inventory_cell(GameObject* item);
 };
 
-class Property_Container : public Object_feature
-{
-public:
-
-	std::list<Inventory_cell*> m_items;
-
-	dimension_t m_size;
-	std::string m_name;
-
-	Property_Container(int width, int height, std::string name);
-	~Property_Container();
-	Object_feature* clone();
-};
-
 class AI_manager
 {
 public:
@@ -228,17 +206,6 @@ public:
 //	Property_body();
 //	Object_feature* clone();
 //};
-
-class Attribute_feature : public Object_feature
-{
-public:
-
-	std::list<label_t*> m_label;
-	std::list<object_attribute_e> m_stat;
-
-	Attribute_feature();
-	Object_feature* clone();
-};
 
 class Interaction_feature : public Object_feature
 {

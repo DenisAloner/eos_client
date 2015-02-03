@@ -40,16 +40,6 @@ object_state_e GameObjectManager::get_object_state_e(const std::string& key)
 	return value->second;
 }
 
-object_attribute_e GameObjectManager::get_object_attribute_e(const std::string& key)
-{
-	auto value = m_to_object_attribute_e.find(key);
-	if (value == m_to_object_attribute_e.end())
-	{
-		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
-	}
-	return value->second;
-}
-
 //object_parameter_e GameObjectManager::get_object_parameter_e(const std::string& key)
 //{
 //	auto value = m_to_object_parameter_e.find(key);
@@ -89,17 +79,6 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	switch (key)
 	{
-	case command_e::label:
-	{
-		m_label = new label_t(args);
-		m_labels[args] = m_label;
-		break;
-	}
-	case command_e::add_to_label:
-	{
-		m_label->m_stat.push_back(get_object_attribute_e(arg[0]));
-		break;
-	}
 	case command_e::obj:
 	{
 		m_object = new GameObject();
@@ -128,11 +107,6 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->m_active_state->m_state = state;
 		m_object->m_state.push_back(m_object->m_active_state);
 		m_object->m_active_state->m_ai = nullptr;
-		break;
-	}
-	case command_e::add_label:
-	{
-		m_object->add_label(arg[0]);
 		break;
 	}
 	case command_e::ai:
@@ -253,27 +227,6 @@ void GameObjectManager::parser(const std::string& command)
 			break;
 		}
 		}
-		break;
-	}
-	case command_e::attribute:
-	{
-		m_object->add_attribute(get_object_attribute_e(arg[0]));
-		break;
-	}
-	case command_e::property_container:
-	{
-		std::size_t pos = 0;
-		std::string name;
-		int x;
-		int y;
-		found = args.find(" ");
-		name = args.substr(0, found);
-		pos = found + 1;
-		found = args.find(" ", pos);
-		x = std::stoi(args.substr(pos, found - pos));
-		pos = found + 1;
-		y = std::stoi(args.substr(pos));
-		m_object->m_active_state->m_feature[object_feature_e::container] = new Property_Container(x, y, name);
 		break;
 	}
 	case command_e::add_slot:
@@ -410,6 +363,11 @@ void GameObjectManager::parser(const std::string& command)
 			tag = new ObjectTag::Purification_from_poison();
 			break;
 		}
+		default:
+		{
+			tag = new ObjectTag::Label(get_object_tag_e(arg[0]));
+			break;
+		}
 		}
 		m_object->add_effect(interaction_e::tag,tag);
 		break;
@@ -419,10 +377,7 @@ void GameObjectManager::parser(const std::string& command)
 
 void GameObjectManager::init()
 {
-	m_commands["label"] = command_e::label;
-	m_commands["add_to_label"] = command_e::add_to_label;
 	m_commands.insert(std::pair<std::string, command_e>("object", command_e::obj));
-	m_commands["add_label"] = command_e::add_label;
 	m_commands.insert(std::pair<std::string, command_e>("size", command_e::size));
 	m_commands.insert(std::pair<std::string, command_e>("ai", command_e::ai));
 	m_commands.insert(std::pair<std::string, command_e>("weight", command_e::weight));
@@ -433,10 +388,8 @@ void GameObjectManager::init()
 	m_commands.insert(std::pair<std::string, command_e>("tile_manager_rotating", command_e::tile_manager_rotating));
 	m_commands.insert(std::pair<std::string, command_e>("light", command_e::light));
 	m_commands["add_action"] = command_e::add_action;
-	m_commands.insert(std::pair<std::string, command_e>("property_container", command_e::property_container));
 	m_commands["add_slot"] = command_e::add_slot;
 	m_commands["add_slot_mem"] = command_e::add_slot_mem;
-	m_commands["attribute"] = command_e::attribute;
 	m_commands["state"] = command_e::state;
 	m_commands["mem_effect"] = command_e::mem_effect;
 	m_commands["mem_part"] = command_e::mem_part;
@@ -471,9 +424,6 @@ void GameObjectManager::init()
 	m_to_effect_e["value"] = effect_e::value;
 	m_to_effect_e["limit"] = effect_e::limit;
 
-	m_to_object_attribute_e["pass_able"] = object_attribute_e::pass_able;
-	m_to_object_attribute_e["pick_able"] = object_attribute_e::pick_able;
-
 	m_effect_string[interaction_e::total_damage] = "общий дополнительный урон";
 	m_effect_string[interaction_e::damage] = "урон";
 	m_effect_string[interaction_e::buff] = "баффы";
@@ -498,10 +448,14 @@ void GameObjectManager::init()
 	m_to_object_tag_e["poison_resist"] = object_tag_e::poison_resist;
 	m_to_object_tag_e["purification_from_poison"] = object_tag_e::purification_from_poison;
 	m_to_object_tag_e["mortal"] = object_tag_e::mortal;
+	m_to_object_tag_e["pick_able"] = object_tag_e::pick_able;
+	m_to_object_tag_e["pass_able"] = object_tag_e::pass_able;
 
 	m_object_tag_string[object_tag_e::poison_resist] = "сопротивление к €ду";
 	m_object_tag_string[object_tag_e::purification_from_poison] = "очищение от €да";
 	m_object_tag_string[object_tag_e::mortal] = "смертное существо";
+	m_object_tag_string[object_tag_e::pass_able] = "не €вл€етс€ преградой";
+	m_object_tag_string[object_tag_e::pick_able] = "можно вз€ть";
 
 	m_to_action_e["equip"] = action_e::equip;
 	m_to_action_e["hit"] = action_e::hit;

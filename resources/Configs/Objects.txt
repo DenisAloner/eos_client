@@ -1,6 +1,3 @@
-label sword
-add_to_label pass_able
-
 object elf
 state alive
 ai 20 0 0
@@ -43,7 +40,6 @@ add_slot body
 feature_list_mem action,action
 mem_action move
 add_slot_mem action
-property_container Мешок 2 4
 mem_effect value,1
 mem_slot_timer 5
 mem_slot_copyist health
@@ -186,7 +182,8 @@ object floor
 state alive
 size 1 1 0
 tile_manager_single EoS_Floor_01
-attribute pass_able
+feature_list tag,tag
+tag pass_able
 layer 0
 
 object health potion
@@ -194,15 +191,17 @@ state alive
 size 1 1 1
 icon health_potion
 tile_manager_single health_potion
-attribute pick_able
+feature_list tag,tag
+tag pick_able
 
 object sword
 state equip,hand
-add_label sword
 size 1 1 1
 icon sword
 tile_manager_single sword
-attribute pick_able
+feature_list tag,tag
+tag pick_able
+tag pass_able
 feature_list generic,action
 add_action hit
 feature_list generic,damage
@@ -275,7 +274,8 @@ tile_manager_rotating door_close_down 0
 tile_manager_rotating door_close_left 1
 tile_manager_rotating no_tile 2
 tile_manager_rotating no_tile 3
-attribute pass_able
+feature_list tag,tag
+tag pass_able
 layer 2
 
 object chest
@@ -286,4 +286,3 @@ tile_manager_rotating chest 0
 tile_manager_rotating no_tile 1
 tile_manager_rotating no_tile 2
 tile_manager_rotating no_tile 3
-property_container Сундук 4 4

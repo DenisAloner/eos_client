@@ -267,50 +267,6 @@ Object_feature* GameObject::get_feature(object_feature_e key)
 	return nullptr;
 }
 
-void GameObject::add_attribute(object_attribute_e key)
-{
-	Attribute_feature* list = static_cast<Attribute_feature*>(get_feature(object_feature_e::attribute_feature));
-	if (list)
-	{
-		list->m_stat.push_back(key);
-	}
-	else
-	{
-		if (m_active_state)
-		{
-			list = new Attribute_feature();
-			list->m_stat.push_back(key);
-			m_active_state->m_feature[object_feature_e::attribute_feature] = list;
-		}
-	}
-}
-
-void GameObject::add_label(const std::string& key)
-{
-	Attribute_feature* list = static_cast<Attribute_feature*>(get_feature(object_feature_e::attribute_feature));
-	if (list)
-	{
-		auto value = Application::instance().m_game_object_manager->m_labels.find(key);
-		if (value != Application::instance().m_game_object_manager->m_labels.end())
-		{
-			list->m_label.push_back(value->second);
-		}
-	}
-	else
-	{
-		if (m_active_state)
-		{
-			auto value = Application::instance().m_game_object_manager->m_labels.find(key);
-			if (value != Application::instance().m_game_object_manager->m_labels.end())
-			{
-				list = new Attribute_feature();
-				list->m_label.push_back(value->second);
-				m_active_state->m_feature[object_feature_e::attribute_feature] = list;
-			}
-		}
-	}
-}
-
 Interaction_list* GameObject::create_feature_list(feature_list_type_e key, interaction_e name)
 {
 	Interaction_list* result;
@@ -439,26 +395,18 @@ Parameter_list* GameObject::get_parameter(interaction_e key)
 	return nullptr;
 }
 
-bool GameObject::get_stat(object_attribute_e key)
+bool GameObject::get_stat(object_tag_e key)
 {
-	Attribute_feature* list = static_cast<Attribute_feature*>(get_feature(object_feature_e::attribute_feature));
-	if (list)
+	Interaction_feature* feature = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
+	if (feature)
 	{
-		for (auto item = list->m_stat.begin(); item != list->m_stat.end();item++)
+		auto list = feature->m_effect.find(interaction_e::tag);
+		if (list != feature->m_effect.end())
 		{
-			if (*item == key)
+			Tag_list* taglist = static_cast<Tag_list*>(list->second);
+			for (auto item = taglist->m_effect.begin(); item != taglist->m_effect.end(); item++)
 			{
-				return true;
-			}
-		}
-		for (auto label = list->m_label.begin(); label != list->m_label.end(); label++)
-		{
-			for (auto stat = (*label)->m_stat.begin(); stat != (*label)->m_stat.end(); stat++)
-			{
-				if (*stat == key)
-				{
-					return true;
-				}
+				if (static_cast<Object_tag*>(*item)->m_type == key){ return true; }
 			}
 		}
 	}
@@ -506,32 +454,13 @@ Inventory_cell::Inventory_cell(GameObject* item = nullptr) : m_item(item)
 	m_kind = entity_e::inventory_cell;
 }
 
-Property_Container::Property_Container(int width, int height, std::string name) : Object_feature(object_feature_e::container), m_size(dimension_t(width, height)), m_name(name)
-{
-	m_items.resize(m_size.w*m_size.h, nullptr);
-	for (std::list<Inventory_cell*>::iterator item = m_items.begin(); item != m_items.end(); item++)
-	{
-		(*item) = new Inventory_cell();
-	}
-}
-
-Object_feature* Property_Container::clone()
-{
-	Property_Container* result = new Property_Container(m_size.w,m_size.h,m_name);
-	return result;
-}
-
-Property_Container::~Property_Container()
-{
-}
-
 AI_manager::AI_manager()
 {
 	m_fov_qualifiers.push_back([](GameObject* object)->bool{return object->m_name == "wall"; });
 	m_fov_qualifiers.push_back([](GameObject* object)->bool{return false; });
 
-	m_path_qualifiers.push_back([](GameObject* object)->bool{return !object->get_stat(object_attribute_e::pass_able);});
-	m_path_qualifiers.push_back([](GameObject* object)->bool{return !object->get_stat(object_attribute_e::pass_able) && object->m_name != "wall"; });
+	m_path_qualifiers.push_back([](GameObject* object)->bool{return !object->get_stat(object_tag_e::pass_able);});
+	m_path_qualifiers.push_back([](GameObject* object)->bool{return !object->get_stat(object_tag_e::pass_able) && object->m_name != "wall"; });
 }
 
 //Property_body::Property_body() : Object_feature(object_feature_e::body)
@@ -548,18 +477,6 @@ AI_manager::AI_manager()
 //	}
 //	return result;
 //}
-
-Attribute_feature::Attribute_feature() : Object_feature(object_feature_e::attribute_feature)
-{
-}
-
-Object_feature* Attribute_feature::clone()
-{
-	Attribute_feature* result = new Attribute_feature();
-	std::copy(m_label.begin(), m_label.end(), std::back_inserter(result->m_label));
-	std::copy(m_stat.begin(), m_stat.end(), std::back_inserter(result->m_stat));
-	return result;
-}
 
 Interaction_feature::Interaction_feature() : Object_feature(object_feature_e::interaction_feature){};
 

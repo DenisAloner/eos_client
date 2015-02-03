@@ -176,6 +176,7 @@ void Application::initialize()
 	m_ai_manager = new AI_manager();
 	m_game_object_manager = new GameObjectManager();
 	m_game_object_manager->init();
+	LOG(INFO) << "Менеджер игровых объектов успешно инициализирован";
 
 	m_GUI->MapViewer = new GUI_MapViewer(this);
 	m_GUI->MapViewer->m_position.x = 0;
@@ -521,23 +522,6 @@ Parameter* Application::command_select_object_on_map()
 		lk.unlock();
 		m_message_queue.m_condition_variable.notify_one();
 		m_message_queue.m_reader = false;
-	}
-	return Result;
-}
-
-bool Application::command_open_inventory(GameObject*& Object)
-{
-	bool Result = false;
-	Property_Container* Property = static_cast<Property_Container*>(Object->get_feature(object_feature_e::container));
-	if (Property != nullptr)
-	{
-		GUI_Window* Window = new GUI_Window(1024 / 2 - (Property->m_size.w * 64 + 2) / 2, 1024 / 2 - (Property->m_size.h * 64 + 2) / 2, Property->m_size.w * 64 + 4, Property->m_size.h * 64 + 27, Object->m_name + "::" + Property->m_name);
-		GUI_Inventory* Inv = new GUI_Inventory(Property);
-		Inv->m_position.x = 2;
-		Inv->m_position.y = Window->m_size.h - Inv->m_size.h-2;
-		Window->add_item_control(Inv);
-		m_GUI->add_front(Window);
-		Result = true;
 	}
 	return Result;
 }

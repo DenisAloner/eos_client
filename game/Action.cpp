@@ -184,7 +184,7 @@ bool ActionClass_Push::check(Parameter* parameter)
 					{
 						if (p->m_object != (*item) && p->m_unit != (*item))
 						{
-							if (!(*item)->get_stat(object_attribute_e::pass_able))
+							if (!(*item)->get_stat(object_tag_e::pass_able))
 							{
 								return false;
 							}
@@ -202,7 +202,7 @@ bool ActionClass_Push::check(Parameter* parameter)
 					{
 						if (p->m_object != (*item) && p->m_unit != (*item))
 						{
-							if (!(*item)->get_stat(object_attribute_e::pass_able))
+							if (!(*item)->get_stat(object_tag_e::pass_able))
 							{
 								return false;
 							}
@@ -373,7 +373,6 @@ void Action_OpenInventory::interaction_handler()
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
-	Application::instance().command_open_inventory(p->m_object);
 	Application::instance().m_message_queue.m_busy = false;
 }
 
