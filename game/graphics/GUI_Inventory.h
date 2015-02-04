@@ -10,7 +10,7 @@ class Parts_list;
 class Inventory_cell;
 class GameObject;
 class Object_part;
-class Interaction_feature;
+class Attribute_map;
 
 class GUI_Body;
 
@@ -36,7 +36,7 @@ class GUI_Body :
 public:
 
 	bool m_already_active;
-	GUI_Body(Interaction_feature* feature);
+	GUI_Body(Attribute_map* feature);
 
 	//virtual void Render(GraphicalController* Graph);
 	virtual void add_item_control(GUI_Object* object);
@@ -45,7 +45,7 @@ public:
 	virtual void on_mouse_down(MouseEventArgs const& e);
 	virtual void set_focus(bool state);
 	void get_part_predicat(Object_interaction* object);
-	void update(Interaction_feature* feature);
+	void update(Attribute_map* feature);
 
 };
 

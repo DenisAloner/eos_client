@@ -4,14 +4,13 @@
 #include "GameObject.h"
 #include "Effect.h"
 
-struct label_t;
 class Effect;
 class Buff;
 class Object_interaction;
 class Interaction_slot;
 class Interaction_copyist;
 class Object_tag;
-class Object_state_generic;
+class Attribute_map;
 
 class GameObjectManager
 {
@@ -57,9 +56,6 @@ public:
 	typedef std::map<std::string, command_e> commands_t;
 	typedef std::map<std::string, parameter_e> parameters_t;
 	 
-	std::map<std::string, label_t*> m_labels;
-
-	std::map<std::string, object_feature_e> m_to_object_feature_e;
 	std::map<std::string, interaction_e> m_to_interaction_e;
 	std::map<std::string, effect_e> m_to_effect_e;
 	std::map<std::string, object_state_e> m_to_object_state_e;
@@ -79,14 +75,12 @@ public:
 	parameters_t m_parameters;
 
 	GameObject* m_object;
-	label_t* m_label;
 	Effect* m_effect;
 	Object_interaction* m_slot;
-	Object_state_generic* m_mem_state;
+	Attribute_map* m_mem_state;
 
 	std::list<GameObject*> m_objects;
 
-	object_feature_e get_object_feature_e(const std::string& key);
 	interaction_e get_interaction_e(const std::string& key);
 	effect_e get_effect_e(const std::string& key);
 	object_state_e get_object_state_e(const std::string& key);

@@ -101,6 +101,7 @@ feature_list parameter,strength,5,100
 feature_list generic,damage
 feature_list tag,tag
 tag poison_resist
+tag mortal
 mem_effect value,-1
 mem_slot_copyist health
 add_slot damage

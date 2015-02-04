@@ -220,12 +220,6 @@ enum class body_part_e
 	foot
 };
 
-enum class object_feature_e
-{
-	none,
-	interaction_feature,
-};
-
 enum class effect_prefix_e
 {
 	physical_damage,

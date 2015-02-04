@@ -25,7 +25,6 @@ class Tag_list;
 struct object_parameter_t;
 class Action;
 
-
 class Game_object_owner{
 
 public:
@@ -64,19 +63,19 @@ public:
 	std::function<bool(GameObject*)> m_path_qualifier;
 };
 
-class Object_state_generic
+class Attribute_map
 {
 public:
 
-	std::map<object_feature_e, Object_feature*> m_feature;
+	std::map<interaction_e, Interaction_list* > m_item;
 
-	Object_state_generic();
+	Attribute_map();
 	void add_effect(interaction_e key, Object_interaction* item);
 	Interaction_list* create_feature_list(feature_list_type_e key, interaction_e name);
-
+	Attribute_map* clone();
 };
 
-class Object_state : public Object_state_generic
+class Object_state : public  Attribute_map
 {
 public:
 
@@ -131,7 +130,6 @@ public:
 	void add_effect(interaction_e key, Object_interaction* item);
 	Interaction_list* get_effect(interaction_e key);
 	void remove_effect(interaction_e key, Object_interaction* item);
-	Object_feature* get_feature(object_feature_e key);
 	bool get_stat(object_tag_e key);
 	Parameter_list* get_parameter(interaction_e key);
 	MapCell* cell();
@@ -158,16 +156,6 @@ public:
 	FOV* m_fov;
 	Player(GameObject* object, GameMap* map);
 
-};
-
-class Object_feature
-{
-public:
-
-	object_feature_e m_kind;
-
-	Object_feature(object_feature_e kind);
-	virtual Object_feature* clone();
 };
 
 class Inventory_cell: public Game_object_owner
@@ -207,21 +195,11 @@ public:
 //	Object_feature* clone();
 //};
 
-class Interaction_feature : public Object_feature
-{
-public:
-
-	std::map<interaction_e, Interaction_list* > m_effect;
-
-	Interaction_feature();
-	Object_feature* clone();
-};
-
 class Object_part : public Inventory_cell, public Object_interaction
 {
 public:
 
-	Object_state_generic* m_object_state;
+	Attribute_map* m_object_state;
 	body_part_e m_part_kind;
 	std::string m_name;
 	Object_part(GameObject* item=nullptr);

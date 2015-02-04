@@ -1,15 +1,5 @@
 #include "Game_object_manager.h"
 
-object_feature_e GameObjectManager::get_object_feature_e(const std::string& key)
-{
-	auto value = m_to_object_feature_e.find(key);
-	if (value == m_to_object_feature_e.end())
-	{
-		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
-	}
-	return value->second;
-}
-
 interaction_e GameObjectManager::get_interaction_e(const std::string& key)
 {
 	auto value = m_to_interaction_e.find(key);

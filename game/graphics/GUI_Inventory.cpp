@@ -84,19 +84,19 @@ void GUI_Body::get_part_predicat(Object_interaction* object)
 	}
 }
 
-void GUI_Body::update(Interaction_feature* feature)
+void GUI_Body::update(Attribute_map* feature)
 {
 	while (m_item_controls->m_items.begin() != m_item_controls->m_items.end())
 	{
 		remove_item_control((*m_item_controls->m_items.begin()));
 	}
-	for (auto item = feature->m_effect.begin(); item != feature->m_effect.end(); item++)
+	for (auto item = feature->m_item.begin(); item != feature->m_item.end(); item++)
 	{
 		item->second->do_predicat(std::bind(&GUI_Body::get_part_predicat, this, std::placeholders::_1));
 	}
 }
 
-GUI_Body::GUI_Body(Interaction_feature* feature) :GUI_Container(0, 0, 192, 4 * 64)
+GUI_Body::GUI_Body(Attribute_map* feature) :GUI_Container(0, 0, 192, 4 * 64)
 {
 	m_already_active = false;
 	update(feature);

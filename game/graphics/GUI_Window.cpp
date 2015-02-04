@@ -114,11 +114,10 @@ void GUI_description_window::update_info()
 	{
 		m_textbox->remove_item_control((*m_textbox->m_item_controls->m_items.begin()));
 	}
-	Interaction_feature* obj_feat_effect = static_cast<Interaction_feature*>(m_object->get_feature(object_feature_e::interaction_feature));
-	if (obj_feat_effect != nullptr)
+	if (m_object->m_active_state)
 	{
 		m_text.push_back("эффекты:");
-		for (auto current = obj_feat_effect->m_effect.begin(); current != obj_feat_effect->m_effect.end(); current++)
+		for (auto current = m_object->m_active_state->m_item.begin(); current != m_object->m_active_state->m_item.end(); current++)
 		{
 			m_text.push_back("." + Application::instance().m_game_object_manager->get_effect_string(current->first) + ":");
 			current->second->description(&m_text,2);
@@ -132,7 +131,7 @@ void GUI_description_window::update_info()
 
 GUI_body_window::GUI_body_window(int x, int y, int width, int height, std::string Name, GameObject*& object) :GUI_Window(x, y, width, height, Name), m_object(object)
 {
-	m_item = new GUI_Body(static_cast<Interaction_feature*>(m_object->get_feature(object_feature_e::interaction_feature)));
+	m_item = new GUI_Body(m_object->m_active_state);
 	m_item->m_position.x = 2;
 	m_item->m_position.y = m_size.h - m_item->m_size.h - 2;
 	//m_item->resize(m_size.w - 4, m_size.h - 25 - 2);
@@ -143,5 +142,5 @@ GUI_body_window::GUI_body_window(int x, int y, int width, int height, std::strin
 
 void GUI_body_window::update_info()
 {
-	m_item->update(static_cast<Interaction_feature*>(m_object->get_feature(object_feature_e::interaction_feature)));
+	m_item->update(m_object->m_active_state);
 }

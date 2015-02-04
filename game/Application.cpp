@@ -382,8 +382,8 @@ void Application::update_action_panel()
 		ActionButton->m_action = (*item);
 		m_GUI->m_action_panel->add_item_control(ActionButton);
 	}
-	Interaction_feature* list = static_cast<Interaction_feature*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_feature[object_feature_e::interaction_feature]);
-	for (auto item = list->m_effect.begin(); item != list->m_effect.end(); item++)
+	Attribute_map* list = m_GUI->MapViewer->m_player->m_object->m_active_state;
+	for (auto item = list->m_item.begin(); item != list->m_item.end(); item++)
 	{
 		item->second->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));
 	}
@@ -757,10 +757,9 @@ void Application::command_equip(GameObject*& unit, Object_part* part, GameObject
 	Object_state* obj_state = object->get_state(object_state_e::equip);
 	if (obj_state)
 	{
-		Interaction_feature* list = static_cast<Interaction_feature*>(object->get_feature(object_feature_e::interaction_feature));
-		if (list)
+		if (object->m_active_state)
 		{
-			for (auto kind = list->m_effect.begin(); kind != list->m_effect.end(); kind++)
+			for (auto kind = object->m_active_state->m_item.begin(); kind != object->m_active_state->m_item.end(); kind++)
 			{
 				if (kind->first != interaction_e::damage)
 				{
@@ -782,10 +781,9 @@ void Application::command_unequip(GameObject*& unit, Object_part* part, GameObje
 	Object_state* obj_state = object->get_state(object_state_e::equip);
 	if (obj_state)
 	{
-		Interaction_feature* list = static_cast<Interaction_feature*>(object->get_feature(object_feature_e::interaction_feature));
-		if (list)
+		if (object->m_active_state)
 		{
-			for (auto kind = list->m_effect.begin(); kind != list->m_effect.end(); kind++)
+			for (auto kind = object->m_active_state->m_item.begin(); kind != object->m_active_state->m_item.end(); kind++)
 			{
 				if (kind->first != interaction_e::damage)
 				{

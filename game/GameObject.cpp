@@ -2,19 +2,12 @@
 #include "game/Action.h"
 #include "log.h"
 
-Object_state_generic::Object_state_generic()
-{
-	Interaction_feature* list = new Interaction_feature();
-	m_feature[object_feature_e::interaction_feature] = list;
-};
+Attribute_map::Attribute_map(){};
 
-Interaction_list* Object_state_generic::create_feature_list(feature_list_type_e key, interaction_e name)
+Interaction_list*  Attribute_map::create_feature_list(feature_list_type_e key, interaction_e name)
 {
-	Interaction_list* result;
-	Interaction_feature* list = static_cast<Interaction_feature*>(m_feature[object_feature_e::interaction_feature]);
-	if (list)
-	{
-		switch (key)
+	Interaction_list* result=nullptr;
+	switch (key)
 		{
 		case feature_list_type_e::generic:
 		{
@@ -42,21 +35,26 @@ Interaction_list* Object_state_generic::create_feature_list(feature_list_type_e 
 			break;
 		}
 		}
-		list->m_effect[name] = result;
-	}
+	m_item[name] = result;	
 	return result;
 }
 
-void Object_state_generic::add_effect(interaction_e key, Object_interaction* item)
+void Attribute_map::add_effect(interaction_e key, Object_interaction* item)
 {
-	Interaction_feature* list = static_cast<Interaction_feature*>(m_feature[object_feature_e::interaction_feature]);
-	if (list)
+	if (m_item.find(key) != m_item.end())
 	{
-		if (list->m_effect.find(key) != list->m_effect.end())
-		{
-			list->m_effect[key]->add(item);
-		}
+		m_item[key]->add(item);
 	}
+}
+
+Attribute_map* Attribute_map::clone()
+{
+	Attribute_map* result = new Attribute_map();
+	for (auto item = m_item.begin(); item != m_item.end(); item++)
+	{
+		result->m_item[item->first] = item->second->clone();
+	}
+	return result;
 }
 
 Object_state::Object_state()
@@ -79,9 +77,9 @@ Object_state* Object_state::clone()
 	state->m_light = m_light;
 	state->m_icon = m_icon;
 	state->m_ai = m_ai;
-	for (auto prop = m_feature.begin(); prop != m_feature.end(); prop++)
+	for (auto item = m_item.begin(); item != m_item.end(); item++)
 	{
-		state->m_feature[prop->first] = prop->second->clone();
+		state->m_item[item->first] = item->second->clone();
 	}
 	return state;
 }
@@ -103,9 +101,9 @@ Object_state* Object_state_equip::clone()
 	state->m_light = m_light;
 	state->m_icon = m_icon;
 	state->m_ai = m_ai;
-	for (auto prop = m_feature.begin(); prop != m_feature.end(); prop++)
+	for (auto item = m_item.begin(); item != m_item.end(); item++)
 	{
-		state->m_feature[prop->first] = prop->second->clone();
+		state->m_item[item->first] = item->second->clone();
 	}
 	return state;
 }
@@ -254,114 +252,90 @@ Object_state* GameObject::get_state(object_state_e state)
 	return nullptr;
 }
 
-Object_feature* GameObject::get_feature(object_feature_e key)
-{
-	if (m_active_state)
-	{
-		auto value = m_active_state->m_feature.find(key);
-		if (value != m_active_state->m_feature.end())
-		{
-			return value->second;
-		}
-	}
-	return nullptr;
-}
-
 Interaction_list* GameObject::create_feature_list(feature_list_type_e key, interaction_e name)
 {
 	Interaction_list* result;
-	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
-	if (list)
+
+	switch (key)
 	{
-		switch (key)
-		{
-		case feature_list_type_e::generic:
-		{
-			result = new Interaction_list();
-			break;
-		}
-		case feature_list_type_e::tag:
-		{
-			result = new Tag_list();
-			break;
-		}
-		case feature_list_type_e::action:
-		{
-			result = new Action_list();
-			break;
-		}
-		case feature_list_type_e::parameter:
-		{
-			result = new Parameter_list(name);
-			break;
-		}
-		case feature_list_type_e::parts:
-		{
-			result = new Parts_list();
-			break;
-		}
-		}
-		list->m_effect[name] = result;
+	case feature_list_type_e::generic:
+	{
+		result = new Interaction_list();
+		break;
 	}
+	case feature_list_type_e::tag:
+	{
+		result = new Tag_list();
+		break;
+	}
+	case feature_list_type_e::action:
+	{
+		result = new Action_list();
+		break;
+	}
+	case feature_list_type_e::parameter:
+	{
+		result = new Parameter_list(name);
+		break;
+	}
+	case feature_list_type_e::parts:
+	{
+		result = new Parts_list();
+		break;
+	}
+	}
+	m_active_state->m_item[name] = result;
 	return result;
 }
 
 void GameObject::add_effect(interaction_e key, Object_interaction* item)
 {
-	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
-	if (list)
+	if (m_active_state->m_item.find(key) != m_active_state->m_item.end())
 	{
-		if (list->m_effect.find(key) != list->m_effect.end())
-		{
-			list->m_effect[key]->add(item);
-		}
+		m_active_state->m_item[key]->add(item);
 	}
 }
 
 void GameObject::add_from(interaction_e key, Interaction_list* feature)
 {
-	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
-	if (list)
+	if (m_active_state)
 	{
-		if (list->m_effect.find(key) == list->m_effect.end())
+		if (m_active_state->m_item.find(key) == m_active_state->m_item.end())
 		{
-			list->m_effect[key] = feature;
+			m_active_state->m_item[key] = feature;
 		}
 		else
 		{
-			list->m_effect[key]->add(feature);
-	
+			m_active_state->m_item[key]->add(feature);
 		}
 	}
 }
 
 void GameObject::remove_effect(interaction_e key, Object_interaction* item)
 {
-	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
-	if (list)
+	if (m_active_state)
 	{
-		if (list->m_effect.find(key) != list->m_effect.end())
+		if (m_active_state->m_item.find(key) != m_active_state->m_item.end())
 		{
-			list->m_effect[key]->remove(item);
+			m_active_state->m_item[key]->remove(item);
 		}
 	}
 }
 
 void GameObject::remove_from(interaction_e key, Interaction_list* feature)
 {
-	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
-	if (list)
+	if (m_active_state)
 	{
-		auto item = list->m_effect.find(key);
-		if ( item != list->m_effect.end())
+		auto item = m_active_state->m_item.find(key);
+		if (item != m_active_state->m_item.end())
 		{
 			if (item->second == feature)
 			{
-				list->m_effect.erase(key);
+				m_active_state->m_item.erase(key);
 			}
 			else
 			{
-				list->m_effect[key]->remove(feature);
+				m_active_state->m_item[key]->remove(feature);
 			}
 		}
 	}
@@ -369,11 +343,10 @@ void GameObject::remove_from(interaction_e key, Interaction_list* feature)
 
 Interaction_list* GameObject::get_effect(interaction_e key)
 {
-	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
-	if (list)
+	if (m_active_state)
 	{
-		auto value = list->m_effect.find(key);
-		if (value != list->m_effect.end())
+		auto value = m_active_state->m_item.find(key);
+		if (value != m_active_state->m_item.end())
 		{
 			return value->second;
 		}
@@ -383,11 +356,10 @@ Interaction_list* GameObject::get_effect(interaction_e key)
 
 Parameter_list* GameObject::get_parameter(interaction_e key)
 {
-	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
-	if (list)
+	if (m_active_state)
 	{
-		auto value = list->m_effect.find(key);
-		if (value != list->m_effect.end())
+		auto value = m_active_state->m_item.find(key);
+		if (value != m_active_state->m_item.end())
 		{
 			return static_cast<Parameter_list*>(value->second);
 		}
@@ -397,11 +369,10 @@ Parameter_list* GameObject::get_parameter(interaction_e key)
 
 bool GameObject::get_stat(object_tag_e key)
 {
-	Interaction_feature* feature = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
-	if (feature)
+	if (m_active_state)
 	{
-		auto list = feature->m_effect.find(interaction_e::tag);
-		if (list != feature->m_effect.end())
+		auto list = m_active_state->m_item.find(interaction_e::tag);
+		if (list != m_active_state->m_item.end())
 		{
 			Tag_list* taglist = static_cast<Tag_list*>(list->second);
 			for (auto item = taglist->m_effect.begin(); item != taglist->m_effect.end(); item++)
@@ -419,10 +390,9 @@ MapCell* GameObject::cell(){
 
 void GameObject::update_interaction()
 {
-	Interaction_feature* list = static_cast<Interaction_feature*>(get_feature(object_feature_e::interaction_feature));
-	if (list)
+	if (m_active_state)
 	{
-		for (auto item = list->m_effect.begin(); item != list->m_effect.end(); item++)
+		for (auto item = m_active_state->m_item.begin(); item != m_active_state->m_item.end(); item++)
 		{
 			item->second->update();
 		}
@@ -436,17 +406,6 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 	m_actions.push_front(Application::instance().m_actions[action_e::open_inventory]);
 	m_actions.push_front(Application::instance().m_actions[action_e::cell_info]);
 	m_actions.push_front(Application::instance().m_actions[action_e::show_parameters]);
-}
-
-Object_feature::Object_feature(object_feature_e kind) : m_kind(kind)
-{
-}
-
-Object_feature* Object_feature::clone()
-{
-	Object_feature* result = new Object_feature(object_feature_e::none);
-	result->m_kind = m_kind;
-	return result;
 }
 
 Inventory_cell::Inventory_cell(GameObject* item = nullptr) : m_item(item)
@@ -478,23 +437,11 @@ AI_manager::AI_manager()
 //	return result;
 //}
 
-Interaction_feature::Interaction_feature() : Object_feature(object_feature_e::interaction_feature){};
-
-Object_feature* Interaction_feature::clone()
-{
-	Interaction_feature* result = new Interaction_feature();
-	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
-	{
-		result->m_effect[item->first] = item->second->clone();
-	}
-	return result;
-}
-
 Object_part::Object_part(GameObject* item) :Inventory_cell(item)
 {
 	m_interaction_message_type = interaction_message_type_e::part;
 	m_kind = entity_e::body_part;
-	m_object_state = new Object_state_generic();
+	m_object_state = new Attribute_map();
 };
 
 Object_part* Object_part::clone()
@@ -505,10 +452,7 @@ Object_part* Object_part::clone()
 	effect->m_name = m_name;
 	effect->m_part_kind = m_part_kind;
 	effect->m_item = nullptr;
-	for (auto prop = m_object_state->m_feature.begin(); prop != m_object_state->m_feature.end(); prop++)
-	{
-		effect->m_object_state->m_feature[prop->first] = prop->second->clone();
-	}
+	effect->m_object_state = m_object_state->clone();
 	return effect;
 }
 
@@ -525,23 +469,18 @@ std::string Object_part::get_description()
 void Object_part::description(std::list<std::string>* info, int level)
 {
 	info->push_back(std::string(level, '.') + "<" + m_name + ">:");
-	Interaction_feature* obj_feat_effect = static_cast<Interaction_feature*>(m_object_state->m_feature[object_feature_e::interaction_feature]);
-	if (obj_feat_effect != nullptr)
+	info->push_back(std::string(level, '.') + "<эффекты>:");
+	for (auto current = m_object_state->m_item.begin(); current != m_object_state->m_item.end(); current++)
 	{
-		info->push_back(std::string(level, '.') + "<эффекты>:");
-		for (auto current = obj_feat_effect->m_effect.begin(); current != obj_feat_effect->m_effect.end(); current++)
-		{
-			info->push_back(std::string(level + 1, '.') + Application::instance().m_game_object_manager->get_effect_string(current->first) + ":");
-			current->second->description(info, level + 2);
-		}
+		info->push_back(std::string(level + 1, '.') + Application::instance().m_game_object_manager->get_effect_string(current->first) + ":");
+		current->second->description(info, level + 2);
 	}
 }
 
 void Object_part::do_predicat(predicat func)
 { 
 	func(this);
-	Interaction_feature* list = static_cast<Interaction_feature*>(m_object_state->m_feature[object_feature_e::interaction_feature]);
-	for (auto item = list->m_effect.begin(); item != list->m_effect.end(); item++)
+	for (auto item = m_object_state->m_item.begin(); item != m_object_state->m_item.end(); item++)
 	{
 		item->second->do_predicat(func);
 	}
