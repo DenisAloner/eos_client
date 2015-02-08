@@ -152,7 +152,7 @@ FOV::FOV()
 void FOV::calculate(int radius,GameObject* unit, GameMap* map)
 {
 	m_radius = radius;
-	std::function<bool(GameObject*)> qualifier = unit->m_active_state->m_ai->m_fov_qualifier;
+	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(unit->m_active_state->m_ai)->m_fov_qualifier;
 	for (int y = 0; y <m_max_size; y++)
 	{
 		for (int x = 0; x <m_max_size; x++)

@@ -90,16 +90,37 @@ class AI
 {
 public:
 
-	FOV* m_fov;
+	ai_type_e m_ai_type;
 	GameObject* m_object;
-
-
-	GameObject* find_goal();
-	void create();
-
 	GameMap* m_map;
 
-	AI();
-	~AI();
+	virtual GameObject* find_goal() = 0;
+	virtual void create() = 0;
+};
+
+class AI_enemy: public AI
+{
+public:
+
+	FOV* m_fov;
+
+	int m_fov_radius;
+	std::function<bool(GameObject*)> m_fov_qualifier;
+	std::function<bool(GameObject*)> m_path_qualifier;
+
+	AI_enemy();
+	virtual GameObject* find_goal();
+	virtual void create();
+
+};
+
+class AI_trap : public AI
+{
+public:
+
+	AI_trap();
+	virtual GameObject* find_goal();
+	virtual void create();
+
 };
 

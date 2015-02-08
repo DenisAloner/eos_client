@@ -883,13 +883,3 @@ void GameMap::add_lighting()
 	}
 }
 
-void  GameMap::calculate_ai()
-{
-	AI obj;
-	obj.m_map = this;
-	for (std::list<GameObject*>::iterator Current = m_ai.begin(); Current != m_ai.end(); Current++)
-	{
-		obj.m_object = (*Current);
-		obj.create();
-	}
-}

@@ -59,7 +59,6 @@ public:
 	void fill();
 	void random_block(block_t* block);
 	void calculate_lighting();
-	void calculate_ai();
 	void connect_room();
 	void link_room(block_t* a, block_t* b);
 	void add_wall();

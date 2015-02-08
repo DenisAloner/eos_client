@@ -306,20 +306,16 @@ void Application::initialize()
 		times you want it to loop (use -1 for infinite, and 0 to
 		have it just play once) */
 	}
-	rx = rx + 1;
-	ry = ry + 1;
 	obj = m_game_object_manager->new_object("snake");
 	obj->set_direction(ObjectDirection_Left);
-	m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
-	rx = rx -1;
-	ry = ry -4;
-	obj = m_game_object_manager->new_object("slime");
+	m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx + 1]);
+	/*obj = m_game_object_manager->new_object("slime");
 	obj->set_direction(ObjectDirection_Left);
-	m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
-	rx = rx - 2;
-	ry = ry + 3;
+	m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry - 3][room->rect.x + rx]);*/
 	obj = m_game_object_manager->new_object("sword");
-	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
+	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx - 2]);
+	obj = m_game_object_manager->new_object("trap");
+	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx + 2]);
 	int ru;
 	for (int i = 0; i <15; i++){
 		index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
@@ -435,10 +431,10 @@ void Application::update()
 		}
 	}
 	m_GUI->MapViewer->m_map->calculate_lighting();
-	m_GUI->MapViewer->m_map->calculate_ai();
+	Application::instance().m_game_object_manager->calculate_ai();
 	if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
 	{
-		m_GUI->MapViewer->m_player->m_fov->calculate(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_fov_radius, m_GUI->MapViewer->m_player->m_object, m_GUI->MapViewer->m_map);
+		m_GUI->MapViewer->m_player->m_fov->calculate(static_cast<AI_enemy*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)->m_fov_radius, m_GUI->MapViewer->m_player->m_object, m_GUI->MapViewer->m_map);
 	}
 	Application::instance().m_game_object_manager->update_buff();
 	Application::instance().m_GUI->MapViewer->update();
@@ -571,7 +567,7 @@ void Application::command_set_pickup_item_visibility(bool _Visibility)
 
 bool Application::command_check_position(GameObject*& object, MapCell*& position, GameMap*& map)
 {
-	std::function<bool(GameObject*)> qualifier = object->m_active_state->m_ai->m_path_qualifier;
+	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier;
 	for (int i = 0; i<object->m_active_state->m_size.y; i++)
 	{
 		for (int j = 0; j<object->m_active_state->m_size.x; j++)

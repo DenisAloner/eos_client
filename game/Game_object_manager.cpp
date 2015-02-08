@@ -10,6 +10,16 @@ interaction_e GameObjectManager::get_interaction_e(const std::string& key)
 	return value->second;
 }
 
+ai_type_e GameObjectManager::get_ai_type_e(const std::string& key)
+{
+	auto value = m_to_ai_type_e.find(key);
+	if (value == m_to_ai_type_e.end())
+	{
+		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
+	}
+	return value->second;
+}
+
 effect_e GameObjectManager::get_effect_e(const std::string& key)
 {
 	auto value = m_to_effect_e.find(key);
@@ -101,16 +111,27 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	case command_e::ai:
 	{
-		AI_configuration* ai = new AI_configuration;
-		std::size_t pos = 0;
-		found = args.find(" ");
-		ai->m_fov_radius = std::stoi(args.substr(0, found));
-		pos = found + 1;
-		found = args.find(" ", pos);
-		ai->m_fov_qualifier = Application::instance().m_ai_manager->m_fov_qualifiers[std::stoi(args.substr(pos, found - pos))];
-		pos = found + 1;
-		ai->m_path_qualifier = Application::instance().m_ai_manager->m_path_qualifiers[std::stoi(args.substr(pos))];
-		m_object->m_active_state->m_ai = ai;
+		ai_type_e type = get_ai_type_e(arg[0]);
+		switch (type)
+		{
+		case ai_type_e::trap:
+		{
+			AI_trap* ai = new AI_trap();
+			ai->m_ai_type = type;
+			m_object->m_active_state->m_ai = ai;
+			break;
+		}
+		case ai_type_e::non_humanoid:
+		{
+			AI_enemy* ai = new AI_enemy();
+			ai->m_ai_type = type;
+			ai->m_fov_radius = std::stoi(arg[1]);
+			ai->m_fov_qualifier = Application::instance().m_ai_manager->m_fov_qualifiers[std::stoi(arg[2])];
+			ai->m_path_qualifier = Application::instance().m_ai_manager->m_path_qualifiers[std::stoi(arg[3])];
+			m_object->m_active_state->m_ai = ai;
+			break;
+		}
+		}
 		break;
 	}
 	case command_e::size:
@@ -466,6 +487,9 @@ void GameObjectManager::init()
 	m_to_feature_list_type_e["parameter"] = feature_list_type_e::parameter;
 	m_to_feature_list_type_e["parts"] = feature_list_type_e::parts;
 
+	m_to_ai_type_e["non_humanoid"] = ai_type_e::non_humanoid;
+	m_to_ai_type_e["trap"] = ai_type_e::trap;
+
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);
 	std::string config(buffer);
@@ -540,6 +564,36 @@ void GameObjectManager::update_buff()
 		}
 		(*object)->update_interaction();
 		(*object)->event_update(VoidEventArgs());
+	}
+}
+
+void GameObjectManager::calculate_ai()
+{
+	for (auto object = m_objects.begin(); object != m_objects.end(); object++)
+	{
+		if ((*object)->m_active_state->m_ai)
+		{
+			switch ((*object)->m_active_state->m_ai->m_ai_type)
+			{
+			case ai_type_e::trap:
+			{
+				AI_trap obj;
+				obj = *static_cast<AI_trap*>((*object)->m_active_state->m_ai);
+				obj.m_object = (*object);
+				obj.create();
+				break;
+			}
+			case ai_type_e::non_humanoid:
+			{
+				AI_enemy obj;
+				obj = *static_cast<AI_enemy*>((*object)->m_active_state->m_ai);
+				obj.m_map = Application::instance().m_GUI->MapViewer->m_map;
+				obj.m_object = (*object);
+				obj.create();
+				break;
+			}
+			}
+		}
 	}
 }
 

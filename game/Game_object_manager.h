@@ -64,6 +64,7 @@ public:
 	std::map<std::string, action_e> m_to_action_e;
 	std::map<std::string, body_part_e> m_to_body_part_e;
 	std::map<std::string, feature_list_type_e> m_to_feature_list_type_e;
+	std::map<std::string, ai_type_e> m_to_ai_type_e;
 
 	std::map<interaction_e, std::string> m_effect_string;
 	std::map<effect_e, std::string> m_effect_subtype_string;
@@ -89,6 +90,7 @@ public:
 	action_e get_action_e(const std::string& key);
 	body_part_e get_body_part_e(const std::string& key);
 	feature_list_type_e get_feature_list_type_e(const std::string& key);
+	ai_type_e get_ai_type_e(const std::string& key);
 
 	void parser(const std::string& command);
 	void init();
@@ -99,4 +101,6 @@ public:
 	std::string get_effect_subtype_string(effect_e key);
 	std::string get_object_tag_string(object_tag_e key);
 	std::string get_effect_prefix_string(effect_prefix_e key);
+
+	void calculate_ai();
 };

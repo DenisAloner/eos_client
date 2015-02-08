@@ -114,7 +114,7 @@ void Path::calculate(GameMap* map, GameObject* object, GameObject* goal, int rad
 	c2 = static_cast<MapCell*>(goal->m_owner);
 	m_goal_cell = &m_map[c2->y - mc->y + m_middle][c2->x - mc->x +m_middle];
 	m_goal_size = goal->m_active_state->m_size;
-	std::function<bool(GameObject*)> qualifier = object->m_active_state->m_ai->m_path_qualifier;
+	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier;
 	for (int y = -radius; y < radius + 1; y++)
 	{
 		if ((object->cell()->y + y >= 0) && (object->cell()->y + y < map->m_size.h))
@@ -228,20 +228,15 @@ std::vector<MapCell*>* Path::get_path(){
 	return nullptr;
 }
 
-AI::AI()
+AI_enemy::AI_enemy()
 {
 	m_fov = new FOV();
 }
 
-
-AI::~AI()
-{
-}
-
-GameObject* AI::find_goal()
+GameObject* AI_enemy::find_goal()
 {
 	if (m_object->m_active_state->m_ai == nullptr){ return nullptr; }
-	m_fov->calculate(m_object->m_active_state->m_ai->m_fov_radius, m_object, m_map);
+	m_fov->calculate(m_fov_radius, m_object, m_map);
 	FOV::cell* fc;
 	MapCell* mc;
 	for (int y = -m_fov->m_radius; y < m_fov->m_radius + 1; y++)
@@ -271,7 +266,7 @@ GameObject* AI::find_goal()
 	return nullptr;
 }
 
-void AI::create()
+void AI_enemy::create()
 {
 		GameObject* goal = find_goal();
 		if (goal == nullptr) {
@@ -285,7 +280,7 @@ void AI::create()
 			Application::instance().m_action_manager->add(p->m_unit, new GameTask(Application::instance().m_actions[action_e::hit], p));
 			return;
 		}
-		Path::instance().calculate(m_map, m_object, goal, m_object->m_active_state->m_ai->m_fov_radius);
+		Path::instance().calculate(m_map, m_object, goal, m_fov_radius);
 		std::vector<MapCell*>* path;
 		path = Path::instance().get_path();
 		if (path)
@@ -299,3 +294,33 @@ void AI::create()
 		}
 		Path::instance().m_heap.m_items.clear();
 }
+
+AI_trap::AI_trap(){};
+
+GameObject* AI_trap::find_goal(){ return nullptr; };
+
+void AI_trap::create()
+{
+	m_object->set_state(object_state_e::off);
+	for (auto item = m_object->cell()->m_items.begin(); item != m_object->cell()->m_items.end(); item++)
+	{
+		if (m_object != (*item) && (*item)->m_name != "floor")
+		{
+			m_object->set_state(object_state_e::on);
+		}
+	}
+	if (m_object->m_active_state->m_state == object_state_e::on)
+	{
+		for (auto item = m_object->cell()->m_items.begin(); item != m_object->cell()->m_items.end(); item++)
+		{
+			if (m_object != (*item) && (*item)->m_name != "floor")
+			{
+				P_unit_interaction* p = new P_unit_interaction();
+				p->m_unit = m_object;
+				p->m_object = (*item);
+				p->m_unit_body_part = nullptr;
+				Application::instance().m_action_manager->add(p->m_unit, new GameTask(Application::instance().m_actions[action_e::hit], p));
+			}
+		}
+	}
+};

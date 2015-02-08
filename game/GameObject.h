@@ -12,6 +12,7 @@
 #include <map>
 #include "Effect.h"
 #include "Action.h"
+#include "AI.h"
 
 class Object_feature;
 class Application;
@@ -24,6 +25,7 @@ class Parameter_list;
 class Tag_list;
 struct object_parameter_t;
 class Action;
+class AI;
 
 class Game_object_owner{
 
@@ -54,15 +56,6 @@ public:
 	//virtual Object_feature* find_property(property_e kind, GameObject* excluded);
 };
 
-struct AI_configuration
-{
-public:
-
-	int m_fov_radius;
-	std::function<bool(GameObject*)> m_fov_qualifier;
-	std::function<bool(GameObject*)> m_path_qualifier;
-};
-
 class Attribute_map
 {
 public:
@@ -88,7 +81,7 @@ public:
 	light_t* m_light;
 	GLuint m_icon;
 
-	AI_configuration* m_ai;
+	AI* m_ai;
 
 	//virtual Action* find_action(action_e kind);
 	virtual void set_tile_size();
@@ -174,26 +167,6 @@ public:
 
 	AI_manager();
 };
-
-//class Body_part : public Inventory_cell
-//{
-//public:
-//
-//	Object_state_generic* m_object_state;
-//	body_part_e m_part_kind;
-//	std::string m_name;
-//	Body_part(GameObject* item = nullptr) :Inventory_cell(item){ m_kind = entity_e::body_part; };
-//};
-//
-//class Property_body : public Object_feature
-//{
-//public:
-//
-//	std::list<Body_part> m_item;
-//
-//	Property_body();
-//	Object_feature* clone();
-//};
 
 class Object_part : public Inventory_cell, public Object_interaction
 {

@@ -402,7 +402,7 @@ void GameObject::update_interaction()
 Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 {
 	m_fov = new FOV();
-	m_fov->calculate(object->m_active_state->m_ai->m_fov_radius, m_object, m_map);
+	m_fov->calculate(static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_fov_radius, m_object, m_map);
 	m_actions.push_front(Application::instance().m_actions[action_e::open_inventory]);
 	m_actions.push_front(Application::instance().m_actions[action_e::cell_info]);
 	m_actions.push_front(Application::instance().m_actions[action_e::show_parameters]);
@@ -421,21 +421,6 @@ AI_manager::AI_manager()
 	m_path_qualifiers.push_back([](GameObject* object)->bool{return !object->get_stat(object_tag_e::pass_able);});
 	m_path_qualifiers.push_back([](GameObject* object)->bool{return !object->get_stat(object_tag_e::pass_able) && object->m_name != "wall"; });
 }
-
-//Property_body::Property_body() : Object_feature(object_feature_e::body)
-//{
-//
-//}
-//
-//Object_feature* Property_body::clone()
-//{
-//	Property_body* result = new Property_body();
-//	for (auto part = m_item.begin(); part != m_item.end(); part++)
-//	{
-//		result->m_item.push_back((*part));
-//	}
-//	return result;
-//}
 
 Object_part::Object_part(GameObject* item) :Inventory_cell(item)
 {

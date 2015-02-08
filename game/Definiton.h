@@ -245,6 +245,12 @@ enum class feature_list_type_e
 	parts
 };
 
+enum class ai_type_e
+{
+	trap,
+	non_humanoid
+};
+
 class Object_interaction
 {
 public:

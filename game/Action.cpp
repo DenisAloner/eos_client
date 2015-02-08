@@ -717,7 +717,7 @@ bool Action_hit::check(Parameter* parameter)
 void Action_hit::perfom(Parameter* parameter)
 {
 	P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
-	if (check(p) && p->m_unit_body_part)
+	if (check(p))
 	{
 		auto reaction = p->m_unit->get_effect(interaction_e::total_damage);
 		if (reaction)
@@ -725,11 +725,14 @@ void Action_hit::perfom(Parameter* parameter)
 			Object_interaction* msg = reaction->clone();
 			msg->apply_effect(p->m_object, nullptr);
 		}
-		reaction = p->m_unit_body_part->m_item->get_effect(interaction_e::damage);
-		if (reaction)
+		if (p->m_unit_body_part)
 		{
-			Object_interaction* msg = reaction->clone();
-			msg->apply_effect(p->m_object, nullptr);
+			reaction = p->m_unit_body_part->m_item->get_effect(interaction_e::damage);
+			if (reaction)
+			{
+				Object_interaction* msg = reaction->clone();
+				msg->apply_effect(p->m_object, nullptr);
+			}
 		}
 		p->m_object->update_interaction();
 		p->m_object->event_update(VoidEventArgs());
