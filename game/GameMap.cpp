@@ -15,7 +15,7 @@ GameMap::GameMap(dimension_t size)
 		for (int j = 0; j < m_size.w; j++)
 		{
 			//m_items[i][j] = nullptr;
-			m_items[i][j] = new MapCell(j, i);
+			m_items[i][j] = new MapCell(j, i,this);
 			obj = Application::instance().m_game_object_manager->new_object("dirt");
 			//add_object(obj, m_items[i][j]);
 		}
@@ -37,11 +37,11 @@ void GameMap::generate_room(void)
 		{
 			if ((i==0)||(j==0)||(i==m_size.h-1)||(j==m_size.w-1))
 			{
-				m_items[i][j] = new MapCell(j, i);
+				m_items[i][j] = new MapCell(j, i,this);
 				GameObject* obj = Application::instance().m_game_object_manager->new_object("wall");
 				add_object(obj, m_items[i][j]);
 			} else {
-				m_items[i][j] = new MapCell(j, i);
+				m_items[i][j] = new MapCell(j, i,this);
 				GameObject* obj = Application::instance().m_game_object_manager->new_object("floor");
 				add_object(obj, m_items[i][j]);
 			}
@@ -210,7 +210,7 @@ void GameMap::fill()
 					add_object(obj, m_items[i][j]);*/
 				}
 				else {
-					m_items[i][j] = new MapCell(j, i);
+					m_items[i][j] = new MapCell(j, i, this);
 					GameObject* obj = Application::instance().m_game_object_manager->new_object("floor");
 					add_object(obj, m_items[i][j]);
 				}
@@ -883,3 +883,7 @@ void GameMap::add_lighting()
 	}
 }
 
+bool GameMap::check(int x, int y)
+{
+	if (x<0 && x>m_size.h - 1 && y<0 && y>m_size.w - 1) { return false; };
+}

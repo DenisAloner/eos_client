@@ -4,6 +4,64 @@
 
 //class Application;
 
+Slot_set_state* Slot_set_state::clone()
+{
+	Slot_set_state* effect = new Slot_set_state();
+	effect->m_interaction_message_type = m_interaction_message_type;
+	effect->m_value = m_value;
+	return effect;
+}
+
+void Slot_set_state::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "изменить состояние");
+}
+
+void Slot_set_state::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	unit->set_state(m_value);
+}
+
+void Slot_select_cell::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "выбрать локацию");
+}
+
+Slot_select_cell* Slot_select_cell::clone()
+{
+	Slot_select_cell* effect = new Slot_select_cell();
+	effect->m_interaction_message_type = m_interaction_message_type;
+	effect->m_value = m_value;
+	return effect;
+}
+
+void Slot_select_cell::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	MapCell* c = unit->cell();
+	MapCell* n = unit->cell();
+	GameMap* map = c->m_map;
+	if (map->check(c->x + 1, c->y))
+	{
+		n = map->m_items[c->y][c->x + 1];
+		if (n->m_items.size() == 1)
+		{
+			GameObject* obj = Application::instance().m_game_object_manager->new_object(m_value);
+			obj->set_direction(ObjectDirection_Left);
+			map->add_object(obj, n);
+		}
+	};
+	if (map->check(c->x + 1, c->y + 1))
+	{
+		n = map->m_items[c->y + 1][c->x + 1];
+		if (n->m_items.size() == 1)
+		{
+			GameObject* obj = Application::instance().m_game_object_manager->new_object(m_value);
+			obj->set_direction(ObjectDirection_Left);
+			map->add_object(obj, n);
+		}
+	};
+}
+
 Interaction_slot::Interaction_slot()
 {
 }
@@ -324,9 +382,9 @@ void Interaction_copyist::apply_effect(GameObject* unit, Object_interaction* obj
 
 void Interaction_timer::apply_effect(GameObject* unit, Object_interaction* object)
 {
-	if (m_turn == m_period)
+	if (m_turn == m_period - 1)
 	{
-		m_value->apply_effect(unit,object);
+		m_value->apply_effect(unit, object);
 	}
 }
 

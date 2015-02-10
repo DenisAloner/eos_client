@@ -267,6 +267,20 @@ void GameObjectManager::parser(const std::string& command)
 		m_mem_state = item->m_object_state;
 		break;
 	}
+	case command_e::mem_slot_set_state:
+	{
+		Slot_set_state* item = new Slot_set_state();
+		item->m_value = get_object_state_e(arg[0]);
+		m_slot = item;
+		break;
+	}
+	case command_e::mem_slot_select_location:
+	{
+		Slot_select_cell* item = new Slot_select_cell();
+		item->m_value = arg[0];
+		m_slot = item;
+		break;
+	}
 	case command_e::mem_effect:
 	{
 		Effect* item = new Effect();
@@ -405,10 +419,12 @@ void GameObjectManager::init()
 	m_commands["mem_effect"] = command_e::mem_effect;
 	m_commands["mem_part"] = command_e::mem_part;
 	m_commands["mem_slot_timer"] = command_e::mem_slot_timer;
+	m_commands["mem_slot_set_state"] = command_e::mem_slot_set_state;
 	m_commands["mem_slot_time"] = command_e::mem_slot_time;
 	m_commands["mem_slot_prefix"] = command_e::mem_slot_prefix;
 	m_commands["mem_slot_copyist"] = command_e::mem_slot_copyist;
 	m_commands["mem_slot_addon"] = command_e::mem_slot_addon;
+	m_commands["mem_slot_select_location"] = command_e::mem_slot_select_location;
 	m_commands["mem_action"] = command_e::mem_action;
 	m_commands["tag"] = command_e::tag;
 	m_commands["feature_list"] = command_e::feature_list;
@@ -419,6 +435,12 @@ void GameObjectManager::init()
 	m_to_object_state_e["on"] = object_state_e::on;
 	m_to_object_state_e["off"] = object_state_e::off;
 	m_to_object_state_e["equip"] = object_state_e::equip;
+	m_to_object_state_e["growth_01"] = object_state_e::growth_01;
+	m_to_object_state_e["growth_02"] = object_state_e::growth_02;
+	m_to_object_state_e["growth_03"] = object_state_e::growth_03;
+	m_to_object_state_e["growth_04"] = object_state_e::growth_04;
+	m_to_object_state_e["growth_05"] = object_state_e::growth_05;
+	m_to_object_state_e["growth_06"] = object_state_e::growth_06;
 
 	m_to_interaction_e["total_damage"] = interaction_e::total_damage;
 	m_to_interaction_e["damage"] = interaction_e::damage;

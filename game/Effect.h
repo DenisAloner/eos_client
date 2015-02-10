@@ -3,6 +3,34 @@
 #include "Parameter.h"
 #include <functional>
 
+class Slot_set_state :public Object_interaction
+{
+public:
+
+	object_state_e m_value;
+	Slot_set_state(){ m_interaction_message_type = interaction_message_type_e::set_attribute_map; };
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	virtual bool on_turn() { return false; };
+	virtual std::string get_description() { return "set_state"; };
+	virtual Slot_set_state* clone();
+	virtual void description(std::list<std::string>* info, int level);
+	virtual void do_predicat(predicat func){ func(this); };
+};
+
+class Slot_select_cell :public Object_interaction
+{
+public:
+
+	std::string m_value;
+	Slot_select_cell(){ m_interaction_message_type = interaction_message_type_e::select_location; };
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	virtual bool on_turn() { return false; };
+	virtual std::string get_description() { return "select_location"; };
+	virtual Slot_select_cell* clone();
+	virtual void description(std::list<std::string>* info, int level);
+	virtual void do_predicat(predicat func){ func(this); };
+};
+
 class Interaction_list :public Object_interaction
 {
 public:

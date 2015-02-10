@@ -109,7 +109,13 @@ enum class object_state_e
 	dead,
 	on,
 	off,
-	equip
+	equip,
+	growth_01,
+	growth_02,
+	growth_03,
+	growth_04,
+	growth_05,
+	growth_06
 };
 
 enum ParameterKind
@@ -189,7 +195,9 @@ enum class interaction_message_type_e
 	single,
 	list,
 	action,
-	part
+	part,
+	set_attribute_map,
+	select_location,
 };
 
 enum class interaction_e
@@ -224,7 +232,7 @@ enum class effect_prefix_e
 {
 	physical_damage,
 	poison_damage,
-	parameter_change
+	parameter_change,
 };
 
 enum class object_tag_e

@@ -40,6 +40,8 @@ class MapCell : public Game_object_owner
 {
 public:
 
+	GameMap* m_map;
+
 	int x;
 	int y;
 
@@ -50,7 +52,7 @@ public:
 	light_t m_light;
 	light_t m_light_blur;
 
-	MapCell(int x, int y);
+	MapCell(int x, int y, GameMap* map);
 
 	void add_object(GameObject* Object);
 	//virtual Object_feature* find_property(property_e kind, GameObject* excluded);

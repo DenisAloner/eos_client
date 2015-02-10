@@ -127,7 +127,8 @@ void Object_state::set_tile_size()
 
 Game_object_owner::Game_object_owner(){}
 
-MapCell::MapCell(int x, int y) :x(x), y(y){
+MapCell::MapCell(int x, int y, GameMap* map) :x(x), y(y), m_map(map)
+{
 	m_kind = entity_e::cell;
 }
 
