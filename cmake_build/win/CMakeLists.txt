@@ -78,8 +78,11 @@ list(APPEND GAME_DEFINES
 )
 
 add_executable(${PROJECT_NAME} WIN32 ${SOURCE_FILES})
-
 target_link_libraries(${PROJECT_NAME} ${EXT_LIBRARIES})
+# Copy assets and resources into the project directory
+string(REPLACE "/" "\\" PROJECT_DIR_WIN ${PROJECT_DIR})
+# Copy libraries into the Output Directory
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND xcopy ${PROJECT_DIR_WIN}\\lib\\win\\${LIB_PLATFORM}\\*.dll $(OutDir) /e/q/r/y)
 
 set_target_properties(${PROJECT_NAME}
 	PROPERTIES
