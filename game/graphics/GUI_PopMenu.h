@@ -73,9 +73,9 @@ public:
 		object->m_text = Text;
 		object->m_owner = this;
 		object->m_object = Object;
-		if (!m_item_controls->m_items.empty())
+		if (!m_items.empty())
 		{
-			GUI_Object* Back = m_item_controls->m_items.back();
+			GUI_Object* Back = m_items.back();
 			object->m_position.x = 0;
 			object->m_position.y = Back->m_position.y + Back->m_size.h;
 		}
@@ -84,9 +84,9 @@ public:
 			object->m_position.x = 0;
 			object->m_position.y = 0;
 		}
-		m_item_controls->add(object);
+		GUI_Layer::add(object);
 		std::size_t maxlen = 0;
-		for (std::list<GUI_Object*>::iterator Current = m_item_controls->m_items.begin(); Current != m_item_controls->m_items.end(); Current++)
+		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); Current++)
 		{
 			object = (GUI_PopMenu::Item*)(*Current);
 			if (object->m_text.length() > maxlen)
@@ -94,8 +94,8 @@ public:
 				maxlen = object->m_text.length();
 			}
 		}
-		resize(maxlen * 9 + 8, m_item_controls->m_items.size() * 18);
-		for (std::list<GUI_Object*>::iterator Current = m_item_controls->m_items.begin(); Current != m_item_controls->m_items.end(); Current++)
+		resize(maxlen * 9 + 8, m_items.size() * 18);
+		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); Current++)
 		{
 			(*Current)->m_size.w = m_size.w - 1;
 		}
@@ -103,7 +103,7 @@ public:
 	virtual void on_lose_focus(GUI_Object* sender){ destroy(this); }
 	virtual void on_mouse_move(MouseEventArgs const& e)
 	{
-		for (std::list<GUI_Object*>::iterator Current = m_item_controls->m_items.begin(); Current != m_item_controls->m_items.end(); Current++)
+		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); Current++)
 		{
 			if ((*Current)->check_region(MouseEventArgs(position_t(e.position.x - m_position.x, e.position.y - m_position.y), e.key, e.value)))
 			{

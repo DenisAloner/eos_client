@@ -6,7 +6,7 @@ GUI_Window::GUI_Window(int _x, int _y, int _width, int _height, std::string _Nam
 	m_is_moving = false;
 	GUI_Item* Header = new GUI_Item(2, 2, m_size.w- 4, 21, _Name, tag_t());
 	Header->close += std::bind(&GUI_Window::on_header_close, this);
-	add_managing_control(Header);
+	GUI_Layer::add(Header);
 	start_moving += std::bind(&GUI_Window::on_start_moving, this, std::placeholders::_1);
 	move += std::bind(&GUI_Window::on_move, this, std::placeholders::_1);
 	end_moving += std::bind(&GUI_Window::on_ending_move, this, std::placeholders::_1);
@@ -102,7 +102,7 @@ GUI_description_window::GUI_description_window(int x, int y, int width, int heig
 	m_textbox->m_position.x = 2;
 	m_textbox->m_position.y = 25;
 	m_textbox->resize(m_size.w - 4, m_size.h - 25 - 2);
-	add_item_control(m_textbox);
+	GUI_Layer::add(m_textbox);
 	update_info();
 	object->event_update += std::bind(&GUI_description_window::update_info, this);
 }
@@ -110,9 +110,9 @@ GUI_description_window::GUI_description_window(int x, int y, int width, int heig
 void GUI_description_window::update_info()
 {
 	m_text.clear();
-	while (m_textbox->m_item_controls->m_items.begin()!= m_textbox->m_item_controls->m_items.end())
+	while (m_textbox->m_items.begin()!= m_textbox->m_items.end())
 	{
-		m_textbox->remove_item_control((*m_textbox->m_item_controls->m_items.begin()));
+		m_textbox->GUI_Layer::remove((*m_textbox->m_items.begin()));
 	}
 	if (m_object->m_active_state)
 	{
@@ -135,7 +135,7 @@ GUI_body_window::GUI_body_window(int x, int y, int width, int height, std::strin
 	m_item->m_position.x = 2;
 	m_item->m_position.y = m_size.h - m_item->m_size.h - 2;
 	//m_item->resize(m_size.w - 4, m_size.h - 25 - 2);
-	add_item_control(m_item);
+	GUI_Layer::add(m_item);
 	update_info();
 	object->event_update += std::bind(&GUI_body_window::update_info, this);
 }

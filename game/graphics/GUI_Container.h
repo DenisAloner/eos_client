@@ -11,9 +11,6 @@ public:
 	GUI_Container(int _x, int _y, int _width, int _height);
 	~GUI_Container();
 
-	GUI_Layer* m_managing_controls;
-	GUI_Layer* m_item_controls;
-
 	position_t m_scroll;
 
 	virtual bool check_region(MouseEventArgs const& e);
@@ -22,9 +19,6 @@ public:
 	virtual void on_mouse_wheel(MouseEventArgs const& e);
 	virtual void on_mouse_down(MouseEventArgs const& e);
 	virtual void on_mouse_move(MouseEventArgs const& e);
-	virtual void add_item_control(GUI_Object* object);
-	virtual void remove_item_control(GUI_Object* object);
-	virtual void add_managing_control(GUI_Object* object);
 	virtual void resize(int _width, int _height);
 	virtual void set_scroll(int dy);
 	virtual MouseEventArgs set_local_mouse_position(MouseEventArgs const& source);

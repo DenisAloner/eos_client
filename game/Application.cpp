@@ -226,12 +226,12 @@ void Application::initialize()
 
 	GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
 	GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), m_GUI->MapViewer);
-	MiniMap->add_item_control(mini_map);
+	MiniMap->add(mini_map);
 	MenuLayer->add(MiniMap);
 
 	MiniMap = new GUI_Window(300, 0, 400, 400, "Поле зрения");
 	GUI_FOV* fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), m_GUI->MapViewer->m_player->m_fov);
-	MiniMap->add_item_control(fov);
+	MiniMap->add(fov);
 
 	MenuLayer->add(m_GUI->Timer);
 	MenuLayer->add(MiniMap);
@@ -366,7 +366,7 @@ void Application::get_action_predicat(Object_interaction* object)
 void Application::update_action_panel()
 {
 	GUI_ActionButton* ActionButton;
-	GUI_Layer* panel = m_GUI->m_action_panel->m_item_controls;
+	GUI_ActionPanel* panel = m_GUI->m_action_panel;
 	while (!panel->m_items.empty())
 	{
 		panel->remove(panel->m_items.front());
@@ -605,7 +605,7 @@ void Application::process_game()
 			m_GUI->DescriptionBox->add_item_control(new GUI_Text("Ход - " + std::to_string(m_game_turn) + ".", new GUI_TextFormat(10, 19, RGBA_t(0.0, 0.8, 0.0, 1.0))));
 			m_game_turn += 1;
 		}
-		std::chrono::milliseconds Duration(50);
+		std::chrono::milliseconds Duration(250);
 		std::this_thread::sleep_for(Duration);
 	}
 }

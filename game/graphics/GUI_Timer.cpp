@@ -3,7 +3,7 @@
 
 GUI_Timer::GUI_Timer(int _x, int _y, int _width, int _height, int time) :GUI_Container(_x, _y, _width, _height)
 {
-	m_item_controls->add(new GUI_Text(""));
+	GUI_Layer::add(new GUI_Text(""));
 	Update(time);
 }
 
@@ -14,7 +14,7 @@ GUI_Timer::~GUI_Timer()
 
 void GUI_Timer::Update(int time)
 {
-	GUI_Text* Text = static_cast<GUI_Text*>(m_item_controls->m_items.front());
+	GUI_Text* Text = static_cast<GUI_Text*>(m_items.front());
 	Text->m_format->m_symbol_size.w = 48;
 	Text->m_format->m_symbol_size.h = 57;
 	Text->m_format->m_color.R = 1 - time / 15.0F;

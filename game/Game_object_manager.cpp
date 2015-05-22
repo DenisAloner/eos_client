@@ -565,6 +565,9 @@ void GameObjectManager::update_buff()
 {
 	Interaction_list* list;
 	Object_interaction* e;
+	/*Application::instance().console(std::to_string(m_objects.size()));
+	Application::instance().console(std::to_string(Application::instance().m_GUI->MapViewer->m_map->m_lights.size()));
+	Application::instance().console(std::to_string(Application::instance().m_GUI->MapViewer->m_map->m_ai.size()));*/
 	for (auto object = m_objects.begin(); object != m_objects.end(); object++)
 	{
 		list =static_cast<Interaction_list*>((*object)->get_effect(interaction_e::buff));
@@ -593,7 +596,7 @@ void GameObjectManager::calculate_ai()
 {
 	for (auto object = m_objects.begin(); object != m_objects.end(); object++)
 	{
-		if ((*object)->m_active_state->m_ai)
+		if (((*object)->m_active_state->m_ai) && ((*object)!=Application::instance().m_GUI->MapViewer->m_player->m_object))
 		{
 			switch ((*object)->m_active_state->m_ai->m_ai_type)
 			{

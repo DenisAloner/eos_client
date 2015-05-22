@@ -12,9 +12,9 @@ GUI_ActionPanel::~GUI_ActionPanel()
 
 void GUI_ActionPanel::add_item_control(GUI_Object* object)
 {
-	if (!m_item_controls->m_items.empty())
+	if (!m_items.empty())
 	{
-		GUI_Object* Back = m_item_controls->m_items.back();
+		GUI_Object* Back = m_items.back();
 		object->m_position.y = 4;
 		object->m_position.x = Back->m_position.x + Back->m_size.w + 4;
 		if (object->m_position.x + object->m_size.w>m_size.w)
@@ -27,5 +27,5 @@ void GUI_ActionPanel::add_item_control(GUI_Object* object)
 		object->m_position.x = 4;
 		object->m_position.y = 4;
 	}
-	m_item_controls->add(object);
+	GUI_Layer::add(object);
 }

@@ -7,18 +7,6 @@ GUI_Container::GUI_Container(int _x, int _y, int _width, int _height)
 	m_position.y = _y;
 	m_size.w = _width;
 	m_size.h = _height;
-	m_managing_controls = new GUI_Layer();
-	m_managing_controls->m_position.x = 0;
-	m_managing_controls->m_position.y = 0;
-	m_managing_controls->m_size.w = m_size.w;
-	m_managing_controls->m_size.h = m_size.h;
-	add(m_managing_controls);
-	m_item_controls = new GUI_Layer();
-	m_item_controls->m_position.x = 0;
-	m_item_controls->m_position.y = 0;
-	m_item_controls->m_size.w = m_size.w;
-	m_item_controls->m_size.h = m_size.h;
-	add(m_item_controls);
 }
 
 
@@ -140,21 +128,6 @@ void GUI_Container::set_scroll(int dy)
 	}
 }
 
-void GUI_Container::add_item_control(GUI_Object* object)
-{
-	m_item_controls->add(object);
-}
-
-void GUI_Container::remove_item_control(GUI_Object* object)
-{
-	m_item_controls->remove(object);
-}
-
-void GUI_Container::add_managing_control(GUI_Object* object)
-{
-	m_managing_controls->add(object);
-}
-
 MouseEventArgs GUI_Container::set_local_mouse_position(MouseEventArgs const& source)
 {
 	return MouseEventArgs(position_t(source.position.x - m_position.x - m_scroll.x, source.position.y - m_position.y - m_scroll.y), source.key, source.value);
@@ -164,8 +137,4 @@ void GUI_Container::resize(int _width, int _height)
 {
 	m_size.w = _width;
 	m_size.h = _height;
-	m_managing_controls->m_size.w = m_size.w;
-	m_managing_controls->m_size.h = m_size.h;
-	m_item_controls->m_size.w = m_size.w;
-	m_item_controls->m_size.h = m_size.h;
 }

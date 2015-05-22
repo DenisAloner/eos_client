@@ -86,9 +86,9 @@ void GUI_Body::get_part_predicat(Object_interaction* object)
 
 void GUI_Body::update(Attribute_map* feature)
 {
-	while (m_item_controls->m_items.begin() != m_item_controls->m_items.end())
+	while (m_items.begin() != m_items.end())
 	{
-		remove_item_control((*m_item_controls->m_items.begin()));
+		remove(*m_items.begin());
 	}
 	for (auto item = feature->m_item.begin(); item != feature->m_item.end(); item++)
 	{
@@ -104,9 +104,9 @@ GUI_Body::GUI_Body(Attribute_map* feature) :GUI_Container(0, 0, 192, 4 * 64)
 
 void GUI_Body::add_item_control(GUI_Object* object)
 {
-	if (!m_item_controls->m_items.empty())
+	if (!m_items.empty())
 	{
-		GUI_body_cell* LastElement = static_cast<GUI_body_cell*>(m_item_controls->m_items.back());
+		GUI_body_cell* LastElement = static_cast<GUI_body_cell*>(m_items.back());
 		object->m_position.x = 0;
 		object->m_position.y = LastElement->m_position.y + LastElement->m_size.h;
 		if (object->m_position.y + object->m_size.h>m_size.h)
@@ -119,7 +119,7 @@ void GUI_Body::add_item_control(GUI_Object* object)
 		object->m_position.x = 0;
 		object->m_position.y = 0;
 	}
-	m_item_controls->add(object);
+	GUI_Layer::add(object);
 }
 
 void GUI_Body::set_scroll(int dy)

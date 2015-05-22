@@ -49,9 +49,9 @@ void GUI_ActionManager::add_item_control(GUI_Object* object)
 	static_cast<GUI_Item*>(object)->resize(m_size.w - 4, 21);
 	/*object->width = width - 4;
 	object->height = 21;*/
-	if (!m_item_controls->m_items.empty())
+	if (!m_items.empty())
 	{
-		GUI_Item* LastElement = static_cast<GUI_Item*>(m_item_controls->m_items.back());
+		GUI_Item* LastElement = static_cast<GUI_Item*>(m_items.back());
 		object->m_position.x = 2;
 		object->m_position.y = LastElement->m_position.y + LastElement->m_size.h + 2;
 		if (object->m_position.y + object->m_size.h>m_size.h)
@@ -65,7 +65,7 @@ void GUI_ActionManager::add_item_control(GUI_Object* object)
 		object->m_position.y = 2;
 	}
 	static_cast<GUI_Item*>(object)->close += std::bind(&GUI_ActionManager::remove_item_from_source, this, std::placeholders::_1);
-	m_item_controls->add(object);
+	GUI_Layer::add(object);
 }
 
 void GUI_ActionManager::on_item_add(tag_t const& e)
@@ -76,7 +76,7 @@ void GUI_ActionManager::on_item_add(tag_t const& e)
 
 void GUI_ActionManager::remove_item_control(GUI_Object* object)
 {
-	for (std::list<GUI_Object*>::iterator Current = m_item_controls->m_items.begin(); Current != m_item_controls->m_items.end(); Current++)
+	for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); Current++)
 	{
 		if (static_cast<GUI_Item*>(*Current)== object)
 		{
@@ -85,7 +85,7 @@ void GUI_ActionManager::remove_item_control(GUI_Object* object)
 			if (!m_items.empty())
 			{
 				int cx, cy;
-				for (std::list<GUI_Object*>::iterator Other = std::next(Current, 1); Other != m_item_controls->m_items.end(); Other++)
+				for (std::list<GUI_Object*>::iterator Other = std::next(Current, 1); Other != m_items.end(); Other++)
 				{
 					cx = (*Other)->m_position.x;
 					cy = (*Other)->m_position.y;
@@ -95,7 +95,7 @@ void GUI_ActionManager::remove_item_control(GUI_Object* object)
 					ly = cy;
 				}
 			}
-			m_item_controls->remove(object);
+			GUI_Layer::remove(object);
 			break;
 		}
 	}
@@ -103,7 +103,7 @@ void GUI_ActionManager::remove_item_control(GUI_Object* object)
 
 void GUI_ActionManager::on_item_remove(tag_t const& e)
 {
-	for (std::list<GUI_Object*>::iterator Current = m_item_controls->m_items.begin(); Current != m_item_controls->m_items.end(); Current++)
+	for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current !=m_items.end(); Current++)
 	{
 		if (static_cast<GUI_Item*>(*Current)->m_tag.object == e.object && static_cast<GUI_Item*>(*Current)->m_tag.task == e.task)
 		{

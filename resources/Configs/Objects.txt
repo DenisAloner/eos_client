@@ -48,6 +48,8 @@ mem_effect value,-10
 mem_slot_prefix physical_damage
 mem_slot_copyist health
 add_slot damage
+feature_list tag,tag
+tag mortal
 state dead
 size 1 2 0
 tile_manager_single elf_corpse
