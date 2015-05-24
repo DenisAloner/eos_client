@@ -47,5 +47,5 @@ void GUI_ItemButton::render(GraphicalController* Graph, int px, int py)
 
 void GUI_ItemButton::on_mouse_move(MouseEventArgs const& e)
 {
-	SetCursor(LoadCursor(NULL, IDC_HAND));
+	//SetCursor(LoadCursor(NULL, IDC_HAND));
 }

@@ -6,6 +6,20 @@
 #include <list>
 #include "GUI_TextBox.h"
 
+class GUI_Header :
+	public GUI_Container
+{
+public:
+
+	Event<GUI_Object*> close;
+	GUI_Header(int x, int y, int width, int height, std::string text);
+	~GUI_Header();
+
+	void on_close_button_click();
+	virtual void resize(int width, int height);
+
+};
+
 class GUI_Window :
 	public GUI_Container
 {
@@ -22,6 +36,7 @@ public:
 	bool m_is_moving;
 	position_t m_initial_position;
 
+	//virtual void on_mouse_down(MouseEventArgs const& e);
 	virtual void on_mouse_move(MouseEventArgs const& e);
 	virtual void on_start_moving(MouseEventArgs const& e);
 	virtual void on_move(MouseEventArgs const& e);
