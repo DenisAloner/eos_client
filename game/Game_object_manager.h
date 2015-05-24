@@ -41,6 +41,8 @@ public:
 		mem_slot_copyist,
 		mem_slot_prefix,
 		mem_slot_addon,
+		mem_slot_mover,
+		mem_slot_allocator,
 		mem_action,
 		add_slot,
 		add_slot_mem,

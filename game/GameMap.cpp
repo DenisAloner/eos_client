@@ -887,3 +887,8 @@ bool GameMap::check(int x, int y)
 {
 	if (x<0 && x>m_size.h - 1 && y<0 && y>m_size.w - 1) { return false; };
 }
+
+//MapCell* GameMap::get_cell(int x, int y)
+//{
+//	if (x<0 && x>m_size.h - 1 && y<0 && y>m_size.w - 1) { return false; };
+//}

@@ -68,6 +68,7 @@ public:
 	void add_lighting();
 	void bresenham_line(MapCell* a, MapCell* b, std::function<void(MapCell*)> f);
 	bool check(int x,int y);
+	//MapCell* get_cell(int x, int y);
 };
 
 #endif //GAMEMAP_H

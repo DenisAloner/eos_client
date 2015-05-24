@@ -31,6 +31,35 @@ public:
 	virtual void do_predicat(predicat func){ func(this); };
 };
 
+class Slot_allocator :public Object_interaction
+{
+public:
+
+	MapCell* m_value;
+	Slot_allocator(){ m_interaction_message_type = interaction_message_type_e::allocator; };
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	virtual bool on_turn() { return false; };
+	virtual std::string get_description() { return "select_location"; };
+	virtual Slot_allocator* clone();
+	virtual void description(std::list<std::string>* info, int level);
+	virtual void do_predicat(predicat func){ func(this); };
+};
+
+class Slot_mover :public Object_interaction
+{
+public:
+
+	Slot_allocator* m_value;
+	Slot_mover(){ m_interaction_message_type = interaction_message_type_e::mover; };
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	virtual bool on_turn() { return false; };
+	virtual std::string get_description() { return "select_location"; };
+	virtual Slot_mover* clone();
+	virtual void description(std::list<std::string>* info, int level);
+	virtual void do_predicat(predicat func){ func(this); };
+
+};
+
 class Interaction_list :public Object_interaction
 {
 public:

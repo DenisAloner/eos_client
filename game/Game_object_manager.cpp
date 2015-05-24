@@ -281,6 +281,19 @@ void GameObjectManager::parser(const std::string& command)
 		m_slot = item;
 		break;
 	}
+	case command_e::mem_slot_mover:
+	{
+		Slot_mover* item = new Slot_mover();
+		item->m_value = static_cast<Slot_allocator*>(m_slot);
+		m_slot = item;
+		break;
+	}
+	case command_e::mem_slot_allocator:
+	{
+		Slot_allocator* item = new Slot_allocator();
+		m_slot = item;
+		break;
+	}
 	case command_e::mem_effect:
 	{
 		Effect* item = new Effect();
@@ -425,6 +438,8 @@ void GameObjectManager::init()
 	m_commands["mem_slot_copyist"] = command_e::mem_slot_copyist;
 	m_commands["mem_slot_addon"] = command_e::mem_slot_addon;
 	m_commands["mem_slot_select_location"] = command_e::mem_slot_select_location;
+	m_commands["mem_slot_mover"] = command_e::mem_slot_mover;
+	m_commands["mem_slot_allocator"] = command_e::mem_slot_allocator;
 	m_commands["mem_action"] = command_e::mem_action;
 	m_commands["tag"] = command_e::tag;
 	m_commands["feature_list"] = command_e::feature_list;

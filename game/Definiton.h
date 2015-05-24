@@ -198,6 +198,8 @@ enum class interaction_message_type_e
 	part,
 	set_attribute_map,
 	select_location,
+	mover,
+	allocator
 };
 
 enum class interaction_e

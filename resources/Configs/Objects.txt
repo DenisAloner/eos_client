@@ -216,6 +216,9 @@ add_slot damage
 mem_effect value,-1
 mem_slot_addon strength
 add_slot damage
+mem_slot_allocator
+mem_slot_mover
+add_slot damage
 mem_effect value,1
 add_slot strength
 mem_effect value,-10

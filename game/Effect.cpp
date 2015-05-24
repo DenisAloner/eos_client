@@ -62,6 +62,53 @@ void Slot_select_cell::apply_effect(GameObject* unit, Object_interaction* object
 	};
 }
 
+
+void Slot_allocator::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "вперед на одну клетку");
+
+}
+
+Slot_allocator* Slot_allocator::clone()
+{
+	Slot_allocator* effect = new Slot_allocator();
+	effect->m_interaction_message_type = m_interaction_message_type;
+	return effect;
+}
+
+void Slot_allocator::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	MapCell* c = unit->cell();
+	GameMap* map = c->m_map;
+	if (map->check(c->x + 1, c->y))
+	{
+		m_value = map->m_items[c->y][c->x + 1];
+	};
+}
+
+void Slot_mover::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "переместить объект:");
+	m_value->description(info, level + 1);
+}
+
+Slot_mover* Slot_mover::clone()
+{
+	Slot_mover* effect = new Slot_mover();
+	effect->m_interaction_message_type = m_interaction_message_type;
+	effect->m_value = m_value;
+	return effect;
+}
+
+void Slot_mover::apply_effect(GameObject* unit, Object_interaction* object)
+{
+
+	MapCell* c = unit->cell();
+	GameMap* map = c->m_map;
+	m_value->apply_effect(unit, object);
+	map->move_object(unit, m_value->m_value);
+}
+
 Interaction_slot::Interaction_slot()
 {
 }
