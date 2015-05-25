@@ -314,6 +314,8 @@ void Application::initialize()
 	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry - 3][room->rect.x + rx]);
 	obj = m_game_object_manager->new_object("sword");
 	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx - 2]);
+	obj = m_game_object_manager->new_object("dagger");
+	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx - 3]);
 	obj = m_game_object_manager->new_object("trap");
 	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx + 2]);
 	int ru;
