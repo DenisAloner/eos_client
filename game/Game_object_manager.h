@@ -3,6 +3,8 @@
 #include <map>
 #include "GameObject.h"
 #include "Effect.h"
+#include "game\impact\forwards.h"
+
 
 class Effect;
 class Buff;
@@ -44,6 +46,7 @@ public:
 		mem_slot_mover,
 		mem_slot_allocator,
 		mem_action,
+		mem_impact_random_value,
 		add_slot,
 		add_slot_mem,
 		tag,

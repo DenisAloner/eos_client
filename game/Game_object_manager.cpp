@@ -1,4 +1,5 @@
 #include "Game_object_manager.h"
+#include "game\impact\Impact_random_value.h"
 
 interaction_e GameObjectManager::get_interaction_e(const std::string& key)
 {
@@ -303,6 +304,18 @@ void GameObjectManager::parser(const std::string& command)
 		m_slot = item;
 		break;
 	}
+	case command_e::mem_impact_random_value:
+	{
+		Impact_random_value* item = new Impact_random_value();
+		item->m_interaction_message_type = interaction_message_type_e::single;
+		LOG(INFO) << "ok 1";
+		item->m_subtype = get_effect_e(arg[0]);
+		item->m_value = std::stoi(arg[1]);
+		item->m_min_value = std::stoi(arg[2]);
+		m_slot = item;
+		LOG(INFO) << "ok 2";
+		break;
+	}
 	case command_e::mem_slot_timer:
 	{
 		Interaction_timer* item = new Interaction_timer();
@@ -440,6 +453,7 @@ void GameObjectManager::init()
 	m_commands["mem_slot_select_location"] = command_e::mem_slot_select_location;
 	m_commands["mem_slot_mover"] = command_e::mem_slot_mover;
 	m_commands["mem_slot_allocator"] = command_e::mem_slot_allocator;
+	m_commands["mem_impact_random_value"] = command_e::mem_impact_random_value;
 	m_commands["mem_action"] = command_e::mem_action;
 	m_commands["tag"] = command_e::tag;
 	m_commands["feature_list"] = command_e::feature_list;
