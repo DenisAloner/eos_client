@@ -277,4 +277,15 @@ public:
 	virtual void do_predicat(predicat func){ func(this); };
 };
 
+class GameTask;
+class GameObject;
+
+struct tag_t {
+	GameObject* object;
+	GameTask* task;
+
+	tag_t(GameObject*object, GameTask* task) :object(object), task(task){};
+	tag_t() :object(nullptr), task(nullptr){};
+};
+
 #endif //DEFINITION_H

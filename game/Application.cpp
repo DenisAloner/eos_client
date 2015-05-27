@@ -186,6 +186,10 @@ void Application::initialize()
 	
 	m_GUI->MapViewer->m_map = new GameMap(dimension_t(200,200));
 	m_GUI->MapViewer->m_map->generate_level();
+
+	m_window_manager = new GUI_Window_manager();
+	m_window_manager->m_position = position_t(0, 0);
+	m_window_manager->m_size = dimension_t(1024, 1024);
 	
 
 	int index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
@@ -227,17 +231,18 @@ void Application::initialize()
 	GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
 	GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), m_GUI->MapViewer);
 	MiniMap->add(mini_map);
-	MenuLayer->add(MiniMap);
+	//MenuLayer->add(MiniMap);
 
 	MiniMap = new GUI_Window(300, 0, 400, 400, "Поле зрения");
 	GUI_FOV* fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), m_GUI->MapViewer->m_player->m_fov);
 	MiniMap->add(fov);
 
 	MenuLayer->add(m_GUI->Timer);
-	MenuLayer->add(MiniMap);
+	//MenuLayer->add(MiniMap);
 	
 	
 	//MenuLayer->add(new GUI_Item(0, 0, 100,21, "4565656"));
+	m_GUI->add(m_window_manager);
 	m_GUI->add(MenuLayer);
 	m_GUI->add(m_GUI->MapViewer);
 	m_GUI->MapViewer->m_GUI = MenuLayer;
@@ -535,7 +540,7 @@ bool Application::command_open_body(GameObject*& Object)
 		Inv->m_position.x = 2;
 		Inv->m_position.y = Window->m_size.h - Inv->m_size.h - 2;
 		Window->add_item_control(Inv);*/
-		m_GUI->add_front(Window);
+		//m_GUI->add_front(Window);
 		Result = true;
 	}
 	return Result;
@@ -544,7 +549,7 @@ bool Application::command_open_body(GameObject*& Object)
 void Application::command_gui_show_characterization(GameObject*& object)
 {
 	GUI_description_window* Window = new GUI_description_window(1024 / 2 - (192 + 2) / 2, 1024 / 2 - (4 * 64 + 2) / 2, 800 + 4, 8 * 64 + 27, object->m_name + "::Характеристика",object);
-	m_GUI->add_front(Window);
+	//m_GUI->add_front(Window);
 }
 
 void Application::command_set_cursor(GLuint _Tile)

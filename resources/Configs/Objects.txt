@@ -245,6 +245,11 @@ feature_list generic,damage
 mem_impact_random_value value,-3,-7
 mem_slot_copyist health
 add_slot damage
+mem_effect value,-2
+mem_slot_prefix poison_damage
+mem_slot_copyist health
+mem_impact_copy_chance 50
+add_slot damage
 
 object wall
 state alive

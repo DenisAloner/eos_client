@@ -20,14 +20,6 @@ public:
 	Parameter* m_parameter;
 };
 
-struct tag_t {
-	GameObject* object;
-	GameTask* task;
-
-	tag_t(GameObject*object, GameTask* task) :object(object), task(task){};
-	tag_t():object(nullptr), task(nullptr){};
-};
-
 class ActionManager
 {
 public:

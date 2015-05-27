@@ -45,7 +45,6 @@ public:
 	virtual void on_header_close();
 	virtual void resize(int _width, int _height);
 	virtual void on_mouse_wheel(MouseEventArgs const& e);
-
 };
 
 class GUI_description_window :
@@ -60,6 +59,8 @@ public:
 	void update_info();
 
 };
+
+class GUI_Body;
 
 class GUI_body_window :
 	public GUI_Window

@@ -17,6 +17,7 @@
 #include <condition_variable>
 #include <map>
 #include "Game_object_manager.h"
+#include "GUI_Window_manager.h"
 
 class Action;
 class ActionManager;
@@ -42,6 +43,7 @@ class AI_manager;
 class GameObjectManager;
 class Object_part;
 class Object_interaction;
+class GUI_Window_manager;
 
 class gui_MessageQueue
 {
@@ -100,6 +102,8 @@ public:
 	Event<MouseEventArgs> mouse_click;
 
 	Mix_Chunk *music;
+
+	GUI_Window_manager* m_window_manager;
 
 	~Application(void);
 

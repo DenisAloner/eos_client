@@ -1,4 +1,5 @@
 #include "GUI_Window.h"
+#include "Application.h"
 
 GUI_Header::GUI_Header(int x, int y, int width, int height, std::string text) :GUI_Container(x, y, width, height)
 {
@@ -45,6 +46,7 @@ GUI_Window::GUI_Window(int _x, int _y, int _width, int _height, std::string _Nam
 	move += std::bind(&GUI_Window::on_move, this, std::placeholders::_1);
 	end_moving += std::bind(&GUI_Window::on_ending_move, this, std::placeholders::_1);
 	close += std::bind(&GUI_Window::on_close, this, std::placeholders::_1);
+	Application::instance().m_window_manager->add_front(this);
 }
 
 
@@ -76,7 +78,6 @@ GUI_Window::~GUI_Window()
 //		}
 //	}
 //}
-
 
 void GUI_Window::on_mouse_move(MouseEventArgs const& e)
 {

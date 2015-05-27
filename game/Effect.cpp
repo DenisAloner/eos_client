@@ -224,9 +224,12 @@ void Interaction_list::update()
 Interaction_list* Interaction_list::clone()
 {
 	Interaction_list* result = new Interaction_list();
+	Object_interaction* c;
 	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
 	{
-		result->m_effect.push_back((*item)->clone());
+		c = (*item)->clone();
+		if (c){ result->m_effect.push_back(c); }
+		
 	}
 	return result;
 }

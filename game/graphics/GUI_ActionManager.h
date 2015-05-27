@@ -10,7 +10,7 @@ class ActionManager;
 class GameTask;
 class GUI_Object;
 
-struct tag_t;
+//struct tag_t;
 struct ActionManagerEventArgs;
 
 class GUI_ActionManager : public GUI_Container

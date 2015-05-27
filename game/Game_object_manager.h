@@ -47,6 +47,7 @@ public:
 		mem_slot_allocator,
 		mem_action,
 		mem_impact_random_value,
+		mem_impact_copy_chance,
 		add_slot,
 		add_slot_mem,
 		tag,
