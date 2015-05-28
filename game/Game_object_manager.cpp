@@ -491,6 +491,7 @@ void GameObjectManager::init()
 	m_to_interaction_e["action"] = interaction_e::action;
 	m_to_interaction_e["tag"] = interaction_e::tag;
 	m_to_interaction_e["body"] = interaction_e::body;
+	m_to_interaction_e["weapon_damage"] = interaction_e::weapon_damage;
 
 	m_to_effect_e["value"] = effect_e::value;
 	m_to_effect_e["limit"] = effect_e::limit;
@@ -506,6 +507,7 @@ void GameObjectManager::init()
 	m_effect_string[interaction_e::poison] = "яд";
 	m_effect_string[interaction_e::action] = "действия";
 	m_effect_string[interaction_e::body] = "тело";
+	m_effect_string[interaction_e::weapon_damage] = "урон оружия";
 
 	m_effect_subtype_string[effect_e::value] = "модификатор значения";
 	m_effect_subtype_string[effect_e::limit] = "модификатор лимита";
@@ -530,6 +532,7 @@ void GameObjectManager::init()
 
 	m_to_action_e["equip"] = action_e::equip;
 	m_to_action_e["hit"] = action_e::hit;
+	m_to_action_e["hit_melee"] = action_e::hit_melee;
 	m_to_action_e["move"] = action_e::move;
 	m_to_action_e["open"] = action_e::open;
 	m_to_action_e["pick"] = action_e::pick;

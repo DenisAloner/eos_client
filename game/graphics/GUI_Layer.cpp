@@ -1,9 +1,13 @@
 #include "GUI_Layer.h"
 #include <Windows.h>
 
-GUI_Layer::GUI_Layer()
+GUI_Layer::GUI_Layer(int x, int y, int width, int height)
 {
 	m_focus=nullptr;
+	m_position.x = x;
+	m_position.y = y;
+	m_size.w = width;
+	m_size.h = height;
 }
 
 

@@ -2,7 +2,7 @@
 #include "utils/log.h"
 
 
-GUI_Window_manager::GUI_Window_manager()
+GUI_Window_manager::GUI_Window_manager(int x, int y, int width, int height) :GUI_Layer(x, y, width, height)
 {
 }
 

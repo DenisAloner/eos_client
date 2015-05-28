@@ -207,7 +207,7 @@ feature_list tag,tag
 tag pick_able
 tag pass_able
 feature_list generic,action
-add_action hit
+add_action hit_melee
 feature_list generic,damage
 feature_list generic,strength
 mem_effect value,-50
@@ -239,8 +239,9 @@ tile_manager_single dagger
 feature_list tag,tag
 tag pick_able
 tag pass_able
+feature_list parameter,weapon_damage,5,5
 feature_list generic,action
-add_action hit
+add_action hit_melee
 feature_list generic,damage
 mem_impact_random_value value,-3,-7
 mem_slot_copyist health

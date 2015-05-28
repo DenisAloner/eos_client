@@ -178,6 +178,16 @@ public:
 
 };
 
+class action_hit_melee :
+	public Action_hit
+{
+public:
+
+	action_hit_melee();
+	virtual Object_interaction* clone(){ return new action_hit_melee(); };
+	virtual void perfom(Parameter* parameter);
+};
+
 class Action_equip :
 	public Action
 {

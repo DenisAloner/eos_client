@@ -8,7 +8,7 @@ class GUI_Container :
 {
 public:
 
-	GUI_Container(int _x, int _y, int _width, int _height);
+	GUI_Container(int x, int y, int width, int height);
 	~GUI_Container();
 
 	position_t m_scroll;

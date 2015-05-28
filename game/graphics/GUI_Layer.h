@@ -17,7 +17,7 @@ public:
 	std::list<GUI_Object*> m_items;
 	GUI_Object* m_focus;
 
-	GUI_Layer(void);
+	GUI_Layer(int x, int y, int width, int height);
 	~GUI_Layer(void);
 
 	virtual void render(GraphicalController* Graph, int px, int py);

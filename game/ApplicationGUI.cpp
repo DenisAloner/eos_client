@@ -1,7 +1,7 @@
 #include "ApplicationGUI.h"
 
 
-ApplicationGUI::ApplicationGUI()
+ApplicationGUI::ApplicationGUI(int x, int y, int width, int height) :GUI_Layer(x, y, width, height)
 {
 }
 

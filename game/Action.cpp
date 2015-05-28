@@ -739,6 +739,39 @@ void Action_hit::perfom(Parameter* parameter)
 	}
 }
 
+action_hit_melee::action_hit_melee()
+{
+	m_kind = action_e::hit_melee;
+	m_icon = Application::instance().m_graph->m_actions[8];
+}
+
+void action_hit_melee::perfom(Parameter* parameter)
+{
+	P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
+	if (check(p))
+	{
+		auto reaction = p->m_unit->get_effect(interaction_e::total_damage);
+		if (reaction)
+		{
+			Object_interaction* msg = reaction->clone();
+			msg->apply_effect(p->m_object, nullptr);
+		}
+		if (p->m_unit_body_part)
+		{
+			reaction = p->m_unit_body_part->m_item->get_effect(interaction_e::damage);
+			Parameter_list* str = p->m_unit_body_part->m_item->get_parameter(interaction_e::strength);
+			Parameter_list* wd = p->m_unit_body_part->m_item->get_parameter(interaction_e::weapon_damage);
+			if (reaction)
+			{
+				Object_interaction* msg = reaction->clone();
+				msg->apply_effect(p->m_object, nullptr);
+			}
+		}
+		p->m_object->update_interaction();
+		p->m_object->event_update(VoidEventArgs());
+	}
+}
+
 std::string Action_hit::get_description(Parameter* parameter)
 {
 	P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);

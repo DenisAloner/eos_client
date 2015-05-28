@@ -12,7 +12,7 @@ class GUI_Timer;
 class ApplicationGUI : public GUI_Layer
 {
 public:
-	ApplicationGUI();
+	ApplicationGUI(int x, int y, int width, int height);
 	~ApplicationGUI();
 
 	GUI_MapViewer* MapViewer;

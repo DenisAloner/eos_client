@@ -94,7 +94,7 @@ public:
 	GraphicalController* m_graph;
 	ActionManager* m_action_manager;
 
-	Action* m_actions[11];
+	Action* m_actions[12];
 
 	AI_manager* m_ai_manager;
 	

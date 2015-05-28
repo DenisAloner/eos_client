@@ -99,6 +99,7 @@ enum action_e
 	pick,
 	open,
 	hit,
+	hit_melee,
 	equip,
 	show_parameters
 };
@@ -214,7 +215,8 @@ enum class interaction_e
 	tag,
 	poison,
 	action,
-	body
+	body,
+	weapon_damage
 };
 
 enum class effect_e

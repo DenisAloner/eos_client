@@ -1,12 +1,8 @@
 #include "GUI_Container.h"
 
 
-GUI_Container::GUI_Container(int _x, int _y, int _width, int _height)
+GUI_Container::GUI_Container(int x, int y, int width, int height) :GUI_Layer(x, y, width, height)
 {
-	m_position.x = _x;
-	m_position.y = _y;
-	m_size.w = _width;
-	m_size.h = _height;
 }
 
 

@@ -151,9 +151,7 @@ void Application::initialize()
 	command_set_cursor(m_graph->m_cursor);
 	command_set_cursor_visibility(true);
 
-	m_GUI = new ApplicationGUI();
-	m_GUI->m_position = position_t(0, 0);
-	m_GUI->m_size = dimension_t(1024, 1024);
+	m_GUI = new ApplicationGUI(0,0,1024,1024);
 	
 	key_press += std::bind(&Application::on_key_press, this, std::placeholders::_1);
 	m_mouse->mouse_click += std::bind(&Application::on_mouse_click, this, std::placeholders::_1);
@@ -171,6 +169,7 @@ void Application::initialize()
 	m_actions[action_e::pick] = new Action_pick();
 	m_actions[action_e::open] = new Action_open();
 	m_actions[action_e::hit] = new Action_hit();
+	m_actions[action_e::hit_melee] = new action_hit_melee();
 	m_actions[action_e::equip] = new Action_equip();
 	m_actions[action_e::show_parameters] = new Action_show_parameters();
 	m_ai_manager = new AI_manager();
@@ -187,11 +186,8 @@ void Application::initialize()
 	m_GUI->MapViewer->m_map = new GameMap(dimension_t(200,200));
 	m_GUI->MapViewer->m_map->generate_level();
 
-	m_window_manager = new GUI_Window_manager();
-	m_window_manager->m_position = position_t(0, 0);
-	m_window_manager->m_size = dimension_t(1024, 1024);
+	m_window_manager = new GUI_Window_manager(0,0,1024,1024);
 	
-
 	int index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
 	GameMap::block_t* room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);
 	int rx = rand() % room->rect.w;
@@ -210,11 +206,7 @@ void Application::initialize()
 	m_GUI->m_action_panel = ActionPanel;
 	update_action_panel();
 	GUI_Layer* MenuLayer;
-	MenuLayer = new GUI_Layer();
-	MenuLayer->m_position.x = 0;
-	MenuLayer->m_position.y = 0;
-	MenuLayer->m_size.w = 1024;
-	MenuLayer->m_size.h = 1024;
+	MenuLayer = new GUI_Layer(0,0,1024,1024);
 	GUI_TextBox* TextBox = new GUI_TextBox();
 	TextBox->m_position.x = 2;
 	TextBox->m_position.y = 710;
