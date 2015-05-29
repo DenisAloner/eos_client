@@ -758,9 +758,34 @@ void action_hit_melee::perfom(Parameter* parameter)
 		}
 		if (p->m_unit_body_part)
 		{
-			reaction = p->m_unit_body_part->m_item->get_effect(interaction_e::damage);
-			Parameter_list* str = p->m_unit_body_part->m_item->get_parameter(interaction_e::strength);
+			Parameter_list* str = p->m_unit->get_parameter(interaction_e::strength);
+			Parameter_list* ms = p->m_unit->get_parameter(interaction_e::skill_sword);
+			Parameter_list* dws = p->m_unit_body_part->m_item->get_parameter(interaction_e::demand_weapon_skill);
 			Parameter_list* wd = p->m_unit_body_part->m_item->get_parameter(interaction_e::weapon_damage);
+			Parameter_list* sb = p->m_unit_body_part->m_item->get_parameter(interaction_e::strength_bonus);
+			srand(time(NULL));
+			int accuracy = ms->m_value - dws->m_value;
+			if (accuracy > 0)
+			{
+				accuracy = ms->m_value + rand() % (accuracy);
+			}
+			else
+			{
+				accuracy = ms->m_value - rand() % (accuracy);
+			}
+			if (accuracy > 0)
+			{
+				Effect* item = new Effect();
+				item->m_interaction_message_type = interaction_message_type_e::single;
+				item->m_subtype = effect_e::value;
+				item->m_value = -accuracy*0.01*sb->m_value*0.01*wd->m_value*str->m_value;
+				Interaction_copyist* item1 = new Interaction_copyist();
+				item1->m_interaction_message_type = interaction_message_type_e::single;
+				item1->m_subtype = interaction_e::health;
+				item1->m_value = item;
+				item1->apply_effect(p->m_object, nullptr);
+			}
+			reaction = p->m_unit_body_part->m_item->get_effect(interaction_e::damage);
 			if (reaction)
 			{
 				Object_interaction* msg = reaction->clone();

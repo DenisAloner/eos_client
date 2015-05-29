@@ -27,6 +27,7 @@ feature_list parameter,health,100,100
 feature_list parameter,strength,8,100
 feature_list parameter,hunger,0,1000
 feature_list parameter,thirst,0,1000
+feature_list parameter,skill_sword,10,100
 feature_list generic,buff
 feature_list generic,damage
 feature_list parts,body
@@ -239,13 +240,12 @@ tile_manager_single dagger
 feature_list tag,tag
 tag pick_able
 tag pass_able
-feature_list parameter,weapon_damage,5,5
+feature_list parameter,weapon_damage,25,25
+feature_list parameter,strength_bonus,50,100
+feature_list parameter,demand_weapon_skill,15,100
 feature_list generic,action
 add_action hit_melee
 feature_list generic,damage
-mem_impact_random_value value,-3,-7
-mem_slot_copyist health
-add_slot damage
 mem_effect value,-2
 mem_slot_prefix poison_damage
 mem_slot_copyist health

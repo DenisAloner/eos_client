@@ -216,7 +216,10 @@ enum class interaction_e
 	poison,
 	action,
 	body,
-	weapon_damage
+	weapon_damage,
+	skill_sword,
+	strength_bonus,
+	demand_weapon_skill
 };
 
 enum class effect_e
