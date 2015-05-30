@@ -27,7 +27,8 @@ class FOV
 {
 public:
 
-	struct cell{
+	struct cell
+	{
 		bool visible;
 		bool opaque;
 	};
@@ -40,7 +41,6 @@ public:
 	FOV();
 
 	
-
 	//static const values m_values;
 
 	

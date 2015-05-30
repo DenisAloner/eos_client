@@ -486,285 +486,80 @@ void  GameMap::add_doors()
 //	}
 //}
 
-void  GameMap::blur_lighting()
-{
-	light_t l;
-	float Gauss[] = { 0.39894228F, 0.241970725F, 0.053990967F };
-	for (int y = 0; y < 41; y++)
-	{
-		for (int x = 0; x < 41; x++)
-		{
-			l = light_t();
-			for (int i = -2; i < 3; i++)
-			{
-				int mx = x + i;
-				int my = y;
-				if (mx < 0){ mx = 0; }
-				if (mx > 40){ mx = 40; }
-				if (my < 0){ my = 0; }
-				if (my > 40){ my = 40; }
-				l.R = l.R + m_local_light[0][my][mx].R*Gauss[abs(i)];
-				l.G = l.G + m_local_light[0][my][mx].G*Gauss[abs(i)];
-				l.B = l.B + m_local_light[0][my][mx].B*Gauss[abs(i)];
-			}
-			m_local_light[1][y][x] = l;
-		}
-	}
-	for (int y = 0; y < 41; y++)
-	{
-		for (int x = 0; x < 41; x++)
-		{
-			l = light_t();
-			for (int i = -2; i < 3; i++)
-			{
-				int mx = x;
-				int my = y + i;
-				if (mx < 0){ mx = 0; }
-				if (mx > 40){ mx = 40; }
-				if (my < 0){ my = 0; }
-				if (my > 40){ my = 40; }
-				l.R = l.R + m_local_light[1][my][mx].R*Gauss[abs(i)];
-				l.G = l.G + m_local_light[1][my][mx].G*Gauss[abs(i)];
-				l.B = l.B + m_local_light[1][my][mx].B*Gauss[abs(i)];
-			}
-			m_local_light[2][y][x] = l;
-		}
-	}
-}
 
-void  GameMap::calculate_lighting()
-{
-	int lx;
-	int ly;
-	int c;
-	for (int y = 0; y < m_size.h; y++)
-	{
-		for (int x = 0; x < m_size.w; x++)
-		{
-			m_items[y][x]->m_light = light_t();
-		}
-	}
-	for (std::list<GameObject*>::iterator Current = m_lights.begin(); Current != m_lights.end(); Current++)
-	{
-		for (int y = 0; y < 41; y++)
-		{
-			for (int x = 0; x < 41; x++)
-			{
-				m_barrier_map[y][x] = false;
-				m_light_map[y][x] = false;
-			}
-		}
-		for (int y = (*Current)->cell()->y - 20; y < (*Current)->cell()->y + 21; y++)
-		{
-			if (!((y<0) || (y>m_size.h - 1)))
-			{
-				for (int x = (*Current)->cell()->x - 20; x < (*Current)->cell()->x + 21; x++)
-				{
-					if (!((x<0) || (x>m_size.w - 1)))
-					{
-						for (std::list<GameObject*>::iterator obj = m_items[y][x]->m_items.begin(); obj != m_items[y][x]->m_items.end(); obj++)
-						{
-							if ((*obj)->m_name != "floor")
-							{
-								m_barrier_map[y - ((*Current)->cell()->y - 20)][x - ((*Current)->cell()->x - 20)] = true;
-							}
-						}
-					}
-				}
-			}
-		}
-		m_barrier_map[20][20] = false;
-		for (int y = 0; y < 41; y++)
-		{
-			for (int x = 0; x < 41; x++)
-			{
-				m_light_map[y][x] = line2(20, 20, x, y);
-				m_light_map2[y][x] = m_light_map[y][x];
-			}
-		}
-
-		for (int y = 1; y < 40; y++)
-		{
-			for (int x = 1; x < 40; x++)
-			{
-				if (m_barrier_map[y][x])
-				{
-					if (y > 20) //грубое прибллижение к модели освещения Ламберта (для всех объектов ниже источника освещения, косинус угла между нормалью и вектором из точки освещения будет меньше нуля, следовательно они будут в тени)
-					{
-						for (int i = -1; i < 2; i++)
-						{
-							for (int j = -1; j < 2; j++)
-							{
-								if (m_light_map[y + i][x + j])
-								{
-									m_light_map2[y][x] = true;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		/*std::string a;
-		for (int y = 20; y > -1; y--)
-		{
-		for (int x = 0; x < 21; x++)
-		{
-		if (y == 10 && x == 10)
-		{
-		a = a + "2";
-		}
-		else
-		{
-		if (m_light_map2[y][x])
-		{
-		a = a + "1";
-		}
-		else
-		{
-		a = a + "0";
-		}
-		}
-		}
-		a = a + "\r\n";
-		}
-		MessageBox(NULL, a.c_str(), "", MB_OK);*/
-
-
-		for (int y = 0; y < 41; y++)
-		{
-			for (int x = 0; x < 41; x++)
-			{
-				if (m_light_map2[y][x])
-				{
-					lx = abs(x - 20);
-					ly = abs(y - 20);
-					c = (*Current)->m_active_state->m_light->R - m_coefficient[ly][lx];
-					if (c < 0){ c = 0; }
-					m_local_light[0][y][x].R = c;
-					c = (*Current)->m_active_state->m_light->G - m_coefficient[ly][lx];
-					if (c < 0){ c = 0; }
-					m_local_light[0][y][x].G = c;
-					c = (*Current)->m_active_state->m_light->B - m_coefficient[ly][lx];
-					if (c < 0){ c = 0; }
-					m_local_light[0][y][x].B = c;
-				}
-				else
-				{
-					m_local_light[0][y][x] = light_t();
-				}
-			}
-		}
-		blur_lighting();
-
-
-		for (int y = 0; y < 41; y++)
-		{
-			ly = (*Current)->cell()->y + y - 20;
-			if (!((ly<0) || (ly>m_size.h - 1)))
-			{
-				for (int x = 0; x < 41; x++)
-				{
-					lx = (*Current)->cell()->x + x - 20;
-					if (!((lx<0) || (lx>m_size.w - 1)))
-					{
-						if (m_light_map2[y][x])
-						{
-							m_items[ly][lx]->m_light.R += m_local_light[2][y][x].R;
-							m_items[ly][lx]->m_light.G += m_local_light[2][y][x].G;
-							m_items[ly][lx]->m_light.B += m_local_light[2][y][x].B;
-							/*m_items[ly][lx]->m_light = light_t(100,100,100);*/
-
-						}
-						else
-						{
-							m_items[ly][lx]->m_light.R += m_local_light[2][y][x].R;
-							m_items[ly][lx]->m_light.G += m_local_light[2][y][x].G;
-							m_items[ly][lx]->m_light.B += m_local_light[2][y][x].B;
-							/*m_items[ly][lx]->m_light = light_t(100,100,100);*/
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-
-bool GameMap::line2(int x1, int y1, int x2, int y2)
-{
-	int e = 0;
-	int dx = abs(x2 - x1);
-	int dy = abs(y2 - y1);
-	int x;
-	int y;
-	int k;
-	if (dx >= dy)
-	{
-		y = y1;
-		k = (y1 < y2 ? 1 : -1);
-		if (x1 < x2)
-		{
-			for (x = x1; x < x2+1; x++)
-			{
-				if (m_barrier_map[y][x]){ return false; }
-				e = e + dy;
-				if (2 * e >= dx)
-				{
-					y = y + k;
-					e = e - dx;
-				}
-			}
-		}
-		else
-		{
-			for (x = x1; x > x2-1; x--)
-			{
-				if (m_barrier_map[y][x]){ return false; }
-				e = e + dy;
-				if (2 * e >= dx)
-				{
-					y = y + k;
-					e = e - dx;
-				}
-			}
-		}
-	}
-	else
-	{
-		x = x1;
-		k = (x1 < x2 ? 1 : -1);
-		if (y1 <= y2)
-		{
-			for (y = y1; y < y2+1; y++)
-			{
-				if (m_barrier_map[y][x]){ return false; }
-				e = e + dx;
-				if (2 * e >= dy)
-				{
-					x = x + k;
-					e = e - dy;
-				}
-			}
-		}
-		else
-		{
-
-			for (y = y1; y > y2-1; y--)
-			{
-				if (m_barrier_map[y][x]){ return false; }
-				e = e + dx;
-				if (2 * e >= dy)
-				{
-					x = x + k;
-					e = e - dy;
-				}
-			}
-		}
-	}
-	return true;
-}
+//bool GameMap::line2(int x1, int y1, int x2, int y2)
+//{
+//	int e = 0;
+//	int dx = abs(x2 - x1);
+//	int dy = abs(y2 - y1);
+//	int x;
+//	int y;
+//	int k;
+//	if (dx >= dy)
+//	{
+//		y = y1;
+//		k = (y1 < y2 ? 1 : -1);
+//		if (x1 < x2)
+//		{
+//			for (x = x1; x < x2+1; x++)
+//			{
+//				if (m_barrier_map[y][x]){ return false; }
+//				e = e + dy;
+//				if (2 * e >= dx)
+//				{
+//					y = y + k;
+//					e = e - dx;
+//				}
+//			}
+//		}
+//		else
+//		{
+//			for (x = x1; x > x2-1; x--)
+//			{
+//				if (m_barrier_map[y][x]){ return false; }
+//				e = e + dy;
+//				if (2 * e >= dx)
+//				{
+//					y = y + k;
+//					e = e - dx;
+//				}
+//			}
+//		}
+//	}
+//	else
+//	{
+//		x = x1;
+//		k = (x1 < x2 ? 1 : -1);
+//		if (y1 <= y2)
+//		{
+//			for (y = y1; y < y2+1; y++)
+//			{
+//				if (m_barrier_map[y][x]){ return false; }
+//				e = e + dx;
+//				if (2 * e >= dy)
+//				{
+//					x = x + k;
+//					e = e - dy;
+//				}
+//			}
+//		}
+//		else
+//		{
+//
+//			for (y = y1; y > y2-1; y--)
+//			{
+//				if (m_barrier_map[y][x]){ return false; }
+//				e = e + dx;
+//				if (2 * e >= dy)
+//				{
+//					x = x + k;
+//					e = e - dy;
+//				}
+//			}
+//		}
+//	}
+//	return true;
+//}
 
 void GameMap::bresenham_line(MapCell* a, MapCell* b, std::function<void(MapCell*)> f)
 {
@@ -892,3 +687,109 @@ bool GameMap::check(int x, int y)
 //{
 //	if (x<0 && x>m_size.h - 1 && y<0 && y>m_size.w - 1) { return false; };
 //}
+
+void GameMap::calculate_lighting2()
+{
+	int lx;
+	int ly;
+	int c;
+	FOV_light fl;
+	light_t m_temp[41][41];
+	for (int y = 0; y < m_size.h; y++)
+	{
+		for (int x = 0; x < m_size.w; x++)
+		{
+			m_items[y][x]->m_light = light_t();
+		}
+	}
+	for (std::list<GameObject*>::iterator l = m_lights.begin(); l != m_lights.end(); l++)
+	{
+		fl.calculate(20, *l, this);
+		for (int y = 0; y < 41; y++)
+		{
+			for (int x = 0; x < 41; x++)
+			{
+				if (fl.m_map[y][x].visible)
+				{
+					lx = abs(x - 20);
+					ly = abs(y - 20);
+					c = (*l)->m_active_state->m_light->R - m_coefficient[ly][lx];
+					if (c < 0){ c = 0; }
+					fl.m_map[y][x].light.R = c;
+					c = (*l)->m_active_state->m_light->G - m_coefficient[ly][lx];
+					if (c < 0){ c = 0; }
+					fl.m_map[y][x].light.G = c;
+					c = (*l)->m_active_state->m_light->B - m_coefficient[ly][lx];
+					if (c < 0){ c = 0; }
+					fl.m_map[y][x].light.B = c;
+				}
+				else
+				{
+					fl.m_map[y][x].light = light_t();
+				}
+			}
+		}
+
+		
+			light_t l1;
+			float Gauss[] = { 0.39894228F, 0.241970725F, 0.053990967F };
+			for (int y = 0; y < 41; y++)
+			{
+				for (int x = 0; x < 41; x++)
+				{
+					l1 = light_t();
+					for (int i = -2; i < 3; i++)
+					{
+						int mx = x + i;
+						int my = y;
+						if (mx < 0){ mx = 0; }
+						if (mx > 40){ mx = 40; }
+						if (my < 0){ my = 0; }
+						if (my > 40){ my = 40; }
+						l1.R = l1.R + fl.m_map[my][mx].light.R*Gauss[abs(i)];
+						l1.G = l1.G + fl.m_map[my][mx].light.G*Gauss[abs(i)];
+						l1.B = l1.B + fl.m_map[my][mx].light.B*Gauss[abs(i)];
+					}
+					m_temp[y][x] = l1;
+				}
+			}
+			for (int y = 0; y < 41; y++)
+			{
+				for (int x = 0; x < 41; x++)
+				{
+					l1 = light_t();
+					for (int i = -2; i < 3; i++)
+					{
+						int mx = x;
+						int my = y + i;
+						if (mx < 0){ mx = 0; }
+						if (mx > 40){ mx = 40; }
+						if (my < 0){ my = 0; }
+						if (my > 40){ my = 40; }
+						l1.R = l1.R + m_temp[my][mx].R*Gauss[abs(i)];
+						l1.G = l1.G + m_temp[my][mx].G*Gauss[abs(i)];
+						l1.B = l1.B + m_temp[my][mx].B*Gauss[abs(i)];
+					}
+					fl.m_map[y][x].light = l1;
+				}
+			}
+
+		for (int y = 0; y < 41; y++)
+		{
+			ly = (*l)->cell()->y + y - 20;
+			if (!((ly<0) || (ly>m_size.h - 1)))
+			{
+				for (int x = 0; x < 41; x++)
+				{
+					lx = (*l)->cell()->x + x - 20;
+					if (!((lx<0) || (lx>m_size.w - 1)))
+					{
+						m_items[ly][lx]->m_light.R += fl.m_map[y][x].light.R;
+						m_items[ly][lx]->m_light.G += fl.m_map[y][x].light.G;
+						m_items[ly][lx]->m_light.B += fl.m_map[y][x].light.B;
+					}
+				}
+			}
+		}
+	}
+}

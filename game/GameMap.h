@@ -10,12 +10,15 @@
 #include "Event.h"
 #include <functional>
 #include "AI.h"
+#include "FOV_light.h"
 
 class Application;
 class GameObject;
 class Object_feature;
 class MapCell;
 class AI;
+
+const int max_light_radius = 20;
 
 class GameMap
 {
@@ -32,11 +35,7 @@ public:
 	dimension_t m_size;
 
 	float m_coefficient[21][21];
-	bool m_light_map[41][41];
-	bool m_light_map2[41][41];
-	light_t m_local_light[3][41][41];
-	bool m_barrier_map[41][41];
-
+	
 	std::vector<std::vector<MapCell*> > m_items;
 	std::list<GameObject*> m_lights;
 	std::list<GameObject*> m_ai;
@@ -58,17 +57,17 @@ public:
 	void add_ai_object(GameObject* Object, MapCell* Element);
 	void fill();
 	void random_block(block_t* block);
-	void calculate_lighting();
 	void connect_room();
 	void link_room(block_t* a, block_t* b);
 	void add_wall();
 	void add_doors();
-	bool line2(int x1, int y1, int x2, int y2);
-	void blur_lighting();
+	//bool line2(int x1, int y1, int x2, int y2);
 	void add_lighting();
 	void bresenham_line(MapCell* a, MapCell* b, std::function<void(MapCell*)> f);
 	bool check(int x,int y);
 	//MapCell* get_cell(int x, int y);
+
+	void calculate_lighting2();
 };
 
 #endif //GAMEMAP_H
