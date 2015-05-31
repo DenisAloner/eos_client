@@ -10,6 +10,7 @@ file(GLOB SRC_PLATFORM_GAME ${PROJECT_DIR}/platform/win/game/*.h ${PROJECT_DIR}/
 file(GLOB SRC_GAME ${PROJECT_DIR}/game/*.h ${PROJECT_DIR}/game/*.cpp)
 file(GLOB SRC_GAME_GRAPHICS ${PROJECT_DIR}/game/graphics/*.h ${PROJECT_DIR}/game/graphics/*.cpp)
 file(GLOB SRC_GAME_UTILS ${PROJECT_DIR}/game/utils/*.h ${PROJECT_DIR}/game/utils/*.cpp)
+file(GLOB SRC_GAME_IMPACT ${PROJECT_DIR}/game/utils/*.h ${PROJECT_DIR}/game/utils/*.cpp)
 
 set(SOURCE_FILES
 	${SRC_PLATFORM}
@@ -17,6 +18,7 @@ set(SOURCE_FILES
 	${SRC_GAME}
 	${SRC_GAME_GRAPHICS}
 	${SRC_GAME_UTILS}
+        ${SRC_GAME_IMPACT}
 )
 
 source_group("platform" FILES ${SRC_PLATFORM})
@@ -24,6 +26,7 @@ source_group("platform\\game" FILES ${SRC_PLATFORM_GAME})
 source_group("game" FILES ${SRC_GAME})
 source_group("game\\graphics" FILES ${SRC_GAME_GRAPHICS})
 source_group("game\\utils" FILES ${SRC_GAME_UTILS})
+source_group("game\\impact" FILES ${SRC_GAME_UTILS})
 
 find_package(OpenGL REQUIRED)
 if (OPENGL_FOUND)
