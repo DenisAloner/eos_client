@@ -496,9 +496,6 @@ void GameObjectManager::init()
 	m_to_interaction_e["strength_bonus"] = interaction_e::strength_bonus;
 	m_to_interaction_e["demand_weapon_skill"] = interaction_e::demand_weapon_skill;
 
-	m_to_effect_e["value"] = effect_e::value;
-	m_to_effect_e["limit"] = effect_e::limit;
-
 	m_effect_string[interaction_e::total_damage] = "общий дополнительный урон";
 	m_effect_string[interaction_e::damage] = "урон";
 	m_effect_string[interaction_e::buff] = "баффы";
@@ -515,6 +512,9 @@ void GameObjectManager::init()
 	m_effect_string[interaction_e::strength_bonus] = "бонус силы";
 	m_effect_string[interaction_e::demand_weapon_skill] = "требование к владению оружием";
 
+	m_to_effect_e["value"] = effect_e::value;
+	m_to_effect_e["limit"] = effect_e::limit;
+
 	m_effect_subtype_string[effect_e::value] = "модификатор значения";
 	m_effect_subtype_string[effect_e::limit] = "модификатор лимита";
 
@@ -529,12 +529,14 @@ void GameObjectManager::init()
 	m_to_object_tag_e["mortal"] = object_tag_e::mortal;
 	m_to_object_tag_e["pick_able"] = object_tag_e::pick_able;
 	m_to_object_tag_e["pass_able"] = object_tag_e::pass_able;
+	m_to_object_tag_e["seethrough_able"] = object_tag_e::seethrough_able;
 
 	m_object_tag_string[object_tag_e::poison_resist] = "сопротивление к яду";
 	m_object_tag_string[object_tag_e::purification_from_poison] = "очищение от яда";
 	m_object_tag_string[object_tag_e::mortal] = "смертное существо";
 	m_object_tag_string[object_tag_e::pass_able] = "не является преградой";
 	m_object_tag_string[object_tag_e::pick_able] = "можно взять";
+	m_object_tag_string[object_tag_e::seethrough_able] = "не загораживает обзор";
 
 	m_to_action_e["equip"] = action_e::equip;
 	m_to_action_e["hit"] = action_e::hit;

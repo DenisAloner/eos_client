@@ -2,7 +2,7 @@
 #define	IMPACT_COPY_CHANCE_H
 
 
-#include "game\Effect.h"
+#include "Effect.h"
 class Impact_copy_chance :
 	public Interaction_slot
 {

@@ -416,7 +416,7 @@ Inventory_cell::Inventory_cell(GameObject* item = nullptr) : m_item(item)
 
 AI_manager::AI_manager()
 {
-	m_fov_qualifiers.push_back([](GameObject* object)->bool{return (object->m_name == "wall" || object->m_name == "door"); });
+	m_fov_qualifiers.push_back([](GameObject* object)->bool{return !object->get_stat(object_tag_e::seethrough_able); });
 	m_fov_qualifiers.push_back([](GameObject* object)->bool{return false; });
 
 	m_path_qualifiers.push_back([](GameObject* object)->bool{return !object->get_stat(object_tag_e::pass_able);});

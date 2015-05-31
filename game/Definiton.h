@@ -248,7 +248,8 @@ enum class object_tag_e
 	purification_from_poison,
 	mortal,
 	pass_able,
-	pick_able
+	pick_able,
+	seethrough_able
 };
 
 enum class feature_list_type_e
