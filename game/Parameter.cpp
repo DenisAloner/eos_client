@@ -64,3 +64,7 @@ P_object::P_object() : Parameter(parameter_kind_object)
 P_unit_interaction::P_unit_interaction() : Parameter(parameter_kind_unit_interaction)
 {
 }
+
+P_interaction_cell::P_interaction_cell() : Parameter(parameter_interaction_cell)
+{
+}

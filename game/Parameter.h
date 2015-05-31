@@ -106,4 +106,16 @@ public:
 	P_unit_interaction();
 };
 
+class P_interaction_cell : public Parameter
+{
+public:
+
+	GameObject* m_unit;
+	Object_part* m_unit_body_part;
+	GameObject* m_object;
+	MapCell* m_cell;
+
+	P_interaction_cell();
+};
+
 #endif //TPARAMETER_H

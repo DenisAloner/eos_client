@@ -138,7 +138,6 @@ public:
 	virtual Object_interaction* clone();
 	virtual void description(std::list<std::string>* info, int level);
 	virtual void do_predicat(predicat func);
-
 };
 
 class Player

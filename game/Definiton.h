@@ -132,7 +132,8 @@ enum ParameterKind
 	parameter_kind_object,
 	parameter_kind_inventory_cell,
 	parameter_kind_body_part,
-	parameter_kind_unit_interaction
+	parameter_kind_unit_interaction,
+	parameter_interaction_cell
 };
 
 enum ObjectDirection

@@ -97,6 +97,15 @@ public:
 	virtual void render();
 };
 
+class mapviewer_hint_object_area : public gui_mapviewer_hint
+{
+public:
+
+	GameObject* m_object;
+	mapviewer_hint_object_area(GUI_MapViewer* owner, GameObject* object);
+	virtual void render();
+};
+
 class mapviewer_hint_line : public gui_mapviewer_hint
 {
 public:

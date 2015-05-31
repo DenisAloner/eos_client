@@ -745,9 +745,65 @@ action_hit_melee::action_hit_melee()
 	m_icon = Application::instance().m_graph->m_actions[8];
 }
 
+void action_hit_melee::interaction_handler()
+{
+	Action::interaction_handler();
+	Application::instance().m_message_queue.m_busy = true;
+	Parameter* result;
+	P_interaction_cell* p = new P_interaction_cell();
+	p->m_unit = Application::instance().m_GUI->MapViewer->m_player->m_object;
+	result = Application::instance().command_select_body_part();
+	if (result)
+	{
+		p->m_unit_body_part = static_cast<Object_part*>(static_cast<P_object_owner*>(result)->m_cell);
+	}
+	else
+	{
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_message_queue.m_busy = false;
+		Application::instance().m_clipboard.m_item = nullptr;
+		return;
+	}
+	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_unit, true));
+	result = Application::instance().command_select_object_on_map();
+	if (result)
+	{
+		p->m_object = static_cast<P_object*>(result)->m_object;
+		std::string a = "Выбран ";
+		a.append(p->m_object->m_name);
+		a = a + ".";
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+	}
+	else
+	{
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_message_queue.m_busy = false;
+		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+		return;
+	}
+	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_object_area(Application::instance().m_GUI->MapViewer, p->m_object));
+	result = Application::instance().command_select_location(p->m_object);
+	if (result)
+	{
+		p->m_cell = static_cast<MapCell*>(static_cast<P_object_owner*>(result)->m_cell);
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_cell->x) + "," + std::to_string(p->m_cell->y) + "}:"));
+	}
+	else
+	{
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_message_queue.m_busy = false;
+		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+		return;
+	}
+	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+	Application::instance().m_action_manager->add(p->m_unit, new GameTask(this, p));
+	Application::instance().m_message_queue.m_busy = false;
+}
+
 void action_hit_melee::perfom(Parameter* parameter)
 {
-	P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
+	P_interaction_cell* p = static_cast<P_interaction_cell*>(parameter);
 	if (check(p))
 	{
 		auto reaction = p->m_unit->get_effect(interaction_e::total_damage);
@@ -764,7 +820,7 @@ void action_hit_melee::perfom(Parameter* parameter)
 			Parameter_list* wd = p->m_unit_body_part->m_item->get_parameter(interaction_e::weapon_damage);
 			Parameter_list* sb = p->m_unit_body_part->m_item->get_parameter(interaction_e::strength_bonus);
 			srand(time(NULL));
-			int accuracy = ms->m_value - dws->m_value;
+			int accuracy = (ms->m_value - dws->m_value);
 			if (accuracy > 0)
 			{
 				accuracy = ms->m_value + rand() % (accuracy);
@@ -775,10 +831,13 @@ void action_hit_melee::perfom(Parameter* parameter)
 			}
 			if (accuracy > 0)
 			{
+				int light = (p->m_cell->m_light.R > p->m_cell->m_light.G ? p->m_cell->m_light.R : p->m_cell->m_light.G);
+				light = (light > p->m_cell->m_light.B ? light : p->m_cell->m_light.B);
+				if (light > 100){ light = 100; };
 				Effect* item = new Effect();
 				item->m_interaction_message_type = interaction_message_type_e::single;
 				item->m_subtype = effect_e::value;
-				item->m_value = -accuracy*0.01*sb->m_value*0.01*wd->m_value*str->m_value;
+				item->m_value = -accuracy*0.01*sb->m_value*0.01*wd->m_value*str->m_value*light*0.01;
 				Interaction_copyist* item1 = new Interaction_copyist();
 				item1->m_interaction_message_type = interaction_message_type_e::single;
 				item1->m_subtype = interaction_e::health;

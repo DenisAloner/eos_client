@@ -7,6 +7,7 @@
 
 gui_mapviewer_hint::gui_mapviewer_hint(GUI_MapViewer* owner) :m_owner(owner){}
 mapviewer_hint_area::mapviewer_hint_area(GUI_MapViewer* owner, GameObject* object, bool consider_object_size) : gui_mapviewer_hint(owner), m_object(object),m_consider_object_size(consider_object_size){}
+mapviewer_hint_object_area::mapviewer_hint_object_area(GUI_MapViewer* owner, GameObject* object) : gui_mapviewer_hint(owner), m_object(object){}
 mapviewer_hint_line::mapviewer_hint_line(GUI_MapViewer* owner, MapCell* cell) : gui_mapviewer_hint(owner), m_cell(cell){}
 
 void mapviewer_hint_area::render()
@@ -52,6 +53,42 @@ void mapviewer_hint_area::render()
 				glColor4f(1.0F, 0.9F, 0.0F, 0.5F);
 				Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
 			}
+		}
+	}
+}
+
+void mapviewer_hint_object_area::render()
+{
+	int px = 0;
+	int py = 0;
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
+	glUseProgramObjectARB(0);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_preselect);
+	double x0, y0, x1, y1, x2, y2, x3, y3;
+	MapCell* Item = m_object->cell();
+	int bx;
+	int by;
+	bx = m_object->m_active_state->m_size.x;
+	by = m_object->m_active_state->m_size.y;
+	for (int i = -by+1; i < 1; i++)
+	{
+		for (int j = -bx+1; j <1; j++)
+		{
+				int x = px + (Item->x + j) - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
+				int y = py + (Item->y + i) - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
+				x0 = x * m_owner->m_tile_size_x;
+				y0 = (m_owner->m_tile_count_y - y - 1) * m_owner->m_tile_size_y;
+				x1 = x0;
+				y1 = (m_owner->m_tile_count_y - y) * m_owner->m_tile_size_y;
+				x2 = (x + 1) * m_owner->m_tile_size_x;
+				y2 = y1;
+				x3 = x2;
+				y3 = y0;
+				glColor4f(1.0F, 0.9F, 0.0F, 0.5F);
+				Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
 		}
 	}
 }

@@ -185,6 +185,7 @@ public:
 
 	action_hit_melee();
 	virtual Object_interaction* clone(){ return new action_hit_melee(); };
+	virtual void interaction_handler();
 	virtual void perfom(Parameter* parameter);
 };
 
