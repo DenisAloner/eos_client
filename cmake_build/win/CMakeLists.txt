@@ -59,6 +59,7 @@ include_directories(
 	${PROJECT_DIR}/game
 	${PROJECT_DIR}/game/graphics
 	${PROJECT_DIR}/game/utils
+        ${PROJECT_DIR}/game/impact
 	${PROJECT_DIR}/include
 	${PROJECT_DIR}/lib/glog/src/windows
 )
