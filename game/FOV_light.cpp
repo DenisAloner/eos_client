@@ -33,7 +33,7 @@ void FOV_light::calculate(int radius, GameObject* unit, GameMap* map)
 				{
 					for (std::list<GameObject*>::iterator obj = map->m_items[y][x]->m_items.begin(); obj != map->m_items[y][x]->m_items.end(); obj++)
 					{
-						if ((*obj)->m_name != "floor")
+						if (!(*obj)->get_stat(object_tag_e::seethrough_able))
 						{
 							m_map[m_middle + (y - unit->cell()->y)][m_middle + (x - unit->cell()->x)].opaque = true;
 						}
