@@ -733,6 +733,7 @@ void GameMap::calculate_lighting2()
 		
 			light_t l1;
 			float Gauss[] = { 0.39894228F, 0.241970725F, 0.053990967F };
+			//float Gauss[] = { 0.2270270270, 0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162 };
 			for (int y = 0; y < 41; y++)
 			{
 				for (int x = 0; x < 41; x++)
