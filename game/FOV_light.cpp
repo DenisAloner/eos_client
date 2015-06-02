@@ -20,7 +20,8 @@ void FOV_light::calculate(int radius, GameObject* unit, GameMap* map)
 		for (int x = 0; x <m_max_size; x++)
 		{
 			m_map[y][x].opaque = false;
-			m_map[y][x].visible = false;
+			m_map[y][x].damping = 0.0;
+			m_map[y][x].attenuation_constant = 0.0;
 		}
 	}
 	for (int y = unit->cell()->y - radius; y < unit->cell()->y + radius+1; y++)
@@ -45,7 +46,7 @@ void FOV_light::calculate(int radius, GameObject* unit, GameMap* map)
 	do_fov(m_middle, m_middle, m_radius);
 }
 
-void FOV_light::cast_light(uint x, uint y, uint radius, uint row, float start_slope, float end_slope, uint xx, uint xy, uint yx, uint yy)
+void FOV_light::cast_light(uint x, uint y, uint radius, uint row, float start_slope, float end_slope, uint xx, uint xy, uint yx, uint yy,float damp)
 {
 	if (start_slope < end_slope) {
 		return;
@@ -77,7 +78,7 @@ void FOV_light::cast_light(uint x, uint y, uint radius, uint row, float start_sl
 
 			uint radius2 = radius * radius;
 			if ((uint)(dx * dx + dy * dy) < radius2) {
-				m_map[ay][ax].visible = true;
+				m_map[ay][ax].damping = damp;
 			}
 
 			if (blocked) {
@@ -93,7 +94,8 @@ void FOV_light::cast_light(uint x, uint y, uint radius, uint row, float start_sl
 			else if (m_map[ay][ax].opaque) {
 				blocked = true;
 				next_start_slope = r_slope;
-				cast_light(x, y, radius, i + 1, start_slope, l_slope, xx,xy, yx, yy);
+				cast_light(x, y, radius, i + 1, l_slope, r_slope, xx, xy, yx, yy, damp*m_map[ay][ax].attenuation_constant);
+				cast_light(x, y, radius, i + 1, start_slope, l_slope, xx, xy, yx, yy, damp);
 			}
 		}
 		if (blocked) {
@@ -105,7 +107,7 @@ void FOV_light::cast_light(uint x, uint y, uint radius, uint row, float start_sl
 void FOV_light::do_fov(uint x, uint y, uint radius)
 {
 	for (uint i = 0; i < 8; i++) {
-		cast_light(x, y, radius, 1, 1.0, 0.0, multipliers1[0][i],multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
+		cast_light(x, y, radius, 1, 1.0, 0.0, multipliers1[0][i],multipliers1[1][i], multipliers1[2][i], multipliers1[3][i],1.0);
 	}
-	m_map[m_middle][m_middle].visible = true;
+	m_map[m_middle][m_middle].damping = 1.0;
 }

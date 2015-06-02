@@ -184,17 +184,25 @@ void Application::initialize()
 	m_GUI->MapViewer->m_size.h = 1024;
 	
 	m_GUI->MapViewer->m_map = new GameMap(dimension_t(200,200));
-	m_GUI->MapViewer->m_map->generate_level();
+	//m_GUI->MapViewer->m_map->generate_level();
+	m_GUI->MapViewer->m_map->generate_room();
+
+	int rx = 100;
+	int ry = 100;
+	GameObject* obj = m_game_object_manager->new_object("elf");
+	obj->set_direction(ObjectDirection_Left);
+	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry][rx]);
+	m_GUI->MapViewer->m_player = new Player(obj, m_GUI->MapViewer->m_map);
 
 	m_window_manager = new GUI_Window_manager(0,0,1024,1024);
 	
-	int index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
+	/*int index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
 	GameMap::block_t* room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);
 	int rx = rand() % room->rect.w;
 	int ry = rand() % room->rect.h;
 	GameObject* obj = m_game_object_manager->new_object("elf");
 	obj->set_direction(ObjectDirection_Left);
-	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
+	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);*/
 	m_GUI->MapViewer->m_player = new Player(obj, m_GUI->MapViewer->m_map);
 	GUI_ActionManager* AMTextBox;
 	AMTextBox = new GUI_ActionManager(m_action_manager);
@@ -303,19 +311,32 @@ void Application::initialize()
 		times you want it to loop (use -1 for infinite, and 0 to
 		have it just play once) */
 	}
-	obj = m_game_object_manager->new_object("snake");
-	obj->set_direction(ObjectDirection_Left);
-	m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx + 1]);
-	obj = m_game_object_manager->new_object("plant");
-	obj->set_direction(ObjectDirection_Left);
-	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry - 3][room->rect.x + rx]);
-	obj = m_game_object_manager->new_object("sword");
-	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx - 2]);
-	obj = m_game_object_manager->new_object("dagger");
-	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx - 3]);
-	obj = m_game_object_manager->new_object("trap");
-	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx + 2]);
-	int ru;
+	//obj = m_game_object_manager->new_object("snake");
+	//obj->set_direction(ObjectDirection_Left);
+	//m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx + 1]);
+	//obj = m_game_object_manager->new_object("plant");
+	//obj->set_direction(ObjectDirection_Left);
+	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry - 3][room->rect.x + rx]);
+	//obj = m_game_object_manager->new_object("sword");
+	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx - 2]);
+	//obj = m_game_object_manager->new_object("dagger");
+	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx - 3]);
+	//obj = m_game_object_manager->new_object("smoke");
+	//obj->set_direction(ObjectDirection_Left);
+	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx - 4]);
+	//obj = m_game_object_manager->new_object("trap");
+	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx + 2]);
+
+	obj = m_game_object_manager->new_object("red torch");
+	m_GUI->MapViewer->m_map->add_new_object(obj, m_GUI->MapViewer->m_map->m_items[ry][rx + 5]);
+
+	obj = m_game_object_manager->new_object("blue torch");
+	m_GUI->MapViewer->m_map->add_new_object(obj, m_GUI->MapViewer->m_map->m_items[ry][rx - 5]);
+
+	obj = m_game_object_manager->new_object("green torch");
+	m_GUI->MapViewer->m_map->add_new_object(obj, m_GUI->MapViewer->m_map->m_items[ry + 5][rx]);
+
+	/*int ru;
 	for (int i = 0; i <15; i++){
 		index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
 		room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);
@@ -347,7 +368,7 @@ void Application::initialize()
 		}
 		obj->set_direction(ObjectDirection_Left);
 		m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
-	}
+	}*/
 
 	m_ready = true;
 }
