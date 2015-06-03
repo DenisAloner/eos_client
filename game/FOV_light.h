@@ -15,8 +15,8 @@ public:
 	{
 		bool opaque;
 		light_t light;
-		float damping;
-		float attenuation_constant;
+		RGB_t damping;
+		RGB_t attenuation_constant;
 	};
 
 	static const int m_max_size = 41;
@@ -27,7 +27,7 @@ public:
 
 	FOV_light();
 	void calculate(int radius, GameObject* unit, GameMap* map);
-	void cast_light(uint x, uint y, uint radius, uint row, float start_slope, float end_slope, uint xx, uint xy, uint yx, uint yy,float damp);
+	void cast_light(uint x, uint y, uint radius, uint row, float start_slope, float end_slope, uint xx, uint xy, uint yx, uint yy,RGB_t damp);
 	void do_fov(uint x, uint y, uint radius);
 
 };

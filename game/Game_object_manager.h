@@ -25,6 +25,7 @@ public:
 		ai,
 		size,
 		weight,
+		optical,
 		layer,
 		icon,
 		tile_manager_single,

@@ -711,63 +711,63 @@ void GameMap::calculate_lighting2()
 			{
 				lx = abs(x - 20);
 				ly = abs(y - 20);
-				c = ((*l)->m_active_state->m_light->R - m_coefficient[ly][lx])*fl.m_map[y][x].damping;
+				c = ((*l)->m_active_state->m_light->R - m_coefficient[ly][lx])*fl.m_map[y][x].damping.R;
 				if (c < 0){ c = 0; }
 				fl.m_map[y][x].light.R = c;
-				c = ((*l)->m_active_state->m_light->G - m_coefficient[ly][lx])*fl.m_map[y][x].damping;
+				c = ((*l)->m_active_state->m_light->G - m_coefficient[ly][lx])*fl.m_map[y][x].damping.G;
 				if (c < 0){ c = 0; }
 				fl.m_map[y][x].light.G = c;
-				c = ((*l)->m_active_state->m_light->B - m_coefficient[ly][lx])*fl.m_map[y][x].damping;
+				c = ((*l)->m_active_state->m_light->B - m_coefficient[ly][lx])*fl.m_map[y][x].damping.B;
 				if (c < 0){ c = 0; }
 				fl.m_map[y][x].light.B = c;
 			}
 		}
 
 		
-			light_t l1;
-			float Gauss[] = { 0.44198F, 0.27901F };
-			//float Gauss[] = { 0.39894228F, 0.241970725F, 0.053990967F };
-			//float Gauss[] = { 0.2270270270, 0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162 };
-			for (int y = 0; y < 41; y++)
-			{
-				for (int x = 0; x < 41; x++)
-				{
-					l1 = light_t();
-					for (int i = -1; i < 2; i++)
-					{
-						int mx = x + i;
-						int my = y;
-						if (mx < 0){ mx = 0; }
-						if (mx > 40){ mx = 40; }
-						if (my < 0){ my = 0; }
-						if (my > 40){ my = 40; }
-						l1.R = l1.R + fl.m_map[my][mx].light.R*Gauss[abs(i)];
-						l1.G = l1.G + fl.m_map[my][mx].light.G*Gauss[abs(i)];
-						l1.B = l1.B + fl.m_map[my][mx].light.B*Gauss[abs(i)];
-					}
-					m_temp[y][x] = l1;
-				}
-			}
-			for (int y = 0; y < 41; y++)
-			{
-				for (int x = 0; x < 41; x++)
-				{
-					l1 = light_t();
-					for (int i = -1; i < 2; i++)
-					{
-						int mx = x;
-						int my = y + i;
-						if (mx < 0){ mx = 0; }
-						if (mx > 40){ mx = 40; }
-						if (my < 0){ my = 0; }
-						if (my > 40){ my = 40; }
-						l1.R = l1.R + m_temp[my][mx].R*Gauss[abs(i)];
-						l1.G = l1.G + m_temp[my][mx].G*Gauss[abs(i)];
-						l1.B = l1.B + m_temp[my][mx].B*Gauss[abs(i)];
-					}
-					fl.m_map[y][x].light = l1;
-				}
-			}
+			//light_t l1;
+			//float Gauss[] = { 0.44198F, 0.27901F };
+			////float Gauss[] = { 0.39894228F, 0.241970725F, 0.053990967F };
+			////float Gauss[] = { 0.2270270270, 0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162 };
+			//for (int y = 0; y < 41; y++)
+			//{
+			//	for (int x = 0; x < 41; x++)
+			//	{
+			//		l1 = light_t();
+			//		for (int i = -1; i < 2; i++)
+			//		{
+			//			int mx = x + i;
+			//			int my = y;
+			//			if (mx < 0){ mx = 0; }
+			//			if (mx > 40){ mx = 40; }
+			//			if (my < 0){ my = 0; }
+			//			if (my > 40){ my = 40; }
+			//			l1.R = l1.R + fl.m_map[my][mx].light.R*Gauss[abs(i)];
+			//			l1.G = l1.G + fl.m_map[my][mx].light.G*Gauss[abs(i)];
+			//			l1.B = l1.B + fl.m_map[my][mx].light.B*Gauss[abs(i)];
+			//		}
+			//		m_temp[y][x] = l1;
+			//	}
+			//}
+			//for (int y = 0; y < 41; y++)
+			//{
+			//	for (int x = 0; x < 41; x++)
+			//	{
+			//		l1 = light_t();
+			//		for (int i = -1; i < 2; i++)
+			//		{
+			//			int mx = x;
+			//			int my = y + i;
+			//			if (mx < 0){ mx = 0; }
+			//			if (mx > 40){ mx = 40; }
+			//			if (my < 0){ my = 0; }
+			//			if (my > 40){ my = 40; }
+			//			l1.R = l1.R + m_temp[my][mx].R*Gauss[abs(i)];
+			//			l1.G = l1.G + m_temp[my][mx].G*Gauss[abs(i)];
+			//			l1.B = l1.B + m_temp[my][mx].B*Gauss[abs(i)];
+			//		}
+			//		fl.m_map[y][x].light = l1;
+			//	}
+			//}
 
 		for (int y = 0; y < 41; y++)
 		{

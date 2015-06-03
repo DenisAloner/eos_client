@@ -182,7 +182,17 @@ struct RGB_t
 {
 	float R, G, B;
 	RGB_t(float R, float G, float B) : R(R), G(G), B(B){};
+	RGB_t() : R(0.0), G(0.0), B(0.0){};
 };
+
+struct optical_properties_t
+{
+	RGB_t attenuation;
+	optical_properties_t(RGB_t attenuation) : attenuation(attenuation){};
+    optical_properties_t(): attenuation(RGB_t(1.0,1.0,1.0)){};
+	//optical_properties_t(const optical_properties_t& value) :seethrough(value.seethrough),attenuation(value.attenuation){};
+};
+
 
 struct light_t
 {

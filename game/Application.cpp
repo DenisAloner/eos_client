@@ -327,14 +327,19 @@ void Application::initialize()
 	//obj = m_game_object_manager->new_object("trap");
 	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx + 2]);
 
-	obj = m_game_object_manager->new_object("red torch");
+	obj = m_game_object_manager->new_object("torch");
 	m_GUI->MapViewer->m_map->add_new_object(obj, m_GUI->MapViewer->m_map->m_items[ry][rx + 5]);
 
-	obj = m_game_object_manager->new_object("blue torch");
-	m_GUI->MapViewer->m_map->add_new_object(obj, m_GUI->MapViewer->m_map->m_items[ry][rx - 5]);
+	obj = m_game_object_manager->new_object("ice");
+	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry][rx + 10]);
 
-	obj = m_game_object_manager->new_object("green torch");
-	m_GUI->MapViewer->m_map->add_new_object(obj, m_GUI->MapViewer->m_map->m_items[ry + 5][rx]);
+	obj = m_game_object_manager->new_object("smoke");
+	obj->set_direction(ObjectDirection_Left);
+	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry-5][rx]);
+
+
+	/*obj = m_game_object_manager->new_object("torch");
+	m_GUI->MapViewer->m_map->add_new_object(obj, m_GUI->MapViewer->m_map->m_items[ry + 15][rx]);*/
 
 	/*int ru;
 	for (int i = 0; i <15; i++){

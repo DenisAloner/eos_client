@@ -82,6 +82,7 @@ public:
 	TileManager* m_tile_manager;
 	light_t* m_light;
 	GLuint m_icon;
+	optical_properties_t* m_optical;
 
 	AI* m_ai;
 
