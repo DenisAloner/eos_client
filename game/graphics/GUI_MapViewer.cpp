@@ -348,7 +348,24 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 					}
 					else
 					{
-
+						/*object_size = dimension_t(1, 1);
+						dx = object_size.w;
+						x0 = (px + gx)*m_tile_size_x;
+						y0 = (m_tile_count_y - py - gy - object_size.h)*m_tile_size_y;
+						x1 = x0;
+						y1 = (m_tile_count_y - py - gy)*m_tile_size_y;
+						x2 = (px + gx + 1)*m_tile_size_x;
+						y2 = y1;
+						x3 = x2;
+						y3 = y0;
+						glUseProgram(0);
+						glEnable(GL_BLEND);
+						glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+						glEnable(GL_TEXTURE_2D);
+						glActiveTexture(GL_TEXTURE0);
+						glBindTexture(GL_TEXTURE_2D, Graph->m_no_visible);
+						glColor4f(1.0, 1.0, 1.0, 1.0);
+						Graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);*/
 					}
 				}
 			}

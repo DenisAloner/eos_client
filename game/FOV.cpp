@@ -159,6 +159,8 @@ void FOV::calculate(int radius,GameObject* unit, GameMap* map)
 		{
 			m_map[y][x].opaque = false;
 			m_map[y][x].visible = false;
+			m_map[y][x].damp = 0.0;
+			m_map[y][x].visibility = 0.0;
 		}
 	}
 	for (int y = unit->cell()->y - radius; y < unit->cell()->y + radius+1; y++)
@@ -175,6 +177,7 @@ void FOV::calculate(int radius,GameObject* unit, GameMap* map)
 						if ((*obj) != unit&&qualifier((*obj)))
 						{
 							m_map[m_middle + (y - unit->cell()->y)][m_middle + (x - unit->cell()->x)].opaque = true;
+							m_map[m_middle + (y - unit->cell()->y)][m_middle + (x - unit->cell()->x)].damp = 0.0;
 						}
 					}
 				}
@@ -192,7 +195,7 @@ void FOV::calculate(int radius,GameObject* unit, GameMap* map)
 	light_quarter(0, 0, 180, -180);*/
 }
 
-void FOV::cast_light(uint x, uint y, uint radius, uint row, float start_slope, float end_slope, uint xx, uint xy, uint yx, uint yy) 
+void FOV::cast_light(uint x, uint y, uint radius, uint row, float start_slope, float end_slope, uint xx, uint xy, uint yx, uint yy, float visibility)
 {
 	if (start_slope < end_slope) {
 		return;
@@ -224,7 +227,10 @@ void FOV::cast_light(uint x, uint y, uint radius, uint row, float start_slope, f
 
 			uint radius2 = radius * radius;
 			if ((uint)(dx * dx + dy * dy) < radius2) {
-				m_map[ay][ax].visible = true;
+				if (visibility > 0.0){
+					m_map[ay][ax].visible = true;
+					m_map[ay][ax].visibility = visibility;
+				}
 			}
 
 			if (blocked) {
@@ -240,7 +246,8 @@ void FOV::cast_light(uint x, uint y, uint radius, uint row, float start_slope, f
 			else if (m_map[ay][ax].opaque) {
 				blocked = true;
 				next_start_slope = r_slope;
-				cast_light(x, y, radius, i + 1, start_slope, l_slope, xx,xy, yx, yy);
+				cast_light(x, y, radius, i + 1, l_slope, r_slope, xx, xy, yx, yy, visibility*m_map[ay][ax].damp);
+				cast_light(x, y, radius, i + 1, start_slope, l_slope, xx,xy, yx, yy,visibility);
 			}
 		}
 		if (blocked) {
@@ -252,7 +259,7 @@ void FOV::cast_light(uint x, uint y, uint radius, uint row, float start_slope, f
 void FOV::do_fov(uint x, uint y, uint radius)
 {
 	for (uint i = 0; i < 8; i++) {
-		cast_light(x, y, radius, 1, 1.0, 0.0, multipliers1[0][i],multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
+		cast_light(x, y, radius, 1, 1.0, 0.0, multipliers1[0][i],multipliers1[1][i], multipliers1[2][i], multipliers1[3][i],1.0);
 	}
 	m_map[m_middle][m_middle].visible = true;
 }

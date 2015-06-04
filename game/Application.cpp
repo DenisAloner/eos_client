@@ -337,6 +337,13 @@ void Application::initialize()
 	obj->set_direction(ObjectDirection_Left);
 	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry-5][rx]);
 
+	obj = m_game_object_manager->new_object("wall");
+	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry - 7][rx]);
+
+	obj = m_game_object_manager->new_object("smoke");
+	obj->set_direction(ObjectDirection_Left);
+	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry - 6][rx-1]);
+
 
 	/*obj = m_game_object_manager->new_object("torch");
 	m_GUI->MapViewer->m_map->add_new_object(obj, m_GUI->MapViewer->m_map->m_items[ry + 15][rx]);*/
