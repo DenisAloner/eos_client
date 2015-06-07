@@ -29,25 +29,47 @@ GameMap::GameMap(dimension_t size)
 	}
 }
 
+//void GameMap::generate_room(void)
+//{
+//	for(int i=0;i<m_size.h;i++)
+//	{
+//		for(int j=0;j<m_size.w;j++)
+//		{
+//			if ((i==0)||(j==0)||(i==m_size.h-1)||(j==m_size.w-1))
+//			{
+//				m_items[i][j] = new MapCell(j, i,this);
+//				GameObject* obj = Application::instance().m_game_object_manager->new_object("wall");
+//				add_object(obj, m_items[i][j]);
+//			} else {
+//				m_items[i][j] = new MapCell(j, i,this);
+//				GameObject* obj = Application::instance().m_game_object_manager->new_object("floor");
+//				add_object(obj, m_items[i][j]);
+//			}
+//		}
+//	}
+//}
+
 void GameMap::generate_room(void)
 {
-	for(int i=0;i<m_size.h;i++)
+	for (int i = 0; i<m_size.h; i++)
 	{
-		for(int j=0;j<m_size.w;j++)
+		for (int j = 0; j<m_size.w; j++)
 		{
-			if ((i==0)||(j==0)||(i==m_size.h-1)||(j==m_size.w-1))
+			if ((i == 0) || (j == 0) || (i == m_size.h - 1) || (j == m_size.w - 1))
 			{
-				m_items[i][j] = new MapCell(j, i,this);
-				GameObject* obj = Application::instance().m_game_object_manager->new_object("wall");
+				m_items[i][j] = new MapCell(j, i, this);
+				GameObject* obj = Application::instance().m_game_object_manager->new_object("iso_floor");
 				add_object(obj, m_items[i][j]);
-			} else {
-				m_items[i][j] = new MapCell(j, i,this);
-				GameObject* obj = Application::instance().m_game_object_manager->new_object("floor");
+			}
+			else {
+				m_items[i][j] = new MapCell(j, i, this);
+				GameObject* obj = Application::instance().m_game_object_manager->new_object("iso_floor");
 				add_object(obj, m_items[i][j]);
 			}
 		}
 	}
 }
+
 
 
 void GameMap::add_object(GameObject* object, MapCell* cell)
