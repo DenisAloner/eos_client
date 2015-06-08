@@ -127,7 +127,7 @@ Object_state* Object_state_equip::clone()
 
 void Object_state::set_tile_size()
 {
-	m_tile_size = dimension_t(m_size.x, m_size.y + m_size.z);
+	m_tile_size = dimension_t(tile_size_x_half*(m_size.x + m_size.y), tile_size_y_half*(m_size.x + m_size.y) + m_size.z * 18);
 }
 
 Game_object_owner::Game_object_owner(){}

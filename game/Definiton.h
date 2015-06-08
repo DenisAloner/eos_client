@@ -9,6 +9,11 @@ class GameObject;
 
 class GUI_Object;
 
+const int tile_size_x = 32;
+const int tile_size_y = 18;
+const int tile_size_x_half = 16;
+const int tile_size_y_half = 9;
+
 struct position_t
 {
 	int x;

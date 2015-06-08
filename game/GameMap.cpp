@@ -79,7 +79,7 @@ void GameMap::add_object(GameObject* object, MapCell* cell)
 	{
 		for (int j = 0; j<object->m_active_state->m_size.x; j++)
 		{
-			m_items[cell->y + i][cell->x - j]->add_object(object);
+			m_items[cell->y + i][cell->x + j]->add_object(object);
 		}
 	}
 }
@@ -90,7 +90,7 @@ void GameMap::remove_object(GameObject* object)
 	{
 		for (int j = 0; j<object->m_active_state->m_size.x; j++)
 		{
-			m_items[object->cell()->y + i][object->cell()->x - j]->m_items.remove(object);
+			m_items[object->cell()->y + i][object->cell()->x + j]->m_items.remove(object);
 		}
 	}
 	object->m_owner = nullptr;

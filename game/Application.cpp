@@ -190,7 +190,7 @@ void Application::initialize()
 	int rx = 100;
 	int ry = 100;
 	GameObject* obj = m_game_object_manager->new_object("iso_unit");
-	obj->set_direction(ObjectDirection_Left);
+	//obj->set_direction(ObjectDirection_Left);
 	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry][rx]);
 	m_GUI->MapViewer->m_player = new Player(obj, m_GUI->MapViewer->m_map);
 
@@ -326,6 +326,10 @@ void Application::initialize()
 	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx - 4]);
 	//obj = m_game_object_manager->new_object("trap");
 	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx + 2]);
+
+	obj = m_game_object_manager->new_object("iso_drou");
+	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry-10][rx + 1]);
+
 
 	obj = m_game_object_manager->new_object("iso_torch");
 	m_GUI->MapViewer->m_map->add_new_object(obj, m_GUI->MapViewer->m_map->m_items[ry][rx + 5]);
