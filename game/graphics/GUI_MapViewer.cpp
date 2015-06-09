@@ -520,6 +520,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	int dx;
 	glColor4d(1.0, 1.0, 1.0, 1.0);
 	dimension_t object_size;
+	game_object_size_t size3d;
 	for (int gy = m_tile_count_y - 1; gy > -6; gy--)
 	{
 		for (int gx = m_tile_count_x - 1; gx > -6 ; gx--)
@@ -535,7 +536,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 			{
 				if ((xf >= -m_player->m_fov->m_radius) && (xf <= m_player->m_fov->m_radius) && (yf >= -m_player->m_fov->m_radius) && (yf <= m_player->m_fov->m_radius))
 				{
-					if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visible)
+					//if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visible)
 					{
 						light[0] = m_map->m_items[y][x]->m_light.R / 100.0F;
 						light[1] = m_map->m_items[y][x]->m_light.G / 100.0F;
@@ -551,14 +552,15 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 							if ((*Current)->cell()->y == m_map->m_items[y][x]->y && (*Current)->cell()->x == m_map->m_items[y][x]->x)
 							{
 								object_size = (*Current)->m_active_state->m_tile_size;
+								size3d = (*Current)->m_active_state->m_size;
 								int yp = m_tile_count_x - px - gx;
 								int xp = m_tile_count_y - py - gy;
 								dx = object_size.w + m_map->m_items[y][x]->x - (*Current)->cell()->x;
-								x0 = (xp - yp) * 16 + m_shift.x;
+								x0 = (xp - yp) * 16 + m_shift.x - (size3d.y-1)*16;
 								y0 = (xp + yp) * 9 - (object_size.h) + m_shift.y;
 								x1 = x0;
 								y1 = (xp + yp) * 9 + m_shift.y;
-								x2 = (xp - yp) * 16 + object_size.w + m_shift.x;
+								x2 = (xp - yp) * 16 + object_size.w + m_shift.x - (size3d.y - 1) * 16;
 								y2 = y1;
 								x3 = x2;
 								y3 = y0;

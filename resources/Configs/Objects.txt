@@ -521,3 +521,12 @@ tag mortal
 state dead
 size 1 2 0
 tile_manager_single elf_corpse
+
+object iso_bear
+state alive
+ai non_humanoid,20,0,0
+size 2 2 4
+tile_manager_single iso_bear
+feature_list action,action
+add_action move
+feature_list parameter,health,100,100

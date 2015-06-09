@@ -327,7 +327,7 @@ void Application::initialize()
 	//obj = m_game_object_manager->new_object("trap");
 	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx + 2]);
 
-	obj = m_game_object_manager->new_object("iso_drou");
+	obj = m_game_object_manager->new_object("iso_bear");
 	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry-10][rx + 1]);
 
 
