@@ -191,7 +191,7 @@ void Application::initialize()
 	int ry = 100;
 	GameObject* obj = m_game_object_manager->new_object("iso_unit");
 	//obj->set_direction(ObjectDirection_Left);
-	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry][rx]);
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx]);
 	m_GUI->MapViewer->m_player = new Player(obj, m_GUI->MapViewer->m_map);
 
 	m_window_manager = new GUI_Window_manager(0,0,1024,1024);
@@ -328,17 +328,16 @@ void Application::initialize()
 	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx + 2]);
 
 	obj = m_game_object_manager->new_object("iso_bear");
-	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry-10][rx + 1]);
-
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 10][rx + 1]);
 
 	obj = m_game_object_manager->new_object("iso_torch");
-	m_GUI->MapViewer->m_map->add_new_object(obj, m_GUI->MapViewer->m_map->m_items[ry][rx + 5]);
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx + 5]);
 
 	obj = m_game_object_manager->new_object("wall");
-	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry-1][rx + 3]);
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 1][rx + 3]);
 
 	obj = m_game_object_manager->new_object("snake");
-	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry - 1][rx + 5]);
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 1][rx + 5]);
 
 	/*obj = m_game_object_manager->new_object("ice");
 	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry][rx + 10]);

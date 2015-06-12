@@ -245,6 +245,7 @@ add_slot damage
 object wall
 state alive
 size 1 1 4
+optical 0.0,0.0,0.0
 tile_manager_single iso_wall
 layer 2
 

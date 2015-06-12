@@ -213,8 +213,6 @@ GUI_MapViewer::GUI_MapViewer(Application* app = nullptr)
 	end_moving += std::bind(&GUI_MapViewer::on_end_moving, this, std::placeholders::_1);
 	m_shift.x = -1024 * 0.5 + m_tile_count_x * 32 * 0.5;
 	m_shift.y = 1024 * 0.5 - m_tile_count_y * 18 * 0.5;
-	LOG(INFO) << m_shift.x;
-	LOG(INFO) << m_shift.y;
 }
 
 GUI_MapViewer::~GUI_MapViewer(void)
@@ -964,7 +962,6 @@ void GUI_MapViewer::on_lose_focus(GUI_Object* sender)
 position_t GUI_MapViewer::local_xy(position_t p)
 {
 	position_t Result = position_t(m_tile_count_x - (m_tile_count_y - (p.x - m_shift.x) / 32 - m_tile_count_x + (p.y - m_shift.y) / 18 + 1), m_tile_count_y - ((p.x - m_shift.x) / 32 + (p.y - m_shift.y) / 18));
-	LOG(INFO) << Result.x << "   " << Result.y;
 	if (Result.x > m_tile_count_x - 1){ Result.x = m_tile_count_x - 1; }
 	if (Result.x <0){ Result.x = 0; }
 	if (Result.y > m_tile_count_y - 1){ Result.y = m_tile_count_y - 1; }

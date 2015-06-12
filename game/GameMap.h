@@ -53,8 +53,9 @@ public:
 	bool divide_block(block_t* Block, int Depth, int Current);
 	void generate_level(void);
 	void add_light(GameObject* Object);
-	void add_new_object(GameObject* Object, MapCell* Element);
-	void add_ai_object(GameObject* Object, MapCell* Element);
+
+	void add_to_map(GameObject* object, MapCell* cell);
+
 	void fill();
 	void random_block(block_t* block);
 	void connect_room();

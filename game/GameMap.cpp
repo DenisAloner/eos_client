@@ -115,16 +115,17 @@ void GameMap::add_light(GameObject* Object)
 	m_lights.push_front(Object);
 }
 
-void GameMap::add_new_object(GameObject* Object, MapCell* Element)
+void GameMap::add_to_map(GameObject* object, MapCell* cell)
 {
-	add_object(Object, Element);
-	add_light(Object);
-}
-
-void GameMap::add_ai_object(GameObject* Object, MapCell* Element)
-{
-	add_object(Object, Element);
-	m_ai.push_front(Object);
+	add_object(object, cell);
+	if (object->m_active_state->m_light)
+	{
+		add_light(object);
+	}
+	if (object->m_active_state->m_ai)
+	{
+		m_ai.push_front(object);
+	}
 }
 
 void GameMap::generate_level(void)
@@ -664,22 +665,22 @@ void GameMap::add_lighting()
 		int tk;
 		std::string torch_kind[] = { "torch", "red torch", "green torch", "blue torch" };
 		tk = rand() % 1;
-		add_new_object(Application::instance().m_game_object_manager->new_object(torch_kind[tk]), m_items[block->rect.y + 1][block->rect.x + 1]);
+		add_to_map(Application::instance().m_game_object_manager->new_object(torch_kind[tk]), m_items[block->rect.y + 1][block->rect.x + 1]);
 		tk = rand() % 1;
-		add_new_object(Application::instance().m_game_object_manager->new_object(torch_kind[tk]), m_items[block->rect.y + 1][block->rect.x + block->rect.w - 1]);
+		add_to_map(Application::instance().m_game_object_manager->new_object(torch_kind[tk]), m_items[block->rect.y + 1][block->rect.x + block->rect.w - 1]);
 		tk = rand() % 1;
-		add_new_object(Application::instance().m_game_object_manager->new_object(torch_kind[tk]), m_items[block->rect.y + block->rect.h - 1][block->rect.x + block->rect.w - 1]);
+		add_to_map(Application::instance().m_game_object_manager->new_object(torch_kind[tk]), m_items[block->rect.y + block->rect.h - 1][block->rect.x + block->rect.w - 1]);
 		tk = rand() % 1;
-		add_new_object(Application::instance().m_game_object_manager->new_object(torch_kind[tk]), m_items[block->rect.y + block->rect.h - 1][block->rect.x + 1]);
+		add_to_map(Application::instance().m_game_object_manager->new_object(torch_kind[tk]), m_items[block->rect.y + block->rect.h - 1][block->rect.x + 1]);
 		int j=0;
 		for (int i = block->rect.x + 1; i < block->rect.x + block->rect.w; i++)
 		{
 			if (j == 30)
 			{
 				tk = rand() % 4;
-				add_new_object(Application::instance().m_game_object_manager->new_object(torch_kind[tk]), m_items[block->rect.y + 1][i]);
+				add_to_map(Application::instance().m_game_object_manager->new_object(torch_kind[tk]), m_items[block->rect.y + 1][i]);
 				tk = rand() % 4;
-				add_new_object(Application::instance().m_game_object_manager->new_object(torch_kind[tk]), m_items[block->rect.y + block->rect.h - 1][i]);
+				add_to_map(Application::instance().m_game_object_manager->new_object(torch_kind[tk]), m_items[block->rect.y + block->rect.h - 1][i]);
 				j = -1;
 			}
 			j = j + 1;
@@ -690,9 +691,9 @@ void GameMap::add_lighting()
 			if (j == 30)
 			{
 				tk = rand() % 4;
-				add_new_object(Application::instance().m_game_object_manager->new_object(torch_kind[tk]), m_items[i][block->rect.x + 1]);
+				add_to_map(Application::instance().m_game_object_manager->new_object(torch_kind[tk]), m_items[i][block->rect.x + 1]);
 				tk = rand() % 4;
-				add_new_object(Application::instance().m_game_object_manager->new_object(torch_kind[tk]), m_items[i][block->rect.x + block->rect.w - 1]);
+				add_to_map(Application::instance().m_game_object_manager->new_object(torch_kind[tk]), m_items[i][block->rect.x + block->rect.w - 1]);
 				j = -1;
 			}
 			j = j + 1;
