@@ -81,6 +81,7 @@ state alive
 ai non_humanoid,20,0,0
 size 1 1 2
 tile_manager_single iso_snake
+optical 0.7,0.7,0.7
 feature_list action,action
 feature_list generic,buff
 add_action move
@@ -189,9 +190,9 @@ tag pick_able
 
 object sword
 state equip,hand
-size 1 1 1
+size 1 1 0
 icon sword
-tile_manager_single sword
+tile_manager_single iso_sword
 feature_list tag,tag
 tag pick_able
 tag pass_able
@@ -441,9 +442,10 @@ tag seethrough_able
 
 object iso_unit
 state alive
-ai non_humanoid,20,0,0
+ai non_humanoid,32,0,0
 size 2 1 4
 tile_manager_single iso_elf
+optical 0.3,0.3,0.3
 feature_list action,action
 add_action equip
 add_action open
@@ -528,6 +530,7 @@ state alive
 ai non_humanoid,20,0,0
 size 2 2 4
 tile_manager_single iso_bear
+optical 0.1,0.1,0.1
 feature_list action,action
 add_action move
 feature_list parameter,health,100,100

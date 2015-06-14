@@ -413,6 +413,14 @@ void Action_CellInfo::interaction_handler()
 		p->m_place = static_cast<MapCell*>(static_cast<P_object_owner*>(result)->m_cell);
 		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}:"));
 		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(" - освещение {" + std::to_string(p->m_place->m_light.R) + "," + std::to_string(p->m_place->m_light.G) + "," + std::to_string(p->m_place->m_light.B) + "}."));
+		MapCell* c = Application::instance().m_GUI->MapViewer->m_player->m_object->cell();
+		int f = Application::instance().m_GUI->MapViewer->m_player->m_fov->m_radius;
+		int xf = p->m_place->x-c->x;
+		int yf = p->m_place->y - c->y;
+		if ((xf >= -f) && (xf <= f) && (yf >= -f) && (yf <=f))
+		{
+			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(std::to_string(Application::instance().m_GUI->MapViewer->m_player->m_fov->m_map[Application::instance().m_GUI->MapViewer->m_player->m_fov->m_middle + yf][Application::instance().m_GUI->MapViewer->m_player->m_fov->m_middle + xf].visibility)));
+		}
 	}
 	else
 	{

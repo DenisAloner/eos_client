@@ -247,7 +247,7 @@ void FOV::cast_light(uint x, uint y, uint radius, uint row, float start_slope, f
 				blocked = true;
 				next_start_slope = r_slope;
 				cast_light(x, y, radius, i + 1, l_slope, r_slope, xx, xy, yx, yy, visibility*m_map[ay][ax].damp);
-				cast_light(x, y, radius, i + 1, start_slope, l_slope, xx,xy, yx, yy,visibility);
+				cast_light(x, y, radius, i + 1, start_slope, l_slope, xx, xy, yx, yy, visibility);
 			}
 		}
 		if (blocked) {
@@ -262,4 +262,6 @@ void FOV::do_fov(uint x, uint y, uint radius)
 		cast_light(x, y, radius, 1, 1.0, 0.0, multipliers1[0][i],multipliers1[1][i], multipliers1[2][i], multipliers1[3][i],1.0);
 	}
 	m_map[m_middle][m_middle].visible = true;
+	m_map[m_middle][m_middle].visibility = 1.0;
+
 }

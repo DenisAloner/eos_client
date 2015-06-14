@@ -34,11 +34,11 @@ void mapviewer_hint_area::render()
 		bx = 1;
 		by = 1;
 	}
-	for (int i = -by; i < 2; i++)
+	for (int i = -1; i < by+1; i++)
 	{
-		for (int j = -bx; j <2; j++)
+		for (int j = -1; j < bx+1; j++)
 		{
-			if (i == -by || j == -bx || i == 1 || j == 1)
+			if (i == by || j == bx|| i == -1 || j == -1)
 			{
 				int x = px + (Item->x + j) - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
 				int y = py + (Item->y + i) - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
@@ -200,8 +200,8 @@ void mapviewer_hint_line::render()
 
 GUI_MapViewer::GUI_MapViewer(Application* app = nullptr)
 {
-	m_tile_count_x = 64;
-	m_tile_count_y = 64;
+	m_tile_count_x = 80;
+	m_tile_count_y = 80;
 	m_just_focused = false;
 	m_is_moving = false;
 	m_focus=nullptr;
@@ -211,8 +211,8 @@ GUI_MapViewer::GUI_MapViewer(Application* app = nullptr)
 	start_moving += std::bind(&GUI_MapViewer::on_start_moving, this, std::placeholders::_1);
 	move += std::bind(&GUI_MapViewer::on_move, this, std::placeholders::_1);
 	end_moving += std::bind(&GUI_MapViewer::on_end_moving, this, std::placeholders::_1);
-	m_shift.x = -1024 * 0.5 + m_tile_count_x * 32 * 0.5;
-	m_shift.y = 1024 * 0.5 - m_tile_count_y * 18 * 0.5;
+	m_shift.x = -1024 * 0.5 + (m_tile_count_x-15) * 32 * 0.5;
+	m_shift.y = 1024 * 0.5 - (m_tile_count_y+6) * 18 * 0.5;
 }
 
 GUI_MapViewer::~GUI_MapViewer(void)
@@ -534,7 +534,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 			{
 				if ((xf >= -m_player->m_fov->m_radius) && (xf <= m_player->m_fov->m_radius) && (yf >= -m_player->m_fov->m_radius) && (yf <= m_player->m_fov->m_radius))
 				{
-					//if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visible)
+					if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visibility>0.0)
 					{
 						light[0] = m_map->m_items[y][x]->m_light.R / 100.0F;
 						light[1] = m_map->m_items[y][x]->m_light.G / 100.0F;
@@ -654,7 +654,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 							}
 						}
 					}
-				//	else
+				else
 					{
 						/*object_size = dimension_t(1, 1);
 						dx = object_size.w;
@@ -665,6 +665,17 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 						x2 = (px + gx + 1)*m_tile_size_x;
 						y2 = y1;
 						x3 = x2;
+						y3 = y0;*/
+						int yp = m_tile_count_x - px - gx;
+						int xp = m_tile_count_y - py - gy;
+						//dx = 32 + m_map->m_items[y][x]->x - (*Current)->cell()->x;
+						x0 = (xp - yp) * 16 + m_shift.x;
+						y0 = (xp + yp) * 9 - 18 + m_shift.y;
+						x1 = x0;
+						y1 = (xp + yp) * 9 + m_shift.y;
+						x2 = (xp - yp) * 16 + 32 + m_shift.x;
+						y2 = y1;
+						x3 = x2;
 						y3 = y0;
 						glUseProgram(0);
 						glEnable(GL_BLEND);
@@ -673,7 +684,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 						glActiveTexture(GL_TEXTURE0);
 						glBindTexture(GL_TEXTURE_2D, Graph->m_no_visible);
 						glColor4f(1.0, 1.0, 1.0, 1.0);
-						Graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);*/
+						Graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
 					}
 				}
 			}
@@ -760,10 +771,10 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	glBindTexture(GL_TEXTURE_2D, Graph->m_empty_01);
 	glColor4d(1.0, 1.0, 1.0, 1.0);
 	//glGenerateMipmap(GL_TEXTURE_2D);
-	//Graph->draw_sprite(0, 0, 0, 1024/8, 1024/8, 1024/8, 1024/8, 0);
-	//Graph->blur_rect(0, 0, 1024 / 8, 1024 / 8);
+	//Graph->draw_sprite(0, 0, 0, 1024/4, 1024/4, 1024/4, 1024/4, 0);
+	//Graph->blur_rect(0, 0, 1024 / 4, 1024 / 4);
 	//glBindTexture(GL_TEXTURE_2D, Graph->m_blur);
-	//glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 1024 - 1024 / 8, 1024 / 8, 1024 / 8);
+	//glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 1024 - 1024 / 4, 1024 /4, 1024 /4);
 	Graph->draw_sprite(0, 0, 0, 1024, 1024, 1024, 1024, 0);
 	glDisable(GL_TEXTURE_2D);
 }
