@@ -33,6 +33,7 @@ GraphicalController::GraphicalController()
 		m_cursor = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Cursor.bmp");
 		m_no_image = load_texture(FileSystem::instance().m_resource_path + "Tiles\\no_tile.bmp");
 		m_no_visible = load_texture(FileSystem::instance().m_resource_path + "Tiles\\no_visible.bmp");
+		m_novisible = load_texture(FileSystem::instance().m_resource_path + "Tiles\\novisible.bmp");
 	}
 	catch(std::logic_error e)
 	{
