@@ -161,6 +161,11 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->m_active_state->m_optical = new optical_properties_t(RGB_t(std::stof(arg[0]), std::stof(arg[1]), std::stof(arg[2])));
 		break;
 	}
+	case command_e::visibility:
+	{
+		m_object->m_active_state->m_visibility = new float(std::stof(arg[0]));
+		break;
+	}
 	case command_e::layer:
 	{
 		m_object->m_active_state->m_layer = std::stoi(args);
@@ -446,6 +451,7 @@ void GameObjectManager::init()
 	m_commands.insert(std::pair<std::string, command_e>("ai", command_e::ai));
 	m_commands.insert(std::pair<std::string, command_e>("weight", command_e::weight));
 	m_commands["optical"] = command_e::optical;
+	m_commands["visibility"] = command_e::visibility;
 	m_commands.insert(std::pair<std::string, command_e>("layer", command_e::layer));
 	m_commands.insert(std::pair<std::string, command_e>("icon", command_e::icon));
 	m_commands.insert(std::pair<std::string, command_e>("tile_manager_single", command_e::tile_manager_single));

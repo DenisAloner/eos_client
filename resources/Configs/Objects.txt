@@ -531,6 +531,7 @@ ai non_humanoid,20,0,0
 size 2 2 4
 tile_manager_single iso_bear
 optical 0.1,0.1,0.1
+visibility 0.25
 feature_list action,action
 add_action move
 feature_list parameter,health,100,100

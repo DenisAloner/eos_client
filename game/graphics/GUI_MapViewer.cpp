@@ -536,9 +536,10 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 				{
 					//if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visibility>0.0)
 					{
-						light[0] = m_map->m_items[y][x]->m_light.R / 100.0F;
-						light[1] = m_map->m_items[y][x]->m_light.G / 100.0F;
-						light[2] = m_map->m_items[y][x]->m_light.B / 100.0F;
+						float v = m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visibility;
+						light[0] = (m_map->m_items[y][x]->m_light.R / 100.0F)*v;
+						light[1] = (m_map->m_items[y][x]->m_light.G / 100.0F)*v;
+						light[2] = (m_map->m_items[y][x]->m_light.B / 100.0F)*v;
 						light[3] = 0.0;
 						/*light[0] = 1.0;
 						light[1] = 1.0;
@@ -653,55 +654,55 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 										}*/
 							}
 						}
-						if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visibility == 0.0)
-						{
-							
-							int yp = m_tile_count_x - px - gx;
-									int xp = m_tile_count_y - py - gy;
-									//dx = 32 + m_map->m_items[y][x]->x - (*Current)->cell()->x;
-									x0 = (xp - yp) * 16 + m_shift.x;
-									y0 = (xp + yp) * 9 - 18 + m_shift.y;
-									x1 = x0;
-									y1 = (xp + yp) * 9 + m_shift.y;
-									x2 = (xp - yp) * 16 + 32 + m_shift.x;
-									y2 = y1;
-									x3 = x2;
-									y3 = y0;
-									glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
-									glUseProgram(0);
-									glEnable(GL_BLEND);
-									glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-									glEnable(GL_TEXTURE_2D);
-									glActiveTexture(GL_TEXTURE0);
-									glBindTexture(GL_TEXTURE_2D, Graph->m_no_visible);
-									glColor4f(1.0, 1.0, 1.0, 0.25);
-									Graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+						//if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visibility == 0.0)
+						//{
+						//	
+						//	//int yp = m_tile_count_x - px - gx;
+						//	//		int xp = m_tile_count_y - py - gy;
+						//	//		//dx = 32 + m_map->m_items[y][x]->x - (*Current)->cell()->x;
+						//	//		x0 = (xp - yp) * 16 + m_shift.x;
+						//	//		y0 = (xp + yp) * 9 - 18 + m_shift.y;
+						//	//		x1 = x0;
+						//	//		y1 = (xp + yp) * 9 + m_shift.y;
+						//	//		x2 = (xp - yp) * 16 + 32 + m_shift.x;
+						//	//		y2 = y1;
+						//	//		x3 = x2;
+						//	//		y3 = y0;
+						//	//		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
+						//	//		glUseProgram(0);
+						//	//		glEnable(GL_BLEND);
+						//	//		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+						//	//		glEnable(GL_TEXTURE_2D);
+						//	//		glActiveTexture(GL_TEXTURE0);
+						//	//		glBindTexture(GL_TEXTURE_2D, Graph->m_no_visible);
+						//	//		glColor4f(1.0, 1.0, 1.0, 1.0);
+						//	//		Graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
 
-									/*int yp = m_tile_count_x - px - gx;
-									int xp = m_tile_count_y - py - gy;
-									x0 = (xp - yp) * 16 + m_shift.x;
-									y0 = (xp + yp) * 9 - (108) + m_shift.y;
-									x1 = x0;
-									y1 = (xp + yp) * 9 + m_shift.y;
-									x2 = (xp - yp) * 16 + 32 + m_shift.x;
-									y2 = y1;
-									x3 = x2;
-									y3 = y0;
-									glUseProgram(0);
-									glEnable(GL_BLEND);
-									glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-									glEnable(GL_TEXTURE_2D);
-									glActiveTexture(GL_TEXTURE0);
-									glBindTexture(GL_TEXTURE_2D, Graph->m_novisible);
-									glColor4f(1.0, 1.0, 1.0, 1.0);
-									Graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+						//			int yp = m_tile_count_x - px - gx;
+						//			int xp = m_tile_count_y - py - gy;
+						//			x0 = (xp - yp) * 16 + m_shift.x;
+						//			y0 = (xp + yp) * 9 - (108) + m_shift.y;
+						//			x1 = x0;
+						//			y1 = (xp + yp) * 9 + m_shift.y;
+						//			x2 = (xp - yp) * 16 + 32 + m_shift.x;
+						//			y2 = y1;
+						//			x3 = x2;
+						//			y3 = y0;
+						//			glUseProgram(0);
+						//			glEnable(GL_BLEND);
+						//			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+						//			glEnable(GL_TEXTURE_2D);
+						//			glActiveTexture(GL_TEXTURE0);
+						//			glBindTexture(GL_TEXTURE_2D, Graph->m_novisible);
+						//			glColor4f(1.0, 1.0, 1.0, 1.0);
+						//			Graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
 
-							glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
-							glUseProgram(Graph->m_mask_shader);
-							glBindTexture(GL_TEXTURE_2D, Graph->m_empty_02);
-							Graph->set_uniform_sampler(Graph->m_mask_shader, "Map");
-							Graph->draw_tile_FBO(x1 / 1024.0, (1024 - y1) / 1024.0, x3 / 1024.0, (1024 - y3) / 1024.0, x0, y0, x1, y1, x2, y2, x3, y3);*/
-						}
+						///*	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
+						//	glUseProgram(Graph->m_mask_shader);
+						//	glBindTexture(GL_TEXTURE_2D, Graph->m_empty_02);
+						//	Graph->set_uniform_sampler(Graph->m_mask_shader, "Map");
+						//	Graph->draw_tile_FBO(x1 / 1024.0, (1024 - y1) / 1024.0, x3 / 1024.0, (1024 - y3) / 1024.0, x0, y0, x1, y1, x2, y2, x3, y3);*/
+						//}
 					}
 					//else
 					//	{
@@ -730,6 +731,77 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 			}
 		}
 	}
+
+	//for (int gy = m_tile_count_y - 1; gy > -6; gy--)
+	//{
+	//	for (int gx = m_tile_count_x - 1; gx > -6; gx--)
+	//	{
+	//		x = m_center.x + gx - m_tile_count_x / 2;
+	//		y = m_center.y + gy - m_tile_count_y / 2;
+	//		xf = x - m_player->m_object->cell()->x;
+	//		yf = y - m_player->m_object->cell()->y;
+	//		if ((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1))
+	//		{
+	//		}
+	//		else
+	//		{
+	//			if ((xf >= -m_player->m_fov->m_radius) && (xf <= m_player->m_fov->m_radius) && (yf >= -m_player->m_fov->m_radius) && (yf <= m_player->m_fov->m_radius))
+	//			{
+	//				
+	//					if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visibility == 0.0)
+	//					{
+
+	//						//int yp = m_tile_count_x - px - gx;
+	//						//		int xp = m_tile_count_y - py - gy;
+	//						//		//dx = 32 + m_map->m_items[y][x]->x - (*Current)->cell()->x;
+	//						//		x0 = (xp - yp) * 16 + m_shift.x;
+	//						//		y0 = (xp + yp) * 9 - 18 + m_shift.y;
+	//						//		x1 = x0;
+	//						//		y1 = (xp + yp) * 9 + m_shift.y;
+	//						//		x2 = (xp - yp) * 16 + 32 + m_shift.x;
+	//						//		y2 = y1;
+	//						//		x3 = x2;
+	//						//		y3 = y0;
+	//						//		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
+	//						//		glUseProgram(0);
+	//						//		glEnable(GL_BLEND);
+	//						//		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//						//		glEnable(GL_TEXTURE_2D);
+	//						//		glActiveTexture(GL_TEXTURE0);
+	//						//		glBindTexture(GL_TEXTURE_2D, Graph->m_no_visible);
+	//						//		glColor4f(1.0, 1.0, 1.0, 1.0);
+	//						//		Graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+
+	//						int yp = m_tile_count_x - px - gx;
+	//						int xp = m_tile_count_y - py - gy;
+	//						x0 = (xp - yp) * 16 + m_shift.x;
+	//						y0 = (xp + yp) * 9 - (108) + m_shift.y;
+	//						x1 = x0;
+	//						y1 = (xp + yp) * 9 + m_shift.y;
+	//						x2 = (xp - yp) * 16 + 32 + m_shift.x;
+	//						y2 = y1;
+	//						x3 = x2;
+	//						y3 = y0;
+	//						glUseProgram(0);
+	//						glEnable(GL_BLEND);
+	//						glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//						glEnable(GL_TEXTURE_2D);
+	//						glActiveTexture(GL_TEXTURE0);
+	//						glBindTexture(GL_TEXTURE_2D, Graph->m_novisible);
+	//						glColor4f(1.0, 1.0, 1.0, 1.0);
+	//						Graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+
+	//						//	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
+	//						//glUseProgram(Graph->m_mask_shader);
+	//						//glBindTexture(GL_TEXTURE_2D, Graph->m_empty_02);
+	//						//Graph->set_uniform_sampler(Graph->m_mask_shader, "Map");
+	//						//Graph->draw_tile_FBO(x1 / 1024.0, (1024 - y1) / 1024.0, x3 / 1024.0, (1024 - y3) / 1024.0, x0, y0, x1, y1, x2, y2, x3, y3);
+	//					}
+	//			}
+	//		}
+	//	}
+	//}
+
 	if (m_cursored != nullptr)
 	{
 		MapCell* Item = m_cursored;

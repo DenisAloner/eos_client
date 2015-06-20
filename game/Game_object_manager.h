@@ -26,6 +26,7 @@ public:
 		size,
 		weight,
 		optical,
+		visibility,
 		layer,
 		icon,
 		tile_manager_single,

@@ -29,7 +29,6 @@ public:
 
 	struct cell
 	{
-		bool visible;
 		bool opaque;
 		float damp;
 		float visibility;

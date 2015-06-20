@@ -83,6 +83,7 @@ public:
 	light_t* m_light;
 	GLuint m_icon;
 	optical_properties_t* m_optical;
+	float* m_visibility;
 
 	AI* m_ai;
 

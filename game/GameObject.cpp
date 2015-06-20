@@ -65,6 +65,7 @@ Object_state::Object_state()
 	m_icon = Application::instance().m_graph->m_no_image;
 	m_ai = nullptr;
 	m_optical = nullptr;
+	m_visibility = nullptr;
 }
 
 Object_state* Object_state::clone()
@@ -81,6 +82,11 @@ Object_state* Object_state::clone()
 	if (m_optical)
 	{
 		state->m_optical = new optical_properties_t(*m_optical);
+	}
+	if (m_visibility)
+	{
+		state->m_visibility = new float;
+		*state->m_visibility = *m_visibility;
 	}
 	for (auto item = m_item.begin(); item != m_item.end(); item++)
 	{

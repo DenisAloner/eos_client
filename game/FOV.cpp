@@ -158,7 +158,6 @@ void FOV::calculate(int radius,GameObject* unit, GameMap* map)
 		for (int x = 0; x <m_max_size; x++)
 		{
 			m_map[y][x].opaque = false;
-			m_map[y][x].visible = false;
 			m_map[y][x].damp = 0.0;
 			m_map[y][x].visibility = 0.0;
 		}
@@ -177,7 +176,14 @@ void FOV::calculate(int radius,GameObject* unit, GameMap* map)
 						if ((*obj) != unit&&qualifier((*obj)))
 						{
 							m_map[m_middle + (y - unit->cell()->y)][m_middle + (x - unit->cell()->x)].opaque = true;
-							m_map[m_middle + (y - unit->cell()->y)][m_middle + (x - unit->cell()->x)].damp = 0.0;
+							if ((*obj)->m_active_state->m_visibility)
+							{
+								m_map[m_middle + (y - unit->cell()->y)][m_middle + (x - unit->cell()->x)].damp = *(*obj)->m_active_state->m_visibility;
+							}
+							else{
+								m_map[m_middle + (y - unit->cell()->y)][m_middle + (x - unit->cell()->x)].damp = 0.0;
+							}
+							
 						}
 					}
 				}
@@ -228,7 +234,6 @@ void FOV::cast_light(uint x, uint y, uint radius, uint row, float start_slope, f
 			uint radius2 = radius * radius;
 			if ((uint)(dx * dx + dy * dy) < radius2) {
 				if (visibility > 0.0){
-					m_map[ay][ax].visible = true;
 					m_map[ay][ax].visibility = visibility;
 				}
 			}
@@ -261,7 +266,6 @@ void FOV::do_fov(uint x, uint y, uint radius)
 	for (uint i = 0; i < 8; i++) {
 		cast_light(x, y, radius, 1, 1.0, 0.0, multipliers1[0][i],multipliers1[1][i], multipliers1[2][i], multipliers1[3][i],1.0);
 	}
-	m_map[m_middle][m_middle].visible = true;
 	m_map[m_middle][m_middle].visibility = 1.0;
 
 }

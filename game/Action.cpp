@@ -564,7 +564,8 @@ void Action_pick::perfom(Parameter* parameter)
 		{
 		case entity_e::cell:
 		{
-			static_cast<MapCell*>(p->m_object->m_owner)->m_items.remove(p->m_object);
+			//static_cast<MapCell*>(p->m_object->m_owner)->m_items.remove(p->m_object);
+			static_cast<MapCell*>(p->m_object->m_owner)->m_map->remove_object(p->m_object);
 			break;
 		}
 		case entity_e::inventory_cell:
@@ -582,7 +583,8 @@ void Action_pick::perfom(Parameter* parameter)
 		{
 		case entity_e::cell:
 		{
-			static_cast<MapCell*>(p->m_owner)->m_items.push_back(p->m_object);
+			//static_cast<MapCell*>(p->m_owner)->m_items.push_back(p->m_object);
+			static_cast<MapCell*>(p->m_owner)->m_map->add_object(p->m_object, static_cast<MapCell*>(p->m_owner));
 			p->m_object->m_owner = p->m_owner;
 			break;
 		}
