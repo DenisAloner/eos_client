@@ -171,15 +171,6 @@ feature_list action,action
 add_action move
 feature_list parameter,health,100,100
 
-object floor
-state alive
-size 1 1 0
-tile_manager_single EoS_Floor_01
-feature_list tag,tag
-tag pass_able
-tag seethrough_able
-layer 0
-
 object health potion
 state alive
 size 1 1 1
@@ -256,43 +247,11 @@ size 1 1 0
 tile_manager_single Mud
 layer 2
 
-object torch
-state alive
-size 1 1 3
-tile_manager_single EoS_Torch
-light 80 80 80
-feature_list tag,tag
-tag seethrough_able
-
-object red torch
-state alive
-size 1 1 3
-tile_manager_single EoS_Torch
-light 80 0 0
-feature_list tag,tag
-tag seethrough_able
-
-object green torch
-state alive
-size 1 1 3
-tile_manager_single EoS_Torch
-light 0 80 0
-feature_list tag,tag
-tag seethrough_able
-
-object blue torch
-state alive
-size 1 1 3
-tile_manager_single EoS_Torch
-light 0 0 80
-feature_list tag,tag
-tag seethrough_able
-
 object door
 state on
-size 5 1 4
-tile_manager_rotating door_down 0
-tile_manager_rotating door_left 1
+size 5 1 5
+tile_manager_rotating iso_door_down 0
+tile_manager_rotating iso_door_left 1
 tile_manager_rotating no_tile 2
 tile_manager_rotating no_tile 3
 layer 2
@@ -423,7 +382,7 @@ tile_manager_single iso_wall
 feature_list tag,tag
 tag seethrough_able
 
-object iso_floor
+object floor
 state alive
 size 1 1 0
 tile_manager_single iso_floor
@@ -432,7 +391,7 @@ tag pass_able
 tag seethrough_able
 layer 0
 
-object iso_torch
+object torch
 state alive
 size 1 1 3
 tile_manager_single iso_torch

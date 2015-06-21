@@ -5,7 +5,7 @@ const float TexStep = 1.0/1024.0;
 void main (void)
 {
  vec4 color = texture2D(Map,gl_TexCoord[0].xy);
- gl_FragColor = vec4(color[0],color[1],color[2],color[3]*0.4);
+ gl_FragColor = vec4(color[0],color[1],color[2],color[3]*0.2);
  if(color[3]>0.0)
  {
   vec4 t1 = texture2D(Map,vec2(gl_TexCoord[0].x, gl_TexCoord[0].y - TexStep));

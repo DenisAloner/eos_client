@@ -97,7 +97,11 @@ void FOV_light::cast_light(uint x, uint y, uint radius, uint row, float start_sl
 			else if (m_map[ay][ax].opaque) {
 				blocked = true;
 				next_start_slope = r_slope;
-				cast_light(x, y, radius, i + 1, l_slope, r_slope, xx, xy, yx, yy, RGB_t(damp.R*m_map[ay][ax].attenuation_constant.R, damp.G*m_map[ay][ax].attenuation_constant.G, damp.B*m_map[ay][ax].attenuation_constant.B));
+				if (damp.R != 0 && damp.G != 0 && damp.B != 0)
+				{
+					cast_light(x, y, radius, i + 1, l_slope, r_slope, xx, xy, yx, yy, RGB_t(damp.R*m_map[ay][ax].attenuation_constant.R, damp.G*m_map[ay][ax].attenuation_constant.G, damp.B*m_map[ay][ax].attenuation_constant.B));
+				}
+				
 				cast_light(x, y, radius, i + 1, start_slope, l_slope, xx, xy, yx, yy, damp);
 			}
 		}
