@@ -333,8 +333,13 @@ void Application::initialize()
 	obj = m_game_object_manager->new_object("sword");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry ][rx - 1]);
 	
-	obj = m_game_object_manager->new_object("iso_bear");
+	obj = m_game_object_manager->new_object("skull");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 5][rx + 1]);
+	obj = m_game_object_manager->new_object("slave_skull");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 5][rx + 2]);
+	obj = m_game_object_manager->new_object("slave_skull");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 5][rx]);
+
 
 	/*obj = m_game_object_manager->new_object("iso_torch");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry + 2][rx + 5]);*/
@@ -621,8 +626,8 @@ bool Application::command_check_position(GameObject*& object, MapCell*& position
 	{
 		for (int j = 0; j<object->m_active_state->m_size.x; j++)
 		{
-			if (map->m_items[position->y + i][position->x - j] == nullptr){ return false; }
-			for (std::list<GameObject*>::iterator item = map->m_items[position->y + i][position->x - j]->m_items.begin(); item != map->m_items[position->y + i][position->x - j]->m_items.end(); item++)
+			if (map->m_items[position->y + i][position->x + j] == nullptr){ return false; }
+			for (std::list<GameObject*>::iterator item = map->m_items[position->y + i][position->x + j]->m_items.begin(); item != map->m_items[position->y + i][position->x + j]->m_items.end(); item++)
 			{
 				if (((*item) != object) && qualifier((*item)))
 				{
