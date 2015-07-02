@@ -332,13 +332,16 @@ void Application::initialize()
 
 	obj = m_game_object_manager->new_object("sword");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry ][rx - 1]);
+
+	obj = m_game_object_manager->new_object("rat");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 5][rx + 1]);
 	
-	obj = m_game_object_manager->new_object("skull");
+	/*obj = m_game_object_manager->new_object("skull");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 5][rx + 1]);
 	obj = m_game_object_manager->new_object("slave_skull");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 5][rx + 2]);
 	obj = m_game_object_manager->new_object("slave_skull");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 5][rx]);
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 5][rx]);*/
 
 
 	/*obj = m_game_object_manager->new_object("iso_torch");

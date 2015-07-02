@@ -149,6 +149,18 @@ enum ObjectDirection
 	ObjectDirection_Right
 };
 
+enum class direction_t
+{
+	top,
+	topright,
+	right,
+	downright,
+	down,
+	downleft,
+	left,
+	topleft
+};
+
 struct tile_t
 {
 	GLuint unit;

@@ -55,32 +55,11 @@ state dead
 size 1 2 0
 tile_manager_single elf_corpse
 
-object rat
-state alive
-ai non_humanoid,20,0,0
-size 1 1 1
-tile_manager_single rat_left
-feature_list action,action
-add_action move
-feature_list parameter,health,100,100
-feature_list parameter,strength,1,100
-feature_list parameter,poison,0,100
-feature_list generic,damage
-feature_list tag,tag
-mem_effect value,-1
-mem_slot_copyist health
-add_slot damage
-tag mortal
-tag purification_from_poison
-state dead
-size 1 1 0
-tile_manager_single snake_corpse
-
 object snake
 state alive
 ai non_humanoid,20,0,0
-size 1 1 2
-tile_manager_single iso_snake
+size 3 1 1
+tile_manager_single snake
 optical 0.7,0.7,0.7
 feature_list action,action
 feature_list generic,buff
@@ -403,50 +382,8 @@ object iso_unit
 state alive
 ai non_humanoid,32,0,0
 size 2 1 4
-tile_manager_single iso_elf
+tile_manager_single knight
 optical 0.3,0.3,0.3
-feature_list action,action
-add_action equip
-add_action open
-add_action push
-add_action turn
-feature_list parameter,health,100,100
-feature_list parameter,strength,8,100
-feature_list parameter,hunger,0,1000
-feature_list parameter,thirst,0,1000
-feature_list parameter,skill_sword,10,100
-feature_list generic,buff
-feature_list generic,damage
-feature_list parts,body
-mem_part hand,руки
-add_slot body
-feature_list_mem action,action
-mem_action pick
-add_slot_mem action
-mem_part foot,ноги
-add_slot body
-feature_list_mem action,action
-mem_action move
-add_slot_mem action
-mem_effect value,1
-mem_slot_timer 5
-mem_slot_copyist health
-add_slot buff
-mem_effect value,-10
-mem_slot_prefix physical_damage
-mem_slot_copyist health
-add_slot damage
-feature_list tag,tag
-tag mortal
-state dead
-size 1 2 0
-tile_manager_single elf_corpse
-
-object iso_drou
-state alive
-ai non_humanoid,20,0,0
-size 2 1 4
-tile_manager_single iso_drou
 feature_list action,action
 add_action equip
 add_action open
@@ -524,6 +461,30 @@ state alive
 ai non_humanoid,20,0,0
 size 1 1 1
 tile_manager_single slave_skull
+optical 0.7,0.7,0.7
+feature_list action,action
+feature_list generic,buff
+add_action move
+feature_list parameter,health,100,100
+feature_list parameter,strength,5,100
+feature_list generic,total_damage
+feature_list generic,damage
+feature_list tag,tag
+tag poison_resist
+tag mortal
+tag seethrough_able
+mem_effect value,-1
+mem_slot_copyist health
+add_slot total_damage
+state dead
+size 1 1 1
+tile_manager_single snake_corpse
+
+object rat
+state alive
+ai non_humanoid,20,0,0
+size 3 1 1
+tile_manager_single rat
 optical 0.7,0.7,0.7
 feature_list action,action
 feature_list generic,buff
