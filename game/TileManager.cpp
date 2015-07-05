@@ -41,6 +41,17 @@ int TileManager_Single::get_tile_index(const ObjectDirection& direction, const i
 }
 
 
+TileManager_Single_animate::TileManager_Single_animate()
+{
+	m_tiles = new GLuint[4];
+}
+
+int TileManager_Single_animate::get_tile_index(const ObjectDirection& direction, const int& frame)
+{
+	return frame;
+}
+
+
 TileManager_Map::TileManager_Map()
 {
 	m_tiles = new GLuint[16];

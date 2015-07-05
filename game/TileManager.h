@@ -52,4 +52,14 @@ public:
 	virtual int get_tile_index(const ObjectDirection& direction, const int& frame);
 };
 
+class TileManager_Single_animate :
+	public TileManager
+{
+public:
+
+	TileManager_Single_animate();
+
+	virtual int get_tile_index(const ObjectDirection& direction, const int& frame);
+};
+
 #endif //TILEMANAGER_H

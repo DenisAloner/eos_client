@@ -30,6 +30,7 @@ public:
 		layer,
 		icon,
 		tile_manager_single,
+		tile_manager_single_animate,
 		tile_manager_map,
 		tile_manager_rotating,
 		light,

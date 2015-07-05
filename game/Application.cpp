@@ -49,7 +49,7 @@ void gui_MessageQueue::push(Parameter* p)
 game_clipboard::game_clipboard():m_item(nullptr){}
 
 Application::Application()
-: m_timer(new Timer(8, 75))
+: m_timer(new Timer(8, 300))
 {
 }
 

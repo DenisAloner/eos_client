@@ -182,6 +182,15 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->m_active_state->m_tile_manager->load_from_file(args, ObjectDirection_Down, 0);
 		break;
 	}
+	case command_e::tile_manager_single_animate:
+	{
+		if (m_object->m_active_state->m_tile_manager == nullptr)
+		{
+			m_object->m_active_state->m_tile_manager = new TileManager_Single_animate();
+		}
+		m_object->m_active_state->m_tile_manager->load_from_file(arg[0], ObjectDirection::ObjectDirection_Down, std::stoi(arg[1]));
+		break;
+	}
 	case command_e::tile_manager_map:
 	{
 		if (m_object->m_active_state->m_tile_manager == nullptr)
@@ -455,6 +464,7 @@ void GameObjectManager::init()
 	m_commands.insert(std::pair<std::string, command_e>("layer", command_e::layer));
 	m_commands.insert(std::pair<std::string, command_e>("icon", command_e::icon));
 	m_commands.insert(std::pair<std::string, command_e>("tile_manager_single", command_e::tile_manager_single));
+	m_commands["tile_manager_single_animate"] = command_e::tile_manager_single_animate;
 	m_commands.insert(std::pair<std::string, command_e>("tile_manager_map", command_e::tile_manager_map));
 	m_commands.insert(std::pair<std::string, command_e>("tile_manager_rotating", command_e::tile_manager_rotating));
 	m_commands.insert(std::pair<std::string, command_e>("light", command_e::light));
