@@ -98,10 +98,22 @@ void GraphicalController::draw_sprite_FBO(double TexWidth, double TexHeight, dou
 void GraphicalController::draw_tile_FBO(double tx1, double ty1, double tx2, double ty2, double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3)
 {
 	glBegin(GL_QUADS);
-	glTexCoord2d(tx1, ty2); glVertex2d(x0, y0);
-	glTexCoord2d(tx1, ty1); glVertex2d(x1, y1);
-	glTexCoord2d(tx2, ty1); glVertex2d(x2, y2);
-	glTexCoord2d(tx2, ty2); glVertex2d(x3, y3);
+	glMultiTexCoord2f(GL_TEXTURE0, tx1, ty2);
+	glMultiTexCoord2f(GL_TEXTURE1, 0.0f, 1.0f);
+	glVertex2d(x0, y0);
+	glMultiTexCoord2f(GL_TEXTURE0, tx1, ty1);
+	glMultiTexCoord2f(GL_TEXTURE1, 0.0f, 0.0f);
+	glVertex2d(x1, y1);
+	glMultiTexCoord2f(GL_TEXTURE0, tx2, ty1);
+	glMultiTexCoord2f(GL_TEXTURE1, 1.0f, 0.0f);
+	glVertex2d(x2, y2);
+	glMultiTexCoord2f(GL_TEXTURE0, tx2, ty2);
+	glMultiTexCoord2f(GL_TEXTURE1, 1.0f, 1.0f);
+	glVertex2d(x3, y3);
+	//glTexCoord2d(tx1, ty2); glVertex2d(x0, y0);
+	//glTexCoord2d(tx1, ty1); glVertex2d(x1, y1);
+	//glTexCoord2d(tx2, ty1); glVertex2d(x2, y2);
+	//glTexCoord2d(tx2, ty2); glVertex2d(x3, y3);
 	glEnd();
 }
 
@@ -209,11 +221,11 @@ void GraphicalController::blur_rect(int x, int y, int width, int height)
 	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_empty_02, 0);
 	glUseProgram(m_horizontal_shader);
-	set_uniform_sampler(m_horizontal_shader, "Map");
+	set_uniform_sampler(m_horizontal_shader, "Map",0);
 	draw_sprite_FBO(Tx, Ty, 0, 1024 - height, 0, 1024, width, 1024, width, 1024 - height);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_empty_01, 0);
 	glUseProgram(m_vertical_shader);
-	set_uniform_sampler(m_vertical_shader, "Map");
+	set_uniform_sampler(m_vertical_shader, "Map",0);
 	glBindTexture(GL_TEXTURE_2D, m_empty_02);
 	draw_sprite_FBO(Tx, Ty, 0, 1024 - height, 0, 1024, width, 1024, width, 1024 - height);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -233,12 +245,12 @@ bool GraphicalController::set_uniform_vector(GLuint program, const char * name, 
 	return true;
 }
 
-bool GraphicalController::set_uniform_sampler(GLuint object, const char * name)
+bool GraphicalController::set_uniform_sampler(GLuint object, const char * name, int index)
 {
 	GLint loc = glGetUniformLocation(object, name);
 	if (loc < 0)
 		return false;
-	glUniform1i(loc, 0);
+	glUniform1i(loc, index);
 	return true;
 }
 

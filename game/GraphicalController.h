@@ -45,7 +45,7 @@ public:
 	GLuint load_shader(const std::string& vPath,const std::string& fPath);
 	std::string load_shader_source(const std::string& path);
 	bool set_uniform_vector(GLuint program, const char * name, const float * value);
-	bool set_uniform_sampler(GLuint object, const char * name);
+	bool set_uniform_sampler(GLuint object, const char * name, int index);
 	bool set_uniform_ptr(GLuint program, const char * name, const int value);
 	position_t get_OpenGL_position(float x, float y);
 	GLuint load_texture(const std::string& path);
