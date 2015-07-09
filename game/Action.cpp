@@ -113,6 +113,40 @@ void ActionClass_Move::perfom(Parameter* parameter)
 	Parameter_Position* p = static_cast<Parameter_Position*>(parameter);
 	if (check(p))
 	{
+		int dx = p->m_place->x - p->m_object->cell()->x;
+		int dy = p->m_place->y - p->m_object->cell()->y;
+		switch (dy)
+		{
+		case 1:
+		{
+			switch (dx)
+			{
+			case -1: {p->m_object->set_direction(object_direction_e::topleft); break; }
+			case 0: {p->m_object->set_direction(object_direction_e::top); break; }
+			case 1: {p->m_object->set_direction(object_direction_e::topright); break; }
+			}
+			break;
+		}
+		case 0:
+		{
+			switch (dx)
+			{
+			case -1: {p->m_object->set_direction(object_direction_e::left); break; }
+			case 1: {p->m_object->set_direction(object_direction_e::right); break; }
+			}
+			break;
+		}
+		case -1:
+		{
+			switch (dx)
+			{
+			case -1: {p->m_object->set_direction(object_direction_e::downleft); break; }
+			case 0: {p->m_object->set_direction(object_direction_e::down); break; }
+			case 1: {p->m_object->set_direction(object_direction_e::downright); break; }
+			}
+			break;
+		}
+		}
 		p->m_map->move_object(p->m_object, p->m_place);
 	}
 }

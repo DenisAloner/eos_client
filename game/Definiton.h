@@ -141,15 +141,7 @@ enum ParameterKind
 	parameter_interaction_cell
 };
 
-enum ObjectDirection
-{
-	ObjectDirection_Down,
-	ObjectDirection_Left,
-	ObjectDirection_Up,
-	ObjectDirection_Right
-};
-
-enum class direction_t
+enum object_direction_e
 {
 	top,
 	topright,

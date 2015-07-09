@@ -315,17 +315,17 @@ void Application::initialize()
 		have it just play once) */
 	}
 	//obj = m_game_object_manager->new_object("snake");
-	//obj->set_direction(ObjectDirection_Left);
+	//obj->set_direction(object_direction_e_Left);
 	//m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx + 1]);
 	//obj = m_game_object_manager->new_object("plant");
-	//obj->set_direction(ObjectDirection_Left);
+	//obj->set_direction(object_direction_e_Left);
 	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry - 3][room->rect.x + rx]);
 	//obj = m_game_object_manager->new_object("sword");
 	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx - 2]);
 	//obj = m_game_object_manager->new_object("dagger");
 	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx - 3]);
 	//obj = m_game_object_manager->new_object("smoke");
-	//obj->set_direction(ObjectDirection_Left);
+	//obj->set_direction(object_direction_e_Left);
 	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx - 4]);
 	//obj = m_game_object_manager->new_object("trap");
 	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx + 2]);
@@ -352,21 +352,21 @@ void Application::initialize()
 	obj = m_game_object_manager->new_object("wall");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 1][rx + 2]);
 */
-	obj = m_game_object_manager->new_object("snake");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 1][rx + 5]);
+	/*obj = m_game_object_manager->new_object("snake");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 1][rx + 5]);*/
 
 	/*obj = m_game_object_manager->new_object("ice");
 	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry][rx + 10]);
 
 	obj = m_game_object_manager->new_object("smoke");
-	obj->set_direction(ObjectDirection_Left);
+	obj->set_direction(object_direction_e_Left);
 	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry-5][rx]);
 
 	obj = m_game_object_manager->new_object("wall");
 	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry - 7][rx]);
 
 	obj = m_game_object_manager->new_object("smoke");
-	obj->set_direction(ObjectDirection_Left);
+	obj->set_direction(object_direction_e_Left);
 	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry - 6][rx-1]);*/
 
 
@@ -403,7 +403,7 @@ void Application::initialize()
 			break;
 		}
 		}
-		obj->set_direction(ObjectDirection_Left);
+		obj->set_direction(object_direction_e_Left);
 		m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 	}*/
 

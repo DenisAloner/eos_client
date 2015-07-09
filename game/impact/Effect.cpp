@@ -46,7 +46,7 @@ void Slot_select_cell::apply_effect(GameObject* unit, Object_interaction* object
 		if (n->m_items.size() == 1)
 		{
 			GameObject* obj = Application::instance().m_game_object_manager->new_object(m_value);
-			obj->set_direction(ObjectDirection_Left);
+			obj->set_direction(object_direction_e::left);
 			map->add_object(obj, n);
 		}
 	};
@@ -56,7 +56,7 @@ void Slot_select_cell::apply_effect(GameObject* unit, Object_interaction* object
 		if (n->m_items.size() == 1)
 		{
 			GameObject* obj = Application::instance().m_game_object_manager->new_object(m_value);
-			obj->set_direction(ObjectDirection_Left);
+			obj->set_direction(object_direction_e::left);
 			map->add_object(obj, n);
 		}
 	};

@@ -12,7 +12,7 @@ TileManager::~TileManager()
 }
 
 
-bool TileManager::load_from_file(const std::string& filename, ObjectDirection direction, int frame)
+bool TileManager::load_from_file(const std::string& filename, object_direction_e direction, int frame)
 {
 	m_tiles[get_tile_index(direction,frame)] = Application::instance().m_graph->load_texture(FileSystem::instance().m_resource_path + "Tiles\\" + filename + ".bmp");
 	return true;
@@ -35,7 +35,7 @@ TileManager_Single::TileManager_Single()
 	m_tiles = new GLuint[1];
 }
 
-int TileManager_Single::get_tile_index(const ObjectDirection& direction, const int& frame)
+int TileManager_Single::get_tile_index(const object_direction_e& direction, const int& frame)
 {
 	return 0;
 }
@@ -46,7 +46,7 @@ TileManager_Single_animate::TileManager_Single_animate()
 	m_tiles = new GLuint[4];
 }
 
-int TileManager_Single_animate::get_tile_index(const ObjectDirection& direction, const int& frame)
+int TileManager_Single_animate::get_tile_index(const object_direction_e& direction, const int& frame)
 {
 	return frame;
 }
@@ -54,12 +54,12 @@ int TileManager_Single_animate::get_tile_index(const ObjectDirection& direction,
 
 TileManager_Map::TileManager_Map()
 {
-	m_tiles = new GLuint[16];
+	m_tiles = new GLuint[32];
 }
 
-int TileManager_Map::get_tile_index(const ObjectDirection& direction, const int& frame)
+int TileManager_Map::get_tile_index(const object_direction_e& direction, const int& frame)
 {
-	return direction*4+frame;
+	return direction * 4 + frame;
 }
 
 
@@ -68,7 +68,17 @@ TileManager_rotating::TileManager_rotating()
 	m_tiles = new GLuint[4];
 }
 
-int TileManager_rotating::get_tile_index(const ObjectDirection& direction, const int& frame)
+int TileManager_rotating::get_tile_index(const object_direction_e& direction, const int& frame)
+{
+	return direction/2;
+}
+
+TileManager_rotating8::TileManager_rotating8()
+{
+	m_tiles = new GLuint[8];
+}
+
+int TileManager_rotating8::get_tile_index(const object_direction_e& direction, const int& frame)
 {
 	return direction;
 }

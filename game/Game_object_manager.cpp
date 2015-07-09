@@ -148,7 +148,7 @@ void GameObjectManager::parser(const std::string& command)
 		pos = found + 1;
 		size.z = std::stoi(args.substr(pos));
 		m_object->m_active_state->m_size = size;
-		m_object->set_direction(ObjectDirection_Down);
+		m_object->set_direction(object_direction_e::down);
 		break;
 	}
 	case command_e::weight:
@@ -179,7 +179,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::tile_manager_single:
 	{
 		m_object->m_active_state->m_tile_manager = new TileManager_Single();
-		m_object->m_active_state->m_tile_manager->load_from_file(args, ObjectDirection_Down, 0);
+		m_object->m_active_state->m_tile_manager->load_from_file(args, object_direction_e::down, 0);
 		break;
 	}
 	case command_e::tile_manager_single_animate:
@@ -188,7 +188,7 @@ void GameObjectManager::parser(const std::string& command)
 		{
 			m_object->m_active_state->m_tile_manager = new TileManager_Single_animate();
 		}
-		m_object->m_active_state->m_tile_manager->load_from_file(arg[0], ObjectDirection::ObjectDirection_Down, std::stoi(arg[1]));
+		m_object->m_active_state->m_tile_manager->load_from_file(arg[0], object_direction_e::down, std::stoi(arg[1]));
 		break;
 	}
 	case command_e::tile_manager_map:
@@ -197,7 +197,7 @@ void GameObjectManager::parser(const std::string& command)
 		{
 			m_object->m_active_state->m_tile_manager = new TileManager_Map();
 		}
-		ObjectDirection dir;
+		object_direction_e dir;
 		int frame;
 		std::string name;
 		std::size_t pos = 0;
@@ -205,7 +205,7 @@ void GameObjectManager::parser(const std::string& command)
 		name = args.substr(0, found);
 		pos = found + 1;
 		found = args.find(" ", pos);
-		dir = static_cast<ObjectDirection>(std::stoi(args.substr(pos, found - pos)));
+		dir = static_cast<object_direction_e>(std::stoi(args.substr(pos, found - pos)));
 		pos = found + 1;
 		frame = std::stoi(args.substr(pos));
 		m_object->m_active_state->m_tile_manager->load_from_file(name, dir, frame);
@@ -217,14 +217,27 @@ void GameObjectManager::parser(const std::string& command)
 		{
 			m_object->m_active_state->m_tile_manager = new TileManager_rotating();
 		}
-		ObjectDirection dir;
+		object_direction_e dir;
 		std::string name;
 		std::size_t pos = 0;
 		found = args.find(" ");
 		name = args.substr(0, found);
 		pos = found + 1;
 		found = args.find(" ", pos);
-		dir = static_cast<ObjectDirection>(std::stoi(args.substr(pos, found - pos)));
+		dir = static_cast<object_direction_e>(std::stoi(args.substr(pos, found - pos)));
+		m_object->m_active_state->m_tile_manager->load_from_file(name, dir, 0);
+		break;
+	}
+	case command_e::tile_manager_rotating8:
+	{
+		if (m_object->m_active_state->m_tile_manager == nullptr)
+		{
+			m_object->m_active_state->m_tile_manager = new TileManager_rotating8();
+		}
+		object_direction_e dir;
+		std::string name;
+		name = arg[0];
+		dir = static_cast<object_direction_e>(std::stoi(arg[1]));
 		m_object->m_active_state->m_tile_manager->load_from_file(name, dir, 0);
 		break;
 	}
@@ -467,6 +480,7 @@ void GameObjectManager::init()
 	m_commands["tile_manager_single_animate"] = command_e::tile_manager_single_animate;
 	m_commands.insert(std::pair<std::string, command_e>("tile_manager_map", command_e::tile_manager_map));
 	m_commands.insert(std::pair<std::string, command_e>("tile_manager_rotating", command_e::tile_manager_rotating));
+	m_commands["tile_manager_rotating8"] = command_e::tile_manager_rotating8;
 	m_commands.insert(std::pair<std::string, command_e>("light", command_e::light));
 	m_commands["add_action"] = command_e::add_action;
 	m_commands["add_slot"] = command_e::add_slot;

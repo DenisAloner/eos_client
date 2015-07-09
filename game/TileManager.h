@@ -17,9 +17,9 @@ public:
 	TileManager();
 	~TileManager();
 
-	virtual bool load_from_file(const std::string& filename, ObjectDirection direction, int frame);
+	virtual bool load_from_file(const std::string& filename, object_direction_e direction, int frame);
 	virtual void set_tile(tile_t& tile, GameObject* obj, int frame, int shift);
-	virtual int get_tile_index(const ObjectDirection& direction, const int& frame) = 0;
+	virtual int get_tile_index(const object_direction_e& direction, const int& frame) = 0;
 };
 
 class TileManager_Single :
@@ -29,7 +29,7 @@ public:
 
 	TileManager_Single();
 
-	virtual int get_tile_index(const ObjectDirection& direction, const int& frame);
+	virtual int get_tile_index(const object_direction_e& direction, const int& frame);
 };
 
 class TileManager_Map :
@@ -39,7 +39,7 @@ public:
 
 	TileManager_Map();
 
-	virtual int get_tile_index(const ObjectDirection& direction, const int& frame);
+	virtual int get_tile_index(const object_direction_e& direction, const int& frame);
 };
 
 class TileManager_rotating :
@@ -49,7 +49,17 @@ public:
 
 	TileManager_rotating();
 
-	virtual int get_tile_index(const ObjectDirection& direction, const int& frame);
+	virtual int get_tile_index(const object_direction_e& direction, const int& frame);
+};
+
+class TileManager_rotating8 :
+	public TileManager
+{
+public:
+
+	TileManager_rotating8();
+
+	virtual int get_tile_index(const object_direction_e& direction, const int& frame);
 };
 
 class TileManager_Single_animate :
@@ -58,8 +68,8 @@ class TileManager_Single_animate :
 public:
 
 	TileManager_Single_animate();
+	virtual int get_tile_index(const object_direction_e& direction, const int& frame);
 
-	virtual int get_tile_index(const ObjectDirection& direction, const int& frame);
 };
 
 #endif //TILEMANAGER_H

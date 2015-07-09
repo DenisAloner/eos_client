@@ -33,6 +33,7 @@ public:
 		tile_manager_single_animate,
 		tile_manager_map,
 		tile_manager_rotating,
+		tile_manager_rotating8,
 		light,
 		add_action,
 		feature_list,

@@ -371,6 +371,10 @@ void  GameMap::add_doors()
 					if (i - s == 7)
 					{
 						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[rect.y][i - 1]);
+						add_object(Application::instance().m_game_object_manager->new_object("door"), m_items[rect.y][i - 2]);
+						add_object(Application::instance().m_game_object_manager->new_object("door"), m_items[rect.y][i - 3]);
+						add_object(Application::instance().m_game_object_manager->new_object("door"), m_items[rect.y][i - 4]);
+						add_object(Application::instance().m_game_object_manager->new_object("door"), m_items[rect.y][i - 5]);
 						add_object(Application::instance().m_game_object_manager->new_object("door"), m_items[rect.y][i - 6]);
 						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[rect.y][i - 7]);
 					}
@@ -397,6 +401,10 @@ void  GameMap::add_doors()
 					if (i - s == 7)
 					{
 						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[rect.y + rect.h][i - 1]);
+						add_object(Application::instance().m_game_object_manager->new_object("door"), m_items[rect.y + rect.h][i - 2]);
+						add_object(Application::instance().m_game_object_manager->new_object("door"), m_items[rect.y + rect.h][i - 3]);
+						add_object(Application::instance().m_game_object_manager->new_object("door"), m_items[rect.y + rect.h][i - 4]);
+						add_object(Application::instance().m_game_object_manager->new_object("door"), m_items[rect.y + rect.h][i - 5]);
 						add_object(Application::instance().m_game_object_manager->new_object("door"), m_items[rect.y + rect.h][i - 6]);
 						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[rect.y + rect.h][i - 7]);
 					}
@@ -424,8 +432,20 @@ void  GameMap::add_doors()
 					{
 						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[i - 1][rect.x]);
 						GameObject* obj = Application::instance().m_game_object_manager->new_object("door");
-						obj->set_direction(ObjectDirection_Left);
-						add_object(obj, m_items[i-6][rect.x]);
+						obj->set_direction(object_direction_e::left);
+						add_object(obj, m_items[i - 2][rect.x]);
+						obj = Application::instance().m_game_object_manager->new_object("door");
+						obj->set_direction(object_direction_e::left);
+						add_object(obj, m_items[i - 3][rect.x]);
+						obj = Application::instance().m_game_object_manager->new_object("door");
+						obj->set_direction(object_direction_e::left);
+						add_object(obj, m_items[i - 4][rect.x]);
+						obj = Application::instance().m_game_object_manager->new_object("door");
+						obj->set_direction(object_direction_e::left);
+						add_object(obj, m_items[i - 5][rect.x]);
+						obj = Application::instance().m_game_object_manager->new_object("door");
+						obj->set_direction(object_direction_e::left);
+						add_object(obj, m_items[i - 6][rect.x]);
 						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[i - 7][rect.x]);
 					}
 				}
@@ -452,7 +472,19 @@ void  GameMap::add_doors()
 					{
 						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[i - 1][rect.x + rect.w]);
 						GameObject* obj = Application::instance().m_game_object_manager->new_object("door");
-						obj->set_direction(ObjectDirection_Left);
+						obj->set_direction(object_direction_e::left);
+						add_object(obj, m_items[i - 2][rect.x + rect.w]);
+						obj = Application::instance().m_game_object_manager->new_object("door");
+						obj->set_direction(object_direction_e::left);
+						add_object(obj, m_items[i - 3][rect.x + rect.w]);
+						obj = Application::instance().m_game_object_manager->new_object("door");
+						obj->set_direction(object_direction_e::left);
+						add_object(obj, m_items[i - 4][rect.x + rect.w]);
+						obj = Application::instance().m_game_object_manager->new_object("door");
+						obj->set_direction(object_direction_e::left);
+						add_object(obj, m_items[i - 5][rect.x + rect.w]);
+						obj = Application::instance().m_game_object_manager->new_object("door");
+						obj->set_direction(object_direction_e::left);
 						add_object(obj, m_items[i - 6][rect.x + rect.w]);
 						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[i - 7][rect.x + rect.w]);
 					}

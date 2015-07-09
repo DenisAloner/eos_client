@@ -111,7 +111,7 @@ public:
 
 	std::string m_name;
 	float m_weight;
-	ObjectDirection m_direction;
+	object_direction_e m_direction;
 	bool m_selected;
 	Game_object_owner* m_owner;
 
@@ -121,7 +121,7 @@ public:
 	GameObject();
 
 	void turn();
-	void set_direction(ObjectDirection dir);
+	void set_direction(object_direction_e dir);
 	void set_state(object_state_e state);
 	Object_state* get_state(object_state_e state);
 	void add_effect(interaction_e key, Object_interaction* item);

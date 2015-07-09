@@ -167,7 +167,7 @@ void MapCell::add_object(GameObject* Object)
 
 GameObject::GameObject()
 {
-	m_direction = ObjectDirection_Down;
+	m_direction = object_direction_e::down;
 	m_selected = false;
 	m_active_state = nullptr;
 	m_weight = 0.0;
@@ -204,35 +204,35 @@ void GameObject::do_predicat(predicat func)
 
 void GameObject::turn()
 {
-	ObjectDirection dir;
-	if (m_direction == ObjectDirection_Down)
+	/*object_direction_e dir;
+	if (m_direction == object_direction_e_Down)
 	{
-		dir = ObjectDirection_Left;
+		dir = object_direction_e_Left;
 	}
-	if (m_direction == ObjectDirection_Left)
+	if (m_direction == object_direction_e_Left)
 	{
-		dir = ObjectDirection_Up;
+		dir = object_direction_e_Up;
 	}
-	if (m_direction == ObjectDirection_Up)
+	if (m_direction == object_direction_e_Up)
 	{
-		dir = ObjectDirection_Right;
+		dir = object_direction_e_Right;
 	}
-	if (m_direction == ObjectDirection_Right)
+	if (m_direction == object_direction_e_Right)
 	{
-		dir = ObjectDirection_Down;
+		dir = object_direction_e_Down;
 	}
-	set_direction(dir);
+	set_direction(dir);*/
 }
 
-void GameObject::set_direction(ObjectDirection dir)
+void GameObject::set_direction(object_direction_e dir)
 {
-	if (((m_direction == ObjectDirection_Left || m_direction == ObjectDirection_Right) && (dir == ObjectDirection_Up || dir == ObjectDirection_Down)) || ((dir == ObjectDirection_Left || dir == ObjectDirection_Right) && (m_direction == ObjectDirection_Up || m_direction == ObjectDirection_Down)))
+	/*if (((m_direction == object_direction_e_Left || m_direction == object_direction_e_Right) && (dir == object_direction_e_Up || dir == object_direction_e_Down)) || ((dir == object_direction_e_Left || dir == object_direction_e_Right) && (m_direction == object_direction_e_Up || m_direction == object_direction_e_Down)))
 	{
 		for (std::list<Object_state*>::iterator item = m_state.begin(); item != m_state.end(); item++)
 		{
 			(*item)->m_size = game_object_size_t((*item)->m_size.y, (*item)->m_size.x, (*item)->m_size.z);
 		}
-	}
+	}*/
 	for (std::list<Object_state*>::iterator item = m_state.begin(); item != m_state.end(); item++)
 	{
 		(*item)->set_tile_size();
