@@ -128,6 +128,7 @@ public:
 	Interaction_list* get_effect(interaction_e key);
 	void remove_effect(interaction_e key, Object_interaction* item);
 	bool get_stat(object_tag_e key);
+	Object_tag* get_tag(object_tag_e key);
 	Parameter_list* get_parameter(interaction_e key);
 	MapCell* cell();
 	void update_interaction();

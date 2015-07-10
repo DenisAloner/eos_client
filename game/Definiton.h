@@ -260,6 +260,7 @@ enum class effect_prefix_e
 	physical_damage,
 	poison_damage,
 	parameter_change,
+	state_change
 };
 
 enum class object_tag_e
@@ -269,7 +270,8 @@ enum class object_tag_e
 	mortal,
 	pass_able,
 	pick_able,
-	seethrough_able
+	seethrough_able,
+	activator
 };
 
 enum class feature_list_type_e

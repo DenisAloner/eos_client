@@ -2,6 +2,7 @@
 #include "game/GameObject.h"
 #include "game/Application.h"
 #include "log.h"
+#include "Effect.h"
 
 GameMap::GameMap(dimension_t size)
 {
@@ -370,13 +371,48 @@ void  GameMap::add_doors()
 				{
 					if (i - s == 7)
 					{
+						
+						GameObject* lever1 = Application::instance().m_game_object_manager->new_object("lever");
+						ObjectTag::Activator* l1 = new ObjectTag::Activator();
+						lever1->add_effect(interaction_e::tag, l1);
+						add_object(lever1, m_items[rect.y - 1][i - 1]);
+						GameObject* lever2 = Application::instance().m_game_object_manager->new_object("lever");
+						ObjectTag::Activator* l2 = new ObjectTag::Activator();
+						lever2->add_effect(interaction_e::tag, l2);
+						add_object(lever2, m_items[rect.y + 1][i - 7]);
+
+						l1->m_link.push_front(lever2);
+						l2->m_link.push_front(lever1);
+
 						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[rect.y][i - 1]);
-						add_object(Application::instance().m_game_object_manager->new_object("door"), m_items[rect.y][i - 2]);
-						add_object(Application::instance().m_game_object_manager->new_object("door"), m_items[rect.y][i - 3]);
-						add_object(Application::instance().m_game_object_manager->new_object("door"), m_items[rect.y][i - 4]);
-						add_object(Application::instance().m_game_object_manager->new_object("door"), m_items[rect.y][i - 5]);
-						add_object(Application::instance().m_game_object_manager->new_object("door"), m_items[rect.y][i - 6]);
+						GameObject*  obj = Application::instance().m_game_object_manager->new_object("door");
+						l1->m_link.push_front(obj);
+						l2->m_link.push_front(obj);
+						add_object(obj, m_items[rect.y][i - 2]);
+						obj = Application::instance().m_game_object_manager->new_object("door");
+						l1->m_link.push_front(obj);
+						l2->m_link.push_front(obj);
+						add_object(obj, m_items[rect.y][i - 3]);
+						obj = Application::instance().m_game_object_manager->new_object("door");
+						l1->m_link.push_front(obj);
+						l2->m_link.push_front(obj);
+						add_object(obj, m_items[rect.y][i - 4]);
+						obj = Application::instance().m_game_object_manager->new_object("door");
+						l1->m_link.push_front(obj);
+						l2->m_link.push_front(obj);
+						add_object(obj, m_items[rect.y][i - 5]);
+						obj = Application::instance().m_game_object_manager->new_object("door");
+						l1->m_link.push_front(obj);
+						l2->m_link.push_front(obj);
+						add_object(obj, m_items[rect.y][i - 6]);
 						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[rect.y][i - 7]);
+
+						Object_state* state = lever1->get_state(object_state_e::off);
+						state->add_effect(interaction_e::tag, l1);
+						state = lever2->get_state(object_state_e::off);
+						state->add_effect(interaction_e::tag, l2);
+
+
 					}
 				}
 				b = false;
@@ -400,13 +436,45 @@ void  GameMap::add_doors()
 				{
 					if (i - s == 7)
 					{
+						GameObject* lever1 = Application::instance().m_game_object_manager->new_object("lever");
+						ObjectTag::Activator* l1 = new ObjectTag::Activator();
+						lever1->add_effect(interaction_e::tag, l1);
+						add_object(lever1, m_items[rect.y + rect.h - 1][i - 1]);
+						GameObject* lever2= Application::instance().m_game_object_manager->new_object("lever");
+						ObjectTag::Activator* l2 = new ObjectTag::Activator();
+						lever2->add_effect(interaction_e::tag, l2);
+						add_object(lever2, m_items[rect.y + rect.h + 1][i - 7]);
+
+						l1->m_link.push_front(lever2);
+						l2->m_link.push_front(lever1);
+
 						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[rect.y + rect.h][i - 1]);
-						add_object(Application::instance().m_game_object_manager->new_object("door"), m_items[rect.y + rect.h][i - 2]);
-						add_object(Application::instance().m_game_object_manager->new_object("door"), m_items[rect.y + rect.h][i - 3]);
-						add_object(Application::instance().m_game_object_manager->new_object("door"), m_items[rect.y + rect.h][i - 4]);
-						add_object(Application::instance().m_game_object_manager->new_object("door"), m_items[rect.y + rect.h][i - 5]);
-						add_object(Application::instance().m_game_object_manager->new_object("door"), m_items[rect.y + rect.h][i - 6]);
+						GameObject*  obj = Application::instance().m_game_object_manager->new_object("door");
+						l1->m_link.push_front(obj);
+						l2->m_link.push_front(obj);
+						add_object(obj, m_items[rect.y + rect.h][i - 2]);
+						obj = Application::instance().m_game_object_manager->new_object("door");
+						l1->m_link.push_front(obj);
+						l2->m_link.push_front(obj);
+						add_object(obj, m_items[rect.y + rect.h][i - 3]);
+						obj = Application::instance().m_game_object_manager->new_object("door");
+						l1->m_link.push_front(obj);
+						l2->m_link.push_front(obj);
+						add_object(obj, m_items[rect.y + rect.h][i - 4]);
+						obj = Application::instance().m_game_object_manager->new_object("door");
+						l1->m_link.push_front(obj);
+						l2->m_link.push_front(obj);
+						add_object(obj, m_items[rect.y + rect.h][i - 5]);
+						obj = Application::instance().m_game_object_manager->new_object("door");
+						l1->m_link.push_front(obj);
+						l2->m_link.push_front(obj);
+						add_object(obj, m_items[rect.y + rect.h][i - 6]);
 						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[rect.y + rect.h][i - 7]);
+
+						Object_state* state = lever1->get_state(object_state_e::off);
+						state->add_effect(interaction_e::tag, l1);
+						state = lever2->get_state(object_state_e::off);
+						state->add_effect(interaction_e::tag, l2);
 					}
 				}
 				b = false;
@@ -430,23 +498,53 @@ void  GameMap::add_doors()
 				{
 					if (i - s == 7)
 					{
+						GameObject* lever1 = Application::instance().m_game_object_manager->new_object("lever");
+						lever1->set_direction(object_direction_e::left);
+						ObjectTag::Activator* l1 = new ObjectTag::Activator();
+						lever1->add_effect(interaction_e::tag, l1);
+						add_object(lever1, m_items[i - 1][rect.x - 1]);
+						GameObject* lever2 = Application::instance().m_game_object_manager->new_object("lever");
+						lever2->set_direction(object_direction_e::left);
+						ObjectTag::Activator* l2 = new ObjectTag::Activator();
+						lever2->add_effect(interaction_e::tag, l2);
+						add_object(lever2, m_items[i - 7][rect.x + 1]);
+
+						l1->m_link.push_front(lever2);
+						l2->m_link.push_front(lever1);
+
 						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[i - 1][rect.x]);
+
 						GameObject* obj = Application::instance().m_game_object_manager->new_object("door");
 						obj->set_direction(object_direction_e::left);
+						l1->m_link.push_front(obj);
+						l2->m_link.push_front(obj);
 						add_object(obj, m_items[i - 2][rect.x]);
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						obj->set_direction(object_direction_e::left);
+						l1->m_link.push_front(obj);
+						l2->m_link.push_front(obj);
 						add_object(obj, m_items[i - 3][rect.x]);
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						obj->set_direction(object_direction_e::left);
+						l1->m_link.push_front(obj);
+						l2->m_link.push_front(obj);
 						add_object(obj, m_items[i - 4][rect.x]);
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						obj->set_direction(object_direction_e::left);
+						l1->m_link.push_front(obj);
+						l2->m_link.push_front(obj);
 						add_object(obj, m_items[i - 5][rect.x]);
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						obj->set_direction(object_direction_e::left);
+						l1->m_link.push_front(obj);
+						l2->m_link.push_front(obj);
 						add_object(obj, m_items[i - 6][rect.x]);
 						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[i - 7][rect.x]);
+
+						Object_state* state = lever1->get_state(object_state_e::off);
+						state->add_effect(interaction_e::tag, l1);
+						state = lever2->get_state(object_state_e::off);
+						state->add_effect(interaction_e::tag, l2);
 					}
 				}
 				b = false;
@@ -470,23 +568,52 @@ void  GameMap::add_doors()
 				{
 					if (i - s == 7)
 					{
+						GameObject* lever1 = Application::instance().m_game_object_manager->new_object("lever");
+						lever1->set_direction(object_direction_e::left);
+						ObjectTag::Activator* l1 = new ObjectTag::Activator();
+						lever1->add_effect(interaction_e::tag, l1);
+						add_object(lever1, m_items[i - 1][rect.x + rect.w - 1]);
+						GameObject* lever2 = Application::instance().m_game_object_manager->new_object("lever");
+						lever2->set_direction(object_direction_e::left);
+						ObjectTag::Activator* l2 = new ObjectTag::Activator();
+						lever2->add_effect(interaction_e::tag, l2);
+						add_object(lever2, m_items[i - 7][rect.x + rect.w + 1]);
+
+						l1->m_link.push_front(lever2);
+						l2->m_link.push_front(lever1);
+
 						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[i - 1][rect.x + rect.w]);
 						GameObject* obj = Application::instance().m_game_object_manager->new_object("door");
 						obj->set_direction(object_direction_e::left);
+						l1->m_link.push_front(obj);
+						l2->m_link.push_front(obj);
 						add_object(obj, m_items[i - 2][rect.x + rect.w]);
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						obj->set_direction(object_direction_e::left);
+						l1->m_link.push_front(obj);
+						l2->m_link.push_front(obj);
 						add_object(obj, m_items[i - 3][rect.x + rect.w]);
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						obj->set_direction(object_direction_e::left);
+						l1->m_link.push_front(obj);
+						l2->m_link.push_front(obj);
 						add_object(obj, m_items[i - 4][rect.x + rect.w]);
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						obj->set_direction(object_direction_e::left);
+						l1->m_link.push_front(obj);
+						l2->m_link.push_front(obj);
 						add_object(obj, m_items[i - 5][rect.x + rect.w]);
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						obj->set_direction(object_direction_e::left);
+						l1->m_link.push_front(obj);
+						l2->m_link.push_front(obj);
 						add_object(obj, m_items[i - 6][rect.x + rect.w]);
 						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[i - 7][rect.x + rect.w]);
+
+						Object_state* state = lever1->get_state(object_state_e::off);
+						state->add_effect(interaction_e::tag, l1);
+						state = lever2->get_state(object_state_e::off);
+						state->add_effect(interaction_e::tag, l2);
 					}
 				}
 				b = false;

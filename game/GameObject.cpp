@@ -396,6 +396,23 @@ bool GameObject::get_stat(object_tag_e key)
 	return false;
 }
 
+Object_tag* GameObject::get_tag(object_tag_e key)
+{
+	if (m_active_state)
+	{
+		auto list = m_active_state->m_item.find(interaction_e::tag);
+		if (list != m_active_state->m_item.end())
+		{
+			Tag_list* taglist = static_cast<Tag_list*>(list->second);
+			for (auto item = taglist->m_effect.begin(); item != taglist->m_effect.end(); item++)
+			{
+				if (static_cast<Object_tag*>(*item)->m_type == key){ return static_cast<Object_tag*>(*item); }
+			}
+		}
+	}
+	return nullptr;
+}
+
 MapCell* GameObject::cell(){
 	return static_cast<MapCell*>(m_owner);
 }

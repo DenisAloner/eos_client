@@ -181,3 +181,21 @@ add_slot total_damage
 state dead
 size 1 1 1
 tile_manager_single snake_corpse
+
+object lever
+state on
+size 1 1 2
+tile_manager_rotating no_tile 0
+tile_manager_rotating no_tile 2
+tile_manager_rotating lever_on_down 4
+tile_manager_rotating lever_on_left 6
+feature_list tag,tag
+tag seethrough_able
+state off
+size 1 1 2
+tile_manager_rotating no_tile 0
+tile_manager_rotating no_tile 2
+tile_manager_rotating lever_off_down 4
+tile_manager_rotating lever_off_left 6
+feature_list tag,tag
+tag seethrough_able

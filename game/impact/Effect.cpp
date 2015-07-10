@@ -649,6 +649,35 @@ void ObjectTag::Purification_from_poison::apply_effect(GameObject* unit, Object_
 	}
 }
 
+ObjectTag::Activator::Activator() :Object_tag(object_tag_e::activator){};
+
+ObjectTag::Activator* ObjectTag::Activator::clone()
+{
+	ObjectTag::Activator* effect = new ObjectTag::Activator();
+	effect->m_link = m_link;
+	return effect;
+}
+
+void ObjectTag::Activator::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	Interaction_prefix* prefix = static_cast<Interaction_prefix*>(object);
+	switch (prefix->m_subtype)
+	{
+	case effect_prefix_e::state_change:
+	{
+		Slot_set_state* e = static_cast<Slot_set_state*>(prefix->m_value);
+		if (e)
+		{
+			for (auto l = m_link.begin(); l != m_link.end(); l++)
+			{
+				(*l)->set_state(e->m_value);
+			}
+		}
+		break;
+	}
+	}
+}
+
 Action_list::Action_list(){};
 
 Interaction_list* Action_list::clone()

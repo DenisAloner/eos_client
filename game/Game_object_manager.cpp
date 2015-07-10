@@ -454,6 +454,11 @@ void GameObjectManager::parser(const std::string& command)
 			tag = new ObjectTag::Purification_from_poison();
 			break;
 		}
+		case object_tag_e::activator:
+		{
+			tag = new ObjectTag::Activator();
+			break;
+		}
 		default:
 		{
 			tag = new ObjectTag::Label(get_object_tag_e(arg[0]));
@@ -556,6 +561,7 @@ void GameObjectManager::init()
 
 	m_effect_prefix_string[effect_prefix_e::physical_damage] = "физический урон";
 	m_effect_prefix_string[effect_prefix_e::poison_damage] = "урон от яда";
+	m_effect_prefix_string[effect_prefix_e::state_change] = "изменить состояние";
 
 	m_to_effect_prefix_e["physical_damage"] = effect_prefix_e::physical_damage;
 	m_to_effect_prefix_e["poison_damage"] = effect_prefix_e::poison_damage;
@@ -566,6 +572,7 @@ void GameObjectManager::init()
 	m_to_object_tag_e["pick_able"] = object_tag_e::pick_able;
 	m_to_object_tag_e["pass_able"] = object_tag_e::pass_able;
 	m_to_object_tag_e["seethrough_able"] = object_tag_e::seethrough_able;
+	m_to_object_tag_e["activator"] = object_tag_e::activator;
 
 	m_object_tag_string[object_tag_e::poison_resist] = "сопротивление к яду";
 	m_object_tag_string[object_tag_e::purification_from_poison] = "очищение от яда";
@@ -573,6 +580,7 @@ void GameObjectManager::init()
 	m_object_tag_string[object_tag_e::pass_able] = "не является преградой";
 	m_object_tag_string[object_tag_e::pick_able] = "можно взять";
 	m_object_tag_string[object_tag_e::seethrough_able] = "не загораживает обзор";
+	m_object_tag_string[object_tag_e::activator] = "активирует/деактивирует механизмы";
 
 	m_to_action_e["equip"] = action_e::equip;
 	m_to_action_e["hit"] = action_e::hit;

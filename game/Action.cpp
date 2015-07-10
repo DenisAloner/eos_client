@@ -686,7 +686,29 @@ void Action_open::perfom(Parameter* parameter)
 	P_object* p = static_cast<P_object*>(parameter);
 	if (check(p))
 	{
-		p->m_object->set_state(object_state_e::off);
+		switch (p->m_object->m_active_state->m_state)
+		{
+		case object_state_e::on:
+		{
+			Interaction_prefix* ip = new Interaction_prefix();
+			ip->m_subtype = effect_prefix_e::state_change;
+			Slot_set_state* s = new Slot_set_state();
+			s->m_value = object_state_e::off;
+			ip->m_value = s;
+			ip->apply_effect(p->m_object, nullptr);
+			break;
+		}
+		case object_state_e::off:
+		{
+			Interaction_prefix* ip = new Interaction_prefix();
+			ip->m_subtype = effect_prefix_e::state_change;
+			Slot_set_state* s = new Slot_set_state();
+			s->m_value = object_state_e::on;
+			ip->m_value = s;
+			ip->apply_effect(p->m_object, nullptr);
+			break;
+		}
+		}
 	}
 }
 

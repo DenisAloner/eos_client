@@ -256,6 +256,15 @@ namespace ObjectTag
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
 	};
 
+	class Activator : public Object_tag
+	{
+	public:
+		Activator();
+		std::list<GameObject*> m_link;
+		virtual Activator* clone();
+		virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	};
+
 	class Label : public Object_tag
 	{
 	public:
