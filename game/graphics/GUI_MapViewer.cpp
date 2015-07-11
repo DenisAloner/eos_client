@@ -534,12 +534,12 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 			{
 				if ((xf >= -m_player->m_fov->m_radius) && (xf <= m_player->m_fov->m_radius) && (yf >= -m_player->m_fov->m_radius) && (yf <= m_player->m_fov->m_radius))
 				{
-					//if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visibility>0.0)
+					if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visible)
 					{
-						float v = m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visibility;
-						light[0] = (m_map->m_items[y][x]->m_light.R / 100.0F)*v;
-						light[1] = (m_map->m_items[y][x]->m_light.G / 100.0F)*v;
-						light[2] = (m_map->m_items[y][x]->m_light.B / 100.0F)*v;
+						//float v = m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visibility;
+						light[0] = (m_map->m_items[y][x]->m_light.R / 100.0F);
+						light[1] = (m_map->m_items[y][x]->m_light.G / 100.0F);
+						light[2] = (m_map->m_items[y][x]->m_light.B / 100.0F);
 						light[3] = 0.0;
 						/*light[0] = 1.0;
 						light[1] = 1.0;

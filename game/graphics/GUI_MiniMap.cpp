@@ -145,14 +145,16 @@ void GUI_FOV::render(GraphicalController* Graph, int px, int py)
 			y3 = y0;
 			glColor4d(0.0, 0.0, 0.0, 1.0);
 			if (m_fov->m_map[m_fov->m_middle - m_fov->m_radius + y][m_fov->m_middle - m_fov->m_radius + x].opaque){
-				
-					glColor4d(m_fov->m_map[m_fov->m_middle - m_fov->m_radius + y][m_fov->m_middle - m_fov->m_radius + x].visibility, 0.0, 0.0, 1.0);
-		
+				if (m_fov->m_map[m_fov->m_middle - m_fov->m_radius + y][m_fov->m_middle - m_fov->m_radius + x].visible){
+					glColor4d(1.0, 0.0, 0.0, 1.0);
+				}
+				else glColor4d(0.5, 0.0, 0.0, 1.0);
 			}
 			else {
-				float v = m_fov->m_map[m_fov->m_middle - m_fov->m_radius + y][m_fov->m_middle - m_fov->m_radius + x].visibility;
-					glColor4d(v, v, v, 1.0);
-				
+				if (m_fov->m_map[m_fov->m_middle - m_fov->m_radius + y][m_fov->m_middle - m_fov->m_radius + x].visible){
+					glColor4d(0.9, 0.9, 0.9, 1.0);
+				}
+				else glColor4d(0.5, 0.5, 0.5, 1.0);
 			}
 			glBegin(GL_QUADS);
 			glVertex2d(x0, y0);

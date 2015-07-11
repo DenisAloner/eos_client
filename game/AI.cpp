@@ -248,7 +248,7 @@ GameObject* AI_enemy::find_goal()
 				if ((m_object->cell()->x + x >= 0) && (m_object->cell()->x + x < m_map->m_size.w))
 				{
 					fc = &m_fov->m_map[m_fov->m_middle + y][m_fov->m_middle + x];
-					if (fc->visibility==1.0)
+					if (fc->visible)
 					{
 						mc = m_map->m_items[m_object->cell()->y + y][m_object->cell()->x + x];
 						for (std::list<GameObject*>::iterator item = mc->m_items.begin(); item != mc->m_items.end(); item++)

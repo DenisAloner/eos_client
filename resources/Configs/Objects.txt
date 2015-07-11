@@ -162,7 +162,7 @@ tile_manager_rotating8 rat_down,4
 tile_manager_rotating8 rat_downleft,5
 tile_manager_rotating8 rat_left,6
 tile_manager_rotating8 rat_topleft,7
-optical 0.7,0.7,0.7
+optical 0.5,0.5,0.5
 feature_list action,action
 feature_list generic,buff
 add_action move
@@ -203,12 +203,14 @@ object trap
 state off
 size 1 1 1
 tile_manager_single trap_off
+optical 0.5,0.5,0.5
 feature_list tag,tag
 tag seethrough_able
 tag pass_able
 state on
 size 1 1 1
 tile_manager_single trap_on
+optical 0.5,0.5,0.5
 feature_list tag,tag
 tag seethrough_able
 tag pass_able

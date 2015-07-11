@@ -30,8 +30,7 @@ public:
 	struct cell
 	{
 		bool opaque;
-		float damp;
-		float visibility;
+		bool visible;
 	};
 
 	static const int m_max_size = 101;
@@ -54,7 +53,7 @@ public:
 	void cast_shadow(int start_x, int start_y, float start_angle, float end_angle);
 	void light_quarter(int start_x, int start_y, float start_angle, float end_angle);*/
 	void calculate(int radius, GameObject* unit, GameMap* map);
-	void cast_light(uint x, uint y, uint radius, uint row, float start_slope, float end_slope, uint xx, uint xy, uint yx, uint yy, float visibility);
+	void cast_light(uint x, uint y, uint radius, uint row, float start_slope, float end_slope, uint xx, uint xy, uint yx, uint yy);
 	void do_fov(uint x, uint y, uint radius);
 
 };
