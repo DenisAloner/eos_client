@@ -62,6 +62,7 @@ public:
 	void link_room(block_t* a, block_t* b);
 	void add_wall();
 	void add_doors();
+	void generate_traps();
 	//bool line2(int x1, int y1, int x2, int y2);
 	void add_lighting();
 	void bresenham_line(MapCell* a, MapCell* b, std::function<void(MapCell*)> f);

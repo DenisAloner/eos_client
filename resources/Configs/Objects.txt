@@ -70,14 +70,14 @@ tile_manager_single Mud
 layer 2
 
 object door
-state on
+state off
 size 1 1 5
 tile_manager_rotating no_tile 0
 tile_manager_rotating no_tile 2
 tile_manager_rotating door_down_close 4
 tile_manager_rotating door_left_close 6
 layer 2
-state off
+state on
 size 1 1 5
 tile_manager_rotating no_tile 0
 tile_manager_rotating no_tile 2
@@ -86,7 +86,6 @@ tile_manager_rotating door_left_open 6
 feature_list tag,tag
 tag pass_able
 tag seethrough_able
-layer 2
 
 object floor
 state alive
@@ -183,7 +182,7 @@ size 1 1 1
 tile_manager_single snake_corpse
 
 object lever
-state on
+state off
 size 1 1 2
 tile_manager_rotating no_tile 0
 tile_manager_rotating no_tile 2
@@ -191,7 +190,7 @@ tile_manager_rotating lever_on_down 4
 tile_manager_rotating lever_on_left 6
 feature_list tag,tag
 tag seethrough_able
-state off
+state on
 size 1 1 2
 tile_manager_rotating no_tile 0
 tile_manager_rotating no_tile 2
@@ -199,3 +198,17 @@ tile_manager_rotating lever_off_down 4
 tile_manager_rotating lever_off_left 6
 feature_list tag,tag
 tag seethrough_able
+
+object trap
+state off
+size 1 1 1
+tile_manager_single trap_off
+feature_list tag,tag
+tag seethrough_able
+tag pass_able
+state on
+size 1 1 1
+tile_manager_single trap_on
+feature_list tag,tag
+tag seethrough_able
+tag pass_able

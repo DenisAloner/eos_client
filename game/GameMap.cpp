@@ -139,7 +139,14 @@ void GameMap::generate_level(void)
 	connect_room();
 	add_wall();
 	add_doors();
+	generate_traps();
 	add_lighting();
+}
+
+
+void GameMap::generate_traps()
+{
+
 }
 
 bool GameMap::divide_block(block_t* block, int Depth, int Current)
@@ -407,9 +414,9 @@ void  GameMap::add_doors()
 						add_object(obj, m_items[rect.y][i - 6]);
 						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[rect.y][i - 7]);
 
-						Object_state* state = lever1->get_state(object_state_e::off);
+						Object_state* state = lever1->get_state(object_state_e::on);
 						state->add_effect(interaction_e::tag, l1);
-						state = lever2->get_state(object_state_e::off);
+						state = lever2->get_state(object_state_e::on);
 						state->add_effect(interaction_e::tag, l2);
 
 
@@ -471,9 +478,9 @@ void  GameMap::add_doors()
 						add_object(obj, m_items[rect.y + rect.h][i - 6]);
 						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[rect.y + rect.h][i - 7]);
 
-						Object_state* state = lever1->get_state(object_state_e::off);
+						Object_state* state = lever1->get_state(object_state_e::on);
 						state->add_effect(interaction_e::tag, l1);
-						state = lever2->get_state(object_state_e::off);
+						state = lever2->get_state(object_state_e::on);
 						state->add_effect(interaction_e::tag, l2);
 					}
 				}
@@ -541,9 +548,9 @@ void  GameMap::add_doors()
 						add_object(obj, m_items[i - 6][rect.x]);
 						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[i - 7][rect.x]);
 
-						Object_state* state = lever1->get_state(object_state_e::off);
+						Object_state* state = lever1->get_state(object_state_e::on);
 						state->add_effect(interaction_e::tag, l1);
-						state = lever2->get_state(object_state_e::off);
+						state = lever2->get_state(object_state_e::on);
 						state->add_effect(interaction_e::tag, l2);
 					}
 				}
@@ -610,9 +617,9 @@ void  GameMap::add_doors()
 						add_object(obj, m_items[i - 6][rect.x + rect.w]);
 						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[i - 7][rect.x + rect.w]);
 
-						Object_state* state = lever1->get_state(object_state_e::off);
+						Object_state* state = lever1->get_state(object_state_e::on);
 						state->add_effect(interaction_e::tag, l1);
-						state = lever2->get_state(object_state_e::off);
+						state = lever2->get_state(object_state_e::on);
 						state->add_effect(interaction_e::tag, l2);
 					}
 				}
