@@ -99,6 +99,7 @@ void mapviewer_hint_object_area::render()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_select);
 	double x0, y0, x1, y1, x2, y2, x3, y3;
 	MapCell* Item = m_object->cell();
@@ -106,20 +107,12 @@ void mapviewer_hint_object_area::render()
 	int by;
 	bx = m_object->m_active_state->m_size.x;
 	by = m_object->m_active_state->m_size.y;
-	for (int i = -by+1; i < 1; i++)
+	for (int i = 0; i < by ; i++)
 	{
-		for (int j = -bx+1; j <1; j++)
+		for (int j = 0; j < bx; j++)
 		{
 				int x = px + (Item->x + j) - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
 				int y = py + (Item->y + i) - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
-				/*x0 = x * m_owner->m_tile_size_x;
-				y0 = (m_owner->m_tile_count_y - y - 1) * m_owner->m_tile_size_y;
-				x1 = x0;
-				y1 = (m_owner->m_tile_count_y - y) * m_owner->m_tile_size_y;
-				x2 = (x + 1) * m_owner->m_tile_size_x;
-				y2 = y1;
-				x3 = x2;
-				y3 = y0;*/
 				int yp = m_owner->m_tile_count_x - x;
 				int xp = m_owner->m_tile_count_y - y;
 				x0 = (xp - yp) * 16 + m_owner->m_shift.x;
@@ -262,239 +255,6 @@ bool GUI_MapViewer::select(int x,int y)
 	return false;
 }
 
-
-//void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
-//{
-//	float light[4];
-//	glBindFramebuffer(GL_FRAMEBUFFER, Graph->m_FBO);
-//	glEnable(GL_TEXTURE_2D);
-//	glEnable(GL_BLEND);
-//	glUseProgram(0);
-//	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
-//	glClearColor(0.0, 0.0, 0.0, 0.0);
-//	glClear(GL_COLOR_BUFFER_BIT);
-//	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_02, 0);
-//	glClearColor(0.0, 0.0, 0.0, 0.0);
-//	glClear(GL_COLOR_BUFFER_BIT);
-//	int x0, y0, x1, y1, x2, y2, x3, y3;
-//	bool IsDraw;
-//	tile_t tile;
-//	int x;
-//	int y;
-//	int xf;
-//	int yf;
-//	int dx;
-//	glColor4d(1.0, 1.0, 1.0, 1.0);
-//	dimension_t object_size;
-//	for (int gy = m_tile_count_y - 1; gy > -6; gy--)
-//	{
-//		for (int gx = 0; gx < m_tile_count_x + 5; gx++)
-//		{
-//			x = m_center.x + gx - m_tile_count_x / 2;
-//			y = m_center.y + gy - m_tile_count_y / 2;
-//			xf = x - m_player->m_object->cell()->x;
-//			yf = y - m_player->m_object->cell()->y;
-//			if ((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1))
-//			{
-//			}
-//			else
-//			{ 
-//				if ((xf >= -m_player->m_fov->m_radius) && (xf <= m_player->m_fov->m_radius) && (yf >= -m_player->m_fov->m_radius) && (yf <= m_player->m_fov->m_radius))
-//				{
-//					if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visible)
-//					{
-//						light[0] = m_map->m_items[y][x]->m_light.R / 100.0F;
-//						light[1] = m_map->m_items[y][x]->m_light.G / 100.0F;
-//						light[2] = m_map->m_items[y][x]->m_light.B / 100.0F;
-//						light[3] = 0.0;
-//						for (std::list<GameObject*>::iterator Current = m_map->m_items[y][x]->m_items.begin(); Current != m_map->m_items[y][x]->m_items.end(); Current++)
-//						{
-//							IsDraw = false;
-//							if ((*Current)->cell()->y == m_map->m_items[y][x]->y)
-//							{
-//								object_size = (*Current)->m_active_state->m_tile_size;
-//								dx = object_size.w + m_map->m_items[y][x]->x - (*Current)->cell()->x;
-//								x0 = (px + gx)*m_tile_size_x;
-//								y0 = (m_tile_count_y - py - gy - object_size.h)*m_tile_size_y;
-//								x1 = x0;
-//								y1 = (m_tile_count_y - py - gy)*m_tile_size_y;
-//								x2 = (px + gx + 1)*m_tile_size_x;
-//								y2 = y1;
-//								x3 = x2;
-//								y3 = y0;
-//								IsDraw = true;
-//							}
-//							if (IsDraw)
-//							{
-//								glUseProgram(Graph->m_tile_shader);
-//								(*Current)->m_active_state->m_tile_manager->set_tile(tile, (*Current), Application::instance().m_timer->m_tick / 7.0*3.0, dx);
-//								GLuint Sprite = tile.unit;
-//								glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//								glActiveTexture(GL_TEXTURE0);
-//								glBindTexture(GL_TEXTURE_2D, Sprite);
-//								Graph->set_uniform_sampler(Graph->m_tile_shader, "Map");
-//								Graph->set_uniform_vector(Graph->m_tile_shader, "light", light);
-//								glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
-//								Graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
-//							/*	glDisable(GL_BLEND);
-//								glDisable(GL_TEXTURE_2D);
-//								glColor4d(1.0, 1.0, 1.0, 1.0);
-//								glBegin(GL_LINES);
-//								glVertex2d(x0, y0);
-//								glVertex2d(x1, y1);
-//								glVertex2d(x1, y1);
-//								glVertex2d(x2, y2);
-//								glVertex2d(x2, y2);
-//								glVertex2d(x3, y3);
-//								glVertex2d(x3, y3);
-//								glVertex2d(x0, y0);
-//								glEnd();
-//								glEnable(GL_BLEND);
-//								glEnable(GL_TEXTURE_2D);*/
-//								if ((*Current)->cell()->x == m_map->m_items[y][x]->x)
-//								{
-//									auto* feat = (*Current)->get_parameter(interaction_e::health);
-//									if (feat)
-//									{
-//										float x0, y0, x1, y1, x2, y2, x3, y3;
-//										float h = feat->m_basic_value / 100.0;
-//										x0 = (px + gx - object_size.w / 2.0 + 1)*m_tile_size_x - 32;
-//										y0 = (m_tile_count_y - py - gy - object_size.h)*m_tile_size_y-8;
-//										x1 = x0;
-//										y1 = (m_tile_count_y - py - gy - object_size.h)*m_tile_size_y;
-//										x2 = (px + gx - object_size.w / 2.0 + 1)*m_tile_size_x + 32;
-//										y2 = y1;
-//										x3 = x2;
-//										y3 = y0;
-//										glUseProgram(0);
-//										glDisable(GL_TEXTURE_2D);
-//										glColor4d(1.0-h, h, 0.0, 0.5);
-//										glBegin(GL_LINES);
-//										glVertex2d(x0, y0);
-//										glVertex2d(x1, y1);
-//										glVertex2d(x1, y1);
-//										glVertex2d(x2, y2);
-//										glVertex2d(x2, y2);
-//										glVertex2d(x3, y3);
-//										glVertex2d(x3, y3);
-//										glVertex2d(x0, y0);
-//										glEnd();
-//										x0 = (px + gx - object_size.w / 2.0 + 1)*m_tile_size_x - 32;
-//										x1 = x0;
-//										x2 = x0 + (h) * 64;
-//										x3 = x2;
-//										Graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
-//										glEnable(GL_TEXTURE_2D);
-//									}
-//								}
-//								if ((*Current)->m_active_state->m_layer == 1)
-//								{
-//									glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_02, 0);
-//									Graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
-//								}
-//								if ((*Current)->m_active_state->m_layer == 2)
-//								{
-//									glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
-//									glUseProgram(Graph->m_mask_shader);
-//									glBindTexture(GL_TEXTURE_2D, Graph->m_empty_02);
-//									Graph->set_uniform_sampler(Graph->m_mask_shader, "Map");
-//									Graph->draw_tile_FBO(x1 / 1024.0, (1024 - y1) / 1024.0, x3 / 1024.0, (1024 - y3) / 1024.0, x0, y0, x1, y1, x2, y2, x3, y3);
-//								}
-//								if ((*Current)->m_selected)
-//								{
-//									glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
-//									glUseProgram(0);
-//									glColor4d(0.0, abs((Application::instance().m_timer->m_tick - 3.5) / 3.5), 0.0, 1.0);
-//									glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-//									glActiveTexture(GL_TEXTURE0);
-//									glBindTexture(GL_TEXTURE_2D, Sprite);
-//									Graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
-//									glColor4d(1.0, 1.0, 1.0, 1.0);
-//								}
-//							}
-//						}
-//					}
-//					else
-//					{
-//						/*object_size = dimension_t(1, 1);
-//						dx = object_size.w;
-//						x0 = (px + gx)*m_tile_size_x;
-//						y0 = (m_tile_count_y - py - gy - object_size.h)*m_tile_size_y;
-//						x1 = x0;
-//						y1 = (m_tile_count_y - py - gy)*m_tile_size_y;
-//						x2 = (px + gx + 1)*m_tile_size_x;
-//						y2 = y1;
-//						x3 = x2;
-//						y3 = y0;
-//						glUseProgram(0);
-//						glEnable(GL_BLEND);
-//						glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//						glEnable(GL_TEXTURE_2D);
-//						glActiveTexture(GL_TEXTURE0);
-//						glBindTexture(GL_TEXTURE_2D, Graph->m_no_visible);
-//						glColor4f(1.0, 1.0, 1.0, 1.0);
-//						Graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);*/
-//					}
-//				}
-//			}
-//		}
-//	}
-//	if (m_cursored != nullptr)
-//	{
-//		MapCell* Item = m_cursored;
-//		int x = px + Item->x - m_center.x + m_tile_count_x / 2;
-//		int y = py + Item->y - m_center.y + m_tile_count_y / 2;
-//		x0 = (x - m_cursor_x + 1) * m_tile_size_x;
-//		y0 = (m_tile_count_y - y - m_cursor_y) * m_tile_size_y;
-//		x1 = (x - m_cursor_x + 1) * m_tile_size_x;
-//		y1 = (m_tile_count_y - y) * m_tile_size_y;
-//		x2 = (x + 1) * m_tile_size_x;
-//		y2 = (m_tile_count_y - y) * m_tile_size_y;
-//		x3 = (x + 1) * m_tile_size_x;
-//		y3 = (m_tile_count_y - y - m_cursor_y) * m_tile_size_y;
-//		glUseProgram(0);
-//		glEnable(GL_BLEND);
-//		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//		glEnable(GL_TEXTURE_2D);
-//		glActiveTexture(GL_TEXTURE0);
-//		glBindTexture(GL_TEXTURE_2D, Graph->m_select);
-//		glColor4f(1.0, 1.0, 1.0, 0.5);
-//		Graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
-//		glDisable(GL_BLEND);
-//		glDisable(GL_TEXTURE_2D);
-//		glBegin(GL_LINES);
-//		glColor4f(0.0, 1.0, 0.0, 1.0);
-//		glVertex2d(x0, y0);
-//		glVertex2d(x1, y1);
-//		glVertex2d(x1, y1);
-//		glVertex2d(x2, y2);
-//		glVertex2d(x2, y2);
-//		glVertex2d(x3, y3);
-//		glVertex2d(x3, y3);
-//		glVertex2d(x0, y0);
-//		glEnd();
-//		glEnable(GL_BLEND);
-//		glEnable(GL_TEXTURE_2D);
-//		glColor4f(1.0, 1.0, 1.0, 1.0);
-//	}
-//	for (std::list<gui_mapviewer_hint*>::iterator current = m_hints.begin(); current != m_hints.end(); current++)
-//	{
-//		(*current)->render();
-//	}
-//	glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
-//	glUseProgram(0);
-//	glDisable(GL_BLEND);
-//	glBindTexture(GL_TEXTURE_2D, Graph->m_empty_01);
-//	glColor4d(1.0, 1.0, 1.0, 1.0);
-//	//glGenerateMipmap(GL_TEXTURE_2D);
-//	//Graph->draw_sprite(0, 0, 0, 1024/8, 1024/8, 1024/8, 1024/8, 0);
-//	//Graph->blur_rect(0, 0, 1024 / 8, 1024 / 8);
-//	//glBindTexture(GL_TEXTURE_2D, Graph->m_blur);
-//	//glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 1024 - 1024 / 8, 1024 / 8, 1024 / 8);
-//	Graph->draw_sprite(0, 0, 0, 1024, 1024, 1024, 1024, 0);
-//	glDisable(GL_TEXTURE_2D);
-//}
-
 void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 {
 	float light[4];
@@ -599,11 +359,18 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 							{ 
 								if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visible)
 								{
-									(*Current)->rendering_necessary = true;
+									 (*Current)->rendering_necessary = true;
 								}
 							}
 							if (IsDraw)
 							{
+								// Подсветка тайлов юнитов
+								if ((*Current)->m_name == "wolf" || (*Current)->m_name == "rat" || (*Current)->m_name == "iso_unit")
+								{
+									auto a = new mapviewer_hint_object_area(this, (*Current));
+									a->render();
+								}
+
 								glUseProgram(Graph->m_tile_shader);
 								(*Current)->m_active_state->m_tile_manager->set_tile(tile, (*Current), Application::instance().m_timer->m_tick / 7.0*3.0, dx);
 								GLuint Sprite = tile.unit;

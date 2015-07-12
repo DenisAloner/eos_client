@@ -110,8 +110,15 @@ tag seethrough_able
 object iso_unit
 state alive
 ai non_humanoid,32,0,0
-size 2 1 4
-tile_manager_single knight
+size 2 2 4
+tile_manager_rotating8 knight_top,0
+tile_manager_rotating8 knight_topright,1
+tile_manager_rotating8 knight_right,2
+tile_manager_rotating8 knight_downright,3
+tile_manager_rotating8 knight_down,4
+tile_manager_rotating8 knight_downleft,5
+tile_manager_rotating8 knight_left,6
+tile_manager_rotating8 knight_topleft,7
 optical 0.3,0.3,0.3
 feature_list action,action
 add_action equip
@@ -162,6 +169,37 @@ tile_manager_rotating8 rat_down,4
 tile_manager_rotating8 rat_downleft,5
 tile_manager_rotating8 rat_left,6
 tile_manager_rotating8 rat_topleft,7
+optical 0.8,0.8,0.8
+feature_list action,action
+feature_list generic,buff
+add_action move
+feature_list parameter,health,100,100
+feature_list parameter,strength,5,100
+feature_list generic,total_damage
+feature_list generic,damage
+feature_list tag,tag
+tag poison_resist
+tag mortal
+tag seethrough_able
+mem_effect value,-1
+mem_slot_copyist health
+add_slot total_damage
+state dead
+size 1 1 1
+tile_manager_single snake_corpse
+
+object wolf
+state alive
+ai non_humanoid,20,0,0
+size 3 3 3
+tile_manager_rotating8 wolf_top,0
+tile_manager_rotating8 wolf_topright,1
+tile_manager_rotating8 wolf_right,2
+tile_manager_rotating8 wolf_downright,3
+tile_manager_rotating8 wolf_down,4
+tile_manager_rotating8 wolf_downleft,5
+tile_manager_rotating8 wolf_left,6
+tile_manager_rotating8 wolf_topleft,7
 optical 0.5,0.5,0.5
 feature_list action,action
 feature_list generic,buff
