@@ -519,6 +519,8 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	glColor4d(1.0, 1.0, 1.0, 1.0);
 	dimension_t object_size;
 	game_object_size_t size3d;
+
+
 	for (int gy = m_tile_count_y - 1; gy > -6; gy--)
 	{
 		for (int gx = m_tile_count_x - 1; gx > -6; gx--)
@@ -536,8 +538,33 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 				{
 					if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visible)
 					{
-						//float v = m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visibility;
-						light[0] = (m_map->m_items[y][x]->m_light.R / 100.0F);
+						for (std::list<GameObject*>::iterator Current = m_map->m_items[y][x]->m_items.begin(); Current != m_map->m_items[y][x]->m_items.end(); Current++)
+						{
+							(*Current)->rendering_necessary = false;
+						}
+					}
+				}
+			}
+		}
+	}
+
+
+	for (int gy = m_tile_count_y - 1; gy > -6; gy--)
+	{
+		for (int gx = m_tile_count_x - 1; gx > -6; gx--)
+		{
+			x = m_center.x + gx - m_tile_count_x / 2;
+			y = m_center.y + gy - m_tile_count_y / 2;
+			xf = x - m_player->m_object->cell()->x;
+			yf = y - m_player->m_object->cell()->y;
+			if ((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1))
+			{
+			}
+			else
+			{
+				if ((xf >= -m_player->m_fov->m_radius) && (xf <= m_player->m_fov->m_radius) && (yf >= -m_player->m_fov->m_radius) && (yf <= m_player->m_fov->m_radius))
+				{
+					    light[0] = (m_map->m_items[y][x]->m_light.R / 100.0F);
 						light[1] = (m_map->m_items[y][x]->m_light.G / 100.0F);
 						light[2] = (m_map->m_items[y][x]->m_light.B / 100.0F);
 						light[3] = 0.0;
@@ -550,20 +577,30 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 							IsDraw = false;
 							if ((*Current)->cell()->y == m_map->m_items[y][x]->y && (*Current)->cell()->x == m_map->m_items[y][x]->x)
 							{
-								object_size = (*Current)->m_active_state->m_tile_size;
-								size3d = (*Current)->m_active_state->m_size;
-								int yp = m_tile_count_x - px - gx;
-								int xp = m_tile_count_y - py - gy;
-								dx = object_size.w + m_map->m_items[y][x]->x - (*Current)->cell()->x;
-								x0 = (xp - yp) * 16 + m_shift.x - (size3d.y - 1) * 16;
-								y0 = (xp + yp) * 9 - (object_size.h) + m_shift.y;
-								x1 = x0;
-								y1 = (xp + yp) * 9 + m_shift.y;
-								x2 = (xp - yp) * 16 + object_size.w + m_shift.x - (size3d.y - 1) * 16;
-								y2 = y1;
-								x3 = x2;
-								y3 = y0;
-								IsDraw = true;
+								if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visible || (*Current)->rendering_necessary)
+								{
+									object_size = (*Current)->m_active_state->m_tile_size;
+									size3d = (*Current)->m_active_state->m_size;
+									int yp = m_tile_count_x - px - gx;
+									int xp = m_tile_count_y - py - gy;
+									dx = object_size.w + m_map->m_items[y][x]->x - (*Current)->cell()->x;
+									x0 = (xp - yp) * 16 + m_shift.x - (size3d.y - 1) * 16;
+									y0 = (xp + yp) * 9 - (object_size.h) + m_shift.y;
+									x1 = x0;
+									y1 = (xp + yp) * 9 + m_shift.y;
+									x2 = (xp - yp) * 16 + object_size.w + m_shift.x - (size3d.y - 1) * 16;
+									y2 = y1;
+									x3 = x2;
+									y3 = y0;
+									IsDraw = true;
+								}
+							}
+							else
+							{ 
+								if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visible)
+								{
+									(*Current)->rendering_necessary = true;
+								}
 							}
 							if (IsDraw)
 							{
@@ -708,7 +745,6 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 						//	Graph->set_uniform_sampler(Graph->m_mask_shader, "Map");
 						//	Graph->draw_tile_FBO(x1 / 1024.0, (1024 - y1) / 1024.0, x3 / 1024.0, (1024 - y3) / 1024.0, x0, y0, x1, y1, x2, y2, x3, y3);*/
 						//}
-					}
 					//else
 					//	{
 					//		

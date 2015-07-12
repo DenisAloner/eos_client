@@ -171,6 +171,7 @@ GameObject::GameObject()
 	m_selected = false;
 	m_active_state = nullptr;
 	m_weight = 0.0;
+	rendering_necessary = false;
 }
 
 bool GameObject::on_turn()

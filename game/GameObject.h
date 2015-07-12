@@ -117,6 +117,7 @@ public:
 
 	Object_state* m_active_state;
 	std::list<Object_state*> m_state;
+	bool rendering_necessary;
 	
 	GameObject();
 
