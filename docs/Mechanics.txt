@@ -7,10 +7,11 @@
  DMG - конечный урон;
  BDW - базовый урон оружия;
  BOS - бонус силы (%);
+ LP - освещенность(%)
  Accuracy - точность;
 
- Accuracy = MOW+RND(MOW-DWM);
- DMG = BDW*STR*BOS/100*Accuracy/100;
+ Accuracy = (MOW + RND(MOW-DWM)) / 100 * (LP + RND(100-LP)/2 ) / 100;
+ DMG = Accuracy*BDW*STR*BOS/100;
 
 Типы оружия ближнего боя:
  - мечи

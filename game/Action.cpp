@@ -887,23 +887,26 @@ void action_hit_melee::perfom(Parameter* parameter)
 			Parameter_list* sb = p->m_unit_body_part->m_item->get_parameter(interaction_e::strength_bonus);
 			srand(time(NULL));
 			int accuracy = (ms->m_value - dws->m_value);
+			int light = (p->m_cell->m_light.R > p->m_cell->m_light.G ? p->m_cell->m_light.R : p->m_cell->m_light.G);
+			light = (light > p->m_cell->m_light.B ? light : p->m_cell->m_light.B);
+			if (light > 100){ light = 100; };
 			if (accuracy > 0)
 			{
-				accuracy = ms->m_value + rand() % (accuracy);
+				accuracy = (ms->m_value + rand() % accuracy)*(light + rand() % (100 - light + 1)*0.5);
+				Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(std::to_string(accuracy*0.0001)));
 			}
 			else
 			{
-				accuracy = ms->m_value - rand() % (accuracy);
+				accuracy = (ms->m_value - rand() % accuracy)*(light + rand() % (100 - light + 1)*0.5);
 			}
 			if (accuracy > 0)
 			{
-				int light = (p->m_cell->m_light.R > p->m_cell->m_light.G ? p->m_cell->m_light.R : p->m_cell->m_light.G);
-				light = (light > p->m_cell->m_light.B ? light : p->m_cell->m_light.B);
-				if (light > 100){ light = 100; };
+				
 				Effect* item = new Effect();
 				item->m_interaction_message_type = interaction_message_type_e::single;
 				item->m_subtype = effect_e::value;
-				item->m_value = -accuracy*0.01*sb->m_value*0.01*wd->m_value*str->m_value*light*0.01;
+				item->m_value = -accuracy*0.0001*sb->m_value*0.01*wd->m_value*str->m_value;
+				Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(std::to_string(item->m_value)));
 				Interaction_copyist* item1 = new Interaction_copyist();
 				item1->m_interaction_message_type = interaction_message_type_e::single;
 				item1->m_subtype = interaction_e::health;

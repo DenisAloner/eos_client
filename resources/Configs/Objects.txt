@@ -20,41 +20,29 @@ mem_slot_copyist health
 add_slot total_damage
 state dead
 size 1 1 0
-tile_manager_single snake_corpse
+tile_manager_single corpse2x2
 
-object sword
+object dagger
 state equip,hand
 size 1 1 0
-icon sword
-tile_manager_single iso_sword
+icon dagger_icon
+tile_manager_single dagger
 feature_list tag,tag
 tag pick_able
 tag pass_able
 tag seethrough_able
+feature_list parameter,weapon_damage,10,25
+feature_list parameter,strength_bonus,25,100
+feature_list parameter,demand_weapon_skill,15,100
 feature_list generic,action
 add_action hit_melee
 feature_list generic,damage
-feature_list generic,strength
-mem_effect value,-50
-mem_slot_copyist health
-add_slot damage
-mem_effect value,-1
-mem_slot_addon strength
-add_slot damage
-mem_slot_allocator
-mem_slot_mover
-add_slot damage
-mem_effect value,1
-add_slot strength
-mem_effect value,-10
+mem_effect value,-6
 mem_slot_prefix poison_damage
 mem_slot_copyist health
 mem_slot_time 5
 mem_slot_addon buff
 add_slot damage
-feature_list parts,body
-mem_part hand,€чейка
-add_slot body
 
 object wall
 state alive
@@ -129,7 +117,7 @@ feature_list parameter,health,100,100
 feature_list parameter,strength,8,100
 feature_list parameter,hunger,0,1000
 feature_list parameter,thirst,0,1000
-feature_list parameter,skill_sword,10,100
+feature_list parameter,skill_sword,50,100
 feature_list generic,buff
 feature_list generic,damage
 feature_list parts,body
@@ -154,8 +142,8 @@ add_slot damage
 feature_list tag,tag
 tag mortal
 state dead
-size 1 2 0
-tile_manager_single elf_corpse
+size 2 2 2
+tile_manager_single big_corpse
 
 object rat
 state alive
@@ -173,7 +161,7 @@ optical 0.8,0.8,0.8
 feature_list action,action
 feature_list generic,buff
 add_action move
-feature_list parameter,health,100,100
+feature_list parameter,health,15,15
 feature_list parameter,strength,5,100
 feature_list generic,total_damage
 feature_list generic,damage
@@ -185,8 +173,43 @@ mem_effect value,-1
 mem_slot_copyist health
 add_slot total_damage
 state dead
-size 1 1 1
-tile_manager_single snake_corpse
+size 2 2 1
+tile_manager_single corpse2x2
+feature_list tag,tag
+tag seethrough_able
+
+object skeleton
+state alive
+ai non_humanoid,20,0,0
+size 2 2 4
+tile_manager_rotating8 skeleton_top,0
+tile_manager_rotating8 skeleton_topright,1
+tile_manager_rotating8 skeleton_right,2
+tile_manager_rotating8 skeleton_downright,3
+tile_manager_rotating8 skeleton_down,4
+tile_manager_rotating8 skeleton_downleft,5
+tile_manager_rotating8 skeleton_left,6
+tile_manager_rotating8 skeleton_topleft,7
+optical 0.9,0.9,0.9
+feature_list action,action
+feature_list generic,buff
+add_action move
+feature_list parameter,health,15,15
+feature_list parameter,strength,5,100
+feature_list generic,total_damage
+feature_list generic,damage
+feature_list tag,tag
+tag poison_resist
+tag mortal
+tag seethrough_able
+mem_effect value,-1
+mem_slot_copyist health
+add_slot total_damage
+state dead
+size 2 2 1
+tile_manager_single corpse2x2
+feature_list tag,tag
+tag seethrough_able
 
 object wolf
 state alive
@@ -204,7 +227,7 @@ optical 0.5,0.5,0.5
 feature_list action,action
 feature_list generic,buff
 add_action move
-feature_list parameter,health,100,100
+feature_list parameter,health,100,1
 feature_list parameter,strength,5,100
 feature_list generic,total_damage
 feature_list generic,damage
@@ -216,8 +239,10 @@ mem_effect value,-1
 mem_slot_copyist health
 add_slot total_damage
 state dead
-size 1 1 1
-tile_manager_single snake_corpse
+size 3 3 2
+tile_manager_single big_corpse
+feature_list tag,tag
+tag seethrough_able
 
 object lever
 state off
