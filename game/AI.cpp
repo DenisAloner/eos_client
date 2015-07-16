@@ -163,7 +163,7 @@ void Path::insert_into_open(int x, int y, int dg, Node* p)
 	{
 		for (int j = 0; j < m_start_size.x; j++)
 		{
-			if (x + j >= 0 && y + i >= 0 && x + j < m_max_size&&y + i < m_max_size)
+			if (x + j >= 0 && y - i >= 0 && x + j < m_max_size&&y - i < m_max_size)
 			{
 				if (m_map[y + i][x + j].state != 0)
 				{
