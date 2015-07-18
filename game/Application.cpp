@@ -339,13 +339,13 @@ void Application::initialize()
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry ][rx - 1]);
 
 	obj = m_game_object_manager->new_object("rat");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 5][rx + 1]);
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 3][rx]);
 
-	obj = m_game_object_manager->new_object("wolf");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 5][rx + 4]);
+	obj = m_game_object_manager->new_object("bear");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 7][rx]);
 
-	obj = m_game_object_manager->new_object("skeleton");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 5][rx - 4]);
+	//obj = m_game_object_manager->new_object("skeleton");
+	//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 5][rx - 4]);
 	
 	/*obj = m_game_object_manager->new_object("skull");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 5][rx + 1]);

@@ -244,6 +244,39 @@ tile_manager_single big_corpse
 feature_list tag,tag
 tag seethrough_able
 
+object bear
+state alive
+ai non_humanoid,20,0,0
+size 4 4 4
+tile_manager_rotating8 bear_top,0
+tile_manager_rotating8 bear_topright,1
+tile_manager_rotating8 bear_right,2
+tile_manager_rotating8 bear_downright,3
+tile_manager_rotating8 bear_down,4
+tile_manager_rotating8 bear_downleft,5
+tile_manager_rotating8 bear_left,6
+tile_manager_rotating8 bear_topleft,7
+optical 0.1,0.1,0.1
+feature_list action,action
+feature_list generic,buff
+add_action move
+feature_list parameter,health,100,1
+feature_list parameter,strength,5,100
+feature_list generic,total_damage
+feature_list generic,damage
+feature_list tag,tag
+tag poison_resist
+tag mortal
+tag seethrough_able
+mem_effect value,-1
+mem_slot_copyist health
+add_slot total_damage
+state dead
+size 4 4 1
+tile_manager_single big_corpse
+feature_list tag,tag
+tag seethrough_able
+
 object lever
 state off
 size 1 1 2

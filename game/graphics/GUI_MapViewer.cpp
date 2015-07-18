@@ -407,11 +407,11 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 									}
 
 									// Подсветка тайлов юнитов
-									/*if ((*Current)->m_name == "wolf" || (*Current)->m_name == "rat" || (*Current)->m_name == "iso_unit")
+									if ((*Current)->m_name == "skeleton" || (*Current)->m_name == "bear" || (*Current)->m_name == "rat" || (*Current)->m_name == "iso_unit")
 									{
 									auto a = new mapviewer_hint_object_area(this, (*Current));
 									a->render();
-									}*/
+									}
 
 									glUseProgram(Graph->m_tile_shader);
 									(*Current)->m_active_state->m_tile_manager->set_tile(tile, (*Current), Application::instance().m_timer->m_tick / 7.0*3.0, dx);
