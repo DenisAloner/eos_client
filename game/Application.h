@@ -18,6 +18,7 @@
 #include <map>
 #include "Game_object_manager.h"
 #include "GUI_Window_manager.h"
+#include "GUI_button.h"
 
 class Action;
 class ActionManager;
@@ -79,6 +80,7 @@ public:
 
 	int m_game_turn;
 	bool m_ready;
+	bool m_turn;
 
 	Timer* m_timer;
 	MouseController* m_mouse;
@@ -155,6 +157,7 @@ private:
 	Application& operator=(const Application&);
 
 	void process_game();
+	void on_turn();
 };
 
 #endif //APPLICATION_H

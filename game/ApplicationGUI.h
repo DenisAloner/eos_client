@@ -17,7 +17,7 @@ public:
 
 	GUI_MapViewer* MapViewer;
 	GUI_TextBox* DescriptionBox;
-	GUI_Timer* Timer;
+	//GUI_Timer* Timer;
 	GUI_ActionPanel* m_action_panel;
 };
 

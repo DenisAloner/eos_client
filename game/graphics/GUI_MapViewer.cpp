@@ -386,6 +386,26 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 								
 								if (IsDraw)
 								{
+									// считаем среднюю освещенность для многотайловых объектов
+									if (size3d.x > 1 || size3d.y > 1) 
+									{
+										light[0] = 0;
+										light[1] = 0;
+										light[2] = 0;
+										for (int m = 0; m < size3d.y; m++)
+										{
+											for (int n = 0; n < size3d.x; n++)
+											{
+												light[0] += m_map->m_items[y - m][x + n]->m_light.R;
+												light[1] += m_map->m_items[y - m][x + n]->m_light.G;
+												light[2] += m_map->m_items[y - m][x + n]->m_light.B;
+											}
+										}
+										light[0] = light[0] / (size3d.x*size3d.y*100.0F);
+										light[1] = light[1] / (size3d.x*size3d.y*100.0F);
+										light[2] = light[2] / (size3d.x*size3d.y*100.0F);
+									}
+
 									// Подсветка тайлов юнитов
 									/*if ((*Current)->m_name == "wolf" || (*Current)->m_name == "rat" || (*Current)->m_name == "iso_unit")
 									{

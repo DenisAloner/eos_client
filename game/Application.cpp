@@ -51,6 +51,7 @@ game_clipboard::game_clipboard():m_item(nullptr){}
 Application::Application()
 : m_timer(new Timer(8, 300))
 {
+	m_turn = false;
 }
 
 Application::~Application(void)
@@ -225,11 +226,15 @@ void Application::initialize()
 
 	m_GUI->DescriptionBox = TextBox;
 
-	m_GUI->Timer = new GUI_Timer(902, 975, 120, 47, 0);
+	//m_GUI->Timer = new GUI_Timer(902, 975, 120, 47, 0);
+
+	GUI_button* button = new GUI_button(902, 975, 120, 47, "Ход");
+	button->mouse_click += std::bind(&Application::on_turn, this);
 
 	MenuLayer->add(AMTextBox);
 	MenuLayer->add(ActionPanel);
 	MenuLayer->add(TextBox);
+	MenuLayer->add(button);
 
 	GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
 	GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), m_GUI->MapViewer);
@@ -240,7 +245,7 @@ void Application::initialize()
 	GUI_FOV* fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), m_GUI->MapViewer->m_player->m_fov);
 	MiniMap->add(fov);
 
-	MenuLayer->add(m_GUI->Timer);
+	//MenuLayer->add(m_GUI->Timer);
 	//MenuLayer->add(MiniMap);
 	
 	
@@ -650,7 +655,7 @@ bool Application::command_check_position(GameObject*& object, MapCell*& position
 
 void Application::process_game()
 {
-	int time = 1;
+	/*int time = 1;
 	while (true)
 	{
 		if (time == 1)
@@ -670,7 +675,23 @@ void Application::process_game()
 		}
 		std::chrono::milliseconds Duration(250);
 		std::this_thread::sleep_for(Duration);
+	}*/
+	update();
+	while (true)
+	{
+		if (m_turn)
+		{
+			update();
+			m_GUI->DescriptionBox->add_item_control(new GUI_Text("Ход - " + std::to_string(m_game_turn) + ".", new GUI_TextFormat(10, 19, RGBA_t(0.0, 0.8, 0.0, 1.0))));
+			m_game_turn += 1;
+			m_turn = false;
+		}
 	}
+}
+
+void Application::on_turn()
+{
+	m_turn = true;
 }
 
 void my_audio_callback(void *userdata, uint8_t *stream, uint32_t len) {
