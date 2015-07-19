@@ -703,11 +703,11 @@ void GameObjectManager::calculate_ai()
 			}
 			case ai_type_e::non_humanoid:
 			{
-				AI_enemy obj;
-				obj = *static_cast<AI_enemy*>((*object)->m_active_state->m_ai);
-				obj.m_map = Application::instance().m_GUI->MapViewer->m_map;
-				obj.m_object = (*object);
-				obj.create();
+				AI_enemy* obj;
+				obj = static_cast<AI_enemy*>((*object)->m_active_state->m_ai);
+				obj->m_map = Application::instance().m_GUI->MapViewer->m_map;
+				obj->m_object = (*object);
+				obj->create();
 				break;
 			}
 			}

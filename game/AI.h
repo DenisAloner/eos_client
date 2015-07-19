@@ -72,7 +72,7 @@ public:
 	game_object_size_t m_goal_size;
 	min_heap m_heap;
 
-	void calculate(GameMap* map, GameObject* object, GameObject* goal, int radius);
+	void calculate(GameMap* map, GameObject* object, MapCell* gc, GameObject* goal, int radius);
 	int manhattan(Path_cell* a, Path_cell* b);
 	std::vector<MapCell*>* get_path();
 	void insert_into_open(int x, int y, int dg, Node* p);
@@ -103,12 +103,15 @@ class AI_enemy: public AI
 public:
 
 	FOV* m_fov;
+	GameObject* m_goal;
+	MapCell* m_memory_goal_cell;
 
 	int m_fov_radius;
 	std::function<bool(GameObject*)> m_fov_qualifier;
 	std::function<bool(GameObject*)> m_path_qualifier;
 
 	AI_enemy();
+	virtual bool check_goal();
 	virtual GameObject* find_goal();
 	virtual void create();
 

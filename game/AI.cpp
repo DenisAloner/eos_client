@@ -91,7 +91,7 @@ Path::Path()
 
 }
 
-void Path::calculate(GameMap* map, GameObject* object, GameObject* goal, int radius)
+void Path::calculate(GameMap* map, GameObject* object, MapCell* gc,GameObject* goal, int radius)
 {
 	for (int y = m_middle - radius; y < m_middle + radius + 1; y++)
 	{
@@ -111,7 +111,7 @@ void Path::calculate(GameMap* map, GameObject* object, GameObject* goal, int rad
 	m_start_cell = &m_map[m_middle][m_middle];
 	m_start_size = object->m_active_state->m_size;
 	mc = static_cast<MapCell*>(object->m_owner);
-	c2 = static_cast<MapCell*>(goal->m_owner);
+	c2 = gc;
 	m_goal_cell = &m_map[c2->y - mc->y + m_middle][c2->x - mc->x +m_middle];
 	m_goal_size = goal->m_active_state->m_size;
 	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier;
@@ -231,12 +231,12 @@ std::vector<MapCell*>* Path::get_path(){
 AI_enemy::AI_enemy()
 {
 	m_fov = new FOV();
+	m_goal = nullptr;
+	m_memory_goal_cell = nullptr;
 }
 
 GameObject* AI_enemy::find_goal()
 {
-	if (m_object->m_active_state->m_ai == nullptr){ return nullptr; }
-	m_fov->calculate(m_fov_radius, m_object, m_map);
 	FOV::cell* fc;
 	MapCell* mc;
 	for (int y = -m_fov->m_radius; y < m_fov->m_radius + 1; y++)
@@ -266,24 +266,85 @@ GameObject* AI_enemy::find_goal()
 	return nullptr;
 }
 
+bool AI_enemy::check_goal()
+{
+	FOV::cell* fc;
+	MapCell* mc;
+	for (int y = -m_fov->m_radius; y < m_fov->m_radius + 1; y++)
+	{
+		if ((m_object->cell()->y + y >= 0) && (m_object->cell()->y + y < m_map->m_size.h))
+		{
+			for (int x = -m_fov->m_radius; x < m_fov->m_radius + 1; x++)
+			{
+				if ((m_object->cell()->x + x >= 0) && (m_object->cell()->x + x < m_map->m_size.w))
+				{
+					fc = &m_fov->m_map[m_fov->m_middle + y][m_fov->m_middle + x];
+					if (fc->visible)
+					{
+						mc = m_map->m_items[m_object->cell()->y + y][m_object->cell()->x + x];
+						for (std::list<GameObject*>::iterator item = mc->m_items.begin(); item != mc->m_items.end(); item++)
+						{
+							if ((*item) == m_goal)
+							{
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
 void AI_enemy::create()
 {
-		GameObject* goal = find_goal();
-		if (goal == nullptr) {
-			return;
+	if (m_object->m_active_state->m_ai == nullptr){ return; }
+	m_fov->calculate(m_fov_radius, m_object, m_map);
+	MapCell* c;
+	GameObject* goal;
+	if (m_goal)
+	{
+		if (!check_goal())
+		{
+			goal = find_goal();
+			if (goal)
+			{
+				c = m_goal->cell();
+				m_memory_goal_cell = c;
+			}
+			else c = m_memory_goal_cell;
 		}
-		if (Game_algorithm::check_distance(static_cast<MapCell*>(m_object->m_owner), m_object->m_active_state->m_size, static_cast<MapCell*>(goal->m_owner), goal->m_active_state->m_size)){
-			P_unit_interaction* p = new P_unit_interaction();
-			p->m_unit = m_object;
-			p->m_object = goal;
-			p->m_unit_body_part = nullptr;
-			Application::instance().m_action_manager->add(p->m_unit, new GameTask(Application::instance().m_actions[action_e::hit], p));
-			return;
+		else
+		{
+			c = m_goal->cell();
+			m_memory_goal_cell = c;
 		}
-		Path::instance().calculate(m_map, m_object, goal, m_fov_radius);
-		std::vector<MapCell*>* path;
-		path = Path::instance().get_path();
-		if (path)
+	}
+	else
+	{
+		m_goal = find_goal();
+		if (m_goal)
+		{
+			c = m_goal->cell();
+			m_memory_goal_cell = c;
+		}
+		else return;
+	}
+	if (Game_algorithm::check_distance(static_cast<MapCell*>(m_object->m_owner), m_object->m_active_state->m_size, static_cast<MapCell*>(m_goal->m_owner), m_goal->m_active_state->m_size)){
+		P_unit_interaction* p = new P_unit_interaction();
+		p->m_unit = m_object;
+		p->m_object = m_goal;
+		p->m_unit_body_part = nullptr;
+		Application::instance().m_action_manager->add(p->m_unit, new GameTask(Application::instance().m_actions[action_e::hit], p));
+		return;
+	}
+	Path::instance().calculate(m_map, m_object, c, m_goal, m_fov_radius);
+	std::vector<MapCell*>* path;
+	path = Path::instance().get_path();
+	if (path)
+	{
+		if (path->size() >= 2)
 		{
 			Parameter_Position* P;
 			P = new Parameter_Position();
@@ -292,7 +353,9 @@ void AI_enemy::create()
 			P->m_map = m_map;
 			Application::instance().m_action_manager->add(m_object, new GameTask(Application::instance().m_actions[action_e::move], P));
 		}
-		Path::instance().m_heap.m_items.clear();
+
+	}
+	Path::instance().m_heap.m_items.clear();
 }
 
 AI_trap::AI_trap(){};
