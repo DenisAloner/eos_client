@@ -785,6 +785,7 @@ void Action_hit::perfom(Parameter* parameter)
 	P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
 	if (check(p))
 	{
+		p->m_unit->set_direction(Game_algorithm::turn_to_object(p->m_unit,p->m_object));
 		auto reaction = p->m_unit->get_effect(interaction_e::total_damage);
 		if (reaction)
 		{

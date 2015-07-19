@@ -1,4 +1,5 @@
 #pragma once
+#include "Definiton.h"
 #include "GameObject.h"
 
 class MapCell;
@@ -12,5 +13,7 @@ public:
 	static bool check_distance(MapCell* a_cell, game_object_size_t& a_size, MapCell* b_cell, game_object_size_t& b_size);
 	static bool check_distance(position_t* a_cell, game_object_size_t& a_size, position_t* b_cell, game_object_size_t& b_size);
 
+	//функция возвращает направление объекта, которое будет указывать на передаваемый объект
+	static object_direction_e turn_to_object(GameObject* object, GameObject* turn_to);
 };
 

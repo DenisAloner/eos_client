@@ -7,6 +7,7 @@
 #include "Definiton.h"
 #include "MouseController.h"
 #include "GameObject.h"
+#include "Game_algorithm.h"
 
 class Application;
 class Parameter;

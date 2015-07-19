@@ -5,6 +5,11 @@
 #include "graphics/gl.hpp"
 #include <list>
 
+#define Pi 3.14159265
+
+const float cos22_5 = cos(22.5F*Pi / 180.0);
+const float cos67_5 = cos(67.5F*Pi / 180.0);
+
 class GameObject;
 
 class GUI_Object;
@@ -314,6 +319,22 @@ struct tag_t {
 
 	tag_t(GameObject*object, GameTask* task) :object(object), task(task){};
 	tag_t() :object(nullptr), task(nullptr){};
+};
+
+struct f2dvector_t
+{
+	float x;
+	float y;
+
+	f2dvector_t(float x, float y) : x(x), y(y) {}
+	f2dvector_t() : x(0.0f), y(0.0f) {}
+
+	void normalize() 
+	{
+		float l = sqrtf(x*x + y*y);
+		x = x / l;
+		y = y / l;
+	}
 };
 
 #endif //DEFINITION_H
