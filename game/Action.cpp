@@ -14,6 +14,7 @@ Action::Action(void)
 	m_kind = action_e::move;
 	m_name = "Нет";
 	m_error = "";
+	m_decay = 1.0F;
 }
 
 Action::~Action(void)
@@ -724,6 +725,7 @@ Action_hit::Action_hit()
 {
 	m_kind = action_e::hit;
 	m_icon = Application::instance().m_graph->m_actions[8];
+	m_decay = 0.8F;
 }
 
 void Action_hit::interaction_handler()

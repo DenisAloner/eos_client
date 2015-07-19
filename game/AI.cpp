@@ -353,6 +353,11 @@ void AI_enemy::create()
 			P->m_map = m_map;
 			Application::instance().m_action_manager->add(m_object, new GameTask(Application::instance().m_actions[action_e::move], P));
 		}
+		else
+		{
+			m_goal = nullptr;
+			m_memory_goal_cell = nullptr;
+		}
 
 	}
 	Path::instance().m_heap.m_items.clear();

@@ -20,6 +20,7 @@ ActionManager::~ActionManager(void)
 
 void ActionManager::add(GameObject* unit, GameTask* action)
 {
+
 	m_items[unit].push_back(action);
 	add_item_event(tag_t(unit,action));
 }

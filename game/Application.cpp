@@ -481,20 +481,40 @@ void Application::PlaySound1()
 void Application::update()
 {
 	m_update_mutex.lock();
-	if(!m_action_manager->m_items.empty())
+	if (!m_action_manager->m_items.empty())
 	{
-		for (std::map<GameObject*, std::list<GameTask*> >::iterator current = m_action_manager->m_items.begin(); current != m_action_manager->m_items.end(); current++)
+		std::map<float, std::list<GameTask*> > task_order;
+		for (auto current = m_action_manager->m_items.begin(); current != m_action_manager->m_items.end(); current++)
 		{
 			if (!current->second.empty())
 			{
 				GameTask* A;
 				A = current->second.front();
+				task_order[A->m_action->m_decay].push_back(A);
+				m_action_manager->remove(current->first);
+			}
+		}
+		//LOG(INFO) << "----------------------";
+		//for (auto current = task_order.begin(); current != task_order.end(); current++)
+		//{
+		//	for (auto task = current->second.begin(); task != current->second.end(); task++)
+		//	{
+		//		GameTask* A;
+		//		A = (*task);
+		//		LOG(INFO) << current->first << " - " << A->m_action->m_name;
+		//	}
+		//}
+		for (auto current = task_order.begin(); current != task_order.end(); current++)
+		{
+			for (auto task = current->second.begin(); task != current->second.end(); task++)
+			{
+				GameTask* A;
+				A = (*task);
 				A->m_action->perfom(A->m_parameter);
 				if (A->m_action->m_error != "")
 				{
 					m_GUI->DescriptionBox->add_item_control(new GUI_Text(A->m_action->m_error));
 				}
-				m_action_manager->remove(current->first);
 			}
 		}
 	}

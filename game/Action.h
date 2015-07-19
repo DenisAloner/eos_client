@@ -21,6 +21,7 @@ public:
 	action_e m_kind;
 	std::string m_name;
 	std::string m_error;
+	float m_decay;
 
 	Action(void);
 	~Action(void);
