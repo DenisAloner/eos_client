@@ -7,6 +7,7 @@
 #include "game/graphics/GUI_MapViewer.h"
 #include "game/graphics/GUI_TextBox.h"
 #include "log.h"
+#include "Action_controller.h"
 
 Action::Action(void)
 {
@@ -14,7 +15,7 @@ Action::Action(void)
 	m_kind = action_e::move;
 	m_name = "Нет";
 	m_error = "";
-	m_decay = 1.0F;
+	m_decay = 1;
 }
 
 Action::~Action(void)
@@ -88,7 +89,8 @@ void ActionClass_Move::interaction_handler()
 		return;
 	}
 	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
-	Application::instance().m_action_manager->add(p->m_object, new GameTask(this, p));
+	//Application::instance().m_action_manager->add(p->m_object, new GameTask(this, p));
+	p->m_object->m_active_state->m_ai->m_action_controller->set(this, p);
 	Application::instance().m_message_queue.m_busy = false;
 }
 
@@ -149,7 +151,12 @@ void ActionClass_Move::perfom(Parameter* parameter)
 		}
 		}
 		p->m_map->move_object(p->m_object, p->m_place);
+		LOG(INFO) << p->m_object->m_name << "  " << "двигается";
 	}
+	else {
+		LOG(INFO)  << "движение не вышло";
+	}
+	
 }
 
 
@@ -303,7 +310,8 @@ void ActionClass_Push::interaction_handler()
 		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 		return;
 	}
-	Application::instance().m_action_manager->add(p->m_unit, new GameTask(this, p));
+	//Application::instance().m_action_manager->add(p->m_unit, new GameTask(this, p));
+	p->m_unit->m_active_state->m_ai->m_action_controller->set(this, p);
 	Application::instance().m_message_queue.m_busy = false;
 	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 }
@@ -314,6 +322,7 @@ ActionClass_Turn::ActionClass_Turn(void)
 	m_kind = action_e::turn;
 	m_icon = Application::instance().m_graph->m_actions[2];
 	m_name = "Повернуться";
+	m_decay = 5;
 }
 
 
@@ -343,7 +352,7 @@ void ActionClass_Turn::perfom(Parameter* parameter)
 	Parameter_Position* p = static_cast<Parameter_Position*>(parameter);
 	if (check(p))
 	{
-		p->m_map->turn_object(p->m_object);
+		//p->m_map->turn_object(p->m_object);
 	}
 }
 
@@ -370,7 +379,10 @@ void ActionClass_Turn::interaction_handler()
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
-	Application::instance().m_action_manager->add(p->m_object, new GameTask(this, p));
+	p->m_object = Application::instance().m_GUI->MapViewer->m_player->m_object;
+	//Application::instance().m_action_manager->add(p->m_object, new GameTask(this, p));
+
+	p->m_object->m_active_state->m_ai->m_action_controller->set(this, p);
 	Application::instance().m_message_queue.m_busy = false;
 }
 
@@ -725,7 +737,7 @@ Action_hit::Action_hit()
 {
 	m_kind = action_e::hit;
 	m_icon = Application::instance().m_graph->m_actions[8];
-	m_decay = 0.8F;
+	m_decay = 1;
 }
 
 void Action_hit::interaction_handler()
@@ -805,6 +817,7 @@ void Action_hit::perfom(Parameter* parameter)
 		}
 		p->m_object->update_interaction();
 		p->m_object->event_update(VoidEventArgs());
+		LOG(INFO)  << p->m_unit->m_name << "  " << "атакует";
 	}
 }
 

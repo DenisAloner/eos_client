@@ -12,6 +12,7 @@
 #include "game/graphics/GUI_Timer.h"
 #include "utils/log.h"
 #include <chrono>
+#include <Action_controller.h>
 
 
 void my_audio_callback(void *userdata, uint8_t *stream, uint32_t len);
@@ -200,7 +201,7 @@ void Application::initialize()
 	int rx = rand() % room->rect.w;
 	int ry = rand() % room->rect.h;
 	GameObject* obj = m_game_object_manager->new_object("iso_unit");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
+	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 	m_GUI->MapViewer->m_player = new Player(obj, m_GUI->MapViewer->m_map);
 
 	rx = room->rect.x + rx;
@@ -339,10 +340,16 @@ void Application::initialize()
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry ][rx - 1]);
 
 	obj = m_game_object_manager->new_object("rat");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 3][rx]);
-
-	obj = m_game_object_manager->new_object("bear");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 7][rx]);
+
+	obj = m_game_object_manager->new_object("rat");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 7][rx-3]);
+
+	obj = m_game_object_manager->new_object("rat");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 7][rx+3]);
+
+	/*obj = m_game_object_manager->new_object("bear");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 7][rx]);*/
 
 	//obj = m_game_object_manager->new_object("skeleton");
 	//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 5][rx - 4]);
@@ -480,51 +487,56 @@ void Application::PlaySound1()
 
 void Application::update()
 {
+	
+	//if (!m_action_manager->m_items.empty())
+	//{
+	//	std::map<int, std::list<GameTask*> > task_order;
+	//	for (auto current = m_action_manager->m_items.begin(); current != m_action_manager->m_items.end(); current++)
+	//	{
+	//		if (!current->second.empty())
+	//		{
+	//			GameTask* A;
+	//			A = current->second.front();
+	//			task_order[A->m_action->m_decay].push_back(A);
+	//			m_action_manager->remove(current->first);
+	//		}
+	//	}
+	//	//LOG(INFO) << "----------------------";
+	//	//for (auto current = task_order.begin(); current != task_order.end(); current++)
+	//	//{
+	//	//	for (auto task = current->second.begin(); task != current->second.end(); task++)
+	//	//	{
+	//	//		GameTask* A;
+	//	//		A = (*task);
+	//	//		LOG(INFO) << current->first << " - " << A->m_action->m_name;
+	//	//	}
+	//	//}
+	//	for (auto current = task_order.begin(); current != task_order.end(); current++)
+	//	{
+	//		for (auto task = current->second.begin(); task != current->second.end(); task++)
+	//		{
+	//			GameTask* A;
+	//			A = (*task);
+	//			A->m_action->perfom(A->m_parameter);
+	//			if (A->m_action->m_error != "")
+	//			{
+	//				m_GUI->DescriptionBox->add_item_control(new GUI_Text(A->m_action->m_error));
+	//			}
+	//		}
+	//	}
+	//}
 	m_update_mutex.lock();
-	if (!m_action_manager->m_items.empty())
+	do
 	{
-		std::map<float, std::list<GameTask*> > task_order;
-		for (auto current = m_action_manager->m_items.begin(); current != m_action_manager->m_items.end(); current++)
-		{
-			if (!current->second.empty())
-			{
-				GameTask* A;
-				A = current->second.front();
-				task_order[A->m_action->m_decay].push_back(A);
-				m_action_manager->remove(current->first);
-			}
-		}
-		//LOG(INFO) << "----------------------";
-		//for (auto current = task_order.begin(); current != task_order.end(); current++)
-		//{
-		//	for (auto task = current->second.begin(); task != current->second.end(); task++)
-		//	{
-		//		GameTask* A;
-		//		A = (*task);
-		//		LOG(INFO) << current->first << " - " << A->m_action->m_name;
-		//	}
-		//}
-		for (auto current = task_order.begin(); current != task_order.end(); current++)
-		{
-			for (auto task = current->second.begin(); task != current->second.end(); task++)
-			{
-				GameTask* A;
-				A = (*task);
-				A->m_action->perfom(A->m_parameter);
-				if (A->m_action->m_error != "")
-				{
-					m_GUI->DescriptionBox->add_item_control(new GUI_Text(A->m_action->m_error));
-				}
-			}
-		}
-	}
-	m_GUI->MapViewer->m_map->calculate_lighting2();
-	Application::instance().m_game_object_manager->calculate_ai();
+		m_GUI->MapViewer->m_map->calculate_lighting2();
+		Application::instance().m_game_object_manager->calculate_ai();
+		Application::instance().m_game_object_manager->update_buff();
+		m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->update();
+	} while (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->m_action);
 	if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
 	{
 		m_GUI->MapViewer->m_player->m_fov->calculate(static_cast<AI_enemy*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)->m_fov_radius, m_GUI->MapViewer->m_player->m_object, m_GUI->MapViewer->m_map);
 	}
-	Application::instance().m_game_object_manager->update_buff();
 	Application::instance().m_GUI->MapViewer->update();
 	Application::instance().m_GUI->MapViewer->m_map->m_update = true;
 	m_update_mutex.unlock();

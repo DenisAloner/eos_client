@@ -78,7 +78,11 @@ Object_state* Object_state::clone()
 	state->m_tile_manager = m_tile_manager;
 	state->m_light = m_light;
 	state->m_icon = m_icon;
-	state->m_ai = m_ai;
+	if (m_ai)
+	{
+		state->m_ai = m_ai->clone();
+	}
+	else state->m_ai = nullptr;
 	if (m_optical)
 	{
 		state->m_optical = new optical_properties_t(*m_optical);
@@ -111,7 +115,12 @@ Object_state* Object_state_equip::clone()
 	state->m_tile_manager = m_tile_manager;
 	state->m_light = m_light;
 	state->m_icon = m_icon;
-	state->m_ai = m_ai;
+	if (m_ai)
+	{
+		state->m_ai = m_ai->clone();
+	}
+	else state->m_ai = nullptr;
+	
 	for (auto item = m_item.begin(); item != m_item.end(); item++)
 	{
 		state->m_item[item->first] = item->second->clone();

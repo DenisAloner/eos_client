@@ -323,10 +323,10 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 							light[1] = (m_map->m_items[y][x]->m_light.G / 100.0F);
 							light[2] = (m_map->m_items[y][x]->m_light.B / 100.0F);
 							light[3] = 0.0;
-							/*light[0] = 1.0;
-							light[1] = 1.0;
-							light[2] = 1.0;
-							light[3] = 0.0;*/
+							//light[0] = 1.0;
+							//light[1] = 1.0;
+							//light[2] = 1.0;
+							//light[3] = 0.0;
 							for (std::list<GameObject*>::iterator Current = m_map->m_items[y][x]->m_items.begin(); Current != m_map->m_items[y][x]->m_items.end(); Current++)
 							{
 								IsDraw = false;
@@ -404,6 +404,10 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 										light[0] = light[0] / (size3d.x*size3d.y*100.0F);
 										light[1] = light[1] / (size3d.x*size3d.y*100.0F);
 										light[2] = light[2] / (size3d.x*size3d.y*100.0F);
+								/*		light[0] = 1.0;
+										light[1] = 1.0;
+										light[2] = 1.0;
+										light[3] = 0.0;*/
 									}
 
 									// Подсветка тайлов юнитов

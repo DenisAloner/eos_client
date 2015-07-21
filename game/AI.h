@@ -14,6 +14,7 @@ class GameMap;
 class GameObject;
 class MapCell;
 class FOV;
+class Action_controller;
 
 struct Path_cell
 {
@@ -94,8 +95,11 @@ public:
 	GameObject* m_object;
 	GameMap* m_map;
 
+	Action_controller* m_action_controller;
+
 	virtual GameObject* find_goal() = 0;
 	virtual void create() = 0;
+	virtual AI* clone() = 0;
 };
 
 class AI_enemy: public AI
@@ -103,6 +107,7 @@ class AI_enemy: public AI
 public:
 
 	FOV* m_fov;
+
 	GameObject* m_goal;
 	MapCell* m_memory_goal_cell;
 
@@ -114,6 +119,7 @@ public:
 	virtual bool check_goal();
 	virtual GameObject* find_goal();
 	virtual void create();
+	virtual AI* clone();
 
 };
 
@@ -124,6 +130,6 @@ public:
 	AI_trap();
 	virtual GameObject* find_goal();
 	virtual void create();
-
+	virtual AI* clone() { return nullptr; };
 };
 
