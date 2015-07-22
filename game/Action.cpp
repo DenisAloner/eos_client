@@ -53,11 +53,32 @@ void Action::interaction_handler()
 	}
 }
 
+Action_wrapper::Action_wrapper()
+{
+	m_action = nullptr;
+	m_parameter = nullptr;
+	m_decay = 0;
+}
+
+Action_wrapper* Action_wrapper::clone()
+{
+	Action_wrapper* result = new Action_wrapper();
+	result->m_action = m_action;
+	result->m_parameter = m_parameter;
+	result->m_decay = m_decay;
+	return result;
+}
+
+//void Action_wrapper::perfom(Parameter* parameter)
+//{
+//}
+
 ActionClass_Move::ActionClass_Move()
 {
 	m_kind = action_e::move;
 	m_icon = Application::instance().m_graph->m_actions[0];
 	m_name = "Идти";
+	m_decay = 2;
 }
 
 
@@ -90,7 +111,7 @@ void ActionClass_Move::interaction_handler()
 	}
 	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 	//Application::instance().m_action_manager->add(p->m_object, new GameTask(this, p));
-	p->m_object->m_active_state->m_ai->m_action_controller->set(this, p);
+	p->m_object->m_active_state->m_ai->m_action_controller->set(p->m_object,this, p);
 	Application::instance().m_message_queue.m_busy = false;
 }
 
@@ -311,7 +332,7 @@ void ActionClass_Push::interaction_handler()
 		return;
 	}
 	//Application::instance().m_action_manager->add(p->m_unit, new GameTask(this, p));
-	p->m_unit->m_active_state->m_ai->m_action_controller->set(this, p);
+	//p->m_unit->m_active_state->m_ai->m_action_controller->set(this, p);
 	Application::instance().m_message_queue.m_busy = false;
 	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 }
@@ -322,7 +343,7 @@ ActionClass_Turn::ActionClass_Turn(void)
 	m_kind = action_e::turn;
 	m_icon = Application::instance().m_graph->m_actions[2];
 	m_name = "Повернуться";
-	m_decay = 5;
+	m_decay = 4;
 }
 
 
@@ -382,7 +403,7 @@ void ActionClass_Turn::interaction_handler()
 	p->m_object = Application::instance().m_GUI->MapViewer->m_player->m_object;
 	//Application::instance().m_action_manager->add(p->m_object, new GameTask(this, p));
 
-	p->m_object->m_active_state->m_ai->m_action_controller->set(this, p);
+	p->m_object->m_active_state->m_ai->m_action_controller->set(p->m_object,this, p);
 	Application::instance().m_message_queue.m_busy = false;
 }
 

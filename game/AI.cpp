@@ -313,7 +313,7 @@ void AI_enemy::create()
 {
 	if (m_object->m_active_state->m_ai == nullptr){ return; }
 	m_action_controller->update();
-	if (!m_action_controller->m_action)
+	if (!m_action_controller->m_wrapper.m_action)
 	{
 		m_fov->calculate(m_fov_radius, m_object, m_map);
 		MapCell* c;
@@ -352,7 +352,7 @@ void AI_enemy::create()
 			p->m_object = m_goal;
 			p->m_unit_body_part = nullptr;
 			//Application::instance().m_action_manager->add(p->m_unit, new GameTask(Application::instance().m_actions[action_e::hit], p));
-			m_action_controller->set(Application::instance().m_actions[action_e::hit], p);
+			m_action_controller->set(p->m_unit,Application::instance().m_actions[action_e::hit], p);
 			return;
 		}
 		Path::instance().calculate(m_map, m_object, c, m_goal, m_fov_radius);
@@ -368,7 +368,7 @@ void AI_enemy::create()
 				P->m_place = (*path)[path->size() - 2];
 				P->m_map = m_map;
 				//Application::instance().m_action_manager->add(m_object, new GameTask(Application::instance().m_actions[action_e::move], P));
-				m_action_controller->set(Application::instance().m_actions[action_e::move], P);
+				m_action_controller->set(P->m_object,Application::instance().m_actions[action_e::move], P);
 			}
 			else
 			{

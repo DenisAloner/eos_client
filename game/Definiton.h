@@ -265,7 +265,8 @@ enum class effect_prefix_e
 	physical_damage,
 	poison_damage,
 	parameter_change,
-	state_change
+	state_change,
+	action
 };
 
 enum class object_tag_e
@@ -276,7 +277,8 @@ enum class object_tag_e
 	pass_able,
 	pick_able,
 	seethrough_able,
-	activator
+	activator,
+	fast_move
 };
 
 enum class feature_list_type_e

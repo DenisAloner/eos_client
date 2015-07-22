@@ -678,6 +678,37 @@ void ObjectTag::Activator::apply_effect(GameObject* unit, Object_interaction* ob
 	}
 }
 
+ObjectTag::Fast_move::Fast_move() :Object_tag(object_tag_e::fast_move) {};
+
+ObjectTag::Fast_move* ObjectTag::Fast_move::clone()
+{
+	ObjectTag::Fast_move* effect = new ObjectTag::Fast_move();
+	return effect;
+}
+
+void ObjectTag::Fast_move::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	Interaction_prefix* prefix = static_cast<Interaction_prefix*>(object);
+	switch (prefix->m_subtype)
+	{
+	case effect_prefix_e::action:
+	{
+		Action_wrapper* e = static_cast<Action_wrapper*>(prefix->m_value);
+		if (e)
+		{
+			if (e->m_action->m_kind == action_e::move)
+			{
+				if (e->m_decay != 1)
+				{
+					e->m_decay /= 2;
+				}
+			}
+		}
+		break;
+	}
+	}
+}
+
 Action_list::Action_list(){};
 
 Interaction_list* Action_list::clone()

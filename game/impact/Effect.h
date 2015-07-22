@@ -265,6 +265,14 @@ namespace ObjectTag
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
 	};
 
+	class Fast_move : public Object_tag
+	{
+	public:
+		Fast_move();
+		virtual Fast_move* clone();
+		virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	};
+
 	class Label : public Object_tag
 	{
 	public:

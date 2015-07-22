@@ -36,6 +36,23 @@ public:
 	virtual void description(std::list<std::string>* info, int level) {};
 };
 
+class Action_wrapper : public Object_interaction
+{
+public:
+
+	int m_decay;
+	Action* m_action;
+	Parameter* m_parameter;
+
+	Action_wrapper();
+
+	virtual bool on_turn() { return false; };
+	virtual std::string get_description() { return "действие"; };
+	virtual void description(std::list<std::string>* info, int level) {};
+	virtual Action_wrapper* clone();
+	//virtual void perfom(Parameter* parameter);
+};
+
 class ActionClass_Move :
 	public Action
 {

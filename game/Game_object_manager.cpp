@@ -459,6 +459,11 @@ void GameObjectManager::parser(const std::string& command)
 			tag = new ObjectTag::Activator();
 			break;
 		}
+		case object_tag_e::fast_move:
+		{
+			tag = new ObjectTag::Fast_move();
+			break;
+		}
 		default:
 		{
 			tag = new ObjectTag::Label(get_object_tag_e(arg[0]));
@@ -573,6 +578,7 @@ void GameObjectManager::init()
 	m_to_object_tag_e["pass_able"] = object_tag_e::pass_able;
 	m_to_object_tag_e["seethrough_able"] = object_tag_e::seethrough_able;
 	m_to_object_tag_e["activator"] = object_tag_e::activator;
+	m_to_object_tag_e["fast_move"] = object_tag_e::fast_move;
 
 	m_object_tag_string[object_tag_e::poison_resist] = "сопротивление к яду";
 	m_object_tag_string[object_tag_e::purification_from_poison] = "очищение от яда";
@@ -581,6 +587,7 @@ void GameObjectManager::init()
 	m_object_tag_string[object_tag_e::pick_able] = "можно взять";
 	m_object_tag_string[object_tag_e::seethrough_able] = "не загораживает обзор";
 	m_object_tag_string[object_tag_e::activator] = "активирует/деактивирует механизмы";
+	m_object_tag_string[object_tag_e::fast_move] = "быстрое передвижение";
 
 	m_to_action_e["equip"] = action_e::equip;
 	m_to_action_e["hit"] = action_e::hit;

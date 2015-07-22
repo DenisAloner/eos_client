@@ -8,15 +8,17 @@ class Action_controller
 {
 public:
 
-	int m_decay;
-	Action* m_action;
-	Parameter* m_parameter;
+
+	Action_wrapper m_wrapper;
 
 	Action_controller();
 	~Action_controller();
 
-	void set(Action* action,Parameter* parameter);
+	void set(GameObject* unit, Action* action, Parameter* parameter);
 	void update();
+
+private:
+	Interaction_prefix m_prefix;
 };
 
 #endif //ACTIONCONTROLLER_H
