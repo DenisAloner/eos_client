@@ -78,7 +78,7 @@ ActionClass_Move::ActionClass_Move()
 	m_kind = action_e::move;
 	m_icon = Application::instance().m_graph->m_actions[0];
 	m_name = "Идти";
-	m_decay = 1;
+	m_decay = 2;
 }
 
 

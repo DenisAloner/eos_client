@@ -10,6 +10,7 @@ public:
 
 
 	Action_wrapper m_wrapper;
+	bool done;
 
 	Action_controller();
 	~Action_controller();

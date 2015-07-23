@@ -528,10 +528,10 @@ void Application::update()
 	do
 	{
 		m_update_mutex.lock();
-		m_GUI->MapViewer->m_map->calculate_lighting2();
+		m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->update();
 		Application::instance().m_game_object_manager->calculate_ai(m_GUI->MapViewer->m_map);
 		Application::instance().m_game_object_manager->update_buff();
-		m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->update();
+		m_GUI->MapViewer->m_map->calculate_lighting2();
 		Application::instance().m_GUI->MapViewer->update();
 		Application::instance().m_GUI->MapViewer->m_map->m_update = true;
 		m_update_mutex.unlock();

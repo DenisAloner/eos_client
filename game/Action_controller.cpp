@@ -18,16 +18,21 @@ void Action_controller::set(GameObject* unit, Action* action, Parameter* paramet
 	m_wrapper.m_parameter = parameter;
 	m_wrapper.m_decay = m_wrapper.m_action->m_decay;
 	m_prefix.apply_effect(unit, &m_wrapper);
+	done = true;
 }
 
 void Action_controller::update()
 {
 	if (m_wrapper.m_action)
 	{
+		if (done)
+		{
+			m_wrapper.m_action->perfom(m_wrapper.m_parameter);
+			done = false;
+		}
 		m_wrapper.m_decay -= 1;
 		if (m_wrapper.m_decay <= 0)
 		{
-			m_wrapper.m_action->perfom(m_wrapper.m_parameter);
 			/*if (m_action->m_error != "")
 			{
 				m_GUI->DescriptionBox->add_item_control(new GUI_Text(A->m_action->m_error));

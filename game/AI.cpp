@@ -312,7 +312,6 @@ bool AI_enemy::check_goal()
 void AI_enemy::create()
 {
 	if (m_object->m_active_state->m_ai == nullptr){ return; }
-	m_action_controller->update();
 	if (!m_action_controller->m_wrapper.m_action)
 	{
 		m_fov->calculate(m_fov_radius, m_object, m_map);
@@ -379,6 +378,7 @@ void AI_enemy::create()
 		}
 		Path::instance().m_heap.m_items.clear();
 	}
+	m_action_controller->update();
 }
 
 AI_trap::AI_trap(){};
