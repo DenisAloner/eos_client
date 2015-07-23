@@ -411,7 +411,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 									}
 
 									// Ïîäñâåòêà òàéëîâ şíèòîâ
-									if ((*Current)->m_name == "skeleton" || (*Current)->m_name == "bear" || (*Current)->m_name == "rat" || (*Current)->m_name == "iso_unit")
+									if ((*Current)->m_name == "bat" || (*Current)->m_name == "skeleton" || (*Current)->m_name == "bear" || (*Current)->m_name == "rat" || (*Current)->m_name == "iso_unit")
 									{
 									auto a = new mapviewer_hint_object_area(this, (*Current));
 									a->render();

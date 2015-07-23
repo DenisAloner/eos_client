@@ -194,7 +194,7 @@ optical 0.8,0.8,0.8
 feature_list action,action
 feature_list generic,buff
 add_action move
-feature_list parameter,health,15,15
+feature_list parameter,health,100,100
 feature_list parameter,strength,5,100
 feature_list generic,total_damage
 feature_list generic,damage

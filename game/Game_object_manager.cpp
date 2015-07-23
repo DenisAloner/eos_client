@@ -657,6 +657,10 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 	}
 	obj->m_active_state = obj->m_state.front();
 	m_objects.push_back(obj);
+	if (obj->get_effect(interaction_e::buff))
+	{
+		m_update_buff.push_front(obj);
+	}
 	obj->update_interaction();
 	return obj;
 }
@@ -668,7 +672,7 @@ void GameObjectManager::update_buff()
 	/*Application::instance().console(std::to_string(m_objects.size()));
 	Application::instance().console(std::to_string(Application::instance().m_GUI->MapViewer->m_map->m_lights.size()));
 	Application::instance().console(std::to_string(Application::instance().m_GUI->MapViewer->m_map->m_ai.size()));*/
-	for (auto object = m_objects.begin(); object != m_objects.end(); object++)
+	for (auto object = m_update_buff.begin(); object != m_update_buff.end(); object++)
 	{
 		list =static_cast<Interaction_list*>((*object)->get_effect(interaction_e::buff));
 		if (list)
@@ -692,9 +696,9 @@ void GameObjectManager::update_buff()
 	}
 }
 
-void GameObjectManager::calculate_ai()
+void GameObjectManager::calculate_ai(GameMap* game_map)
 {
-	for (auto object = m_objects.begin(); object != m_objects.end(); object++)
+	for (auto object = game_map->m_ai.begin(); object != game_map->m_ai.end(); object++)
 	{
 		if (((*object)->m_active_state->m_ai) && ((*object)!=Application::instance().m_GUI->MapViewer->m_player->m_object))
 		{

@@ -93,6 +93,7 @@ public:
 	Attribute_map* m_mem_state;
 
 	std::list<GameObject*> m_objects;
+	std::list<GameObject*> m_update_buff;
 
 	interaction_e get_interaction_e(const std::string& key);
 	effect_e get_effect_e(const std::string& key);
@@ -114,5 +115,5 @@ public:
 	std::string get_object_tag_string(object_tag_e key);
 	std::string get_effect_prefix_string(effect_prefix_e key);
 
-	void calculate_ai();
+	void calculate_ai(GameMap* game_map);
 };

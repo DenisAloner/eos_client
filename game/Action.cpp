@@ -78,7 +78,7 @@ ActionClass_Move::ActionClass_Move()
 	m_kind = action_e::move;
 	m_icon = Application::instance().m_graph->m_actions[0];
 	m_name = "Идти";
-	m_decay = 2;
+	m_decay = 1;
 }
 
 
@@ -618,7 +618,8 @@ void Action_pick::interaction_handler()
 		Application::instance().m_clipboard.m_item = nullptr;
 		return;
 	}
-	Application::instance().m_action_manager->add(p->m_unit, new GameTask(this, p));
+	//Application::instance().m_action_manager->add(p->m_unit, new GameTask(this, p));
+	p->m_unit->m_active_state->m_ai->m_action_controller->set(p->m_unit, this, p);
 	Application::instance().m_clipboard.m_item = nullptr;
 	Application::instance().m_message_queue.m_busy = false;
 }
@@ -900,7 +901,8 @@ void action_hit_melee::interaction_handler()
 		return;
 	}
 	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
-	Application::instance().m_action_manager->add(p->m_unit, new GameTask(this, p));
+	//Application::instance().m_action_manager->add(p->m_unit, new GameTask(this, p));
+	p->m_unit->m_active_state->m_ai->m_action_controller->set(p->m_unit, this, p);
 	Application::instance().m_message_queue.m_busy = false;
 }
 

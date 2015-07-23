@@ -39,6 +39,7 @@ public:
 	std::vector<std::vector<MapCell*> > m_items;
 	std::list<GameObject*> m_lights;
 	std::list<GameObject*> m_ai;
+
 	std::list<block_t*> m_rooms;
 	std::list<block_t*> m_link_rooms;
 
