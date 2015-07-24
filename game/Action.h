@@ -236,4 +236,19 @@ public:
 
 };
 
+
+class Action_use:
+	public Action
+{
+public:
+
+	Action_use();
+
+	virtual bool check(Parameter* parameter);
+	virtual void perfom(Parameter* parameter);
+	virtual std::string get_description(Parameter* parameter);
+	virtual void interaction_handler();
+	virtual Object_interaction* clone() { return new Action_use(); };
+};
+
 #endif //TACTION_H

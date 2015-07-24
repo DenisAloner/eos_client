@@ -115,7 +115,7 @@ void Application::render()
 	{
 		if (m_clipboard.m_item)
 		{
-			glColor4d(1.0, 1.0, 1.0, 0.5);
+			glColor4d(1.0, 1.0, 1.0, 1.0);
 			glBindTexture(GL_TEXTURE_2D, m_clipboard.m_item->m_active_state->m_icon);
 			m_graph->draw_sprite(mouse.x - 32, mouse.y - 32, mouse.x - 32, mouse.y + 32, mouse.x + 32, mouse.y + 32, mouse.x + 32, mouse.y - 32);
 			glDisable(GL_TEXTURE_2D);
@@ -174,6 +174,7 @@ void Application::initialize()
 	m_actions[action_e::hit_melee] = new action_hit_melee();
 	m_actions[action_e::equip] = new Action_equip();
 	m_actions[action_e::show_parameters] = new Action_show_parameters();
+	m_actions[action_e::use] = new Action_use();
 	m_ai_manager = new AI_manager();
 	m_game_object_manager = new GameObjectManager();
 	m_game_object_manager->init();
@@ -336,8 +337,10 @@ void Application::initialize()
 	//obj = m_game_object_manager->new_object("trap");
 	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx + 2]);
 	 
-	obj = m_game_object_manager->new_object("dagger");
+	obj = m_game_object_manager->new_object("red potion");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry ][rx - 1]);
+	obj = m_game_object_manager->new_object("blue potion");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx - 2]);
 
 	obj = m_game_object_manager->new_object("bat");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 7][rx]);

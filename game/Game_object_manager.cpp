@@ -529,6 +529,7 @@ void GameObjectManager::init()
 	m_to_interaction_e["total_damage"] = interaction_e::total_damage;
 	m_to_interaction_e["damage"] = interaction_e::damage;
 	m_to_interaction_e["buff"] = interaction_e::buff;
+	m_to_interaction_e["use"] = interaction_e::use;
 	m_to_interaction_e["health"] = interaction_e::health;
 	m_to_interaction_e["strength"] = interaction_e::strength;
 	m_to_interaction_e["hunger"] = interaction_e::hunger;
@@ -545,6 +546,7 @@ void GameObjectManager::init()
 	m_effect_string[interaction_e::total_damage] = "общий дополнительный урон";
 	m_effect_string[interaction_e::damage] = "урон";
 	m_effect_string[interaction_e::buff] = "баффы";
+	m_effect_string[interaction_e::use] = "применение";
 	m_effect_string[interaction_e::health] = "здоровье";
 	m_effect_string[interaction_e::strength] = "сила";
 	m_effect_string[interaction_e::hunger] = "голод";
@@ -598,6 +600,7 @@ void GameObjectManager::init()
 	m_to_action_e["push"] = action_e::push;
 	m_to_action_e["set_motion_path"] = action_e::set_motion_path;
 	m_to_action_e["turn"] = action_e::turn;
+	m_to_action_e["use"] = action_e::use;
 
 	m_to_body_part_e["head"] = body_part_e::head;
 	m_to_body_part_e["hand"] = body_part_e::hand;

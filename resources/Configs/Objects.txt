@@ -113,6 +113,7 @@ add_action equip
 add_action open
 add_action push
 add_action turn
+add_action use
 feature_list parameter,health,100,100
 feature_list parameter,strength,8,100
 feature_list parameter,hunger,0,1000
@@ -344,3 +345,31 @@ optical 0.5,0.5,0.5
 feature_list tag,tag
 tag seethrough_able
 tag pass_able
+
+object red potion
+state alive
+size 1 1 1
+icon red_potion_icon
+tile_manager_single red_potion
+feature_list tag,tag
+tag seethrough_able
+feature_list generic,use
+mem_effect value,6
+mem_slot_copyist health
+mem_slot_time 5
+mem_slot_addon buff
+add_slot use
+
+object blue potion
+state alive
+size 1 1 1
+icon blue_potion_icon
+tile_manager_single blue_potion
+feature_list tag,tag
+tag seethrough_able
+feature_list generic,use
+mem_effect value,6
+mem_slot_copyist health
+mem_slot_time 5
+mem_slot_addon buff
+add_slot use

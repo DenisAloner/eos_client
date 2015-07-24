@@ -1058,3 +1058,86 @@ std::string Action_show_parameters::get_description(Parameter* parameter)
 	return s;
 }
 
+Action_use::Action_use()
+{
+	m_kind = action_e::use;
+	m_icon = Application::instance().m_graph->m_actions[11];
+	m_name = "Применить";
+	m_decay = 1;
+}
+
+void Action_use::interaction_handler()
+{
+	Action::interaction_handler();
+	Application::instance().m_message_queue.m_busy = true;
+	Parameter* result;
+	P_unit_interaction* p = new P_unit_interaction();
+	p->m_unit = Application::instance().m_GUI->MapViewer->m_player->m_object;
+	result = Application::instance().command_select_object_on_map();
+	if (result)
+	{
+		p->m_object = static_cast<P_object*>(result)->m_object;
+		std::string a = "Выбран ";
+		a.append(p->m_object->m_name);
+		a = a + ".";
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+	}
+	else
+	{
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_message_queue.m_busy = false;
+		return;
+	}
+	p->m_unit->m_active_state->m_ai->m_action_controller->set(p->m_unit, this, p);
+	Application::instance().m_message_queue.m_busy = false;
+}
+
+
+bool Action_use::check(Parameter* parameter)
+{
+	return true;
+}
+
+void Action_use::perfom(Parameter* parameter)
+{
+	P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
+	if (check(p))
+	{
+		p->m_unit->set_direction(Game_algorithm::turn_to_object(p->m_unit, p->m_object));
+		auto reaction = p->m_object->get_effect(interaction_e::use);
+		if (reaction)
+		{
+			Object_interaction* msg = reaction->clone();
+			msg->apply_effect(p->m_unit, nullptr);
+		}
+		switch (p->m_object->m_owner->m_kind)
+		{
+		case entity_e::cell:
+		{
+			//static_cast<MapCell*>(p->m_object->m_owner)->m_items.remove(p->m_object);
+			static_cast<MapCell*>(p->m_object->m_owner)->m_map->remove_object(p->m_object);
+			break;
+		}
+		case entity_e::inventory_cell:
+		{
+			static_cast<Inventory_cell*>(p->m_object->m_owner)->m_item = nullptr;
+			break;
+		}
+		case entity_e::body_part:
+		{
+			Application::instance().command_unequip(p->m_unit, static_cast<Object_part*>(p->m_object->m_owner), p->m_object);
+			break;
+		}
+		}
+		Application::instance().m_game_object_manager->m_objects.remove(p->m_object);
+		p->m_unit->update_interaction();
+		p->m_unit->event_update(VoidEventArgs());
+	}
+}
+
+std::string Action_use::get_description(Parameter* parameter)
+{
+	Parameter_Position* p = static_cast<Parameter_Position*>(parameter);
+	std::string s("Применять");
+	return s;
+}

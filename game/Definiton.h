@@ -111,7 +111,8 @@ enum action_e
 	hit,
 	hit_melee,
 	equip,
-	show_parameters
+	show_parameters,
+	use
 };
 
 enum class object_state_e
@@ -233,6 +234,7 @@ enum class interaction_e
 	total_damage,
 	damage,
 	buff,
+	use,
 	health,
 	strength,
 	hunger,
