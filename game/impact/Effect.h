@@ -64,6 +64,8 @@ class Interaction_list :public Object_interaction
 {
 public:
 
+	feature_list_type_e m_list_type;
+
 	std::list<Object_interaction*> m_effect;
 	Interaction_list();
 	virtual bool on_turn();
@@ -103,7 +105,7 @@ public:
 	virtual void description(std::list<std::string>* info, int level);
 
 private:
-	void update_list(Interaction_list* list);
+	void update_list(Object_interaction* list);
 };
 
 class Tag_list :public  Interaction_list

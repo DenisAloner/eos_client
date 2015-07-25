@@ -369,7 +369,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::mem_slot_time:
 	{
 		Interaction_time* item = new Interaction_time();
-		item->m_interaction_message_type = interaction_message_type_e::single;
+		item->m_interaction_message_type = interaction_message_type_e::slot_time;
 		item->m_turn = std::stoi(arg[0]);
 		item->m_value = m_slot;
 		m_slot = item;
@@ -406,6 +406,7 @@ void GameObjectManager::parser(const std::string& command)
 	{
 		feature_list_type_e list_type = get_feature_list_type_e(arg[0]);
 		Interaction_list* list = m_object->create_feature_list(list_type, get_interaction_e(arg[1]));
+		list->m_list_type = list_type;
 		switch (list_type)
 		{
 		case feature_list_type_e::parameter:
@@ -422,6 +423,7 @@ void GameObjectManager::parser(const std::string& command)
 	{
 		feature_list_type_e list_type = get_feature_list_type_e(arg[0]);
 		Interaction_list* list= m_mem_state->create_feature_list(list_type, get_interaction_e(arg[1]));
+		list->m_list_type = list_type;
 		switch (list_type)
 		{
 		case feature_list_type_e::parameter:
@@ -671,26 +673,29 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 void GameObjectManager::update_buff()
 {
 	Interaction_list* list;
-	Object_interaction* e;
+	Interaction_list* e;
 	/*Application::instance().console(std::to_string(m_objects.size()));
 	Application::instance().console(std::to_string(Application::instance().m_GUI->MapViewer->m_map->m_lights.size()));
 	Application::instance().console(std::to_string(Application::instance().m_GUI->MapViewer->m_map->m_ai.size()));*/
 	for (auto object = m_update_buff.begin(); object != m_update_buff.end(); object++)
 	{
-		list =static_cast<Interaction_list*>((*object)->get_effect(interaction_e::buff));
+		list = static_cast<Interaction_list*>((*object)->get_effect(interaction_e::buff));
 		if (list)
 		{
-			for (auto buff = list->m_effect.begin(); buff != list->m_effect.end();)
+			e = list->clone();
+			e->apply_effect(*object, nullptr);
+			list->on_turn();
+		}
+		for (auto item = (*object)->m_active_state->m_item.begin(); item != (*object)->m_active_state->m_item.end(); item++)
+		{
+			if ((*item).second->m_interaction_message_type == interaction_message_type_e::list)
 			{
-				e = (*buff)->clone();
-				e->apply_effect(*object,nullptr);
-				if ((*buff)->on_turn())
+				LOG(INFO) << "in";
+				e = static_cast<Interaction_list*>((*item).second);
+				if (e->m_list_type == feature_list_type_e::parameter)
 				{
-					buff = list->m_effect.erase(buff);
-				}
-				else
-				{
-					++buff;
+					LOG(INFO) << "in 2";
+					e->on_turn();
 				}
 			}
 		}

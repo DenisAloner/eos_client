@@ -197,14 +197,16 @@ Interaction_list::Interaction_list()
 bool Interaction_list::on_turn()
 {
 	bool result = false;
-	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	for (auto item = m_effect.begin(); item != m_effect.end();)
 	{
 		if ((*item)->on_turn())
 		{
-			result = true;
+			item = m_effect.erase(item);
 		}
+		else
+			++item;
 	}
-	return result;
+	return true;
 }
 
 std::string Interaction_list::get_description()
@@ -224,6 +226,7 @@ void Interaction_list::update()
 Interaction_list* Interaction_list::clone()
 {
 	Interaction_list* result = new Interaction_list();
+	result->m_list_type = m_list_type;
 	Object_interaction* c;
 	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
 	{
@@ -266,22 +269,31 @@ Parts_list* Parts_list::clone()
 
 Parameter_list::Parameter_list(interaction_e subtype) :m_subtype(subtype){};
 
-void Parameter_list::update_list(Interaction_list* list)
+void Parameter_list::update_list(Object_interaction* list)
 {
-	Effect* item;
-	Interaction_list* list_item;
-	for (auto current = list->m_effect.begin(); current != list->m_effect.end(); current++)
-	{
-		switch ((*current)->m_interaction_message_type)
+	
+		switch (list->m_interaction_message_type)
 		{
 		case interaction_message_type_e::list:
 		{
-			update_list(static_cast<Interaction_list*>(*current));
+			Interaction_list* list_item=static_cast<Interaction_list*>(list);
+			for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); current++)
+			{
+				update_list((*current));
+			}
+			break;
+		}
+		case interaction_message_type_e::slot_time:
+		{
+			LOG(INFO) << "buff in parameter";
+			Interaction_time* item = static_cast<Interaction_time*>(list);
+			update_list(item->m_value);
 			break;
 		}
 		default:
 		{
-			item = static_cast<Effect*>(*current);
+			Effect* item;
+			item = static_cast<Effect*>(list);
 			switch (item->m_subtype)
 			{
 			case effect_e::value:
@@ -297,7 +309,7 @@ void Parameter_list::update_list(Interaction_list* list)
 			}
 		}
 		}
-	}
+
 }
 
 void Parameter_list::update()
@@ -337,6 +349,7 @@ std::string Parameter_list::get_description()
 Parameter_list* Parameter_list::clone()
 {
 	Parameter_list* result = new Parameter_list(m_subtype);
+	result->m_list_type = m_list_type;
 	result->m_basic_limit = m_basic_limit;
 	result->m_basic_value = m_basic_value;
 	result->m_value = m_value;
@@ -387,7 +400,7 @@ void Parameter_list::description(std::list<std::string>* info, int level)
 
 Interaction_timer::Interaction_timer()
 {
-
+	m_interaction_message_type = interaction_message_type_e::slot_time;
 }
 
 bool Interaction_timer::on_turn()
@@ -450,7 +463,12 @@ Interaction_time::Interaction_time()
 bool Interaction_time::on_turn()
 {
 	m_turn -= 1;
-	return m_turn == 0;
+	if (m_turn == 0)
+	{
+		m_value = nullptr;
+		return true;
+	}
+	else return false;
 }
 
 std::string Interaction_time::get_description()

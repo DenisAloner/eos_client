@@ -226,7 +226,8 @@ enum class interaction_message_type_e
 	set_attribute_map,
 	select_location,
 	mover,
-	allocator
+	allocator,
+	slot_time
 };
 
 enum class interaction_e
