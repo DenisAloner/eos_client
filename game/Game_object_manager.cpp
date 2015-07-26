@@ -84,8 +84,8 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::obj:
 	{
 		m_object = new GameObject();
-		m_object->m_name = args;
-		m_items.insert(std::pair<std::string, GameObject*>(args, m_object));
+		m_object->m_name = arg[0];
+		m_items.insert(std::pair<std::string, GameObject*>(arg[0], m_object));
 		break;
 	}
 	case command_e::state:
@@ -138,22 +138,17 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	case command_e::size:
 	{
-		std::size_t pos = 0;
 		game_object_size_t size;
-		found = args.find(" ");
-		size.x = std::stoi(args.substr(0, found));
-		pos = found + 1;
-		found = args.find(" ", pos);
-		size.y = std::stoi(args.substr(pos, found - pos));
-		pos = found + 1;
-		size.z = std::stoi(args.substr(pos));
+		size.x = std::stoi(arg[0]);
+		size.y = std::stoi(arg[1]);
+		size.z = std::stoi(arg[2]);
 		m_object->m_active_state->m_size = size;
 		m_object->set_direction(object_direction_e::down);
 		break;
 	}
 	case command_e::weight:
 	{
-		m_object->m_weight = std::stof(args);
+		m_object->m_weight = std::stof(arg[0]);
 		break;
 	}
 	case command_e::optical:
@@ -168,18 +163,18 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	case command_e::layer:
 	{
-		m_object->m_active_state->m_layer = std::stoi(args);
+		m_object->m_active_state->m_layer = std::stoi(arg[0]);
 		break;
 	}
 	case command_e::icon:
 	{
-		m_object->m_active_state->m_icon = Application::instance().m_graph->load_texture(FileSystem::instance().m_resource_path + "Tiles\\" + args + ".bmp");
+		m_object->m_active_state->m_icon = Application::instance().m_graph->load_texture(FileSystem::instance().m_resource_path + "Tiles\\" + arg[0] + ".bmp");
 		break;
 	}
 	case command_e::tile_manager_single:
 	{
 		m_object->m_active_state->m_tile_manager = new TileManager_Single();
-		m_object->m_active_state->m_tile_manager->load_from_file(args, object_direction_e::down, 0);
+		m_object->m_active_state->m_tile_manager->load_from_file(arg[0], object_direction_e::down, 0);
 		break;
 	}
 	case command_e::tile_manager_single_animate:
@@ -200,14 +195,9 @@ void GameObjectManager::parser(const std::string& command)
 		object_direction_e dir;
 		int frame;
 		std::string name;
-		std::size_t pos = 0;
-		found = args.find(" ");
-		name = args.substr(0, found);
-		pos = found + 1;
-		found = args.find(" ", pos);
-		dir = static_cast<object_direction_e>(std::stoi(args.substr(pos, found - pos)));
-		pos = found + 1;
-		frame = std::stoi(args.substr(pos));
+		name = arg[0];
+		dir = static_cast<object_direction_e>(std::stoi(arg[1]));
+		frame = std::stoi(arg[2]);
 		m_object->m_active_state->m_tile_manager->load_from_file(name, dir, frame);
 		break;
 	}
@@ -219,12 +209,8 @@ void GameObjectManager::parser(const std::string& command)
 		}
 		object_direction_e dir;
 		std::string name;
-		std::size_t pos = 0;
-		found = args.find(" ");
-		name = args.substr(0, found);
-		pos = found + 1;
-		found = args.find(" ", pos);
-		dir = static_cast<object_direction_e>(std::stoi(args.substr(pos, found - pos)));
+		name = arg[0];
+		dir = static_cast<object_direction_e>(std::stoi(arg[1]));
 		m_object->m_active_state->m_tile_manager->load_from_file(name, dir, 0);
 		break;
 	}
@@ -243,15 +229,10 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	case command_e::light:
 	{
-		std::size_t pos = 0;
 		light_t* light = new light_t(0, 0, 0);
-		found = args.find(" ");
-		light->R = std::stoi(args.substr(0, found));
-		pos = found + 1;
-		found = args.find(" ", pos);
-		light->G = std::stoi(args.substr(pos, found - pos));
-		pos = found + 1;
-		light->B = std::stoi(args.substr(pos));
+		light->R = std::stoi(arg[0]);
+		light->G = std::stoi(arg[1]);
+		light->B = std::stoi(arg[2]);
 		m_object->m_active_state->m_light = light;
 		break;
 	}
@@ -480,20 +461,20 @@ void GameObjectManager::parser(const std::string& command)
 
 void GameObjectManager::init()
 {
-	m_commands.insert(std::pair<std::string, command_e>("object", command_e::obj));
-	m_commands.insert(std::pair<std::string, command_e>("size", command_e::size));
-	m_commands.insert(std::pair<std::string, command_e>("ai", command_e::ai));
-	m_commands.insert(std::pair<std::string, command_e>("weight", command_e::weight));
+	m_commands["object"] = command_e::obj;
+	m_commands["size"] = command_e::size;
+	m_commands["ai"] = command_e::ai;
+	m_commands["weight"] = command_e::weight;
 	m_commands["optical"] = command_e::optical;
 	m_commands["visibility"] = command_e::visibility;
-	m_commands.insert(std::pair<std::string, command_e>("layer", command_e::layer));
-	m_commands.insert(std::pair<std::string, command_e>("icon", command_e::icon));
-	m_commands.insert(std::pair<std::string, command_e>("tile_manager_single", command_e::tile_manager_single));
+	m_commands["layer"] = command_e::layer;
+	m_commands["icon"] = command_e::icon;
+	m_commands["tile_manager_single"] = command_e::tile_manager_single;
 	m_commands["tile_manager_single_animate"] = command_e::tile_manager_single_animate;
-	m_commands.insert(std::pair<std::string, command_e>("tile_manager_map", command_e::tile_manager_map));
-	m_commands.insert(std::pair<std::string, command_e>("tile_manager_rotating", command_e::tile_manager_rotating));
+	m_commands["tile_manager_map"] = command_e::tile_manager_map;
+	m_commands["tile_manager_rotating"] = command_e::tile_manager_rotating;
 	m_commands["tile_manager_rotating8"] = command_e::tile_manager_rotating8;
-	m_commands.insert(std::pair<std::string, command_e>("light", command_e::light));
+	m_commands["light"] = command_e::light;
 	m_commands["add_action"] = command_e::add_action;
 	m_commands["add_slot"] = command_e::add_slot;
 	m_commands["add_slot_mem"] = command_e::add_slot_mem;
