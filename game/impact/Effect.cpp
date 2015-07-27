@@ -2,7 +2,218 @@
 #include "Application.h"
 #include "game\graphics\GUI_TextBox.h"
 
-//class Application;
+
+// Interaction_list
+
+Interaction_list::Interaction_list()
+{
+	m_interaction_message_type = interaction_message_type_e::list;
+}
+
+bool Interaction_list::on_turn()
+{
+	bool result = false;
+	for (auto item = m_effect.begin(); item != m_effect.end();)
+	{
+		if ((*item)->on_turn())
+		{
+			item = m_effect.erase(item);
+		}
+		else
+			++item;
+	}
+	return true;
+}
+
+std::string Interaction_list::get_description()
+{
+	std::string result = "";
+	for (auto current = m_effect.begin(); current != m_effect.end(); current++)
+	{
+		result += (*current)->get_description() + ",";
+	}
+	return result;
+}
+
+void Interaction_list::update()
+{
+}
+
+Interaction_list* Interaction_list::clone()
+{
+	Interaction_list* result = new Interaction_list();
+	result->m_list_type = m_list_type;
+	Object_interaction* c;
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		c = (*item)->clone();
+		if (c) { result->m_effect.push_back(c); }
+
+	}
+	return result;
+}
+
+void Interaction_list::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		(*item)->apply_effect(unit, object);
+	}
+}
+
+void Interaction_list::do_predicat(predicat func)
+{
+	func(this);
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		(*item)->do_predicat(func);
+	}
+}
+
+void Interaction_list::description(std::list<std::string>* info, int level)
+{
+	for (auto current = m_effect.begin(); current != m_effect.end(); current++)
+	{
+		(*current)->description(info, level);
+	}
+}
+
+
+// Patameter_list
+
+Parameter_list::Parameter_list(interaction_e subtype) :m_subtype(subtype) {};
+
+void Parameter_list::update_list(Object_interaction* list)
+{
+
+	switch (list->m_interaction_message_type)
+	{
+	case interaction_message_type_e::list:
+	{
+		Interaction_list* list_item = static_cast<Interaction_list*>(list);
+		for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); current++)
+		{
+			update_list((*current));
+		}
+		break;
+	}
+	case interaction_message_type_e::slot_time:
+	{
+		LOG(INFO) << "buff in parameter";
+		Interaction_time* item = static_cast<Interaction_time*>(list);
+		update_list(item->m_value);
+		break;
+	}
+	default:
+	{
+		Effect* item;
+		item = static_cast<Effect*>(list);
+		switch (item->m_subtype)
+		{
+		case effect_e::value:
+		{
+			m_value = m_value + item->m_value;
+			break;
+		}
+		case effect_e::limit:
+		{
+			m_limit = m_limit + item->m_value;
+			break;
+		}
+		}
+	}
+	}
+
+}
+
+void Parameter_list::update()
+{
+	m_value = m_basic_value;
+	m_limit = m_basic_limit;
+	update_list(this);
+}
+
+std::string Parameter_list::get_description()
+{
+	std::string result = std::to_string(m_value) + "/" + std::to_string(m_limit) + ",";
+	for (auto current = m_effect.begin(); current != m_effect.end(); current++)
+	{
+		result += (*current)->get_description() + ",";
+	}
+	return result;
+}
+
+Parameter_list* Parameter_list::clone()
+{
+	Parameter_list* result = new Parameter_list(m_subtype);
+	result->m_list_type = m_list_type;
+	result->m_basic_limit = m_basic_limit;
+	result->m_basic_value = m_basic_value;
+	result->m_value = m_value;
+	result->m_limit = m_limit;
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		result->add((*item)->clone());
+	}
+	return result;
+}
+
+void Parameter_list::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + std::to_string(m_value) + "(" + std::to_string(m_basic_value) + ")/" + std::to_string(m_limit) + "(" + std::to_string(m_basic_limit) + "):");
+	for (auto current = m_effect.begin(); current != m_effect.end(); current++)
+	{
+		(*current)->description(info, level);
+	}
+}
+
+// Tag_list
+
+Tag_list::Tag_list()
+{
+	m_interaction_message_type = interaction_message_type_e::list;
+}
+
+Tag_list* Tag_list::clone()
+{
+	Tag_list* result = new Tag_list();
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		result->m_effect.push_back((*item)->clone());
+	}
+	return result;
+}
+
+// Parts_list
+
+Parts_list::Parts_list()
+{
+	m_interaction_message_type = interaction_message_type_e::list;
+}
+
+Parts_list* Parts_list::clone()
+{
+	Parts_list* result = new Parts_list();
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		result->m_effect.push_back((*item)->clone());
+	}
+	return result;
+}
+
+// Action_list
+
+Action_list::Action_list() {};
+
+Interaction_list* Action_list::clone()
+{
+	Action_list* result = new Action_list();
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		result->m_effect.push_back((*item)->clone());
+	}
+	return result;
+}
 
 Slot_set_state* Slot_set_state::clone()
 {
@@ -189,177 +400,7 @@ void Effect::apply_effect(GameObject* unit, Object_interaction* object)
 	}
 }
 
-Interaction_list::Interaction_list()
-{
-	m_interaction_message_type = interaction_message_type_e::list;
-}
 
-bool Interaction_list::on_turn()
-{
-	bool result = false;
-	for (auto item = m_effect.begin(); item != m_effect.end();)
-	{
-		if ((*item)->on_turn())
-		{
-			item = m_effect.erase(item);
-		}
-		else
-			++item;
-	}
-	return true;
-}
-
-std::string Interaction_list::get_description()
-{
-	std::string result = "";
-	for (auto current = m_effect.begin(); current != m_effect.end(); current++)
-	{
-		result += (*current)->get_description() + ",";
-	}
-	return result;
-}
-
-void Interaction_list::update()
-{
-}
-
-Interaction_list* Interaction_list::clone()
-{
-	Interaction_list* result = new Interaction_list();
-	result->m_list_type = m_list_type;
-	Object_interaction* c;
-	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
-	{
-		c = (*item)->clone();
-		if (c){ result->m_effect.push_back(c); }
-		
-	}
-	return result;
-}
-
-Tag_list::Tag_list()
-{
-	m_interaction_message_type = interaction_message_type_e::list;
-}
-
-Tag_list* Tag_list::clone()
-{
-	Tag_list* result = new Tag_list();
-	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
-	{
-		result->m_effect.push_back((*item)->clone());
-	}
-	return result;
-}
-
-Parts_list::Parts_list()
-{
-	m_interaction_message_type = interaction_message_type_e::list;
-}
-
-Parts_list* Parts_list::clone()
-{
-	Parts_list* result = new Parts_list();
-	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
-	{
-		result->m_effect.push_back((*item)->clone());
-	}
-	return result;
-}
-
-Parameter_list::Parameter_list(interaction_e subtype) :m_subtype(subtype){};
-
-void Parameter_list::update_list(Object_interaction* list)
-{
-	
-		switch (list->m_interaction_message_type)
-		{
-		case interaction_message_type_e::list:
-		{
-			Interaction_list* list_item=static_cast<Interaction_list*>(list);
-			for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); current++)
-			{
-				update_list((*current));
-			}
-			break;
-		}
-		case interaction_message_type_e::slot_time:
-		{
-			LOG(INFO) << "buff in parameter";
-			Interaction_time* item = static_cast<Interaction_time*>(list);
-			update_list(item->m_value);
-			break;
-		}
-		default:
-		{
-			Effect* item;
-			item = static_cast<Effect*>(list);
-			switch (item->m_subtype)
-			{
-			case effect_e::value:
-			{
-				m_value = m_value + item->m_value;
-				break;
-			}
-			case effect_e::limit:
-			{
-				m_limit = m_limit + item->m_value;
-				break;
-			}
-			}
-		}
-		}
-
-}
-
-void Parameter_list::update()
-{
-	m_value = m_basic_value;
-	m_limit = m_basic_limit;
-	update_list(this);
-}
-
-void Interaction_list::apply_effect(GameObject* unit, Object_interaction* object)
-{
-	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
-	{
-		(*item)->apply_effect(unit,object);
-	}
-}
-
-void Interaction_list::do_predicat(predicat func)
-{
-	func(this);
-	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
-	{
-		(*item)->do_predicat(func);
-	}
-}
-
-std::string Parameter_list::get_description()
-{
-	std::string result = std::to_string(m_value) + "/" + std::to_string(m_limit) + ",";
-	for (auto current = m_effect.begin(); current != m_effect.end(); current++)
-	{
-		result += (*current)->get_description() + ",";
-	}
-	return result;
-}
-
-Parameter_list* Parameter_list::clone()
-{
-	Parameter_list* result = new Parameter_list(m_subtype);
-	result->m_list_type = m_list_type;
-	result->m_basic_limit = m_basic_limit;
-	result->m_basic_value = m_basic_value;
-	result->m_value = m_value;
-	result->m_limit = m_limit;
-	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
-	{
-		result->add((*item)->clone());
-	}
-	return result;
-}
 
 //void Interaction_list::add(Object_interaction* item)
 //{
@@ -379,23 +420,6 @@ void Interaction_copyist::description(std::list<std::string>* info, int level)
 {
 	info->push_back(std::string(level, '.') + "<тип параметра:" + Application::instance().m_game_object_manager->get_effect_string(m_subtype) + ">:");
 	m_value->description(info,level+1);
-}
-
-void Interaction_list::description(std::list<std::string>* info, int level)
-{
-	for (auto current = m_effect.begin(); current != m_effect.end(); current++)
-	{
-		(*current)->description(info,level);
-	}
-}
-
-void Parameter_list::description(std::list<std::string>* info, int level)
-{
-	info->push_back(std::string(level, '.') + std::to_string(m_value) + "(" + std::to_string(m_basic_value) + ")/" + std::to_string(m_limit) + "(" + std::to_string(m_basic_limit) + "):");
-	for (auto current = m_effect.begin(); current != m_effect.end(); current++)
-	{
-		(*current)->description(info,level);
-	}
 }
 
 Interaction_timer::Interaction_timer()
@@ -725,18 +749,6 @@ void ObjectTag::Fast_move::apply_effect(GameObject* unit, Object_interaction* ob
 		break;
 	}
 	}
-}
-
-Action_list::Action_list(){};
-
-Interaction_list* Action_list::clone()
-{
-	Action_list* result = new Action_list();
-	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
-	{
-		result->m_effect.push_back((*item)->clone());
-	}
-	return result;
 }
 
 ObjectTag::Label::Label(object_tag_e type) :Object_tag(type){};

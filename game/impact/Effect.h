@@ -3,70 +3,13 @@
 #include "Parameter.h"
 #include <functional>
 
-class Slot_set_state :public Object_interaction
-{
-public:
-
-	object_state_e m_value;
-	Slot_set_state(){ m_interaction_message_type = interaction_message_type_e::set_attribute_map; };
-	virtual void apply_effect(GameObject* unit, Object_interaction* object);
-	virtual bool on_turn() { return false; };
-	virtual std::string get_description() { return "set_state"; };
-	virtual Slot_set_state* clone();
-	virtual void description(std::list<std::string>* info, int level);
-	virtual void do_predicat(predicat func){ func(this); };
-};
-
-class Slot_select_cell :public Object_interaction
-{
-public:
-
-	std::string m_value;
-	Slot_select_cell(){ m_interaction_message_type = interaction_message_type_e::select_location; };
-	virtual void apply_effect(GameObject* unit, Object_interaction* object);
-	virtual bool on_turn() { return false; };
-	virtual std::string get_description() { return "select_location"; };
-	virtual Slot_select_cell* clone();
-	virtual void description(std::list<std::string>* info, int level);
-	virtual void do_predicat(predicat func){ func(this); };
-};
-
-class Slot_allocator :public Object_interaction
-{
-public:
-
-	MapCell* m_value;
-	Slot_allocator(){ m_interaction_message_type = interaction_message_type_e::allocator; };
-	virtual void apply_effect(GameObject* unit, Object_interaction* object);
-	virtual bool on_turn() { return false; };
-	virtual std::string get_description() { return "select_location"; };
-	virtual Slot_allocator* clone();
-	virtual void description(std::list<std::string>* info, int level);
-	virtual void do_predicat(predicat func){ func(this); };
-};
-
-class Slot_mover :public Object_interaction
-{
-public:
-
-	Slot_allocator* m_value;
-	Slot_mover(){ m_interaction_message_type = interaction_message_type_e::mover; };
-	virtual void apply_effect(GameObject* unit, Object_interaction* object);
-	virtual bool on_turn() { return false; };
-	virtual std::string get_description() { return "select_location"; };
-	virtual Slot_mover* clone();
-	virtual void description(std::list<std::string>* info, int level);
-	virtual void do_predicat(predicat func){ func(this); };
-
-};
-
 class Interaction_list :public Object_interaction
 {
 public:
 
 	feature_list_type_e m_list_type;
-
 	std::list<Object_interaction*> m_effect;
+
 	Interaction_list();
 	virtual bool on_turn();
 	virtual std::string get_description();
@@ -77,14 +20,6 @@ public:
 	virtual void add(Object_interaction* item) { m_effect.push_back(item); };
 	virtual void remove(Object_interaction* item) { m_effect.remove(item); };
 	virtual void do_predicat(predicat func);
-};
-
-class Action_list :public Interaction_list
-{
-public:
-
-	Action_list();
-	virtual Interaction_list* clone();
 };
 
 class Parameter_list :public Interaction_list
@@ -123,6 +58,71 @@ public:
 
 	Parts_list();
 	virtual Parts_list* clone();
+
+};
+
+class Action_list :public Interaction_list
+{
+public:
+
+	Action_list();
+	virtual Interaction_list* clone();
+};
+
+class Slot_set_state :public Object_interaction
+{
+public:
+
+	object_state_e m_value;
+	Slot_set_state() { m_interaction_message_type = interaction_message_type_e::set_attribute_map; };
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	virtual bool on_turn() { return false; };
+	virtual std::string get_description() { return "set_state"; };
+	virtual Slot_set_state* clone();
+	virtual void description(std::list<std::string>* info, int level);
+	virtual void do_predicat(predicat func) { func(this); };
+};
+
+class Slot_select_cell :public Object_interaction
+{
+public:
+
+	std::string m_value;
+	Slot_select_cell() { m_interaction_message_type = interaction_message_type_e::select_location; };
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	virtual bool on_turn() { return false; };
+	virtual std::string get_description() { return "select_location"; };
+	virtual Slot_select_cell* clone();
+	virtual void description(std::list<std::string>* info, int level);
+	virtual void do_predicat(predicat func) { func(this); };
+};
+
+class Slot_allocator :public Object_interaction
+{
+public:
+
+	MapCell* m_value;
+	Slot_allocator() { m_interaction_message_type = interaction_message_type_e::allocator; };
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	virtual bool on_turn() { return false; };
+	virtual std::string get_description() { return "select_location"; };
+	virtual Slot_allocator* clone();
+	virtual void description(std::list<std::string>* info, int level);
+	virtual void do_predicat(predicat func) { func(this); };
+};
+
+class Slot_mover :public Object_interaction
+{
+public:
+
+	Slot_allocator* m_value;
+	Slot_mover() { m_interaction_message_type = interaction_message_type_e::mover; };
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	virtual bool on_turn() { return false; };
+	virtual std::string get_description() { return "select_location"; };
+	virtual Slot_mover* clone();
+	virtual void description(std::list<std::string>* info, int level);
+	virtual void do_predicat(predicat func) { func(this); };
 
 };
 
@@ -205,7 +205,7 @@ public:
 	virtual void description(std::list<std::string>* info, int level);
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 };
- 
+
 class Effect :public Object_interaction
 {
 public:
@@ -228,7 +228,7 @@ public:
 	Object_tag(object_tag_e key);
 	virtual void description(std::list<std::string>* info, int level);
 	virtual std::string get_description();
-	virtual Object_tag* clone()=0;
+	virtual Object_tag* clone() = 0;
 	virtual bool on_turn();
 };
 
@@ -250,7 +250,7 @@ namespace ObjectTag
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
 	};
 
-	class Purification_from_poison: public Object_tag
+	class Purification_from_poison : public Object_tag
 	{
 	public:
 		Purification_from_poison();
