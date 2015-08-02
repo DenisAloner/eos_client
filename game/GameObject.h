@@ -82,6 +82,7 @@ public:
 	TileManager* m_tile_manager;
 	light_t* m_light;
 	GLuint m_icon;
+	float m_weight;
 	optical_properties_t* m_optical;
 	float* m_visibility;
 
@@ -103,21 +104,20 @@ public:
 
 };
 
-class GameObject : public  Object_interaction
+class GameObject : public  Object_interaction,public iSerializable
 {
 public:
 
 	Event<VoidEventArgs> event_update;
 
 	std::string m_name;
-	float m_weight;
 	object_direction_e m_direction;
 	bool m_selected;
 	Game_object_owner* m_owner;
 
 	Object_state* m_active_state;
 	std::list<Object_state*> m_state;
-	bool rendering_necessary;
+	//bool rendering_necessary;
 	
 	GameObject();
 
@@ -142,6 +142,9 @@ public:
 	virtual Object_interaction* clone();
 	virtual void description(std::list<std::string>* info, int level);
 	virtual void do_predicat(predicat func);
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 };
 
 class Player

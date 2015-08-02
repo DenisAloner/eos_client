@@ -342,4 +342,10 @@ struct f2dvector_t
 	}
 };
 
+class iSerializable
+{
+	virtual void save(FILE* file) = 0;
+	virtual void load(FILE* file) = 0;
+};
+
 #endif //DEFINITION_H

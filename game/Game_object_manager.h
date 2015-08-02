@@ -14,7 +14,7 @@ class Interaction_copyist;
 class Object_tag;
 class Attribute_map;
 
-class GameObjectManager
+class GameObjectManager:public iSerializable
 {
 public:
 
@@ -116,4 +116,7 @@ public:
 	std::string get_effect_prefix_string(effect_prefix_e key);
 
 	void calculate_ai(GameMap* game_map);
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 };

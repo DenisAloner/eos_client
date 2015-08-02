@@ -60,3 +60,22 @@ bool FileSystem::save_to_file(const std::string& path, bytearray& data)
 		return false;
 	}
 }
+
+void FileSystem::serialize_string(std::string& text,FILE* file)
+{
+	size_t s = text.size();
+	fwrite(&s, sizeof(size_t), 1, file);
+	fwrite(text.c_str(), sizeof(char), s, file);
+}
+
+void FileSystem::deserialize_string(std::string& text, FILE* file)
+{
+	size_t s;
+	fread(&s, sizeof(size_t), 1, file);
+	char* str = new char[s];
+	if (fread(str, sizeof(char), s, file) != s)
+	{
+		std::cout << "error" << std::endl;
+	}
+	text.assign(str, s);
+}

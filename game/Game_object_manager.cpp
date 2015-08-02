@@ -148,7 +148,7 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	case command_e::weight:
 	{
-		m_object->m_weight = std::stof(arg[0]);
+		m_object->m_active_state->m_weight = std::stof(arg[0]);
 		break;
 	}
 	case command_e::optical:
@@ -634,7 +634,6 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 	GameObject* config = m_items.find(unit_name)->second;
 	obj->m_direction = config->m_direction;
 	obj->m_name = config->m_name;
-	obj->m_weight = config->m_weight;
 	Object_state* state;
 	for (std::list<Object_state*>::iterator item = config->m_state.begin(); item != config->m_state.end(); item++)
 	{
@@ -803,4 +802,17 @@ feature_list_type_e GameObjectManager::get_feature_list_type_e(const std::string
 		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
 	}
 	return value->second;
+}
+
+void GameObjectManager::save(FILE* file)
+{
+	for (auto object = m_objects.begin(); object != m_objects.end(); object++)
+	{
+		(*object)->save(file);
+	}
+}
+
+void GameObjectManager::load(FILE* file)
+{
+
 }

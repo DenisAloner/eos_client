@@ -66,6 +66,7 @@ Object_state::Object_state()
 	m_ai = nullptr;
 	m_optical = nullptr;
 	m_visibility = nullptr;
+	m_weight = 0.0F;
 }
 
 Object_state* Object_state::clone()
@@ -78,6 +79,7 @@ Object_state* Object_state::clone()
 	state->m_tile_manager = m_tile_manager;
 	state->m_light = m_light;
 	state->m_icon = m_icon;
+	state->m_weight = m_weight;
 	if (m_ai)
 	{
 		state->m_ai = m_ai->clone();
@@ -179,8 +181,7 @@ GameObject::GameObject()
 	m_direction = object_direction_e::down;
 	m_selected = false;
 	m_active_state = nullptr;
-	m_weight = 0.0;
-	rendering_necessary = false;
+	//rendering_necessary = false;
 }
 
 bool GameObject::on_turn()
@@ -436,6 +437,17 @@ void GameObject::update_interaction()
 			item->second->update();
 		}
 	}
+}
+
+
+void GameObject::save(FILE* file)
+{
+	FileSystem::instance().serialize_string(m_name, file);
+}
+
+void GameObject::load(FILE* file)
+{
+
 }
 
 Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)

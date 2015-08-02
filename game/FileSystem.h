@@ -24,6 +24,8 @@ public:
 
 	bool load_from_file(const std::string& path, bytearray& data);
 	bool save_to_file(const std::string& path, bytearray& data);
+	void serialize_string(std::string& text, FILE* file);
+	void deserialize_string(std::string& text, FILE* file);
 
 private:
 	FileSystem();

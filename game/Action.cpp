@@ -225,9 +225,9 @@ bool ActionClass_Push::check(Parameter* parameter)
 	auto* prop = p->m_unit->get_parameter(interaction_e::strength);
 	if (prop != nullptr)
 	{
-		if (prop->m_value * 10 < p->m_object->m_weight)
+		if (prop->m_value * 10 < p->m_object->m_active_state->m_weight)
 		{
-			m_error = "Вы слишком слабы: нужно " + std::to_string(p->m_object->m_weight / 10) + " силы.";
+			m_error = "Вы слишком слабы: нужно " + std::to_string(p->m_object->m_active_state->m_weight / 10) + " силы.";
 			return false;
 		}
 	}

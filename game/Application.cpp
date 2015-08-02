@@ -428,6 +428,21 @@ void Application::initialize()
 		m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 	}*/
 
+	FILE* file;
+	errno_t err;
+
+	err = fopen_s(&file, (FileSystem::instance().m_resource_path + "Saves\\save_01.txt").c_str(), "wb");
+	if (err == 0)
+	{
+		m_game_object_manager->save(file);
+		fclose(file);
+		LOG(INFO) << "Сохранение завершено успешно";
+	}
+	else
+	{
+		LOG(INFO) << "Сохранение не завершено из-за ошибки";
+	}
+
 	m_ready = true;
 }
 
