@@ -54,6 +54,7 @@ object_state_e GameObjectManager::get_object_state_e(const std::string& key)
 
 void GameObjectManager::parser(const std::string& command)
 {
+	LOG(INFO) << command;
 	std::size_t found = 0;
 	std::string args;
 	command_e key;
@@ -171,60 +172,9 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->m_active_state->m_icon = Application::instance().m_graph->load_texture(FileSystem::instance().m_resource_path + "Tiles\\" + arg[0] + ".bmp");
 		break;
 	}
-	case command_e::tile_manager_single:
+	case command_e::tile_manager:
 	{
-		m_object->m_active_state->m_tile_manager = new TileManager_Single();
-		m_object->m_active_state->m_tile_manager->load_from_file(arg[0], object_direction_e::down, 0);
-		break;
-	}
-	case command_e::tile_manager_single_animate:
-	{
-		if (m_object->m_active_state->m_tile_manager == nullptr)
-		{
-			m_object->m_active_state->m_tile_manager = new TileManager_Single_animate();
-		}
-		m_object->m_active_state->m_tile_manager->load_from_file(arg[0], object_direction_e::down, std::stoi(arg[1]));
-		break;
-	}
-	case command_e::tile_manager_map:
-	{
-		if (m_object->m_active_state->m_tile_manager == nullptr)
-		{
-			m_object->m_active_state->m_tile_manager = new TileManager_Map();
-		}
-		object_direction_e dir;
-		int frame;
-		std::string name;
-		name = arg[0];
-		dir = static_cast<object_direction_e>(std::stoi(arg[1]));
-		frame = std::stoi(arg[2]);
-		m_object->m_active_state->m_tile_manager->load_from_file(name, dir, frame);
-		break;
-	}
-	case command_e::tile_manager_rotating:
-	{
-		if (m_object->m_active_state->m_tile_manager == nullptr)
-		{
-			m_object->m_active_state->m_tile_manager = new TileManager_rotating();
-		}
-		object_direction_e dir;
-		std::string name;
-		name = arg[0];
-		dir = static_cast<object_direction_e>(std::stoi(arg[1]));
-		m_object->m_active_state->m_tile_manager->load_from_file(name, dir, 0);
-		break;
-	}
-	case command_e::tile_manager_rotating8:
-	{
-		if (m_object->m_active_state->m_tile_manager == nullptr)
-		{
-			m_object->m_active_state->m_tile_manager = new TileManager_rotating8();
-		}
-		object_direction_e dir;
-		std::string name;
-		name = arg[0];
-		dir = static_cast<object_direction_e>(std::stoi(arg[1]));
-		m_object->m_active_state->m_tile_manager->load_from_file(name, dir, 0);
+		m_object->m_active_state->m_tile_manager = Application::instance().m_graph->m_tile_managers[std::stoi(arg[0])];
 		break;
 	}
 	case command_e::light:
@@ -469,11 +419,7 @@ void GameObjectManager::init()
 	m_commands["visibility"] = command_e::visibility;
 	m_commands["layer"] = command_e::layer;
 	m_commands["icon"] = command_e::icon;
-	m_commands["tile_manager_single"] = command_e::tile_manager_single;
-	m_commands["tile_manager_single_animate"] = command_e::tile_manager_single_animate;
-	m_commands["tile_manager_map"] = command_e::tile_manager_map;
-	m_commands["tile_manager_rotating"] = command_e::tile_manager_rotating;
-	m_commands["tile_manager_rotating8"] = command_e::tile_manager_rotating8;
+	m_commands["tile_manager"] = command_e::tile_manager;
 	m_commands["light"] = command_e::light;
 	m_commands["add_action"] = command_e::add_action;
 	m_commands["add_slot"] = command_e::add_slot;
@@ -670,11 +616,9 @@ void GameObjectManager::update_buff()
 		{
 			if ((*item).second->m_interaction_message_type == interaction_message_type_e::list)
 			{
-				LOG(INFO) << "in";
 				e = static_cast<Interaction_list*>((*item).second);
 				if (e->m_list_type == feature_list_type_e::parameter)
 				{
-					LOG(INFO) << "in 2";
 					e->on_turn();
 				}
 			}

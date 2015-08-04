@@ -1,5 +1,6 @@
 #include "GraphicalController.h"
 #include "utils/log.h"
+#include "TileManager.h"
 
 
 GraphicalController::GraphicalController()
@@ -35,6 +36,7 @@ GraphicalController::GraphicalController()
 		m_no_image = load_texture(FileSystem::instance().m_resource_path + "Tiles\\no_tile.bmp");
 		m_no_visible = load_texture(FileSystem::instance().m_resource_path + "Tiles\\no_visible.bmp");
 		m_novisible = load_texture(FileSystem::instance().m_resource_path + "Tiles\\novisible.bmp");
+		load_configuration();
 	}
 	catch(std::logic_error e)
 	{
@@ -423,4 +425,108 @@ GLint GraphicalController::create_empty_texture(dimension_t size)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.w, size.h, 0, GL_BGRA, GL_UNSIGNED_BYTE, nullptr);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	return texture;
+}
+
+void GraphicalController::parser(const std::string& command)
+{
+	LOG(INFO) << command;
+	std::size_t found = 0;
+	std::string args;
+	command_e key;
+	std::vector<std::string> arg;
+	found = command.find(" ");
+	if (found != std::string::npos)
+	{
+		key = m_commands.find(command.substr(0, found))->second;
+		args = command.substr(found + 1);
+		std::size_t pos = 0;
+		do
+		{
+			found = args.find(",", pos);
+			if (found != -1)
+			{
+				arg.push_back(args.substr(pos, found - pos));
+				pos = found + 1;
+			}
+			else break;
+		} while (true);
+		arg.push_back(args.substr(pos));
+	}
+	else {
+		key = m_commands.find(command)->second;
+	}
+	switch (key)
+	{
+	case command_e::single:
+	{
+		TileManager_Single* m_tile_manager = new TileManager_Single();
+		m_tile_manager->load_from_file(arg[0], object_direction_e::down, 0);
+		m_tile_managers.push_back(m_tile_manager);
+		break;
+	}
+	case command_e::single_animate:
+	{
+		TileManager_Single_animate* m_tile_manager = new TileManager_Single_animate();
+		m_tile_manager->load_from_file(arg[0], object_direction_e::down, 0);
+		m_tile_manager->load_from_file(arg[1], object_direction_e::down, 1);
+		m_tile_manager->load_from_file(arg[2], object_direction_e::down, 2);
+		m_tile_manager->load_from_file(arg[3], object_direction_e::down, 3);
+		m_tile_managers.push_back(m_tile_manager);
+		break;
+	}
+	case command_e::rotating:
+	{
+		TileManager_rotating* m_tile_manager = new TileManager_rotating();
+		m_tile_manager->load_from_file(arg[0], object_direction_e::top, 0);
+		m_tile_manager->load_from_file(arg[1], object_direction_e::right, 2);
+		m_tile_manager->load_from_file(arg[2], object_direction_e::down, 4);
+		m_tile_manager->load_from_file(arg[3], object_direction_e::left, 6);
+		m_tile_managers.push_back(m_tile_manager);
+		break;
+	}
+	case command_e::rotating8:
+	{
+		TileManager_rotating8* m_tile_manager = new TileManager_rotating8();
+		m_tile_manager->load_from_file(arg[0] + "_top", object_direction_e::top, 0);
+		m_tile_manager->load_from_file(arg[0] + "_topright", object_direction_e::topright, 1);
+		m_tile_manager->load_from_file(arg[0] + "_right", object_direction_e::right, 2);
+		m_tile_manager->load_from_file(arg[0] + "_downright", object_direction_e::downright, 3);
+		m_tile_manager->load_from_file(arg[0] + "_down", object_direction_e::down, 4);
+		m_tile_manager->load_from_file(arg[0] + "_downleft", object_direction_e::downleft, 5);
+		m_tile_manager->load_from_file(arg[0] + "_left", object_direction_e::left, 6);
+		m_tile_manager->load_from_file(arg[0] + "_topleft", object_direction_e::topleft, 7);
+		m_tile_managers.push_back(m_tile_manager);
+		break;
+	}
+	}
+}
+
+void GraphicalController::load_configuration()
+{
+	m_commands["single"] = command_e::single;
+	m_commands["single_animate"] = command_e::single_animate;
+	m_commands["rotating"] = command_e::rotating;
+	m_commands["rotating8"] = command_e::rotating8;
+	bytearray buffer;
+	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Tiles.txt", buffer);
+	std::string config(buffer);
+	std::size_t pos = 0;
+	std::size_t found = 0;
+	while (pos != std::string::npos)
+	{
+		found = config.find("\r\n", pos);
+		if (found != std::string::npos)
+		{
+			if (found - pos > 0)
+			{
+				parser(config.substr(pos, found - pos));
+
+			}
+			pos = found + 2;
+		}
+		else {
+			parser(config.substr(pos));
+			pos = std::string::npos;
+		}
+	}
 }

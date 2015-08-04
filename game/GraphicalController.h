@@ -9,10 +9,12 @@
 #include <list>
 #include <vector>
 #include "FileSystem.h"
+#include <map>
 
 #define WIDTH   640
 #define HEIGHT  480
 
+class TileManager;
 
 class GraphicalController
 {
@@ -36,7 +38,18 @@ public:
 	GLuint m_no_visible;
 	GLuint m_novisible;
 	GLuint m_blur;
+
+	enum class command_e
+	{
+		single,
+		single_animate,
+		rotating,
+		rotating8,
+	};
+
 	std::list<frectangle_t> m_scissors;
+	std::vector<TileManager*> m_tile_managers;
+	std::map<std::string, command_e> m_commands;
 
 	GLuint m_FBO;
 
@@ -62,11 +75,16 @@ public:
 	void draw_tile(tile_t& tile, double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
 	void draw_tile_FBO(double tx1, double ty1, double tx2, double ty2, double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
 	GLint create_empty_texture(dimension_t size);
+	void load_configuration();
+	void parser(const std::string& command);
 
 private:
 	bool CompileSuccessful(int obj);
 	bool LinkSuccessful(int obj);
 	bool ValidateSuccessful(int obj);
+
+
+	
 };
 
 #endif //GRAPHICALCONTROLLER_H
