@@ -147,6 +147,21 @@ void Object_state::set_tile_size()
 	m_tile_size = dimension_t(tile_size_x_half*(m_size.x + m_size.y), tile_size_y_half*(m_size.x + m_size.y) + m_size.z * 18);
 }
 
+void Object_state::save(FILE* file)
+{
+	fwrite(&m_state, sizeof(object_state_e), 1, file);
+	fwrite(&m_layer, sizeof(int), 1, file);
+	fwrite(&m_size, sizeof(game_object_size_t), 1, file);
+	fwrite(&m_weight, sizeof(float), 1, file);
+	FileSystem::instance().serialize_pointer(m_light, type_e::light_t, file);
+}
+
+void Object_state::load(FILE* file)
+{
+
+}
+
+
 Game_object_owner::Game_object_owner(){}
 
 MapCell::MapCell(int x, int y, GameMap* map) :x(x), y(y), m_map(map)
@@ -443,6 +458,13 @@ void GameObject::update_interaction()
 void GameObject::save(FILE* file)
 {
 	FileSystem::instance().serialize_string(m_name, file);
+	fwrite(&m_direction, sizeof(object_direction_e), 1, file);
+	size_t s = m_state.size();
+	fwrite(&s, sizeof(size_t), 1, file);
+	for (auto item = m_state.begin(); item != m_state.end(); item++)
+	{
+		(*item)->save(file);
+	}
 }
 
 void GameObject::load(FILE* file)

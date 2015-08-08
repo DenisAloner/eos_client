@@ -70,7 +70,7 @@ public:
 	Attribute_map* clone();
 };
 
-class Object_state : public  Attribute_map
+class Object_state : public  Attribute_map, public iSerializable
 {
 public:
 
@@ -92,6 +92,9 @@ public:
 	virtual void set_tile_size();
 	Object_state();
 	virtual Object_state* clone();
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 };
 
 class Object_state_equip :public Object_state
@@ -104,7 +107,7 @@ public:
 
 };
 
-class GameObject : public  Object_interaction,public iSerializable
+class GameObject : public  Object_interaction, public iSerializable
 {
 public:
 

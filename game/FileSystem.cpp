@@ -79,3 +79,24 @@ void FileSystem::deserialize_string(std::string& text, FILE* file)
 	}
 	text.assign(str, s);
 }
+
+void FileSystem::serialize_pointer(const void* value, type_e object_type, FILE* file)
+{
+	if (value == nullptr)
+	{
+		object_type = type_e::null;
+		fwrite(&object_type, sizeof(type_e), 1, file);
+	}
+	else
+	{
+		switch (object_type)
+		{
+		case type_e::light_t:
+		{
+			fwrite(&object_type, sizeof(type_e), 1, file);
+			fwrite(value, sizeof(light_t), 1, file);
+			break;
+		}
+		}
+	}
+}

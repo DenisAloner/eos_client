@@ -6,6 +6,7 @@
 #include <iostream>
 #include <memory>
 #include "utils/bytearray.h"
+#include "Definiton.h"
 
 
 class FileSystem
@@ -26,6 +27,7 @@ public:
 	bool save_to_file(const std::string& path, bytearray& data);
 	void serialize_string(std::string& text, FILE* file);
 	void deserialize_string(std::string& text, FILE* file);
+	void serialize_pointer(const void* value, type_e object_type, FILE* file);
 
 private:
 	FileSystem();

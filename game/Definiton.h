@@ -348,4 +348,10 @@ class iSerializable
 	virtual void load(FILE* file) = 0;
 };
 
+enum class type_e
+{
+	null,
+	light_t
+};
+
 #endif //DEFINITION_H
