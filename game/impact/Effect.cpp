@@ -78,6 +78,22 @@ void Interaction_list::description(std::list<std::string>* info, int level)
 	}
 }
 
+void Interaction_list::save(FILE* file)
+{
+	type_e t = type_e::interaction_list;
+	fwrite(&t, sizeof(type_e), 1, file);
+	size_t s = m_effect.size();
+	fwrite(&s, sizeof(size_t), 1, file);
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		(*item)->save(file);
+	}
+}
+
+void Interaction_list::load(FILE* file)
+{
+
+}
 
 // Patameter_list
 
@@ -167,6 +183,29 @@ void Parameter_list::description(std::list<std::string>* info, int level)
 	}
 }
 
+void Parameter_list::save(FILE* file)
+{
+	type_e t = type_e::parameter_list;
+	fwrite(&t, sizeof(type_e), 1, file);
+
+	fwrite(&m_basic_value, sizeof(int), 1, file);
+	fwrite(&m_basic_limit, sizeof(int), 1, file);
+	fwrite(&m_value, sizeof(int), 1, file);
+	fwrite(&m_limit, sizeof(int), 1, file);
+
+	size_t s = m_effect.size();
+	fwrite(&s, sizeof(size_t), 1, file);
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		(*item)->save(file);
+	}
+}
+
+void Parameter_list::load(FILE* file)
+{
+
+}
+
 // Tag_list
 
 Tag_list::Tag_list()
@@ -215,6 +254,8 @@ Interaction_list* Action_list::clone()
 	return result;
 }
 
+// Slot_set_state
+
 Slot_set_state* Slot_set_state::clone()
 {
 	Slot_set_state* effect = new Slot_set_state();
@@ -232,6 +273,19 @@ void Slot_set_state::apply_effect(GameObject* unit, Object_interaction* object)
 {
 	unit->set_state(m_value);
 }
+
+void Slot_set_state::save(FILE* file)
+{
+	type_e t = type_e::slot_set_state;
+	fwrite(&t, sizeof(type_e), 1, file);
+	fwrite(&m_value, sizeof(object_state_e), 1, file);
+}
+
+void Slot_set_state::load(FILE* file)
+{
+}
+
+// Slot_select_cell
 
 void Slot_select_cell::description(std::list<std::string>* info, int level)
 {
@@ -273,6 +327,19 @@ void Slot_select_cell::apply_effect(GameObject* unit, Object_interaction* object
 	};
 }
 
+void Slot_select_cell::save(FILE* file)
+{
+	type_e t = type_e::slot_select_cell;
+	fwrite(&t, sizeof(type_e), 1, file);
+	FileSystem::instance().serialize_string(m_value, file);
+}
+
+void Slot_select_cell::load(FILE* file)
+{
+}
+
+
+// Slot_allocator
 
 void Slot_allocator::description(std::list<std::string>* info, int level)
 {
@@ -297,6 +364,18 @@ void Slot_allocator::apply_effect(GameObject* unit, Object_interaction* object)
 	};
 }
 
+void Slot_allocator::save(FILE* file)
+{
+	type_e t = type_e::slot_allocator;
+	fwrite(&t, sizeof(type_e), 1, file);
+}
+
+void Slot_allocator::load(FILE* file)
+{
+}
+
+// Slot_mover
+
 void Slot_mover::description(std::list<std::string>* info, int level)
 {
 	info->push_back(std::string(level, '.') + "переместить объект:");
@@ -320,6 +399,18 @@ void Slot_mover::apply_effect(GameObject* unit, Object_interaction* object)
 	map->move_object(unit, m_value->m_value);
 }
 
+void Slot_mover::save(FILE* file)
+{
+	type_e t = type_e::slot_mover;
+	fwrite(&t, sizeof(type_e), 1, file);
+}
+
+void Slot_mover::load(FILE* file)
+{
+}
+
+// Interaction_slot
+
 Interaction_slot::Interaction_slot()
 {
 }
@@ -335,10 +426,28 @@ void Interaction_slot::do_predicat(predicat func)
 	m_value->do_predicat(func);
 }
 
+
+void Interaction_slot::save(FILE* file)
+{
+	type_e t = type_e::interaction_slot;
+	fwrite(&t, sizeof(type_e), 1, file);
+}
+
+void Interaction_slot::load(FILE* file)
+{
+}
+
+// Interaction_copyist
+
+Interaction_copyist::Interaction_copyist()
+{
+}
+
 std::string Interaction_copyist::get_description()
 {
 	return "slot";
 }
+
 
 Object_interaction* Interaction_copyist::clone()
 {
@@ -348,6 +457,249 @@ Object_interaction* Interaction_copyist::clone()
 	effect->m_value = m_value->clone();
 	return effect;
 }
+
+void Interaction_copyist::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "<тип параметра:" + Application::instance().m_game_object_manager->get_effect_string(m_subtype) + ">:");
+	m_value->description(info, level + 1);
+}
+
+void Interaction_copyist::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	auto i = unit->get_effect(m_subtype);
+	if (i)
+	{
+		m_value->apply_effect(unit, i);
+	}
+}
+
+void Interaction_copyist::save(FILE* file)
+{
+	type_e t = type_e::interaction_copyist;
+	fwrite(&t, sizeof(type_e), 1, file);
+}
+
+void Interaction_copyist::load(FILE* file)
+{
+}
+
+// Interaction_prefix
+
+Interaction_prefix::Interaction_prefix() {};
+
+void Interaction_prefix::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "<тип эффекта:" + Application::instance().m_game_object_manager->get_effect_prefix_string(m_subtype) + ">:");
+	m_value->description(info, level + 1);
+}
+
+Interaction_prefix* Interaction_prefix::clone()
+{
+	Interaction_prefix* effect = new Interaction_prefix();
+	effect->m_subtype = m_subtype;
+	effect->m_value = m_value->clone();
+	return effect;
+}
+
+void Interaction_prefix::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	Tag_list* i = static_cast<Tag_list*>(unit->get_effect(interaction_e::tag));
+	if (i)
+	{
+		for (auto item = i->m_effect.begin(); item != i->m_effect.end(); item++)
+		{
+			(*item)->apply_effect(unit, this);
+		}
+	}
+	if (m_value) { m_value->apply_effect(unit, object); }
+}
+
+std::string Interaction_prefix::get_description()
+{
+	return "none";
+}
+
+
+void Interaction_prefix::save(FILE* file)
+{
+	type_e t = type_e::interaction_prefix;
+	fwrite(&t, sizeof(type_e), 1, file);
+}
+
+void Interaction_prefix::load(FILE* file)
+{
+}
+
+// Interaction_prefix_ex
+
+Interaction_prefix_ex* Interaction_prefix_ex::clone()
+{
+	Interaction_prefix_ex* effect = new Interaction_prefix_ex();
+	effect->m_subtype = m_subtype;
+	effect->m_value = m_value;
+	effect->m_effect = m_effect;
+	return effect;
+}
+
+void Interaction_prefix_ex::save(FILE* file)
+{
+	type_e t = type_e::interaction_prefix_ex;
+	fwrite(&t, sizeof(type_e), 1, file);
+}
+
+void Interaction_prefix_ex::load(FILE* file)
+{
+}
+
+// Interaction_addon
+
+Interaction_addon::Interaction_addon() {};
+
+std::string Interaction_addon::get_description()
+{
+	return "slot";
+}
+
+Object_interaction* Interaction_addon::clone()
+{
+	Interaction_addon* effect = new Interaction_addon();
+	effect->m_interaction_message_type = m_interaction_message_type;
+	effect->m_subtype = m_subtype;
+	effect->m_value = m_value->clone();
+	return effect;
+}
+
+void Interaction_addon::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "<наложение эффекта:" + Application::instance().m_game_object_manager->get_effect_string(m_subtype) + ">:");
+	m_value->description(info, level + 1);
+}
+
+void Interaction_addon::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	unit->add_effect(m_subtype, m_value->clone());
+}
+
+void Interaction_addon::save(FILE* file)
+{
+	type_e t = type_e::interaction_addon;
+	fwrite(&t, sizeof(type_e), 1, file);
+}
+
+void Interaction_addon::load(FILE* file)
+{
+}
+
+// Interaction_time
+
+Interaction_time::Interaction_time()
+{
+
+}
+
+bool Interaction_time::on_turn()
+{
+	m_turn -= 1;
+	if (m_turn == 0)
+	{
+		m_value = nullptr;
+		return true;
+	}
+	else return false;
+}
+
+std::string Interaction_time::get_description()
+{
+	return "slot";
+}
+
+Object_interaction* Interaction_time::clone()
+{
+	Interaction_time* effect = new Interaction_time();
+	effect->m_interaction_message_type = m_interaction_message_type;
+	effect->m_turn = m_turn;
+	effect->m_value = m_value->clone();
+	return effect;
+}
+
+void Interaction_time::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "<длительное наложение эффекта:" + std::to_string(m_turn) + ">:");
+	m_value->description(info, level + 1);
+}
+
+void Interaction_time::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	m_value->apply_effect(unit, object);
+}
+
+void Interaction_time::save(FILE* file)
+{
+	type_e t = type_e::interaction_time;
+	fwrite(&t, sizeof(type_e), 1, file);
+}
+
+void Interaction_time::load(FILE* file)
+{
+}
+
+// Interaction_timer
+
+Interaction_timer::Interaction_timer()
+{
+	m_interaction_message_type = interaction_message_type_e::slot_time;
+}
+
+bool Interaction_timer::on_turn()
+{
+	m_turn += 1;
+	if (m_turn > m_period)
+	{
+		m_turn = 0;
+	}
+	return m_value->on_turn();
+}
+
+std::string Interaction_timer::get_description()
+{
+	return "slot";
+}
+
+Object_interaction* Interaction_timer::clone()
+{
+	Interaction_timer* effect = new Interaction_timer();
+	effect->m_interaction_message_type = m_interaction_message_type;
+	effect->m_turn = m_turn;
+	effect->m_period = m_period;
+	effect->m_value = m_value->clone();
+	return effect;
+}
+
+void Interaction_timer::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "<цикличное наложение эффекта:" + std::to_string(m_turn) + "(" + std::to_string(m_period) + ")>:");
+	m_value->description(info, level + 1);
+}
+
+void Interaction_timer::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	if (m_turn == m_period - 1)
+	{
+		m_value->apply_effect(unit, object);
+	}
+}
+
+void Interaction_timer::save(FILE* file)
+{
+	type_e t = type_e::interaction_timer;
+	fwrite(&t, sizeof(type_e), 1, file);
+}
+
+void Interaction_timer::load(FILE* file)
+{
+}
+
+// Effect
 
 Effect::Effect()
 {
@@ -401,194 +753,22 @@ void Effect::apply_effect(GameObject* unit, Object_interaction* object)
 }
 
 
-
-//void Interaction_list::add(Object_interaction* item)
-//{
-//	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
-//	{
-//		(*item)->apply(object);
-//	}
-//}
-
-
 void Effect::description(std::list<std::string>* info, int level)
 {
 	info->push_back(std::string(level,'.')+Application::instance().m_game_object_manager->get_effect_subtype_string(m_subtype) + ":" + std::to_string(m_value));
 }
 
-void Interaction_copyist::description(std::list<std::string>* info, int level)
+void Effect::save(FILE* file)
 {
-	info->push_back(std::string(level, '.') + "<тип параметра:" + Application::instance().m_game_object_manager->get_effect_string(m_subtype) + ">:");
-	m_value->description(info,level+1);
+	type_e t = type_e::effect;
+	fwrite(&t, sizeof(type_e), 1, file);
 }
 
-Interaction_timer::Interaction_timer()
-{
-	m_interaction_message_type = interaction_message_type_e::slot_time;
-}
-
-bool Interaction_timer::on_turn()
-{
-	m_turn += 1;
-	if (m_turn > m_period)
-	{
-		m_turn = 0;
-	}
-	return m_value->on_turn();
-}
-
-std::string Interaction_timer::get_description()
-{
-	return "slot";
-}
-
-Object_interaction* Interaction_timer::clone()
-{
-	Interaction_timer* effect = new Interaction_timer();
-	effect->m_interaction_message_type = m_interaction_message_type;
-	effect->m_turn = m_turn;
-	effect->m_period = m_period;
-	effect->m_value = m_value->clone();
-	return effect;
-}
-
-void Interaction_timer::description(std::list<std::string>* info, int level)
-{
-	info->push_back(std::string(level, '.') + "<цикличное наложение эффекта:" + std::to_string(m_turn) + "(" + std::to_string(m_period) + ")>:");
-	m_value->description(info, level + 1);
-}
-
-void Interaction_copyist::apply_effect(GameObject* unit, Object_interaction* object)
-{
-	auto i = unit->get_effect(m_subtype);
-	if (i)
-	{
-		m_value->apply_effect(unit, i);
-	}
-}
-
-void Interaction_timer::apply_effect(GameObject* unit, Object_interaction* object)
-{
-	if (m_turn == m_period - 1)
-	{
-		m_value->apply_effect(unit, object);
-	}
-}
-
-Interaction_copyist::Interaction_copyist()
+void Effect::load(FILE* file)
 {
 }
 
-Interaction_time::Interaction_time()
-{
-
-}
-
-bool Interaction_time::on_turn()
-{
-	m_turn -= 1;
-	if (m_turn == 0)
-	{
-		m_value = nullptr;
-		return true;
-	}
-	else return false;
-}
-
-std::string Interaction_time::get_description()
-{
-	return "slot";
-}
-
-Object_interaction* Interaction_time::clone()
-{
-	Interaction_time* effect = new Interaction_time();
-	effect->m_interaction_message_type = m_interaction_message_type;
-	effect->m_turn = m_turn;
-	effect->m_value = m_value->clone();
-	return effect;
-}
-
-void Interaction_time::description(std::list<std::string>* info, int level)
-{
-	info->push_back(std::string(level, '.') + "<длительное наложение эффекта:" + std::to_string(m_turn) + ">:");
-	m_value->description(info, level + 1);
-}
-
-void Interaction_time::apply_effect(GameObject* unit, Object_interaction* object)
-{
-	m_value->apply_effect(unit,object);
-}
-
-std::string Interaction_prefix::get_description()
-{
-	return "none";
-}
-
-Interaction_prefix::Interaction_prefix(){};
-
-void Interaction_prefix::description(std::list<std::string>* info, int level)
-{
-	info->push_back(std::string(level, '.') + "<тип эффекта:" + Application::instance().m_game_object_manager->get_effect_prefix_string(m_subtype) + ">:");
-	m_value->description(info, level + 1);
-}
-
-Interaction_prefix* Interaction_prefix::clone()
-{
-	Interaction_prefix* effect = new Interaction_prefix();
-	effect->m_subtype = m_subtype;
-	effect->m_value = m_value->clone();
-	return effect;
-}
-
-Interaction_prefix_ex* Interaction_prefix_ex::clone()
-{
-	Interaction_prefix_ex* effect = new Interaction_prefix_ex();
-	effect->m_subtype = m_subtype;
-	effect->m_value = m_value;
-	effect->m_effect = m_effect;
-	return effect;
-}
-
-void Interaction_prefix::apply_effect(GameObject* unit, Object_interaction* object)
-{
-	Tag_list* i = static_cast<Tag_list*>(unit->get_effect(interaction_e::tag));
-	if (i)
-	{
-		for (auto item = i->m_effect.begin(); item != i->m_effect.end(); item++)
-		{
-			(*item)->apply_effect(unit, this);
-		}
-	}
-	if (m_value){ m_value->apply_effect(unit, object); }
-}
-
-Interaction_addon::Interaction_addon(){};
-
-std::string Interaction_addon::get_description()
-{
-	return "slot";
-}
-
-Object_interaction* Interaction_addon::clone()
-{
-	Interaction_addon* effect = new Interaction_addon();
-	effect->m_interaction_message_type = m_interaction_message_type;
-	effect->m_subtype = m_subtype;
-	effect->m_value = m_value->clone();
-	return effect;
-}
-
-void Interaction_addon::description(std::list<std::string>* info, int level)
-{
-	info->push_back(std::string(level, '.') + "<наложение эффекта:" + Application::instance().m_game_object_manager->get_effect_string(m_subtype) + ">:");
-	m_value->description(info, level + 1);
-}
-
-void Interaction_addon::apply_effect(GameObject* unit, Object_interaction* object)
-{
-unit->add_effect(m_subtype, m_value->clone());
-}
+// Object_tag
 
 Object_tag::Object_tag(object_tag_e key) :m_type(key){};
 
@@ -606,6 +786,8 @@ bool Object_tag::on_turn()
 {
 	return false;
 }
+
+// ObjectTag::Poison_resist
 
 ObjectTag::Poison_resist::Poison_resist() :Object_tag(object_tag_e::poison_resist){};
 
@@ -627,6 +809,16 @@ void ObjectTag::Poison_resist::apply_effect(GameObject* unit, Object_interaction
 	}
 	}
 }
+
+void ObjectTag::Poison_resist::save(FILE* file)
+{
+}
+
+void ObjectTag::Poison_resist::load(FILE* file)
+{
+}
+
+// ObjectTag::Mortal
 
 ObjectTag::Mortal::Mortal() :Object_tag(object_tag_e::mortal){};
 
@@ -655,6 +847,16 @@ void ObjectTag::Mortal::apply_effect(GameObject* unit, Object_interaction* objec
 	}
 	}
 }
+
+void ObjectTag::Mortal::save(FILE* file)
+{
+}
+
+void ObjectTag::Mortal::load(FILE* file)
+{
+}
+
+// ObjectTag::Purification_from_poison
 
 ObjectTag::Purification_from_poison::Purification_from_poison() :Object_tag(object_tag_e::purification_from_poison){};
 
@@ -691,6 +893,16 @@ void ObjectTag::Purification_from_poison::apply_effect(GameObject* unit, Object_
 	}
 }
 
+void ObjectTag::Purification_from_poison::save(FILE* file)
+{
+}
+
+void ObjectTag::Purification_from_poison::load(FILE* file)
+{
+}
+
+// ObjectTag::Activator::Activator
+
 ObjectTag::Activator::Activator() :Object_tag(object_tag_e::activator){};
 
 ObjectTag::Activator* ObjectTag::Activator::clone()
@@ -719,6 +931,16 @@ void ObjectTag::Activator::apply_effect(GameObject* unit, Object_interaction* ob
 	}
 	}
 }
+
+void ObjectTag::Activator::save(FILE* file)
+{
+}
+
+void ObjectTag::Activator::load(FILE* file)
+{
+}
+
+// ObjectTag::Fast_move
 
 ObjectTag::Fast_move::Fast_move() :Object_tag(object_tag_e::fast_move) {};
 
@@ -751,6 +973,16 @@ void ObjectTag::Fast_move::apply_effect(GameObject* unit, Object_interaction* ob
 	}
 }
 
+void ObjectTag::Fast_move::save(FILE* file)
+{
+}
+
+void ObjectTag::Fast_move::load(FILE* file)
+{
+}
+
+// ObjectTag::Label
+
 ObjectTag::Label::Label(object_tag_e type) :Object_tag(type){};
 
 ObjectTag::Label* ObjectTag::Label::clone()
@@ -760,3 +992,11 @@ ObjectTag::Label* ObjectTag::Label::clone()
 }
 
 void ObjectTag::Label::apply_effect(GameObject* unit, Object_interaction* object){};
+
+void ObjectTag::Label::save(FILE* file)
+{
+}
+
+void ObjectTag::Label::load(FILE* file)
+{
+}

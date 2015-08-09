@@ -149,6 +149,13 @@ void Object_state::set_tile_size()
 
 void Object_state::save(FILE* file)
 {
+	size_t s = m_item.size();
+	fwrite(&s, sizeof(size_t), 1, file);
+	for (auto item = m_item.begin(); item != m_item.end(); item++)
+	{
+		fwrite(&((*item).first), sizeof(interaction_e), 1, file);
+		(*item).second->save(file);
+	}
 	fwrite(&m_state, sizeof(object_state_e), 1, file);
 	fwrite(&m_layer, sizeof(int), 1, file);
 	fwrite(&m_size, sizeof(game_object_size_t), 1, file);
@@ -542,4 +549,12 @@ void Object_part::do_predicat(predicat func)
 	{
 		item->second->do_predicat(func);
 	}
-};
+}
+
+void Object_part::save(FILE* file)
+{
+}
+
+void Object_part::load(FILE* file)
+{
+}

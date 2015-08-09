@@ -53,6 +53,15 @@ void Action::interaction_handler()
 	}
 }
 
+void Action::save(FILE* file)
+{
+}
+
+void Action::load(FILE* file)
+{
+}
+
+
 Action_wrapper::Action_wrapper()
 {
 	m_action = nullptr;
@@ -69,9 +78,14 @@ Action_wrapper* Action_wrapper::clone()
 	return result;
 }
 
-//void Action_wrapper::perfom(Parameter* parameter)
-//{
-//}
+void Action_wrapper::save(FILE* file)
+{
+}
+
+void Action_wrapper::load(FILE* file)
+{
+}
+
 
 ActionClass_Move::ActionClass_Move()
 {

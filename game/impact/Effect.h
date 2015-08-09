@@ -20,6 +20,10 @@ public:
 	virtual void add(Object_interaction* item) { m_effect.push_back(item); };
 	virtual void remove(Object_interaction* item) { m_effect.remove(item); };
 	virtual void do_predicat(predicat func);
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
+
 };
 
 class Parameter_list :public Interaction_list
@@ -38,6 +42,9 @@ public:
 	virtual void update();
 	virtual Parameter_list* clone();
 	virtual void description(std::list<std::string>* info, int level);
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 
 private:
 	void update_list(Object_interaction* list);
@@ -69,7 +76,7 @@ public:
 	virtual Interaction_list* clone();
 };
 
-class Slot_set_state :public Object_interaction
+class Slot_set_state: public Object_interaction
 {
 public:
 
@@ -81,6 +88,9 @@ public:
 	virtual Slot_set_state* clone();
 	virtual void description(std::list<std::string>* info, int level);
 	virtual void do_predicat(predicat func) { func(this); };
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 };
 
 class Slot_select_cell :public Object_interaction
@@ -95,6 +105,9 @@ public:
 	virtual Slot_select_cell* clone();
 	virtual void description(std::list<std::string>* info, int level);
 	virtual void do_predicat(predicat func) { func(this); };
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 };
 
 class Slot_allocator :public Object_interaction
@@ -109,6 +122,9 @@ public:
 	virtual Slot_allocator* clone();
 	virtual void description(std::list<std::string>* info, int level);
 	virtual void do_predicat(predicat func) { func(this); };
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 };
 
 class Slot_mover :public Object_interaction
@@ -124,6 +140,8 @@ public:
 	virtual void description(std::list<std::string>* info, int level);
 	virtual void do_predicat(predicat func) { func(this); };
 
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 };
 
 class Interaction_slot :public Object_interaction
@@ -134,25 +152,9 @@ public:
 	Interaction_slot();
 	virtual bool on_turn();
 	virtual void do_predicat(predicat func);
-};
 
-class Interaction_prefix :public Interaction_slot
-{
-public:
-
-	effect_prefix_e m_subtype;
-	Interaction_prefix();
-	virtual std::string get_description();
-	virtual Interaction_prefix* clone();
-	virtual void description(std::list<std::string>* info, int level);
-	virtual void apply_effect(GameObject* unit, Object_interaction* object);
-};
-
-class Interaction_prefix_ex :public Interaction_prefix
-{
-public:
-	Object_interaction* m_effect;
-	virtual Interaction_prefix_ex* clone();
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 };
 
 class Interaction_copyist :public Interaction_slot
@@ -165,6 +167,35 @@ public:
 	virtual Object_interaction* clone();
 	virtual void description(std::list<std::string>* info, int level);
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
+};
+
+
+class Interaction_prefix :public Interaction_slot
+{
+public:
+
+	effect_prefix_e m_subtype;
+	Interaction_prefix();
+	virtual std::string get_description();
+	virtual Interaction_prefix* clone();
+	virtual void description(std::list<std::string>* info, int level);
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
+};
+
+class Interaction_prefix_ex :public Interaction_prefix
+{
+public:
+	Object_interaction* m_effect;
+	virtual Interaction_prefix_ex* clone();
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 };
 
 class Interaction_addon :public Interaction_slot
@@ -177,6 +208,9 @@ public:
 	virtual Object_interaction* clone();
 	virtual void description(std::list<std::string>* info, int level);
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 };
 
 class Interaction_time :public Interaction_slot
@@ -190,6 +224,9 @@ public:
 	virtual Object_interaction* clone();
 	virtual void description(std::list<std::string>* info, int level);
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 };
 
 class Interaction_timer :public Interaction_slot
@@ -204,6 +241,9 @@ public:
 	virtual Object_interaction* clone();
 	virtual void description(std::list<std::string>* info, int level);
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 };
 
 class Effect :public Object_interaction
@@ -218,6 +258,9 @@ public:
 	virtual std::string get_description();
 	virtual void description(std::list<std::string>* info, int level);
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 };
 
 class Object_tag :public Object_interaction
@@ -240,6 +283,9 @@ namespace ObjectTag
 		Poison_resist();
 		virtual Poison_resist* clone();
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+		virtual void save(FILE* file);
+		virtual void load(FILE* file);
 	};
 
 	class Mortal :public Object_tag
@@ -248,6 +294,9 @@ namespace ObjectTag
 		Mortal();
 		virtual Mortal* clone();
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+		virtual void save(FILE* file);
+		virtual void load(FILE* file);
 	};
 
 	class Purification_from_poison : public Object_tag
@@ -256,6 +305,9 @@ namespace ObjectTag
 		Purification_from_poison();
 		virtual Purification_from_poison* clone();
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+		virtual void save(FILE* file);
+		virtual void load(FILE* file);
 	};
 
 	class Activator : public Object_tag
@@ -265,6 +317,9 @@ namespace ObjectTag
 		std::list<GameObject*> m_link;
 		virtual Activator* clone();
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+		virtual void save(FILE* file);
+		virtual void load(FILE* file);
 	};
 
 	class Fast_move : public Object_tag
@@ -273,6 +328,9 @@ namespace ObjectTag
 		Fast_move();
 		virtual Fast_move* clone();
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+		virtual void save(FILE* file);
+		virtual void load(FILE* file);
 	};
 
 	class Label : public Object_tag
@@ -281,5 +339,8 @@ namespace ObjectTag
 		Label(object_tag_e type);
 		virtual Label* clone();
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+		virtual void save(FILE* file);
+		virtual void load(FILE* file);
 	};
 }

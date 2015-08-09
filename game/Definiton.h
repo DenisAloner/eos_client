@@ -299,7 +299,14 @@ enum class ai_type_e
 	non_humanoid
 };
 
-class Object_interaction
+class iSerializable
+{
+	virtual void save(FILE* file) = 0;
+	virtual void load(FILE* file) = 0;
+};
+
+
+class Object_interaction: public iSerializable
 {
 public:
 
@@ -313,6 +320,9 @@ public:
 	virtual Object_interaction* clone() = 0;
 	virtual void description(std::list<std::string>* info, int level) = 0;
 	virtual void do_predicat(predicat func){ func(this); };
+
+	virtual void save(FILE* file) = 0;
+	virtual void load(FILE* file) = 0;
 };
 
 class GameTask;
@@ -342,16 +352,25 @@ struct f2dvector_t
 	}
 };
 
-class iSerializable
-{
-	virtual void save(FILE* file) = 0;
-	virtual void load(FILE* file) = 0;
-};
-
 enum class type_e
 {
 	null,
-	light_t
+	light_t,
+	interaction_list,
+	parameter_list,
+	slot_set_state,
+	slot_select_cell,
+	slot_allocator,
+	slot_mover,
+	interaction_slot,
+	interaction_copyist,
+	interaction_prefix,
+	interaction_prefix_ex,
+	interaction_addon,
+	interaction_time,
+	interaction_timer,
+	effect
+
 };
 
 #endif //DEFINITION_H

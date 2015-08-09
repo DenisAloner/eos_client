@@ -34,6 +34,9 @@ public:
 	virtual std::string get_description() { return "действие"; };
 	virtual Object_interaction* clone();
 	virtual void description(std::list<std::string>* info, int level) {};
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 };
 
 class Action_wrapper : public Object_interaction
@@ -51,6 +54,9 @@ public:
 	virtual void description(std::list<std::string>* info, int level) {};
 	virtual Action_wrapper* clone();
 	//virtual void perfom(Parameter* parameter);
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 };
 
 class ActionClass_Move :
