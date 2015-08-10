@@ -76,15 +76,16 @@ public:
 
 	object_state_e m_state;
 	int m_layer;
-
 	game_object_size_t m_size;
-	dimension_t m_tile_size;
-	TileManager* m_tile_manager;
-	light_t* m_light;
 	GLuint m_icon;
 	float m_weight;
+	light_t* m_light;
 	optical_properties_t* m_optical;
+	
 	float* m_visibility;
+
+	TileManager* m_tile_manager;
+	dimension_t m_tile_size;
 
 	AI* m_ai;
 

@@ -1,4 +1,5 @@
 #include "FileSystem.h"
+#include "impact\Effect.h"
 
 #ifndef RESOURCES_PATH
 #define RESOURCES_PATH "resources\\"
@@ -97,6 +98,62 @@ void FileSystem::serialize_pointer(const void* value, type_e object_type, FILE* 
 			fwrite(value, sizeof(light_t), 1, file);
 			break;
 		}
+		case type_e::optical_properties_t:
+		{
+			fwrite(&object_type, sizeof(type_e), 1, file);
+			fwrite(value, sizeof(optical_properties_t), 1, file);
+			break;
 		}
+		}
+	}
+}
+
+void* FileSystem::deserialize_pointer(FILE* file)
+{
+	type_e type;
+	fread(&type, sizeof(type_e), 1, file);
+
+	switch (type)
+	{
+	case type_e::null:
+	{
+		return nullptr;
+	}
+	case type_e::light_t:
+	{
+		light_t* value = new light_t();
+		fwrite(value, sizeof(light_t), 1, file);
+		return value;
+	}
+	case type_e::optical_properties_t:
+	{
+		optical_properties_t* value = new optical_properties_t();
+		fwrite(value, sizeof(optical_properties_t), 1, file);
+		return value;
+	}
+	}
+}
+
+Object_interaction* FileSystem::deserialize_impact(FILE* file)
+{
+	type_e type;
+	fread(&type, sizeof(type_e), 1, file);
+
+	switch (type)
+	{
+	case type_e::null:
+	{
+		return nullptr;
+	}
+	case type_e::interaction_list:
+	{
+		return nullptr;
+	}
+	case type_e::effect:
+	{
+		Effect* value = new Effect();
+		value->load(file);
+		return value;
+	}
 	}
 }

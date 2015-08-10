@@ -431,10 +431,15 @@ void Application::initialize()
 	FILE* file;
 	errno_t err;
 
-	err = fopen_s(&file, (FileSystem::instance().m_resource_path + "Saves\\save_01.txt").c_str(), "wb");
+	//obj = m_game_object_manager->new_object("wall");
+	obj = new GameObject();
+//	LOG(INFO) << std::to_string(obj->m_active_state->m_tile_manager->m_index);
+	
+	LOG(INFO) << "Запись обьекта";
+	err = fopen_s(&file, (FileSystem::instance().m_resource_path + "Saves\\save_01.txt").c_str(), "rb");
 	if (err == 0)
 	{
-		m_GUI->MapViewer->m_player->m_object->save(file);
+		obj->load(file);
 		fclose(file);
 		LOG(INFO) << "Сохранение завершено успешно";
 	}
@@ -443,6 +448,8 @@ void Application::initialize()
 		LOG(INFO) << "Сохранение не завершено из-за ошибки";
 	}
 
+	//obj = m_game_object_manager->new_object("wall");
+	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry-2][rx-2]);
 	m_ready = true;
 }
 

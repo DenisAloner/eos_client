@@ -200,6 +200,12 @@ struct RGB_t
 	RGB_t() : R(0.0), G(0.0), B(0.0){};
 };
 
+class iSerializable
+{
+	virtual void save(FILE* file) = 0;
+	virtual void load(FILE* file) = 0;
+};
+
 struct optical_properties_t
 {
 	RGB_t attenuation;
@@ -207,7 +213,6 @@ struct optical_properties_t
     optical_properties_t(): attenuation(RGB_t(1.0,1.0,1.0)){};
 	//optical_properties_t(const optical_properties_t& value) :seethrough(value.seethrough),attenuation(value.attenuation){};
 };
-
 
 struct light_t
 {
@@ -299,12 +304,6 @@ enum class ai_type_e
 	non_humanoid
 };
 
-class iSerializable
-{
-	virtual void save(FILE* file) = 0;
-	virtual void load(FILE* file) = 0;
-};
-
 
 class Object_interaction: public iSerializable
 {
@@ -356,6 +355,7 @@ enum class type_e
 {
 	null,
 	light_t,
+	optical_properties_t,
 	interaction_list,
 	parameter_list,
 	slot_set_state,

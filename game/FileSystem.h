@@ -28,6 +28,8 @@ public:
 	void serialize_string(std::string& text, FILE* file);
 	void deserialize_string(std::string& text, FILE* file);
 	void serialize_pointer(const void* value, type_e object_type, FILE* file);
+	void* deserialize_pointer(FILE* file);
+	Object_interaction* deserialize_impact(FILE* file);
 
 private:
 	FileSystem();

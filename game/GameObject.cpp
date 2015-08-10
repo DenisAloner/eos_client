@@ -161,11 +161,29 @@ void Object_state::save(FILE* file)
 	fwrite(&m_size, sizeof(game_object_size_t), 1, file);
 	fwrite(&m_weight, sizeof(float), 1, file);
 	FileSystem::instance().serialize_pointer(m_light, type_e::light_t, file);
+	FileSystem::instance().serialize_pointer(m_optical, type_e::optical_properties_t, file);
+	fwrite(&m_tile_manager->m_index, sizeof(size_t), 1, file);
 }
 
 void Object_state::load(FILE* file)
 {
-
+	size_t s;
+	fread(&s, sizeof(size_t), 1, file);
+	m_item.clear();
+	interaction_e ie;
+	for (size_t i = 0; i < s; i++)
+	{
+		fread(&ie, sizeof(interaction_e), 1, file);
+		m_item[ie] = static_cast<Interaction_list*>(FileSystem::instance().deserialize_impact(file));
+	}
+	fread(&m_state, sizeof(object_state_e), 1, file);
+	fread(&m_layer, sizeof(int), 1, file);
+	fread(&m_size, sizeof(game_object_size_t), 1, file);
+	fread(&m_weight, sizeof(float), 1, file);
+	m_light = static_cast<light_t*>(FileSystem::instance().deserialize_pointer(file));
+	m_optical = static_cast<optical_properties_t*>(FileSystem::instance().deserialize_pointer(file));
+	fread(&s, sizeof(size_t), 1, file);
+	m_tile_manager = Application::instance().m_graph->m_tile_managers[s];
 }
 
 
@@ -476,6 +494,20 @@ void GameObject::save(FILE* file)
 
 void GameObject::load(FILE* file)
 {
+	FileSystem::instance().deserialize_string(m_name, file);
+	fread(&m_direction, sizeof(object_direction_e), 1, file);
+	size_t s;
+	fread(&s, sizeof(size_t), 1, file);
+	Object_state* value;
+	for (size_t i = 0; i < s; i++)
+	{
+		value = new Object_state();
+		value->load(file);
+		m_state.push_back(value);
+	}
+	m_active_state = m_state.front();
+	set_direction(m_direction);
+	update_interaction();
 
 }
 

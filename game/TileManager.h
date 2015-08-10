@@ -13,6 +13,7 @@ class TileManager
 public:
 
 	GLuint* m_tiles;
+	size_t m_index;
 
 	TileManager();
 	~TileManager();

@@ -461,6 +461,7 @@ void GraphicalController::parser(const std::string& command)
 	{
 		TileManager_Single* m_tile_manager = new TileManager_Single();
 		m_tile_manager->load_from_file(arg[0], object_direction_e::down, 0);
+		m_tile_manager->m_index = m_tile_managers.size();
 		m_tile_managers.push_back(m_tile_manager);
 		break;
 	}
@@ -471,6 +472,7 @@ void GraphicalController::parser(const std::string& command)
 		m_tile_manager->load_from_file(arg[1], object_direction_e::down, 1);
 		m_tile_manager->load_from_file(arg[2], object_direction_e::down, 2);
 		m_tile_manager->load_from_file(arg[3], object_direction_e::down, 3);
+		m_tile_manager->m_index = m_tile_managers.size();
 		m_tile_managers.push_back(m_tile_manager);
 		break;
 	}
@@ -481,6 +483,7 @@ void GraphicalController::parser(const std::string& command)
 		m_tile_manager->load_from_file(arg[1], object_direction_e::right, 2);
 		m_tile_manager->load_from_file(arg[2], object_direction_e::down, 4);
 		m_tile_manager->load_from_file(arg[3], object_direction_e::left, 6);
+		m_tile_manager->m_index = m_tile_managers.size();
 		m_tile_managers.push_back(m_tile_manager);
 		break;
 	}
@@ -495,6 +498,7 @@ void GraphicalController::parser(const std::string& command)
 		m_tile_manager->load_from_file(arg[0] + "_downleft", object_direction_e::downleft, 5);
 		m_tile_manager->load_from_file(arg[0] + "_left", object_direction_e::left, 6);
 		m_tile_manager->load_from_file(arg[0] + "_topleft", object_direction_e::topleft, 7);
+		m_tile_manager->m_index = m_tile_managers.size();
 		m_tile_managers.push_back(m_tile_manager);
 		break;
 	}

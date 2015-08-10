@@ -8,6 +8,7 @@
 Interaction_list::Interaction_list()
 {
 	m_interaction_message_type = interaction_message_type_e::list;
+	m_list_type = feature_list_type_e::generic;
 }
 
 bool Interaction_list::on_turn()
@@ -92,12 +93,21 @@ void Interaction_list::save(FILE* file)
 
 void Interaction_list::load(FILE* file)
 {
-
+	size_t s;
+	fread(&s, sizeof(size_t), 1, file);
+	m_effect.clear();
+	for (size_t i = 0; i < s; i++)
+	{
+		m_effect.push_back(FileSystem::instance().deserialize_impact(file));
+	}
 }
 
 // Patameter_list
 
-Parameter_list::Parameter_list(interaction_e subtype) :m_subtype(subtype) {};
+Parameter_list::Parameter_list(interaction_e subtype) :m_subtype(subtype)
+{
+	m_list_type = feature_list_type_e::parameter;
+};
 
 void Parameter_list::update_list(Object_interaction* list)
 {
@@ -203,7 +213,18 @@ void Parameter_list::save(FILE* file)
 
 void Parameter_list::load(FILE* file)
 {
+	fwrite(&m_basic_value, sizeof(int), 1, file);
+	fwrite(&m_basic_limit, sizeof(int), 1, file);
+	fwrite(&m_value, sizeof(int), 1, file);
+	fwrite(&m_limit, sizeof(int), 1, file);
 
+	size_t s;
+	fread(&s, sizeof(size_t), 1, file);
+	m_effect.clear();
+	for (size_t i = 0; i < s; i++)
+	{
+		m_effect.push_back(FileSystem::instance().deserialize_impact(file));
+	}
 }
 
 // Tag_list
@@ -211,6 +232,7 @@ void Parameter_list::load(FILE* file)
 Tag_list::Tag_list()
 {
 	m_interaction_message_type = interaction_message_type_e::list;
+	m_list_type = feature_list_type_e::tag;
 }
 
 Tag_list* Tag_list::clone()
@@ -228,6 +250,7 @@ Tag_list* Tag_list::clone()
 Parts_list::Parts_list()
 {
 	m_interaction_message_type = interaction_message_type_e::list;
+	m_list_type = feature_list_type_e::parts;
 }
 
 Parts_list* Parts_list::clone()
@@ -703,6 +726,7 @@ void Interaction_timer::load(FILE* file)
 
 Effect::Effect()
 {
+	m_interaction_message_type = interaction_message_type_e::single;
 }
 
 bool Effect::on_turn()
@@ -762,10 +786,14 @@ void Effect::save(FILE* file)
 {
 	type_e t = type_e::effect;
 	fwrite(&t, sizeof(type_e), 1, file);
+	fwrite(&m_value, sizeof(int), 1, file);
+	fwrite(&m_subtype, sizeof(effect_e), 1, file);
 }
 
 void Effect::load(FILE* file)
 {
+	fread(&m_value, sizeof(int), 1, file);
+	fread(&m_subtype, sizeof(effect_e), 1, file);
 }
 
 // Object_tag
