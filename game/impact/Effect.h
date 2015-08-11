@@ -56,7 +56,10 @@ public:
 
 	Tag_list();
 	virtual Tag_list* clone();
-	//virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 };
 
 class Parts_list :public  Interaction_list

@@ -202,6 +202,7 @@ struct RGB_t
 
 class iSerializable
 {
+public:
 	virtual void save(FILE* file) = 0;
 	virtual void load(FILE* file) = 0;
 };
@@ -279,6 +280,7 @@ enum class effect_prefix_e
 
 enum class object_tag_e
 {
+	none,
 	poison_resist,
 	purification_from_poison,
 	mortal,
@@ -319,9 +321,6 @@ public:
 	virtual Object_interaction* clone() = 0;
 	virtual void description(std::list<std::string>* info, int level) = 0;
 	virtual void do_predicat(predicat func){ func(this); };
-
-	virtual void save(FILE* file) = 0;
-	virtual void load(FILE* file) = 0;
 };
 
 class GameTask;
@@ -358,6 +357,7 @@ enum class type_e
 	optical_properties_t,
 	interaction_list,
 	parameter_list,
+	tag_list,
 	slot_set_state,
 	slot_select_cell,
 	slot_allocator,
@@ -369,8 +369,8 @@ enum class type_e
 	interaction_addon,
 	interaction_time,
 	interaction_timer,
-	effect
-
+	effect,
+	tag_label
 };
 
 #endif //DEFINITION_H

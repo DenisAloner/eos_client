@@ -138,22 +138,44 @@ Object_interaction* FileSystem::deserialize_impact(FILE* file)
 {
 	type_e type;
 	fread(&type, sizeof(type_e), 1, file);
-
+	Object_interaction* value;
 	switch (type)
 	{
 	case type_e::null:
 	{
 		return nullptr;
 	}
+	case type_e::interaction_addon:
+	{
+		value = new Interaction_addon();
+		break;
+	}
+	case type_e::interaction_time:
+	{
+		value = new Interaction_time();
+		break;
+	}
 	case type_e::interaction_list:
 	{
-		return nullptr;
+		value = new Interaction_list();
+		break;
+	}
+	case type_e::tag_list:
+	{
+		value = new Tag_list();
+		break;
 	}
 	case type_e::effect:
 	{
-		Effect* value = new Effect();
-		value->load(file);
-		return value;
+		value = new Effect();
+		break;
+	}
+	case type_e::tag_label:
+	{
+		value = new ObjectTag::Label(object_tag_e::none);
+		break;
 	}
 	}
+	value->load(file);
+	return value;
 }

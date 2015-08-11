@@ -245,6 +245,29 @@ Tag_list* Tag_list::clone()
 	return result;
 }
 
+void Tag_list::save(FILE* file)
+{
+	type_e t = type_e::tag_list;
+	fwrite(&t, sizeof(type_e), 1, file);
+	size_t s = m_effect.size();
+	fwrite(&s, sizeof(size_t), 1, file);
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		(*item)->save(file);
+	}
+}
+
+void Tag_list::load(FILE* file)
+{
+	size_t s;
+	fread(&s, sizeof(size_t), 1, file);
+	m_effect.clear();
+	for (size_t i = 0; i < s; i++)
+	{
+		m_effect.push_back(FileSystem::instance().deserialize_impact(file));
+	}
+}
+
 // Parts_list
 
 Parts_list::Parts_list()
@@ -607,10 +630,14 @@ void Interaction_addon::save(FILE* file)
 {
 	type_e t = type_e::interaction_addon;
 	fwrite(&t, sizeof(type_e), 1, file);
+	fwrite(&m_subtype, sizeof(interaction_e), 1, file);
+	m_value->save(file);
 }
 
 void Interaction_addon::load(FILE* file)
 {
+	fread(&m_subtype, sizeof(interaction_e), 1, file);
+	m_value = FileSystem::instance().deserialize_impact(file);
 }
 
 // Interaction_time
@@ -660,10 +687,14 @@ void Interaction_time::save(FILE* file)
 {
 	type_e t = type_e::interaction_time;
 	fwrite(&t, sizeof(type_e), 1, file);
+	fwrite(&m_turn, sizeof(int), 1, file);
+	m_value->save(file);
 }
 
 void Interaction_time::load(FILE* file)
 {
+	fread(&m_turn, sizeof(int), 1, file);
+	m_value = FileSystem::instance().deserialize_impact(file);
 }
 
 // Interaction_timer
@@ -840,6 +871,7 @@ void ObjectTag::Poison_resist::apply_effect(GameObject* unit, Object_interaction
 
 void ObjectTag::Poison_resist::save(FILE* file)
 {
+
 }
 
 void ObjectTag::Poison_resist::load(FILE* file)
@@ -1023,8 +1055,12 @@ void ObjectTag::Label::apply_effect(GameObject* unit, Object_interaction* object
 
 void ObjectTag::Label::save(FILE* file)
 {
+	type_e t = type_e::tag_label;
+	fwrite(&t, sizeof(type_e), 1, file);
+	fwrite(&m_type, sizeof(object_tag_e), 1, file);
 }
 
 void ObjectTag::Label::load(FILE* file)
 {
+	fread(&m_type, sizeof(object_tag_e), 1, file);
 }

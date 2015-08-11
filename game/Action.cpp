@@ -726,7 +726,8 @@ void Action_open::interaction_handler()
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
-	Application::instance().m_action_manager->add(Application::instance().m_GUI->MapViewer->m_player->m_object, new GameTask(this, p));
+	//Application::instance().m_action_manager->add(Application::instance().m_GUI->MapViewer->m_player->m_object, new GameTask(this, p));
+	Application::instance().m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->set(p->m_object, this, p);
 	Application::instance().m_message_queue.m_busy = false;
 }
 
