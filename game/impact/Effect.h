@@ -38,6 +38,7 @@ public:
 	int m_limit;
 
 	Parameter_list(interaction_e subtype);
+	Parameter_list();
 	virtual std::string get_description();
 	virtual void update();
 	virtual Parameter_list* clone();

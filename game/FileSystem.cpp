@@ -160,6 +160,11 @@ Object_interaction* FileSystem::deserialize_impact(FILE* file)
 		value = new Interaction_list();
 		break;
 	}
+	case type_e::parameter_list:
+	{
+		value = new Parameter_list();
+		break;
+	}
 	case type_e::tag_list:
 	{
 		value = new Tag_list();

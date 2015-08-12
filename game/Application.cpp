@@ -431,7 +431,7 @@ void Application::initialize()
 	FILE* file;
 	errno_t err;
 
-	//obj = m_game_object_manager->new_object("blue potion");
+	//obj = m_game_object_manager->new_object("test dagger");
 	obj = new GameObject();
 	LOG(INFO) << "Запись обьекта";
 	err = fopen_s(&file, (FileSystem::instance().m_resource_path + "Saves\\save_01.txt").c_str(), "rb");

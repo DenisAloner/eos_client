@@ -109,6 +109,11 @@ Parameter_list::Parameter_list(interaction_e subtype) :m_subtype(subtype)
 	m_list_type = feature_list_type_e::parameter;
 };
 
+Parameter_list::Parameter_list()
+{
+	m_list_type = feature_list_type_e::parameter;
+};
+
 void Parameter_list::update_list(Object_interaction* list)
 {
 
@@ -198,10 +203,9 @@ void Parameter_list::save(FILE* file)
 	type_e t = type_e::parameter_list;
 	fwrite(&t, sizeof(type_e), 1, file);
 
+	fwrite(&m_subtype, sizeof(interaction_e), 1, file);
 	fwrite(&m_basic_value, sizeof(int), 1, file);
 	fwrite(&m_basic_limit, sizeof(int), 1, file);
-	fwrite(&m_value, sizeof(int), 1, file);
-	fwrite(&m_limit, sizeof(int), 1, file);
 
 	size_t s = m_effect.size();
 	fwrite(&s, sizeof(size_t), 1, file);
@@ -213,10 +217,9 @@ void Parameter_list::save(FILE* file)
 
 void Parameter_list::load(FILE* file)
 {
-	fwrite(&m_basic_value, sizeof(int), 1, file);
-	fwrite(&m_basic_limit, sizeof(int), 1, file);
-	fwrite(&m_value, sizeof(int), 1, file);
-	fwrite(&m_limit, sizeof(int), 1, file);
+	fread(&m_subtype, sizeof(interaction_e), 1, file);
+	fread(&m_basic_value, sizeof(int), 1, file);
+	fread(&m_basic_limit, sizeof(int), 1, file);
 
 	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
