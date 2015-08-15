@@ -78,6 +78,9 @@ public:
 
 	Action_list();
 	virtual Interaction_list* clone();
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 };
 
 class Slot_set_state: public Object_interaction

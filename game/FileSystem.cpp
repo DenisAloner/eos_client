@@ -160,9 +160,19 @@ Object_interaction* FileSystem::deserialize_impact(FILE* file)
 		value = new Interaction_list();
 		break;
 	}
+	case type_e::interaction_copyist:
+	{
+		value = new Interaction_copyist();
+		break;
+	}
 	case type_e::parameter_list:
 	{
 		value = new Parameter_list();
+		break;
+	}
+	case type_e::action_list:
+	{
+		value = new Action_list();
 		break;
 	}
 	case type_e::tag_list:
@@ -178,6 +188,33 @@ Object_interaction* FileSystem::deserialize_impact(FILE* file)
 	case type_e::tag_label:
 	{
 		value = new ObjectTag::Label(object_tag_e::none);
+		break;
+	}
+	case type_e::tag_poison_resist:
+	{
+		value = new ObjectTag::Poison_resist();
+		break;
+	}
+	case type_e::tag_mortal:
+	{
+		value = new ObjectTag::Mortal();
+		break;
+	}
+	case type_e::tag_purification_from_poison:
+	{
+		value = new ObjectTag::Purification_from_poison();
+		break;
+	}
+	case type_e::tag_fast_move:
+	{
+		value = new ObjectTag::Fast_move();
+		break;
+	}
+	case type_e::action:
+	{
+		size_t s;
+		fread(&s, sizeof(size_t), 1, file);
+		value = Application::instance().m_actions[s];
 		break;
 	}
 	}

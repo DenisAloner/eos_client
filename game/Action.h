@@ -17,6 +17,8 @@ class Action : public Object_interaction
 {
 public:
 
+	size_t m_index;
+
 	GLuint m_icon;
 	action_e m_kind;
 	std::string m_name;
@@ -72,6 +74,9 @@ public:
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler();
 	virtual Object_interaction* clone(){ return new ActionClass_Move(); };
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 };
 
 class action_move_step :

@@ -205,6 +205,17 @@ std::string ActionClass_Move::get_description(Parameter* parameter)
 	return s;
 }
 
+void ActionClass_Move::save(FILE* file)
+{
+	type_e t = type_e::action;
+	fwrite(&t, sizeof(type_e), 1, file);
+	fwrite(&m_index, sizeof(size_t), 1, file);
+}
+
+void ActionClass_Move::load(FILE* file)
+{
+}
+
 
 ActionClass_Push::ActionClass_Push(void)
 {

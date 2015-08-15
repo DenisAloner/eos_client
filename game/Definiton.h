@@ -357,6 +357,7 @@ enum class type_e
 	optical_properties_t,
 	interaction_list,
 	parameter_list,
+	action_list,
 	tag_list,
 	slot_set_state,
 	slot_select_cell,
@@ -370,7 +371,12 @@ enum class type_e
 	interaction_time,
 	interaction_timer,
 	effect,
-	tag_label
+	tag_label,
+	tag_poison_resist,
+	tag_mortal,
+	tag_purification_from_poison,
+	tag_fast_move,
+	action
 };
 
 #endif //DEFINITION_H

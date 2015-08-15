@@ -175,6 +175,12 @@ void Application::initialize()
 	m_actions[action_e::equip] = new Action_equip();
 	m_actions[action_e::show_parameters] = new Action_show_parameters();
 	m_actions[action_e::use] = new Action_use();
+
+	for (size_t i = 0; i < 13; i++)
+	{
+		m_actions[i]->m_index = i;
+	}
+
 	m_ai_manager = new AI_manager();
 	m_game_object_manager = new GameObjectManager();
 	m_game_object_manager->init();
@@ -431,7 +437,7 @@ void Application::initialize()
 	FILE* file;
 	errno_t err;
 
-	//obj = m_game_object_manager->new_object("test dagger");
+	//obj = m_game_object_manager->new_object("rat");
 	obj = new GameObject();
 	LOG(INFO) << "Запись обьекта";
 	err = fopen_s(&file, (FileSystem::instance().m_resource_path + "Saves\\save_01.txt").c_str(), "rb");

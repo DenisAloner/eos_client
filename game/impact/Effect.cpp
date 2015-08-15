@@ -291,7 +291,11 @@ Parts_list* Parts_list::clone()
 
 // Action_list
 
-Action_list::Action_list() {};
+Action_list::Action_list() 
+{
+	m_interaction_message_type = interaction_message_type_e::list;
+	m_list_type = feature_list_type_e::action;
+};
 
 Interaction_list* Action_list::clone()
 {
@@ -302,6 +306,30 @@ Interaction_list* Action_list::clone()
 	}
 	return result;
 }
+
+void Action_list::save(FILE* file)
+{
+	type_e t = type_e::action_list;
+	fwrite(&t, sizeof(type_e), 1, file);
+	size_t s = m_effect.size();
+	fwrite(&s, sizeof(size_t), 1, file);
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		(*item)->save(file);
+	}
+}
+
+void Action_list::load(FILE* file)
+{
+	size_t s;
+	fread(&s, sizeof(size_t), 1, file);
+	m_effect.clear();
+	for (size_t i = 0; i < s; i++)
+	{
+		m_effect.push_back(FileSystem::instance().deserialize_impact(file));
+	}
+}
+
 
 // Slot_set_state
 
@@ -526,10 +554,14 @@ void Interaction_copyist::save(FILE* file)
 {
 	type_e t = type_e::interaction_copyist;
 	fwrite(&t, sizeof(type_e), 1, file);
+	fwrite(&m_subtype, sizeof(interaction_e), 1, file);
+	m_value->save(file);
 }
 
 void Interaction_copyist::load(FILE* file)
 {
+	fread(&m_subtype, sizeof(interaction_e), 1, file);
+	m_value = FileSystem::instance().deserialize_impact(file);
 }
 
 // Interaction_prefix
@@ -874,7 +906,8 @@ void ObjectTag::Poison_resist::apply_effect(GameObject* unit, Object_interaction
 
 void ObjectTag::Poison_resist::save(FILE* file)
 {
-
+	type_e t = type_e::tag_poison_resist;
+	fwrite(&t, sizeof(type_e), 1, file);
 }
 
 void ObjectTag::Poison_resist::load(FILE* file)
@@ -913,6 +946,8 @@ void ObjectTag::Mortal::apply_effect(GameObject* unit, Object_interaction* objec
 
 void ObjectTag::Mortal::save(FILE* file)
 {
+	type_e t = type_e::tag_mortal;
+	fwrite(&t, sizeof(type_e), 1, file);
 }
 
 void ObjectTag::Mortal::load(FILE* file)
@@ -958,6 +993,8 @@ void ObjectTag::Purification_from_poison::apply_effect(GameObject* unit, Object_
 
 void ObjectTag::Purification_from_poison::save(FILE* file)
 {
+	type_e t = type_e::tag_purification_from_poison;
+	fwrite(&t, sizeof(type_e), 1, file);
 }
 
 void ObjectTag::Purification_from_poison::load(FILE* file)
@@ -1038,6 +1075,8 @@ void ObjectTag::Fast_move::apply_effect(GameObject* unit, Object_interaction* ob
 
 void ObjectTag::Fast_move::save(FILE* file)
 {
+	type_e t = type_e::tag_fast_move;
+	fwrite(&t, sizeof(type_e), 1, file);
 }
 
 void ObjectTag::Fast_move::load(FILE* file)
