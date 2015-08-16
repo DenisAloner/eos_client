@@ -865,7 +865,7 @@ void Action_hit::perfom(Parameter* parameter)
 		}
 		p->m_object->update_interaction();
 		p->m_object->event_update(VoidEventArgs());
-		LOG(INFO)  << p->m_unit->m_name << "  " << "атакует";
+		LOG(INFO)  << p->m_unit->m_name << "  " << "атакует"<<"   "<<std::to_string(m_decay);
 	}
 }
 

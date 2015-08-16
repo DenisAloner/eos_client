@@ -1,9 +1,8 @@
 #pragma once
-#include<iostream>
+#include <iostream>
 #include <list>
 #include <vector>
 #include "GameMap.h"
-#include "GameObject.h"
 #include "Application.h"
 #include "ApplicationGUI.h"
 #include "ActionManager.h"
@@ -87,7 +86,7 @@ private:
 	Path& operator=(const Path&);
 };
 
-class AI
+class AI: public iSerializable
 {
 public:
 
@@ -112,14 +111,17 @@ public:
 	MapCell* m_memory_goal_cell;
 
 	int m_fov_radius;
-	std::function<bool(GameObject*)> m_fov_qualifier;
-	std::function<bool(GameObject*)> m_path_qualifier;
+	predicat_t* m_fov_qualifier;
+	predicat_t* m_path_qualifier;
 
 	AI_enemy();
 	virtual bool check_goal();
 	virtual GameObject* find_goal();
 	virtual void create();
 	virtual AI* clone();
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 
 };
 
@@ -131,5 +133,17 @@ public:
 	virtual GameObject* find_goal();
 	virtual void create();
 	virtual AI* clone() { return nullptr; };
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 };
 
+class AI_manager
+{
+public:
+
+	std::vector<predicat_t*> m_fov_qualifiers;
+	std::vector<predicat_t*> m_path_qualifiers;
+
+	AI_manager();
+};

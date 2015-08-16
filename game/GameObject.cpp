@@ -1,6 +1,7 @@
 #include "game/GameObject.h"
 #include "game/Action.h"
 #include "log.h"
+#include "AI.h"
 
 Attribute_map::Attribute_map(){};
 
@@ -163,6 +164,7 @@ void Object_state::save(FILE* file)
 	FileSystem::instance().serialize_pointer(m_light, type_e::light_t, file);
 	FileSystem::instance().serialize_pointer(m_optical, type_e::optical_properties_t, file);
 	fwrite(&m_tile_manager->m_index, sizeof(size_t), 1, file);
+	FileSystem::instance().serialize_AI(m_ai, file);
 }
 
 void Object_state::load(FILE* file)
@@ -184,6 +186,7 @@ void Object_state::load(FILE* file)
 	m_optical = static_cast<optical_properties_t*>(FileSystem::instance().deserialize_pointer(file));
 	fread(&s, sizeof(size_t), 1, file);
 	m_tile_manager = Application::instance().m_graph->m_tile_managers[s];
+	m_ai=FileSystem::instance().deserialize_AI(file);
 }
 
 
@@ -523,15 +526,6 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 Inventory_cell::Inventory_cell(GameObject* item = nullptr) : m_item(item)
 {
 	m_kind = entity_e::inventory_cell;
-}
-
-AI_manager::AI_manager()
-{
-	m_fov_qualifiers.push_back([](GameObject* object)->bool{return !object->get_stat(object_tag_e::seethrough_able); });
-	m_fov_qualifiers.push_back([](GameObject* object)->bool{return false; });
-
-	m_path_qualifiers.push_back([](GameObject* object)->bool{return !object->get_stat(object_tag_e::pass_able);});
-	m_path_qualifiers.push_back([](GameObject* object)->bool{return !object->get_stat(object_tag_e::pass_able) && object->m_name != "wall"; });
 }
 
 Object_part::Object_part(GameObject* item) :Inventory_cell(item)

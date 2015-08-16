@@ -376,7 +376,16 @@ enum class type_e
 	tag_mortal,
 	tag_purification_from_poison,
 	tag_fast_move,
-	action
+	action,
+	ai_enemy
+};
+
+struct predicat_t
+{
+	std::function<bool(GameObject*)> predicat;
+	size_t index;
+
+	predicat_t(std::function<bool(GameObject*)> predicat, size_t index) :predicat(predicat), index(index) {};
 };
 
 #endif //DEFINITION_H

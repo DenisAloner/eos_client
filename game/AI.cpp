@@ -1,6 +1,7 @@
 #include "AI.h"
 #include "log.h"
 #include "Action_controller.h"
+#include "GameObject.h"
 
 min_heap::min_heap(void)
 {
@@ -115,7 +116,7 @@ void Path::calculate(GameMap* map, GameObject* object, MapCell* gc,GameObject* g
 	c2 = gc;
 	m_goal_cell = &m_map[c2->y - mc->y + m_middle][c2->x - mc->x +m_middle];
 	m_goal_size = goal->m_active_state->m_size;
-	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier;
+	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier->predicat;
 	for (int y = -radius; y < radius + 1; y++)
 	{
 		if ((object->cell()->y + y >= 0) && (object->cell()->y + y < map->m_size.h))
@@ -231,6 +232,7 @@ std::vector<MapCell*>* Path::get_path(){
 
 AI_enemy::AI_enemy()
 {
+	m_ai_type = ai_type_e::non_humanoid;
 	m_fov = new FOV();
 	m_goal = nullptr;
 	m_memory_goal_cell = nullptr;
@@ -352,33 +354,56 @@ void AI_enemy::create()
 			p->m_unit_body_part = nullptr;
 			//Application::instance().m_action_manager->add(p->m_unit, new GameTask(Application::instance().m_actions[action_e::hit], p));
 			m_action_controller->set(p->m_unit,Application::instance().m_actions[action_e::hit], p);
-			return;
 		}
-		Path::instance().calculate(m_map, m_object, c, m_goal, m_fov_radius);
-		std::vector<MapCell*>* path;
-		path = Path::instance().get_path();
-		if (path)
+		else
 		{
-			if (path->size() >= 2)
+			Path::instance().calculate(m_map, m_object, c, m_goal, m_fov_radius);
+			std::vector<MapCell*>* path;
+			path = Path::instance().get_path();
+			if (path)
 			{
-				Parameter_Position* P;
-				P = new Parameter_Position();
-				P->m_object = m_object;
-				P->m_place = (*path)[path->size() - 2];
-				P->m_map = m_map;
-				//Application::instance().m_action_manager->add(m_object, new GameTask(Application::instance().m_actions[action_e::move], P));
-				m_action_controller->set(P->m_object,Application::instance().m_actions[action_e::move], P);
-			}
-			else
-			{
-				m_goal = nullptr;
-				m_memory_goal_cell = nullptr;
-			}
+				if (path->size() >= 2)
+				{
+					Parameter_Position* P;
+					P = new Parameter_Position();
+					P->m_object = m_object;
+					P->m_place = (*path)[path->size() - 2];
+					P->m_map = m_map;
+					//Application::instance().m_action_manager->add(m_object, new GameTask(Application::instance().m_actions[action_e::move], P));
+					m_action_controller->set(P->m_object, Application::instance().m_actions[action_e::move], P);
+				}
+				else
+				{
+					m_goal = nullptr;
+					m_memory_goal_cell = nullptr;
+				}
 
+			}
+			Path::instance().m_heap.m_items.clear();
 		}
-		Path::instance().m_heap.m_items.clear();
 	}
 	m_action_controller->update();
+}
+
+void AI_enemy::save(FILE* file)
+{
+	type_e t = type_e::ai_enemy;
+	fwrite(&t, sizeof(type_e), 1, file);
+	fwrite(&m_ai_type, sizeof(ai_type_e), 1, file);
+	fwrite(&m_fov_radius, sizeof(int), 1, file);
+	fwrite(&m_fov_qualifier->index, sizeof(size_t), 1, file);
+	fwrite(&m_path_qualifier->index, sizeof(size_t), 1, file);
+}
+
+void AI_enemy::load(FILE* file)
+{
+	fread(&m_ai_type, sizeof(ai_type_e), 1, file);
+	fread(&m_fov_radius, sizeof(int), 1, file);
+	size_t s;
+	fread(&s, sizeof(size_t), 1, file);
+	m_fov_qualifier = Application::instance().m_ai_manager->m_fov_qualifiers[s];
+	fread(&s, sizeof(size_t), 1, file);
+	m_path_qualifier = Application::instance().m_ai_manager->m_path_qualifiers[s];
 }
 
 AI_trap::AI_trap(){};
@@ -410,3 +435,20 @@ void AI_trap::create()
 		}
 	}
 };
+
+void AI_trap::save(FILE* file)
+{
+}
+
+void AI_trap::load(FILE* file)
+{
+}
+
+AI_manager::AI_manager()
+{
+	m_fov_qualifiers.push_back(new predicat_t([](GameObject* object)->bool{return !object->get_stat(object_tag_e::seethrough_able); },0));
+	m_fov_qualifiers.push_back(new predicat_t([](GameObject* object)->bool{return false; },1));
+
+	m_path_qualifiers.push_back(new predicat_t([](GameObject* object)->bool {return !object->get_stat(object_tag_e::pass_able); }, 0));
+	m_path_qualifiers.push_back(new predicat_t([](GameObject* object)->bool{return !object->get_stat(object_tag_e::pass_able) && object->m_name != "wall"; },1));
+}

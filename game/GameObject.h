@@ -12,7 +12,6 @@
 #include <map>
 #include "Effect.h"
 #include "Action.h"
-#include "AI.h"
 
 class Object_feature;
 class Application;
@@ -168,16 +167,6 @@ class Inventory_cell: public Game_object_owner
 public:
 	GameObject* m_item;
 	Inventory_cell(GameObject* item);
-};
-
-class AI_manager
-{
-public:
-
-	std::vector<std::function<bool(GameObject*)> > m_fov_qualifiers;
-	std::vector<std::function<bool(GameObject*)> > m_path_qualifiers;
-
-	AI_manager();
 };
 
 class Object_part : public Inventory_cell, public Object_interaction

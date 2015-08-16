@@ -1,5 +1,6 @@
 #include "FileSystem.h"
 #include "impact\Effect.h"
+#include "AI.h"
 
 #ifndef RESOURCES_PATH
 #define RESOURCES_PATH "resources\\"
@@ -215,6 +216,48 @@ Object_interaction* FileSystem::deserialize_impact(FILE* file)
 		size_t s;
 		fread(&s, sizeof(size_t), 1, file);
 		value = Application::instance().m_actions[s];
+		break;
+	}
+	}
+	value->load(file);
+	return value;
+}
+
+void FileSystem::serialize_AI(AI* value, FILE* file)
+{
+	type_e object_type;
+	if (value == nullptr)
+	{
+		object_type = type_e::null;
+		fwrite(&object_type, sizeof(type_e), 1, file);
+	}
+	else
+	{
+		switch (value->m_ai_type)
+		{
+		case ai_type_e::non_humanoid:
+		{
+			value->save(file);
+			break;
+		}
+		}
+	}
+}
+
+AI* FileSystem::deserialize_AI(FILE* file)
+{
+	type_e type;
+	fread(&type, sizeof(type_e), 1, file);
+	AI* value;
+	switch (type)
+	{
+	case type_e::null:
+	{
+		return nullptr;
+	}
+	case type_e::ai_enemy:
+	{
+		value = new AI_enemy();
 		break;
 	}
 	}

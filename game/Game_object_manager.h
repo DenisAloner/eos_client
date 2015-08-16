@@ -104,6 +104,7 @@ public:
 	void parser(const std::string& command);
 	void init();
 	GameObject* new_object(std::string unit_name);
+	void register_object(GameObject*& object);
 	void update_buff();
 
 	std::string get_effect_string(interaction_e key);

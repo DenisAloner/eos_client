@@ -444,6 +444,7 @@ void Application::initialize()
 	if (err == 0)
 	{
 		obj->load(file);
+		Application::instance().m_game_object_manager->register_object(obj);
 		fclose(file);
 		LOG(INFO) << "Сохранение завершено успешно";
 	}
@@ -451,7 +452,7 @@ void Application::initialize()
 	{
 		LOG(INFO) << "Сохранение не завершено из-за ошибки";
 	}
-	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry-2][rx-2]);
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry+4][rx]);
 
 	m_ready = true;
 }
@@ -699,7 +700,7 @@ void Application::command_set_pickup_item_visibility(bool _Visibility)
 
 bool Application::command_check_position(GameObject*& object, MapCell*& position, GameMap*& map)
 {
-	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier;
+	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier->predicat;
 	for (int i = 0; i<object->m_active_state->m_size.y; i++)
 	{
 		for (int j = 0; j<object->m_active_state->m_size.x; j++)

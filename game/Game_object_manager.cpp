@@ -587,14 +587,20 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 		obj->m_state.push_back(state);
 	}
 	obj->m_active_state = obj->m_state.front();
-	m_objects.push_back(obj);
-	if (obj->get_effect(interaction_e::buff))
-	{
-		m_update_buff.push_front(obj);
-	}
+	register_object(obj);
 	obj->update_interaction();
 	return obj;
 }
+
+void GameObjectManager::register_object(GameObject*& object)
+{
+	m_objects.push_back(object);
+	if (object->get_effect(interaction_e::buff))
+	{
+		m_update_buff.push_front(object);
+	}
+}
+
 
 void GameObjectManager::update_buff()
 {

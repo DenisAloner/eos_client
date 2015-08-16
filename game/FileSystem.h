@@ -8,6 +8,7 @@
 #include "utils/bytearray.h"
 #include "Definiton.h"
 
+class AI;
 
 class FileSystem
 {
@@ -30,6 +31,8 @@ public:
 	void serialize_pointer(const void* value, type_e object_type, FILE* file);
 	void* deserialize_pointer(FILE* file);
 	Object_interaction* deserialize_impact(FILE* file);
+	void serialize_AI(AI* value, FILE* file);
+	AI* deserialize_AI(FILE* file);
 
 private:
 	FileSystem();
