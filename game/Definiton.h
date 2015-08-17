@@ -101,6 +101,7 @@ enum entity_e
 enum action_e
 {
 	move,
+	move_step,
 	push,
 	turn,
 	open_inventory,
@@ -358,7 +359,9 @@ enum class type_e
 	interaction_list,
 	parameter_list,
 	action_list,
+	parts_list,
 	tag_list,
+	object_part,
 	slot_set_state,
 	slot_select_cell,
 	slot_allocator,
@@ -377,7 +380,8 @@ enum class type_e
 	tag_purification_from_poison,
 	tag_fast_move,
 	action,
-	ai_enemy
+	ai_enemy,
+	gameobject
 };
 
 struct predicat_t

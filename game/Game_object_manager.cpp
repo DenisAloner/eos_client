@@ -189,20 +189,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::add_action:
 	{
 		action_e action = get_action_e(arg[0]);
-		switch (action)
-		{
-		//case action_e::hit:
-		//{
-		//	Action_hit* a = new Action_hit();
-		//	m_object->m_active_state->m_actions.push_back(a);
-		//	break;
-		//}
-		default:
-		{
-			m_object->add_effect(interaction_e::action, Application::instance().m_actions[action]);
-			break;
-		}
-		}
+		m_object->add_effect(interaction_e::action, Application::instance().m_actions[action]);
 		break;
 	}
 	case command_e::add_slot:
@@ -229,7 +216,7 @@ void GameObjectManager::parser(const std::string& command)
 		item->m_part_kind = get_body_part_e(arg[0]);
 		item->m_name = arg[1];
 		m_slot = item;
-		m_mem_state = item->m_object_state;
+		m_mem_state = &item->m_object_state;
 		break;
 	}
 	case command_e::mem_slot_set_state:
@@ -524,6 +511,7 @@ void GameObjectManager::init()
 	m_to_action_e["hit"] = action_e::hit;
 	m_to_action_e["hit_melee"] = action_e::hit_melee;
 	m_to_action_e["move"] = action_e::move;
+	m_to_action_e["move_step"] = action_e::move_step;
 	m_to_action_e["open"] = action_e::open;
 	m_to_action_e["pick"] = action_e::pick;
 	m_to_action_e["push"] = action_e::push;

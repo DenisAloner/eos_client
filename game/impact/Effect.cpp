@@ -289,6 +289,29 @@ Parts_list* Parts_list::clone()
 	return result;
 }
 
+void Parts_list::save(FILE* file)
+{
+	type_e t = type_e::parts_list;
+	fwrite(&t, sizeof(type_e), 1, file);
+	size_t s = m_effect.size();
+	fwrite(&s, sizeof(size_t), 1, file);
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		(*item)->save(file);
+	}
+}
+
+void Parts_list::load(FILE* file)
+{
+	size_t s;
+	fread(&s, sizeof(size_t), 1, file);
+	m_effect.clear();
+	for (size_t i = 0; i < s; i++)
+	{
+		m_effect.push_back(FileSystem::instance().deserialize_impact(file));
+	}
+}
+
 // Action_list
 
 Action_list::Action_list() 
@@ -600,15 +623,18 @@ std::string Interaction_prefix::get_description()
 	return "none";
 }
 
-
 void Interaction_prefix::save(FILE* file)
 {
 	type_e t = type_e::interaction_prefix;
 	fwrite(&t, sizeof(type_e), 1, file);
+	fwrite(&m_subtype, sizeof(effect_prefix_e), 1, file);
+	m_value->save(file);
 }
 
 void Interaction_prefix::load(FILE* file)
 {
+	fread(&m_subtype, sizeof(effect_prefix_e), 1, file);
+	m_value = FileSystem::instance().deserialize_impact(file);
 }
 
 // Interaction_prefix_ex
@@ -782,11 +808,18 @@ void Interaction_timer::save(FILE* file)
 {
 	type_e t = type_e::interaction_timer;
 	fwrite(&t, sizeof(type_e), 1, file);
+	fwrite(&m_turn, sizeof(int), 1, file);
+	fwrite(&m_period, sizeof(int), 1, file);
+	m_value->save(file);
 }
 
 void Interaction_timer::load(FILE* file)
 {
+	fread(&m_turn, sizeof(int), 1, file);
+	fread(&m_period, sizeof(int), 1, file);
+	m_value = FileSystem::instance().deserialize_impact(file);
 }
+
 
 // Effect
 

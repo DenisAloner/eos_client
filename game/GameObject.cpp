@@ -58,6 +58,30 @@ Attribute_map* Attribute_map::clone()
 	return result;
 }
 
+void  Attribute_map::save(FILE* file)
+{
+	size_t s = m_item.size();
+	fwrite(&s, sizeof(size_t), 1, file);
+	for (auto item = m_item.begin(); item != m_item.end(); item++)
+	{
+		fwrite(&((*item).first), sizeof(interaction_e), 1, file);
+		(*item).second->save(file);
+	}
+}
+
+void Attribute_map::load(FILE* file)
+{
+	size_t s;
+	fread(&s, sizeof(size_t), 1, file);
+	m_item.clear();
+	interaction_e ie;
+	for (size_t i = 0; i < s; i++)
+	{
+		fread(&ie, sizeof(interaction_e), 1, file);
+		m_item[ie] = static_cast<Interaction_list*>(FileSystem::instance().deserialize_impact(file));
+	}
+}
+
 Object_state::Object_state()
 {
 	m_layer = 1;
@@ -150,13 +174,7 @@ void Object_state::set_tile_size()
 
 void Object_state::save(FILE* file)
 {
-	size_t s = m_item.size();
-	fwrite(&s, sizeof(size_t), 1, file);
-	for (auto item = m_item.begin(); item != m_item.end(); item++)
-	{
-		fwrite(&((*item).first), sizeof(interaction_e), 1, file);
-		(*item).second->save(file);
-	}
+	Attribute_map::save(file);
 	fwrite(&m_state, sizeof(object_state_e), 1, file);
 	fwrite(&m_layer, sizeof(int), 1, file);
 	fwrite(&m_size, sizeof(game_object_size_t), 1, file);
@@ -169,21 +187,14 @@ void Object_state::save(FILE* file)
 
 void Object_state::load(FILE* file)
 {
-	size_t s;
-	fread(&s, sizeof(size_t), 1, file);
-	m_item.clear();
-	interaction_e ie;
-	for (size_t i = 0; i < s; i++)
-	{
-		fread(&ie, sizeof(interaction_e), 1, file);
-		m_item[ie] = static_cast<Interaction_list*>(FileSystem::instance().deserialize_impact(file));
-	}
+	Attribute_map::load(file);
 	fread(&m_state, sizeof(object_state_e), 1, file);
 	fread(&m_layer, sizeof(int), 1, file);
 	fread(&m_size, sizeof(game_object_size_t), 1, file);
 	fread(&m_weight, sizeof(float), 1, file);
 	m_light = static_cast<light_t*>(FileSystem::instance().deserialize_pointer(file));
 	m_optical = static_cast<optical_properties_t*>(FileSystem::instance().deserialize_pointer(file));
+	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
 	m_tile_manager = Application::instance().m_graph->m_tile_managers[s];
 	m_ai=FileSystem::instance().deserialize_AI(file);
@@ -511,7 +522,6 @@ void GameObject::load(FILE* file)
 	m_active_state = m_state.front();
 	set_direction(m_direction);
 	update_interaction();
-
 }
 
 Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
@@ -532,7 +542,6 @@ Object_part::Object_part(GameObject* item) :Inventory_cell(item)
 {
 	m_interaction_message_type = interaction_message_type_e::part;
 	m_kind = entity_e::body_part;
-	m_object_state = new Attribute_map();
 };
 
 Object_part* Object_part::clone()
@@ -543,7 +552,7 @@ Object_part* Object_part::clone()
 	effect->m_name = m_name;
 	effect->m_part_kind = m_part_kind;
 	effect->m_item = nullptr;
-	effect->m_object_state = m_object_state->clone();
+	effect->m_object_state = *m_object_state.clone();
 	return effect;
 }
 
@@ -561,7 +570,7 @@ void Object_part::description(std::list<std::string>* info, int level)
 {
 	info->push_back(std::string(level, '.') + "<" + m_name + ">:");
 	info->push_back(std::string(level, '.') + "<эффекты>:");
-	for (auto current = m_object_state->m_item.begin(); current != m_object_state->m_item.end(); current++)
+	for (auto current = m_object_state.m_item.begin(); current != m_object_state.m_item.end(); current++)
 	{
 		info->push_back(std::string(level + 1, '.') + Application::instance().m_game_object_manager->get_effect_string(current->first) + ":");
 		current->second->description(info, level + 2);
@@ -571,7 +580,7 @@ void Object_part::description(std::list<std::string>* info, int level)
 void Object_part::do_predicat(predicat func)
 { 
 	func(this);
-	for (auto item = m_object_state->m_item.begin(); item != m_object_state->m_item.end(); item++)
+	for (auto item = m_object_state.m_item.begin(); item != m_object_state.m_item.end(); item++)
 	{
 		item->second->do_predicat(func);
 	}
@@ -579,8 +588,36 @@ void Object_part::do_predicat(predicat func)
 
 void Object_part::save(FILE* file)
 {
+	type_e t = type_e::object_part;
+	fwrite(&t, sizeof(type_e), 1, file);
+	m_object_state.save(file);
+	fwrite(&m_kind, sizeof(body_part_e), 1, file);
+	FileSystem::instance().serialize_string(m_name, file);
+	if (m_item)
+	{
+		t = type_e::gameobject;
+		fwrite(&t, sizeof(type_e), 1, file);
+		m_item->save(file);
+	}
+	else
+	{
+		t = type_e::null;
+		fwrite(&t, sizeof(type_e), 1, file);
+	}
 }
 
 void Object_part::load(FILE* file)
 {
+	m_object_state.load(file);
+	fread(&m_kind, sizeof(body_part_e), 1, file);
+	FileSystem::instance().deserialize_string(m_name, file);
+	type_e type;
+	fread(&type, sizeof(type_e), 1, file);
+	m_item = nullptr;
+	if (type== type_e::gameobject)
+	{
+		m_item = new GameObject();
+		m_item->load(file);
+		Application::instance().m_game_object_manager->register_object(m_item);
+	}
 }

@@ -24,7 +24,7 @@ Action::~Action(void)
 
 Object_interaction* Action::clone()
 {
-	return nullptr;
+	return Application::instance().m_actions[m_index];
 }
 
 
@@ -55,6 +55,10 @@ void Action::interaction_handler()
 
 void Action::save(FILE* file)
 {
+	type_e t = type_e::action;
+	fwrite(&t, sizeof(type_e), 1, file);
+	LOG(INFO)<< m_name <<"    " <<std::to_string(m_index);
+	fwrite(&m_index, sizeof(size_t), 1, file);
 }
 
 void Action::load(FILE* file)
@@ -129,11 +133,18 @@ void ActionClass_Move::interaction_handler()
 	Application::instance().m_message_queue.m_busy = false;
 }
 
-
 bool ActionClass_Move::check(Parameter* parameter)
 {
 	Parameter_Position* p = static_cast<Parameter_Position*>(parameter);
 	return Application::instance().command_check_position(p->m_object, p->m_place, p->m_map);
+}
+
+action_move_step::action_move_step()
+{
+	m_kind = action_e::move_step;
+	m_icon = Application::instance().m_graph->m_actions[0];
+	m_name = "Идти";
+	m_decay = 2;
 }
 
 bool action_move_step::check(Parameter* parameter)
@@ -204,18 +215,6 @@ std::string ActionClass_Move::get_description(Parameter* parameter)
 	s += std::to_string(p->m_place->y);
 	return s;
 }
-
-void ActionClass_Move::save(FILE* file)
-{
-	type_e t = type_e::action;
-	fwrite(&t, sizeof(type_e), 1, file);
-	fwrite(&m_index, sizeof(size_t), 1, file);
-}
-
-void ActionClass_Move::load(FILE* file)
-{
-}
-
 
 ActionClass_Push::ActionClass_Push(void)
 {

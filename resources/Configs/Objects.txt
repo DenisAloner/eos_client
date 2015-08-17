@@ -114,7 +114,7 @@ add_slot_mem action
 mem_part foot,ноги
 add_slot body
 feature_list_mem action,action
-mem_action move
+mem_action move_step
 add_slot_mem action
 mem_effect value,1
 mem_slot_timer 5

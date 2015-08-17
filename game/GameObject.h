@@ -57,7 +57,7 @@ public:
 	//virtual Object_feature* find_property(property_e kind, GameObject* excluded);
 };
 
-class Attribute_map
+class Attribute_map: public iSerializable
 {
 public:
 
@@ -67,9 +67,12 @@ public:
 	void add_effect(interaction_e key, Object_interaction* item);
 	Interaction_list* create_feature_list(feature_list_type_e key, interaction_e name);
 	Attribute_map* clone();
+
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 };
 
-class Object_state : public  Attribute_map, public iSerializable
+class Object_state : public Attribute_map
 {
 public:
 
@@ -173,10 +176,10 @@ class Object_part : public Inventory_cell, public Object_interaction
 {
 public:
 
-	Attribute_map* m_object_state;
+	Attribute_map m_object_state;
 	body_part_e m_part_kind;
 	std::string m_name;
-	Object_part(GameObject* item=nullptr);
+	Object_part(GameObject* item = nullptr);
 	virtual bool on_turn();
 	virtual std::string get_description();
 	virtual Object_part* clone();

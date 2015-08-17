@@ -162,7 +162,8 @@ void Application::initialize()
 	m_mouse->mouse_move += std::bind(&Application::on_mouse_move, this, std::placeholders::_1);
 	m_action_manager = new ActionManager();
 
-	m_actions[action_e::move] = new action_move_step();
+	m_actions[action_e::move] = new ActionClass_Move(); 
+	m_actions[action_e::move_step] = new action_move_step();
 	m_actions[action_e::push] = new ActionClass_Push();
 	m_actions[action_e::turn] = new ActionClass_Turn();
 	m_actions[action_e::open_inventory] = new Action_OpenInventory();
@@ -176,7 +177,7 @@ void Application::initialize()
 	m_actions[action_e::show_parameters] = new Action_show_parameters();
 	m_actions[action_e::use] = new Action_use();
 
-	for (size_t i = 0; i < 13; i++)
+	for (size_t i = 0; i < 14; i++)
 	{
 		m_actions[i]->m_index = i;
 	}
@@ -437,7 +438,7 @@ void Application::initialize()
 	FILE* file;
 	errno_t err;
 
-	//obj = m_game_object_manager->new_object("rat");
+	//obj = m_game_object_manager->new_object("iso_unit");
 	obj = new GameObject();
 	LOG(INFO) << "Запись обьекта";
 	err = fopen_s(&file, (FileSystem::instance().m_resource_path + "Saves\\save_01.txt").c_str(), "rb");

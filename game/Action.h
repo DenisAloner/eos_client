@@ -73,18 +73,16 @@ public:
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler();
-	virtual Object_interaction* clone(){ return new ActionClass_Move(); };
-
-	virtual void save(FILE* file);
-	virtual void load(FILE* file);
 };
 
 class action_move_step :
 	public ActionClass_Move
 {
 public:
+
+	action_move_step();
+
 	virtual bool check(Parameter* parameter);
-	virtual Object_interaction* clone(){ return new action_move_step(); };
 };
 
 class ActionClass_Push :
@@ -99,7 +97,6 @@ public:
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler();
-	virtual Object_interaction* clone(){ return new ActionClass_Push(); };
 
 };
 
@@ -115,7 +112,6 @@ public:
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler();
-	virtual Object_interaction* clone(){ return new ActionClass_Turn(); };
 
 };
 
@@ -131,7 +127,6 @@ public:
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler();
-	virtual Object_interaction* clone(){ return new Action_OpenInventory(); };
 
 };
 
@@ -146,7 +141,6 @@ public:
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler();
-	virtual Object_interaction* clone(){ return new Action_CellInfo(); };
 
 };
 
@@ -160,8 +154,6 @@ public:
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler();
-	virtual Object_interaction* clone(){ return new action_set_motion_path(); };
-
 };
 
 
@@ -175,7 +167,6 @@ public:
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler();
-	virtual Object_interaction* clone(){ return new Action_pick(); };
 	virtual void description(std::list<std::string>* info, int level);
 
 };
@@ -190,7 +181,6 @@ public:
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler();
-	virtual Object_interaction* clone(){ return new Action_open(); };
 
 };
 
@@ -204,7 +194,6 @@ public:
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler();
-	virtual Object_interaction* clone(){ return new Action_hit(); };
 
 };
 
@@ -214,7 +203,6 @@ class action_hit_melee :
 public:
 
 	action_hit_melee();
-	virtual Object_interaction* clone(){ return new action_hit_melee(); };
 	virtual void interaction_handler();
 	virtual void perfom(Parameter* parameter);
 };
@@ -230,7 +218,6 @@ public:
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler();
-	virtual Object_interaction* clone(){ return new Action_equip(); };
 
 };
 
@@ -243,7 +230,6 @@ public:
 
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler();
-	virtual Object_interaction* clone(){ return new Action_show_parameters(); };
 
 };
 
@@ -259,7 +245,6 @@ public:
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler();
-	virtual Object_interaction* clone() { return new Action_use(); };
 };
 
 #endif //TACTION_H

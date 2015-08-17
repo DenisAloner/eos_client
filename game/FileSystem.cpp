@@ -156,6 +156,11 @@ Object_interaction* FileSystem::deserialize_impact(FILE* file)
 		value = new Interaction_time();
 		break;
 	}
+	case type_e::interaction_timer:
+	{
+		value = new Interaction_timer();
+		break;
+	}
 	case type_e::interaction_list:
 	{
 		value = new Interaction_list();
@@ -166,6 +171,11 @@ Object_interaction* FileSystem::deserialize_impact(FILE* file)
 		value = new Interaction_copyist();
 		break;
 	}
+	case type_e::interaction_prefix:
+	{
+		value = new Interaction_prefix();
+		break;
+	}
 	case type_e::parameter_list:
 	{
 		value = new Parameter_list();
@@ -174,6 +184,11 @@ Object_interaction* FileSystem::deserialize_impact(FILE* file)
 	case type_e::action_list:
 	{
 		value = new Action_list();
+		break;
+	}
+	case type_e::parts_list:
+	{
+		value = new Parts_list();
 		break;
 	}
 	case type_e::tag_list:
@@ -199,6 +214,11 @@ Object_interaction* FileSystem::deserialize_impact(FILE* file)
 	case type_e::tag_mortal:
 	{
 		value = new ObjectTag::Mortal();
+		break;
+	}
+	case type_e::object_part:
+	{
+		value = new Object_part();
 		break;
 	}
 	case type_e::tag_purification_from_poison:

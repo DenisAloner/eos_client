@@ -70,6 +70,8 @@ public:
 	Parts_list();
 	virtual Parts_list* clone();
 
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 };
 
 class Action_list :public Interaction_list
