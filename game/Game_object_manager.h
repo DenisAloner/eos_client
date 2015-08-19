@@ -60,7 +60,6 @@ public:
 		foot
 	};
 
-	typedef std::map<std::string, GameObject*> items_t;
 	typedef std::map<std::string, command_e> commands_t;
 	typedef std::map<std::string, parameter_e> parameters_t;
 	 
@@ -79,7 +78,7 @@ public:
 	std::map<object_tag_e, std::string> m_object_tag_string;
 	std::map<effect_prefix_e, std::string> m_effect_prefix_string;
 
-	items_t m_items;
+	std::map<std::string, GameObject*> m_items;
 	commands_t m_commands;
 	parameters_t m_parameters;
 
@@ -88,8 +87,8 @@ public:
 	Object_interaction* m_slot;
 	Attribute_map* m_mem_state;
 
-	std::list<GameObject*> m_objects;
-	std::list<GameObject*> m_update_buff;
+
+	//std::list<GameObject*> m_object_templates;
 
 	interaction_e get_interaction_e(const std::string& key);
 	effect_e get_effect_e(const std::string& key);
@@ -104,15 +103,13 @@ public:
 	void parser(const std::string& command);
 	void init();
 	GameObject* new_object(std::string unit_name);
-	void register_object(GameObject*& object);
-	void update_buff();
+	//void register_object(GameObject*& object);
 
 	std::string get_effect_string(interaction_e key);
 	std::string get_effect_subtype_string(effect_e key);
 	std::string get_object_tag_string(object_tag_e key);
 	std::string get_effect_prefix_string(effect_prefix_e key);
 
-	void calculate_ai(GameMap* game_map);
 
 	virtual void save(FILE* file);
 	virtual void load(FILE* file);

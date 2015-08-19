@@ -1154,7 +1154,7 @@ void Action_use::perfom(Parameter* parameter)
 			break;
 		}
 		}
-		Application::instance().m_game_object_manager->m_objects.remove(p->m_object);
+		Application::instance().m_GUI->MapViewer->m_map->m_object_manager.m_items.remove(p->m_object);
 		p->m_unit->update_interaction();
 		p->m_unit->event_update(VoidEventArgs());
 	}

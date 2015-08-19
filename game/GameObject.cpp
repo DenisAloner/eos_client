@@ -618,6 +618,6 @@ void Object_part::load(FILE* file)
 	{
 		m_item = new GameObject();
 		m_item->load(file);
-		Application::instance().m_game_object_manager->register_object(m_item);
+		//Application::instance().m_game_object_manager->register_object(m_item);
 	}
 }

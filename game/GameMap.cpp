@@ -4,6 +4,67 @@
 #include "log.h"
 #include "Effect.h"
 
+void Object_manager::update_buff()
+{
+	Interaction_list* list;
+	Interaction_list* e;
+
+	for (auto object = m_items.begin(); object !=m_items.end(); object++)
+	{
+		list = static_cast<Interaction_list*>((*object)->get_effect(interaction_e::buff));
+		if (list)
+		{
+			e = list->clone();
+			e->apply_effect(*object, nullptr);
+			list->on_turn();
+		}
+		for (auto item = (*object)->m_active_state->m_item.begin(); item != (*object)->m_active_state->m_item.end(); item++)
+		{
+			if ((*item).second->m_interaction_message_type == interaction_message_type_e::list)
+			{
+				e = static_cast<Interaction_list*>((*item).second);
+				if (e->m_list_type == feature_list_type_e::parameter)
+				{
+					e->on_turn();
+				}
+			}
+		}
+		(*object)->update_interaction();
+		(*object)->event_update(VoidEventArgs());
+	}
+}
+
+void Object_manager::calculate_ai(GameMap* game_map)
+{
+	for (auto object = m_items.begin(); object != m_items.end(); object++)
+	{
+		if (((*object)->m_active_state->m_ai) && ((*object) != Application::instance().m_GUI->MapViewer->m_player->m_object))
+		{
+			switch ((*object)->m_active_state->m_ai->m_ai_type)
+			{
+			case ai_type_e::trap:
+			{
+				AI_trap obj;
+				obj = *static_cast<AI_trap*>((*object)->m_active_state->m_ai);
+				obj.m_object = (*object);
+				obj.create();
+				break;
+			}
+			case ai_type_e::non_humanoid:
+			{
+				AI_enemy* obj;
+				obj = static_cast<AI_enemy*>((*object)->m_active_state->m_ai);
+				obj->m_map = Application::instance().m_GUI->MapViewer->m_map;
+				obj->m_object = (*object);
+				obj->create();
+				break;
+			}
+			}
+		}
+	}
+}
+
+
 GameMap::GameMap(dimension_t size)
 {
 	m_update = true;
@@ -17,7 +78,7 @@ GameMap::GameMap(dimension_t size)
 		{
 			//m_items[i][j] = nullptr;
 			m_items[i][j] = new MapCell(j, i,this);
-			obj = Application::instance().m_game_object_manager->new_object("dirt");
+			//obj = Application::instance().m_game_object_manager->new_object("dirt");
 			//add_object(obj, m_items[i][j]);
 		}
 	}
@@ -111,22 +172,9 @@ void  GameMap::turn_object(GameObject* object)
 	add_object(object, position);
 }
 
-void GameMap::add_light(GameObject* Object)
-{
-	m_lights.push_front(Object);
-}
-
 void GameMap::add_to_map(GameObject* object, MapCell* cell)
 {
 	add_object(object, cell);
-	if (object->m_active_state->m_light)
-	{
-		add_light(object);
-	}
-	if (object->m_active_state->m_ai)
-	{
-		m_ai.push_front(object);
-	}
 }
 
 void GameMap::generate_level(void)
@@ -891,8 +939,9 @@ void GameMap::calculate_lighting2()
 			m_items[y][x]->m_light = light_t();
 		}
 	}
-	for (std::list<GameObject*>::iterator l = m_lights.begin(); l != m_lights.end(); l++)
+	for (auto l = m_object_manager.m_items.begin(); l != m_object_manager.m_items.end(); l++)
 	{
+		if (!(*l)->m_active_state->m_light) { continue; }
 		fl.calculate(20, *l, this);
 		for (int y = 0; y < 41; y++)
 		{

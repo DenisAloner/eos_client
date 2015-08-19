@@ -560,7 +560,7 @@ void GameObjectManager::init()
 GameObject* GameObjectManager::new_object(std::string unit_name)
 {
 	GameObject* obj = new GameObject();
-	items_t::iterator it = m_items.find(unit_name);
+	auto it = m_items.find(unit_name);
 	if (it == m_items.end())
 	{
 		LOG(FATAL) << "Ёлемент `" << unit_name << "` отсутствует в m_items";
@@ -575,82 +575,20 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 		obj->m_state.push_back(state);
 	}
 	obj->m_active_state = obj->m_state.front();
-	register_object(obj);
+	//register_object(obj);
 	obj->update_interaction();
+	Application::instance().m_GUI->MapViewer->m_map->m_object_manager.m_items.push_back(obj);
 	return obj;
 }
 
-void GameObjectManager::register_object(GameObject*& object)
-{
-	m_objects.push_back(object);
-	if (object->get_effect(interaction_e::buff))
-	{
-		m_update_buff.push_front(object);
-	}
-}
-
-
-void GameObjectManager::update_buff()
-{
-	Interaction_list* list;
-	Interaction_list* e;
-	/*Application::instance().console(std::to_string(m_objects.size()));
-	Application::instance().console(std::to_string(Application::instance().m_GUI->MapViewer->m_map->m_lights.size()));
-	Application::instance().console(std::to_string(Application::instance().m_GUI->MapViewer->m_map->m_ai.size()));*/
-	for (auto object = m_update_buff.begin(); object != m_update_buff.end(); object++)
-	{
-		list = static_cast<Interaction_list*>((*object)->get_effect(interaction_e::buff));
-		if (list)
-		{
-			e = list->clone();
-			e->apply_effect(*object, nullptr);
-			list->on_turn();
-		}
-		for (auto item = (*object)->m_active_state->m_item.begin(); item != (*object)->m_active_state->m_item.end(); item++)
-		{
-			if ((*item).second->m_interaction_message_type == interaction_message_type_e::list)
-			{
-				e = static_cast<Interaction_list*>((*item).second);
-				if (e->m_list_type == feature_list_type_e::parameter)
-				{
-					e->on_turn();
-				}
-			}
-		}
-		(*object)->update_interaction();
-		(*object)->event_update(VoidEventArgs());
-	}
-}
-
-void GameObjectManager::calculate_ai(GameMap* game_map)
-{
-	for (auto object = game_map->m_ai.begin(); object != game_map->m_ai.end(); object++)
-	{
-		if (((*object)->m_active_state->m_ai) && ((*object)!=Application::instance().m_GUI->MapViewer->m_player->m_object))
-		{
-			switch ((*object)->m_active_state->m_ai->m_ai_type)
-			{
-			case ai_type_e::trap:
-			{
-				AI_trap obj;
-				obj = *static_cast<AI_trap*>((*object)->m_active_state->m_ai);
-				obj.m_object = (*object);
-				obj.create();
-				break;
-			}
-			case ai_type_e::non_humanoid:
-			{
-				AI_enemy* obj;
-				obj = static_cast<AI_enemy*>((*object)->m_active_state->m_ai);
-				obj->m_map = Application::instance().m_GUI->MapViewer->m_map;
-				obj->m_object = (*object);
-				obj->create();
-				break;
-			}
-			}
-		}
-	}
-}
+//void GameObjectManager::register_object(GameObject*& object)
+//{
+//	m_objects.push_back(object);
+//	if (object->get_effect(interaction_e::buff))
+//	{
+//		m_update_buff.push_front(object);
+//	}
+//}
 
 std::string GameObjectManager::get_effect_string(interaction_e key)
 {
@@ -744,10 +682,10 @@ feature_list_type_e GameObjectManager::get_feature_list_type_e(const std::string
 
 void GameObjectManager::save(FILE* file)
 {
-	for (auto object = m_objects.begin(); object != m_objects.end(); object++)
+	/*for (auto object = m_objects.begin(); object != m_objects.end(); object++)
 	{
 		(*object)->save(file);
-	}
+	}*/
 }
 
 void GameObjectManager::load(FILE* file)

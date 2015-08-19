@@ -20,9 +20,25 @@ class AI;
 
 const int max_light_radius = 20;
 
+class Object_manager
+{
+
+public:
+
+	std::list<GameObject*> m_items;
+	Object_manager() {};
+
+	void update_buff();
+	void calculate_ai(GameMap* game_map);
+
+};
+
 class GameMap
 {
 public:
+
+	Object_manager m_object_manager;
+
 	bool m_update;
 	Event<VoidEventArgs> update;
 
@@ -37,8 +53,6 @@ public:
 	float m_coefficient[21][21];
 	
 	std::vector<std::vector<MapCell*> > m_items;
-	std::list<GameObject*> m_lights;
-	std::list<GameObject*> m_ai;
 
 	std::list<block_t*> m_rooms;
 	std::list<block_t*> m_link_rooms;
@@ -53,7 +67,6 @@ public:
 	void generate_room(void);
 	bool divide_block(block_t* Block, int Depth, int Current);
 	void generate_level(void);
-	void add_light(GameObject* Object);
 
 	void add_to_map(GameObject* object, MapCell* cell);
 

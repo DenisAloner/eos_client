@@ -435,25 +435,25 @@ void Application::initialize()
 		m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 	}*/
 
-	FILE* file;
-	errno_t err;
+	//FILE* file;
+	//errno_t err;
 
-	//obj = m_game_object_manager->new_object("iso_unit");
-	obj = new GameObject();
-	LOG(INFO) << "Запись обьекта";
-	err = fopen_s(&file, (FileSystem::instance().m_resource_path + "Saves\\save_01.txt").c_str(), "rb");
-	if (err == 0)
-	{
-		obj->load(file);
-		Application::instance().m_game_object_manager->register_object(obj);
-		fclose(file);
-		LOG(INFO) << "Сохранение завершено успешно";
-	}
-	else
-	{
-		LOG(INFO) << "Сохранение не завершено из-за ошибки";
-	}
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry+4][rx]);
+	////obj = m_game_object_manager->new_object("iso_unit");
+	//obj = new GameObject();
+	//LOG(INFO) << "Запись обьекта";
+	//err = fopen_s(&file, (FileSystem::instance().m_resource_path + "Saves\\save_01.txt").c_str(), "rb");
+	//if (err == 0)
+	//{
+	//	obj->load(file);
+	//	//Application::instance().m_game_object_manager->register_object(obj);
+	//	fclose(file);
+	//	LOG(INFO) << "Сохранение завершено успешно";
+	//}
+	//else
+	//{
+	//	LOG(INFO) << "Сохранение не завершено из-за ошибки";
+	//}
+	//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry+4][rx]);
 
 	m_ready = true;
 }
@@ -559,8 +559,8 @@ void Application::update()
 	{
 		m_update_mutex.lock();
 		m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->update();
-		Application::instance().m_game_object_manager->calculate_ai(m_GUI->MapViewer->m_map);
-		Application::instance().m_game_object_manager->update_buff();
+		Application::instance().m_GUI->MapViewer->m_map->m_object_manager.calculate_ai(m_GUI->MapViewer->m_map);
+		Application::instance().m_GUI->MapViewer->m_map->m_object_manager.update_buff();
 		m_GUI->MapViewer->m_map->calculate_lighting2();
 		Application::instance().m_GUI->MapViewer->update();
 		Application::instance().m_GUI->MapViewer->m_map->m_update = true;
