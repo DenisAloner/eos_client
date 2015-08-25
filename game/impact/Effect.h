@@ -199,16 +199,6 @@ public:
 	virtual void load(FILE* file);
 };
 
-class Interaction_prefix_ex :public Interaction_prefix
-{
-public:
-	Object_interaction* m_effect;
-	virtual Interaction_prefix_ex* clone();
-
-	virtual void save(FILE* file);
-	virtual void load(FILE* file);
-};
-
 class Interaction_addon :public Interaction_slot
 {
 public:

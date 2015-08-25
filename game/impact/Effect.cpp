@@ -654,27 +654,6 @@ void Interaction_prefix::load(FILE* file)
 	m_value = FileSystem::instance().deserialize_impact(file);
 }
 
-// Interaction_prefix_ex
-
-Interaction_prefix_ex* Interaction_prefix_ex::clone()
-{
-	Interaction_prefix_ex* effect = new Interaction_prefix_ex();
-	effect->m_subtype = m_subtype;
-	effect->m_value = m_value;
-	effect->m_effect = m_effect;
-	return effect;
-}
-
-void Interaction_prefix_ex::save(FILE* file)
-{
-	type_e t = type_e::interaction_prefix_ex;
-	fwrite(&t, sizeof(type_e), 1, file);
-}
-
-void Interaction_prefix_ex::load(FILE* file)
-{
-}
-
 // Interaction_addon
 
 Interaction_addon::Interaction_addon() {};
@@ -875,10 +854,12 @@ void Effect::apply_effect(GameObject* unit, Object_interaction* object)
 		if (item->m_basic_value <=1)
 		{ 
 			item->m_basic_value = 0;
-			Interaction_prefix_ex* prefix = new Interaction_prefix_ex();
-			prefix->m_value = object;
+			Interaction_copyist* copyist = new Interaction_copyist();
+			copyist->m_subtype = item->m_subtype;
+			copyist->m_value = clone();
+			Interaction_prefix* prefix = new Interaction_prefix();
+			prefix->m_value = copyist;
 			prefix->m_subtype = effect_prefix_e::parameter_change;
-			prefix->m_effect = clone();
 			prefix->apply_effect(unit, object);
 		}
 		break;
@@ -981,12 +962,16 @@ void ObjectTag::Mortal::apply_effect(GameObject* unit, Object_interaction* objec
 	{
 	case effect_prefix_e::parameter_change:
 	{
-		Interaction_prefix_ex* prefix_ex = static_cast<Interaction_prefix_ex*>(object);
-		if (static_cast<Parameter_list*>(prefix_ex->m_value)->m_subtype == interaction_e::health)
+		Interaction_copyist* copyist = static_cast<Interaction_copyist*>(prefix->m_value);
+		if (copyist->m_subtype == interaction_e::health)
 		{
-			if (static_cast<Parameter_list*>(prefix_ex->m_value)->m_basic_value == 0)
+			auto feat = unit->get_parameter(interaction_e::health);
+			if (feat)
 			{
-				unit->set_state(object_state_e::dead);
+				if (feat->m_basic_value == 0)
+				{
+					unit->set_state(object_state_e::dead);
+				}
 			}
 		}
 		break;
