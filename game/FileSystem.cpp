@@ -284,3 +284,12 @@ AI* FileSystem::deserialize_AI(FILE* file)
 	value->load(file);
 	return value;
 }
+
+Serialization_manager::Serialization_manager()
+{
+}
+
+
+Serialization_manager::~Serialization_manager()
+{
+}

@@ -438,13 +438,11 @@ void Application::initialize()
 	//FILE* file;
 	//errno_t err;
 
-	////obj = m_game_object_manager->new_object("iso_unit");
-	//obj = new GameObject();
 	//LOG(INFO) << "Запись обьекта";
-	//err = fopen_s(&file, (FileSystem::instance().m_resource_path + "Saves\\save_01.txt").c_str(), "rb");
+	//err = fopen_s(&file, (FileSystem::instance().m_resource_path + "Saves\\save_01.txt").c_str(), "wb");
 	//if (err == 0)
 	//{
-	//	obj->load(file);
+	//	m_GUI->MapViewer->m_map->m_object_manager.save(file);
 	//	//Application::instance().m_game_object_manager->register_object(obj);
 	//	fclose(file);
 	//	LOG(INFO) << "Сохранение завершено успешно";
@@ -453,7 +451,6 @@ void Application::initialize()
 	//{
 	//	LOG(INFO) << "Сохранение не завершено из-за ошибки";
 	//}
-	//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry+4][rx]);
 
 	m_ready = true;
 }

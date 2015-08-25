@@ -204,6 +204,11 @@ struct RGB_t
 class iSerializable
 {
 public:
+
+	size_t m_serialization_index;
+
+	virtual void reset_serialization_index() { m_serialization_index = 0; };
+
 	virtual void save(FILE* file) = 0;
 	virtual void load(FILE* file) = 0;
 };

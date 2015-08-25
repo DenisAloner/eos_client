@@ -21,6 +21,7 @@ public:
 	virtual void remove(Object_interaction* item) { m_effect.remove(item); };
 	virtual void do_predicat(predicat func);
 
+	virtual void reset_serialization_index();
 	virtual void save(FILE* file);
 	virtual void load(FILE* file);
 
@@ -162,6 +163,7 @@ public:
 	virtual bool on_turn();
 	virtual void do_predicat(predicat func);
 
+	virtual void reset_serialization_index();
 	virtual void save(FILE* file);
 	virtual void load(FILE* file);
 };

@@ -68,6 +68,7 @@ public:
 	Interaction_list* create_feature_list(feature_list_type_e key, interaction_e name);
 	Attribute_map* clone();
 
+	virtual void reset_serialization_index();
 	virtual void save(FILE* file);
 	virtual void load(FILE* file);
 };
@@ -96,6 +97,7 @@ public:
 	Object_state();
 	virtual Object_state* clone();
 
+	virtual void reset_serialization_index();
 	virtual void save(FILE* file);
 	virtual void load(FILE* file);
 };
@@ -110,7 +112,7 @@ public:
 
 };
 
-class GameObject : public  Object_interaction, public iSerializable
+class GameObject : public  Object_interaction
 {
 public:
 
@@ -124,8 +126,6 @@ public:
 	Object_state* m_active_state;
 	std::list<Object_state*> m_state;
 
-	bool m_active;
-	
 	GameObject();
 
 	void turn();
@@ -150,6 +150,7 @@ public:
 	virtual void description(std::list<std::string>* info, int level);
 	virtual void do_predicat(predicat func);
 
+	virtual void reset_serialization_index();
 	virtual void save(FILE* file);
 	virtual void load(FILE* file);
 };
@@ -187,6 +188,7 @@ public:
 	virtual void description(std::list<std::string>* info, int level);
 	virtual void do_predicat(predicat func);
 
+	virtual void reset_serialization_index();
 	virtual void save(FILE* file);
 	virtual void load(FILE* file);
 };

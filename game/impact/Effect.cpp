@@ -79,6 +79,15 @@ void Interaction_list::description(std::list<std::string>* info, int level)
 	}
 }
 
+void Interaction_list::reset_serialization_index()
+{
+	m_serialization_index = 0;
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		(*item)->reset_serialization_index();
+	}
+}
+
 void Interaction_list::save(FILE* file)
 {
 	type_e t = type_e::interaction_list;
@@ -526,6 +535,14 @@ void Interaction_slot::do_predicat(predicat func)
 	m_value->do_predicat(func);
 }
 
+void Interaction_slot::reset_serialization_index()
+{
+	m_serialization_index = 0;
+	if (m_value)
+	{
+		m_value->reset_serialization_index();
+	}
+}
 
 void Interaction_slot::save(FILE* file)
 {

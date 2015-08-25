@@ -64,6 +64,39 @@ void Object_manager::calculate_ai(GameMap* game_map)
 	}
 }
 
+void Object_manager::save(FILE* file)
+{
+	//size_t s = m_items.size();
+	//fwrite(&s, sizeof(size_t), 1, file);
+	//size_t current_index = 1;
+	//for (auto item = m_items.begin(); item != m_items.end(); item++)
+	//{
+	//	(*item)->m_index_serialization = current_index;
+	//	(*item)->save(file);
+	//	current_index += 1;
+	//}
+}
+
+void Object_manager::load(FILE* file)
+{
+	//size_t s;
+	//fread(&s, sizeof(size_t), 1, file);
+	//std::vector<GameObject*> items(s);
+	//for (int i = 0; i < items.size(); i++)
+	//{
+	//	items[i] = new GameObject;
+	//}
+	////Object_state* value;
+	////for (size_t i = 0; i < s; i++)
+	////{
+	////	value = new Object_state();
+	////	value->load(file);
+	////	m_state.push_back(value);
+	////}
+	////m_active_state = m_state.front();
+	////set_direction(m_direction);
+	////update_interaction();
+}
 
 GameMap::GameMap(dimension_t size)
 {

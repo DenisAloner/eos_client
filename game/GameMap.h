@@ -20,7 +20,7 @@ class AI;
 
 const int max_light_radius = 20;
 
-class Object_manager
+class Object_manager: public iSerializable
 {
 
 public:
@@ -31,6 +31,8 @@ public:
 	void update_buff();
 	void calculate_ai(GameMap* game_map);
 
+	virtual void save(FILE* file);
+	virtual void load(FILE* file);
 };
 
 class GameMap

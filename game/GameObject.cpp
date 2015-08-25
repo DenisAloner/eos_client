@@ -58,6 +58,15 @@ Attribute_map* Attribute_map::clone()
 	return result;
 }
 
+void  Attribute_map::reset_serialization_index()
+{
+	m_serialization_index = 0;
+	for (auto item = m_item.begin(); item != m_item.end(); item++)
+	{
+		(*item).second->reset_serialization_index();
+	}
+}
+
 void  Attribute_map::save(FILE* file)
 {
 	size_t s = m_item.size();
@@ -170,6 +179,12 @@ Object_state* Object_state_equip::clone()
 void Object_state::set_tile_size()
 {
 	m_tile_size = dimension_t(tile_size_x_half*(m_size.x + m_size.y), tile_size_y_half*(m_size.x + m_size.y) + m_size.z * 18);
+}
+
+void Object_state::reset_serialization_index()
+{
+	m_serialization_index = 0;
+	Attribute_map::reset_serialization_index();
 }
 
 void Object_state::save(FILE* file)
@@ -493,6 +508,14 @@ void GameObject::update_interaction()
 	}
 }
 
+void GameObject::reset_serialization_index()
+{
+	m_serialization_index = 0;
+	for (auto item = m_state.begin(); item != m_state.end(); item++)
+	{
+		(*item)->reset_serialization_index();
+	}
+}
 
 void GameObject::save(FILE* file)
 {
@@ -583,6 +606,15 @@ void Object_part::do_predicat(predicat func)
 	for (auto item = m_object_state.m_item.begin(); item != m_object_state.m_item.end(); item++)
 	{
 		item->second->do_predicat(func);
+	}
+}
+
+void Object_part::reset_serialization_index()
+{
+	m_serialization_index = 0;
+	if (m_item)
+	{
+		m_item->reset_serialization_index();
 	}
 }
 
