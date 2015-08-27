@@ -385,8 +385,9 @@ void AI_enemy::create()
 	m_action_controller->update();
 }
 
-void AI_enemy::save(FILE* file)
+void AI_enemy::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::ai_enemy;
 	fwrite(&t, sizeof(type_e), 1, file);
 	fwrite(&m_ai_type, sizeof(ai_type_e), 1, file);
@@ -395,8 +396,9 @@ void AI_enemy::save(FILE* file)
 	fwrite(&m_path_qualifier->index, sizeof(size_t), 1, file);
 }
 
-void AI_enemy::load(FILE* file)
+void AI_enemy::load()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_ai_type, sizeof(ai_type_e), 1, file);
 	fread(&m_fov_radius, sizeof(int), 1, file);
 	size_t s;
@@ -436,11 +438,11 @@ void AI_trap::create()
 	}
 };
 
-void AI_trap::save(FILE* file)
+void AI_trap::save()
 {
 }
 
-void AI_trap::load(FILE* file)
+void AI_trap::load()
 {
 }
 

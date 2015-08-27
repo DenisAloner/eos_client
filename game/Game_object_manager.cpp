@@ -680,7 +680,7 @@ feature_list_type_e GameObjectManager::get_feature_list_type_e(const std::string
 	return value->second;
 }
 
-void GameObjectManager::save(FILE* file)
+void GameObjectManager::save()
 {
 	/*for (auto object = m_objects.begin(); object != m_objects.end(); object++)
 	{
@@ -688,7 +688,7 @@ void GameObjectManager::save(FILE* file)
 	}*/
 }
 
-void GameObjectManager::load(FILE* file)
+void GameObjectManager::load()
 {
 
 }

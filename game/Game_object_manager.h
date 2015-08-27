@@ -111,6 +111,6 @@ public:
 	std::string get_effect_prefix_string(effect_prefix_e key);
 
 
-	virtual void save(FILE* file);
-	virtual void load(FILE* file);
+	virtual void save();
+	virtual void load();
 };

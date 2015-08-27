@@ -120,8 +120,8 @@ public:
 	virtual void create();
 	virtual AI* clone();
 
-	virtual void save(FILE* file);
-	virtual void load(FILE* file);
+	virtual void save();
+	virtual void load();
 
 };
 
@@ -134,8 +134,8 @@ public:
 	virtual void create();
 	virtual AI* clone() { return nullptr; };
 
-	virtual void save(FILE* file);
-	virtual void load(FILE* file);
+	virtual void save();
+	virtual void load();
 };
 
 class AI_manager

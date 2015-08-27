@@ -31,9 +31,7 @@ public:
 	void deserialize_string(std::string& text, FILE* file);
 	void serialize_pointer(const void* value, type_e object_type, FILE* file);
 	void* deserialize_pointer(FILE* file);
-	Object_interaction* deserialize_impact(FILE* file);
-	void serialize_AI(AI* value, FILE* file);
-	AI* deserialize_AI(FILE* file);
+	/*Object_interaction* deserialize_impact(FILE* file);*/
 
 private:
 	FileSystem();
@@ -45,6 +43,10 @@ class Serialization_manager
 {
 public:
 
+	FILE* m_file;
+
+	size_t m_index;
+
 	std::vector<iSerializable*> m_items;
 
 	static Serialization_manager& instance()
@@ -55,15 +57,10 @@ public:
 
 	~Serialization_manager();
 
-	bool load_from_file(const std::string& path, bytearray& data);
-	bool save_to_file(const std::string& path, bytearray& data);
-	void serialize_string(std::string& text, FILE* file);
-	void deserialize_string(std::string& text, FILE* file);
-	void serialize_pointer(const void* value, type_e object_type, FILE* file);
-	void* deserialize_pointer(FILE* file);
-	Object_interaction* deserialize_impact(FILE* file);
-	void serialize_AI(AI* value, FILE* file);
-	AI* deserialize_AI(FILE* file);
+
+	void serialize(iSerializable* value);
+	iSerializable* deserialize();
+
 
 private:
 	Serialization_manager();

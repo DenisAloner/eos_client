@@ -69,8 +69,8 @@ public:
 	Attribute_map* clone();
 
 	virtual void reset_serialization_index();
-	virtual void save(FILE* file);
-	virtual void load(FILE* file);
+	virtual void save();
+	virtual void load();
 };
 
 class Object_state : public Attribute_map
@@ -98,8 +98,8 @@ public:
 	virtual Object_state* clone();
 
 	virtual void reset_serialization_index();
-	virtual void save(FILE* file);
-	virtual void load(FILE* file);
+	virtual void save();
+	virtual void load();
 };
 
 class Object_state_equip :public Object_state
@@ -151,8 +151,8 @@ public:
 	virtual void do_predicat(predicat func);
 
 	virtual void reset_serialization_index();
-	virtual void save(FILE* file);
-	virtual void load(FILE* file);
+	virtual void save();
+	virtual void load();
 };
 
 class Player
@@ -189,8 +189,8 @@ public:
 	virtual void do_predicat(predicat func);
 
 	virtual void reset_serialization_index();
-	virtual void save(FILE* file);
-	virtual void load(FILE* file);
+	virtual void save();
+	virtual void load();
 };
 
 #endif //GAMEOBJECT_H

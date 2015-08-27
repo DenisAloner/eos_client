@@ -88,26 +88,28 @@ void Interaction_list::reset_serialization_index()
 	}
 }
 
-void Interaction_list::save(FILE* file)
+void Interaction_list::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::interaction_list;
 	fwrite(&t, sizeof(type_e), 1, file);
 	size_t s = m_effect.size();
 	fwrite(&s, sizeof(size_t), 1, file);
 	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
 	{
-		(*item)->save(file);
+		Serialization_manager::instance().serialize(*item);
 	}
 }
 
-void Interaction_list::load(FILE* file)
+void Interaction_list::load()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
 	m_effect.clear();
 	for (size_t i = 0; i < s; i++)
 	{
-		m_effect.push_back(FileSystem::instance().deserialize_impact(file));
+		m_effect.push_back(static_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
 	}
 }
 
@@ -207,8 +209,9 @@ void Parameter_list::description(std::list<std::string>* info, int level)
 	}
 }
 
-void Parameter_list::save(FILE* file)
+void Parameter_list::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::parameter_list;
 	fwrite(&t, sizeof(type_e), 1, file);
 
@@ -220,12 +223,13 @@ void Parameter_list::save(FILE* file)
 	fwrite(&s, sizeof(size_t), 1, file);
 	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
 	{
-		(*item)->save(file);
+		Serialization_manager::instance().serialize(*item);
 	}
 }
 
-void Parameter_list::load(FILE* file)
+void Parameter_list::load()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_subtype, sizeof(interaction_e), 1, file);
 	fread(&m_basic_value, sizeof(int), 1, file);
 	fread(&m_basic_limit, sizeof(int), 1, file);
@@ -235,7 +239,7 @@ void Parameter_list::load(FILE* file)
 	m_effect.clear();
 	for (size_t i = 0; i < s; i++)
 	{
-		m_effect.push_back(FileSystem::instance().deserialize_impact(file));
+		m_effect.push_back(static_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
 	}
 }
 
@@ -257,26 +261,28 @@ Tag_list* Tag_list::clone()
 	return result;
 }
 
-void Tag_list::save(FILE* file)
+void Tag_list::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::tag_list;
 	fwrite(&t, sizeof(type_e), 1, file);
 	size_t s = m_effect.size();
 	fwrite(&s, sizeof(size_t), 1, file);
 	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
 	{
-		(*item)->save(file);
+		Serialization_manager::instance().serialize(*item);
 	}
 }
 
-void Tag_list::load(FILE* file)
+void Tag_list::load()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
 	m_effect.clear();
 	for (size_t i = 0; i < s; i++)
 	{
-		m_effect.push_back(FileSystem::instance().deserialize_impact(file));
+		m_effect.push_back(static_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
 	}
 }
 
@@ -298,26 +304,28 @@ Parts_list* Parts_list::clone()
 	return result;
 }
 
-void Parts_list::save(FILE* file)
+void Parts_list::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::parts_list;
 	fwrite(&t, sizeof(type_e), 1, file);
 	size_t s = m_effect.size();
 	fwrite(&s, sizeof(size_t), 1, file);
 	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
 	{
-		(*item)->save(file);
+		Serialization_manager::instance().serialize(*item);
 	}
 }
 
-void Parts_list::load(FILE* file)
+void Parts_list::load()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
 	m_effect.clear();
 	for (size_t i = 0; i < s; i++)
 	{
-		m_effect.push_back(FileSystem::instance().deserialize_impact(file));
+		m_effect.push_back(static_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
 	}
 }
 
@@ -339,26 +347,28 @@ Interaction_list* Action_list::clone()
 	return result;
 }
 
-void Action_list::save(FILE* file)
+void Action_list::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::action_list;
 	fwrite(&t, sizeof(type_e), 1, file);
 	size_t s = m_effect.size();
 	fwrite(&s, sizeof(size_t), 1, file);
 	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
 	{
-		(*item)->save(file);
+		Serialization_manager::instance().serialize(*item);
 	}
 }
 
-void Action_list::load(FILE* file)
+void Action_list::load()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
 	m_effect.clear();
 	for (size_t i = 0; i < s; i++)
 	{
-		m_effect.push_back(FileSystem::instance().deserialize_impact(file));
+		m_effect.push_back(static_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
 	}
 }
 
@@ -383,14 +393,15 @@ void Slot_set_state::apply_effect(GameObject* unit, Object_interaction* object)
 	unit->set_state(m_value);
 }
 
-void Slot_set_state::save(FILE* file)
+void Slot_set_state::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::slot_set_state;
 	fwrite(&t, sizeof(type_e), 1, file);
 	fwrite(&m_value, sizeof(object_state_e), 1, file);
 }
 
-void Slot_set_state::load(FILE* file)
+void Slot_set_state::load()
 {
 }
 
@@ -436,14 +447,15 @@ void Slot_select_cell::apply_effect(GameObject* unit, Object_interaction* object
 	};
 }
 
-void Slot_select_cell::save(FILE* file)
+void Slot_select_cell::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::slot_select_cell;
 	fwrite(&t, sizeof(type_e), 1, file);
 	FileSystem::instance().serialize_string(m_value, file);
 }
 
-void Slot_select_cell::load(FILE* file)
+void Slot_select_cell::load()
 {
 }
 
@@ -473,13 +485,14 @@ void Slot_allocator::apply_effect(GameObject* unit, Object_interaction* object)
 	};
 }
 
-void Slot_allocator::save(FILE* file)
+void Slot_allocator::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::slot_allocator;
 	fwrite(&t, sizeof(type_e), 1, file);
 }
 
-void Slot_allocator::load(FILE* file)
+void Slot_allocator::load()
 {
 }
 
@@ -508,13 +521,14 @@ void Slot_mover::apply_effect(GameObject* unit, Object_interaction* object)
 	map->move_object(unit, m_value->m_value);
 }
 
-void Slot_mover::save(FILE* file)
+void Slot_mover::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::slot_mover;
 	fwrite(&t, sizeof(type_e), 1, file);
 }
 
-void Slot_mover::load(FILE* file)
+void Slot_mover::load()
 {
 }
 
@@ -544,13 +558,14 @@ void Interaction_slot::reset_serialization_index()
 	}
 }
 
-void Interaction_slot::save(FILE* file)
+void Interaction_slot::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::interaction_slot;
 	fwrite(&t, sizeof(type_e), 1, file);
 }
 
-void Interaction_slot::load(FILE* file)
+void Interaction_slot::load()
 {
 }
 
@@ -590,18 +605,20 @@ void Interaction_copyist::apply_effect(GameObject* unit, Object_interaction* obj
 	}
 }
 
-void Interaction_copyist::save(FILE* file)
+void Interaction_copyist::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::interaction_copyist;
 	fwrite(&t, sizeof(type_e), 1, file);
 	fwrite(&m_subtype, sizeof(interaction_e), 1, file);
-	m_value->save(file);
+	Serialization_manager::instance().serialize(m_value);
 }
 
-void Interaction_copyist::load(FILE* file)
+void Interaction_copyist::load()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_subtype, sizeof(interaction_e), 1, file);
-	m_value = FileSystem::instance().deserialize_impact(file);
+	m_value = static_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
 }
 
 // Interaction_prefix
@@ -640,18 +657,20 @@ std::string Interaction_prefix::get_description()
 	return "none";
 }
 
-void Interaction_prefix::save(FILE* file)
+void Interaction_prefix::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::interaction_prefix;
 	fwrite(&t, sizeof(type_e), 1, file);
 	fwrite(&m_subtype, sizeof(effect_prefix_e), 1, file);
-	m_value->save(file);
+	Serialization_manager::instance().serialize(m_value);
 }
 
-void Interaction_prefix::load(FILE* file)
+void Interaction_prefix::load()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_subtype, sizeof(effect_prefix_e), 1, file);
-	m_value = FileSystem::instance().deserialize_impact(file);
+	m_value = static_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
 }
 
 // Interaction_addon
@@ -683,18 +702,20 @@ void Interaction_addon::apply_effect(GameObject* unit, Object_interaction* objec
 	unit->add_effect(m_subtype, m_value->clone());
 }
 
-void Interaction_addon::save(FILE* file)
+void Interaction_addon::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::interaction_addon;
 	fwrite(&t, sizeof(type_e), 1, file);
 	fwrite(&m_subtype, sizeof(interaction_e), 1, file);
-	m_value->save(file);
+	Serialization_manager::instance().serialize(m_value);
 }
 
-void Interaction_addon::load(FILE* file)
+void Interaction_addon::load()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_subtype, sizeof(interaction_e), 1, file);
-	m_value = FileSystem::instance().deserialize_impact(file);
+	m_value = static_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
 }
 
 // Interaction_time
@@ -740,18 +761,20 @@ void Interaction_time::apply_effect(GameObject* unit, Object_interaction* object
 	m_value->apply_effect(unit, object);
 }
 
-void Interaction_time::save(FILE* file)
+void Interaction_time::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::interaction_time;
 	fwrite(&t, sizeof(type_e), 1, file);
 	fwrite(&m_turn, sizeof(int), 1, file);
-	m_value->save(file);
+	Serialization_manager::instance().serialize(m_value);
 }
 
-void Interaction_time::load(FILE* file)
+void Interaction_time::load()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_turn, sizeof(int), 1, file);
-	m_value = FileSystem::instance().deserialize_impact(file);
+	m_value = static_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
 }
 
 // Interaction_timer
@@ -800,20 +823,22 @@ void Interaction_timer::apply_effect(GameObject* unit, Object_interaction* objec
 	}
 }
 
-void Interaction_timer::save(FILE* file)
+void Interaction_timer::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::interaction_timer;
 	fwrite(&t, sizeof(type_e), 1, file);
 	fwrite(&m_turn, sizeof(int), 1, file);
 	fwrite(&m_period, sizeof(int), 1, file);
-	m_value->save(file);
+	Serialization_manager::instance().serialize(m_value);
 }
 
-void Interaction_timer::load(FILE* file)
+void Interaction_timer::load()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_turn, sizeof(int), 1, file);
 	fread(&m_period, sizeof(int), 1, file);
-	m_value = FileSystem::instance().deserialize_impact(file);
+	m_value = static_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
 }
 
 
@@ -879,16 +904,18 @@ void Effect::description(std::list<std::string>* info, int level)
 	info->push_back(std::string(level,'.')+Application::instance().m_game_object_manager->get_effect_subtype_string(m_subtype) + ":" + std::to_string(m_value));
 }
 
-void Effect::save(FILE* file)
+void Effect::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::effect;
 	fwrite(&t, sizeof(type_e), 1, file);
 	fwrite(&m_value, sizeof(int), 1, file);
 	fwrite(&m_subtype, sizeof(effect_e), 1, file);
 }
 
-void Effect::load(FILE* file)
+void Effect::load()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_value, sizeof(int), 1, file);
 	fread(&m_subtype, sizeof(effect_e), 1, file);
 }
@@ -935,13 +962,14 @@ void ObjectTag::Poison_resist::apply_effect(GameObject* unit, Object_interaction
 	}
 }
 
-void ObjectTag::Poison_resist::save(FILE* file)
+void ObjectTag::Poison_resist::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::tag_poison_resist;
 	fwrite(&t, sizeof(type_e), 1, file);
 }
 
-void ObjectTag::Poison_resist::load(FILE* file)
+void ObjectTag::Poison_resist::load()
 {
 }
 
@@ -979,13 +1007,14 @@ void ObjectTag::Mortal::apply_effect(GameObject* unit, Object_interaction* objec
 	}
 }
 
-void ObjectTag::Mortal::save(FILE* file)
+void ObjectTag::Mortal::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::tag_mortal;
 	fwrite(&t, sizeof(type_e), 1, file);
 }
 
-void ObjectTag::Mortal::load(FILE* file)
+void ObjectTag::Mortal::load()
 {
 }
 
@@ -1026,13 +1055,14 @@ void ObjectTag::Purification_from_poison::apply_effect(GameObject* unit, Object_
 	}
 }
 
-void ObjectTag::Purification_from_poison::save(FILE* file)
+void ObjectTag::Purification_from_poison::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::tag_purification_from_poison;
 	fwrite(&t, sizeof(type_e), 1, file);
 }
 
-void ObjectTag::Purification_from_poison::load(FILE* file)
+void ObjectTag::Purification_from_poison::load()
 {
 }
 
@@ -1067,11 +1097,11 @@ void ObjectTag::Activator::apply_effect(GameObject* unit, Object_interaction* ob
 	}
 }
 
-void ObjectTag::Activator::save(FILE* file)
+void ObjectTag::Activator::save()
 {
 }
 
-void ObjectTag::Activator::load(FILE* file)
+void ObjectTag::Activator::load()
 {
 }
 
@@ -1108,13 +1138,14 @@ void ObjectTag::Fast_move::apply_effect(GameObject* unit, Object_interaction* ob
 	}
 }
 
-void ObjectTag::Fast_move::save(FILE* file)
+void ObjectTag::Fast_move::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::tag_fast_move;
 	fwrite(&t, sizeof(type_e), 1, file);
 }
 
-void ObjectTag::Fast_move::load(FILE* file)
+void ObjectTag::Fast_move::load()
 {
 }
 
@@ -1130,14 +1161,16 @@ ObjectTag::Label* ObjectTag::Label::clone()
 
 void ObjectTag::Label::apply_effect(GameObject* unit, Object_interaction* object){};
 
-void ObjectTag::Label::save(FILE* file)
+void ObjectTag::Label::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::tag_label;
 	fwrite(&t, sizeof(type_e), 1, file);
 	fwrite(&m_type, sizeof(object_tag_e), 1, file);
 }
 
-void ObjectTag::Label::load(FILE* file)
+void ObjectTag::Label::load()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_type, sizeof(object_tag_e), 1, file);
 }

@@ -53,15 +53,16 @@ void Action::interaction_handler()
 	}
 }
 
-void Action::save(FILE* file)
+void Action::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::action;
 	fwrite(&t, sizeof(type_e), 1, file);
 	LOG(INFO)<< m_name <<"    " <<std::to_string(m_index);
 	fwrite(&m_index, sizeof(size_t), 1, file);
 }
 
-void Action::load(FILE* file)
+void Action::load()
 {
 }
 
@@ -82,11 +83,11 @@ Action_wrapper* Action_wrapper::clone()
 	return result;
 }
 
-void Action_wrapper::save(FILE* file)
+void Action_wrapper::save()
 {
 }
 
-void Action_wrapper::load(FILE* file)
+void Action_wrapper::load()
 {
 }
 

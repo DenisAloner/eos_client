@@ -67,19 +67,21 @@ void  Attribute_map::reset_serialization_index()
 	}
 }
 
-void  Attribute_map::save(FILE* file)
+void  Attribute_map::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	size_t s = m_item.size();
 	fwrite(&s, sizeof(size_t), 1, file);
 	for (auto item = m_item.begin(); item != m_item.end(); item++)
 	{
 		fwrite(&((*item).first), sizeof(interaction_e), 1, file);
-		(*item).second->save(file);
+		Serialization_manager::instance().serialize((*item).second);
 	}
 }
 
-void Attribute_map::load(FILE* file)
+void Attribute_map::load()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
 	m_item.clear();
@@ -87,7 +89,7 @@ void Attribute_map::load(FILE* file)
 	for (size_t i = 0; i < s; i++)
 	{
 		fread(&ie, sizeof(interaction_e), 1, file);
-		m_item[ie] = static_cast<Interaction_list*>(FileSystem::instance().deserialize_impact(file));
+		m_item[ie] = static_cast<Interaction_list*>(Serialization_manager::instance().deserialize());
 	}
 }
 
@@ -187,9 +189,10 @@ void Object_state::reset_serialization_index()
 	Attribute_map::reset_serialization_index();
 }
 
-void Object_state::save(FILE* file)
+void Object_state::save()
 {
-	Attribute_map::save(file);
+	FILE* file = Serialization_manager::instance().m_file;
+	Attribute_map::save();
 	fwrite(&m_state, sizeof(object_state_e), 1, file);
 	fwrite(&m_layer, sizeof(int), 1, file);
 	fwrite(&m_size, sizeof(game_object_size_t), 1, file);
@@ -197,12 +200,13 @@ void Object_state::save(FILE* file)
 	FileSystem::instance().serialize_pointer(m_light, type_e::light_t, file);
 	FileSystem::instance().serialize_pointer(m_optical, type_e::optical_properties_t, file);
 	fwrite(&m_tile_manager->m_index, sizeof(size_t), 1, file);
-	FileSystem::instance().serialize_AI(m_ai, file);
+	Serialization_manager::instance().serialize(m_ai);
 }
 
-void Object_state::load(FILE* file)
+void Object_state::load()
 {
-	Attribute_map::load(file);
+	FILE* file = Serialization_manager::instance().m_file;
+	Attribute_map::load();
 	fread(&m_state, sizeof(object_state_e), 1, file);
 	fread(&m_layer, sizeof(int), 1, file);
 	fread(&m_size, sizeof(game_object_size_t), 1, file);
@@ -212,7 +216,7 @@ void Object_state::load(FILE* file)
 	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
 	m_tile_manager = Application::instance().m_graph->m_tile_managers[s];
-	m_ai=FileSystem::instance().deserialize_AI(file);
+	m_ai = static_cast<AI*>(Serialization_manager::instance().deserialize());
 }
 
 
@@ -517,20 +521,22 @@ void GameObject::reset_serialization_index()
 	}
 }
 
-void GameObject::save(FILE* file)
+void GameObject::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	FileSystem::instance().serialize_string(m_name, file);
 	fwrite(&m_direction, sizeof(object_direction_e), 1, file);
 	size_t s = m_state.size();
 	fwrite(&s, sizeof(size_t), 1, file);
 	for (auto item = m_state.begin(); item != m_state.end(); item++)
 	{
-		(*item)->save(file);
+		Serialization_manager::instance().serialize(*item);
 	}
 }
 
-void GameObject::load(FILE* file)
+void GameObject::load()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	FileSystem::instance().deserialize_string(m_name, file);
 	fread(&m_direction, sizeof(object_direction_e), 1, file);
 	size_t s;
@@ -538,8 +544,8 @@ void GameObject::load(FILE* file)
 	Object_state* value;
 	for (size_t i = 0; i < s; i++)
 	{
-		value = new Object_state();
-		value->load(file);
+		value =static_cast<Object_state*>(Serialization_manager::instance().deserialize());
+		value->load();
 		m_state.push_back(value);
 	}
 	m_active_state = m_state.front();
@@ -618,38 +624,24 @@ void Object_part::reset_serialization_index()
 	}
 }
 
-void Object_part::save(FILE* file)
+void Object_part::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::object_part;
 	fwrite(&t, sizeof(type_e), 1, file);
-	m_object_state.save(file);
+	m_object_state.save();
 	fwrite(&m_kind, sizeof(body_part_e), 1, file);
 	FileSystem::instance().serialize_string(m_name, file);
-	if (m_item)
-	{
-		t = type_e::gameobject;
-		fwrite(&t, sizeof(type_e), 1, file);
-		m_item->save(file);
-	}
-	else
-	{
-		t = type_e::null;
-		fwrite(&t, sizeof(type_e), 1, file);
-	}
+	Serialization_manager::instance().serialize(m_item);
 }
 
-void Object_part::load(FILE* file)
+void Object_part::load()
 {
-	m_object_state.load(file);
+	FILE* file = Serialization_manager::instance().m_file;
+	m_object_state.load();
 	fread(&m_kind, sizeof(body_part_e), 1, file);
 	FileSystem::instance().deserialize_string(m_name, file);
 	type_e type;
 	fread(&type, sizeof(type_e), 1, file);
-	m_item = nullptr;
-	if (type== type_e::gameobject)
-	{
-		m_item = new GameObject();
-		m_item->load(file);
-		//Application::instance().m_game_object_manager->register_object(m_item);
-	}
+	m_item = static_cast<GameObject*>(Serialization_manager::instance().deserialize());
 }

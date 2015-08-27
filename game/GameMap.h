@@ -31,8 +31,9 @@ public:
 	void update_buff();
 	void calculate_ai(GameMap* game_map);
 
-	virtual void save(FILE* file);
-	virtual void load(FILE* file);
+	virtual void reset_serialization_index();
+	virtual void save();
+	virtual void load();
 };
 
 class GameMap

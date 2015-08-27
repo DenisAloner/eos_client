@@ -209,8 +209,8 @@ public:
 
 	virtual void reset_serialization_index() { m_serialization_index = 0; };
 
-	virtual void save(FILE* file) = 0;
-	virtual void load(FILE* file) = 0;
+	virtual void save() = 0;
+	virtual void load() = 0;
 };
 
 struct optical_properties_t
@@ -359,7 +359,9 @@ struct f2dvector_t
 enum class type_e
 {
 	null,
+	link,
 	light_t,
+	object_state,
 	optical_properties_t,
 	interaction_list,
 	parameter_list,

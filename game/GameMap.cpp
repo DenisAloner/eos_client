@@ -64,7 +64,16 @@ void Object_manager::calculate_ai(GameMap* game_map)
 	}
 }
 
-void Object_manager::save(FILE* file)
+void Object_manager::reset_serialization_index()
+{
+	m_serialization_index = 0;
+	for (auto item = m_items.begin(); item != m_items.end(); item++)
+	{
+		(*item)->reset_serialization_index();
+	}
+}
+
+void Object_manager::save()
 {
 	//size_t s = m_items.size();
 	//fwrite(&s, sizeof(size_t), 1, file);
@@ -77,7 +86,7 @@ void Object_manager::save(FILE* file)
 	//}
 }
 
-void Object_manager::load(FILE* file)
+void Object_manager::load()
 {
 	//size_t s;
 	//fread(&s, sizeof(size_t), 1, file);
