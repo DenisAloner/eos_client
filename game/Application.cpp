@@ -193,27 +193,30 @@ void Application::initialize()
 	m_GUI->MapViewer->m_size.w = 1024;
 	m_GUI->MapViewer->m_size.h = 1024;
 	
-	m_GUI->MapViewer->m_map = new GameMap(dimension_t(200,200));
-	m_GUI->MapViewer->m_map->generate_level();
-	//m_GUI->MapViewer->m_map->generate_room();
+	m_GUI->MapViewer->m_map = new GameMap(dimension_t(7,4));
+	//m_GUI->MapViewer->m_map->generate_level();
 
-	/*int rx = 100;
-	int ry = 100;
+	m_GUI->MapViewer->m_map->generate_room();
+
+	int rx = 2;
+	int ry = 2;
 	GameObject* obj = m_game_object_manager->new_object("iso_unit");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx]);
-	m_GUI->MapViewer->m_player = new Player(obj, m_GUI->MapViewer->m_map);*/
-
-
-	int index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
-	GameMap::block_t* room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);
-	int rx = rand() % room->rect.w;
-	int ry = rand() % room->rect.h;
-	GameObject* obj = m_game_object_manager->new_object("iso_unit");
-	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 	m_GUI->MapViewer->m_player = new Player(obj, m_GUI->MapViewer->m_map);
 
-	rx = room->rect.x + rx;
-	ry = room->rect.y + ry;
+	obj = m_game_object_manager->new_object("rat");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[2][4]);
+
+	//int index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
+	//GameMap::block_t* room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);
+	//int rx = rand() % room->rect.w;
+	//int ry = rand() % room->rect.h;
+	//GameObject* obj = m_game_object_manager->new_object("iso_unit");
+	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
+	//m_GUI->MapViewer->m_player = new Player(obj, m_GUI->MapViewer->m_map);
+
+	//rx = room->rect.x + rx;
+	//ry = room->rect.y + ry;
 
 	m_window_manager = new GUI_Window_manager(0, 0, 1024, 1024);
 
@@ -328,75 +331,6 @@ void Application::initialize()
 		times you want it to loop (use -1 for infinite, and 0 to
 		have it just play once) */
 	}
-	//obj = m_game_object_manager->new_object("snake");
-	//obj->set_direction(object_direction_e_Left);
-	//m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx + 1]);
-	//obj = m_game_object_manager->new_object("plant");
-	//obj->set_direction(object_direction_e_Left);
-	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry - 3][room->rect.x + rx]);
-	//obj = m_game_object_manager->new_object("sword");
-	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx - 2]);
-	//obj = m_game_object_manager->new_object("dagger");
-	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx - 3]);
-	//obj = m_game_object_manager->new_object("smoke");
-	//obj->set_direction(object_direction_e_Left);
-	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx - 4]);
-	//obj = m_game_object_manager->new_object("trap");
-	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx + 2]);
-	 
-	obj = m_game_object_manager->new_object("dagger");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry ][rx - 1]);
-	obj = m_game_object_manager->new_object("blue potion");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx - 2]);
-
-	obj = m_game_object_manager->new_object("bat");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 7][rx]);
-
-	obj = m_game_object_manager->new_object("rat");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 7][rx-3]);
-
-	obj = m_game_object_manager->new_object("rat");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 7][rx+3]);
-
-	/*obj = m_game_object_manager->new_object("bear");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 7][rx]);*/
-
-	//obj = m_game_object_manager->new_object("skeleton");
-	//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 5][rx - 4]);
-	
-	/*obj = m_game_object_manager->new_object("skull");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 5][rx + 1]);
-	obj = m_game_object_manager->new_object("slave_skull");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 5][rx + 2]);
-	obj = m_game_object_manager->new_object("slave_skull");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 5][rx]);*/
-
-
-	/*obj = m_game_object_manager->new_object("iso_torch");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry + 2][rx + 5]);*/
-
-	/*obj = m_game_object_manager->new_object("wall");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 1][rx + 3]);
-	obj = m_game_object_manager->new_object("wall");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 1][rx + 2]);
-*/
-	/*obj = m_game_object_manager->new_object("snake");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 1][rx + 5]);*/
-
-	/*obj = m_game_object_manager->new_object("ice");
-	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry][rx + 10]);
-
-	obj = m_game_object_manager->new_object("smoke");
-	obj->set_direction(object_direction_e_Left);
-	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry-5][rx]);
-
-	obj = m_game_object_manager->new_object("wall");
-	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry - 7][rx]);
-
-	obj = m_game_object_manager->new_object("smoke");
-	obj->set_direction(object_direction_e_Left);
-	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[ry - 6][rx-1]);*/
-
 
 	/*obj = m_game_object_manager->new_object("torch");
 	m_GUI->MapViewer->m_map->add_new_object(obj, m_GUI->MapViewer->m_map->m_items[ry + 15][rx]);*/
@@ -435,22 +369,9 @@ void Application::initialize()
 		m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 	}*/
 
-	//FILE* file;
-	//errno_t err;
-
-	//LOG(INFO) << "Запись обьекта";
-	//err = fopen_s(&file, (FileSystem::instance().m_resource_path + "Saves\\save_01.txt").c_str(), "wb");
-	//if (err == 0)
-	//{
-	//	m_GUI->MapViewer->m_map->m_object_manager.save(file);
-	//	//Application::instance().m_game_object_manager->register_object(obj);
-	//	fclose(file);
-	//	LOG(INFO) << "Сохранение завершено успешно";
-	//}
-	//else
-	//{
-	//	LOG(INFO) << "Сохранение не завершено из-за ошибки";
-	//}
+	//Serialization_manager::instance().save("save_02", m_GUI->MapViewer->m_map);
+	//GameMap* A = Serialization_manager::instance().load("save_02");
+	//LOG(INFO) << std::to_string(A->m_object_manager.m_items.size());
 
 	m_ready = true;
 }

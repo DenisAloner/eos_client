@@ -90,6 +90,7 @@ void Interaction_list::reset_serialization_index()
 
 void Interaction_list::save()
 {
+	LOG(INFO) << "Лист общий";
 	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::interaction_list;
 	fwrite(&t, sizeof(type_e), 1, file);
@@ -99,6 +100,7 @@ void Interaction_list::save()
 	{
 		Serialization_manager::instance().serialize(*item);
 	}
+	LOG(INFO) << "Конец общего листа";
 }
 
 void Interaction_list::load()
@@ -170,6 +172,7 @@ void Parameter_list::update_list(Object_interaction* list)
 
 void Parameter_list::update()
 {
+	LOG(INFO) << "ТИП ПАРАМЕТРА " << std::to_string((int)m_subtype);
 	m_value = m_basic_value;
 	m_limit = m_basic_limit;
 	update_list(this);
@@ -211,6 +214,7 @@ void Parameter_list::description(std::list<std::string>* info, int level)
 
 void Parameter_list::save()
 {
+	LOG(INFO) << "Лист параметров";
 	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::parameter_list;
 	fwrite(&t, sizeof(type_e), 1, file);
@@ -225,15 +229,17 @@ void Parameter_list::save()
 	{
 		Serialization_manager::instance().serialize(*item);
 	}
+	LOG(INFO) << "Конец листа параметров";
 }
 
 void Parameter_list::load()
 {
+	LOG(INFO) << "Лист параметров";
 	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_subtype, sizeof(interaction_e), 1, file);
+	LOG(INFO) << "ТИП листа параметров " << std::to_string((int)m_subtype);
 	fread(&m_basic_value, sizeof(int), 1, file);
 	fread(&m_basic_limit, sizeof(int), 1, file);
-
 	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
 	m_effect.clear();
@@ -241,6 +247,7 @@ void Parameter_list::load()
 	{
 		m_effect.push_back(static_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
 	}
+	LOG(INFO) << "Конец листа параметров";
 }
 
 // Tag_list
@@ -263,15 +270,18 @@ Tag_list* Tag_list::clone()
 
 void Tag_list::save()
 {
+	LOG(INFO) << "Лист меток";
 	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::tag_list;
 	fwrite(&t, sizeof(type_e), 1, file);
 	size_t s = m_effect.size();
 	fwrite(&s, sizeof(size_t), 1, file);
+
 	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
 	{
 		Serialization_manager::instance().serialize(*item);
 	}
+	LOG(INFO) << "Конец листа меток";
 }
 
 void Tag_list::load()
@@ -306,6 +316,7 @@ Parts_list* Parts_list::clone()
 
 void Parts_list::save()
 {
+	LOG(INFO) << "Лист частей";
 	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::parts_list;
 	fwrite(&t, sizeof(type_e), 1, file);
@@ -315,6 +326,7 @@ void Parts_list::save()
 	{
 		Serialization_manager::instance().serialize(*item);
 	}
+	LOG(INFO) << "Конец листа частей";
 }
 
 void Parts_list::load()
@@ -349,6 +361,7 @@ Interaction_list* Action_list::clone()
 
 void Action_list::save()
 {
+	LOG(INFO) << "Лист действий";
 	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::action_list;
 	fwrite(&t, sizeof(type_e), 1, file);
@@ -358,6 +371,7 @@ void Action_list::save()
 	{
 		Serialization_manager::instance().serialize(*item);
 	}
+	LOG(INFO) << "Конец листа действий";
 }
 
 void Action_list::load()
@@ -558,16 +572,16 @@ void Interaction_slot::reset_serialization_index()
 	}
 }
 
-void Interaction_slot::save()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::interaction_slot;
-	fwrite(&t, sizeof(type_e), 1, file);
-}
-
-void Interaction_slot::load()
-{
-}
+//void Interaction_slot::save()
+//{
+//	FILE* file = Serialization_manager::instance().m_file;
+//	type_e t = type_e::interaction_slot;
+//	fwrite(&t, sizeof(type_e), 1, file);
+//}
+//
+//void Interaction_slot::load()
+//{
+//}
 
 // Interaction_copyist
 
@@ -1099,6 +1113,9 @@ void ObjectTag::Activator::apply_effect(GameObject* unit, Object_interaction* ob
 
 void ObjectTag::Activator::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
+	type_e t = type_e::tag_activator;
+	fwrite(&t, sizeof(type_e), 1, file);
 }
 
 void ObjectTag::Activator::load()

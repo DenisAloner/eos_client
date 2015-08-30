@@ -37,6 +37,7 @@ public:
 	virtual Object_interaction* clone();
 	virtual void description(std::list<std::string>* info, int level) {};
 
+	virtual void reset_serialization_index() { m_serialization_index = 1; };
 	virtual void save();
 	virtual void load();
 };

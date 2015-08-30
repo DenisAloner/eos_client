@@ -16,6 +16,9 @@ public:
 	virtual Object_interaction* clone();
 	virtual std::string get_description();
 	virtual void description(std::list<std::string>* info, int level);
+
+	virtual void save();
+	virtual void load();
 };
 
 #endif // IMPACT_COPY_CHANCE_H

@@ -36,7 +36,7 @@ public:
 	virtual void load();
 };
 
-class GameMap
+class GameMap: public iSerializable
 {
 public:
 
@@ -87,6 +87,11 @@ public:
 	//MapCell* get_cell(int x, int y);
 
 	void calculate_lighting2();
+
+	virtual void reset_serialization_index();
+	virtual void save();
+	virtual void load();
+
 };
 
 #endif //GAMEMAP_H

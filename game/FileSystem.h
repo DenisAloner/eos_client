@@ -10,6 +10,7 @@
 #include <vector>
 
 class AI;
+class GameMap;
 
 class FileSystem
 {
@@ -47,7 +48,7 @@ public:
 
 	size_t m_index;
 
-	std::vector<iSerializable*> m_items;
+	std::vector<iSerializable*>* m_items;
 
 	static Serialization_manager& instance()
 	{
@@ -60,6 +61,8 @@ public:
 
 	void serialize(iSerializable* value);
 	iSerializable* deserialize();
+	void save(const std::string& path, GameMap* map);
+	GameMap* load(const std::string& path);
 
 
 private:

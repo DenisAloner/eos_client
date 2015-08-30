@@ -162,10 +162,7 @@ public:
 	Interaction_slot();
 	virtual bool on_turn();
 	virtual void do_predicat(predicat func);
-
 	virtual void reset_serialization_index();
-	virtual void save();
-	virtual void load();
 };
 
 class Interaction_copyist :public Interaction_slot

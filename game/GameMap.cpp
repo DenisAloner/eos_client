@@ -75,36 +75,26 @@ void Object_manager::reset_serialization_index()
 
 void Object_manager::save()
 {
-	//size_t s = m_items.size();
-	//fwrite(&s, sizeof(size_t), 1, file);
-	//size_t current_index = 1;
-	//for (auto item = m_items.begin(); item != m_items.end(); item++)
-	//{
-	//	(*item)->m_index_serialization = current_index;
-	//	(*item)->save(file);
-	//	current_index += 1;
-	//}
+	FILE* file = Serialization_manager::instance().m_file;
+	size_t s = m_items.size();
+	fwrite(&s, sizeof(size_t), 1, file);
+	for (auto item = m_items.begin(); item != m_items.end(); item++)
+	{
+		Serialization_manager::instance().serialize(*item);
+	}
 }
 
 void Object_manager::load()
 {
-	//size_t s;
-	//fread(&s, sizeof(size_t), 1, file);
-	//std::vector<GameObject*> items(s);
-	//for (int i = 0; i < items.size(); i++)
-	//{
-	//	items[i] = new GameObject;
-	//}
-	////Object_state* value;
-	////for (size_t i = 0; i < s; i++)
-	////{
-	////	value = new Object_state();
-	////	value->load(file);
-	////	m_state.push_back(value);
-	////}
-	////m_active_state = m_state.front();
-	////set_direction(m_direction);
-	////update_interaction();
+	FILE* file = Serialization_manager::instance().m_file;
+	size_t s;
+	fread(&s, sizeof(size_t), 1, file);
+	GameObject* value;
+	for (size_t i = 0; i < s; i++)
+	{
+		value = static_cast<GameObject*>(Serialization_manager::instance().deserialize());
+		m_items.push_back(value);
+	}
 }
 
 GameMap::GameMap(dimension_t size)
@@ -162,7 +152,7 @@ void GameMap::generate_room(void)
 			if ((i == 0) || (j == 0) || (i == m_size.h - 1) || (j == m_size.w - 1))
 			{
 				m_items[i][j] = new MapCell(j, i, this);
-				GameObject* obj = Application::instance().m_game_object_manager->new_object("floor");
+				GameObject* obj = Application::instance().m_game_object_manager->new_object("wall");
 				add_object(obj, m_items[i][j]);
 			}
 			else {
@@ -172,6 +162,8 @@ void GameMap::generate_room(void)
 			}
 		}
 	}
+	GameObject* obj = Application::instance().m_game_object_manager->new_object("torch");
+	add_to_map(obj, m_items[1][1]);
 }
 
 
@@ -228,7 +220,7 @@ void GameMap::generate_level(void)
 	fill();
 	connect_room();
 	add_wall();
-	add_doors();
+	//add_doors();
 	generate_traps();
 	add_lighting();
 }
@@ -1067,4 +1059,19 @@ void GameMap::calculate_lighting2()
 			}
 		}
 	}
+}
+
+void GameMap::reset_serialization_index()
+{
+	m_object_manager.reset_serialization_index();
+}
+
+void GameMap::save()
+{
+	m_object_manager.save();
+}
+
+void GameMap::load()
+{
+	m_object_manager.load();
 }

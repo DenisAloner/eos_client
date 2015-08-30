@@ -1,6 +1,8 @@
 #include "FileSystem.h"
 #include "impact\Effect.h"
 #include "AI.h"
+#include "GameMap.h"
+#include "impact\Impact_copy_chance.h"
 
 #ifndef RESOURCES_PATH
 #define RESOURCES_PATH "resources\\"
@@ -255,21 +257,34 @@ void Serialization_manager::serialize(iSerializable* value)
 {
 	if (value)
 	{
-		if (value->m_serialization_index == 0)
+		switch (value->m_serialization_index)
+		{
+		case 0:
 		{
 			m_index += 1;
 			value->m_serialization_index = m_index;
+			LOG(INFO) << "Присвоен индекс " << std::to_string(value->m_serialization_index);
 			value->save();
+			break;
 		}
-		else
+		case 1:
+		{
+			value->save();
+			break;
+		}
+		default :
 		{
 			type_e type = type_e::link;
 			fwrite(&type, sizeof(type_e), 1, m_file);
+			LOG(INFO) << "линк "<<std::to_string(value->m_serialization_index);
 			fwrite(&value->m_serialization_index, sizeof(size_t), 1, m_file);
+			break;
+		}
 		}
 	}
 	else
 	{
+		LOG(INFO) << "nullptr";
 		type_e type = type_e::null;
 		fwrite(&type, sizeof(type_e), 1, m_file);
 	}
@@ -283,17 +298,30 @@ iSerializable* Serialization_manager::deserialize()
 	{
 	case type_e::null:
 	{
+		LOG(INFO) << "nullptr";
 		return nullptr;
 	}
 	case type_e::link:
 	{
 		size_t s;
 		fread(&s, sizeof(type_e), 1, m_file);
-		return m_items[s];
+		LOG(INFO) << "линк " << std::to_string(s);
+		return (*m_items)[s];
+	}
+	case type_e::action:
+	{
+		LOG(INFO) << "Загрузка действия";
+		iSerializable* value;
+		size_t s;
+		fread(&s, sizeof(size_t), 1, m_file);
+		value = Application::instance().m_actions[s];
+		LOG(INFO) << "Загружено действие "<< Application::instance().m_actions[s]->m_name;
+		return value;
 	}
 	default:
 	{
 		iSerializable* value;
+		size_t s;
 		switch (type)
 		{
 		case type_e::object_state:
@@ -301,34 +329,9 @@ iSerializable* Serialization_manager::deserialize()
 			value = new Object_state();
 			break;
 		}
-		case type_e::interaction_addon:
-		{
-			value = new Interaction_addon();
-			break;
-		}
-		case type_e::interaction_time:
-		{
-			value = new Interaction_time();
-			break;
-		}
-		case type_e::interaction_timer:
-		{
-			value = new Interaction_timer();
-			break;
-		}
 		case type_e::interaction_list:
 		{
 			value = new Interaction_list();
-			break;
-		}
-		case type_e::interaction_copyist:
-		{
-			value = new Interaction_copyist();
-			break;
-		}
-		case type_e::interaction_prefix:
-		{
-			value = new Interaction_prefix();
 			break;
 		}
 		case type_e::parameter_list:
@@ -351,6 +354,56 @@ iSerializable* Serialization_manager::deserialize()
 			value = new Tag_list();
 			break;
 		}
+		case type_e::object_part:
+		{
+			value = new Object_part();
+			break;
+		}
+		case type_e::slot_set_state:
+		{
+			value = new Slot_set_state();
+			break;
+		}
+		case type_e::slot_select_cell:
+		{
+			value = new Slot_select_cell();
+			break;
+		}
+		case type_e::slot_allocator:
+		{
+			value = new Slot_allocator();
+			break;
+		}
+		case type_e::slot_mover:
+		{
+			value = new Slot_mover();
+			break;
+		}
+		case type_e::interaction_copyist:
+		{
+			value = new Interaction_copyist();
+			break;
+		}
+		case type_e::interaction_prefix:
+		{
+			value = new Interaction_prefix();
+			break;
+		}
+		case type_e::interaction_addon:
+		{
+			value = new Interaction_addon();
+			break;
+		}
+		case type_e::interaction_time:
+		{
+			value = new Interaction_time();
+			break;
+		}
+		case type_e::interaction_timer:
+		{
+			value = new Interaction_timer();
+			break;
+		}
 		case type_e::effect:
 		{
 			value = new Effect();
@@ -371,11 +424,6 @@ iSerializable* Serialization_manager::deserialize()
 			value = new ObjectTag::Mortal();
 			break;
 		}
-		case type_e::object_part:
-		{
-			value = new Object_part();
-			break;
-		}
 		case type_e::tag_purification_from_poison:
 		{
 			value = new ObjectTag::Purification_from_poison();
@@ -386,11 +434,9 @@ iSerializable* Serialization_manager::deserialize()
 			value = new ObjectTag::Fast_move();
 			break;
 		}
-		case type_e::action:
+		case type_e::tag_activator:
 		{
-			size_t s;
-			fread(&s, sizeof(size_t), 1, m_file);
-			value = Application::instance().m_actions[s];
+			value = new ObjectTag::Activator();
 			break;
 		}
 		case type_e::ai_enemy:
@@ -398,9 +444,73 @@ iSerializable* Serialization_manager::deserialize()
 			value = new AI_enemy();
 			break;
 		}
+		case type_e::gameobject:
+		{
+			value = new GameObject();
+			break;
 		}
+		case type_e::impact_copy_chance:
+		{
+			value = new Impact_copy_chance();
+			break;
+		}
+		}
+		LOG(INFO) << "Тип обьекта: " << std::to_string((int)type);
+		m_index += 1;
+		s = m_index;
+		LOG(INFO) << "индекс: " << std::to_string(s);
 		value->load();
+		(*m_items)[s] = value;
 		return value;
 	}
+	}
+}
+
+void Serialization_manager::save(const std::string& path, GameMap* map)
+{
+	errno_t err;
+	LOG(INFO) << "Сохранение игры";
+	err = fopen_s(&m_file, (FileSystem::instance().m_resource_path + "Saves\\" + path + ".txt").c_str(), "wb");
+	if (err == 0)
+	{
+		m_index = 1;
+		fwrite(&m_index, sizeof(size_t), 1, m_file);
+		map->reset_serialization_index();
+		map->save();
+		rewind(m_file);
+		m_index += 1;
+		fwrite(&m_index, sizeof(size_t), 1, m_file);
+		LOG(INFO) << "Количество сущностей: " << std::to_string(m_index - 1);
+		fclose(m_file);
+		LOG(INFO) << "Сохранение завершено успешно";
+	}
+	else
+	{
+		LOG(INFO) << "Сохранение завершилось с ошибкой";
+	}
+}
+
+GameMap* Serialization_manager::load(const std::string& path)
+{
+	errno_t err;
+	LOG(INFO) << "Загрузка игры";
+	err = fopen_s(&m_file, (FileSystem::instance().m_resource_path + "Saves\\" + path + ".txt").c_str(), "rb");
+	if (err == 0)
+	{
+		GameMap* map = new GameMap(dimension_t(0, 0));
+		fread(&m_index, sizeof(size_t), 1, m_file);
+		LOG(INFO) << "Количество сущностей: " << std::to_string(m_index);
+		m_items = new std::vector<iSerializable*>(m_index, nullptr);
+		m_index = 1;
+		map->load();
+		m_items->clear();
+		fclose(m_file);
+		LOG(INFO) << "Загрузка завершена успешно";
+		return map;
+	}
+	else
+	{
+		LOG(INFO) << "Загрузка завершилась с ошибкой";
+		return nullptr;
 	}
 }

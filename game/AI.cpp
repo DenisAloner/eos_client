@@ -398,6 +398,7 @@ void AI_enemy::save()
 
 void AI_enemy::load()
 {
+	LOG(INFO) << "ИИ Загружен";
 	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_ai_type, sizeof(ai_type_e), 1, file);
 	fread(&m_fov_radius, sizeof(int), 1, file);
@@ -406,6 +407,7 @@ void AI_enemy::load()
 	m_fov_qualifier = Application::instance().m_ai_manager->m_fov_qualifiers[s];
 	fread(&s, sizeof(size_t), 1, file);
 	m_path_qualifier = Application::instance().m_ai_manager->m_path_qualifiers[s];
+	
 }
 
 AI_trap::AI_trap(){};

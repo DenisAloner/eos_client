@@ -58,7 +58,7 @@ void Action::save()
 	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::action;
 	fwrite(&t, sizeof(type_e), 1, file);
-	LOG(INFO)<< m_name <<"    " <<std::to_string(m_index);
+	LOG(INFO)<< m_name <<" " <<std::to_string(m_index);
 	fwrite(&m_index, sizeof(size_t), 1, file);
 }
 
@@ -85,6 +85,7 @@ Action_wrapper* Action_wrapper::clone()
 
 void Action_wrapper::save()
 {
+	LOG(FATAL) << "error";
 }
 
 void Action_wrapper::load()
@@ -144,7 +145,7 @@ action_move_step::action_move_step()
 {
 	m_kind = action_e::move_step;
 	m_icon = Application::instance().m_graph->m_actions[0];
-	m_name = "Идти";
+	m_name = "Идти на шаг";
 	m_decay = 2;
 }
 
@@ -585,6 +586,7 @@ Action_pick::Action_pick()
 {
 	m_kind = action_e::push;
 	m_icon = Application::instance().m_graph->m_actions[6];
+	m_name = "Поднять";
 }
 
 void Action_pick::interaction_handler()
@@ -714,6 +716,7 @@ Action_open::Action_open()
 {
 	m_kind = action_e::open;
 	m_icon = Application::instance().m_graph->m_actions[7];
+	m_name = "Открыть ";
 }
 
 void Action_open::interaction_handler()
@@ -786,6 +789,7 @@ Action_hit::Action_hit()
 	m_kind = action_e::hit;
 	m_icon = Application::instance().m_graph->m_actions[8];
 	m_decay = 1;
+	m_name = "Ударить без оружия";
 }
 
 void Action_hit::interaction_handler()
@@ -873,6 +877,7 @@ action_hit_melee::action_hit_melee()
 {
 	m_kind = action_e::hit_melee;
 	m_icon = Application::instance().m_graph->m_actions[8];
+	m_name = "Ударить оружием";
 }
 
 void action_hit_melee::interaction_handler()

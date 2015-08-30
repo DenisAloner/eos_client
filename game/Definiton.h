@@ -252,14 +252,14 @@ enum class interaction_e
 	strength,
 	hunger,
 	thirst,
+	demand_weapon_skill,
 	tag,
 	poison,
 	action,
 	body,
-	weapon_damage,
 	skill_sword,
+	weapon_damage,
 	strength_bonus,
-	demand_weapon_skill
 };
 
 enum class effect_e
@@ -361,8 +361,8 @@ enum class type_e
 	null,
 	link,
 	light_t,
-	object_state,
 	optical_properties_t,
+	object_state,
 	interaction_list,
 	parameter_list,
 	action_list,
@@ -373,10 +373,8 @@ enum class type_e
 	slot_select_cell,
 	slot_allocator,
 	slot_mover,
-	interaction_slot,
 	interaction_copyist,
 	interaction_prefix,
-	interaction_prefix_ex,
 	interaction_addon,
 	interaction_time,
 	interaction_timer,
@@ -386,9 +384,11 @@ enum class type_e
 	tag_mortal,
 	tag_purification_from_poison,
 	tag_fast_move,
+	tag_activator,
 	action,
 	ai_enemy,
-	gameobject
+	gameobject,
+	impact_copy_chance
 };
 
 struct predicat_t
