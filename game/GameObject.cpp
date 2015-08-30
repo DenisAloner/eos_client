@@ -93,7 +93,7 @@ void Attribute_map::load()
 	{
 		fread(&ie, sizeof(interaction_e), 1, file);
 		LOG(INFO) << "МАРКЕР АТРИБУТА  - " << std::to_string((int)ie);
-		m_item[ie] = static_cast<Interaction_list*>(Serialization_manager::instance().deserialize());
+		m_item[ie] = dynamic_cast<Interaction_list*>(Serialization_manager::instance().deserialize());
 	}
 }
 
@@ -237,9 +237,6 @@ void Object_state::load()
 	m_tile_manager = Application::instance().m_graph->m_tile_managers[s];
 	m_ai = static_cast<AI*>(Serialization_manager::instance().deserialize());
 }
-
-
-Game_object_owner::Game_object_owner(){}
 
 MapCell::MapCell(int x, int y, GameMap* map) :x(x), y(y), m_map(map)
 {
@@ -673,7 +670,7 @@ void Object_part::load()
 	fread(&m_part_kind, sizeof(body_part_e), 1, file);
 	FileSystem::instance().deserialize_string(m_name, file);
 	LOG(INFO) << "Объект в части";
-	m_item = static_cast<GameObject*>(Serialization_manager::instance().deserialize());
+	m_item = dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize());
 	LOG(INFO) << "Конец объекта в части";
 	LOG(INFO) << "Конец части";
 }

@@ -26,13 +26,13 @@ struct object_parameter_t;
 class Action;
 class AI;
 
-class Game_object_owner{
-
+class Game_object_owner: public virtual iSerializable
+{
 public:
-
 	entity_e m_kind;
-	Game_object_owner();
 
+	virtual void save() {};
+	virtual void load() {};
 };
 
 class MapCell : public Game_object_owner
@@ -121,6 +121,7 @@ public:
 	std::string m_name;
 	object_direction_e m_direction;
 	bool m_selected;
+
 	Game_object_owner* m_owner;
 
 	Object_state* m_active_state;
@@ -170,6 +171,7 @@ public:
 class Inventory_cell: public Game_object_owner
 {
 public:
+
 	GameObject* m_item;
 	Inventory_cell(GameObject* item);
 };

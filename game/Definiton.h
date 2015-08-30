@@ -313,7 +313,7 @@ enum class ai_type_e
 };
 
 
-class Object_interaction: public iSerializable
+class Object_interaction: public virtual iSerializable
 {
 public:
 
@@ -388,7 +388,8 @@ enum class type_e
 	action,
 	ai_enemy,
 	gameobject,
-	impact_copy_chance
+	impact_copy_chance,
+	gamemap
 };
 
 struct predicat_t

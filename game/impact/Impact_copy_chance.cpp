@@ -43,5 +43,5 @@ void Impact_copy_chance::load()
 {
 	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_chance, sizeof(int), 1, file);
-	m_value = static_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
+	m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
 }

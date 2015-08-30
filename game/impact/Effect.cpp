@@ -111,7 +111,7 @@ void Interaction_list::load()
 	m_effect.clear();
 	for (size_t i = 0; i < s; i++)
 	{
-		m_effect.push_back(static_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
+		m_effect.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
 	}
 }
 
@@ -245,7 +245,7 @@ void Parameter_list::load()
 	m_effect.clear();
 	for (size_t i = 0; i < s; i++)
 	{
-		m_effect.push_back(static_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
+		m_effect.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
 	}
 	LOG(INFO) << "Конец листа параметров";
 }
@@ -292,7 +292,7 @@ void Tag_list::load()
 	m_effect.clear();
 	for (size_t i = 0; i < s; i++)
 	{
-		m_effect.push_back(static_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
+		m_effect.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
 	}
 }
 
@@ -337,7 +337,7 @@ void Parts_list::load()
 	m_effect.clear();
 	for (size_t i = 0; i < s; i++)
 	{
-		m_effect.push_back(static_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
+		m_effect.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
 	}
 }
 
@@ -382,7 +382,7 @@ void Action_list::load()
 	m_effect.clear();
 	for (size_t i = 0; i < s; i++)
 	{
-		m_effect.push_back(static_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
+		m_effect.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
 	}
 }
 
@@ -632,7 +632,7 @@ void Interaction_copyist::load()
 {
 	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_subtype, sizeof(interaction_e), 1, file);
-	m_value = static_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
+	m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
 }
 
 // Interaction_prefix
@@ -684,7 +684,7 @@ void Interaction_prefix::load()
 {
 	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_subtype, sizeof(effect_prefix_e), 1, file);
-	m_value = static_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
+	m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
 }
 
 // Interaction_addon
@@ -729,7 +729,7 @@ void Interaction_addon::load()
 {
 	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_subtype, sizeof(interaction_e), 1, file);
-	m_value = static_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
+	m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
 }
 
 // Interaction_time
@@ -788,7 +788,7 @@ void Interaction_time::load()
 {
 	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_turn, sizeof(int), 1, file);
-	m_value = static_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
+	m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
 }
 
 // Interaction_timer
@@ -852,7 +852,7 @@ void Interaction_timer::load()
 	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_turn, sizeof(int), 1, file);
 	fread(&m_period, sizeof(int), 1, file);
-	m_value = static_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
+	m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
 }
 
 

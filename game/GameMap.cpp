@@ -92,15 +92,23 @@ void Object_manager::load()
 	GameObject* value;
 	for (size_t i = 0; i < s; i++)
 	{
-		value = static_cast<GameObject*>(Serialization_manager::instance().deserialize());
+		value = dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize());
 		m_items.push_back(value);
 	}
 }
 
 GameMap::GameMap(dimension_t size)
 {
+	init(size);
+}
+
+GameMap::GameMap()
+{
+}
+
+void GameMap::init(dimension_t size)
+{
 	m_update = true;
-	GameObject* obj;
 	m_size = size;
 	m_items.resize(m_size.h);
 	for (int i = 0; i < m_size.h; i++)
@@ -108,17 +116,14 @@ GameMap::GameMap(dimension_t size)
 		m_items[i].resize(m_size.w);
 		for (int j = 0; j < m_size.w; j++)
 		{
-			//m_items[i][j] = nullptr;
-			m_items[i][j] = new MapCell(j, i,this);
-			//obj = Application::instance().m_game_object_manager->new_object("dirt");
-			//add_object(obj, m_items[i][j]);
+			m_items[i][j] = new MapCell(j, i, this);
 		}
 	}
 	for (int y = 0; y < 21; y++)
 	{
 		for (int x = 0; x< 21; x++)
 		{
-			m_coefficient[y][x] = (float)sqrt(x*x + y*y)*5;
+			m_coefficient[y][x] = (float)sqrt(x*x + y*y) * 5;
 		}
 	}
 }
@@ -1063,15 +1068,33 @@ void GameMap::calculate_lighting2()
 
 void GameMap::reset_serialization_index()
 {
+	m_serialization_index = 0;
 	m_object_manager.reset_serialization_index();
 }
 
 void GameMap::save()
 {
+	FILE* file = Serialization_manager::instance().m_file;
+	type_e t = type_e::gamemap;
+	fwrite(&t, sizeof(type_e), 1, file);
+	fwrite(&m_size, sizeof(dimension_t), 1, file);
 	m_object_manager.save();
+	/*MapCell* cell;
+	for (int i = 0; i < m_size.h; i++)
+	{
+		m_items[i].resize(m_size.w);
+		for (int j = 0; j < m_size.w; j++)
+		{
+			cell = m_items[i][j];
+		}
+	}*/
 }
 
 void GameMap::load()
 {
+	FILE* file = Serialization_manager::instance().m_file;
+	fread(&m_size, sizeof(dimension_t), 1, file);
+	LOG(INFO) << "Размер карты: " << std::to_string(m_size.h) << " x " << std::to_string(m_size.w);
+	//init(m_size);
 	m_object_manager.load();
 }

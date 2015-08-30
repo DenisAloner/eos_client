@@ -370,8 +370,8 @@ void Application::initialize()
 	}*/
 
 	//Serialization_manager::instance().save("save_02", m_GUI->MapViewer->m_map);
-	//GameMap* A = Serialization_manager::instance().load("save_02");
-	//LOG(INFO) << std::to_string(A->m_object_manager.m_items.size());
+	GameMap* A = Serialization_manager::instance().load("save_02");
+	LOG(INFO) << std::to_string(A->m_object_manager.m_items.size());
 
 	m_ready = true;
 }

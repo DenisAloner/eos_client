@@ -45,8 +45,8 @@ class Serialization_manager
 public:
 
 	FILE* m_file;
-
 	size_t m_index;
+	GameMap* m_map;
 
 	std::vector<iSerializable*>* m_items;
 

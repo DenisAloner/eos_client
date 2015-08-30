@@ -61,7 +61,9 @@ public:
 	std::list<block_t*> m_link_rooms;
 
 	GameMap(dimension_t size);
+	GameMap();
 
+	void init(dimension_t size);
 	void add_object(GameObject* object, MapCell* cell);
 	void remove_object(GameObject* object);
 	void move_object(GameObject* object, MapCell* cell);

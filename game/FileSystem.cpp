@@ -454,6 +454,11 @@ iSerializable* Serialization_manager::deserialize()
 			value = new Impact_copy_chance();
 			break;
 		}
+		case type_e::gamemap:
+		{
+			value = new GameMap();
+			break;
+		}
 		}
 		LOG(INFO) << "Тип обьекта: " << std::to_string((int)type);
 		m_index += 1;
@@ -468,6 +473,7 @@ iSerializable* Serialization_manager::deserialize()
 
 void Serialization_manager::save(const std::string& path, GameMap* map)
 {
+	m_map = map;
 	errno_t err;
 	LOG(INFO) << "Сохранение игры";
 	err = fopen_s(&m_file, (FileSystem::instance().m_resource_path + "Saves\\" + path + ".txt").c_str(), "wb");
@@ -476,7 +482,7 @@ void Serialization_manager::save(const std::string& path, GameMap* map)
 		m_index = 1;
 		fwrite(&m_index, sizeof(size_t), 1, m_file);
 		map->reset_serialization_index();
-		map->save();
+		serialize(map);
 		rewind(m_file);
 		m_index += 1;
 		fwrite(&m_index, sizeof(size_t), 1, m_file);
@@ -497,16 +503,15 @@ GameMap* Serialization_manager::load(const std::string& path)
 	err = fopen_s(&m_file, (FileSystem::instance().m_resource_path + "Saves\\" + path + ".txt").c_str(), "rb");
 	if (err == 0)
 	{
-		GameMap* map = new GameMap(dimension_t(0, 0));
 		fread(&m_index, sizeof(size_t), 1, m_file);
 		LOG(INFO) << "Количество сущностей: " << std::to_string(m_index);
 		m_items = new std::vector<iSerializable*>(m_index, nullptr);
 		m_index = 1;
-		map->load();
+		m_map = dynamic_cast<GameMap*>(deserialize());
 		m_items->clear();
 		fclose(m_file);
 		LOG(INFO) << "Загрузка завершена успешно";
-		return map;
+		return m_map;
 	}
 	else
 	{
