@@ -193,19 +193,23 @@ void Application::initialize()
 	m_GUI->MapViewer->m_size.w = 1024;
 	m_GUI->MapViewer->m_size.h = 1024;
 	
-	m_GUI->MapViewer->m_map = new GameMap(dimension_t(7,4));
-	//m_GUI->MapViewer->m_map->generate_level();
+	//m_GUI->MapViewer->m_map = new GameMap(dimension_t(10,10));
+	////m_GUI->MapViewer->m_map->generate_level();
 
-	m_GUI->MapViewer->m_map->generate_room();
+	//m_GUI->MapViewer->m_map->generate_room();
 
-	int rx = 2;
-	int ry = 2;
-	GameObject* obj = m_game_object_manager->new_object("iso_unit");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx]);
-	m_GUI->MapViewer->m_player = new Player(obj, m_GUI->MapViewer->m_map);
+	//int rx = 2;
+	//int ry = 2;
+	//GameObject* obj = m_game_object_manager->new_object("iso_unit");
+	//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx]);
+	//m_GUI->MapViewer->m_player = new Player(obj, m_GUI->MapViewer->m_map);
 
-	obj = m_game_object_manager->new_object("rat");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[2][4]);
+	//obj = m_game_object_manager->new_object("rat");
+	//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[8][8]);
+
+
+	//Serialization_manager::instance().save("save_02", m_GUI->MapViewer->m_map);
+	m_GUI->MapViewer->m_map = Serialization_manager::instance().load("save_02");
 
 	//int index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
 	//GameMap::block_t* room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);
@@ -368,10 +372,6 @@ void Application::initialize()
 		obj->set_direction(object_direction_e_Left);
 		m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
 	}*/
-
-	//Serialization_manager::instance().save("save_02", m_GUI->MapViewer->m_map);
-	GameMap* A = Serialization_manager::instance().load("save_02");
-	LOG(INFO) << std::to_string(A->m_object_manager.m_items.size());
 
 	m_ready = true;
 }

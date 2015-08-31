@@ -3,6 +3,32 @@
 #include "log.h"
 #include "AI.h"
 
+MapCell::MapCell(int x, int y, GameMap* map) :x(x), y(y), m_map(map)
+{
+	m_kind = entity_e::cell;
+}
+
+void MapCell::add_object(GameObject* Object)
+{
+	m_items.push_back(Object);
+}
+
+void MapCell::save()
+{
+	LOG(INFO) << "Запись клетки карты";
+	FILE* file = Serialization_manager::instance().m_file;
+	type_e t = type_e::mapcell;
+	fwrite(&t, sizeof(type_e), 1, file);
+	fwrite(&x, sizeof(int), 1, file);
+	fwrite(&y, sizeof(int), 1, file);
+	LOG(INFO) << "Конец записи клетки карты";
+}
+
+void MapCell::load()
+{
+}
+
+
 Attribute_map::Attribute_map(){};
 
 Interaction_list*  Attribute_map::create_feature_list(feature_list_type_e key, interaction_e name)
@@ -230,22 +256,15 @@ void Object_state::load()
 	fread(&m_size, sizeof(game_object_size_t), 1, file);
 	fread(&m_weight, sizeof(float), 1, file);
 	m_light = static_cast<light_t*>(FileSystem::instance().deserialize_pointer(file));
+	if (m_light) {
+		LOG(INFO) << "--------------------------------------------"<<std::to_string(m_light->R);
+	}
 	m_optical = static_cast<optical_properties_t*>(FileSystem::instance().deserialize_pointer(file));
 	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
 	LOG(INFO) << "тайл "<<std::to_string(s);
 	m_tile_manager = Application::instance().m_graph->m_tile_managers[s];
 	m_ai = static_cast<AI*>(Serialization_manager::instance().deserialize());
-}
-
-MapCell::MapCell(int x, int y, GameMap* map) :x(x), y(y), m_map(map)
-{
-	m_kind = entity_e::cell;
-}
-
-void MapCell::add_object(GameObject* Object)
-{
-	m_items.push_back(Object);
 }
 
 //Object_feature* MapCell::find_property(property_e kind, GameObject* excluded)
@@ -533,6 +552,10 @@ void GameObject::update_interaction()
 void GameObject::reset_serialization_index()
 {
 	m_serialization_index = 0;
+	if (m_owner)
+	{
+		m_owner->reset_serialization_index();
+	}
 	for (auto item = m_state.begin(); item != m_state.end(); item++)
 	{
 		(*item)->reset_serialization_index();
@@ -547,6 +570,7 @@ void GameObject::save()
 	fwrite(&t, sizeof(type_e), 1, file);
 	FileSystem::instance().serialize_string(m_name, file);
 	fwrite(&m_direction, sizeof(object_direction_e), 1, file);
+	Serialization_manager::instance().serialize(m_owner);
 	size_t s = m_state.size();
 	fwrite(&s, sizeof(size_t), 1, file);
 	for (auto item = m_state.begin(); item != m_state.end(); item++)
@@ -561,6 +585,7 @@ void GameObject::load()
 	FileSystem::instance().deserialize_string(m_name, file);
 	LOG(INFO) << m_name;
 	fread(&m_direction, sizeof(object_direction_e), 1, file);
+	m_owner = dynamic_cast<Game_object_owner*>(Serialization_manager::instance().deserialize());
 	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
 	Object_state* value;
@@ -579,6 +604,7 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 {
 	m_fov = new FOV();
 	m_fov->calculate(static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_fov_radius, m_object, m_map);
+	LOG(INFO) << "Поле зрение " << std::to_string(static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_fov_radius);
 	m_actions.push_front(Application::instance().m_actions[action_e::open_inventory]);
 	m_actions.push_front(Application::instance().m_actions[action_e::cell_info]);
 	m_actions.push_front(Application::instance().m_actions[action_e::show_parameters]);
@@ -587,6 +613,20 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 Inventory_cell::Inventory_cell(GameObject* item = nullptr) : m_item(item)
 {
 	m_kind = entity_e::inventory_cell;
+}
+
+void Inventory_cell::save()
+{
+	FILE* file = Serialization_manager::instance().m_file;
+	type_e t = type_e::inventory_cell;
+	fwrite(&t, sizeof(type_e), 1, file);
+	Serialization_manager::instance().serialize(m_item);
+}
+
+void Inventory_cell::load()
+{
+	FILE* file = Serialization_manager::instance().m_file;
+	m_item = dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize());
 }
 
 Object_part::Object_part(GameObject* item) :Inventory_cell(item)

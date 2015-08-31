@@ -125,13 +125,13 @@ void* FileSystem::deserialize_pointer(FILE* file)
 	case type_e::light_t:
 	{
 		light_t* value = new light_t();
-		fwrite(value, sizeof(light_t), 1, file);
+		fread(value, sizeof(light_t), 1, file);
 		return value;
 	}
 	case type_e::optical_properties_t:
 	{
 		optical_properties_t* value = new optical_properties_t();
-		fwrite(value, sizeof(optical_properties_t), 1, file);
+		fread(value, sizeof(optical_properties_t), 1, file);
 		return value;
 	}
 	}
@@ -318,6 +318,16 @@ iSerializable* Serialization_manager::deserialize()
 		LOG(INFO) << "Загружено действие "<< Application::instance().m_actions[s]->m_name;
 		return value;
 	}
+	case type_e::mapcell:
+	{
+		int x;
+		int y;
+		fread(&x, sizeof(int), 1, m_file);
+		fread(&y, sizeof(int), 1, m_file);
+		LOG(INFO) << "Координаты " << std::to_string(x)<<" " << std::to_string(y);
+		return m_map->m_items[y][x];
+		break;
+	}
 	default:
 	{
 		iSerializable* value;
@@ -459,6 +469,11 @@ iSerializable* Serialization_manager::deserialize()
 			value = new GameMap();
 			break;
 		}
+		case type_e::inventory_cell:
+		{
+			value = new Inventory_cell(nullptr);
+			break;
+		}
 		}
 		LOG(INFO) << "Тип обьекта: " << std::to_string((int)type);
 		m_index += 1;
@@ -483,6 +498,7 @@ void Serialization_manager::save(const std::string& path, GameMap* map)
 		fwrite(&m_index, sizeof(size_t), 1, m_file);
 		map->reset_serialization_index();
 		serialize(map);
+		serialize(Application::instance().m_GUI->MapViewer->m_player->m_object);
 		rewind(m_file);
 		m_index += 1;
 		fwrite(&m_index, sizeof(size_t), 1, m_file);
@@ -508,6 +524,7 @@ GameMap* Serialization_manager::load(const std::string& path)
 		m_items = new std::vector<iSerializable*>(m_index, nullptr);
 		m_index = 1;
 		m_map = dynamic_cast<GameMap*>(deserialize());
+		Application::instance().m_GUI->MapViewer->m_player = new Player(dynamic_cast<GameObject*>(deserialize()), m_map);
 		m_items->clear();
 		fclose(m_file);
 		LOG(INFO) << "Загрузка завершена успешно";

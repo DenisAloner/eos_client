@@ -30,9 +30,6 @@ class Game_object_owner: public virtual iSerializable
 {
 public:
 	entity_e m_kind;
-
-	virtual void save() {};
-	virtual void load() {};
 };
 
 class MapCell : public Game_object_owner
@@ -55,6 +52,10 @@ public:
 
 	void add_object(GameObject* Object);
 	//virtual Object_feature* find_property(property_e kind, GameObject* excluded);
+
+	virtual void reset_serialization_index() { m_serialization_index = 1; };
+	virtual void save();
+	virtual void load();
 };
 
 class Attribute_map: public iSerializable
@@ -174,6 +175,9 @@ public:
 
 	GameObject* m_item;
 	Inventory_cell(GameObject* item);
+
+	virtual void save();
+	virtual void load();
 };
 
 class Object_part : public Inventory_cell, public Object_interaction

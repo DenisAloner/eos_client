@@ -389,7 +389,9 @@ enum class type_e
 	ai_enemy,
 	gameobject,
 	impact_copy_chance,
-	gamemap
+	gamemap,
+	mapcell,
+	inventory_cell
 };
 
 struct predicat_t

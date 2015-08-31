@@ -156,12 +156,10 @@ void GameMap::generate_room(void)
 		{
 			if ((i == 0) || (j == 0) || (i == m_size.h - 1) || (j == m_size.w - 1))
 			{
-				m_items[i][j] = new MapCell(j, i, this);
 				GameObject* obj = Application::instance().m_game_object_manager->new_object("wall");
 				add_object(obj, m_items[i][j]);
 			}
 			else {
-				m_items[i][j] = new MapCell(j, i, this);
 				GameObject* obj = Application::instance().m_game_object_manager->new_object("floor");
 				add_object(obj, m_items[i][j]);
 			}
@@ -169,6 +167,8 @@ void GameMap::generate_room(void)
 	}
 	GameObject* obj = Application::instance().m_game_object_manager->new_object("torch");
 	add_to_map(obj, m_items[1][1]);
+	obj = Application::instance().m_game_object_manager->new_object("torch");
+	add_to_map(obj, m_items[m_size.h - 2][m_size.w - 2]);
 }
 
 
@@ -1079,22 +1079,44 @@ void GameMap::save()
 	fwrite(&t, sizeof(type_e), 1, file);
 	fwrite(&m_size, sizeof(dimension_t), 1, file);
 	m_object_manager.save();
-	/*MapCell* cell;
+	MapCell* cell;
+	size_t s;
 	for (int i = 0; i < m_size.h; i++)
 	{
 		m_items[i].resize(m_size.w);
 		for (int j = 0; j < m_size.w; j++)
 		{
 			cell = m_items[i][j];
+			s = cell->m_items.size();
+			fwrite(&s, sizeof(size_t), 1, file);
+			for (auto item = cell->m_items.begin(); item != cell->m_items.end(); item++)
+			{
+				Serialization_manager::instance().serialize(*item);
+			}
 		}
-	}*/
+	}
 }
 
 void GameMap::load()
 {
 	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_size, sizeof(dimension_t), 1, file);
-	LOG(INFO) << "Размер карты: " << std::to_string(m_size.h) << " x " << std::to_string(m_size.w);
-	//init(m_size);
+	init(m_size);
+	Serialization_manager::instance().m_map = this;
 	m_object_manager.load();
+	MapCell* cell;
+	size_t s;
+	for (int i = 0; i < m_size.h; i++)
+	{
+		m_items[i].resize(m_size.w);
+		for (int j = 0; j < m_size.w; j++)
+		{
+			cell = m_items[i][j];
+			fread(&s, sizeof(size_t), 1, file);
+			for (int k = 0; k < s; k++)
+			{
+				cell->m_items.push_back(dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize()));
+			}
+		}
+	}
 }
