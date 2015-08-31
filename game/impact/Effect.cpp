@@ -81,9 +81,12 @@ void Interaction_list::description(std::list<std::string>* info, int level)
 
 void Interaction_list::reset_serialization_index()
 {
+	LOG(INFO) << "шаг 4";
 	m_serialization_index = 0;
+	LOG(INFO) << "шаг 5";
 	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
 	{
+		LOG(INFO) << "шаг 6";
 		(*item)->reset_serialization_index();
 	}
 }

@@ -495,8 +495,11 @@ void Serialization_manager::save(const std::string& path, GameMap* map)
 	if (err == 0)
 	{
 		m_index = 1;
+		LOG(INFO) << "шаг 1";
 		fwrite(&m_index, sizeof(size_t), 1, m_file);
+		LOG(INFO) << "шаг 2";
 		map->reset_serialization_index();
+		LOG(INFO) << "шаг 3";
 		serialize(map);
 		serialize(Application::instance().m_GUI->MapViewer->m_player->m_object);
 		rewind(m_file);

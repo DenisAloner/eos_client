@@ -256,9 +256,6 @@ void Object_state::load()
 	fread(&m_size, sizeof(game_object_size_t), 1, file);
 	fread(&m_weight, sizeof(float), 1, file);
 	m_light = static_cast<light_t*>(FileSystem::instance().deserialize_pointer(file));
-	if (m_light) {
-		LOG(INFO) << "--------------------------------------------"<<std::to_string(m_light->R);
-	}
 	m_optical = static_cast<optical_properties_t*>(FileSystem::instance().deserialize_pointer(file));
 	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
@@ -608,11 +605,25 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 	m_actions.push_front(Application::instance().m_actions[action_e::open_inventory]);
 	m_actions.push_front(Application::instance().m_actions[action_e::cell_info]);
 	m_actions.push_front(Application::instance().m_actions[action_e::show_parameters]);
+	m_actions.push_front(Application::instance().m_actions[action_e::save]);
 }
 
 Inventory_cell::Inventory_cell(GameObject* item = nullptr) : m_item(item)
 {
 	m_kind = entity_e::inventory_cell;
+}
+
+void Inventory_cell::reset_serialization_index()
+{
+	m_serialization_index = 0;
+	if (m_item)
+	{
+		// ??? исправить, временная заглушка, необходимо добавить свойство, которое показывает был ли сброшен объект для сохранения уже
+		if (m_item->m_serialization_index != 0)
+		{
+			m_item->reset_serialization_index();
+		}
+	}
 }
 
 void Inventory_cell::save()
@@ -683,7 +694,11 @@ void Object_part::reset_serialization_index()
 	m_object_state.reset_serialization_index();
 	if (m_item)
 	{
-		m_item->reset_serialization_index();
+		// ??? исправить, временная заглушка, необходимо добавить свойство, которое показывает был ли сброшен объект для сохранения уже
+		if(m_item->m_serialization_index!=0)
+		{
+			m_item->reset_serialization_index();
+		}
 	}
 }
 
@@ -711,6 +726,9 @@ void Object_part::load()
 	FileSystem::instance().deserialize_string(m_name, file);
 	LOG(INFO) << "Объект в части";
 	m_item = dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize());
-	LOG(INFO) << "Конец объекта в части";
+	if (m_item)
+	{
+		LOG(INFO) << "Конец объекта в части " << m_item->m_name;
+	}
 	LOG(INFO) << "Конец части";
 }

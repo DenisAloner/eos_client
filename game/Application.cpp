@@ -176,6 +176,7 @@ void Application::initialize()
 	m_actions[action_e::equip] = new Action_equip();
 	m_actions[action_e::show_parameters] = new Action_show_parameters();
 	m_actions[action_e::use] = new Action_use();
+	m_actions[action_e::save] = new Action_save();
 
 	for (size_t i = 0; i < 14; i++)
 	{
@@ -193,23 +194,27 @@ void Application::initialize()
 	m_GUI->MapViewer->m_size.w = 1024;
 	m_GUI->MapViewer->m_size.h = 1024;
 	
-	//m_GUI->MapViewer->m_map = new GameMap(dimension_t(10,10));
+	//m_GUI->MapViewer->m_map = new GameMap(dimension_t(20,20));
 	////m_GUI->MapViewer->m_map->generate_level();
 
 	//m_GUI->MapViewer->m_map->generate_room();
 
-	//int rx = 2;
-	//int ry = 2;
+	//int rx = 9;
+	//int ry = 9;
+
 	//GameObject* obj = m_game_object_manager->new_object("iso_unit");
 	//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx]);
 	//m_GUI->MapViewer->m_player = new Player(obj, m_GUI->MapViewer->m_map);
 
+	//obj = m_game_object_manager->new_object("dagger");
+	//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx-1]);
+
 	//obj = m_game_object_manager->new_object("rat");
-	//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[8][8]);
+	//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[2][2]);
 
 
-	//Serialization_manager::instance().save("save_02", m_GUI->MapViewer->m_map);
-	m_GUI->MapViewer->m_map = Serialization_manager::instance().load("save_02");
+	//Serialization_manager::instance().save("save", m_GUI->MapViewer->m_map);
+	m_GUI->MapViewer->m_map = Serialization_manager::instance().load("save");
 
 	//int index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
 	//GameMap::block_t* room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);

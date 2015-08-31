@@ -176,6 +176,7 @@ public:
 	GameObject* m_item;
 	Inventory_cell(GameObject* item);
 
+	virtual void reset_serialization_index();
 	virtual void save();
 	virtual void load();
 };

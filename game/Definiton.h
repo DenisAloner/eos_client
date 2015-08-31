@@ -113,7 +113,8 @@ enum action_e
 	hit_melee,
 	equip,
 	show_parameters,
-	use
+	use,
+	save
 };
 
 enum class object_state_e

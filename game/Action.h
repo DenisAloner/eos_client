@@ -248,4 +248,16 @@ public:
 	virtual void interaction_handler();
 };
 
+class Action_save :
+	public Action
+{
+public:
+
+	Action_save();
+
+	virtual std::string get_description(Parameter* parameter);
+	virtual void interaction_handler();
+
+};
+
 #endif //TACTION_H

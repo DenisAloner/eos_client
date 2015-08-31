@@ -613,6 +613,7 @@ void Action_pick::interaction_handler()
 		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 		return;
 	}
+	LOG(INFO) << p->m_object->m_name;
 	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 	Application::instance().m_clipboard.m_item = p->m_object;
 	result = Application::instance().command_select_transfer(p);
@@ -1170,5 +1171,25 @@ std::string Action_use::get_description(Parameter* parameter)
 {
 	Parameter_Position* p = static_cast<Parameter_Position*>(parameter);
 	std::string s("Применять");
+	return s;
+}
+
+Action_save::Action_save()
+{
+	m_kind = action_e::save;
+	m_icon = Application::instance().m_graph->m_actions[12];
+}
+
+void Action_save::interaction_handler()
+{
+	Action::interaction_handler();
+	Application::instance().m_message_queue.m_busy = true;
+	Serialization_manager::instance().save("save", Application::instance().m_GUI->MapViewer->m_map);
+	Application::instance().m_message_queue.m_busy = false;
+}
+
+std::string Action_save::get_description(Parameter* parameter)
+{
+	std::string s("Игра сохранена");
 	return s;
 }
