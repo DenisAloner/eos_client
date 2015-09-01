@@ -3,6 +3,7 @@
 #include "AI.h"
 #include "GameMap.h"
 #include "impact\Impact_copy_chance.h"
+#include "Parameter.h"
 
 #ifndef RESOURCES_PATH
 #define RESOURCES_PATH "resources\\"
@@ -306,6 +307,10 @@ iSerializable* Serialization_manager::deserialize()
 		size_t s;
 		fread(&s, sizeof(type_e), 1, m_file);
 		LOG(INFO) << "линк " << std::to_string(s);
+		if (!(*m_items)[s]) 
+		{
+			LOG(INFO) << "!!! Еще не заполнена";
+		}
 		return (*m_items)[s];
 	}
 	case type_e::action:
@@ -331,7 +336,6 @@ iSerializable* Serialization_manager::deserialize()
 	default:
 	{
 		iSerializable* value;
-		size_t s;
 		switch (type)
 		{
 		case type_e::object_state:
@@ -474,13 +478,17 @@ iSerializable* Serialization_manager::deserialize()
 			value = new Inventory_cell(nullptr);
 			break;
 		}
+		case type_e::parameter_mapcell:
+		{
+			value = new Parameter_MapCell();
+			break;
+		}
 		}
 		LOG(INFO) << "Тип обьекта: " << std::to_string((int)type);
 		m_index += 1;
-		s = m_index;
-		LOG(INFO) << "индекс: " << std::to_string(s);
+		(*m_items)[m_index] = value;
+		LOG(INFO) << "индекс: " << std::to_string(m_index);
 		value->load();
-		(*m_items)[s] = value;
 		return value;
 	}
 	}

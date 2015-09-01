@@ -392,7 +392,8 @@ enum class type_e
 	impact_copy_chance,
 	gamemap,
 	mapcell,
-	inventory_cell
+	inventory_cell,
+	parameter_mapcell
 };
 
 struct predicat_t

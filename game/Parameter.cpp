@@ -21,6 +21,18 @@ Parameter_MapCell::~Parameter_MapCell()
 {
 }
 
+void Parameter_MapCell::save()
+{
+	FILE* file = Serialization_manager::instance().m_file;
+	type_e t = type_e::interaction_copyist;
+	Serialization_manager::instance().serialize(m_place);
+}
+
+void Parameter_MapCell::load()
+{
+	FILE* file = Serialization_manager::instance().m_file;
+	m_place = dynamic_cast<MapCell*>(Serialization_manager::instance().deserialize());
+}
 
 Parameter_Position::Parameter_Position() : Parameter(ParameterKind_Position)
 {

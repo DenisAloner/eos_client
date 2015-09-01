@@ -12,7 +12,7 @@ class GameMap;
 class Object_part;
 class Action;
 
-class Parameter
+class Parameter: public iSerializable
 {
 public:
 
@@ -20,6 +20,9 @@ public:
 
 	Parameter(ParameterKind _kind);
 	~Parameter(void);
+
+	virtual void save() {};
+	virtual void load() {};
 };
 
 class Parameter_MapCell : public Parameter
@@ -29,6 +32,9 @@ public:
 
 	Parameter_MapCell();
 	~Parameter_MapCell();
+
+	virtual void save();
+	virtual void load();
 };
 
 class Parameter_GameObject : public Parameter

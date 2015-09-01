@@ -613,7 +613,6 @@ void Action_pick::interaction_handler()
 		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 		return;
 	}
-	LOG(INFO) << p->m_object->m_name;
 	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 	Application::instance().m_clipboard.m_item = p->m_object;
 	result = Application::instance().command_select_transfer(p);

@@ -567,7 +567,9 @@ void GameObject::save()
 	fwrite(&t, sizeof(type_e), 1, file);
 	FileSystem::instance().serialize_string(m_name, file);
 	fwrite(&m_direction, sizeof(object_direction_e), 1, file);
+	LOG(INFO) << " --- Запись владельца";
 	Serialization_manager::instance().serialize(m_owner);
+	LOG(INFO) << " --- Конец запись владельца";
 	size_t s = m_state.size();
 	fwrite(&s, sizeof(size_t), 1, file);
 	for (auto item = m_state.begin(); item != m_state.end(); item++)
@@ -582,7 +584,17 @@ void GameObject::load()
 	FileSystem::instance().deserialize_string(m_name, file);
 	LOG(INFO) << m_name;
 	fread(&m_direction, sizeof(object_direction_e), 1, file);
+	LOG(INFO) << " --- Загрузка владельца";
 	m_owner = dynamic_cast<Game_object_owner*>(Serialization_manager::instance().deserialize());
+	if (m_owner)
+	{
+		LOG(INFO) << " --- Конец загрузки владельца " << std::to_string((int)m_owner->m_kind);
+	}
+	else
+	{
+		LOG(INFO) << " --- Конец загрузки пустого владельца " ;
+	}
+	
 	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
 	Object_state* value;
@@ -713,7 +725,9 @@ void Object_part::save()
 	LOG(INFO) << "Конец состояния";
 	fwrite(&m_part_kind, sizeof(body_part_e), 1, file);
 	FileSystem::instance().serialize_string(m_name, file);
+	LOG(INFO) << "--- Запись объекта ---";
 	Serialization_manager::instance().serialize(m_item);
+	LOG(INFO) << "--- Конец записи объекта ---";
 	LOG(INFO) << "Конец листа частей";
 }
 
@@ -729,6 +743,13 @@ void Object_part::load()
 	if (m_item)
 	{
 		LOG(INFO) << "Конец объекта в части " << m_item->m_name;
+		if (m_item->m_owner)
+		{
+			LOG(INFO) << "Объект имеет владельца";
+		}
+		else {
+			LOG(INFO) << "Объект не имеет владельца";
+		}
 	}
 	LOG(INFO) << "Конец части";
 }
