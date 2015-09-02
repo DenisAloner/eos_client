@@ -8,10 +8,12 @@
 #include "MouseController.h"
 #include "GameObject.h"
 #include "Game_algorithm.h"
+#include  "impact\Effect.h"
 
 class Application;
 class Parameter;
 class Action;
+class Interaction_prefix;
 
 class Action : public Object_interaction
 {
@@ -49,6 +51,7 @@ public:
 	int m_decay;
 	Action* m_action;
 	Parameter* m_parameter;
+	bool done;
 
 	Action_wrapper();
 
@@ -58,8 +61,15 @@ public:
 	virtual Action_wrapper* clone();
 	//virtual void perfom(Parameter* parameter);
 
+	virtual void reset_serialization_index();
 	virtual void save();
 	virtual void load();
+
+	void set(GameObject* unit, Action* action, Parameter* parameter);
+	void update();
+
+private:
+	Interaction_prefix* m_prefix;
 };
 
 class ActionClass_Move :

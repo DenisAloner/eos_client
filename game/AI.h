@@ -13,7 +13,7 @@ class GameMap;
 class GameObject;
 class MapCell;
 class FOV;
-class Action_controller;
+class Action_wrapper;
 
 struct Path_cell
 {
@@ -94,7 +94,7 @@ public:
 	GameObject* m_object;
 	GameMap* m_map;
 
-	Action_controller* m_action_controller;
+	Action_wrapper* m_action_controller;
 
 	virtual GameObject* find_goal() = 0;
 	virtual void create() = 0;
@@ -120,6 +120,7 @@ public:
 	virtual void create();
 	virtual AI* clone();
 
+	virtual void reset_serialization_index();
 	virtual void save();
 	virtual void load();
 

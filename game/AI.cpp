@@ -236,7 +236,7 @@ AI_enemy::AI_enemy()
 	m_fov = new FOV();
 	m_goal = nullptr;
 	m_memory_goal_cell = nullptr;
-	m_action_controller = new Action_controller();
+	m_action_controller = new Action_wrapper();
 }
 
 AI* AI_enemy::clone()
@@ -314,7 +314,7 @@ bool AI_enemy::check_goal()
 void AI_enemy::create()
 {
 	if (m_object->m_active_state->m_ai == nullptr){ return; }
-	if (!m_action_controller->m_wrapper.m_action)
+	if (!m_action_controller->m_action)
 	{
 		m_fov->calculate(m_fov_radius, m_object, m_map);
 		MapCell* c;
@@ -385,8 +385,21 @@ void AI_enemy::create()
 	m_action_controller->update();
 }
 
+void AI_enemy::reset_serialization_index()
+{
+	m_serialization_index = 0;
+	if (m_action_controller)
+	{
+		if (m_action_controller->m_serialization_index > 1)
+		{
+			m_action_controller->reset_serialization_index();
+		}
+	}
+}
+
 void AI_enemy::save()
 {
+	LOG(INFO) << "ИИ";
 	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::ai_enemy;
 	fwrite(&t, sizeof(type_e), 1, file);
@@ -394,11 +407,13 @@ void AI_enemy::save()
 	fwrite(&m_fov_radius, sizeof(int), 1, file);
 	fwrite(&m_fov_qualifier->index, sizeof(size_t), 1, file);
 	fwrite(&m_path_qualifier->index, sizeof(size_t), 1, file);
+	Serialization_manager::instance().serialize(m_action_controller);
+	LOG(INFO) << "Конец ИИ";
 }
 
 void AI_enemy::load()
 {
-	LOG(INFO) << "ИИ Загружен";
+	LOG(INFO) << "ИИ";
 	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_ai_type, sizeof(ai_type_e), 1, file);
 	fread(&m_fov_radius, sizeof(int), 1, file);
@@ -407,7 +422,8 @@ void AI_enemy::load()
 	m_fov_qualifier = Application::instance().m_ai_manager->m_fov_qualifiers[s];
 	fread(&s, sizeof(size_t), 1, file);
 	m_path_qualifier = Application::instance().m_ai_manager->m_path_qualifiers[s];
-	
+	m_action_controller = dynamic_cast<Action_wrapper*>(Serialization_manager::instance().deserialize());
+	LOG(INFO) << "Конец ИИ";
 }
 
 AI_trap::AI_trap(){};

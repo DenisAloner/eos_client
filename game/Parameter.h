@@ -37,16 +37,6 @@ public:
 	virtual void load();
 };
 
-class Parameter_GameObject : public Parameter
-{
-public:
-
-	GameObject* m_object;
-
-	Parameter_GameObject();
-	~Parameter_GameObject();
-};
-
 class Parameter_Position : public Parameter
 {
 public:
@@ -59,6 +49,10 @@ public:
 
 	Parameter_Position(void);
 	~Parameter_Position(void);
+
+	virtual void reset_serialization_index();
+	virtual void save();
+	virtual void load();
 };
 
 class Parameter_MoveObjectByUnit : public Parameter
@@ -71,6 +65,10 @@ public:
 
 	Parameter_MoveObjectByUnit(void);
 	~Parameter_MoveObjectByUnit(void);
+
+	virtual void reset_serialization_index();
+	virtual void save();
+	virtual void load();
 };
 
 class Parameter_destination : public Parameter
@@ -82,6 +80,10 @@ public:
 	Game_object_owner* m_owner;
 
 	Parameter_destination();
+
+	virtual void reset_serialization_index();
+	virtual void save();
+	virtual void load();
 };
 
 class P_object : public Parameter
@@ -91,6 +93,10 @@ public:
 	GameObject* m_object;
 
 	P_object();
+
+	virtual void reset_serialization_index();
+	virtual void save();
+	virtual void load();
 };
 
 class P_object_owner : public Parameter
@@ -98,7 +104,12 @@ class P_object_owner : public Parameter
 public:
 
 	Game_object_owner* m_cell;
-	P_object_owner(ParameterKind kind);
+
+	P_object_owner();
+
+	virtual void reset_serialization_index();
+	virtual void save();
+	virtual void load();
 };
 
 class P_unit_interaction : public Parameter
@@ -106,22 +117,31 @@ class P_unit_interaction : public Parameter
 public:
 
 	GameObject* m_unit;
-	Object_part* m_unit_body_part;
 	GameObject* m_object;
-
+	Object_part* m_unit_body_part;
+	
 	P_unit_interaction();
+
+	virtual void reset_serialization_index();
+	virtual void save();
+	virtual void load();
 };
+
 
 class P_interaction_cell : public Parameter
 {
 public:
 
 	GameObject* m_unit;
-	Object_part* m_unit_body_part;
 	GameObject* m_object;
+	Object_part* m_unit_body_part;
 	MapCell* m_cell;
 
 	P_interaction_cell();
+
+	virtual void reset_serialization_index();
+	virtual void save();
+	virtual void load();
 };
 
 #endif //TPARAMETER_H

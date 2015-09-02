@@ -138,15 +138,13 @@ enum ParameterKind
 	ParameterKind_Position,
 	ParameterKind_MapCell,
 	ParameterKind_MoveObjectByUnit,
-	ParameterKind_GameObject,
 	ParameterKind_Cancel,
 	ParameterKind_Destination,
-	parameter_kind_cell,
 	parameter_kind_object,
-	parameter_kind_inventory_cell,
-	parameter_kind_body_part,
+	parameter_kind_owner,
 	parameter_kind_unit_interaction,
-	parameter_interaction_cell
+	parameter_interaction_cell,
+
 };
 
 enum object_direction_e
@@ -393,7 +391,16 @@ enum class type_e
 	gamemap,
 	mapcell,
 	inventory_cell,
-	parameter_mapcell
+	parameter_mapcell,
+	parameter_position,
+	parameter_movegameobject,
+	parameter_destination,
+	parameter_gameobject,
+	parameter_object_owner,
+	parameter_unit_interaction,
+	parameter_interaction_cell,
+	action_wrapper
+
 };
 
 struct predicat_t

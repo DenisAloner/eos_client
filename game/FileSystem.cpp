@@ -483,6 +483,46 @@ iSerializable* Serialization_manager::deserialize()
 			value = new Parameter_MapCell();
 			break;
 		}
+		case type_e::parameter_position:
+		{
+			value = new Parameter_Position();
+			break;
+		}
+		case type_e::parameter_movegameobject:
+		{
+			value = new Parameter_MoveObjectByUnit();
+			break;
+		}
+		case type_e::parameter_destination:
+		{
+			value = new Parameter_destination();
+			break;
+		}
+		case type_e::parameter_gameobject:
+		{
+			value = new P_object();
+			break;
+		}
+		case type_e::parameter_object_owner:
+		{
+			value = new P_object_owner();
+			break;
+		}
+		case type_e::parameter_unit_interaction:
+		{
+			value = new P_unit_interaction();
+			break;
+		}
+		case type_e::parameter_interaction_cell:
+		{
+			value = new P_interaction_cell();
+			break;
+		}
+		case type_e::action_wrapper:
+		{
+			value = new Action_wrapper();
+			break;
+		}
 		}
 		LOG(INFO) << "Тип обьекта: " << std::to_string((int)type);
 		m_index += 1;

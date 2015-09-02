@@ -490,7 +490,7 @@ void Application::update()
 		m_update_mutex.unlock();
 		std::chrono::milliseconds Duration(1);
 		std::this_thread::sleep_for(Duration);
-	} while (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->m_wrapper.m_action);
+	} while (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->m_action);
 	m_update_mutex.lock();
 	if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
 	{
@@ -523,10 +523,14 @@ Parameter* Application::command_select_location(GameObject* object)
 			m_message_queue.m_condition_variable.wait(lk);
 		}
 		m_message_queue.m_processed_message = true;
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_cell)
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_owner)
 		{
-			Result = m_message_queue.m_items.front();
-			Exit = true;
+			P_object_owner* p = static_cast<P_object_owner*>(m_message_queue.m_items.front());
+			if (p->m_cell->m_kind == entity_e::cell)
+			{
+				Result = m_message_queue.m_items.front();
+				Exit = true;
+			}
 		}
 		if (m_message_queue.m_items.front()->m_kind == ParameterKind_Cancel)
 		{
@@ -709,17 +713,7 @@ Parameter* Application::command_select_transfer(Parameter_destination* parameter
 			m_message_queue.m_condition_variable.wait(lk);
 		}
 		m_message_queue.m_processed_message = true;
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_body_part)
-		{
-			Result = m_message_queue.m_items.front();
-			Exit = true;
-		}
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_inventory_cell)
-		{
-			Result = m_message_queue.m_items.front();
-			Exit = true;
-		}
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_cell)
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_owner)
 		{
 			Result = m_message_queue.m_items.front();
 			Exit = true;
@@ -754,27 +748,34 @@ P_object* Application::command_select_transfer_source(Parameter_destination* par
 			Result = static_cast<P_object*>(m_message_queue.m_items.front());
 			Exit = true;
 		}
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_inventory_cell)
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_owner)
 		{
 			P_object_owner* temp = static_cast<P_object_owner*>(m_message_queue.m_items.front());
-			if (static_cast<Inventory_cell*>(temp->m_cell)->m_item)
+			switch (temp->m_cell->m_kind)
 			{
-				Result = new P_object();
-				Result->m_object = static_cast<Inventory_cell*>(temp->m_cell)->m_item;
-				Exit = true;
-			}
-			else Result = nullptr;
-		}
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_body_part)
-		{
-			P_object_owner* temp = static_cast<P_object_owner*>(m_message_queue.m_items.front());
-			if (static_cast<Object_part*>(temp->m_cell)->m_item)
+			case entity_e::inventory_cell:
+				{
+					if (static_cast<Inventory_cell*>(temp->m_cell)->m_item)
+					{
+						Result = new P_object();
+						Result->m_object = static_cast<Inventory_cell*>(temp->m_cell)->m_item;
+						Exit = true;
+					}
+					else Result = nullptr;
+					break;
+				}
+			case entity_e::body_part:
 			{
-				Result = new P_object();
-				Result->m_object = static_cast<Object_part*>(temp->m_cell)->m_item;
-				Exit = true;
+				if (static_cast<Object_part*>(temp->m_cell)->m_item)
+				{
+					Result = new P_object();
+					Result->m_object = static_cast<Object_part*>(temp->m_cell)->m_item;
+					Exit = true;
+				}
+				else Result = nullptr;
+				break;
 			}
-			else Result = nullptr;
+			}
 		}
 		if (m_message_queue.m_items.front()->m_kind == ParameterKind_Cancel)
 		{
@@ -802,10 +803,14 @@ Parameter* Application::command_select_body_part()
 			m_message_queue.m_condition_variable.wait(lk);
 		}
 		m_message_queue.m_processed_message = true;
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_body_part)
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_owner)
 		{
-			Result = m_message_queue.m_items.front();
-			Exit = true;
+			P_object_owner* p = static_cast<P_object_owner*>(m_message_queue.m_items.front());
+			if (p->m_cell->m_kind == entity_e::body_part)
+			{
+				Result = m_message_queue.m_items.front();
+				Exit = true;
+			}
 		}
 		if (m_message_queue.m_items.front()->m_kind == ParameterKind_Cancel)
 		{

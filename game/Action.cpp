@@ -8,6 +8,7 @@
 #include "game/graphics/GUI_TextBox.h"
 #include "log.h"
 #include "Action_controller.h"
+#include  "impact\Effect.h"
 
 Action::Action(void)
 {
@@ -72,6 +73,10 @@ Action_wrapper::Action_wrapper()
 	m_action = nullptr;
 	m_parameter = nullptr;
 	m_decay = 0;
+	m_prefix = new Interaction_prefix();
+	m_prefix->m_interaction_message_type = interaction_message_type_e::single;
+	m_prefix->m_subtype = effect_prefix_e::action;
+	m_prefix->m_value = this;
 }
 
 Action_wrapper* Action_wrapper::clone()
@@ -83,15 +88,69 @@ Action_wrapper* Action_wrapper::clone()
 	return result;
 }
 
+void Action_wrapper::reset_serialization_index()
+{
+	m_serialization_index = 0;
+	if (m_parameter)
+	{
+		if (m_parameter->m_serialization_index > 1)
+		{
+			m_parameter->reset_serialization_index();
+		}
+	}
+}
+
 void Action_wrapper::save()
 {
-	LOG(FATAL) << "error";
+	LOG(INFO) << "Выполняемое действие";
+	FILE* file = Serialization_manager::instance().m_file;
+	type_e t = type_e::action_wrapper;
+	fwrite(&t, sizeof(type_e), 1, file);
+	fwrite(&m_decay, sizeof(int), 1, file);
+	Serialization_manager::instance().serialize(m_action);
+	Serialization_manager::instance().serialize(m_parameter);
+	LOG(INFO) << "Конец выполняемого действия";
 }
 
 void Action_wrapper::load()
 {
+	LOG(INFO) << "Выполняемое действие";
+	FILE* file = Serialization_manager::instance().m_file;
+	fread(&m_decay, sizeof(int), 1, file);
+	m_action = dynamic_cast<Action*>(Serialization_manager::instance().deserialize());
+	m_parameter = dynamic_cast<Parameter*>(Serialization_manager::instance().deserialize());
+	LOG(INFO) << "Конец выполняемого действия";
 }
 
+void Action_wrapper::set(GameObject* unit, Action* action, Parameter* parameter)
+{
+	m_action = action;
+	m_parameter = parameter;
+	m_decay = m_action->m_decay;
+	m_prefix->apply_effect(unit, this);
+	done = true;
+}
+
+void Action_wrapper::update()
+{
+	if (m_action)
+	{
+		if (done)
+		{
+			m_action->perfom(m_parameter);
+			done = false;
+		}
+		m_decay -= 1;
+		if (m_decay <= 0)
+		{
+			/*if (m_action->m_error != "")
+			{
+			m_GUI->DescriptionBox->add_item_control(new GUI_Text(A->m_action->m_error));
+			}*/
+			m_action = nullptr;
+		}
+	}
+}
 
 ActionClass_Move::ActionClass_Move()
 {
@@ -451,7 +510,7 @@ void Action_OpenInventory::interaction_handler()
 	Action::interaction_handler();
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
-	Parameter_GameObject* p = new Parameter_GameObject();
+	P_object* p = new P_object();
 	result = Application::instance().command_select_object_on_map();
 	if (result)
 	{
@@ -620,17 +679,7 @@ void Action_pick::interaction_handler()
 	{
 		switch (result->m_kind)
 		{
-		case ParameterKind::parameter_kind_cell:
-		{
-			p->m_owner = static_cast<P_object_owner*>(result)->m_cell;
-			break;
-		}
-		case ParameterKind::parameter_kind_inventory_cell:
-		{
-			p->m_owner = static_cast<P_object_owner*>(result)->m_cell;
-			break;
-		}
-		case ParameterKind::parameter_kind_body_part:
+		case ParameterKind::parameter_kind_owner:
 		{
 			p->m_owner = static_cast<P_object_owner*>(result)->m_cell;
 			break;
@@ -1014,7 +1063,7 @@ void Action_equip::interaction_handler()
 	Action::interaction_handler();
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
-	Parameter_GameObject* p = new Parameter_GameObject();
+	P_object* p = new P_object();
 	result = Application::instance().command_select_object_on_map();
 	if (result)
 	{
