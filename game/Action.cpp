@@ -7,7 +7,6 @@
 #include "game/graphics/GUI_MapViewer.h"
 #include "game/graphics/GUI_TextBox.h"
 #include "log.h"
-#include "Action_controller.h"
 #include  "impact\Effect.h"
 
 Action::Action(void)

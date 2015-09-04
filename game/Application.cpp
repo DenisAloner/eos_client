@@ -12,7 +12,6 @@
 #include "game/graphics/GUI_Timer.h"
 #include "utils/log.h"
 #include <chrono>
-#include <Action_controller.h>
 
 
 void my_audio_callback(void *userdata, uint8_t *stream, uint32_t len);
@@ -194,8 +193,8 @@ void Application::initialize()
 	m_GUI->MapViewer->m_size.w = 1024;
 	m_GUI->MapViewer->m_size.h = 1024;
 	
-	//m_GUI->MapViewer->m_map = new GameMap(dimension_t(20,20));
-	////m_GUI->MapViewer->m_map->generate_level();
+	/*m_GUI->MapViewer->m_map = new GameMap(dimension_t(40,40));
+	m_GUI->MapViewer->m_map->generate_level();*/
 
 	//m_GUI->MapViewer->m_map->generate_room();
 
@@ -216,16 +215,16 @@ void Application::initialize()
 	//Serialization_manager::instance().save("save", m_GUI->MapViewer->m_map);
 	m_GUI->MapViewer->m_map = Serialization_manager::instance().load("save");
 
-	//int index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
-	//GameMap::block_t* room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);
-	//int rx = rand() % room->rect.w;
-	//int ry = rand() % room->rect.h;
-	//GameObject* obj = m_game_object_manager->new_object("iso_unit");
-	//m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
-	//m_GUI->MapViewer->m_player = new Player(obj, m_GUI->MapViewer->m_map);
+	/*int index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
+	GameMap::block_t* room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);
+	int rx = rand() % room->rect.w;
+	int ry = rand() % room->rect.h;
+	GameObject* obj = m_game_object_manager->new_object("iso_unit");
+	m_GUI->MapViewer->m_map->add_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
+	m_GUI->MapViewer->m_player = new Player(obj, m_GUI->MapViewer->m_map);
 
-	//rx = room->rect.x + rx;
-	//ry = room->rect.y + ry;
+	rx = room->rect.x + rx;
+	ry = room->rect.y + ry;*/
 
 	m_window_manager = new GUI_Window_manager(0, 0, 1024, 1024);
 
@@ -440,7 +439,7 @@ void Application::PlaySound1()
 
 void Application::update()
 {
-	
+
 	//if (!m_action_manager->m_items.empty())
 	//{
 	//	std::map<int, std::list<GameTask*> > task_order;
@@ -491,6 +490,23 @@ void Application::update()
 		std::chrono::milliseconds Duration(1);
 		std::this_thread::sleep_for(Duration);
 	} while (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->m_action);
+	m_update_mutex.lock();
+	if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
+	{
+		m_GUI->MapViewer->m_player->m_fov->calculate(static_cast<AI_enemy*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)->m_fov_radius, m_GUI->MapViewer->m_player->m_object, m_GUI->MapViewer->m_map);
+	}
+	m_update_mutex.unlock();
+}
+
+void Application::update_after_load()
+{
+	m_update_mutex.lock();
+	m_GUI->MapViewer->m_map->calculate_lighting2();
+	Application::instance().m_GUI->MapViewer->update();
+	Application::instance().m_GUI->MapViewer->m_map->m_update = true;
+	m_update_mutex.unlock();
+	std::chrono::milliseconds Duration(1);
+	std::this_thread::sleep_for(Duration);
 	m_update_mutex.lock();
 	if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
 	{
@@ -669,7 +685,7 @@ void Application::process_game()
 		std::chrono::milliseconds Duration(250);
 		std::this_thread::sleep_for(Duration);
 	}*/
-	update();
+	update_after_load();
 	while (true)
 	{
 		if (m_turn)

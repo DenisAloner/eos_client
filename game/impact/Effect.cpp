@@ -1114,15 +1114,41 @@ void ObjectTag::Activator::apply_effect(GameObject* unit, Object_interaction* ob
 	}
 }
 
+void ObjectTag::Activator::reset_serialization_index()
+{
+	m_serialization_index = 0;
+	for (auto item = m_link.begin(); item != m_link.end(); item++)
+	{
+		if ((*item)->m_serialization_index > 1)
+		{
+			(*item)->reset_serialization_index();
+		}
+	}
+}
+
 void ObjectTag::Activator::save()
 {
 	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::tag_activator;
 	fwrite(&t, sizeof(type_e), 1, file);
+	size_t s = m_link.size();
+	fwrite(&s, sizeof(size_t), 1, file);
+	for (auto item = m_link.begin(); item != m_link.end(); item++)
+	{
+		Serialization_manager::instance().serialize(*item);
+	}
 }
 
 void ObjectTag::Activator::load()
 {
+	FILE* file = Serialization_manager::instance().m_file;
+	size_t s;
+	fread(&s, sizeof(size_t), 1, file);
+	m_link.clear();
+	for (size_t i = 0; i < s; i++)
+	{
+		m_link.push_back(dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize()));
+	}
 }
 
 // ObjectTag::Fast_move

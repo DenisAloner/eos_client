@@ -576,6 +576,7 @@ void GameObject::save()
 	{
 		Serialization_manager::instance().serialize(*item);
 	}
+	Serialization_manager::instance().serialize(m_active_state);
 }
 
 void GameObject::load()
@@ -603,7 +604,7 @@ void GameObject::load()
 		value = static_cast<Object_state*>(Serialization_manager::instance().deserialize());
 		m_state.push_back(value);
 	}
-	m_active_state = m_state.front();
+	m_active_state = static_cast<Object_state*>(Serialization_manager::instance().deserialize());
 	set_direction(m_direction);
 	update_interaction();
 	LOG(INFO) << "конец загрузки объекта";

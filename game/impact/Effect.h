@@ -316,6 +316,7 @@ namespace ObjectTag
 		virtual Activator* clone();
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
+		virtual void reset_serialization_index();
 		virtual void save();
 		virtual void load();
 	};

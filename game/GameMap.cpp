@@ -225,7 +225,7 @@ void GameMap::generate_level(void)
 	fill();
 	connect_room();
 	add_wall();
-	//add_doors();
+	add_doors();
 	generate_traps();
 	add_lighting();
 }
