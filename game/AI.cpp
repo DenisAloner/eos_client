@@ -449,7 +449,7 @@ void AI_trap::create()
 				p->m_unit = m_object;
 				p->m_object = (*item);
 				p->m_unit_body_part = nullptr;
-				Application::instance().m_action_manager->add(p->m_unit, new GameTask(Application::instance().m_actions[action_e::hit], p));
+				Application::instance().m_action_manager->add(new GameTask(Application::instance().m_actions[action_e::hit], p));
 			}
 		}
 	}

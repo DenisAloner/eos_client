@@ -332,11 +332,11 @@ class GameTask;
 class GameObject;
 
 struct tag_t {
-	GameObject* object;
+
 	GameTask* task;
 
-	tag_t(GameObject*object, GameTask* task) :object(object), task(task){};
-	tag_t() :object(nullptr), task(nullptr){};
+	tag_t(GameTask* task) : task(task) {};
+	tag_t() : task(nullptr) {};
 };
 
 struct f2dvector_t

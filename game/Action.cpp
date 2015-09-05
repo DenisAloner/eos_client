@@ -188,8 +188,7 @@ void ActionClass_Move::interaction_handler()
 		return;
 	}
 	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
-	//Application::instance().m_action_manager->add(p->m_object, new GameTask(this, p));
-	p->m_object->m_active_state->m_ai->m_action_controller->set(p->m_object,this, p);
+	Application::instance().m_action_manager->add(new GameTask(this, p));
 	Application::instance().m_message_queue.m_busy = false;
 }
 
@@ -415,8 +414,7 @@ void ActionClass_Push::interaction_handler()
 		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 		return;
 	}
-	//Application::instance().m_action_manager->add(p->m_unit, new GameTask(this, p));
-	//p->m_unit->m_active_state->m_ai->m_action_controller->set(this, p);
+	Application::instance().m_action_manager->add(new GameTask(this, p));
 	Application::instance().m_message_queue.m_busy = false;
 	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 }
@@ -485,9 +483,7 @@ void ActionClass_Turn::interaction_handler()
 		return;
 	}
 	p->m_object = Application::instance().m_GUI->MapViewer->m_player->m_object;
-	//Application::instance().m_action_manager->add(p->m_object, new GameTask(this, p));
-
-	p->m_object->m_active_state->m_ai->m_action_controller->set(p->m_object,this, p);
+	Application::instance().m_action_manager->add(new GameTask(this, p));
 	Application::instance().m_message_queue.m_busy = false;
 }
 
@@ -626,7 +622,7 @@ void action_set_motion_path::interaction_handler()
 		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 		return;
 	}
-	p->m_map->bresenham_line(p->m_object->cell(), p->m_place, [p](MapCell* a) { Application::instance().m_action_manager->add(p->m_object, new GameTask(Application::instance().m_actions[0], new Parameter_Position(p->m_object, a, p->m_map))); });
+	p->m_map->bresenham_line(p->m_object->cell(), p->m_place, [p](MapCell* a) { Application::instance().m_action_manager->add(new GameTask(Application::instance().m_actions[0], new Parameter_Position(p->m_object, a, p->m_map))); });
 	Application::instance().m_message_queue.m_busy = false;
 	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 }
@@ -693,8 +689,7 @@ void Action_pick::interaction_handler()
 		Application::instance().m_clipboard.m_item = nullptr;
 		return;
 	}
-	//Application::instance().m_action_manager->add(p->m_unit, new GameTask(this, p));
-	p->m_unit->m_active_state->m_ai->m_action_controller->set(p->m_unit, this, p);
+	Application::instance().m_action_manager->add(new GameTask(this, p));
 	Application::instance().m_clipboard.m_item = nullptr;
 	Application::instance().m_message_queue.m_busy = false;
 }
@@ -788,8 +783,7 @@ void Action_open::interaction_handler()
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
-	//Application::instance().m_action_manager->add(Application::instance().m_GUI->MapViewer->m_player->m_object, new GameTask(this, p));
-	Application::instance().m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->set(p->m_object, this, p);
+	Application::instance().m_action_manager->add(new GameTask(this, p));
 	Application::instance().m_message_queue.m_busy = false;
 }
 
@@ -877,7 +871,7 @@ void Action_hit::interaction_handler()
 		return;
 	}
 	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
-	Application::instance().m_action_manager->add(p->m_unit, new GameTask(this, p));
+	Application::instance().m_action_manager->add(new GameTask(this, p));
 	Application::instance().m_message_queue.m_busy = false;
 }
 
@@ -980,8 +974,7 @@ void action_hit_melee::interaction_handler()
 		return;
 	}
 	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
-	//Application::instance().m_action_manager->add(p->m_unit, new GameTask(this, p));
-	p->m_unit->m_active_state->m_ai->m_action_controller->set(p->m_unit, this, p);
+	Application::instance().m_action_manager->add(new GameTask(this, p));
 	Application::instance().m_message_queue.m_busy = false;
 }
 
@@ -1167,7 +1160,7 @@ void Action_use::interaction_handler()
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
-	p->m_unit->m_active_state->m_ai->m_action_controller->set(p->m_unit, this, p);
+	Application::instance().m_action_manager->add(new GameTask(this, p));
 	Application::instance().m_message_queue.m_busy = false;
 }
 

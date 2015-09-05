@@ -18,26 +18,26 @@ ActionManager::~ActionManager(void)
 }
 
 
-void ActionManager::add(GameObject* unit, GameTask* action)
+void ActionManager::add(GameTask* action)
 {
 
-	m_items[unit].push_back(action);
-	add_item_event(tag_t(unit,action));
+	m_items.push_back(action);
+	add_item_event(tag_t(action));
 }
 
 
-void ActionManager::remove(GameObject* unit)
+void ActionManager::remove()
 {
-	if (!m_items[unit].empty())
+	if (!m_items.empty())
 	{
-		remove_item_event(tag_t(unit,m_items[unit].front()));
-		m_items[unit].pop_front();
+		remove_item_event(tag_t(m_items.front()));
+		m_items.pop_front();
 	}
 }
 
 
-void ActionManager::remove(GameObject* unit, GameTask* item)
+void ActionManager::remove(GameTask* item)
 {
-	remove_item_event(tag_t(unit,item));
-	m_items[unit].remove(item);
+	remove_item_event(tag_t(item));
+	m_items.remove(item);
 }

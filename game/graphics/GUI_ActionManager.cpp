@@ -70,7 +70,7 @@ void GUI_ActionManager::add_item_control(GUI_Object* object)
 
 void GUI_ActionManager::on_item_add(tag_t const& e)
 {
-	GUI_Item* item = new GUI_Item(0, 0, 0,0,e.object->m_name+": "+ e.task->m_action->get_description(e.task->m_parameter), e);
+	GUI_Item* item = new GUI_Item(0, 0, 0,0,e.task->m_action->get_description(e.task->m_parameter), e);
 	add_item_control(item);
 }
 
@@ -105,7 +105,7 @@ void GUI_ActionManager::on_item_remove(tag_t const& e)
 {
 	for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current !=m_items.end(); Current++)
 	{
-		if (static_cast<GUI_Item*>(*Current)->m_tag.object == e.object && static_cast<GUI_Item*>(*Current)->m_tag.task == e.task)
+		if (static_cast<GUI_Item*>(*Current)->m_tag.task == e.task)
 		{
 			remove_item_control((*Current));
 			break;
@@ -115,5 +115,5 @@ void GUI_ActionManager::on_item_remove(tag_t const& e)
 
 void GUI_ActionManager::remove_item_from_source(GUI_Object* object)
 {
-	m_item->remove(static_cast<GUI_Item*>(object)->m_tag.object,static_cast<GUI_Item*>(object)->m_tag.task);
+	m_item->remove(static_cast<GUI_Item*>(object)->m_tag.task);
 }

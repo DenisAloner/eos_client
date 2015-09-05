@@ -24,8 +24,7 @@ class ActionManager
 {
 public:
 
-	
-	std::map<GameObject*,std::list<GameTask*> > m_items;
+	std::list<GameTask*> m_items;
 
 	ActionManager(void);
 	~ActionManager(void);
@@ -33,9 +32,9 @@ public:
 	Event<tag_t> add_item_event;
 	Event<tag_t> remove_item_event;
 
-	void add(GameObject* unit, GameTask* action);
-	void remove(GameObject* unit);
-	void remove(GameObject* unit, GameTask* item);
+	void add(GameTask* action);
+	void remove();
+	void remove(GameTask* item);
 };
 
 #endif //TACTIONMANAGER_H
