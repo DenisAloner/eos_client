@@ -175,7 +175,7 @@ void Parameter_list::update_list(Object_interaction* list)
 
 void Parameter_list::update()
 {
-	LOG(INFO) << "ÒÈÏ ÏÀÐÀÌÅÒÐÀ " << std::to_string((int)m_subtype);
+	//LOG(INFO) << "ÒÈÏ ÏÀÐÀÌÅÒÐÀ " << std::to_string((int)m_subtype);
 	m_value = m_basic_value;
 	m_limit = m_basic_limit;
 	update_list(this);

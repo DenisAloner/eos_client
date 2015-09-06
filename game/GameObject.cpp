@@ -537,10 +537,8 @@ void GameObject::update_interaction()
 {
 	if (m_active_state)
 	{
-		LOG(INFO) << "ÂÑÅÃÎ Â ÑÎÑÒÎßÍÈÈ " << std::to_string(m_active_state->m_item.size());
 		for (auto item = m_active_state->m_item.begin(); item != m_active_state->m_item.end(); item++)
 		{
-			LOG(INFO) << "ÒÈÏ ËÈÑÒÀ " << std::to_string((int)item->second->m_list_type);
 			item->second->update();
 		}
 	}
@@ -615,6 +613,7 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 	m_fov = new FOV();
 	m_fov->calculate(static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_fov_radius, m_object, m_map);
 	LOG(INFO) << "Ïîëå çðåíèå " << std::to_string(static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_fov_radius);
+	m_actions.push_front(Application::instance().m_actions[action_e::set_motion_path]);
 	m_actions.push_front(Application::instance().m_actions[action_e::open_inventory]);
 	m_actions.push_front(Application::instance().m_actions[action_e::cell_info]);
 	m_actions.push_front(Application::instance().m_actions[action_e::show_parameters]);

@@ -141,6 +141,59 @@ void Path::calculate(GameMap* map, GameObject* object, MapCell* gc,GameObject* g
 	}
 }
 
+void Path::map_costing(GameMap* map, GameObject* object, MapCell* gc, int radius)
+{
+	//for (int i = 0; i < map->m_size.h; i++)
+	//{
+	//	for (int j = 0; j < map->m_size.w; j++)
+	//	{
+	//	}
+	//}
+	for (int y = m_middle - radius; y < m_middle + radius + 1; y++)
+	{
+		for (int x = m_middle - radius; x < m_middle + radius + 1; x++)
+		{
+			m_map[y][x].closed = false;
+			m_map[y][x].state = 1;
+			m_map[y][x].pos.y = y;
+			m_map[y][x].pos.x = x;
+		}
+	}
+	Path_cell* pc;
+	MapCell* mc;
+	MapCell* c2;
+	m_game_map = map;
+	m_unit = object;
+	m_start_cell = &m_map[m_middle][m_middle];
+	m_start_size = object->m_active_state->m_size;
+	mc = static_cast<MapCell*>(object->m_owner);
+	c2 = gc;
+	m_goal_cell = &m_map[c2->y - mc->y + m_middle][c2->x - mc->x + m_middle];
+	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier->predicat;
+	for (int y = -radius; y < radius + 1; y++)
+	{
+		if ((object->cell()->y + y >= 0) && (object->cell()->y + y < map->m_size.h))
+		{
+			for (int x = -radius; x < radius + 1; x++)
+			{
+				if ((object->cell()->x + x >= 0) && (object->cell()->x + x < map->m_size.w))
+				{
+					pc = &m_map[m_middle + y][m_middle + x];
+					mc = map->m_items[object->cell()->y + y][object->cell()->x + x];
+					pc->state = 0;
+					for (std::list<GameObject*>::iterator item = mc->m_items.begin(); item != mc->m_items.end(); item++)
+					{
+						if (((*item) != object) && qualifier((*item)))
+						{
+							pc->state = 1;
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+}
 
 int Path::manhattan(Path_cell* a, Path_cell* b) {
 	return abs(a->pos.x - b->pos.x) + abs(a->pos.y - b->pos.y);
@@ -213,6 +266,29 @@ std::vector<MapCell*>* Path::get_path(){
 	{
 		current = m_heap.pop();
 		if (Game_algorithm::check_distance(&current->cell->pos,m_start_size,&m_goal_cell->pos,m_goal_size))
+		{
+			return back(current);
+		}
+		current->cell->closed = true;
+		insert_into_open(current->cell->pos.x + 1, current->cell->pos.y, 10, current);
+		insert_into_open(current->cell->pos.x - 1, current->cell->pos.y, 10, current);
+		insert_into_open(current->cell->pos.x, current->cell->pos.y + 1, 10, current);
+		insert_into_open(current->cell->pos.x, current->cell->pos.y - 1, 10, current);
+		insert_into_open(current->cell->pos.x + 1, current->cell->pos.y + 1, 14, current);
+		insert_into_open(current->cell->pos.x + 1, current->cell->pos.y - 1, 14, current);
+		insert_into_open(current->cell->pos.x - 1, current->cell->pos.y + 1, 14, current);
+		insert_into_open(current->cell->pos.x - 1, current->cell->pos.y - 1, 14, current);
+	}
+	return nullptr;
+}
+
+std::vector<MapCell*>* Path::get_path_to_cell() {
+	Node* current;
+	m_heap.push(new Node(m_start_cell, 0, manhattan(m_start_cell, m_goal_cell) * 10));
+	while (!m_heap.m_items.empty())
+	{
+		current = m_heap.pop();
+		if ((current->cell->pos.x== m_goal_cell->pos.x)&& (current->cell->pos.y == m_goal_cell->pos.y))
 		{
 			return back(current);
 		}

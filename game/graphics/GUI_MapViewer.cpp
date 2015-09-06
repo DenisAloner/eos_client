@@ -6,9 +6,55 @@
 
 
 gui_mapviewer_hint::gui_mapviewer_hint(GUI_MapViewer* owner) :m_owner(owner){}
+mapviewer_hint_path::mapviewer_hint_path(GUI_MapViewer* owner, std::vector<MapCell*>* path) : gui_mapviewer_hint(owner), m_path(path) {};
 mapviewer_hint_area::mapviewer_hint_area(GUI_MapViewer* owner, GameObject* object, bool consider_object_size) : gui_mapviewer_hint(owner), m_object(object),m_consider_object_size(consider_object_size){}
 mapviewer_hint_object_area::mapviewer_hint_object_area(GUI_MapViewer* owner, GameObject* object) : gui_mapviewer_hint(owner), m_object(object){}
 mapviewer_hint_line::mapviewer_hint_line(GUI_MapViewer* owner, MapCell* cell) : gui_mapviewer_hint(owner), m_cell(cell){}
+
+void gui_mapviewer_hint::draw_cell(MapCell* cell, int index)
+{
+	double x0, y0, x1, y1, x2, y2, x3, y3;
+	int px = 0;
+	int py = 0;
+	int x = px + cell->x - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
+	int y = py + cell->y - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
+	int yp = m_owner->m_tile_count_x - x;
+	int xp = m_owner->m_tile_count_y - y;
+	x0 = (xp - yp) * 16 + m_owner->m_shift.x;
+	y0 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
+	x1 = x0;
+	y1 = (xp + yp) * 9 + m_owner->m_shift.y;
+	x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
+	y2 = y1;
+	x3 = x2;
+	y3 = y0;
+	glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_select);
+	glColor4f(1.0F, 0.9F, 0.0F, 0.5F);
+	Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+	glColor4f(1.0F, 0.9F, 0.0F, 1.0F);
+	Application::instance().m_graph->center_text((x0 + x2)*0.5, (y0 + y1) *0.5, std::to_string(index), 8, 17);
+}
+
+void mapviewer_hint_path::render()
+{
+	int px = 0;
+	int py = 0;
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
+	glUseProgramObjectARB(0);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_TEXTURE_2D);
+	if (m_owner->m_cursored != nullptr)
+	{
+		if (m_path)
+		{
+			for (int i = 0; i < m_path->size(); i++)
+			{
+				draw_cell((*m_path)[(m_path->size() - 1) - i], i);
+			}
+		}
+	}
+}
 
 void mapviewer_hint_area::render()
 {
@@ -159,15 +205,17 @@ void mapviewer_hint_line::draw_cell(MapCell* a)
 	int py = 0;
 	int x = px + a->x - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
 	int y = py + a->y - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
-	x0 = x * m_owner->m_tile_size_x;
-	y0 = (m_owner->m_tile_count_y - y - 1) * m_owner->m_tile_size_y;
+	int yp = m_owner->m_tile_count_x - x;
+	int xp = m_owner->m_tile_count_y - y;
+	x0 = (xp - yp) * 16 + m_owner->m_shift.x;
+	y0 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
 	x1 = x0;
-	y1 = (m_owner->m_tile_count_y - y) * m_owner->m_tile_size_y;
-	x2 = (x + 1) * m_owner->m_tile_size_x;
+	y1 = (xp + yp) * 9 + m_owner->m_shift.y;
+	x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
 	y2 = y1;
 	x3 = x2;
 	y3 = y0;
-	glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_preselect);
+	glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_select);
 	glColor4f(1.0F, 0.9F, 0.0F, 0.5F);
 	Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
 	glColor4f(1.0F, 0.9F, 0.0F, 1.0F);
@@ -489,8 +537,6 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 				}
 			}
 		}
-
-
 	if (m_cursored != nullptr)
 	{
 		MapCell* Item = m_cursored;
@@ -588,50 +634,61 @@ void GUI_MapViewer::on_key_press(WPARAM w)
 	case VK_ESCAPE:
 		PostQuitMessage(0);
 		return;
-	//case VK_UP:
-	//	P = new Parameter_Position();
-	//	P->m_object=m_player;
-	//	P->m_place=m_map->m_items[m_player->cell()->y+1][m_player->cell()->x];
-	//	P->m_map=m_map;
-	//	Application::instance().m_action_manager->m_items.push_back(new GameTask(Application::instance().m_actions[action_e::move], P));
-	//	P->~Parameter_Position();
-	//	//app->TurnEnd=true;
-	//	return;
-	//case VK_DOWN:
-	//	P = new Parameter_Position();
-	//	P->m_object=m_player;
-	//	P->m_place=m_map->m_items[m_player->cell()->y-1][m_player->cell()->x];
-	//	P->m_map=m_map;
-	//	Application::instance().m_action_manager->m_items.push_back(new GameTask(Application::instance().m_actions[action_e::move], P));
-	//	P->~Parameter_Position();
-	//	//app->TurnEnd=true;
-	//	return;
-	//case VK_LEFT:
-	//	P = new Parameter_Position();
-	//	P->m_object=m_player;
-	//	P->m_place=m_map->m_items[m_player->cell()->y][m_player->cell()->x-1];
-	//	P->m_map=m_map;
-	//	Application::instance().m_action_manager->m_items.push_back(new GameTask(Application::instance().m_actions[action_e::move], P));
-	//	P->~Parameter_Position();
-	//	//app->TurnEnd=true;
-	//	return;
-	//case VK_RIGHT:
-	//	P = new Parameter_Position();
-	//	P->m_object=m_player;
-	//	P->m_place=m_map->m_items[m_player->cell()->y][m_player->cell()->x+1];
-	//	P->m_map=m_map;
-	//	Application::instance().m_action_manager->m_items.push_back(new GameTask(Application::instance().m_actions[action_e::move], P));
-	//	P->~Parameter_Position();
-	//	//app->TurnEnd=true;
-	//	return;
+		//case VK_UP:
+		//	P = new Parameter_Position();
+		//	P->m_object=m_player;
+		//	P->m_place=m_map->m_items[m_player->cell()->y+1][m_player->cell()->x];
+		//	P->m_map=m_map;
+		//	Application::instance().m_action_manager->m_items.push_back(new GameTask(Application::instance().m_actions[action_e::move], P));
+		//	P->~Parameter_Position();
+		//	//app->TurnEnd=true;
+		//	return;
+		//case VK_DOWN:
+		//	P = new Parameter_Position();
+		//	P->m_object=m_player;
+		//	P->m_place=m_map->m_items[m_player->cell()->y-1][m_player->cell()->x];
+		//	P->m_map=m_map;
+		//	Application::instance().m_action_manager->m_items.push_back(new GameTask(Application::instance().m_actions[action_e::move], P));
+		//	P->~Parameter_Position();
+		//	//app->TurnEnd=true;
+		//	return;
+		//case VK_LEFT:
+		//	P = new Parameter_Position();
+		//	P->m_object=m_player;
+		//	P->m_place=m_map->m_items[m_player->cell()->y][m_player->cell()->x-1];
+		//	P->m_map=m_map;
+		//	Application::instance().m_action_manager->m_items.push_back(new GameTask(Application::instance().m_actions[action_e::move], P));
+		//	P->~Parameter_Position();
+		//	//app->TurnEnd=true;
+		//	return;
+		//case VK_RIGHT:
+		//	P = new Parameter_Position();
+		//	P->m_object=m_player;
+		//	P->m_place=m_map->m_items[m_player->cell()->y][m_player->cell()->x+1];
+		//	P->m_map=m_map;
+		//	Application::instance().m_action_manager->m_items.push_back(new GameTask(Application::instance().m_actions[action_e::move], P));
+		//	P->~Parameter_Position();
+		//	//app->TurnEnd=true;
+		//	return;
+	case 0x59:
+	{
+		if (Application::instance().m_message_queue.m_reader)
+		{
+			Parameter* p = new Parameter(parameter_accept);
+			Application::instance().m_message_queue.push(p);
+		}
+		return;
+	}
 	case VK_SPACE:
+	{
 		if (Application::instance().m_message_queue.m_reader)
 		{
 			Parameter* p = new Parameter(ParameterKind_Cancel);
 			Application::instance().m_message_queue.push(p);
 		}
 		return;
-		}
+	}
+	}
 }
 
 void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)

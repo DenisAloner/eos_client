@@ -86,6 +86,17 @@ public:
 
 	gui_mapviewer_hint(GUI_MapViewer* owner);
 	virtual void render() = 0;
+
+	void draw_cell(MapCell* cell, int index);
+};
+
+class mapviewer_hint_path : public gui_mapviewer_hint
+{
+public:
+
+	std::vector<MapCell*>* m_path;
+	mapviewer_hint_path(GUI_MapViewer* owner, std::vector<MapCell*>* path);
+	virtual void render();
 };
 
 class mapviewer_hint_area : public gui_mapviewer_hint

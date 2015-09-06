@@ -73,8 +73,10 @@ public:
 	min_heap m_heap;
 
 	void calculate(GameMap* map, GameObject* object, MapCell* gc, GameObject* goal, int radius);
+	void map_costing(GameMap* map, GameObject* object, MapCell* gc, int radius);
 	int manhattan(Path_cell* a, Path_cell* b);
 	std::vector<MapCell*>* get_path();
+	std::vector<MapCell*>* get_path_to_cell();
 	void insert_into_open(int x, int y, int dg, Node* p);
 	int is_in_open(Path_cell* c);
 	std::vector<MapCell*>* back(Node* c);

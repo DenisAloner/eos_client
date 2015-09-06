@@ -144,6 +144,7 @@ enum ParameterKind
 	parameter_kind_owner,
 	parameter_kind_unit_interaction,
 	parameter_interaction_cell,
+	parameter_accept
 
 };
 

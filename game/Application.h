@@ -143,6 +143,7 @@ public:
 	P_object* command_select_transfer_source(Parameter_destination* parameter);
 	Parameter* command_select_transfer(Parameter_destination* parameter);
 	Parameter* command_select_body_part();
+	bool command_agreement();
 	void console(std::string text);
 	
 	void PlaySound1();

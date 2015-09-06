@@ -208,12 +208,15 @@ void Application::initialize()
 	//obj = m_game_object_manager->new_object("dagger");
 	//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx-1]);
 
-	//obj = m_game_object_manager->new_object("rat");
-	//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[2][2]);
-
 
 	//Serialization_manager::instance().save("save", m_GUI->MapViewer->m_map);
 	m_GUI->MapViewer->m_map = Serialization_manager::instance().load("save");
+
+	int rx = m_GUI->MapViewer->m_player->m_object->cell()->x;
+	int ry = m_GUI->MapViewer->m_player->m_object->cell()->y;
+
+	GameObject* obj = m_game_object_manager->new_object("bat");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-15][rx]);
 
 	/*int index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
 	GameMap::block_t* room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);
@@ -489,6 +492,10 @@ void Application::update()
 			m_update_mutex.lock();
 			m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->update();
 			Application::instance().m_GUI->MapViewer->m_map->m_object_manager.calculate_ai(m_GUI->MapViewer->m_map);
+			if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
+			{
+				m_GUI->MapViewer->m_player->m_fov->calculate(static_cast<AI_enemy*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)->m_fov_radius, m_GUI->MapViewer->m_player->m_object, m_GUI->MapViewer->m_map);
+			}
 			Application::instance().m_GUI->MapViewer->m_map->m_object_manager.update_buff();
 			m_GUI->MapViewer->m_map->calculate_lighting2();
 			Application::instance().m_GUI->MapViewer->update();
@@ -498,10 +505,6 @@ void Application::update()
 			std::this_thread::sleep_for(Duration);
 		} while (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->m_action);
 		m_update_mutex.lock();
-		if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
-		{
-			m_GUI->MapViewer->m_player->m_fov->calculate(static_cast<AI_enemy*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)->m_fov_radius, m_GUI->MapViewer->m_player->m_object, m_GUI->MapViewer->m_map);
-		}
 		m_action_manager->remove();
 		if (m_action_manager->m_items.empty())
 		{
@@ -852,6 +855,37 @@ Parameter* Application::command_select_body_part()
 		m_message_queue.m_reader = false;
 	}
 	return Result;
+}
+
+bool Application::command_agreement()
+{
+	bool result;
+	bool Exit = false;
+	while (Exit == false)
+	{
+		std::unique_lock<std::mutex> lk(m_message_queue.m_mutex);
+		m_message_queue.m_reader = true;
+		while (!m_message_queue.m_read_message)
+		{
+			m_message_queue.m_condition_variable.wait(lk);
+		}
+		m_message_queue.m_processed_message = true;
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_accept)
+		{
+			result= true;
+			Exit = true;
+		}
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind_Cancel)
+		{
+			result= false;
+			Exit = true;
+		}
+		m_message_queue.m_read_message = false;
+		lk.unlock();
+		m_message_queue.m_condition_variable.notify_one();
+		m_message_queue.m_reader = false;
+	}
+	return result;
 }
 
 void Application::command_equip(GameObject*& unit, Object_part* part, GameObject*& object)
