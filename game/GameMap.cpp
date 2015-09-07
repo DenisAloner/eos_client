@@ -169,6 +169,20 @@ void GameMap::generate_room(void)
 	add_to_map(obj, m_items[1][1]);
 	obj = Application::instance().m_game_object_manager->new_object("torch");
 	add_to_map(obj, m_items[m_size.h - 2][m_size.w - 2]);
+	for (int i =0; i < m_size.h-5; i++)
+	{
+		if (i>5)
+		{
+			GameObject* obj = Application::instance().m_game_object_manager->new_object("wall");
+			add_object(obj, m_items[i][10]);
+		}
+		else
+		{
+			GameObject* obj = Application::instance().m_game_object_manager->new_object("glass_wall");
+			add_object(obj, m_items[i][10]);
+		}
+	
+	}
 }
 
 

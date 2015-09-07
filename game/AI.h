@@ -14,23 +14,17 @@ class GameObject;
 class MapCell;
 class FOV;
 class Action_wrapper;
-
-struct Path_cell
-{
-	int state;
-	bool closed;
-	position_t pos;
-};
+class MapCell;
 
 struct Node
 {
-	Path_cell* cell;
+	MapCell* cell;
 	int g;
 	int h;
 	int f;
 	Node* parent;
 
-	Node(Path_cell* c, int G, int H, Node* p = nullptr) : cell(c), g(G), h(H), parent(p), f(g + h) {}
+	Node(MapCell* c, int G, int H, Node* p = nullptr) : cell(c), g(G), h(H), parent(p), f(g + h) {}
 };
 
 class min_heap
@@ -60,25 +54,21 @@ public:
 		return Singleton;
 	}
 
-	static const int m_max_size = 101;
-	static const int m_middle = (m_max_size - 1) >> 1;
-
-	Path_cell m_map[m_max_size][m_max_size];
 	GameObject* m_unit;
 	GameMap* m_game_map;
-	Path_cell* m_start_cell;
-	Path_cell* m_goal_cell;
+	MapCell* m_start_cell;
+	MapCell* m_goal_cell;
 	game_object_size_t m_start_size;
 	game_object_size_t m_goal_size;
 	min_heap m_heap;
 
 	void calculate(GameMap* map, GameObject* object, MapCell* gc, GameObject* goal, int radius);
 	void map_costing(GameMap* map, GameObject* object, MapCell* gc, int radius);
-	int manhattan(Path_cell* a, Path_cell* b);
+	int manhattan(MapCell* a, MapCell* b);
 	std::vector<MapCell*>* get_path();
 	std::vector<MapCell*>* get_path_to_cell();
 	void insert_into_open(int x, int y, int dg, Node* p);
-	int is_in_open(Path_cell* c);
+	int is_in_open(MapCell* c);
 	std::vector<MapCell*>* back(Node* c);
 
 private:

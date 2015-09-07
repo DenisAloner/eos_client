@@ -20,3 +20,4 @@ single trap_off
 single trap_on
 single red_potion
 single blue_potion
+single glass_wall

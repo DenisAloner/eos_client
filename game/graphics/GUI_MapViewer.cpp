@@ -367,14 +367,14 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 					{
 						if ((xf >= -m_player->m_fov->m_radius) && (xf <= m_player->m_fov->m_radius) && (yf >= -m_player->m_fov->m_radius) && (yf <= m_player->m_fov->m_radius))
 						{
-							light[0] = (m_map->m_items[y][x]->m_light.R / 100.0F);
+							/*light[0] = (m_map->m_items[y][x]->m_light.R / 100.0F);
 							light[1] = (m_map->m_items[y][x]->m_light.G / 100.0F);
 							light[2] = (m_map->m_items[y][x]->m_light.B / 100.0F);
+							light[3] = 0.0;*/
+							light[0] = 1.0;
+							light[1] = 1.0;
+							light[2] = 1.0;
 							light[3] = 0.0;
-							//light[0] = 1.0;
-							//light[1] = 1.0;
-							//light[2] = 1.0;
-							//light[3] = 0.0;
 							for (std::list<GameObject*>::iterator Current = m_map->m_items[y][x]->m_items.begin(); Current != m_map->m_items[y][x]->m_items.end(); Current++)
 							{
 								IsDraw = false;
@@ -384,7 +384,8 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 									if ((*Current)->cell()->y == m_map->m_items[y][x]->y && (*Current)->cell()->x == m_map->m_items[y][x]->x)
 									{
 										size3d = (*Current)->m_active_state->m_size;
-										if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visible)
+										//if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visible)
+										if (true)
 										{
 											object_size = (*Current)->m_active_state->m_tile_size;
 											int yp = m_tile_count_x - px - gx;

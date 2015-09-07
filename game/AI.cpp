@@ -94,47 +94,40 @@ Path::Path()
 
 void Path::calculate(GameMap* map, GameObject* object, MapCell* gc,GameObject* goal, int radius)
 {
-	for (int y = m_middle - radius; y < m_middle + radius + 1; y++)
+	/*int left_limit = (object->cell()->x - radius < 0) ? 0 : object->cell()->x - radius;
+	int right_limit = (object->cell()->x + radius + 1 > map->m_size.w) ? map->m_size.w : object->cell()->y + radius + 1;
+	int bottom_limit = (object->cell()->y - radius < 0) ? 0 : object->cell()->y - radius;
+	int top_limit = (object->cell()->y + radius + 1 > map->m_size.h) ? map->m_size.h : object->cell()->y + radius + 1;*/
+	MapCell* c;
+	for (int y = 0; y < map->m_size.h; y++)
 	{
-		for (int x = m_middle - radius; x < m_middle + radius + 1; x++)
+		for (int x = 0; x < map->m_size.w; x++)
 		{
-			m_map[y][x].closed = false;
-			m_map[y][x].state = 1;
-			m_map[y][x].pos.y = y;
-			m_map[y][x].pos.x = x;
+			c = map->m_items[y][x];
+			c->m_closed = false;
 		}
 	}
-	Path_cell* pc;
-	MapCell* mc;
-	MapCell* c2;
+	MapCell* pc;
 	m_game_map = map;
 	m_unit = object;
-	m_start_cell = &m_map[m_middle][m_middle];
+	m_start_cell = object->cell();
 	m_start_size = object->m_active_state->m_size;
-	mc = static_cast<MapCell*>(object->m_owner);
-	c2 = gc;
-	m_goal_cell = &m_map[c2->y - mc->y + m_middle][c2->x - mc->x +m_middle];
+	m_goal_cell = gc;
 	m_goal_size = goal->m_active_state->m_size;
 	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier->predicat;
-	for (int y = -radius; y < radius + 1; y++)
+	for (int y = 0; y < map->m_size.h; y++)
 	{
-		if ((object->cell()->y + y >= 0) && (object->cell()->y + y < map->m_size.h))
+		for (int x = 0; x < map->m_size.w; x++)
 		{
-			for (int x = -radius; x < radius + 1; x++)
+			c = map->m_items[y][x];
+			c->m_closed = false;
+			c->m_state = 0;
+			for (std::list<GameObject*>::iterator item =c->m_items.begin(); item != c->m_items.end(); item++)
 			{
-				if ((object->cell()->x + x >= 0) && (object->cell()->x + x < map->m_size.w))
+				if (((*item) != object) && ((*item) != goal) && qualifier((*item)))
 				{
-					pc = &m_map[m_middle + y][m_middle + x];
-					mc = map->m_items[object->cell()->y + y][object->cell()->x + x];
-					pc->state = 0;
-					for (std::list<GameObject*>::iterator item = mc->m_items.begin(); item != mc->m_items.end(); item++)
-					{
-						if (((*item) != object) && ((*item) != goal) && qualifier((*item)))
-						{
-							pc->state = 1;
-							break;
-						}
-					}
+					c->m_state = 1;
+					break;
 				}
 			}
 		}
@@ -143,63 +136,50 @@ void Path::calculate(GameMap* map, GameObject* object, MapCell* gc,GameObject* g
 
 void Path::map_costing(GameMap* map, GameObject* object, MapCell* gc, int radius)
 {
-	//for (int i = 0; i < map->m_size.h; i++)
-	//{
-	//	for (int j = 0; j < map->m_size.w; j++)
-	//	{
-	//	}
-	//}
-	for (int y = m_middle - radius; y < m_middle + radius + 1; y++)
+	/*int left_limit = (object->cell()->x - radius < 0) ? 0 : object->cell()->x - radius;
+	int right_limit = (object->cell()->x + radius + 1 > map->m_size.w) ? map->m_size.w : object->cell()->y + radius + 1;
+	int bottom_limit = (object->cell()->y - radius < 0) ? 0 : object->cell()->y - radius;
+	int top_limit = (object->cell()->y + radius + 1 > map->m_size.h) ? map->m_size.h : object->cell()->y + radius + 1;*/
+	MapCell* c;
+	for (int y = 0; y < map->m_size.h; y++)
 	{
-		for (int x = m_middle - radius; x < m_middle + radius + 1; x++)
+		for (int x = 0; x < map->m_size.w; x++)
 		{
-			m_map[y][x].closed = false;
-			m_map[y][x].state = 1;
-			m_map[y][x].pos.y = y;
-			m_map[y][x].pos.x = x;
+			c = map->m_items[y][x];
+			c->m_closed = false;
 		}
 	}
-	Path_cell* pc;
-	MapCell* mc;
-	MapCell* c2;
+	MapCell* pc;
 	m_game_map = map;
 	m_unit = object;
-	m_start_cell = &m_map[m_middle][m_middle];
+	m_start_cell = object->cell();
 	m_start_size = object->m_active_state->m_size;
-	mc = static_cast<MapCell*>(object->m_owner);
-	c2 = gc;
-	m_goal_cell = &m_map[c2->y - mc->y + m_middle][c2->x - mc->x + m_middle];
+	m_goal_cell = gc;
 	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier->predicat;
-	for (int y = -radius; y < radius + 1; y++)
+	for (int y = 0; y < map->m_size.h; y++)
 	{
-		if ((object->cell()->y + y >= 0) && (object->cell()->y + y < map->m_size.h))
+		for (int x = 0; x < map->m_size.w; x++)
 		{
-			for (int x = -radius; x < radius + 1; x++)
+			c = map->m_items[y][x];
+			c->m_closed = false;
+			c->m_state = 0;
+			for (std::list<GameObject*>::iterator item = c->m_items.begin(); item != c->m_items.end(); item++)
 			{
-				if ((object->cell()->x + x >= 0) && (object->cell()->x + x < map->m_size.w))
+				if (((*item) != object) && qualifier((*item)))
 				{
-					pc = &m_map[m_middle + y][m_middle + x];
-					mc = map->m_items[object->cell()->y + y][object->cell()->x + x];
-					pc->state = 0;
-					for (std::list<GameObject*>::iterator item = mc->m_items.begin(); item != mc->m_items.end(); item++)
-					{
-						if (((*item) != object) && qualifier((*item)))
-						{
-							pc->state = 1;
-							break;
-						}
-					}
+					c->m_state = 1;
+					break;
 				}
 			}
 		}
 	}
 }
 
-int Path::manhattan(Path_cell* a, Path_cell* b) {
-	return abs(a->pos.x - b->pos.x) + abs(a->pos.y - b->pos.y);
+int Path::manhattan(MapCell* a, MapCell* b) {
+	return abs(a->x - b->x) + abs(a->y - b->y);
 }
 
-int Path::is_in_open(Path_cell* c)
+int Path::is_in_open(MapCell* c)
 {
 	for (int i = 0; i < m_heap.m_items.size();i++)
 	{
@@ -217,9 +197,9 @@ void Path::insert_into_open(int x, int y, int dg, Node* p)
 	{
 		for (int j = 0; j < m_start_size.x; j++)
 		{
-			if (x + j >= 0 && y - i >= 0 && x + j < m_max_size&&y - i < m_max_size)
+			if (x + j >= 0 && y - i >= 0 && x + j < m_game_map->m_size.w&&y - i <m_game_map->m_size.h)
 			{
-				if (m_map[y - i][x + j].state != 0)
+				if (m_game_map->m_items[y - i][x + j]->m_state != 0)
 				{
 					return;
 				}
@@ -227,8 +207,8 @@ void Path::insert_into_open(int x, int y, int dg, Node* p)
 			else return;
 		}
 	}
-	Path_cell* c = &m_map[y][x];
-	if (!c->closed)
+	MapCell* c = m_game_map->m_items[y][x];
+	if (!c->m_closed)
 	{
 		int n = is_in_open(c);
 		if (n == -1)
@@ -253,7 +233,7 @@ std::vector<MapCell*>* Path::back(Node* c)
 	Node* current=c;
 	while (current)
 	{
-		result->push_back(m_game_map->m_items[cell->y + current->cell->pos.y - m_middle][cell->x + current->cell->pos.x - m_middle]);
+		result->push_back(current->cell);
 		current = current->parent;
 	}
 	return result;
@@ -265,19 +245,19 @@ std::vector<MapCell*>* Path::get_path(){
 	while (!m_heap.m_items.empty())
 	{
 		current = m_heap.pop();
-		if (Game_algorithm::check_distance(&current->cell->pos,m_start_size,&m_goal_cell->pos,m_goal_size))
+		if (Game_algorithm::check_distance(current->cell,m_start_size,m_goal_cell,m_goal_size))
 		{
 			return back(current);
 		}
-		current->cell->closed = true;
-		insert_into_open(current->cell->pos.x + 1, current->cell->pos.y, 10, current);
-		insert_into_open(current->cell->pos.x - 1, current->cell->pos.y, 10, current);
-		insert_into_open(current->cell->pos.x, current->cell->pos.y + 1, 10, current);
-		insert_into_open(current->cell->pos.x, current->cell->pos.y - 1, 10, current);
-		insert_into_open(current->cell->pos.x + 1, current->cell->pos.y + 1, 14, current);
-		insert_into_open(current->cell->pos.x + 1, current->cell->pos.y - 1, 14, current);
-		insert_into_open(current->cell->pos.x - 1, current->cell->pos.y + 1, 14, current);
-		insert_into_open(current->cell->pos.x - 1, current->cell->pos.y - 1, 14, current);
+		current->cell->m_closed = true;
+		insert_into_open(current->cell->x + 1, current->cell->y, 10, current);
+		insert_into_open(current->cell->x - 1, current->cell->y, 10, current);
+		insert_into_open(current->cell->x, current->cell->y + 1, 10, current);
+		insert_into_open(current->cell->x, current->cell->y - 1, 10, current);
+		insert_into_open(current->cell->x + 1, current->cell->y + 1, 14, current);
+		insert_into_open(current->cell->x + 1, current->cell->y - 1, 14, current);
+		insert_into_open(current->cell->x - 1, current->cell->y + 1, 14, current);
+		insert_into_open(current->cell->x - 1, current->cell->y - 1, 14, current);
 	}
 	return nullptr;
 }
@@ -288,19 +268,19 @@ std::vector<MapCell*>* Path::get_path_to_cell() {
 	while (!m_heap.m_items.empty())
 	{
 		current = m_heap.pop();
-		if ((current->cell->pos.x== m_goal_cell->pos.x)&& (current->cell->pos.y == m_goal_cell->pos.y))
+		if ((current->cell->x== m_goal_cell->x)&& (current->cell->y == m_goal_cell->y))
 		{
 			return back(current);
 		}
-		current->cell->closed = true;
-		insert_into_open(current->cell->pos.x + 1, current->cell->pos.y, 10, current);
-		insert_into_open(current->cell->pos.x - 1, current->cell->pos.y, 10, current);
-		insert_into_open(current->cell->pos.x, current->cell->pos.y + 1, 10, current);
-		insert_into_open(current->cell->pos.x, current->cell->pos.y - 1, 10, current);
-		insert_into_open(current->cell->pos.x + 1, current->cell->pos.y + 1, 14, current);
-		insert_into_open(current->cell->pos.x + 1, current->cell->pos.y - 1, 14, current);
-		insert_into_open(current->cell->pos.x - 1, current->cell->pos.y + 1, 14, current);
-		insert_into_open(current->cell->pos.x - 1, current->cell->pos.y - 1, 14, current);
+		current->cell->m_closed = true;
+		insert_into_open(current->cell->x + 1, current->cell->y, 10, current);
+		insert_into_open(current->cell->x - 1, current->cell->y, 10, current);
+		insert_into_open(current->cell->x, current->cell->y + 1, 10, current);
+		insert_into_open(current->cell->x, current->cell->y - 1, 10, current);
+		insert_into_open(current->cell->x + 1, current->cell->y + 1, 14, current);
+		insert_into_open(current->cell->x + 1, current->cell->y - 1, 14, current);
+		insert_into_open(current->cell->x - 1, current->cell->y + 1, 14, current);
+		insert_into_open(current->cell->x - 1, current->cell->y - 1, 14, current);
 	}
 	return nullptr;
 }

@@ -38,6 +38,9 @@ public:
 
 	GameMap* m_map;
 
+	bool m_closed;
+	int m_state;
+
 	int x;
 	int y;
 
