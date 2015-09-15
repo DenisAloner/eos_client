@@ -285,6 +285,90 @@ std::vector<MapCell*>* Path::get_path_to_cell() {
 	return nullptr;
 }
 
+Dijkstra_map::Dijkstra_map()
+{
+}
+
+void Dijkstra_map::init(int size)
+{
+	m_size = size;
+	//m_map = new cell_t[0][dijkstra_map_max][dijkstra_map_max];
+}
+
+bool Dijkstra_map::opaque_check(int x, int y, int size)
+{
+	for (int i = 0; i < size; i++)
+	{
+		if (y - i < 0) { return false; }
+		for (int j = 0; j < size; j++)
+		{
+			if (x + j > m_size - 1) { return false; }
+			if ((m_map)[y - i][x + j].opaque) { return false; }
+		}
+	}
+	return true;
+}
+
+void Dijkstra_map::calculate(GameMap* map, GameObject* object, GameObject* goal)
+{
+	MapCell* c;
+	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier->predicat;
+	for (int y = 0; y < map->m_size.h; y++)
+	{
+		for (int x = 0; x < map->m_size.w; x++)
+		{
+			c = map->m_items[y][x];
+			(m_map)[y][x].opaque = false;
+			(m_map)[y][x].value = 10000;
+			for (std::list<GameObject*>::iterator item = c->m_items.begin(); item != c->m_items.end(); item++)
+			{
+				if ((*item) == goal)
+				{
+					(m_map)[y][x].opaque = false;
+					(m_map)[y][x].value = 0;
+				}
+				else
+				{
+					if (((*item) != object) && qualifier((*item)))
+					{
+						(m_map)[y][x].opaque = true;
+						break;
+					}
+				}
+			}
+		}
+	}
+	bool was_change;
+	int low;
+	do
+	{
+		was_change = false;
+		for (int y = 1; y < m_size - 1; y++)
+		{
+			for (int x = 1; x < m_size - 1; x++)
+			{
+				if (opaque_check(x, y, 2))
+				{
+					low = (m_map)[y - 1][x - 1].value;
+					low = ((m_map)[y - 1][x].value < low) ? (m_map)[y - 1][x].value : low;
+					low = ((m_map)[y - 1][x + 1].value < low) ? (m_map)[y - 1][x + 1].value : low;
+					low = ((m_map)[y][x - 1].value < low) ? (m_map)[y][x - 1].value : low;
+					low = ((m_map)[y][x + 1].value < low) ? (m_map)[y][x + 1].value : low;
+					low = ((m_map)[y + 1][x - 1].value < low) ? (m_map)[y + 1][x - 1].value : low;
+					low = ((m_map)[y + 1][x].value < low) ? (m_map)[y + 1][x].value : low;
+					low = ((m_map)[y + 1][x + 1].value < low) ? (m_map)[y + 1][x + 1].value : low;
+					if ((m_map)[y][x].value > low + 1)
+					{
+						was_change = true;
+						(m_map)[y][x].value = low + 1;
+					}
+				}
+			}
+		}
+	} while (was_change);
+}
+
+
 AI_enemy::AI_enemy()
 {
 	m_ai_type = ai_type_e::non_humanoid;
@@ -412,29 +496,82 @@ void AI_enemy::create()
 		}
 		else
 		{
-			Path::instance().calculate(m_map, m_object, c, m_goal, m_fov_radius);
-			std::vector<MapCell*>* path;
-			path = Path::instance().get_path();
-			if (path)
+			m_map->m_dijkstra_map->calculate(m_map, m_object, m_goal);
+			MapCell* c = nullptr;
+			int value = m_map->m_dijkstra_map->m_map[m_object->cell()->y][m_object->cell()->x].value;
+			if (m_map->m_dijkstra_map->m_map[m_object->cell()->y - 1][m_object->cell()->x - 1].value < value)
 			{
-				if (path->size() >= 2)
-				{
-					Parameter_Position* P;
-					P = new Parameter_Position();
-					P->m_object = m_object;
-					P->m_place = (*path)[path->size() - 2];
-					P->m_map = m_map;
-					//Application::instance().m_action_manager->add(m_object, new GameTask(Application::instance().m_actions[action_e::move], P));
-					m_action_controller->set(P->m_object, Application::instance().m_actions[action_e::move], P);
-				}
-				else
-				{
-					m_goal = nullptr;
-					m_memory_goal_cell = nullptr;
-				}
-
+				c = m_map->m_items[m_object->cell()->y - 1][m_object->cell()->x - 1];
+				value = m_map->m_dijkstra_map->m_map[m_object->cell()->y - 1][m_object->cell()->x - 1].value;
 			}
-			Path::instance().m_heap.m_items.clear();
+			if (m_map->m_dijkstra_map->m_map[m_object->cell()->y - 1][m_object->cell()->x].value < value)
+			{
+				c = m_map->m_items[m_object->cell()->y - 1][m_object->cell()->x];
+				value = m_map->m_dijkstra_map->m_map[m_object->cell()->y - 1][m_object->cell()->x].value;
+			}
+			if (m_map->m_dijkstra_map->m_map[m_object->cell()->y - 1][m_object->cell()->x + 1].value < value)
+			{
+				c = m_map->m_items[m_object->cell()->y - 1][m_object->cell()->x + 1];
+				value = m_map->m_dijkstra_map->m_map[m_object->cell()->y - 1][m_object->cell()->x + 1].value;
+			}
+			if (m_map->m_dijkstra_map->m_map[m_object->cell()->y][m_object->cell()->x - 1].value < value)
+			{
+				c = m_map->m_items[m_object->cell()->y][m_object->cell()->x - 1];
+				value = m_map->m_dijkstra_map->m_map[m_object->cell()->y][m_object->cell()->x - 1].value;
+			}
+			if (m_map->m_dijkstra_map->m_map[m_object->cell()->y][m_object->cell()->x + 1].value < value)
+			{
+				c = m_map->m_items[m_object->cell()->y][m_object->cell()->x + 1];
+				value = m_map->m_dijkstra_map->m_map[m_object->cell()->y][m_object->cell()->x + 1].value;
+			}
+			if (m_map->m_dijkstra_map->m_map[m_object->cell()->y + 1][m_object->cell()->x - 1].value < value)
+			{
+				c = m_map->m_items[m_object->cell()->y + 1][m_object->cell()->x - 1];
+				value = m_map->m_dijkstra_map->m_map[m_object->cell()->y + 1][m_object->cell()->x - 1].value;
+			}
+			if (m_map->m_dijkstra_map->m_map[m_object->cell()->y + 1][m_object->cell()->x].value < value)
+			{
+				c = m_map->m_items[m_object->cell()->y + 1][m_object->cell()->x];
+				value = m_map->m_dijkstra_map->m_map[m_object->cell()->y + 1][m_object->cell()->x].value;
+			}
+			if (m_map->m_dijkstra_map->m_map[m_object->cell()->y + 1][m_object->cell()->x + 1].value < value)
+			{
+				c = m_map->m_items[m_object->cell()->y + 1][m_object->cell()->x + 1];
+				value = m_map->m_dijkstra_map->m_map[m_object->cell()->y + 1][m_object->cell()->x + 1].value;
+			}
+			if (c != nullptr)
+			{
+				Parameter_Position* P;
+						P = new Parameter_Position();
+						P->m_object = m_object;
+						P->m_place = c;
+						P->m_map = m_map;
+						m_action_controller->set(P->m_object, Application::instance().m_actions[action_e::move], P);
+			}
+
+		//	Path::instance().calculate(m_map, m_object, c, m_goal, m_fov_radius);
+		//	std::vector<MapCell*>* path;
+		//	path = Path::instance().get_path();
+		//	if (path)
+		//	{
+		//		if (path->size() >= 2)
+		//		{
+		//			Parameter_Position* P;
+		//			P = new Parameter_Position();
+		//			P->m_object = m_object;
+		//			P->m_place = (*path)[path->size() - 2];
+		//			P->m_map = m_map;
+		//			//Application::instance().m_action_manager->add(m_object, new GameTask(Application::instance().m_actions[action_e::move], P));
+		//			m_action_controller->set(P->m_object, Application::instance().m_actions[action_e::move], P);
+		//		}
+		//		else
+		//		{
+		//			m_goal = nullptr;
+		//			m_memory_goal_cell = nullptr;
+		//		}
+
+		//	}
+		//	Path::instance().m_heap.m_items.clear();
 		}
 	}
 	m_action_controller->update();

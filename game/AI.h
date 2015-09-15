@@ -78,6 +78,28 @@ private:
 	Path& operator=(const Path&);
 };
 
+struct cell_t
+{
+	int value;
+	bool opaque;
+};
+
+const int dijkstra_map_max = 1024;
+//typedef cell_t map_t[dijkstra_map_max][dijkstra_map_max];
+
+class Dijkstra_map
+{
+public:
+
+	int m_size;
+	cell_t (m_map)[dijkstra_map_max][dijkstra_map_max];
+	Dijkstra_map();
+
+	void init(int size);
+	bool opaque_check(int x, int y, int size);
+	void calculate(GameMap* map, GameObject* object, GameObject* goal);
+};
+
 class AI: public iSerializable
 {
 public:

@@ -17,6 +17,7 @@ class GameObject;
 class Object_feature;
 class MapCell;
 class AI;
+class Dijkstra_map;
 
 const int max_light_radius = 20;
 
@@ -44,6 +45,8 @@ public:
 
 	bool m_update;
 	Event<VoidEventArgs> update;
+
+	Dijkstra_map* m_dijkstra_map;
 
 	struct block_t
 	{

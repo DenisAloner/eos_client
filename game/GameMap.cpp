@@ -3,6 +3,7 @@
 #include "game/Application.h"
 #include "log.h"
 #include "Effect.h"
+#include "AI.h"
 
 void Object_manager::update_buff()
 {
@@ -99,6 +100,8 @@ void Object_manager::load()
 
 GameMap::GameMap(dimension_t size)
 {
+	m_dijkstra_map = new Dijkstra_map();
+	m_dijkstra_map->init(size.w);
 	init(size);
 }
 

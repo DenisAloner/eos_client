@@ -193,7 +193,7 @@ void Application::initialize()
 	m_GUI->MapViewer->m_size.w = 1024;
 	m_GUI->MapViewer->m_size.h = 1024;
 	
-	m_GUI->MapViewer->m_map = new GameMap(dimension_t(101,100));
+	m_GUI->MapViewer->m_map = new GameMap(dimension_t(100,100));
 	//m_GUI->MapViewer->m_map->generate_level();
 
 	m_GUI->MapViewer->m_map->generate_room();
@@ -218,12 +218,12 @@ void Application::initialize()
 
 	obj = m_game_object_manager->new_object("bat");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx+10]);
-	obj = m_game_object_manager->new_object("bat");
+	/*obj = m_game_object_manager->new_object("bat");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx + 12]);
 	obj = m_game_object_manager->new_object("bat");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry+2][rx + 10]);
 	obj = m_game_object_manager->new_object("bat");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry+2][rx + 12]);
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry+2][rx + 12]);*/
 
 	/*int index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
 	GameMap::block_t* room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);
