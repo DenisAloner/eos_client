@@ -6,6 +6,7 @@
 MapCell::MapCell(int x, int y, GameMap* map) :x(x), y(y), m_map(map)
 {
 	m_kind = entity_e::cell;
+	m_notable = false;
 }
 
 void MapCell::add_object(GameObject* Object)
@@ -143,9 +144,12 @@ Object_state* Object_state::clone()
 	state->m_size = m_size;
 	state->m_tile_size = m_tile_size;
 	state->m_tile_manager = m_tile_manager;
-	state->m_light = m_light;
 	state->m_icon = m_icon;
 	state->m_weight = m_weight;
+	if (m_light)
+	{
+		state->m_light = new light_t(*m_light);
+	}
 	if (m_ai)
 	{
 		state->m_ai = m_ai->clone();
@@ -612,6 +616,24 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 {
 	m_fov = new FOV();
 	m_fov->calculate(static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_fov_radius, m_object, m_map);
+	int radius = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_fov_radius;
+	for (int y = m_object->cell()->y -radius; y < m_object->cell()->y + radius + 1; y++)
+	{
+		if (!((y<0) || (y>map->m_size.h - 1)))
+		{
+			for (int x = m_object->cell()->x - radius; x <  m_object->cell()->x + radius + 1; x++)
+			{
+				if (!((x<0) || (x>map->m_size.w - 1)))
+				{
+						if (m_fov->m_map[m_fov->m_middle + (y - m_object->cell()->y)][m_fov->m_middle + (x - m_object->cell()->x)].visible)
+						{
+							m_map->m_items[y][x]->m_notable = true;
+						}
+
+				}
+			}
+		}
+	}
 	LOG(INFO) << "Поле зрение " << std::to_string(static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_fov_radius);
 	m_actions.push_front(Application::instance().m_actions[action_e::set_motion_path]);
 	m_actions.push_front(Application::instance().m_actions[action_e::open_inventory]);

@@ -92,6 +92,7 @@ public:
 	//MapCell* get_cell(int x, int y);
 
 	void calculate_lighting2();
+	void blur_lighting();
 
 	virtual void reset_serialization_index();
 	virtual void save();

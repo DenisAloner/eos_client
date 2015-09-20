@@ -193,7 +193,7 @@ void Application::initialize()
 	m_GUI->MapViewer->m_size.w = 1024;
 	m_GUI->MapViewer->m_size.h = 1024;
 	
-	m_GUI->MapViewer->m_map = new GameMap(dimension_t(100,100));
+	m_GUI->MapViewer->m_map = new GameMap(dimension_t(128,128));
 	//m_GUI->MapViewer->m_map->generate_level();
 
 	m_GUI->MapViewer->m_map->generate_room();
@@ -223,7 +223,24 @@ void Application::initialize()
 	obj = m_game_object_manager->new_object("bat");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry+2][rx + 10]);
 	obj = m_game_object_manager->new_object("bat");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry+2][rx + 12]);*/
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry+2][rx + 12]);
+	obj = m_game_object_manager->new_object("bat");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry + 4][rx + 10]);
+	obj = m_game_object_manager->new_object("bat");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry + 4][rx + 12]);
+	obj = m_game_object_manager->new_object("bat");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry + 6][rx + 10]);
+	obj = m_game_object_manager->new_object("bat");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry + 6][rx + 12]);
+	obj = m_game_object_manager->new_object("bat");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry + 8][rx + 10]);
+	obj = m_game_object_manager->new_object("bat");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry + 8][rx + 12]);
+	obj = m_game_object_manager->new_object("bat");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry + 10][rx + 10]);
+	obj = m_game_object_manager->new_object("bat");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry + 10][rx + 12]);*/
+
 
 	/*int index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
 	GameMap::block_t* room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);
@@ -502,11 +519,30 @@ void Application::update()
 			if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
 			{
 				m_GUI->MapViewer->m_player->m_fov->calculate(static_cast<AI_enemy*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)->m_fov_radius, m_GUI->MapViewer->m_player->m_object, m_GUI->MapViewer->m_map);
+				GameObject* object = m_GUI->MapViewer->m_player->m_object;
+				int radius = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_fov_radius;
+				for (int y = object->cell()->y - radius; y < object->cell()->y + radius + 1; y++)
+				{
+					if (!((y<0) || (y>m_GUI->MapViewer->m_map->m_size.h - 1)))
+					{
+						for (int x = object->cell()->x - radius; x < object->cell()->x + radius + 1; x++)
+						{
+							if (!((x<0) || (x>m_GUI->MapViewer->m_map->m_size.w - 1)))
+							{
+								if (m_GUI->MapViewer->m_player->m_fov->m_map[m_GUI->MapViewer->m_player->m_fov->m_middle + (y - object->cell()->y)][m_GUI->MapViewer->m_player->m_fov->m_middle + (x - object->cell()->x)].visible)
+								{
+									m_GUI->MapViewer->m_map->m_items[y][x]->m_notable = true;
+								}
+
+							}
+						}
+					}
+				}
 			}
 			Application::instance().m_GUI->MapViewer->m_map->m_object_manager.update_buff();
 			m_GUI->MapViewer->m_map->calculate_lighting2();
 			Application::instance().m_GUI->MapViewer->update();
-			Application::instance().m_GUI->MapViewer->m_map->m_update = true;
+			//Application::instance().m_GUI->MapViewer->m_map->m_update = true;
 			m_update_mutex.unlock();
 			std::chrono::milliseconds Duration(1);
 			std::this_thread::sleep_for(Duration);

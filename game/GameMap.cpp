@@ -168,13 +168,33 @@ void GameMap::generate_room(void)
 			}
 		}
 	}
-	GameObject* obj = Application::instance().m_game_object_manager->new_object("torch");
-	add_to_map(obj, m_items[1][1]);
-	obj = Application::instance().m_game_object_manager->new_object("torch");
-	add_to_map(obj, m_items[m_size.h - 2][m_size.w - 2]);
+
+	int light_source_count = 0;
+	for (int i = 1; i<m_size.h; i=i+20)
+	{
+		for (int j = 1; j<m_size.w; j=j+20)
+		{
+			GameObject* obj = Application::instance().m_game_object_manager->new_object("torch");
+			add_to_map(obj, m_items[i][j]);
+			light_source_count += 1;
+		}
+	}
+	LOG(INFO) << " -= Всего источников света: "+std::to_string(light_source_count) << "=-";
+
+	//GameObject* obj = Application::instance().m_game_object_manager->new_object("torch");
+	//*obj->m_active_state->m_light = light_t(80, 0, 0);
+	//add_to_map(obj, m_items[15][15]);
+	//obj = Application::instance().m_game_object_manager->new_object("torch");
+	//*obj->m_active_state->m_light = light_t(0, 80, 0);
+	//add_to_map(obj, m_items[15][35]);
+	//obj = Application::instance().m_game_object_manager->new_object("torch");
+	//*obj->m_active_state->m_light = light_t(0, 0, 80);
+	//add_to_map(obj, m_items[35][25]);
+
+	
 	for (int i =0; i < m_size.h-5; i++)
 	{
-		if (i>5)
+		if (i>10)
 		{
 			GameObject* obj = Application::instance().m_game_object_manager->new_object("wall");
 			add_object(obj, m_items[i][10]);
@@ -733,51 +753,53 @@ void  GameMap::add_doors()
 	}
 }
 
-//void  GameMap::blur_lighting()
-//{
-//	light_t l;
-//	float Gauss[] = { 0.2270270270, 0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162 };
-//	for (int y = 0; y < 41; y++)
-//	{
-//		for (int x = 0; x < 41; x++)
-//		{
-//			l = light_t();
-//			for (int i = -4; i < 5; i++)
-//			{
-//				int mx = x + i;
-//				int my = y;
-//				if (mx < 0){ mx = 0; }
-//				if (mx > 40){ mx = 40; }
-//				if (my < 0){ my = 0; }
-//				if (my > 40){ my = 40; }
-//				l.R = l.R + m_local_light[0][my][mx].R*Gauss[abs(i)];
-//				l.G = l.G + m_local_light[0][my][mx].G*Gauss[abs(i)];
-//				l.B = l.B + m_local_light[0][my][mx].B*Gauss[abs(i)];
-//			}
-//			m_local_light[1][y][x] = l;
-//		}
-//	}
-//	for (int y = 0; y < 41; y++)
-//	{
-//		for (int x = 0; x < 41; x++)
-//		{
-//			l = light_t();
-//			for (int i = -4; i < 5; i++)
-//			{
-//				int mx = x;
-//				int my = y + i;
-//				if (mx < 0){ mx = 0; }
-//				if (mx > 40){ mx = 40; }
-//				if (my < 0){ my = 0; }
-//				if (my > 40){ my = 40; }
-//				l.R = l.R + m_local_light[1][my][mx].R*Gauss[abs(i)];
-//				l.G = l.G + m_local_light[1][my][mx].G*Gauss[abs(i)];
-//				l.B = l.B + m_local_light[1][my][mx].B*Gauss[abs(i)];
-//			}
-//			m_local_light[2][y][x] = l;
-//		}
-//	}
-//}
+void  GameMap::blur_lighting()
+{
+	light_t l;
+	float Gauss[] = { 0.44198F, 0.27901F };
+	//float Gauss[] = { 0.39894228F, 0.241970725F, 0.053990967F };
+	//float Gauss[] = { 0.2270270270, 0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162 };
+	for (int y = 0; y < m_size.h; y++)
+	{
+		for (int x = 0; x < m_size.w; x++)
+		{
+			l = light_t();
+			for (int i = -1; i < 2; i++)
+			{
+				int mx = x + i;
+				int my = y;
+				if (mx < 0){ mx = 0; }
+				if (mx > m_size.w-1){ mx = m_size.w-1; }
+				if (my < 0){ my = 0; }
+				if (my > m_size.h-1){ my = m_size.h-1; }
+				l.R = l.R + m_items[my][mx]->m_light.R*Gauss[abs(i)];
+				l.G = l.G + m_items[my][mx]->m_light.G*Gauss[abs(i)];
+				l.B = l.B + m_items[my][mx]->m_light.B*Gauss[abs(i)];
+			}
+			m_items[y][x]->m_light_blur = l;
+		}
+	}
+	for (int y = 0; y < m_size.h; y++)
+	{
+		for (int x = 0; x < m_size.w; x++)
+		{
+			l = light_t();
+			for (int i = -1; i < 2; i++)
+			{
+				int mx = x;
+				int my = y + i;
+				if (mx < 0) { mx = 0; }
+				if (mx > m_size.w - 1) { mx = m_size.w - 1; }
+				if (my < 0) { my = 0; }
+				if (my > m_size.h - 1) { my = m_size.h - 1; }
+				l.R = l.R + m_items[my][mx]->m_light_blur.R*Gauss[abs(i)];
+				l.G = l.G + m_items[my][mx]->m_light_blur.G*Gauss[abs(i)];
+				l.B = l.B + m_items[my][mx]->m_light_blur.B*Gauss[abs(i)];
+			}
+			m_items[y][x]->m_light = l;
+		}
+	}
+}
 
 
 //bool GameMap::line2(int x1, int y1, int x2, int y2)
@@ -1017,51 +1039,50 @@ void GameMap::calculate_lighting2()
 			}
 		}
 
-		
-			light_t l1;
-			float Gauss[] = { 0.44198F, 0.27901F };
-			//float Gauss[] = { 0.39894228F, 0.241970725F, 0.053990967F };
-			//float Gauss[] = { 0.2270270270, 0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162 };
-			for (int y = 0; y < 41; y++)
-			{
-				for (int x = 0; x < 41; x++)
-				{
-					l1 = light_t();
-					for (int i = -1; i < 2; i++)
-					{
-						int mx = x + i;
-						int my = y;
-						if (mx < 0){ mx = 0; }
-						if (mx > 40){ mx = 40; }
-						if (my < 0){ my = 0; }
-						if (my > 40){ my = 40; }
-						l1.R = l1.R + fl.m_map[my][mx].light.R*Gauss[abs(i)];
-						l1.G = l1.G + fl.m_map[my][mx].light.G*Gauss[abs(i)];
-						l1.B = l1.B + fl.m_map[my][mx].light.B*Gauss[abs(i)];
-					}
-					m_temp[y][x] = l1;
-				}
-			}
-			for (int y = 0; y < 41; y++)
-			{
-				for (int x = 0; x < 41; x++)
-				{
-					l1 = light_t();
-					for (int i = -1; i < 2; i++)
-					{
-						int mx = x;
-						int my = y + i;
-						if (mx < 0){ mx = 0; }
-						if (mx > 40){ mx = 40; }
-						if (my < 0){ my = 0; }
-						if (my > 40){ my = 40; }
-						l1.R = l1.R + m_temp[my][mx].R*Gauss[abs(i)];
-						l1.G = l1.G + m_temp[my][mx].G*Gauss[abs(i)];
-						l1.B = l1.B + m_temp[my][mx].B*Gauss[abs(i)];
-					}
-					fl.m_map[y][x].light = l1;
-				}
-			}
+		//light_t l1;
+		//float Gauss[] = { 0.44198F, 0.27901F };
+		////float Gauss[] = { 0.39894228F, 0.241970725F, 0.053990967F };
+		////float Gauss[] = { 0.2270270270, 0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162 };
+		//for (int y = 0; y < 41; y++)
+		//{
+		//	for (int x = 0; x < 41; x++)
+		//	{
+		//		l1 = light_t();
+		//		for (int i = -1; i < 2; i++)
+		//		{
+		//			int mx = x + i;
+		//			int my = y;
+		//			if (mx < 0) { mx = 0; }
+		//			if (mx > 40) { mx = 40; }
+		//			if (my < 0) { my = 0; }
+		//			if (my > 40) { my = 40; }
+		//			l1.R = l1.R + fl.m_map[my][mx].light.R*Gauss[abs(i)];
+		//			l1.G = l1.G + fl.m_map[my][mx].light.G*Gauss[abs(i)];
+		//			l1.B = l1.B + fl.m_map[my][mx].light.B*Gauss[abs(i)];
+		//		}
+		//		m_temp[y][x] = l1;
+		//	}
+		//}
+		//for (int y = 0; y < 41; y++)
+		//{
+		//	for (int x = 0; x < 41; x++)
+		//	{
+		//		l1 = light_t();
+		//		for (int i = -1; i < 2; i++)
+		//		{
+		//			int mx = x;
+		//			int my = y + i;
+		//			if (mx < 0) { mx = 0; }
+		//			if (mx > 40) { mx = 40; }
+		//			if (my < 0) { my = 0; }
+		//			if (my > 40) { my = 40; }
+		//			l1.R = l1.R + m_temp[my][mx].R*Gauss[abs(i)];
+		//			l1.G = l1.G + m_temp[my][mx].G*Gauss[abs(i)];
+		//			l1.B = l1.B + m_temp[my][mx].B*Gauss[abs(i)];
+		//		}
+		//		fl.m_map[y][x].light = l1;
+		//	}
+		//}
 
 		for (int y = 0; y < 41; y++)
 		{
@@ -1081,6 +1102,7 @@ void GameMap::calculate_lighting2()
 			}
 		}
 	}
+	blur_lighting();
 }
 
 void GameMap::reset_serialization_index()

@@ -41,6 +41,8 @@ public:
 	bool m_closed;
 	int m_state;
 
+	bool m_notable;
+
 	int x;
 	int y;
 

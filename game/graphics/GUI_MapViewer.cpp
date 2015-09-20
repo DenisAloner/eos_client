@@ -336,6 +336,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	int gx;
 	int gy;
 	bool passable;
+	bool is_hide;
 		for (int r = 0; r < 2; r++)
 		{
 			for (int i = 0; i < (m_tile_count_x + m_tile_count_y) - 1; i++)
@@ -367,16 +368,17 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 					{
 						if ((xf >= -m_player->m_fov->m_radius) && (xf <= m_player->m_fov->m_radius) && (yf >= -m_player->m_fov->m_radius) && (yf <= m_player->m_fov->m_radius))
 						{
-							/*light[0] = (m_map->m_items[y][x]->m_light.R / 100.0F);
+							light[0] = (m_map->m_items[y][x]->m_light.R / 100.0F);
 							light[1] = (m_map->m_items[y][x]->m_light.G / 100.0F);
 							light[2] = (m_map->m_items[y][x]->m_light.B / 100.0F);
-							light[3] = 0.0;*/
-							light[0] = 1.0;
+							light[3] = 0.0;
+							/*light[0] = 1.0;
 							light[1] = 1.0;
 							light[2] = 1.0;
-							light[3] = 0.0;
+							light[3] = 0.0;*/
 							for (std::list<GameObject*>::iterator Current = m_map->m_items[y][x]->m_items.begin(); Current != m_map->m_items[y][x]->m_items.end(); Current++)
 							{
+								is_hide = false;
 								IsDraw = false;
 								passable = (*Current)->get_stat(object_tag_e::pass_able);
 								if ((r == 0 && passable) || (r == 1 && !passable))
@@ -384,8 +386,8 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 									if ((*Current)->cell()->y == m_map->m_items[y][x]->y && (*Current)->cell()->x == m_map->m_items[y][x]->x)
 									{
 										size3d = (*Current)->m_active_state->m_size;
-										//if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visible)
-										if (true)
+										if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visible)
+										//if (true)
 										{
 											object_size = (*Current)->m_active_state->m_tile_size;
 											int yp = m_tile_count_x - px - gx;
@@ -430,6 +432,26 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 												}
 											}
 										}
+										else if(m_map->m_items[y][x]->m_notable)
+										{
+											if (((*Current)->m_name == "floor" )|| ((*Current)->m_name == "wall"))
+											{
+												object_size = (*Current)->m_active_state->m_tile_size;
+												int yp = m_tile_count_x - px - gx;
+												int xp = m_tile_count_y - py - gy;
+												dx = object_size.w + m_map->m_items[y][x]->x - (*Current)->cell()->x;
+												x0 = (xp - yp) * 16 + m_shift.x;
+												y0 = (xp + yp) * 9 - (object_size.h) + m_shift.y + (size3d.x - 1) * 9;
+												x1 = x0;
+												y1 = (xp + yp) * 9 + m_shift.y + (size3d.x - 1) * 9;
+												x2 = (xp - yp) * 16 + object_size.w + m_shift.x;
+												y2 = y1;
+												x3 = x2;
+												y3 = y0;
+												IsDraw = true;
+												is_hide = true;
+											}
+										}
 									}
 								}
 								
@@ -465,8 +487,14 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 									auto a = new mapviewer_hint_object_area(this, (*Current));
 									a->render();
 									}
-
-									glUseProgram(Graph->m_tile_shader);
+									if (is_hide)
+									{
+										glUseProgram(Graph->m_tile_shader_hide);
+									}
+									else
+									{
+										glUseProgram(Graph->m_tile_shader);
+									}
 									(*Current)->m_active_state->m_tile_manager->set_tile(tile, (*Current), Application::instance().m_timer->m_tick / 7.0*3.0, dx);
 									GLuint Sprite = tile.unit;
 									glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -476,6 +504,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 									Graph->set_uniform_vector(Graph->m_tile_shader, "light", light);
 									glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
 									Graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
+
 									if ((*Current)->cell()->x == m_map->m_items[y][x]->x)
 									{
 										/*auto* feat = (*Current)->get_parameter(interaction_e::health);
@@ -512,11 +541,21 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 										glEnable(GL_TEXTURE_2D);
 										}*/
 									}
-									if ((*Current)->m_active_state->m_layer == 1)
-									{
-										glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_02, 0);
-										Graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
-									}
+						
+										if ((*Current)->m_active_state->m_layer == 1)
+										{
+											if (is_hide)
+											{
+												glUseProgram(Graph->m_tile_shader_hide);
+											}
+											else
+											{
+												glUseProgram(Graph->m_tile_shader);
+											}
+											glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_02, 0);
+											Graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
+										}
+						
 
 									if ((*Current)->m_active_state->m_layer == 2)
 									{
@@ -531,6 +570,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 										glActiveTexture(GL_TEXTURE0);
 										Graph->draw_tile_FBO(x1 / 1024.0, (1024 - y1) / 1024.0, x3 / 1024.0, (1024 - y3) / 1024.0, x0, y0, x1, y1, x2, y2, x3, y3);
 									}
+
 								}
 							}
 						}
