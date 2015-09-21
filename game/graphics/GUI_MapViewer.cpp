@@ -241,19 +241,19 @@ void mapviewer_hint_line::render()
 
 GUI_MapViewer::GUI_MapViewer(Application* app = nullptr)
 {
-	m_tile_count_x = 80;
-	m_tile_count_y = 80;
+	m_tile_count_x = 90;
+	m_tile_count_y = 90;
 	m_just_focused = false;
 	m_is_moving = false;
-	m_focus=nullptr;
+	m_focus = nullptr;
 	m_cursored = nullptr;
 	m_cursor_x = 1;
 	m_cursor_y = 1;
 	start_moving += std::bind(&GUI_MapViewer::on_start_moving, this, std::placeholders::_1);
 	move += std::bind(&GUI_MapViewer::on_move, this, std::placeholders::_1);
 	end_moving += std::bind(&GUI_MapViewer::on_end_moving, this, std::placeholders::_1);
-	m_shift.x = -1024 * 0.5 + (m_tile_count_x-15) * 32 * 0.5;
-	m_shift.y = 1024 * 0.5 - (m_tile_count_y+6) * 18 * 0.5;
+	m_shift.x = (1024 / 2) - 16;// (m_tile_count_x)* 32 * 0.5;
+	m_shift.y = (1024 / 2) - (m_tile_count_y)* 9 - 9;// 1024 * 0.5 - (m_tile_count_y + 6) * 18 * 0.5;
 }
 
 GUI_MapViewer::~GUI_MapViewer(void)
@@ -337,6 +337,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	int gy;
 	bool passable;
 	bool is_hide;
+	bool is_in_fov;
 		for (int r = 0; r < 2; r++)
 		{
 			for (int i = 0; i < (m_tile_count_x + m_tile_count_y) - 1; i++)
@@ -361,13 +362,16 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 					y = m_center.y + gy - m_tile_count_y / 2;
 					xf = x - m_player->m_object->cell()->x;
 					yf = y - m_player->m_object->cell()->y;
-					if ((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1))
-					{
-					}
-					else
+					if ((x>-1) && (x<m_map->m_size.w) && (y>-1) && (y<m_map->m_size.h))
 					{
 						if ((xf >= -m_player->m_fov->m_radius) && (xf <= m_player->m_fov->m_radius) && (yf >= -m_player->m_fov->m_radius) && (yf <= m_player->m_fov->m_radius))
 						{
+							is_in_fov = true;
+						}
+						else
+						{
+							is_in_fov = false;
+						}
 							light[0] = (m_map->m_items[y][x]->m_light.R / 100.0F);
 							light[1] = (m_map->m_items[y][x]->m_light.G / 100.0F);
 							light[2] = (m_map->m_items[y][x]->m_light.B / 100.0F);
@@ -386,70 +390,38 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 									if ((*Current)->cell()->y == m_map->m_items[y][x]->y && (*Current)->cell()->x == m_map->m_items[y][x]->x)
 									{
 										size3d = (*Current)->m_active_state->m_size;
-										if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visible)
-										//if (true)
+										if (is_in_fov)
 										{
-											object_size = (*Current)->m_active_state->m_tile_size;
-											int yp = m_tile_count_x - px - gx;
-											int xp = m_tile_count_y - py - gy;
-											dx = object_size.w + m_map->m_items[y][x]->x - (*Current)->cell()->x;
-											x0 = (xp - yp) * 16 + m_shift.x;
-											y0 = (xp + yp) * 9 - (object_size.h) + m_shift.y + (size3d.x - 1) * 9;
-											x1 = x0;
-											y1 = (xp + yp) * 9 + m_shift.y + (size3d.x - 1) * 9;
-											x2 = (xp - yp) * 16 + object_size.w + m_shift.x;
-											y2 = y1;
-											x3 = x2;
-											y3 = y0;
-											IsDraw = true;
-										}
-										else if (size3d.x>1 || size3d.y>1)
-										{
-											for (int m = 0; m < size3d.y; m++)
+											if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visible)
 											{
-												for (int n = 0; n < size3d.x; n++)
+												IsDraw = true;
+											}
+										}
+										if (!IsDraw)
+										{
+											if (size3d.x>1 || size3d.y>1)
+											{
+												for (int m = 0; m < size3d.y; m++)
 												{
-													if ((xf + n >= -m_player->m_fov->m_radius) && (xf + n <= m_player->m_fov->m_radius) && (yf - m >= -m_player->m_fov->m_radius) && (yf - m <= m_player->m_fov->m_radius))
+													for (int n = 0; n < size3d.x; n++)
 													{
-														if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf - m][m_player->m_fov->m_middle + xf + n].visible)
+														if ((xf + n >= -m_player->m_fov->m_radius) && (xf + n <= m_player->m_fov->m_radius) && (yf - m >= -m_player->m_fov->m_radius) && (yf - m <= m_player->m_fov->m_radius))
 														{
-															object_size = (*Current)->m_active_state->m_tile_size;
-															size3d = (*Current)->m_active_state->m_size;
-															int yp = m_tile_count_x - px - gx;
-															int xp = m_tile_count_y - py - gy;
-															dx = object_size.w + m_map->m_items[y][x]->x - (*Current)->cell()->x;
-															x0 = (xp - yp) * 16 + m_shift.x;
-															y0 = (xp + yp) * 9 - (object_size.h) + m_shift.y + (size3d.x - 1) * 9;
-															x1 = x0;
-															y1 = (xp + yp) * 9 + m_shift.y + (size3d.x - 1) * 9;
-															x2 = (xp - yp) * 16 + object_size.w + m_shift.x;
-															y2 = y1;
-															x3 = x2;
-															y3 = y0;
-															IsDraw = true;
+															if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf - m][m_player->m_fov->m_middle + xf + n].visible)
+															{
+																IsDraw = true;
+															}
 														}
 													}
 												}
 											}
-										}
-										else if(m_map->m_items[y][x]->m_notable)
-										{
-											if (((*Current)->m_name == "floor" )|| ((*Current)->m_name == "wall"))
+											else if (m_map->m_items[y][x]->m_notable)
 											{
-												object_size = (*Current)->m_active_state->m_tile_size;
-												int yp = m_tile_count_x - px - gx;
-												int xp = m_tile_count_y - py - gy;
-												dx = object_size.w + m_map->m_items[y][x]->x - (*Current)->cell()->x;
-												x0 = (xp - yp) * 16 + m_shift.x;
-												y0 = (xp + yp) * 9 - (object_size.h) + m_shift.y + (size3d.x - 1) * 9;
-												x1 = x0;
-												y1 = (xp + yp) * 9 + m_shift.y + (size3d.x - 1) * 9;
-												x2 = (xp - yp) * 16 + object_size.w + m_shift.x;
-												y2 = y1;
-												x3 = x2;
-												y3 = y0;
-												IsDraw = true;
-												is_hide = true;
+												if (((*Current)->m_name == "floor") || ((*Current)->m_name == "wall"))
+												{
+													IsDraw = true;
+													is_hide = true;
+												}
 											}
 										}
 									}
@@ -457,6 +429,18 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 								
 								if (IsDraw)
 								{
+									object_size = (*Current)->m_active_state->m_tile_size;
+									int yp = m_tile_count_x - px - gx;
+									int xp = m_tile_count_y - py - gy;
+									dx = object_size.w + m_map->m_items[y][x]->x - (*Current)->cell()->x;
+									x0 = (xp - yp) * 16 + m_shift.x;
+									y0 = (xp + yp) * 9 - (object_size.h) + m_shift.y + (size3d.x - 1) * 9;
+									x1 = x0;
+									y1 = (xp + yp) * 9 + m_shift.y + (size3d.x - 1) * 9;
+									x2 = (xp - yp) * 16 + object_size.w + m_shift.x;
+									y2 = y1;
+									x3 = x2;
+									y3 = y0;
 									// считаем среднюю освещенность для многотайловых объектов
 									if (size3d.x > 1 || size3d.y > 1) 
 									{
@@ -573,7 +557,6 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 
 								}
 							}
-						}
 					}
 				}
 			}
@@ -602,10 +585,11 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 		x3 = x2;
 		y3 = y0;
 		glUseProgram(0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glEnable(GL_TEXTURE_2D);
 		glActiveTexture(GL_TEXTURE0);
+		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, Graph->m_select);
 		glColor4f(0.0, 1.0, 0.0, 0.25);
 		Graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
@@ -787,7 +771,7 @@ void GUI_MapViewer::on_mouse_down(MouseEventArgs const& e)
 {
 	if (e.key == mk_left || e.key == mk_right)
 	{
-		position_t p =local_xy(e.position);
+		position_t p = local_xy(e.position);
 		int x;
 		int y;
 		x = m_center.x + p.x - m_tile_count_x / 2;
