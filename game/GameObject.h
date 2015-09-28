@@ -43,8 +43,12 @@ public:
 
 	bool m_notable;
 
+	bool m_mark;
+
 	int x;
 	int y;
+
+	cell_t m_pathfind_info;
 
 	std::list<GameObject*> m_items;
 

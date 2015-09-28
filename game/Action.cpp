@@ -256,7 +256,7 @@ void ActionClass_Move::perfom(Parameter* parameter)
 		}
 		}
 		p->m_map->move_object(p->m_object, p->m_place);
-		LOG(INFO) << p->m_object->m_name << "  " << "двигается";
+		//LOG(INFO) << p->m_object->m_name << "  " << "двигается";
 	}
 	else {
 		LOG(INFO)  << "движение не вышло";
@@ -1262,4 +1262,63 @@ std::string Action_save::get_description(Parameter* parameter)
 {
 	std::string s("Игра сохранена");
 	return s;
+}
+
+Action_autoexplore::Action_autoexplore()
+{
+	m_kind = action_e::autoexplore;
+	m_icon = Application::instance().m_graph->m_actions[13];
+}
+
+void Action_autoexplore::interaction_handler()
+{
+	//Action::interaction_handler();
+	//Application::instance().m_message_queue.m_busy = true;
+	//Parameter* result;
+	//P_object* p = new P_object();
+	//result = Application::instance().command_select_object_on_map();
+	//if (result)
+	//{
+	//	p->m_object = static_cast<P_object*>(result)->m_object;
+	//	std::string a = "Выбран ";
+	//	a.append(p->m_object->m_name);
+	//	a = a + ".";
+	//	Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+	//}
+	//else
+	//{
+	//	Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+	//	Application::instance().m_message_queue.m_busy = false;
+	//	return;
+	//}
+	//Application::instance().command_gui_show_characterization(p->m_object);
+	/*Application::instance().m_message_queue.m_busy = false;*/
+
+	//P_object* p;
+	//p->m_unit = Application::instance().m_GUI->MapViewer->m_player->m_object;
+	Application::instance().m_action_manager->add(new GameTask(this, nullptr));
+}
+
+std::string Action_autoexplore::get_description(Parameter* parameter)
+{
+	return "Автоисследование";
+}
+
+bool Action_autoexplore::get_child(GameTask*& task)
+{
+	GameMap* map = Application::instance().m_GUI->MapViewer->m_map;
+	map->m_dijkstra_map->calculate_cost_autoexplore(map, Application::instance().m_GUI->MapViewer->m_player->m_object);
+	map->m_dijkstra_map->trace();
+	MapCell* c = map->m_dijkstra_map->next(Application::instance().m_GUI->MapViewer->m_player->m_object);
+	if (c)
+	{
+		Parameter_Position* P;
+		P = new Parameter_Position();
+		P->m_object = Application::instance().m_GUI->MapViewer->m_player->m_object;
+		P->m_place = c;
+		P->m_map = map;
+		task = new GameTask(Application::instance().m_actions[action_e::move_step], P);
+	}
+	else task = nullptr;
+	return true;
 }

@@ -20,6 +20,7 @@ GraphicalController::GraphicalController()
 		m_actions[10] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_10.bmp");
 		m_actions[11] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_11.bmp");
 		m_actions[12] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_12.bmp");
+		m_actions[13] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\ico_action_autoexplore.bmp");
 
 		m_horizontal_shader = load_shader("EoS_blur", "EoS_blur_horizontal");
 		m_vertical_shader = load_shader("EoS_blur", "EoS_blur_vertical");

@@ -42,6 +42,8 @@ public:
 	virtual void reset_serialization_index() { m_serialization_index = 1; };
 	virtual void save();
 	virtual void load();
+
+	virtual bool get_child(GameTask*& task) { return false; };
 };
 
 class Action_wrapper : public Object_interaction
@@ -267,6 +269,19 @@ public:
 
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler();
+
+};
+
+class Action_autoexplore :
+	public Action
+{
+public:
+
+	Action_autoexplore();
+
+	virtual std::string get_description(Parameter* parameter);
+	virtual void interaction_handler();
+	virtual bool get_child(GameTask*& task);
 
 };
 

@@ -64,7 +64,7 @@ public:
 
 	void calculate(GameMap* map, GameObject* object, MapCell* gc, GameObject* goal, int radius);
 	void map_costing(GameMap* map, GameObject* object, MapCell* gc, int radius);
-	int manhattan(MapCell* a, MapCell* b);
+	int manhattan(MapCell* a, MapCell* b,MapCell* c);
 	std::vector<MapCell*>* get_path();
 	std::vector<MapCell*>* get_path_to_cell();
 	void insert_into_open(int x, int y, int dg, Node* p);
@@ -78,26 +78,18 @@ private:
 	Path& operator=(const Path&);
 };
 
-struct cell_t
-{
-	int value;
-	bool opaque;
-};
-
-const int dijkstra_map_max = 1024;
-//typedef cell_t map_t[dijkstra_map_max][dijkstra_map_max];
-
 class Dijkstra_map
 {
 public:
 
-	int m_size;
-	cell_t (m_map)[dijkstra_map_max][dijkstra_map_max];
+	GameMap* m_map;
 	Dijkstra_map();
 
-	void init(int size);
 	bool opaque_check(int x, int y, int size);
-	void calculate(GameMap* map, GameObject* object, GameObject* goal);
+	void calculate_cost(GameMap* map, GameObject* object, GameObject* goal);
+	void calculate_cost_autoexplore(GameMap* map, GameObject* object);
+	void trace();
+	MapCell* next(GameObject* object);
 };
 
 class AI: public iSerializable

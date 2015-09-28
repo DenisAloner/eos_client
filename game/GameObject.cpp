@@ -240,7 +240,7 @@ void Object_state::save()
 	fwrite(&m_weight, sizeof(float), 1, file);
 	FileSystem::instance().serialize_pointer(m_light, type_e::light_t, file);
 	FileSystem::instance().serialize_pointer(m_optical, type_e::optical_properties_t, file);
-	if(m_tile_manager->m_index>21)
+	if(m_tile_manager->m_index>22)
 	{
 		LOG(FATAL) << "Тайловый менеджер с ошибкой " <<std::to_string(m_tile_manager->m_index);
 	}
@@ -635,6 +635,7 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 		}
 	}
 	LOG(INFO) << "Поле зрение " << std::to_string(static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_fov_radius);
+	m_actions.push_front(Application::instance().m_actions[action_e::autoexplore]);
 	m_actions.push_front(Application::instance().m_actions[action_e::set_motion_path]);
 	m_actions.push_front(Application::instance().m_actions[action_e::open_inventory]);
 	m_actions.push_front(Application::instance().m_actions[action_e::cell_info]);

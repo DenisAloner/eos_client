@@ -158,7 +158,7 @@ tag seethrough_able
 
 object bat
 state alive
-ai non_humanoid,20,0,0
+ai non_humanoid,64,0,0
 size 2,2,4
 tile_manager 12
 optical 0.8,0.8,0.8

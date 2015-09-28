@@ -101,7 +101,6 @@ void Object_manager::load()
 GameMap::GameMap(dimension_t size)
 {
 	m_dijkstra_map = new Dijkstra_map();
-	m_dijkstra_map->init(size.w);
 	init(size);
 }
 

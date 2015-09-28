@@ -25,6 +25,12 @@ void ActionManager::add(GameTask* action)
 	add_item_event(tag_t(action));
 }
 
+void ActionManager::add_front(GameTask* action)
+{
+
+	m_items.push_front(action);
+	add_item_event(tag_t(action));
+}
 
 void ActionManager::remove()
 {
@@ -40,4 +46,26 @@ void ActionManager::remove(GameTask* item)
 {
 	remove_item_event(tag_t(item));
 	m_items.remove(item);
+}
+
+GameTask* ActionManager::get_task()
+{
+	m_is_remove = true;
+	while (!m_items.empty())
+	{
+		GameTask* parent;
+		parent = m_items.front();
+		GameTask* child = nullptr;
+		if (parent->m_action->get_child(child))
+		{
+			if (child)
+			{
+				m_is_remove = false;
+				return child;
+			}
+			else remove();
+		}
+		else return parent;
+	}
+	return nullptr;
 }

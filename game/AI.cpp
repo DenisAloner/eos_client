@@ -35,10 +35,10 @@ Node* min_heap::pop(){
 void min_heap::sort_down(unsigned int index)
 {
 	int left, right;
-	int temp;
+	int size = m_items.size();
 	left = 2 * index + 1;
 	right = 2 * index + 2;
-	if (left < m_items.size())
+	if (left < size)
 	{
 		if (m_items[index]->f > m_items[left]->f)
 		{
@@ -46,7 +46,7 @@ void min_heap::sort_down(unsigned int index)
 			sort_down(left);
 		}
 	}
-	if (right <m_items.size())
+	if (right <size)
 	{
 		if (m_items[index]->f > m_items[right]->f)
 		{
@@ -122,6 +122,7 @@ void Path::calculate(GameMap* map, GameObject* object, MapCell* gc,GameObject* g
 			c = map->m_items[y][x];
 			c->m_closed = false;
 			c->m_state = 0;
+			c->m_mark = false;
 			for (std::list<GameObject*>::iterator item =c->m_items.begin(); item != c->m_items.end(); item++)
 			{
 				if (((*item) != object) && ((*item) != goal) && qualifier((*item)))
@@ -175,15 +176,36 @@ void Path::map_costing(GameMap* map, GameObject* object, MapCell* gc, int radius
 	}
 }
 
-int Path::manhattan(MapCell* a, MapCell* b) {
-	return abs(a->x - b->x) + abs(a->y - b->y);
-}
-
-//int Path::manhattan(MapCell* a, MapCell* b, MapCell* c)
-//{
-//	int h = abs(a->x - b->x) + abs(a->y - b->y);
-//	return h + abs(a->x - b->x)*(c->y - b->y) - (c->x - b->x)*(a->y - b->y)*0.001;
+//int Path::manhattan(MapCell* a, MapCell* b) {
+//	return abs(a->x - b->x) + abs(a->y - b->y);
 //}
+
+int Path::manhattan(MapCell* a, MapCell* b, MapCell* c)
+{
+	int h = abs(a->x - b->x) + abs(a->y - b->y);
+	return h * 10;
+
+	//int xdist = a->x - b->x;
+	//int	ydist = a->y - b->y;
+	//float sqrt2 = 1.41421356; //(this should be precomputed and stored as a define somewhere)
+	//float	h = min(xdist, ydist) * sqrt2 + max(xdist, ydist) - min(xdist, ydist);
+	//return h * 10;
+
+	//int h;
+	//int xDistance = abs(a->x - b->x);
+	//int yDistance = abs(a->y - b->y);
+	//if (xDistance > yDistance)
+	//{
+	//	h = 14 * yDistance + 10 * (xDistance - yDistance);
+	//}	
+	//else
+	//{
+	//	h = 14 * xDistance + 10 * (yDistance - xDistance);
+	//}
+	//return h;
+
+	//return (h + abs((a->x - b->x)*(c->y - b->y) - (c->x - b->x)*(a->y - b->y))*0.001)*10;
+}
 
 int Path::is_in_open(MapCell* c)
 {
@@ -216,16 +238,17 @@ void Path::insert_into_open(int x, int y, int dg, Node* p)
 	MapCell* c = m_game_map->m_items[y][x];
 	if (!c->m_closed)
 	{
+		m_game_map->m_items[y][x]->m_mark = true;
 		int n = is_in_open(c);
 		if (n == -1)
 		{
-			m_heap.push(new Node(c, p->g + dg, manhattan(c, m_goal_cell) * 10, p));
+			m_heap.push(new Node(c, p->g + dg, manhattan(c, m_goal_cell, m_start_cell), p));
 		}
 		else {
 			if (p->g + dg < m_heap.m_items[n]->g){
 				m_heap.m_items[n]->parent = p;
 				m_heap.m_items[n]->g = p->g + dg;
-				m_heap.m_items[n]->h = manhattan(m_heap.m_items[n]->cell, m_goal_cell) * 10;
+				m_heap.m_items[n]->h = manhattan(m_heap.m_items[n]->cell, m_goal_cell, m_start_cell);
 				m_heap.edit(n, m_heap.m_items[n]->g + m_heap.m_items[n]->h);
 			}
 		}
@@ -247,7 +270,7 @@ std::vector<MapCell*>* Path::back(Node* c)
 
 std::vector<MapCell*>* Path::get_path(){
 	Node* current;
-	m_heap.push(new Node(m_start_cell, 0, manhattan(m_start_cell, m_goal_cell) * 10));
+	m_heap.push(new Node(m_start_cell, 0, manhattan(m_start_cell, m_goal_cell, m_start_cell)));
 	while (!m_heap.m_items.empty())
 	{
 		current = m_heap.pop();
@@ -270,7 +293,7 @@ std::vector<MapCell*>* Path::get_path(){
 
 std::vector<MapCell*>* Path::get_path_to_cell() {
 	Node* current;
-	m_heap.push(new Node(m_start_cell, 0, manhattan(m_start_cell, m_goal_cell) * 10));
+	m_heap.push(new Node(m_start_cell, 0, manhattan(m_start_cell, m_goal_cell, m_start_cell)));
 	while (!m_heap.m_items.empty())
 	{
 		current = m_heap.pop();
@@ -295,12 +318,6 @@ Dijkstra_map::Dijkstra_map()
 {
 }
 
-void Dijkstra_map::init(int size)
-{
-	m_size = size;
-	//m_map = new cell_t[0][dijkstra_map_max][dijkstra_map_max];
-}
-
 bool Dijkstra_map::opaque_check(int x, int y, int size)
 {
 	for (int i = 0; i < size; i++)
@@ -308,72 +325,162 @@ bool Dijkstra_map::opaque_check(int x, int y, int size)
 		if (y - i < 0) { return false; }
 		for (int j = 0; j < size; j++)
 		{
-			if (x + j > m_size - 1) { return false; }
-			if ((m_map)[y - i][x + j].opaque) { return false; }
+			if (x + j > m_map->m_size.w - 1) { return false; }
+			if (m_map->m_items[y - i][x + j]->m_pathfind_info.opaque) { return false; }
 		}
 	}
 	return true;
 }
 
-void Dijkstra_map::calculate(GameMap* map, GameObject* object, GameObject* goal)
+void Dijkstra_map::calculate_cost(GameMap* map, GameObject* object, GameObject* goal)
 {
+	m_map = map;
 	MapCell* c;
 	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier->predicat;
-	for (int y = 0; y < map->m_size.h; y++)
+	for (int y = 0; y < m_map->m_size.h; y++)
 	{
-		for (int x = 0; x < map->m_size.w; x++)
+		for (int x = 0; x < m_map->m_size.w; x++)
 		{
-			c = map->m_items[y][x];
-			(m_map)[y][x].opaque = false;
-			(m_map)[y][x].value = 100000;
+			c = m_map->m_items[y][x];
+			c->m_pathfind_info.opaque = false;
+			c->m_pathfind_info.value = 100000;
 			for (std::list<GameObject*>::iterator item = c->m_items.begin(); item != c->m_items.end(); item++)
 			{
 				if ((*item) == goal)
 				{
-					(m_map)[y][x].opaque = false;
-					(m_map)[y][x].value = 0;
+					c->m_pathfind_info.opaque = false;
+					c->m_pathfind_info.value = 0;
 				}
 				else
 				{
 					if (((*item) != object) && qualifier((*item)))
 					{
-						(m_map)[y][x].opaque = true;
+						c->m_pathfind_info.opaque = true;
 						break;
 					}
 				}
 			}
 		}
 	}
+}
+
+void Dijkstra_map::calculate_cost_autoexplore(GameMap* map, GameObject* object)
+{
+	m_map = map;
+	MapCell* c;
+	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier->predicat;
+	for (int y = 0; y < m_map->m_size.h; y++)
+	{
+		for (int x = 0; x < m_map->m_size.w; x++)
+		{
+			c = m_map->m_items[y][x];
+			if (!c->m_notable)
+			{
+				c->m_pathfind_info.opaque = false;
+				c->m_pathfind_info.value = 0;
+			}
+			else
+			{
+				c->m_pathfind_info.opaque = false;
+				c->m_pathfind_info.value = 100000;
+				for (std::list<GameObject*>::iterator item = c->m_items.begin(); item != c->m_items.end(); item++)
+				{
+					if (((*item) != object) && qualifier((*item)))
+					{
+						c->m_pathfind_info.opaque = true;
+						break;
+					}
+
+				}
+			}
+		}
+	}
+}
+
+void Dijkstra_map::trace()
+{
 	bool was_change;
 	int low;
+	int i = 0;
+	std::vector<std::vector<MapCell*> >& cells = m_map->m_items;
 	do
 	{
 		was_change = false;
-		for (int y = 1; y < m_size - 1; y++)
+		for (int y = 1; y < m_map->m_size.h-1; y++)
 		{
-			for (int x = 1; x < m_size - 1; x++)
+			for (int x = 1; x <  m_map->m_size.w - 1; x++)
 			{
 				if (opaque_check(x, y, 2))
 				{
-					low = (m_map)[y - 1][x - 1].value;
-					low = ((m_map)[y - 1][x].value < low) ? (m_map)[y - 1][x].value : low;
-					low = ((m_map)[y - 1][x + 1].value < low) ? (m_map)[y - 1][x + 1].value : low;
-					low = ((m_map)[y][x - 1].value < low) ? (m_map)[y][x - 1].value : low;
-					low = ((m_map)[y][x + 1].value < low) ? (m_map)[y][x + 1].value : low;
-					low = ((m_map)[y + 1][x - 1].value < low) ? (m_map)[y + 1][x - 1].value : low;
-					low = ((m_map)[y + 1][x].value < low) ? (m_map)[y + 1][x].value : low;
-					low = ((m_map)[y + 1][x + 1].value < low) ? (m_map)[y + 1][x + 1].value : low;
-					if ((m_map)[y][x].value > low + 1)
+					low = cells[y - 1][x - 1]->m_pathfind_info.value;
+					low = (cells[y - 1][x]->m_pathfind_info.value < low) ? cells[y - 1][x]->m_pathfind_info.value : low;
+					low = (cells[y - 1][x + 1]->m_pathfind_info.value < low) ? cells[y - 1][x + 1]->m_pathfind_info.value : low;
+					low = (cells[y][x - 1]->m_pathfind_info.value < low) ? cells[y][x - 1]->m_pathfind_info.value : low;
+					low = (cells[y][x + 1]->m_pathfind_info.value < low) ? cells[y][x + 1]->m_pathfind_info.value : low;
+					low = (cells[y + 1][x - 1]->m_pathfind_info.value < low) ? cells[y + 1][x - 1]->m_pathfind_info.value : low;
+					low = (cells[y + 1][x]->m_pathfind_info.value < low) ? cells[y + 1][x]->m_pathfind_info.value : low;
+					low = (cells[y + 1][x + 1]->m_pathfind_info.value < low) ? cells[y + 1][x + 1]->m_pathfind_info.value : low;
+					if (cells[y][x]->m_pathfind_info.value > low + 1)
 					{
 						was_change = true;
-						(m_map)[y][x].value = low + 1;
+						cells[y][x]->m_pathfind_info.value = low + 1;
 					}
 				}
 			}
 		}
+		i += 1;
 	} while (was_change);
+	LOG(INFO) << std::to_string(i);
 }
 
+MapCell* Dijkstra_map::next(GameObject* object)
+{
+	MapCell* c = nullptr;
+	int value = object->cell()->m_pathfind_info.value;
+	int x = object->cell()->x;
+	int y = object->cell()->y;
+	if (m_map->m_items[y - 1][x - 1]->m_pathfind_info.value < value)
+	{
+		c = m_map->m_items[y - 1][x - 1];
+		value = m_map->m_items[y - 1][x - 1]->m_pathfind_info.value;
+	}
+	if (m_map->m_items[y - 1][x]->m_pathfind_info.value < value)
+	{
+		c = m_map->m_items[y - 1][x];
+		value = m_map->m_items[y - 1][x]->m_pathfind_info.value;
+	}
+	if (m_map->m_items[y - 1][x + 1]->m_pathfind_info.value < value)
+	{
+		c = m_map->m_items[y - 1][x + 1];
+		value = m_map->m_items[y - 1][x + 1]->m_pathfind_info.value;
+	}
+	if (m_map->m_items[y][x - 1]->m_pathfind_info.value < value)
+	{
+		c = m_map->m_items[y][x - 1];
+		value = m_map->m_items[y][x - 1]->m_pathfind_info.value;
+	}
+	if (m_map->m_items[y][x + 1]->m_pathfind_info.value < value)
+	{
+		c = m_map->m_items[y][x + 1];
+		value = m_map->m_items[y][x + 1]->m_pathfind_info.value;
+	}
+	if (m_map->m_items[y + 1][x - 1]->m_pathfind_info.value < value)
+	{
+		c = m_map->m_items[y + 1][x - 1];
+		value = m_map->m_items[y + 1][x - 1]->m_pathfind_info.value;
+	}
+	if (m_map->m_items[y + 1][x]->m_pathfind_info.value < value)
+	{
+		c = m_map->m_items[y + 1][x];
+		value = m_map->m_items[y + 1][x]->m_pathfind_info.value;
+	}
+	if (m_map->m_items[y + 1][x + 1]->m_pathfind_info.value < value)
+	{
+		c = m_map->m_items[y + 1][x + 1];
+		value = m_map->m_items[y + 1][x + 1]->m_pathfind_info.value;
+	}
+	return c;
+}
 
 AI_enemy::AI_enemy()
 {

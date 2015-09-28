@@ -114,7 +114,8 @@ enum action_e
 	equip,
 	show_parameters,
 	use,
-	save
+	save,
+	autoexplore
 };
 
 enum class object_state_e
@@ -410,6 +411,12 @@ struct predicat_t
 	size_t index;
 
 	predicat_t(std::function<bool(GameObject*)> predicat, size_t index) :predicat(predicat), index(index) {};
+};
+
+struct cell_t
+{
+	int value;
+	bool opaque;
 };
 
 #endif //DEFINITION_H

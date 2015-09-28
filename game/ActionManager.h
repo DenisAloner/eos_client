@@ -24,6 +24,8 @@ class ActionManager
 {
 public:
 
+	bool m_is_remove;
+
 	std::list<GameTask*> m_items;
 
 	ActionManager(void);
@@ -33,8 +35,10 @@ public:
 	Event<tag_t> remove_item_event;
 
 	void add(GameTask* action);
+	void add_front(GameTask* action);
 	void remove();
 	void remove(GameTask* item);
+	GameTask* get_task();
 };
 
 #endif //TACTIONMANAGER_H

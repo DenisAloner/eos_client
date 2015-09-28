@@ -176,6 +176,7 @@ void Application::initialize()
 	m_actions[action_e::show_parameters] = new Action_show_parameters();
 	m_actions[action_e::use] = new Action_use();
 	m_actions[action_e::save] = new Action_save();
+	m_actions[action_e::autoexplore] = new Action_autoexplore();
 
 	for (size_t i = 0; i < 14; i++)
 	{
@@ -216,8 +217,9 @@ void Application::initialize()
 	int rx = m_GUI->MapViewer->m_player->m_object->cell()->x;
 	int ry = m_GUI->MapViewer->m_player->m_object->cell()->y;*/
 
-	obj = m_game_object_manager->new_object("bat");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx+10]);
+	/*obj = m_game_object_manager->new_object("bat");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx+10]);*/
+
 	/*obj = m_game_object_manager->new_object("bat");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx + 12]);
 	obj = m_game_object_manager->new_object("bat");
@@ -503,12 +505,12 @@ void Application::update()
 	//		}
 	//	}
 	//}
+	GameTask* A;
 	while (true)
 	{
-		if (!m_action_manager->m_items.empty())
+		A = m_action_manager->get_task();
+		if (A)
 		{
-			GameTask* A;
-			A=m_action_manager->m_items.front();
 			m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->set(m_GUI->MapViewer->m_player->m_object, A->m_action, A->m_parameter);
 		}
 		do
@@ -542,13 +544,13 @@ void Application::update()
 			Application::instance().m_GUI->MapViewer->m_map->m_object_manager.update_buff();
 			m_GUI->MapViewer->m_map->calculate_lighting2();
 			Application::instance().m_GUI->MapViewer->update();
-			//Application::instance().m_GUI->MapViewer->m_map->m_update = true;
+			Application::instance().m_GUI->MapViewer->m_map->m_update = true;
 			m_update_mutex.unlock();
-			std::chrono::milliseconds Duration(1);
-			std::this_thread::sleep_for(Duration);
+			/*std::chrono::milliseconds Duration(1);
+			std::this_thread::sleep_for(Duration);*/
 		} while (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->m_action);
 		m_update_mutex.lock();
-		m_action_manager->remove();
+		if (m_action_manager->m_is_remove) { m_action_manager->remove(); }
 		if (m_action_manager->m_items.empty())
 		{
 			m_update_mutex.unlock();
