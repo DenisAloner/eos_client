@@ -62,6 +62,8 @@ public:
 	game_object_size_t m_goal_size;
 	min_heap m_heap;
 
+	int m_open;
+
 	void calculate(GameMap* map, GameObject* object, MapCell* gc, GameObject* goal, int radius);
 	void map_costing(GameMap* map, GameObject* object, MapCell* gc, int radius);
 	int manhattan(MapCell* a, MapCell* b,MapCell* c);

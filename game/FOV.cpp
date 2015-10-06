@@ -181,6 +181,10 @@ void FOV::calculate(int radius,GameObject* unit, GameMap* map)
 			}
 		}
 	}
+	if (m_radius > 128) 
+	{
+		LOG(INFO) << "    Просчет поля зрения " << std::to_string(m_radius);
+	}
 	do_fov(m_middle, m_middle, m_radius);
 	/*m_quarter = 0;
 	light_quarter(0, 0, 180, -180);
@@ -194,11 +198,13 @@ void FOV::calculate(int radius,GameObject* unit, GameMap* map)
 
 void FOV::cast_light(uint x, uint y, uint radius, uint row, float start_slope, float end_slope, uint xx, uint xy, uint yx, uint yy)
 {
+	//LOG(INFO) << "    Вызов функции";
 	if (start_slope < end_slope) {
 		return;
 	}
 	float next_start_slope = start_slope;
-	for (uint i = row; i <= radius; i++) {
+	for (uint i = row; i <= radius; i++)
+	{
 		bool blocked = false;
 		for (int dx = -i, dy = -i; dx <= 0; dx++) {
 			float l_slope = (dx - 0.5) / (dy + 0.5);
@@ -209,7 +215,6 @@ void FOV::cast_light(uint x, uint y, uint radius, uint row, float start_slope, f
 			else if (end_slope > l_slope) {
 				break;
 			}
-
 			int sax = dx * xx + dy * xy;
 			int say = dx * yx + dy * yy;
 			if ((sax < 0 && (uint)std::abs(sax) > x) ||
@@ -223,7 +228,8 @@ void FOV::cast_light(uint x, uint y, uint radius, uint row, float start_slope, f
 			}
 
 			uint radius2 = radius * radius;
-			if ((uint)(dx * dx + dy * dy) < radius2) {
+			if ((uint)(dx * dx + dy * dy) < radius2)
+			{
 				m_map[ay][ax].visible = true;
 			}
 
@@ -251,7 +257,8 @@ void FOV::cast_light(uint x, uint y, uint radius, uint row, float start_slope, f
 
 void FOV::do_fov(uint x, uint y, uint radius)
 {
-	for (uint i = 0; i < 8; i++) {
+	for (uint i = 0; i < 8; i++)
+	{
 		cast_light(x, y, radius, 1, 1.0, 0.0, multipliers1[0][i],multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
 	}
 	m_map[m_middle][m_middle].visible = true;

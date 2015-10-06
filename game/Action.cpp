@@ -256,10 +256,11 @@ void ActionClass_Move::perfom(Parameter* parameter)
 		}
 		}
 		p->m_map->move_object(p->m_object, p->m_place);
-		//LOG(INFO) << p->m_object->m_name << "  " << "двигается";
+		//LOG(INFO) << p->m_object->m_name << "  " << "двигается:" << std::to_string(p->m_place->x) << "," << std::to_string(p->m_place->y);
 	}
 	else {
-		LOG(INFO)  << "движение не вышло";
+		LOG(INFO) << "errror";
+		//LOG(INFO) << p->m_object->m_name << " движение не вышло";
 	}
 	
 }

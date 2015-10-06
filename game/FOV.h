@@ -2,6 +2,7 @@
 #include <cmath>
 #include "GameObject.h"
 #include "GameMap.h"
+
 typedef unsigned int uint;
 
 class GameObject;
@@ -33,7 +34,7 @@ public:
 		bool visible;
 	};
 
-	static const int m_max_size = 101;
+	static const int m_max_size = 129;
 	static const int m_middle = (m_max_size - 1) >> 1;
 
 	cell m_map[m_max_size][m_max_size];
@@ -42,8 +43,6 @@ public:
 
 	
 	//static const values m_values;
-
-	
 
 	int m_radius;
 	//int m_sqr_radius;

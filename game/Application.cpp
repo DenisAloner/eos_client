@@ -217,8 +217,8 @@ void Application::initialize()
 	int rx = m_GUI->MapViewer->m_player->m_object->cell()->x;
 	int ry = m_GUI->MapViewer->m_player->m_object->cell()->y;*/
 
-	/*obj = m_game_object_manager->new_object("bat");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx+10]);*/
+	obj = m_game_object_manager->new_object("bat");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx+10]);
 
 	/*obj = m_game_object_manager->new_object("bat");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx + 12]);
@@ -507,7 +507,7 @@ void Application::update()
 	//}
 	GameTask* A;
 	while (true)
-	{
+	{ 
 		A = m_action_manager->get_task();
 		if (A)
 		{
@@ -546,8 +546,8 @@ void Application::update()
 			Application::instance().m_GUI->MapViewer->update();
 			Application::instance().m_GUI->MapViewer->m_map->m_update = true;
 			m_update_mutex.unlock();
-			/*std::chrono::milliseconds Duration(1);
-			std::this_thread::sleep_for(Duration);*/
+			std::chrono::milliseconds Duration(1);
+			std::this_thread::sleep_for(Duration);
 		} while (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->m_action);
 		m_update_mutex.lock();
 		if (m_action_manager->m_is_remove) { m_action_manager->remove(); }

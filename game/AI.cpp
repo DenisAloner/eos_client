@@ -98,6 +98,7 @@ void Path::calculate(GameMap* map, GameObject* object, MapCell* gc,GameObject* g
 	int right_limit = (object->cell()->x + radius + 1 > map->m_size.w) ? map->m_size.w : object->cell()->y + radius + 1;
 	int bottom_limit = (object->cell()->y - radius < 0) ? 0 : object->cell()->y - radius;
 	int top_limit = (object->cell()->y + radius + 1 > map->m_size.h) ? map->m_size.h : object->cell()->y + radius + 1;*/
+	m_open = 0;
 	MapCell* c;
 	for (int y = 0; y < map->m_size.h; y++)
 	{
@@ -182,8 +183,14 @@ void Path::map_costing(GameMap* map, GameObject* object, MapCell* gc, int radius
 
 int Path::manhattan(MapCell* a, MapCell* b, MapCell* c)
 {
-	int h = abs(a->x - b->x) + abs(a->y - b->y);
-	return h * 10;
+	return (abs(a->x - b->x) + abs(a->y - b->y)) * 10;
+
+	/*int dx = abs(a->x - b->x);
+	int dy = abs(a->y - b->y);
+
+	return (dx < dy) ? 4 * dx + 10 * dy : 4 * dy + 10 * dx;*/
+
+	/*return (dx > dy) ? 14 * dy + 10 * (dx - dy) : 14 * dx + 10 * (dy - dx);*/
 
 	//int xdist = a->x - b->x;
 	//int	ydist = a->y - b->y;
@@ -238,6 +245,7 @@ void Path::insert_into_open(int x, int y, int dg, Node* p)
 	MapCell* c = m_game_map->m_items[y][x];
 	if (!c->m_closed)
 	{
+		m_open += 1;
 		m_game_map->m_items[y][x]->m_mark = true;
 		int n = is_in_open(c);
 		if (n == -1)
@@ -486,6 +494,7 @@ AI_enemy::AI_enemy()
 {
 	m_ai_type = ai_type_e::non_humanoid;
 	m_fov = new FOV();
+	m_fov_radius = 0;
 	m_goal = nullptr;
 	m_memory_goal_cell = nullptr;
 	m_action_controller = new Action_wrapper();
@@ -599,7 +608,8 @@ void AI_enemy::create()
 			}
 			else return;
 		}
-		if (Game_algorithm::check_distance(static_cast<MapCell*>(m_object->m_owner), m_object->m_active_state->m_size, static_cast<MapCell*>(m_goal->m_owner), m_goal->m_active_state->m_size)) {
+		if (Game_algorithm::check_distance(static_cast<MapCell*>(m_object->m_owner), m_object->m_active_state->m_size, static_cast<MapCell*>(m_goal->m_owner), m_goal->m_active_state->m_size))
+		{
 			P_unit_interaction* p = new P_unit_interaction();
 			p->m_unit = m_object;
 			p->m_object = m_goal;
@@ -661,7 +671,6 @@ void AI_enemy::create()
 						P->m_map = m_map;
 						m_action_controller->set(P->m_object, Application::instance().m_actions[action_e::move], P);
 			}*/
-
 			Path::instance().calculate(m_map, m_object, c, m_goal, m_fov_radius);
 			std::vector<MapCell*>* path;
 			path = Path::instance().get_path();
