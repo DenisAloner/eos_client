@@ -448,6 +448,8 @@ void GameObjectManager::init()
 	m_to_interaction_e["use"] = interaction_e::use;
 	m_to_interaction_e["health"] = interaction_e::health;
 	m_to_interaction_e["strength"] = interaction_e::strength;
+	m_to_interaction_e["intelligence"] = interaction_e::intelligence;
+	m_to_interaction_e["dexterity"] = interaction_e::dexterity;
 	m_to_interaction_e["hunger"] = interaction_e::hunger;
 	m_to_interaction_e["thirst"] = interaction_e::thirst;
 	m_to_interaction_e["poison"] = interaction_e::poison;
@@ -465,6 +467,8 @@ void GameObjectManager::init()
 	m_effect_string[interaction_e::use] = "применение";
 	m_effect_string[interaction_e::health] = "здоровье";
 	m_effect_string[interaction_e::strength] = "сила";
+	m_effect_string[interaction_e::intelligence] = "интеллект";
+	m_effect_string[interaction_e::dexterity] = "ловкость";
 	m_effect_string[interaction_e::hunger] = "голод";
 	m_effect_string[interaction_e::thirst] = "жажда";
 	m_effect_string[interaction_e::tag] = "метки";

@@ -33,7 +33,7 @@ tag pass_able
 tag seethrough_able
 feature_list parameter,weapon_damage,10,25
 feature_list parameter,strength_bonus,25,100
-feature_list parameter,demand_weapon_skill,15,100
+feature_list parameter,demand_weapon_skill,15000,100000
 feature_list generic,action
 add_action hit_melee
 feature_list generic,damage
@@ -99,10 +99,12 @@ add_action push
 add_action turn
 add_action use
 feature_list parameter,health,100,100
-feature_list parameter,strength,8,100
+feature_list parameter,strength,8000,100000
+feature_list parameter,intelligence,8000,100000
+feature_list parameter,dexterity,8000,100000
 feature_list parameter,hunger,0,1000
 feature_list parameter,thirst,0,1000
-feature_list parameter,skill_sword,50,100
+feature_list parameter,skill_sword,50000,100000
 feature_list generic,buff
 feature_list generic,damage
 feature_list parts,body

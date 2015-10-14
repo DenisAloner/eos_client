@@ -1035,7 +1035,7 @@ void action_hit_melee::perfom(Parameter* parameter)
 			if (accuracy > 0)
 			{
 				accuracy = (ms->m_value + rand() % accuracy)*(light + rand() % (100 - light + 1)*0.5);
-				Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(std::to_string(accuracy*0.0001)));
+				Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(std::to_string(accuracy*0.0000001)));
 			}
 			else
 			{
@@ -1043,11 +1043,10 @@ void action_hit_melee::perfom(Parameter* parameter)
 			}
 			if (accuracy > 0)
 			{
-				
 				Effect* item = new Effect();
 				item->m_interaction_message_type = interaction_message_type_e::single;
 				item->m_subtype = effect_e::value;
-				item->m_value = -accuracy*0.0001*sb->m_value*0.01*wd->m_value*str->m_value;
+				item->m_value = -accuracy*0.0000001*sb->m_value*0.01*wd->m_value*str->m_value*0.001;
 				Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(std::to_string(item->m_value)));
 				Interaction_copyist* item1 = new Interaction_copyist();
 				item1->m_interaction_message_type = interaction_message_type_e::single;

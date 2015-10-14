@@ -251,6 +251,8 @@ enum class interaction_e
 	use,
 	health,
 	strength,
+	intelligence,
+	dexterity,
 	hunger,
 	thirst,
 	demand_weapon_skill,
