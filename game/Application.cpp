@@ -466,6 +466,15 @@ void Application::PlaySound1()
 	Mix_PlayChannel(-1, music, 0);
 }
 
+bool Application::check_action_completion(GameObject*& object)
+{
+	if (object->m_active_state->m_ai)
+	{
+		return !object->m_active_state->m_ai->m_action_controller->m_action;
+	}
+	return true;
+}
+
 void Application::update()
 {
 	//if (!m_action_manager->m_items.empty())
@@ -516,7 +525,10 @@ void Application::update()
 		do
 		{
 			m_update_mutex.lock();
-			m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->update();
+			if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
+			{
+				m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->update();
+			}
 			Application::instance().m_GUI->MapViewer->m_map->m_object_manager.calculate_ai(m_GUI->MapViewer->m_map);
 			if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
 			{
@@ -548,7 +560,7 @@ void Application::update()
 			m_update_mutex.unlock();
 			std::chrono::milliseconds Duration(1);
 			std::this_thread::sleep_for(Duration);
-		} while (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->m_action);
+		} while (!check_action_completion(m_GUI->MapViewer->m_player->m_object));
 		m_update_mutex.lock();
 		if (m_action_manager->m_is_remove) { m_action_manager->remove(); }
 		if (m_action_manager->m_items.empty())

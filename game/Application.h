@@ -160,6 +160,8 @@ private:
 
 	void process_game();
 	void on_turn();
+
+	bool check_action_completion(GameObject*& object);
 };
 
 #endif //APPLICATION_H

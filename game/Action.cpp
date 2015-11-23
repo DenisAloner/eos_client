@@ -1053,6 +1053,8 @@ void action_hit_melee::perfom(Parameter* parameter)
 				item1->m_subtype = interaction_e::health;
 				item1->m_value = item;
 				item1->apply_effect(p->m_object, nullptr);
+				ms->m_basic_value += 1;
+				ms->update();
 			}
 			reaction = p->m_unit_body_part->m_item->get_effect(interaction_e::damage);
 			if (reaction)
