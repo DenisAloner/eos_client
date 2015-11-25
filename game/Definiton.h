@@ -256,6 +256,7 @@ enum class interaction_e
 	hunger,
 	thirst,
 	demand_weapon_skill,
+	evasion_skill,
 	tag,
 	poison,
 	action,
