@@ -1194,7 +1194,22 @@ void Action_use::interaction_handler()
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
 	P_unit_interaction* p = new P_unit_interaction();
-	p->m_unit = Application::instance().m_GUI->MapViewer->m_player->m_object;
+	Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("тест"));
+	result = Application::instance().command_select_object_on_map();
+	if (result)
+	{
+		p->m_unit = static_cast<P_object*>(result)->m_object;
+		std::string a = "Выбран ";
+		a.append(p->m_unit->m_name);
+		a = a + ".";
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+	}
+	else
+	{
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_message_queue.m_busy = false;
+		return;
+	}
 	result = Application::instance().command_select_object_on_map();
 	if (result)
 	{
