@@ -1195,7 +1195,7 @@ void Action_use::interaction_handler()
 	Parameter* result;
 	P_unit_interaction* p = new P_unit_interaction();
 	Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("тест"));
-	result = Application::instance().command_select_object_on_map();
+	result = Application::instance().command_select_object();
 	if (result)
 	{
 		p->m_unit = static_cast<P_object*>(result)->m_object;
@@ -1210,7 +1210,7 @@ void Action_use::interaction_handler()
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
-	result = Application::instance().command_select_object_on_map();
+	result = Application::instance().command_select_object();
 	if (result)
 	{
 		p->m_object = static_cast<P_object*>(result)->m_object;

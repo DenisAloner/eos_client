@@ -131,6 +131,7 @@ public:
 
 	Parameter* command_select_location(GameObject* object);
 	Parameter* command_select_object_on_map();
+	Parameter* command_select_object();
 	bool command_open_body(GameObject*& Object);
 	void command_gui_show_characterization(GameObject*& object);
 	bool command_check_position(GameObject*& object, MapCell*& position, GameMap*& map);

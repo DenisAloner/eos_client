@@ -675,6 +675,72 @@ Parameter* Application::command_select_object_on_map()
 	return Result;
 }
 
+Parameter* Application::command_select_object()
+{
+	P_object* Result = nullptr;
+	m_GUI->MapViewer->m_cursor_x = 1;
+	m_GUI->MapViewer->m_cursor_y = 1;
+	m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выберите обьект."));
+	bool Exit = false;
+	while (Exit == false)
+	{
+		std::unique_lock<std::mutex> lk(m_message_queue.m_mutex);
+		m_message_queue.m_reader = true;
+		while (!m_message_queue.m_read_message)
+		{
+			m_message_queue.m_condition_variable.wait(lk);
+		}
+		m_message_queue.m_processed_message = true;
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_object)
+		{
+			Result = static_cast<P_object*>(m_message_queue.m_items.front());
+			//if (static_cast<P_object*>(Result)->m_object->m_owner->Game_object_owner::m_kind == entity_e::cell)
+			{
+				Exit = true;
+			}
+			//else Result = nullptr;
+		}
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_owner)
+		{
+			P_object_owner* temp = static_cast<P_object_owner*>(m_message_queue.m_items.front());
+			switch (temp->m_cell->m_kind)
+			{
+			case entity_e::inventory_cell:
+			{
+				if (static_cast<Inventory_cell*>(temp->m_cell)->m_item)
+				{
+					Result = new P_object();
+					Result->m_object = static_cast<Inventory_cell*>(temp->m_cell)->m_item;
+					Exit = true;
+				}
+				else Result = nullptr;
+				break;
+			}
+			case entity_e::body_part:
+			{
+				if (static_cast<Object_part*>(temp->m_cell)->m_item)
+				{
+					Result = new P_object();
+					Result->m_object = static_cast<Object_part*>(temp->m_cell)->m_item;
+					Exit = true;
+				}
+				else Result = nullptr;
+				break;
+			}
+			}
+		}
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind_Cancel)
+		{
+			Exit = true;
+		}
+		m_message_queue.m_read_message = false;
+		lk.unlock();
+		m_message_queue.m_condition_variable.notify_one();
+		m_message_queue.m_reader = false;
+	}
+	return Result;
+}
+
 bool Application::command_open_body(GameObject*& Object)
 {
 	bool Result = false;
