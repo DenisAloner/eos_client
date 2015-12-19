@@ -499,6 +499,19 @@ Parameter_list* GameObject::get_parameter(interaction_e key)
 	return nullptr;
 }
 
+Parts_list* GameObject::get_parts_list(interaction_e key)
+{
+	if (m_active_state)
+	{
+		auto value = m_active_state->m_item.find(key);
+		if (value != m_active_state->m_item.end())
+		{
+			return static_cast<Parts_list*>(value->second);
+		}
+	}
+	return nullptr;
+}
+
 bool GameObject::get_stat(object_tag_e key)
 {
 	if (m_active_state)

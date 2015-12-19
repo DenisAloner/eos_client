@@ -6,6 +6,7 @@ GUI_ActionButton::GUI_ActionButton()
 {
 	m_size.w = 40;
 	m_size.h = 40;
+	m_parameter = nullptr;
 }
 
 
@@ -39,7 +40,7 @@ void GUI_ActionButton::render(GraphicalController* Graph, int px, int py)
 void GUI_ActionButton::on_mouse_click(MouseEventArgs const& e)
 {
 	set_focus(true);
-	std::thread t(&Action::interaction_handler,m_action);
+	std::thread t(&Action::interaction_handler, m_action, m_parameter);
 	t.detach();
 }
 

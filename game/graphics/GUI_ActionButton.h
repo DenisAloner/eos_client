@@ -14,6 +14,7 @@ class GUI_ActionButton :
 public:
 
 	Action* m_action;
+	Parameter* m_parameter;
 
 	GUI_ActionButton();
 	~GUI_ActionButton();

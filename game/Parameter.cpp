@@ -285,6 +285,10 @@ void P_unit_interaction::load()
 
 P_interaction_cell::P_interaction_cell() : Parameter(parameter_interaction_cell)
 {
+	m_unit=nullptr;
+	m_object = nullptr;
+	m_unit_body_part = nullptr;
+	m_cell = nullptr;
 }
 
 void P_interaction_cell::reset_serialization_index()

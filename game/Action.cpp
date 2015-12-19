@@ -39,7 +39,7 @@ void Action::perfom(Parameter* parameter)
 }
 
 
-void Action::interaction_handler()
+void Action::interaction_handler(Parameter* arg)
 {
 	/*Game->PlaySound1();*/
 	if (Application::instance().m_message_queue.m_busy)
@@ -165,9 +165,9 @@ ActionClass_Move::~ActionClass_Move()
 }
 
 
-void ActionClass_Move::interaction_handler()
+void ActionClass_Move::interaction_handler(Parameter* arg)
 {
-	Action::interaction_handler();
+	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
 	Parameter_Position* p = new Parameter_Position();
@@ -375,9 +375,9 @@ void ActionClass_Push::perfom(Parameter* parameter)
 }
 
 
-void ActionClass_Push::interaction_handler()
+void ActionClass_Push::interaction_handler(Parameter* arg)
 {
-	Action::interaction_handler();
+	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
 	Parameter_MoveObjectByUnit* p = new Parameter_MoveObjectByUnit();
@@ -461,9 +461,9 @@ void ActionClass_Turn::perfom(Parameter* parameter)
 }
 
 
-void ActionClass_Turn::interaction_handler()
+void ActionClass_Turn::interaction_handler(Parameter* arg)
 {
-	Action::interaction_handler();
+	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
 	Parameter_Position* p = new Parameter_Position();
@@ -501,9 +501,9 @@ Action_OpenInventory::~Action_OpenInventory()
 }
 
 
-void Action_OpenInventory::interaction_handler()
+void Action_OpenInventory::interaction_handler(Parameter* arg)
 {
-	Action::interaction_handler();
+	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
 	P_object* p = new P_object();
@@ -548,9 +548,9 @@ Action_CellInfo::Action_CellInfo()
 	m_icon = Application::instance().m_graph->m_actions[4];
 }
 
-void Action_CellInfo::interaction_handler()
+void Action_CellInfo::interaction_handler(Parameter* arg)
 {
-	Action::interaction_handler();
+	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
 	Parameter_Position* p = new Parameter_Position();
@@ -601,9 +601,9 @@ action_set_motion_path::action_set_motion_path()
 	m_icon = Application::instance().m_graph->m_actions[5];
 }
 
-void action_set_motion_path::interaction_handler()
+void action_set_motion_path::interaction_handler(Parameter* arg)
 {
-	Action::interaction_handler();
+	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
 	Parameter_Position* p = new Parameter_Position();
@@ -674,9 +674,9 @@ Action_pick::Action_pick()
 	m_name = "Поднять";
 }
 
-void Action_pick::interaction_handler()
+void Action_pick::interaction_handler(Parameter* arg)
 {
-	Action::interaction_handler();
+	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
 	Parameter_destination* p = new Parameter_destination();
@@ -793,9 +793,9 @@ Action_open::Action_open()
 	m_name = "Открыть ";
 }
 
-void Action_open::interaction_handler()
+void Action_open::interaction_handler(Parameter* arg)
 {
-	Action::interaction_handler();
+	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
 	P_object* p = new P_object();
@@ -865,9 +865,9 @@ Action_hit::Action_hit()
 	m_name = "Ударить без оружия";
 }
 
-void Action_hit::interaction_handler()
+void Action_hit::interaction_handler(Parameter* arg)
 {
-	Action::interaction_handler();
+	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
 	P_unit_interaction* p = new P_unit_interaction();
@@ -953,58 +953,78 @@ action_hit_melee::action_hit_melee()
 	m_name = "Ударить оружием";
 }
 
-void action_hit_melee::interaction_handler()
+void action_hit_melee::interaction_handler(Parameter* arg)
 {
-	Action::interaction_handler();
+	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
+	P_interaction_cell* arg_p = static_cast<P_interaction_cell*>(arg);
 	P_interaction_cell* p = new P_interaction_cell();
-	p->m_unit = Application::instance().m_GUI->MapViewer->m_player->m_object;
-	result = Application::instance().command_select_body_part();
-	if (result)
+	if(arg_p)
 	{
-		p->m_unit_body_part = static_cast<Object_part*>(static_cast<P_object_owner*>(result)->m_cell);
+		p->m_unit = arg_p->m_unit;
+		p->m_unit_body_part = arg_p->m_unit_body_part;
+		p->m_object = arg_p->m_object;
+		p->m_cell = arg_p->m_cell;
 	}
-	else
-	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
-		Application::instance().m_message_queue.m_busy = false;
-		Application::instance().m_clipboard.m_item = nullptr;
-		return;
+	if (!p->m_unit)
+	{ 
+		p->m_unit = Application::instance().m_GUI->MapViewer->m_player->m_object; 
 	}
-	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_unit, true));
-	result = Application::instance().command_select_object_on_map();
-	if (result)
+	if (!p->m_unit_body_part)
 	{
-		p->m_object = static_cast<P_object*>(result)->m_object;
-		std::string a = "Выбран ";
-		a.append(p->m_object->m_name);
-		a = a + ".";
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+		result = Application::instance().command_select_body_part();
+		if (result)
+		{
+			p->m_unit_body_part = static_cast<Object_part*>(static_cast<P_object_owner*>(result)->m_cell);
+		}
+		else
+		{
+			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+			Application::instance().m_message_queue.m_busy = false;
+			Application::instance().m_clipboard.m_item = nullptr;
+			return;
+		}
 	}
-	else
+	if (!p->m_object)
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
-		Application::instance().m_message_queue.m_busy = false;
+		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_unit, true));
+		result = Application::instance().command_select_object_on_map();
+		if (result)
+		{
+			p->m_object = static_cast<P_object*>(result)->m_object;
+			std::string a = "Выбран ";
+			a.append(p->m_object->m_name);
+			a = a + ".";
+			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+		}
+		else
+		{
+			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+			Application::instance().m_message_queue.m_busy = false;
+			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+			return;
+		}
 		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
-		return;
 	}
-	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
-	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_object_area(Application::instance().m_GUI->MapViewer, p->m_object));
-	result = Application::instance().command_select_location(p->m_object);
-	if (result)
+	if(!p->m_cell)
 	{
-		p->m_cell = static_cast<MapCell*>(static_cast<P_object_owner*>(result)->m_cell);
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_cell->x) + "," + std::to_string(p->m_cell->y) + "}:"));
-	}
-	else
-	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
-		Application::instance().m_message_queue.m_busy = false;
+		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_object_area(Application::instance().m_GUI->MapViewer, p->m_object));
+		result = Application::instance().command_select_location(p->m_object);
+		if (result)
+		{
+			p->m_cell = static_cast<MapCell*>(static_cast<P_object_owner*>(result)->m_cell);
+			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_cell->x) + "," + std::to_string(p->m_cell->y) + "}:"));
+		}
+		else
+		{
+			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+			Application::instance().m_message_queue.m_busy = false;
+			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+			return;
+		}
 		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
-		return;
 	}
-	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 	Application::instance().m_action_manager->add(new GameTask(this, p));
 	Application::instance().m_message_queue.m_busy = false;
 }
@@ -1100,9 +1120,9 @@ Action_equip::Action_equip()
 	m_icon = Application::instance().m_graph->m_actions[9];
 }
 
-void Action_equip::interaction_handler()
+void Action_equip::interaction_handler(Parameter* arg)
 {
-	Action::interaction_handler();
+	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
 	P_object* p = new P_object();
@@ -1147,9 +1167,9 @@ Action_show_parameters::Action_show_parameters()
 	m_icon = Application::instance().m_graph->m_actions[10];
 }
 
-void Action_show_parameters::interaction_handler()
+void Action_show_parameters::interaction_handler(Parameter* arg)
 {
-	Action::interaction_handler();
+	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
 	P_object* p = new P_object();
@@ -1188,17 +1208,16 @@ Action_use::Action_use()
 	m_decay = 1;
 }
 
-void Action_use::interaction_handler()
+void Action_use::interaction_handler(Parameter* arg)
 {
-	Action::interaction_handler();
+	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
 	P_unit_interaction* p = new P_unit_interaction();
-	Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("тест"));
 	result = Application::instance().command_select_object();
 	if (result)
 	{
-		p->m_unit = static_cast<P_object*>(result)->m_object;
+		p->m_object = static_cast<P_object*>(result)->m_object;
 		std::string a = "Выбран ";
 		a.append(p->m_unit->m_name);
 		a = a + ".";
@@ -1213,7 +1232,7 @@ void Action_use::interaction_handler()
 	result = Application::instance().command_select_object();
 	if (result)
 	{
-		p->m_object = static_cast<P_object*>(result)->m_object;
+		p->m_unit = static_cast<P_object*>(result)->m_object;
 		std::string a = "Выбран ";
 		a.append(p->m_object->m_name);
 		a = a + ".";
@@ -1285,9 +1304,9 @@ Action_save::Action_save()
 	m_icon = Application::instance().m_graph->m_actions[12];
 }
 
-void Action_save::interaction_handler()
+void Action_save::interaction_handler(Parameter* arg)
 {
-	Action::interaction_handler();
+	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
 	Serialization_manager::instance().save("save", Application::instance().m_GUI->MapViewer->m_map);
 	Application::instance().m_message_queue.m_busy = false;
@@ -1305,7 +1324,7 @@ Action_autoexplore::Action_autoexplore()
 	m_icon = Application::instance().m_graph->m_actions[13];
 }
 
-void Action_autoexplore::interaction_handler()
+void Action_autoexplore::interaction_handler(Parameter* arg)
 {
 	//Action::interaction_handler();
 	//Application::instance().m_message_queue.m_busy = true;

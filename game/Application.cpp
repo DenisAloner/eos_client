@@ -441,6 +441,41 @@ void Application::update_action_panel()
 	{
 		item->second->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));
 	}
+	Parts_list* parts = m_GUI->MapViewer->m_player->m_object->get_parts_list(interaction_e::body);
+	Action_list* al;
+	Object_part* op;
+	Action* a;
+	for (auto item = parts->m_effect.begin(); item != parts->m_effect.end(); item++)
+	{
+		op = static_cast<Object_part*>(*item);
+		if (op->m_item)
+		{
+			al = static_cast<Action_list*>(op->m_item->get_effect(interaction_e::action));
+			if (al)
+			{
+				//al->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));
+				for (auto action = al->m_effect.begin(); action != al->m_effect.end(); action++)
+				{
+					a = static_cast<Action*>(*action);
+					switch (a->m_kind)
+					{
+					case action_e::hit_melee:
+					{
+						//a->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));
+						GUI_ActionButton* ActionButton = new GUI_ActionButton();
+						ActionButton->m_action = a;
+						P_interaction_cell* p = new P_interaction_cell();
+						p->m_unit = m_GUI->MapViewer->m_player->m_object;
+						p->m_unit_body_part = op;
+						ActionButton->m_parameter = p;
+						m_GUI->m_action_panel->add_item_control(ActionButton);
+						break;
+					}
+					}
+				}
+			}
+		}
+	}
 }
 
 void Application::start()
@@ -1024,7 +1059,7 @@ void Application::command_equip(GameObject*& unit, Object_part* part, GameObject
 		{
 			for (auto kind = object->m_active_state->m_item.begin(); kind != object->m_active_state->m_item.end(); kind++)
 			{
-				if (kind->first != interaction_e::damage)
+				if (kind->first != interaction_e::damage&&kind->first != interaction_e::action)
 				{
 					//unit->add_effect(kind->first, kind->second);
 					unit->add_from(kind->first, static_cast<Interaction_list*>(kind->second));
@@ -1048,7 +1083,7 @@ void Application::command_unequip(GameObject*& unit, Object_part* part, GameObje
 		{
 			for (auto kind = object->m_active_state->m_item.begin(); kind != object->m_active_state->m_item.end(); kind++)
 			{
-				if (kind->first != interaction_e::damage)
+				if (kind->first != interaction_e::damage&&kind->first != interaction_e::action)
 				{
 					//unit->remove_effect(kind->first, kind->second);
 					unit->remove_from(kind->first, static_cast<Interaction_list*>(kind->second));

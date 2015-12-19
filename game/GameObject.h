@@ -149,6 +149,7 @@ public:
 	bool get_stat(object_tag_e key);
 	Object_tag* get_tag(object_tag_e key);
 	Parameter_list* get_parameter(interaction_e key);
+	Parts_list* GameObject::get_parts_list(interaction_e key);
 	MapCell* cell();
 	void update_interaction();
 	Interaction_list* create_feature_list(feature_list_type_e key, interaction_e name);

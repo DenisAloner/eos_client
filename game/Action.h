@@ -33,7 +33,7 @@ public:
 	virtual bool check(Parameter* parameter);
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter) = 0;
-	virtual void interaction_handler();
+	virtual void interaction_handler(Parameter* arg);
 	virtual bool on_turn(){ return false; };
 	virtual std::string get_description() { return "действие"; };
 	virtual Object_interaction* clone();
@@ -85,7 +85,7 @@ public:
 	virtual bool check(Parameter* parameter);
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
-	virtual void interaction_handler();
+	virtual void interaction_handler(Parameter* arg);
 };
 
 class action_move_step :
@@ -109,7 +109,7 @@ public:
 	virtual bool check(Parameter* parameter);
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
-	virtual void interaction_handler();
+	virtual void interaction_handler(Parameter* arg);
 
 };
 
@@ -124,7 +124,7 @@ public:
 	virtual bool check(Parameter* parameter);
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
-	virtual void interaction_handler();
+	virtual void interaction_handler(Parameter* arg);
 
 };
 
@@ -139,7 +139,7 @@ public:
 	virtual bool check(Parameter* parameter);
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
-	virtual void interaction_handler();
+	virtual void interaction_handler(Parameter* arg);
 
 };
 
@@ -153,7 +153,7 @@ public:
 	virtual bool check(Parameter* parameter);
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
-	virtual void interaction_handler();
+	virtual void interaction_handler(Parameter* arg);
 
 };
 
@@ -166,7 +166,7 @@ public:
 
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
-	virtual void interaction_handler();
+	virtual void interaction_handler(Parameter* arg);
 };
 
 
@@ -179,7 +179,7 @@ public:
 
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
-	virtual void interaction_handler();
+	virtual void interaction_handler(Parameter* arg);
 	virtual void description(std::list<std::string>* info, int level);
 
 };
@@ -193,7 +193,7 @@ public:
 
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
-	virtual void interaction_handler();
+	virtual void interaction_handler(Parameter* arg);
 
 };
 
@@ -206,7 +206,7 @@ public:
 	virtual bool check(Parameter* parameter);
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
-	virtual void interaction_handler();
+	virtual void interaction_handler(Parameter* arg);
 
 };
 
@@ -216,7 +216,7 @@ class action_hit_melee :
 public:
 
 	action_hit_melee();
-	virtual void interaction_handler();
+	virtual void interaction_handler(Parameter* arg);
 	virtual void perfom(Parameter* parameter);
 };
 
@@ -230,7 +230,7 @@ public:
 	virtual bool check(Parameter* parameter);
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
-	virtual void interaction_handler();
+	virtual void interaction_handler(Parameter* arg);
 
 };
 
@@ -242,7 +242,7 @@ public:
 	Action_show_parameters();
 
 	virtual std::string get_description(Parameter* parameter);
-	virtual void interaction_handler();
+	virtual void interaction_handler(Parameter* arg);
 
 };
 
@@ -257,7 +257,7 @@ public:
 	virtual bool check(Parameter* parameter);
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
-	virtual void interaction_handler();
+	virtual void interaction_handler(Parameter* arg);
 };
 
 class Action_save :
@@ -268,7 +268,7 @@ public:
 	Action_save();
 
 	virtual std::string get_description(Parameter* parameter);
-	virtual void interaction_handler();
+	virtual void interaction_handler(Parameter* arg);
 
 };
 
@@ -280,7 +280,7 @@ public:
 	Action_autoexplore();
 
 	virtual std::string get_description(Parameter* parameter);
-	virtual void interaction_handler();
+	virtual void interaction_handler(Parameter* arg);
 	virtual bool get_child(GameTask*& task);
 
 };
