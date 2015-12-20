@@ -177,8 +177,9 @@ void Application::initialize()
 	m_actions[action_e::use] = new Action_use();
 	m_actions[action_e::save] = new Action_save();
 	m_actions[action_e::autoexplore] = new Action_autoexplore();
+	m_actions[action_e::shoot] = new Action_shoot();
 
-	for (size_t i = 0; i < 14; i++)
+	for (size_t i = 0; i < c_action_size; i++)
 	{
 		m_actions[i]->m_index = i;
 	}
@@ -206,7 +207,7 @@ void Application::initialize()
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx]);
 	m_GUI->MapViewer->m_player = new Player(obj, m_GUI->MapViewer->m_map);
 
-	obj = m_game_object_manager->new_object("dagger");
+	obj = m_game_object_manager->new_object("bow");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx-1]);
 	obj = m_game_object_manager->new_object("blue potion");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-1][rx - 1]);
@@ -460,6 +461,18 @@ void Application::update_action_panel()
 					switch (a->m_kind)
 					{
 					case action_e::hit_melee:
+					{
+						//a->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));
+						GUI_ActionButton* ActionButton = new GUI_ActionButton();
+						ActionButton->m_action = a;
+						P_interaction_cell* p = new P_interaction_cell();
+						p->m_unit = m_GUI->MapViewer->m_player->m_object;
+						p->m_unit_body_part = op;
+						ActionButton->m_parameter = p;
+						m_GUI->m_action_panel->add_item_control(ActionButton);
+						break;
+					}
+					case action_e::shoot:
 					{
 						//a->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));
 						GUI_ActionButton* ActionButton = new GUI_ActionButton();

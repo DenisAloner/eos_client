@@ -239,6 +239,84 @@ void mapviewer_hint_line::render()
 	}
 }
 
+mapviewer_hint_weapon_range::mapviewer_hint_weapon_range(GUI_MapViewer* owner, GameObject* object, int range) : gui_mapviewer_hint(owner), m_object(object), m_range(range) {}
+
+void mapviewer_hint_weapon_range::render()
+{
+	int px = 0;
+	int py = 0;
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
+	glUseProgramObjectARB(0);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_select);
+	double x0, y0, x1, y1, x2, y2, x3, y3;
+	MapCell* item = m_object->cell();
+	int xc;
+	int yc;
+	xc = item->x + m_object->m_active_state->m_size.x / 2;
+	yc = item->y - m_object->m_active_state->m_size.y / 2;
+	int ax = 2*m_range + m_object->m_active_state->m_size.x;
+	int ay = 2*m_range + m_object->m_active_state->m_size.y;
+	int xr = ax / 2;
+	int yr = ay / 2;
+	for (int i = 0; i < ay; i++)
+	{
+		for (int j = 0; j < ax; j++)
+		{
+			//if (i*i + j*j <= m_range*m_range)
+			{
+				int x = px + (xc + j - xr) - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
+				int y = py + (yc - i + yr) - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
+				/*x0 = x * m_owner->m_tile_size_x;
+				y0 = (m_owner->m_tile_count_y - y - 1) * m_owner->m_tile_size_y;
+				x1 = x0;
+				y1 = (m_owner->m_tile_count_y - y) * m_owner->m_tile_size_y;
+				x2 = (x + 1) * m_owner->m_tile_size_x;
+				y2 = y1;
+				x3 = x2;
+				y3 = y0;*/
+				int yp = m_owner->m_tile_count_x - x;
+				int xp = m_owner->m_tile_count_y - y;
+				x0 = (xp - yp) * 16 + m_owner->m_shift.x;
+				y0 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
+				x1 = x0;
+				y1 = (xp + yp) * 9 + m_owner->m_shift.y;
+				x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
+				y2 = y1;
+				x3 = x2;
+				y3 = y0;
+				glColor4f(1.0F, 0.9F, 0.0F, 0.25F);
+				Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+				x0 = (xp - yp) * 16 + m_owner->m_shift.x;
+				y0 = (xp + yp) * 9 - 9 + m_owner->m_shift.y;
+				x1 = (xp - yp) * 16 + 16 + m_owner->m_shift.x;
+				y1 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
+				x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
+				y2 = y0;
+				x3 = x1;
+				y3 = (xp + yp) * 9 + m_owner->m_shift.y;
+				glDisable(GL_BLEND);
+				glDisable(GL_TEXTURE_2D);
+				glBegin(GL_LINES);
+				glColor4f(1.0, 1.0, 0.0, 1.0);
+				glVertex2d(x0, y0);
+				glVertex2d(x1, y1);
+				glVertex2d(x1, y1);
+				glVertex2d(x2, y2);
+				glVertex2d(x2, y2);
+				glVertex2d(x3, y3);
+				glVertex2d(x3, y3);
+				glVertex2d(x0, y0);
+				glEnd();
+				glEnable(GL_BLEND);
+				glEnable(GL_TEXTURE_2D);
+			}
+		}
+	}
+}
+
 GUI_MapViewer::GUI_MapViewer(Application* app = nullptr)
 {
 	m_tile_count_x = 90;

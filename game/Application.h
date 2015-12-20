@@ -78,6 +78,8 @@ class Application
 {
 public:
 
+	static const std::size_t c_action_size = 17;
+
 	int m_game_turn;
 	bool m_ready;
 	bool m_turn;
@@ -96,7 +98,7 @@ public:
 	GraphicalController* m_graph;
 	ActionManager* m_action_manager;
 
-	Action* m_actions[16];
+	Action* m_actions[c_action_size];
 
 	AI_manager* m_ai_manager;
 	

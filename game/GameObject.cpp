@@ -240,7 +240,7 @@ void Object_state::save()
 	fwrite(&m_weight, sizeof(float), 1, file);
 	FileSystem::instance().serialize_pointer(m_light, type_e::light_t, file);
 	FileSystem::instance().serialize_pointer(m_optical, type_e::optical_properties_t, file);
-	if(m_tile_manager->m_index>22)
+	if(m_tile_manager->m_index>23)
 	{
 		LOG(FATAL) << "Тайловый менеджер с ошибкой " <<std::to_string(m_tile_manager->m_index);
 	}

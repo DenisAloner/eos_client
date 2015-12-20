@@ -115,7 +115,8 @@ enum action_e
 	show_parameters,
 	use,
 	save,
-	autoexplore
+	autoexplore,
+	shoot
 };
 
 enum class object_state_e
@@ -264,6 +265,7 @@ enum class interaction_e
 	skill_sword,
 	weapon_damage,
 	strength_bonus,
+	weapon_range
 };
 
 enum class effect_e

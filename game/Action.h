@@ -285,4 +285,17 @@ public:
 
 };
 
+class Action_shoot :
+	public Action
+{
+public:
+
+	Action_shoot();
+	virtual bool check(Parameter* parameter);
+	virtual void perfom(Parameter* parameter);
+	virtual std::string get_description(Parameter* parameter);
+	virtual void interaction_handler(Parameter* arg);
+
+};
+
 #endif //TACTION_H

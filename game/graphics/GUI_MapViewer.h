@@ -131,5 +131,16 @@ public:
 	void draw_cell(MapCell* a);
 };
 
+class mapviewer_hint_weapon_range : public gui_mapviewer_hint
+{
+public:
+
+	int m_range;
+
+	GameObject* m_object;
+	mapviewer_hint_weapon_range(GUI_MapViewer* owner, GameObject* object, int range);
+	virtual void render();
+};
+
 #endif //GUI_MAPVIEWER_H
 

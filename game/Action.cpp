@@ -24,6 +24,7 @@ Action::~Action(void)
 
 Object_interaction* Action::clone()
 {
+	LOG(INFO) << std::to_string(m_index);
 	return Application::instance().m_actions[m_index];
 }
 
@@ -1375,4 +1376,188 @@ bool Action_autoexplore::get_child(GameTask*& task)
 	}
 	else task = nullptr;
 	return true;
+}
+
+Action_shoot::Action_shoot()
+{
+	m_kind = action_e::shoot;
+	m_icon = Application::instance().m_graph->m_actions[14];
+	m_decay = 1;
+	m_name = "Выстрелить из оружия";
+}
+
+void Action_shoot::interaction_handler(Parameter* arg)
+{
+	Action::interaction_handler(nullptr);
+	Application::instance().m_message_queue.m_busy = true;
+	Parameter* result;
+	P_interaction_cell* arg_p = static_cast<P_interaction_cell*>(arg);
+	P_interaction_cell* p = new P_interaction_cell();
+	if (arg_p)
+	{
+		p->m_unit = arg_p->m_unit;
+		p->m_unit_body_part = arg_p->m_unit_body_part;
+		p->m_object = arg_p->m_object;
+		p->m_cell = arg_p->m_cell;
+	}
+	if (!p->m_unit)
+	{
+		p->m_unit = Application::instance().m_GUI->MapViewer->m_player->m_object;
+	}
+	if (!p->m_unit_body_part)
+	{
+		result = Application::instance().command_select_body_part();
+		if (result)
+		{
+			p->m_unit_body_part = static_cast<Object_part*>(static_cast<P_object_owner*>(result)->m_cell);
+		}
+		else
+		{
+			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+			Application::instance().m_message_queue.m_busy = false;
+			Application::instance().m_clipboard.m_item = nullptr;
+			return;
+		}
+	}
+	/*if (!p->m_object)
+	{
+		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_unit, true));
+		result = Application::instance().command_select_object_on_map();
+		if (result)
+		{
+			p->m_object = static_cast<P_object*>(result)->m_object;
+			std::string a = "Выбран ";
+			a.append(p->m_object->m_name);
+			a = a + ".";
+			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+		}
+		else
+		{
+			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+			Application::instance().m_message_queue.m_busy = false;
+			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+			return;
+		}
+		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+	}*/
+	if (!p->m_cell)
+	{
+		Parameter_list* wr = p->m_unit_body_part->m_item->get_parameter(interaction_e::weapon_range);
+		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_weapon_range(Application::instance().m_GUI->MapViewer, p->m_unit,wr->m_value));
+		result = Application::instance().command_select_location(p->m_object);
+		if (result)
+		{
+			p->m_cell = static_cast<MapCell*>(static_cast<P_object_owner*>(result)->m_cell);
+			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_cell->x) + "," + std::to_string(p->m_cell->y) + "}:"));
+		}
+		else
+		{
+			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+			Application::instance().m_message_queue.m_busy = false;
+			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+			return;
+		}
+		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+	}
+	Application::instance().m_action_manager->add(new GameTask(this, p));
+	Application::instance().m_message_queue.m_busy = false;
+}
+
+bool Action_shoot::check(Parameter* parameter)
+{
+	m_error = "";
+	/*P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
+	MapCell* cell;
+	if (!Game_algorithm::check_distance(p->m_unit->cell(), p->m_unit->m_active_state->m_size, p->m_object->cell(), p->m_object->m_active_state->m_size))
+	{
+		m_error = "Вы слишком далеко от " + p->m_object->m_name;
+		return false;
+	};*/
+	return true;
+}
+
+void Action_shoot::perfom(Parameter* parameter)
+{
+	P_interaction_cell* p = static_cast<P_interaction_cell*>(parameter);
+	if (check(p))
+	{
+		auto reaction = p->m_unit->get_effect(interaction_e::total_damage);
+		if (reaction)
+		{
+			Object_interaction* msg = reaction->clone();
+			msg->apply_effect(p->m_object, nullptr);
+		}
+		if (p->m_unit_body_part)
+		{
+			srand(time(NULL));
+			Parameter_list* dexterity_subject = p->m_unit->get_parameter(interaction_e::dexterity);
+			Parameter_list* dexterity_object = p->m_object->get_parameter(interaction_e::dexterity);
+			Parameter_list* evasion_skill_object = p->m_object->get_parameter(interaction_e::evasion_skill);
+			int evasion;
+			if (dexterity_subject->m_value>dexterity_object->m_value)
+			{
+				evasion = evasion_skill_object->m_value / 1000 - (100 - (float)dexterity_object->m_value / dexterity_subject->m_value * 100)*0.5;
+			}
+			else
+			{
+				evasion = evasion_skill_object->m_value / 1000 - ((float)(dexterity_subject->m_value * 100) / dexterity_object->m_value - 100)*0.5;
+			}
+			if (evasion > 90) { evasion = 90; }
+			if (evasion < 10) { evasion = 10; }
+			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(std::to_string(evasion)));
+			if (rand() % 100>evasion)
+			{
+				Parameter_list* str = p->m_unit->get_parameter(interaction_e::strength);
+				Parameter_list* ms = p->m_unit->get_parameter(interaction_e::skill_sword);
+				Parameter_list* dws = p->m_unit_body_part->m_item->get_parameter(interaction_e::demand_weapon_skill);
+				Parameter_list* wd = p->m_unit_body_part->m_item->get_parameter(interaction_e::weapon_damage);
+				Parameter_list* sb = p->m_unit_body_part->m_item->get_parameter(interaction_e::strength_bonus);
+				int accuracy = (ms->m_value - dws->m_value);
+				int light = (p->m_cell->m_light.R > p->m_cell->m_light.G ? p->m_cell->m_light.R : p->m_cell->m_light.G);
+				light = (light > p->m_cell->m_light.B ? light : p->m_cell->m_light.B);
+				if (light > 100) { light = 100; };
+				if (accuracy > 0)
+				{
+					accuracy = (ms->m_value + rand() % accuracy)*(light + rand() % (100 - light + 1)*0.5);
+					Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(std::to_string(accuracy*0.0000001)));
+				}
+				else
+				{
+					accuracy = (ms->m_value - rand() % accuracy)*(light + rand() % (100 - light + 1)*0.5);
+				}
+				if (accuracy > 0)
+				{
+					Effect* item = new Effect();
+					item->m_interaction_message_type = interaction_message_type_e::single;
+					item->m_subtype = effect_e::value;
+					item->m_value = -accuracy*0.0000001*sb->m_value*0.01*wd->m_value*str->m_value*0.001;
+					Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(std::to_string(item->m_value)));
+					Interaction_copyist* item1 = new Interaction_copyist();
+					item1->m_interaction_message_type = interaction_message_type_e::single;
+					item1->m_subtype = interaction_e::health;
+					item1->m_value = item;
+					item1->apply_effect(p->m_object, nullptr);
+					ms->m_basic_value += 1;
+					ms->update();
+				}
+			}
+			else { Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Объект уклонился!")); }
+			reaction = p->m_unit_body_part->m_item->get_effect(interaction_e::damage);
+			if (reaction)
+			{
+				Object_interaction* msg = reaction->clone();
+				msg->apply_effect(p->m_object, nullptr);
+			}
+		}
+		p->m_object->update_interaction();
+		p->m_object->event_update(VoidEventArgs());
+	}
+}
+
+std::string Action_shoot::get_description(Parameter* parameter)
+{
+	P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
+	std::string s("Атаковать ");
+	s += p->m_object->m_name + ".";
+	return s;
 }

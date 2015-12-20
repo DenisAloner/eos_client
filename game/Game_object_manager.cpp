@@ -189,6 +189,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::add_action:
 	{
 		action_e action = get_action_e(arg[0]);
+		LOG(INFO) << "загружено действие " << arg[0] << " - " << std::to_string(get_action_e(arg[0]));
 		m_object->add_effect(interaction_e::action, Application::instance().m_actions[action]);
 		break;
 	}
@@ -461,6 +462,7 @@ void GameObjectManager::init()
 	m_to_interaction_e["strength_bonus"] = interaction_e::strength_bonus;
 	m_to_interaction_e["demand_weapon_skill"] = interaction_e::demand_weapon_skill;
 	m_to_interaction_e["evasion_skill"] = interaction_e::evasion_skill;
+	m_to_interaction_e["weapon_range"] = interaction_e::weapon_range;
 
 	m_effect_string[interaction_e::total_damage] = "общий дополнительный урон";
 	m_effect_string[interaction_e::damage] = "урон";
@@ -481,6 +483,7 @@ void GameObjectManager::init()
 	m_effect_string[interaction_e::strength_bonus] = "бонус силы";
 	m_effect_string[interaction_e::demand_weapon_skill] = "требование к владению оружием";
 	m_effect_string[interaction_e::evasion_skill] = "навык уклонения";
+	m_effect_string[interaction_e::weapon_range] = "дальность";
 
 	m_to_effect_e["value"] = effect_e::value;
 	m_to_effect_e["limit"] = effect_e::limit;
@@ -524,6 +527,7 @@ void GameObjectManager::init()
 	m_to_action_e["set_motion_path"] = action_e::set_motion_path;
 	m_to_action_e["turn"] = action_e::turn;
 	m_to_action_e["use"] = action_e::use;
+	m_to_action_e["shoot"] = action_e::shoot;
 
 	m_to_body_part_e["head"] = body_part_e::head;
 	m_to_body_part_e["hand"] = body_part_e::hand;
