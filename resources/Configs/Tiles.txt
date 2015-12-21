@@ -22,3 +22,4 @@ single red_potion
 single blue_potion
 single glass_wall
 single bow
+single arrow

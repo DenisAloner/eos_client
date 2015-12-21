@@ -947,6 +947,91 @@ void GameMap::bresenham_line(MapCell* a, MapCell* b, std::function<void(MapCell*
 	}
 }
 
+MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, std::function<bool(MapCell*)> f)
+{
+	int e = 0;
+	int dx = abs(b->x - a->x);
+	int dy = abs(b->y - a->y);
+	int x;
+	int y;
+	int k;
+	if (dx >= dy)
+	{
+		y = a->y;
+		k = (a->y < b->y ? 1 : -1);
+		if (a->x < b->x)
+		{
+			for (x = a->x; x < b->x + 1; x++)
+			{
+				if (f(m_items[y][x]))
+				{
+					return m_items[y][x];
+				}
+				e = e + dy;
+				if (2 * e >= dx)
+				{
+					y = y + k;
+					e = e - dx;
+				}
+			}
+		}
+		else
+		{
+			for (x = a->x; x > b->x - 1; x--)
+			{
+				if (f(m_items[y][x]))
+				{
+					return m_items[y][x];
+				}
+				e = e + dy;
+				if (2 * e >= dx)
+				{
+					y = y + k;
+					e = e - dx;
+				}
+			}
+		}
+	}
+	else
+	{
+		x = a->x;
+		k = (a->x < b->x ? 1 : -1);
+		if (a->y < b->y)
+		{
+			for (y = a->y; y < b->y + 1; y++)
+			{
+				if (f(m_items[y][x]))
+				{
+					return m_items[y][x];
+				}
+				e = e + dx;
+				if (2 * e >= dy)
+				{
+					x = x + k;
+					e = e - dy;
+				}
+			}
+		}
+		else
+		{
+			for (y = a->y; y > b->y - 1; y--)
+			{
+				if (f(m_items[y][x]))
+				{
+					return m_items[y][x];
+				}
+				e = e + dx;
+				if (2 * e >= dy)
+				{
+					x = x + k;
+					e = e - dy;
+				}
+			}
+		}
+	}
+	return m_items[y][x];
+}
+
 void GameMap::add_lighting()
 {
 	block_t* block;

@@ -263,6 +263,7 @@ enum class interaction_e
 	action,
 	body,
 	skill_sword,
+	skill_bow,
 	weapon_damage,
 	strength_bonus,
 	weapon_range

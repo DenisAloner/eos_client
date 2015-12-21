@@ -459,6 +459,7 @@ void GameObjectManager::init()
 	m_to_interaction_e["body"] = interaction_e::body;
 	m_to_interaction_e["weapon_damage"] = interaction_e::weapon_damage;
 	m_to_interaction_e["skill_sword"] = interaction_e::skill_sword;
+	m_to_interaction_e["skill_bow"] = interaction_e::skill_bow;
 	m_to_interaction_e["strength_bonus"] = interaction_e::strength_bonus;
 	m_to_interaction_e["demand_weapon_skill"] = interaction_e::demand_weapon_skill;
 	m_to_interaction_e["evasion_skill"] = interaction_e::evasion_skill;
@@ -480,6 +481,7 @@ void GameObjectManager::init()
 	m_effect_string[interaction_e::body] = "тело";
 	m_effect_string[interaction_e::weapon_damage] = "урон оружия";
 	m_effect_string[interaction_e::skill_sword] = "владение мечом";
+	m_effect_string[interaction_e::skill_bow] = "владение луком";
 	m_effect_string[interaction_e::strength_bonus] = "бонус силы";
 	m_effect_string[interaction_e::demand_weapon_skill] = "требование к владению оружием";
 	m_effect_string[interaction_e::evasion_skill] = "навык уклонения";

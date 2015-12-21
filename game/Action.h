@@ -12,6 +12,7 @@
 
 class Application;
 class Parameter;
+class P_interaction_cell;
 class Action;
 class Interaction_prefix;
 
@@ -290,12 +291,14 @@ class Action_shoot :
 {
 public:
 
+	P_interaction_cell* m_arg;
+
 	Action_shoot();
 	virtual bool check(Parameter* parameter);
 	virtual void perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
-
+	bool process_cell(MapCell* a);
 };
 
 #endif //TACTION_H

@@ -88,6 +88,7 @@ public:
 	//bool line2(int x1, int y1, int x2, int y2);
 	void add_lighting();
 	void bresenham_line(MapCell* a, MapCell* b, std::function<void(MapCell*)> f);
+	MapCell* bresenham_line2(MapCell* a, MapCell* b, std::function<bool(MapCell*)> f);
 	bool check(int x,int y);
 	//MapCell* get_cell(int x, int y);
 
