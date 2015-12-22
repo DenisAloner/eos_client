@@ -131,6 +131,18 @@ public:
 	void draw_cell(MapCell* a);
 };
 
+class mapviewer_hint_shoot : public gui_mapviewer_hint
+{
+public:
+
+	int m_step_count;
+
+	GameObject* m_object;
+	mapviewer_hint_shoot(GUI_MapViewer* owner, GameObject* object);
+	virtual void render();
+	void draw_cell(MapCell* a);
+};
+
 class mapviewer_hint_weapon_range : public gui_mapviewer_hint
 {
 public:

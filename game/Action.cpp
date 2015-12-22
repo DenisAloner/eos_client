@@ -1443,7 +1443,8 @@ void Action_shoot::interaction_handler(Parameter* arg)
 	if (!p->m_cell)
 	{
 		Parameter_list* wr = p->m_unit_body_part->m_item->get_parameter(interaction_e::weapon_range);
-		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_weapon_range(Application::instance().m_GUI->MapViewer, p->m_unit,wr->m_value));
+		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_shoot(Application::instance().m_GUI->MapViewer, p->m_unit));
+		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_weapon_range(Application::instance().m_GUI->MapViewer, p->m_unit, wr->m_value));
 		result = Application::instance().command_select_location(p->m_object);
 		if (result)
 		{
@@ -1455,8 +1456,10 @@ void Action_shoot::interaction_handler(Parameter* arg)
 			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
 			Application::instance().m_message_queue.m_busy = false;
 			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 			return;
 		}
+		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 	}
 	Application::instance().m_action_manager->add(new GameTask(this, p));
@@ -1480,7 +1483,7 @@ bool Action_shoot::process_cell(MapCell* a)
 {
 	for (auto c_object =a->m_items.begin(); c_object != a->m_items.end(); c_object++)
 	{
-		if (!(a->x >= m_arg->m_unit->cell()->x&&a->x <= m_arg->m_unit->cell()->x + m_arg->m_unit->m_active_state->m_size.x&&a->y <= m_arg->m_unit->cell()->y&&a->y >= m_arg->m_unit->cell()->y - m_arg->m_unit->m_active_state->m_size.y))
+		if (!m_arg->m_unit->is_own(a))
 		{
 			if (!(*c_object)->get_tag(object_tag_e::pass_able))
 			{

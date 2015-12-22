@@ -3,7 +3,7 @@
 #include "game/graphics/GUI_PopMenu.h"
 #include "game/ActionManager.h"
 #include "log.h"
-
+#include <algorithm>
 
 gui_mapviewer_hint::gui_mapviewer_hint(GUI_MapViewer* owner) :m_owner(owner) {}
 mapviewer_hint_path::mapviewer_hint_path(GUI_MapViewer* owner, std::vector<MapCell*>* path) : gui_mapviewer_hint(owner), m_path(path) {};
@@ -266,9 +266,12 @@ void mapviewer_hint_weapon_range::render()
 		for (int j = 0; j < ax; j++)
 		{
 			//if (i*i + j*j <= m_range*m_range)
+			int xp = xc + j - xr;
+			int yp = yc - i + yr;
+			if (!m_object->is_own(xp,yp))
 			{
-				int x = px + (xc + j - xr) - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
-				int y = py + (yc - i + yr) - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
+				int x = px + xp - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
+				int y = py + yp - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
 				/*x0 = x * m_owner->m_tile_size_x;
 				y0 = (m_owner->m_tile_count_y - y - 1) * m_owner->m_tile_size_y;
 				x1 = x0;
@@ -289,6 +292,7 @@ void mapviewer_hint_weapon_range::render()
 				y3 = y0;
 				glColor4f(1.0F, 0.9F, 0.0F, 0.25F);
 				Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+				glColor4f(1.0F, 0.9F, 0.0F, 1.0F);
 				x0 = (xp - yp) * 16 + m_owner->m_shift.x;
 				y0 = (xp + yp) * 9 - 9 + m_owner->m_shift.y;
 				x1 = (xp - yp) * 16 + 16 + m_owner->m_shift.x;
@@ -314,6 +318,81 @@ void mapviewer_hint_weapon_range::render()
 				glEnable(GL_TEXTURE_2D);
 			}
 		}
+	}
+}
+
+mapviewer_hint_shoot::mapviewer_hint_shoot(GUI_MapViewer* owner, GameObject* object) : gui_mapviewer_hint(owner), m_object(object) {}
+
+void mapviewer_hint_shoot::draw_cell(MapCell* a)
+{
+	if (!m_object->is_own(a))
+	{
+		double x0, y0, x1, y1, x2, y2, x3, y3;
+		int px = 0;
+		int py = 0;
+		int x = px + a->x - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
+		int y = py + a->y - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
+		int yp = m_owner->m_tile_count_x - x;
+		int xp = m_owner->m_tile_count_y - y;
+		x0 = (xp - yp) * 16 + m_owner->m_shift.x;
+		y0 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
+		x1 = x0;
+		y1 = (xp + yp) * 9 + m_owner->m_shift.y;
+		x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
+		y2 = y1;
+		x3 = x2;
+		y3 = y0;
+		glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_select);
+		glColor4f(1.0F, 0.9F, 0.0F, 0.5F);
+		Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+		glColor4f(1.0F, 0.9F, 0.0F, 1.0F);
+		Application::instance().m_graph->center_text((x0 + x2)*0.5, (y0 + y1) *0.5, std::to_string(m_step_count), 8, 17);
+		m_step_count += 1;
+	}
+}
+
+void mapviewer_hint_shoot::render()
+{
+	int px = 0;
+	int py = 0;
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
+	glUseProgramObjectARB(0);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_TEXTURE_2D);
+	if (m_owner->m_cursored != nullptr)
+	{
+		m_step_count = 1;
+		MapCell* cell;
+		if ((m_object->m_active_state->m_size.x % 2) == 0)
+		{
+			int x;
+			int y;
+			if (m_owner->m_cursored->x <= m_object->cell()->x + m_object->m_active_state->m_size.x / 2 - 1)
+			{
+				x = m_object->cell()->x + m_object->m_active_state->m_size.x / 2 - 1;
+			}
+			else
+			{
+				x = m_object->cell()->x + m_object->m_active_state->m_size.x / 2;
+			}
+			if (m_owner->m_cursored->y >= m_object->cell()->y - m_object->m_active_state->m_size.y / 2+1)
+			{
+				y = m_object->cell()->y - m_object->m_active_state->m_size.y / 2 + 1;
+			}
+			else
+			{
+				y = m_object->cell()->y - m_object->m_active_state->m_size.y / 2;
+			}
+			cell = m_owner->m_map->m_items[y][x];
+		}
+		else
+		{
+			int x = m_object->cell()->x + m_object->m_active_state->m_size.x / 2;
+			int y = m_object->cell()->y - m_object->m_active_state->m_size.y / 2;
+			cell = m_owner->m_map->m_items[y][x];
+		}
+		m_owner->m_map->bresenham_line(cell, m_owner->m_cursored, std::bind(&mapviewer_hint_shoot::draw_cell, this, std::placeholders::_1));
 	}
 }
 

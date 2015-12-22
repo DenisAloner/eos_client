@@ -550,6 +550,24 @@ MapCell* GameObject::cell(){
 	return static_cast<MapCell*>(m_owner);
 }
 
+bool GameObject::is_own(MapCell* c)
+{
+	if (c->x >= cell()->x&&c->x<cell()->x + m_active_state->m_size.x&&c->y <= cell()->y&&c->y > cell()->y - m_active_state->m_size.y)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool GameObject::is_own(int x, int y)
+{
+	if (x >= cell()->x&&x<cell()->x + m_active_state->m_size.x&&y <= cell()->y&&y > cell()->y - m_active_state->m_size.y)
+	{
+		return true;
+	}
+	return false;
+}
+
 void GameObject::update_interaction()
 {
 	if (m_active_state)
