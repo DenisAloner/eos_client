@@ -27,9 +27,11 @@ public:
 	GLuint m_tile_shader;
 	GLuint m_tile_shader_hide;
 	GLuint m_mask_shader;
+	GLuint m_mask_shader2;
 
 	GLuint m_empty_01;
 	GLuint m_empty_02;
+	GLuint m_empty_03;
 	GLuint m_cursor;
 	GLuint m_close;
 	GLuint m_preselect;

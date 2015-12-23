@@ -136,9 +136,10 @@ class mapviewer_hint_shoot : public gui_mapviewer_hint
 public:
 
 	int m_step_count;
+	int m_range;
 
 	GameObject* m_object;
-	mapviewer_hint_shoot(GUI_MapViewer* owner, GameObject* object);
+	mapviewer_hint_shoot(GUI_MapViewer* owner, GameObject* object, int range);
 	virtual void render();
 	void draw_cell(MapCell* a);
 };

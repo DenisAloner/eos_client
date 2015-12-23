@@ -245,7 +245,6 @@ void mapviewer_hint_weapon_range::render()
 {
 	int px = 0;
 	int py = 0;
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
 	glUseProgramObjectARB(0);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -291,8 +290,11 @@ void mapviewer_hint_weapon_range::render()
 				x3 = x2;
 				y3 = y0;
 				glColor4f(1.0F, 0.9F, 0.0F, 0.25F);
+				glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
 				Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
-				glColor4f(1.0F, 0.9F, 0.0F, 1.0F);
+				glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_03, 0);
+				Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+				glColor4f(1.0F, 0.9F, 0.0F, 0.5F);
 				x0 = (xp - yp) * 16 + m_owner->m_shift.x;
 				y0 = (xp + yp) * 9 - 9 + m_owner->m_shift.y;
 				x1 = (xp - yp) * 16 + 16 + m_owner->m_shift.x;
@@ -301,10 +303,21 @@ void mapviewer_hint_weapon_range::render()
 				y2 = y0;
 				x3 = x1;
 				y3 = (xp + yp) * 9 + m_owner->m_shift.y;
-				glDisable(GL_BLEND);
+				//glDisable(GL_BLEND);
 				glDisable(GL_TEXTURE_2D);
+				glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
 				glBegin(GL_LINES);
-				glColor4f(1.0, 1.0, 0.0, 1.0);
+				glVertex2d(x0, y0);
+				glVertex2d(x1, y1);
+				glVertex2d(x1, y1);
+				glVertex2d(x2, y2);
+				glVertex2d(x2, y2);
+				glVertex2d(x3, y3);
+				glVertex2d(x3, y3);
+				glVertex2d(x0, y0);
+				glEnd();
+				glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_03, 0);
+				glBegin(GL_LINES);
 				glVertex2d(x0, y0);
 				glVertex2d(x1, y1);
 				glVertex2d(x1, y1);
@@ -321,7 +334,7 @@ void mapviewer_hint_weapon_range::render()
 	}
 }
 
-mapviewer_hint_shoot::mapviewer_hint_shoot(GUI_MapViewer* owner, GameObject* object) : gui_mapviewer_hint(owner), m_object(object) {}
+mapviewer_hint_shoot::mapviewer_hint_shoot(GUI_MapViewer* owner, GameObject* object, int range) : gui_mapviewer_hint(owner), m_object(object),m_range(range) {}
 
 void mapviewer_hint_shoot::draw_cell(MapCell* a)
 {
@@ -343,9 +356,32 @@ void mapviewer_hint_shoot::draw_cell(MapCell* a)
 		x3 = x2;
 		y3 = y0;
 		glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_select);
-		glColor4f(1.0F, 0.9F, 0.0F, 0.5F);
+		if (m_step_count > m_range)
+		{
+			glColor4f(1.0F, 0.0F, 0.0F, 0.5F);
+		}
+		else
+		{
+			bool pass_able = true;
+			for (auto object = a->m_items.begin(); object != a->m_items.end(); object++)
+			{
+				if (!(*object)->get_tag(object_tag_e::pass_able))
+				{
+					pass_able = false;
+					break;
+				}
+			}
+			if (pass_able)
+			{
+				glColor4f(0.0F, 1.0F, 0.0F, 0.5F);
+			}
+			else
+			{
+				glColor4f(1.0F, 0.0F, 0.0F, 0.5F);
+			}
+		}
 		Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
-		glColor4f(1.0F, 0.9F, 0.0F, 1.0F);
+		glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		Application::instance().m_graph->center_text((x0 + x2)*0.5, (y0 + y1) *0.5, std::to_string(m_step_count), 8, 17);
 		m_step_count += 1;
 	}
@@ -355,7 +391,7 @@ void mapviewer_hint_shoot::render()
 {
 	int px = 0;
 	int py = 0;
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_03, 0);
 	glUseProgramObjectARB(0);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -392,6 +428,10 @@ void mapviewer_hint_shoot::render()
 			int y = m_object->cell()->y - m_object->m_active_state->m_size.y / 2;
 			cell = m_owner->m_map->m_items[y][x];
 		}
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
+		m_owner->m_map->bresenham_line(cell, m_owner->m_cursored, std::bind(&mapviewer_hint_shoot::draw_cell, this, std::placeholders::_1));
+		m_step_count = 1;
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_03, 0);
 		m_owner->m_map->bresenham_line(cell, m_owner->m_cursored, std::bind(&mapviewer_hint_shoot::draw_cell, this, std::placeholders::_1));
 	}
 }
@@ -471,6 +511,9 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_02, 0);
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_03, 0);
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 	int x0, y0, x1, y1, x2, y2, x3, y3;
@@ -696,11 +739,32 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 								}
 								glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_02, 0);
 								Graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
-							}
 
+								/*glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
+								glUseProgram(Graph->m_mask_shader2);
+								glActiveTexture(GL_TEXTURE0);
+								glBindTexture(GL_TEXTURE_2D, Graph->m_empty_03);
+								Graph->set_uniform_sampler(Graph->m_mask_shader2, "Map", 0);
+								glActiveTexture(GL_TEXTURE1);
+								glBindTexture(GL_TEXTURE_2D, Sprite);
+								Graph->set_uniform_sampler(Graph->m_mask_shader2, "Unit", 1);
+								glActiveTexture(GL_TEXTURE0);
+								Graph->draw_tile_FBO(x1 / 1024.0, (1024 - y1) / 1024.0, x3 / 1024.0, (1024 - y3) / 1024.0, x0, y0, x1, y1, x2, y2, x3, y3);*/
+							}
 
 							if ((*Current)->m_active_state->m_layer == 2)
 							{
+								glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
+								glUseProgram(Graph->m_mask_shader2);
+								glActiveTexture(GL_TEXTURE0);
+								glBindTexture(GL_TEXTURE_2D, Graph->m_empty_03);
+								Graph->set_uniform_sampler(Graph->m_mask_shader2, "Map", 0);
+								glActiveTexture(GL_TEXTURE1);
+								glBindTexture(GL_TEXTURE_2D, Sprite);
+								Graph->set_uniform_sampler(Graph->m_mask_shader2, "Unit", 1);
+								glActiveTexture(GL_TEXTURE0);
+								Graph->draw_tile_FBO(x1 / 1024.0, (1024 - y1) / 1024.0, x3 / 1024.0, (1024 - y3) / 1024.0, x0, y0, x1, y1, x2, y2, x3, y3);
+
 								glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
 								glUseProgram(Graph->m_mask_shader);
 								glActiveTexture(GL_TEXTURE0);
@@ -716,6 +780,13 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 						}
 					}
 				}
+			}
+		}
+		if (r == 0)
+		{
+			for (std::list<gui_mapviewer_hint*>::iterator current = m_hints.begin(); current != m_hints.end(); current++)
+			{
+				(*current)->render();
 			}
 		}
 	}
@@ -790,10 +861,6 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 		glEnable(GL_BLEND);
 		glEnable(GL_TEXTURE_2D);
 		glColor4f(1.0, 1.0, 1.0, 1.0);
-	}
-	for (std::list<gui_mapviewer_hint*>::iterator current = m_hints.begin(); current != m_hints.end(); current++)
-	{
-		(*current)->render();
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
 	glUseProgram(0);

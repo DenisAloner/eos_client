@@ -1443,7 +1443,7 @@ void Action_shoot::interaction_handler(Parameter* arg)
 	if (!p->m_cell)
 	{
 		Parameter_list* wr = p->m_unit_body_part->m_item->get_parameter(interaction_e::weapon_range);
-		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_shoot(Application::instance().m_GUI->MapViewer, p->m_unit));
+		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_shoot(Application::instance().m_GUI->MapViewer, p->m_unit, wr->m_value));
 		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_weapon_range(Application::instance().m_GUI->MapViewer, p->m_unit, wr->m_value));
 		result = Application::instance().command_select_location(p->m_object);
 		if (result)
