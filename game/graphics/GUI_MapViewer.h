@@ -83,6 +83,7 @@ class gui_mapviewer_hint
 public:
 
 	GUI_MapViewer* m_owner;
+	bool m_top;
 
 	gui_mapviewer_hint(GUI_MapViewer* owner);
 	virtual void render() = 0;

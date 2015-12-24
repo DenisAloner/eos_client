@@ -26,7 +26,7 @@ GraphicalController::GraphicalController()
 		m_horizontal_shader = load_shader("EoS_blur", "EoS_blur_horizontal");
 		m_vertical_shader = load_shader("EoS_blur", "EoS_blur_vertical");
 		m_mask_shader = load_shader("EoS_mask", "EoS_mask");
-		m_mask_shader2 = load_shader("EoS_mask2", "EoS_mask2");
+		m_mask_shader2 = load_shader("EoS_mask", "EoS_mask2");
 		m_tile_shader = load_shader("EoS_tile", "EoS_tile");
 		m_tile_shader_hide = load_shader("EoS_tile", "EoS_tile_hide");
 		m_empty_01 = create_empty_texture(dimension_t(1024, 1024));
