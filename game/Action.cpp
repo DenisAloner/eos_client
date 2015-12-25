@@ -1048,16 +1048,15 @@ void action_hit_melee::perfom(Parameter* parameter)
 			Parameter_list* dexterity_object = p->m_object->get_parameter(interaction_e::dexterity);
 			Parameter_list* evasion_skill_object = p->m_object->get_parameter(interaction_e::evasion_skill);
 			int evasion;
-			if (dexterity_subject->m_value>dexterity_object->m_value)
+			if (dexterity_subject->m_value!=0)
 			{
-				evasion = evasion_skill_object->m_value / 1000 - (100 - (float)dexterity_object->m_value / dexterity_subject->m_value * 100)*0.5;
+				evasion = evasion_skill_object->m_value / 1000 * ((float)dexterity_object->m_value / dexterity_subject->m_value / 2);
 			}
 			else
 			{
-				evasion = evasion_skill_object->m_value / 1000 - ((float)(dexterity_subject->m_value * 100) / dexterity_object->m_value - 100)*0.5;
+				evasion = 100;
 			}
-			if (evasion > 90) { evasion = 90; }
-			if (evasion < 10) { evasion = 10; }
+			if (evasion > 100) { evasion = 100; }
 			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(std::to_string(evasion)));
 			if (rand() % 100>evasion)
 			{
