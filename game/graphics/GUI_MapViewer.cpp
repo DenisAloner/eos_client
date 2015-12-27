@@ -427,35 +427,7 @@ void mapviewer_hint_shoot::render()
 	if (m_owner->m_cursored != nullptr)
 	{
 		m_step_count = 1;
-		MapCell* cell;
-		if ((m_object->m_active_state->m_size.x % 2) == 0)
-		{
-			int x;
-			int y;
-			if (m_owner->m_cursored->x <= m_object->cell()->x + m_object->m_active_state->m_size.x / 2 - 1)
-			{
-				x = m_object->cell()->x + m_object->m_active_state->m_size.x / 2 - 1;
-			}
-			else
-			{
-				x = m_object->cell()->x + m_object->m_active_state->m_size.x / 2;
-			}
-			if (m_owner->m_cursored->y >= m_object->cell()->y - m_object->m_active_state->m_size.y / 2+1)
-			{
-				y = m_object->cell()->y - m_object->m_active_state->m_size.y / 2 + 1;
-			}
-			else
-			{
-				y = m_object->cell()->y - m_object->m_active_state->m_size.y / 2;
-			}
-			cell = m_owner->m_map->m_items[y][x];
-		}
-		else
-		{
-			int x = m_object->cell()->x + m_object->m_active_state->m_size.x / 2;
-			int y = m_object->cell()->y - m_object->m_active_state->m_size.y / 2;
-			cell = m_owner->m_map->m_items[y][x];
-		}
+		MapCell* cell = m_object->get_center(m_owner->m_cursored);
 		//glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
 		m_owner->m_map->bresenham_line(cell, m_owner->m_cursored, std::bind(&mapviewer_hint_shoot::draw_cell, this, std::placeholders::_1));
 		m_step_count = 1;

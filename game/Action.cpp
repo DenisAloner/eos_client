@@ -1385,6 +1385,18 @@ Action_shoot::Action_shoot()
 	m_name = "Выстрелить из оружия";
 }
 
+bool Action_shoot::check_cell(MapCell* a)
+{
+	if (!m_arg->m_unit->is_own(a))
+	{
+		MapCell* cell = m_arg->m_unit->get_center(a);
+		int distance = (std::max)(abs(a->x-cell->x)+ m_arg->m_unit->m_active_state->m_size.x/2, abs(a->y - cell->y) + m_arg->m_unit->m_active_state->m_size.y / 2);
+		Parameter_list* range = m_arg->m_unit_body_part->m_item->get_parameter(interaction_e::weapon_range);
+		return distance <= range->m_value;
+	}
+	return true;
+}
+
 void Action_shoot::interaction_handler(Parameter* arg)
 {
 	Action::interaction_handler(nullptr);
@@ -1392,6 +1404,7 @@ void Action_shoot::interaction_handler(Parameter* arg)
 	Parameter* result;
 	P_interaction_cell* arg_p = static_cast<P_interaction_cell*>(arg);
 	P_interaction_cell* p = new P_interaction_cell();
+	bool valid;
 	if (arg_p)
 	{
 		p->m_unit = arg_p->m_unit;
@@ -1399,6 +1412,7 @@ void Action_shoot::interaction_handler(Parameter* arg)
 		p->m_object = arg_p->m_object;
 		p->m_cell = arg_p->m_cell;
 	}
+	m_arg = p;
 	if (!p->m_unit)
 	{
 		p->m_unit = Application::instance().m_GUI->MapViewer->m_player->m_object;
@@ -1444,19 +1458,31 @@ void Action_shoot::interaction_handler(Parameter* arg)
 		Parameter_list* wr = p->m_unit_body_part->m_item->get_parameter(interaction_e::weapon_range);
 		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_shoot(Application::instance().m_GUI->MapViewer, p->m_unit, wr->m_value));
 		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_weapon_range(Application::instance().m_GUI->MapViewer, p->m_unit, wr->m_value));
-		result = Application::instance().command_select_location(p->m_object);
-		if (result)
+		valid = false;
+		while (!valid)
 		{
-			p->m_cell = static_cast<MapCell*>(static_cast<P_object_owner*>(result)->m_cell);
-			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_cell->x) + "," + std::to_string(p->m_cell->y) + "}:"));
-		}
-		else
-		{
-			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
-			Application::instance().m_message_queue.m_busy = false;
-			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
-			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
-			return;
+			result = Application::instance().command_select_location(p->m_object);
+			if (result)
+			{
+				p->m_cell = static_cast<MapCell*>(static_cast<P_object_owner*>(result)->m_cell);
+				if (check_cell(p->m_cell))
+				{
+					Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_cell->x) + "," + std::to_string(p->m_cell->y) + "}:"));
+					valid = true;
+				}
+				else
+				{
+					Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Слишком большая дистанция!"));
+				}
+			}
+			else
+			{
+				Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+				Application::instance().m_message_queue.m_busy = false;
+				Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+				Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+				return;
+			}
 		}
 		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 		Application::instance().m_GUI->MapViewer->m_hints.pop_front();

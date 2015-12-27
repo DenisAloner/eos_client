@@ -568,6 +568,38 @@ bool GameObject::is_own(int x, int y)
 	return false;
 }
 
+MapCell* GameObject::get_center(MapCell* c)
+{
+	if ((m_active_state->m_size.x % 2) == 0)
+	{
+		int x;
+		int y;
+		if (c->x <= cell()->x + m_active_state->m_size.x / 2 - 1)
+		{
+			x = cell()->x + m_active_state->m_size.x / 2 - 1;
+		}
+		else
+		{
+			x =cell()->x +m_active_state->m_size.x / 2;
+		}
+		if (c->y >= cell()->y - m_active_state->m_size.y / 2 + 1)
+		{
+			y = cell()->y - m_active_state->m_size.y / 2 + 1;
+		}
+		else
+		{
+			y = cell()->y - m_active_state->m_size.y / 2;
+		}
+		return cell()->m_map->m_items[y][x];
+	}
+	else
+	{
+		int x = cell()->x + m_active_state->m_size.x / 2;
+		int y = cell()->y - m_active_state->m_size.y / 2;
+		return cell()->m_map->m_items[y][x];
+	}
+}
+
 void GameObject::update_interaction()
 {
 	if (m_active_state)

@@ -299,6 +299,9 @@ public:
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 	bool process_cell(MapCell* a);
+private:
+	int m_distance;
+	bool check_cell(MapCell* a);
 };
 
 #endif //TACTION_H

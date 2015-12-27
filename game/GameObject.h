@@ -157,6 +157,7 @@ public:
 	void remove_from(interaction_e key, Interaction_list* feature);
 	bool is_own(MapCell* cell);
 	bool is_own(int x, int y);
+	MapCell* get_center(MapCell* c);
 
 	virtual bool on_turn();
 	virtual std::string get_description();
