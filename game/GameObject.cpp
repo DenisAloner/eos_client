@@ -75,6 +75,16 @@ void Attribute_map::add_effect(interaction_e key, Object_interaction* item)
 	}
 }
 
+Interaction_list* Attribute_map::get_list(interaction_e key)
+{
+	auto value = m_item.find(key);
+	if (value != m_item.end())
+	{
+		return static_cast<Parts_list*>(value->second);
+	}
+	return nullptr;
+}
+
 Attribute_map* Attribute_map::clone()
 {
 	Attribute_map* result = new Attribute_map();

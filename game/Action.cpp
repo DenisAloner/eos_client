@@ -670,7 +670,7 @@ std::string action_set_motion_path::get_description(Parameter* parameter)
 
 Action_pick::Action_pick()
 {
-	m_kind = action_e::push;
+	m_kind = action_e::pick;
 	m_icon = Application::instance().m_graph->m_actions[6];
 	m_name = "Поднять";
 }
@@ -680,46 +680,62 @@ void Action_pick::interaction_handler(Parameter* arg)
 	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
+	Parameter_destination* arg_p = static_cast<Parameter_destination*>(arg);
 	Parameter_destination* p = new Parameter_destination();
-	p->m_unit = Application::instance().m_GUI->MapViewer->m_player->m_object;
-	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_unit, true));
-	P_object* object = Application::instance().command_select_transfer_source(p);
-	if (object)
+	if (arg_p)
 	{
-		p->m_object = object->m_object;
-		std::string a = "Выбран ";
-		a.append(p->m_object->m_name);
-		a = a + ".";
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+		p->m_unit = arg_p->m_unit;
+		p->m_object = arg_p->m_object;
+		p->m_owner = arg_p->m_owner;
 	}
-	else
+	if (!p->m_unit)
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
-		Application::instance().m_message_queue.m_busy = false;
+		p->m_unit = Application::instance().m_GUI->MapViewer->m_player->m_object;
+	}
+	if (!p->m_owner)
+	{
+		result = Application::instance().command_select_transfer(p);
+		if (result)
+		{
+			switch (result->m_kind)
+			{
+			case ParameterKind::parameter_kind_owner:
+			{
+				p->m_owner = static_cast<P_object_owner*>(result)->m_cell;
+				break;
+			}
+			}
+			//Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));
+		}
+		else
+		{
+			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+			Application::instance().m_message_queue.m_busy = false;
+			Application::instance().m_clipboard.m_item = nullptr;
+			return;
+		}
+	}
+	if (!p->m_object)
+	{
+		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_unit, true));
+		P_object* object = Application::instance().command_select_transfer_source(p);
+		if (object)
+		{
+			p->m_object = object->m_object;
+			std::string a = "Выбран ";
+			a.append(p->m_object->m_name);
+			a = a + ".";
+			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+		}
+		else
+		{
+			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+			Application::instance().m_message_queue.m_busy = false;
+			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+			return;
+		}
 		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
-		return;
-	}
-	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
-	Application::instance().m_clipboard.m_item = p->m_object;
-	result = Application::instance().command_select_transfer(p);
-	if (result)
-	{
-		switch (result->m_kind)
-		{
-		case ParameterKind::parameter_kind_owner:
-		{
-			p->m_owner = static_cast<P_object_owner*>(result)->m_cell;
-			break;
-		}
-		}
-		//Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));
-	}
-	else
-	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
-		Application::instance().m_message_queue.m_busy = false;
-		Application::instance().m_clipboard.m_item = nullptr;
-		return;
+		Application::instance().m_clipboard.m_item = p->m_object;
 	}
 	Application::instance().m_action_manager->add(new GameTask(this, p));
 	Application::instance().m_clipboard.m_item = nullptr;
@@ -1390,7 +1406,7 @@ bool Action_shoot::check_cell(MapCell* a)
 	if (!m_arg->m_unit->is_own(a))
 	{
 		MapCell* cell = m_arg->m_unit->get_center(a);
-		int distance = (std::max)(abs(a->x-cell->x)+ m_arg->m_unit->m_active_state->m_size.x/2, abs(a->y - cell->y) + m_arg->m_unit->m_active_state->m_size.y / 2);
+		int distance = (std::max)(abs(a->x - cell->x) + m_arg->m_unit->m_active_state->m_size.x / 2 - 1, abs(a->y - cell->y) + m_arg->m_unit->m_active_state->m_size.y / 2 - 1);
 		Parameter_list* range = m_arg->m_unit_body_part->m_item->get_parameter(interaction_e::weapon_range);
 		return distance <= range->m_value;
 	}

@@ -81,6 +81,9 @@ public:
 	virtual void reset_serialization_index();
 	virtual void save();
 	virtual void load();
+
+	Interaction_list* get_list(interaction_e key);
+
 };
 
 class Object_state : public Attribute_map

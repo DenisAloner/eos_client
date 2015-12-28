@@ -439,18 +439,47 @@ void Application::update_action_panel()
 		ActionButton->m_action = (*item);
 		m_GUI->m_action_panel->add_item_control(ActionButton);
 	}
-	Attribute_map* list = m_GUI->MapViewer->m_player->m_object->m_active_state;
-	for (auto item = list->m_item.begin(); item != list->m_item.end(); item++)
-	{
-		item->second->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));
-	}
+
 	Parts_list* parts = m_GUI->MapViewer->m_player->m_object->get_parts_list(interaction_e::body);
 	Action_list* al;
 	Object_part* op;
 	Action* a;
+
+	al = static_cast<Action_list*>(m_GUI->MapViewer->m_player->m_object->get_effect(interaction_e::action));
+	if (al)
+	{
+		for (auto action = al->m_effect.begin(); action != al->m_effect.end(); action++)
+		{
+			(*action)->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));
+		}
+	}
+
 	for (auto item = parts->m_effect.begin(); item != parts->m_effect.end(); item++)
 	{
 		op = static_cast<Object_part*>(*item);
+		al = static_cast<Action_list*>(op->m_object_state.get_list(interaction_e::action));
+		if (al)
+		{
+			for (auto action = al->m_effect.begin(); action != al->m_effect.end(); action++)
+			{
+				a = static_cast<Action*>(*action);
+				switch (a->m_kind)
+				{
+				case action_e::pick:
+				{
+					//a->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));
+					GUI_ActionButton* ActionButton = new GUI_ActionButton();
+					ActionButton->m_action = a;
+					Parameter_destination* p = new Parameter_destination();
+					p->m_unit = m_GUI->MapViewer->m_player->m_object;
+					p->m_owner = op;
+					ActionButton->m_parameter = p;
+					m_GUI->m_action_panel->add_item_control(ActionButton);
+					break;
+				}
+				}
+			}
+		}
 		if (op->m_item)
 		{
 			al = static_cast<Action_list*>(op->m_item->get_effect(interaction_e::action));
@@ -476,6 +505,7 @@ void Application::update_action_panel()
 					}
 					case action_e::shoot:
 					{
+						
 						//a->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));
 						GUI_ActionButton* ActionButton = new GUI_ActionButton();
 						ActionButton->m_action = a;

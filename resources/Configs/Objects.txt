@@ -108,7 +108,12 @@ feature_list parameter,skill_sword,50000,100000
 feature_list generic,buff
 feature_list generic,damage
 feature_list parts,body
-mem_part hand,руки
+mem_part hand,рука
+add_slot body
+feature_list_mem action,action
+mem_action pick
+add_slot_mem action
+mem_part hand,рука
 add_slot body
 feature_list_mem action,action
 mem_action pick

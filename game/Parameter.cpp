@@ -128,9 +128,7 @@ void Parameter_MoveObjectByUnit::load()
 }
 
 
-Parameter_destination::Parameter_destination() : Parameter(ParameterKind_Destination)
-{
-}
+Parameter_destination::Parameter_destination() : Parameter(ParameterKind_Destination), m_unit(nullptr), m_owner(nullptr), m_object(nullptr) {}
 
 void Parameter_destination::reset_serialization_index()
 {
