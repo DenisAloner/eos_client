@@ -425,4 +425,13 @@ struct cell_t
 	bool opaque;
 };
 
+struct common_action_t
+{
+	bool pick;
+	common_action_t()
+	{
+		pick = false;
+	}
+};
+
 #endif //DEFINITION_H

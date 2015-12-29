@@ -445,6 +445,8 @@ void Application::update_action_panel()
 	Object_part* op;
 	Action* a;
 
+	common_action_t ca;
+
 	al = static_cast<Action_list*>(m_GUI->MapViewer->m_player->m_object->get_effect(interaction_e::action));
 	if (al)
 	{
@@ -475,6 +477,7 @@ void Application::update_action_panel()
 					p->m_owner = op;
 					ActionButton->m_parameter = p;
 					m_GUI->m_action_panel->add_item_control(ActionButton);
+					ca.pick = true;
 					break;
 				}
 				}
@@ -520,6 +523,14 @@ void Application::update_action_panel()
 				}
 			}
 		}
+	}
+	if (ca.pick)
+	{
+		GUI_ActionButton* ActionButton = new GUI_ActionButton();
+		ActionButton->m_action = m_actions[action_e::pick];
+		ActionButton->m_parameter = nullptr;
+		m_GUI->m_action_panel->add_item_control(ActionButton);
+		ca.pick = true;
 	}
 }
 
