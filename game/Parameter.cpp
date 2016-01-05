@@ -334,3 +334,57 @@ void P_interaction_cell::load()
 	m_unit_body_part = dynamic_cast<Object_part*>(Serialization_manager::instance().deserialize());
 	m_cell = dynamic_cast<MapCell*>(Serialization_manager::instance().deserialize());
 }
+
+P_bow_shoot::P_bow_shoot() : Parameter(parameter_bow_shoot)
+{
+	m_unit = nullptr;
+	m_object = nullptr;
+	m_unit_body_part = nullptr;
+	m_cell = nullptr;
+}
+
+void P_bow_shoot::reset_serialization_index()
+{
+	m_serialization_index = 0;
+	if (m_unit)
+	{
+		if (m_unit->m_serialization_index > 1)
+		{
+			m_unit->reset_serialization_index();
+		}
+	}
+	if (m_object)
+	{
+		if (m_object->m_serialization_index > 1)
+		{
+			m_object->reset_serialization_index();
+		}
+	}
+	if (m_unit_body_part)
+	{
+		if (m_unit_body_part->m_serialization_index > 1)
+		{
+			m_unit_body_part->reset_serialization_index();
+		}
+	}
+}
+
+void P_bow_shoot::save()
+{
+	FILE* file = Serialization_manager::instance().m_file;
+	type_e t = type_e::parameter_bow_shoot;
+	fwrite(&t, sizeof(type_e), 1, file);
+	Serialization_manager::instance().serialize(m_unit);
+	Serialization_manager::instance().serialize(m_object);
+	Serialization_manager::instance().serialize(m_unit_body_part);
+	Serialization_manager::instance().serialize(m_cell);
+}
+
+void P_bow_shoot::load()
+{
+	FILE* file = Serialization_manager::instance().m_file;
+	m_unit = dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize());
+	m_object = dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize());
+	m_unit_body_part = dynamic_cast<Object_part*>(Serialization_manager::instance().deserialize());
+	m_cell = dynamic_cast<MapCell*>(Serialization_manager::instance().deserialize());
+}

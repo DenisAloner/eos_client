@@ -974,6 +974,7 @@ MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, std::function<bool(Map
 					e = e - dx;
 				}
 			}
+			return m_items[y][x - 1];
 		}
 		else
 		{
@@ -990,6 +991,7 @@ MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, std::function<bool(Map
 					e = e - dx;
 				}
 			}
+			return m_items[y][x + 1];
 		}
 	}
 	else
@@ -1011,6 +1013,7 @@ MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, std::function<bool(Map
 					e = e - dy;
 				}
 			}
+			return m_items[y - 1][x];
 		}
 		else
 		{
@@ -1027,9 +1030,9 @@ MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, std::function<bool(Map
 					e = e - dy;
 				}
 			}
+			return m_items[y + 1][x];
 		}
 	}
-	return m_items[y][x];
 }
 
 void GameMap::add_lighting()

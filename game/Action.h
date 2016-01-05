@@ -13,6 +13,7 @@
 class Application;
 class Parameter;
 class P_interaction_cell;
+class P_bow_shoot;
 class Action;
 class Interaction_prefix;
 
@@ -291,7 +292,7 @@ class Action_shoot :
 {
 public:
 
-	P_interaction_cell* m_arg;
+	P_bow_shoot* m_arg;
 
 	Action_shoot();
 	virtual bool check(Parameter* parameter);

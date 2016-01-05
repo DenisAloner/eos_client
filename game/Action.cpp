@@ -1418,8 +1418,8 @@ void Action_shoot::interaction_handler(Parameter* arg)
 	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
-	P_interaction_cell* arg_p = static_cast<P_interaction_cell*>(arg);
-	P_interaction_cell* p = new P_interaction_cell();
+	P_bow_shoot* arg_p = static_cast<P_bow_shoot*>(arg);
+	P_bow_shoot* p = new P_bow_shoot();
 	bool valid;
 	if (arg_p)
 	{
@@ -1427,6 +1427,7 @@ void Action_shoot::interaction_handler(Parameter* arg)
 		p->m_unit_body_part = arg_p->m_unit_body_part;
 		p->m_object = arg_p->m_object;
 		p->m_cell = arg_p->m_cell;
+		p->m_ammo_owner = arg_p->m_ammo_owner;
 	}
 	m_arg = p;
 	if (!p->m_unit)
@@ -1448,6 +1449,20 @@ void Action_shoot::interaction_handler(Parameter* arg)
 			return;
 		}
 	}
+
+	result = Application::instance().command_select_body_part();
+	if (result)
+	{
+		p->m_ammo_owner.push_back(static_cast<Object_part*>(static_cast<P_object_owner*>(result)->m_cell));
+	}
+	else
+	{
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_message_queue.m_busy = false;
+		Application::instance().m_clipboard.m_item = nullptr;
+		return;
+	}
+
 	/*if (!p->m_object)
 	{
 		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_unit, true));
@@ -1537,15 +1552,44 @@ bool Action_shoot::process_cell(MapCell* a)
 
 void Action_shoot::perfom(Parameter* parameter)
 {
-	P_interaction_cell* p = static_cast<P_interaction_cell*>(parameter);
+	P_bow_shoot* p = static_cast<P_bow_shoot*>(parameter);
 	if (check(p))
 	{
 		m_arg = p;
-		MapCell* c=p->m_cell->m_map->bresenham_line2(p->m_unit->cell(), p->m_cell, std::bind(&Action_shoot::process_cell, this, std::placeholders::_1));
-		GameObject* obj = Application::instance().m_game_object_manager->new_object("arrow");
-		c->m_map->add_to_map(obj, c);
-		/*p->m_object->update_interaction();
-		p->m_object->event_update(VoidEventArgs());*/
+		MapCell* center= p->m_unit->get_center(p->m_cell);
+		MapCell* c=p->m_cell->m_map->bresenham_line2(center, p->m_cell, std::bind(&Action_shoot::process_cell, this, std::placeholders::_1));
+		GameObject* temp = p->m_ammo_owner.front()->m_item;
+		Application::instance().command_unequip(p->m_unit, p->m_ammo_owner.front(), temp);
+		c->m_map->add_object(temp, c);
+		temp->m_owner = c;
+
+		//switch (p->m_owner->m_kind)
+		//{
+		//case entity_e::cell:
+		//{
+		//	//static_cast<MapCell*>(p->m_owner)->m_items.push_back(p->m_object);
+		//	static_cast<MapCell*>(p->m_owner)->m_map->add_object(p->m_object, static_cast<MapCell*>(p->m_owner));
+		//	p->m_object->m_owner = p->m_owner;
+		//	break;
+		//}
+		//case entity_e::inventory_cell:
+		//{
+		//	static_cast<Inventory_cell*>(p->m_owner)->m_item = p->m_object;
+		//	p->m_object->m_owner = p->m_owner;
+		//	break;
+		//}
+		//case entity_e::body_part:
+		//{
+		//	Application::instance().command_equip(p->m_unit, static_cast<Object_part*>(p->m_owner), p->m_object);
+		//	break;
+		//}
+		//}
+
+
+		//GameObject* obj = Application::instance().m_game_object_manager->new_object("arrow");
+		//c->m_map->add_to_map(obj, c);
+		///*p->m_object->update_interaction();
+		//p->m_object->event_update(VoidEventArgs());*/
 	}
 }
 

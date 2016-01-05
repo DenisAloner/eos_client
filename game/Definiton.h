@@ -146,7 +146,8 @@ enum ParameterKind
 	parameter_kind_owner,
 	parameter_kind_unit_interaction,
 	parameter_interaction_cell,
-	parameter_accept
+	parameter_accept,
+	parameter_bow_shoot
 
 };
 
@@ -407,7 +408,8 @@ enum class type_e
 	parameter_object_owner,
 	parameter_unit_interaction,
 	parameter_interaction_cell,
-	action_wrapper
+	action_wrapper,
+	parameter_bow_shoot
 
 };
 

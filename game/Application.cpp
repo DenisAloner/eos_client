@@ -209,6 +209,8 @@ void Application::initialize()
 
 	obj = m_game_object_manager->new_object("bow");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx-1]);
+	obj = m_game_object_manager->new_object("arrow");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx - 1]);
 	obj = m_game_object_manager->new_object("dagger");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx - 1]);
 	obj = m_game_object_manager->new_object("blue potion");
@@ -512,7 +514,7 @@ void Application::update_action_panel()
 						//a->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));
 						GUI_ActionButton* ActionButton = new GUI_ActionButton();
 						ActionButton->m_action = a;
-						P_interaction_cell* p = new P_interaction_cell();
+						P_bow_shoot* p = new P_bow_shoot();
 						p->m_unit = m_GUI->MapViewer->m_player->m_object;
 						p->m_unit_body_part = op;
 						ActionButton->m_parameter = p;
@@ -651,6 +653,8 @@ void Application::update()
 			Application::instance().m_GUI->MapViewer->update();
 			Application::instance().m_GUI->MapViewer->m_map->m_update = true;
 			m_update_mutex.unlock();
+			m_GUI->DescriptionBox->add_item_control(new GUI_Text("’Ó‰ - " + std::to_string(m_game_turn) + ".", new GUI_TextFormat(10, 19, RGBA_t(0.0, 0.8, 0.0, 1.0))));
+			m_game_turn += 1;
 			std::chrono::milliseconds Duration(1);
 			std::this_thread::sleep_for(Duration);
 		} while (!check_action_completion(m_GUI->MapViewer->m_player->m_object));
@@ -924,8 +928,6 @@ void Application::process_game()
 		if (m_turn)
 		{
 			update();
-			m_GUI->DescriptionBox->add_item_control(new GUI_Text("’Ó‰ - " + std::to_string(m_game_turn) + ".", new GUI_TextFormat(10, 19, RGBA_t(0.0, 0.8, 0.0, 1.0))));
-			m_game_turn += 1;
 			m_turn = false;
 		}
 	}
