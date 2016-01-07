@@ -165,6 +165,9 @@ private:
 	void on_turn();
 
 	bool check_action_completion(GameObject*& object);
+	void Application::add_action_from_part(Object_interaction* object);
+
+	common_action_t m_common_action;
 };
 
 #endif //APPLICATION_H

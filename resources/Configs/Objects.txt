@@ -365,3 +365,19 @@ feature_list tag,tag
 tag pick_able
 tag pass_able
 tag seethrough_able
+
+object ring
+state equip,hand
+size 1,1,0
+icon ring_icon
+tile_manager 25
+feature_list tag,tag
+tag pick_able
+tag pass_able
+tag seethrough_able
+feature_list parts,body
+mem_part hand,рука Акхма
+add_slot body
+feature_list_mem action,action
+mem_action pick
+add_slot_mem action

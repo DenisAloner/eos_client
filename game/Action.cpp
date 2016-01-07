@@ -1450,19 +1450,24 @@ void Action_shoot::interaction_handler(Parameter* arg)
 		}
 	}
 
-	result = Application::instance().command_select_body_part();
-	if (result)
+	do
 	{
-		p->m_ammo_owner.push_back(static_cast<Object_part*>(static_cast<P_object_owner*>(result)->m_cell));
-	}
-	else
-	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
-		Application::instance().m_message_queue.m_busy = false;
-		Application::instance().m_clipboard.m_item = nullptr;
-		return;
-	}
-
+		result = Application::instance().command_select_body_part();
+		if (result)
+		{
+			p->m_ammo_owner.push_back(static_cast<Object_part*>(static_cast<P_object_owner*>(result)->m_cell));
+		}
+		else
+		{
+			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+			Application::instance().m_message_queue.m_busy = false;
+			Application::instance().m_clipboard.m_item = nullptr;
+			return;
+		}
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрать еще заряд? [Y/N]"));
+		
+	} while (Application::instance().command_agreement());
+	
 	/*if (!p->m_object)
 	{
 		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_unit, true));
