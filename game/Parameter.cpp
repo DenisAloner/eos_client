@@ -37,6 +37,9 @@ void Parameter_MapCell::load()
 
 Parameter_Position::Parameter_Position() : Parameter(ParameterKind_Position)
 {
+	m_object = nullptr;
+	m_place = nullptr;
+	m_map = nullptr;
 }
 
 

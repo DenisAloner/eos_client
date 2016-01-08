@@ -207,7 +207,7 @@ void Application::initialize()
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx]);
 	m_GUI->MapViewer->m_player = new Player(obj, m_GUI->MapViewer->m_map);
 
-	obj = m_game_object_manager->new_object("bow");
+	/*obj = m_game_object_manager->new_object("bow");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx-1]);
 	obj = m_game_object_manager->new_object("arrow");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx - 1]);
@@ -218,7 +218,7 @@ void Application::initialize()
 	obj = m_game_object_manager->new_object("dagger");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx - 1]);
 	obj = m_game_object_manager->new_object("blue potion");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-1][rx - 1]);
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-1][rx - 1]);*/
 
 
 	//Serialization_manager::instance().save("save", m_GUI->MapViewer->m_map);
@@ -229,7 +229,7 @@ void Application::initialize()
 	int ry = m_GUI->MapViewer->m_player->m_object->cell()->y;*/
 
 	obj = m_game_object_manager->new_object("bat");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry+2][rx]);
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry+8][rx]);
 
 	/*obj = m_game_object_manager->new_object("bat");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx + 12]);
@@ -445,6 +445,19 @@ void Application::add_action_from_part(Object_interaction* object)
 				switch (a->m_kind)
 				{
 				case action_e::pick:
+				{
+					//a->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));
+					GUI_ActionButton* ActionButton = new GUI_ActionButton();
+					ActionButton->m_action = a;
+					Parameter_destination* p = new Parameter_destination();
+					p->m_unit = m_GUI->MapViewer->m_player->m_object;
+					p->m_owner = op;
+					ActionButton->m_parameter = p;
+					m_GUI->m_action_panel->add_item_control(ActionButton);
+					m_common_action.pick = true;
+					break;
+				}
+				case action_e::move_step:
 				{
 					//a->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));
 					GUI_ActionButton* ActionButton = new GUI_ActionButton();
