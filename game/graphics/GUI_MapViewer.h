@@ -156,5 +156,14 @@ public:
 	virtual void render();
 };
 
+class mapviewer_object_move : public gui_mapviewer_hint
+{
+public:
+
+	GameObject* m_object;
+	mapviewer_object_move(GUI_MapViewer* owner, GameObject* object);
+	virtual void render();
+};
+
 #endif //GUI_MAPVIEWER_H
 
