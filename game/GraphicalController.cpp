@@ -42,6 +42,7 @@ GraphicalController::GraphicalController()
 		m_no_image = load_texture(FileSystem::instance().m_resource_path + "Tiles\\no_tile.bmp");
 		m_no_visible = load_texture(FileSystem::instance().m_resource_path + "Tiles\\no_visible.bmp");
 		m_novisible = load_texture(FileSystem::instance().m_resource_path + "Tiles\\novisible.bmp");
+		m_dir = load_texture(FileSystem::instance().m_resource_path + "Tiles\\directions.bmp");
 		load_configuration();
 	}
 	catch(std::logic_error e)

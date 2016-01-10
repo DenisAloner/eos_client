@@ -15,5 +15,7 @@ public:
 
 	//функция возвращает направление объекта, которое будет указывать на передаваемый объект
 	static object_direction_e turn_to_object(GameObject* object, GameObject* turn_to);
+
+	static object_direction_e turn_to_cell(GameObject* object, MapCell* c);
 };
 

@@ -81,3 +81,75 @@ object_direction_e Game_algorithm::turn_to_object(GameObject* object, GameObject
 		}
 	}
 }
+
+object_direction_e Game_algorithm::turn_to_cell(GameObject* object, MapCell* c)
+{
+	f2dvector_t v(c->x + 0.5F - (object->cell()->x + object->m_active_state->m_size.x*0.5F), c->y - 0.5F - (object->cell()->y - object->m_active_state->m_size.y*0.5F));
+	float cs = abs(v.y / sqrt(v.x*v.x + v.y*v.y));
+	if (v.y > 0.0F)
+	{
+		if (v.x > 0.0F)
+		{
+			if (cs > cos22_5)
+			{
+				return object_direction_e::top;
+			}
+			if (cs < cos67_5)
+			{
+				return object_direction_e::right;
+			}
+			else
+			{
+				return object_direction_e::topright;
+			}
+		}
+		else
+		{
+			if (cs > cos22_5)
+			{
+				return object_direction_e::top;
+			}
+			if (cs < cos67_5)
+			{
+				return object_direction_e::left;
+			}
+			else
+			{
+				return object_direction_e::topleft;
+			}
+		}
+	}
+	else
+	{
+		if (v.x > 0.0F)
+		{
+			if (cs > cos22_5)
+			{
+				return object_direction_e::down;
+			}
+			if (cs < cos67_5)
+			{
+				return object_direction_e::right;
+			}
+			else
+			{
+				return object_direction_e::downright;
+			}
+		}
+		else
+		{
+			if (cs > cos22_5)
+			{
+				return object_direction_e::down;
+			}
+			if (cs < cos67_5)
+			{
+				return object_direction_e::left;
+			}
+			else
+			{
+				return object_direction_e::downleft;
+			}
+		}
+	}
+}
