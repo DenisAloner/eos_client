@@ -153,3 +153,43 @@ object_direction_e Game_algorithm::turn_to_cell(GameObject* object, MapCell* c)
 		}
 	}
 }
+
+MapCell* Game_algorithm::step_in_direction(GameObject* object, object_direction_e d)
+{
+	MapCell* result = object->cell();
+	switch (d)
+	{
+	case object_direction_e::down:
+	{
+		return result->m_map->m_items[result->y - 1][result->x];
+	}
+	case object_direction_e::downleft:
+	{
+		return result->m_map->m_items[result->y - 1][result->x-1];
+	}
+	case object_direction_e::downright:
+	{
+		return result->m_map->m_items[result->y - 1][result->x + 1];
+	}
+	case object_direction_e::left:
+	{
+		return result->m_map->m_items[result->y][result->x - 1];
+	}
+	case object_direction_e::right:
+	{
+		return result->m_map->m_items[result->y][result->x + 1];
+	}
+	case object_direction_e::top:
+	{
+		return result->m_map->m_items[result->y + 1][result->x];
+	}
+	case object_direction_e::topleft:
+	{
+		return result->m_map->m_items[result->y + 1][result->x - 1];
+	}
+	case object_direction_e::topright:
+	{
+		return result->m_map->m_items[result->y + 1][result->x + 1];
+	}
+	}
+}

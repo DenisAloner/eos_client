@@ -185,7 +185,9 @@ void ActionClass_Move::interaction_handler(Parameter* arg)
 		if (result)
 		{
 			p->m_place = static_cast<MapCell*>(static_cast<P_object_owner*>(result)->m_cell);
+			p->m_place = Game_algorithm::step_in_direction(p->m_object, Game_algorithm::turn_to_cell(p->m_object, p->m_place));
 			p->m_map = p->m_place->m_map;
+
 			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));
 		}
 		else

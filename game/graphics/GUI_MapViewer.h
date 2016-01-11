@@ -87,7 +87,8 @@ public:
 
 	gui_mapviewer_hint(GUI_MapViewer* owner);
 	virtual void render() = 0;
-
+	virtual void init() {};
+	virtual void render_on_cell(MapCell* c) {};
 	void draw_cell(MapCell* cell, int index);
 };
 
@@ -160,9 +161,12 @@ class mapviewer_object_move : public gui_mapviewer_hint
 {
 public:
 
+	MapCell* m_cell;
 	GameObject* m_object;
 	mapviewer_object_move(GUI_MapViewer* owner, GameObject* object);
+	virtual void init();
 	virtual void render();
+	virtual void render_on_cell(MapCell* c);
 };
 
 #endif //GUI_MAPVIEWER_H
