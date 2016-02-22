@@ -8,19 +8,18 @@ min_heap::min_heap(void)
 
 void min_heap::push(Node* value)
 {
-	unsigned int i, parent;
+	std::size_t index, parent;
 	m_items.push_back(value);
-	i = m_items.size() - 1;
-	parent = (i - 1) >> 1;
-	int temp;
-	while (parent >= 0 && i > 0)
+	index = m_items.size() - 1;
+	parent = (index - 1) >> 1;
+	while (index > 0)
 	{
-		if (m_items[i]->f < m_items[parent]->f)
+		if (m_items[index]->f < m_items[parent]->f)
 		{
-			std::swap(m_items[i], m_items[parent]);
+			std::swap(m_items[index], m_items[parent]);
 		}
-		i = parent;
-		parent = (i - 1) >> 1;
+		index = parent;
+		parent = (index - 1) >> 1;
 	}
 }
 
@@ -56,11 +55,10 @@ void min_heap::sort_down(unsigned int index)
 	}
 }
 
-void min_heap::sort_up(unsigned int index)
+void min_heap::sort_up(std::size_t index)
 {
-	unsigned int parent = (index - 1) >> 1;
-	int temp;
-	while (parent >= 0 && index > 0)
+	std::size_t parent = (index - 1) >> 1;
+	while (index > 0)
 	{
 		if (m_items[index]->f < m_items[parent]->f)
 		{

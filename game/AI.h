@@ -31,7 +31,7 @@ class min_heap
 {
 private:
 
-	void sort_up(unsigned int index);
+	void sort_up(std::size_t index);
 	void sort_down(unsigned int index);
 
 public:
