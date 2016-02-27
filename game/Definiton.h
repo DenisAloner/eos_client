@@ -5,8 +5,7 @@
 #include "graphics/gl.hpp"
 #include <list>
 
-#define Pi 3.14159265
-
+const float Pi = 3.14159265F;
 const float cos22_5 = cos(22.5F*Pi / 180.0);
 const float cos67_5 = cos(67.5F*Pi / 180.0);
 

@@ -11,7 +11,7 @@ Parameter::~Parameter()
 }
 
 
-Parameter_MapCell::Parameter_MapCell() : Parameter(ParameterKind_MapCell)
+Parameter_MapCell::Parameter_MapCell() : Parameter(ParameterKind_MapCell),m_place(nullptr)
 {
 
 }
@@ -177,7 +177,7 @@ void Parameter_destination::load()
 	m_owner = dynamic_cast<Game_object_owner*>(Serialization_manager::instance().deserialize());
 }
 
-P_object::P_object() : Parameter(parameter_kind_object)
+P_object::P_object() : Parameter(parameter_kind_object),m_object(nullptr)
 {
 }
 
@@ -207,7 +207,7 @@ void P_object::load()
 	m_object = dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize());
 }
 
-P_object_owner::P_object_owner() : Parameter(parameter_kind_owner)
+P_object_owner::P_object_owner() : Parameter(parameter_kind_owner),m_cell(nullptr)
 {
 }
 
