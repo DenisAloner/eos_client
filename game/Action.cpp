@@ -128,12 +128,18 @@ void Action_wrapper::set(GameObject* unit, Action* action, Parameter* parameter)
 	m_parameter = parameter;
 	m_decay = m_action->m_decay;
 	m_prefix->apply_effect(unit, this);
+	done = true;
 }
 
 void Action_wrapper::update()
 {
 	if (m_action)
 	{
+		if (done)
+		{
+			m_action->perfom(m_parameter);
+			done = false;
+		}
 		m_decay -= 1;
 		if (m_decay <= 0)
 		{
@@ -141,7 +147,7 @@ void Action_wrapper::update()
 			{
 			m_GUI->DescriptionBox->add_item_control(new GUI_Text(A->m_action->m_error));
 			}*/
-			m_action->perfom(m_parameter);
+			//m_action->perfom(m_parameter);
 			m_action = nullptr;
 		}
 	}

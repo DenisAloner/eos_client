@@ -55,6 +55,7 @@ public:
 	int m_decay;
 	Action* m_action;
 	Parameter* m_parameter;
+	bool done;
 
 	Action_wrapper();
 
