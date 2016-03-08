@@ -19,7 +19,7 @@ bool TileManager::load_from_file(const std::string& filename, object_direction_e
 }
 
 
-void  TileManager::set_tile(tile_t& tile, GameObject* obj, int frame, int shift)
+void TileManager::set_tile(tile_t& tile, GameObject* obj, int frame, int shift)
 {
 	tile.unit = m_tiles[get_tile_index(obj->m_direction, frame)];
 	double sx = 1.0 / obj->m_active_state->m_tile_size.w;
@@ -29,6 +29,15 @@ void  TileManager::set_tile(tile_t& tile, GameObject* obj, int frame, int shift)
 	tile.coordinat[3] = 0.0;
 }
 
+void TileManager::set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction)
+{
+	tile.unit = m_tiles[get_tile_index(direction, frame)];
+	double sx = 1.0 / obj->m_active_state->m_tile_size.w;
+	tile.coordinat[0] = 0.0;
+	tile.coordinat[1] = 1.0;
+	tile.coordinat[2] = 1.0;
+	tile.coordinat[3] = 0.0;
+}
 
 TileManager_Single::TileManager_Single()
 {

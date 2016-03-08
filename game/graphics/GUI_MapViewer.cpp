@@ -822,7 +822,7 @@ void mapviewer_object_move::render_on_cell(MapCell* c)
 			x3 = x2;
 			y3 = y0;
 			tile_t tile;
-			m_object->m_active_state->m_tile_manager->set_tile(tile, m_object, Application::instance().m_timer->m_tick / 7.0*3.0, 0);
+			m_object->m_active_state->m_tile_manager->set_tile(tile, m_object, Application::instance().m_timer->m_tick / 7.0*3.0, Game_algorithm::turn_to_cell(m_object, m_owner->m_cursored));
 			GLuint Sprite = tile.unit;
 			glUseProgramObjectARB(0);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

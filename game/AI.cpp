@@ -574,7 +574,7 @@ void AI_enemy::create()
 	if (m_object->m_active_state->m_ai == nullptr){ return; }
 	if (!m_action_controller->m_action)
 	{
-		m_fov->calculate(m_fov_radius, m_object, m_map);
+		m_fov->calculate(m_fov_radius, m_object, m_map,0,0);
 		MapCell* c;
 		GameObject* goal;
 		if (m_goal)

@@ -18,5 +18,6 @@ public:
 
 	static object_direction_e turn_to_cell(GameObject* object, MapCell* c);
 	static MapCell* step_in_direction(GameObject* object, object_direction_e d);
-};
+	static int get_angle(GameObject* object, int angle);
 
+};

@@ -200,8 +200,8 @@ void Application::initialize()
 
 	m_GUI->MapViewer->m_map->generate_room();
 
-	int rx = 5;
-	int ry = 5;
+	int rx = 8;
+	int ry = 15;
 
 	GameObject* obj = m_game_object_manager->new_object("iso_unit");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx]);
@@ -648,7 +648,7 @@ void Application::update()
 			Application::instance().m_GUI->MapViewer->m_map->m_object_manager.calculate_ai(m_GUI->MapViewer->m_map);
 			if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
 			{
-				m_GUI->MapViewer->m_player->m_fov->calculate(static_cast<AI_enemy*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)->m_fov_radius, m_GUI->MapViewer->m_player->m_object, m_GUI->MapViewer->m_map);
+				m_GUI->MapViewer->m_player->m_fov->calculate(static_cast<AI_enemy*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)->m_fov_radius, m_GUI->MapViewer->m_player->m_object, m_GUI->MapViewer->m_map,270,90);
 				GameObject* object = m_GUI->MapViewer->m_player->m_object;
 				int radius = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_fov_radius;
 				for (int y = object->cell()->y - radius; y < object->cell()->y + radius + 1; y++)
@@ -702,7 +702,7 @@ void Application::update_after_load()
 	m_update_mutex.lock();
 	if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
 	{
-		m_GUI->MapViewer->m_player->m_fov->calculate(static_cast<AI_enemy*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)->m_fov_radius, m_GUI->MapViewer->m_player->m_object, m_GUI->MapViewer->m_map);
+		m_GUI->MapViewer->m_player->m_fov->calculate(static_cast<AI_enemy*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)->m_fov_radius, m_GUI->MapViewer->m_player->m_object, m_GUI->MapViewer->m_map,270,90);
 	}
 	m_update_mutex.unlock();
 }

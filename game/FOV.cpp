@@ -1,10 +1,24 @@
 #include "FOV.h"
 
+//static int multipliers1[4][8] = {
+//	{ 1, 0, 0, -1, -1, 0, 0, 1 },
+//	{ 0, 1, -1, 0, 0, -1, 1, 0 },
+//	{ 0, 1, 1, 0, 0, -1, -1, 0 },
+//	{ 1, 0, 0, 1, -1, 0, 0, -1 }
+//};
+
+//static int multipliers1[4][8] = {
+//		{ 0, 0, 0, -1, -1, 0, 0, 1 },
+//		{ -1, 1, -1, 0, 0, -1, 1, 0 },
+//		{ 1, 1, 1, 0, 0, -1, -1, 0 },
+//		{ 0, 0, 0, 1, -1, 0, 0, -1 }
+//};
+
 static int multipliers1[4][8] = {
-		{ 1, 0, 0, -1, -1, 0, 0, 1 },
-		{ 0, 1, -1, 0, 0, -1, 1, 0 },
-		{ 0, 1, 1, 0, 0, -1, -1, 0 },
-		{ 1, 0, 0, 1, -1, 0, 0, -1 }
+	{ 1, 0,  0,  1, -1,  0,  0, -1 },
+	{ 0, 1,  1,  0,  0, -1, -1,  0 },
+	{ 0, 1, -1,  0,  0, -1,  1,  0 },
+	{ 1, 0,  0, -1, -1,  0,  0,  1 }
 };
 
 
@@ -149,7 +163,7 @@ FOV::FOV()
 //}
 
 
-void FOV::calculate(int radius,GameObject* unit, GameMap* map)
+void FOV::calculate(int radius,GameObject* unit, GameMap* map, int start_angle, int end_angle)
 {
 	m_radius = radius;
 	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(unit->m_active_state->m_ai)->m_fov_qualifier->predicat;
@@ -185,16 +199,11 @@ void FOV::calculate(int radius,GameObject* unit, GameMap* map)
 	{
 		LOG(INFO) << "    Просчет поля зрения " << std::to_string(m_radius);
 	}
-	do_fov(m_middle, m_middle, m_radius);
-	/*m_quarter = 0;
-	light_quarter(0, 0, 180, -180);
-	m_quarter = 1;
-	light_quarter(0, 0, 180, -180);
-	m_quarter = 2;
-	light_quarter(0, 0, 180, -180);
-	m_quarter = 3;
-	light_quarter(0, 0, 180, -180);*/
+	do_fov(m_middle, m_middle, m_radius, Game_algorithm::get_angle(unit,start_angle), Game_algorithm::get_angle(unit, end_angle));
+	//do_fov(m_middle, m_middle, m_radius, start_angle, end_angle);
 }
+
+
 
 void FOV::cast_light(uint x, uint y, uint radius, uint row, float start_slope, float end_slope, uint xx, uint xy, uint yx, uint yy)
 {
@@ -255,12 +264,137 @@ void FOV::cast_light(uint x, uint y, uint radius, uint row, float start_slope, f
 	}
 }
 
-void FOV::do_fov(uint x, uint y, uint radius)
+void set_slopes(uint start_octant, uint end_octant, uint current_octant, int start_angle, int end_angle, float& start_slope, float& end_slope)
 {
-	for (uint i = 0; i < 8; i++)
+	start_slope = 1.0;
+	end_slope = 0.0;
+	if (current_octant == start_octant)
 	{
-		cast_light(x, y, radius, 1, 1.0, 0.0, multipliers1[0][i],multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
+		switch (current_octant)
+		{
+		case 0:
+		{
+			end_slope = std::tan(start_angle*Pi / 180.0F);
+			break;
+		}
+		case 1:
+		{
+			start_slope = std::tan((90 - start_angle)*Pi / 180.0F);
+			break;
+		}
+		case 2:
+		{
+			end_slope = std::tan((start_angle - 90)*Pi / 180.0F);
+			break;
+		}
+		case 3:
+		{
+			start_slope = std::tan((180 - start_angle)*Pi / 180.0F);
+			break;
+		}
+		case 4:
+		{
+			end_slope = std::tan((start_angle - 180)*Pi / 180.0F);
+			break;
+		}
+		case 5:
+		{
+			start_slope = std::tan((270 - start_angle)*Pi / 180.0F);
+			break;
+		}
+		case 6:
+		{
+			end_slope = std::tan((start_angle - 270)*Pi / 180.0F);
+			break;
+		}
+		case 7:
+		{
+			start_slope = std::tan((360 - start_angle)*Pi / 180.0F);
+			break;
+		}
+		}
+	}
+	if (current_octant == end_octant)
+	{
+		switch (current_octant)
+		{
+		case 0:
+		{
+			start_slope = std::tan(end_angle*Pi / 180.0F);
+			break;
+		}
+		case 1:
+		{
+			end_slope = std::tan((90 - end_angle)*Pi / 180.0F);
+			break;
+		}
+		case 2:
+		{
+			start_slope = std::tan((end_angle - 90)*Pi / 180.0F);
+			break;
+		}
+		case 3:
+		{
+			end_slope = std::tan((180 - end_angle)*Pi / 180.0F);
+			break;
+		}
+		case 4:
+		{
+			start_slope = std::tan((end_angle - 180)*Pi / 180.0F);
+			break;
+		}
+		case 5:
+		{
+			end_slope = std::tan((270 - end_angle)*Pi / 180.0F);
+			break;
+		}
+		case 6:
+		{
+			start_slope = std::tan((end_angle - 270)*Pi / 180.0F);
+			break;
+		}
+		case 7:
+		{
+			end_slope = std::tan((360 - end_angle)*Pi / 180.0F);
+			break;
+		}
+		}
+	}
+}
+
+void FOV::do_fov(uint x, uint y, uint radius,int start_angle,int end_angle)
+{
+	if (start_angle == end_angle)
+	{
+		for (uint i = 0; i <8; i++)
+		{
+			cast_light(x, y, radius, 1, 1.0, 0.0, multipliers1[0][i], multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
+		}
+	}
+	uint start_octant = start_angle / 45;
+	uint end_octant = end_angle / 45;
+	float start_slope;
+	float end_slope;
+	if(start_octant<=end_octant)
+	{ 
+		for (uint i = start_octant; i <end_octant+1; i++)
+		{
+			set_slopes(start_octant, end_octant, i, start_angle, end_angle, start_slope, end_slope);
+			cast_light(x, y, radius, 1, start_slope, end_slope, multipliers1[0][i], multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
+		}
+	}
+	else
+	{
+		for (uint i = start_octant; i < 8; i++)
+		{
+			set_slopes(start_octant, 7, i, start_angle, end_angle, start_slope, end_slope);
+			cast_light(x, y, radius, 1, start_slope, end_slope, multipliers1[0][i], multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
+		}
+		for (uint i = 0; i < end_octant+1; i++)
+		{
+			set_slopes(0, end_octant, i, start_angle, end_angle, start_slope, end_slope);
+			cast_light(x, y, radius, 1, start_slope, end_slope, multipliers1[0][i], multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
+		}
 	}
 	m_map[m_middle][m_middle].visible = true;
-
 }

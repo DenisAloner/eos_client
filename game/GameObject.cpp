@@ -688,7 +688,7 @@ void GameObject::load()
 Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 {
 	m_fov = new FOV();
-	m_fov->calculate(static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_fov_radius, m_object, m_map);
+	m_fov->calculate(static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_fov_radius, m_object, m_map,90,0);
 	int radius = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_fov_radius;
 	for (int y = m_object->cell()->y -radius; y < m_object->cell()->y + radius + 1; y++)
 	{

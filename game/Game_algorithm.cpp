@@ -193,3 +193,56 @@ MapCell* Game_algorithm::step_in_direction(GameObject* object, object_direction_
 	}
 	}
 }
+
+int Game_algorithm::get_angle(GameObject * object, int angle)
+{
+	uint result;
+	switch (object->m_direction)
+	{
+	case object_direction_e::down:
+	{
+		result = angle;
+		break;
+	}
+	case object_direction_e::downleft:
+	{
+		result = angle+45;
+		break;
+	}
+	case object_direction_e::downright:
+	{
+		result = angle + 315;
+		break;
+	}
+	case object_direction_e::left:
+	{
+		result = angle + 90;
+		break;
+	}
+	case object_direction_e::right:
+	{
+		result = angle + 270;
+		break;
+	}
+	case object_direction_e::top:
+	{
+		result = angle + 180;
+		break;
+	}
+	case object_direction_e::topleft:
+	{
+		result = angle + 135;
+		break;
+	}
+	case object_direction_e::topright:
+	{
+		result = angle + 225;
+		break;
+	}
+	}
+	if (result > 360)
+	{
+		result -= 360;
+	}
+	return result;
+}
