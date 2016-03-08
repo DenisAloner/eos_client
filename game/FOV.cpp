@@ -200,7 +200,6 @@ void FOV::calculate(int radius,GameObject* unit, GameMap* map, int start_angle, 
 		LOG(INFO) << "    Просчет поля зрения " << std::to_string(m_radius);
 	}
 	do_fov(m_middle, m_middle, m_radius, Game_algorithm::get_angle(unit,start_angle), Game_algorithm::get_angle(unit, end_angle));
-	//do_fov(m_middle, m_middle, m_radius, start_angle, end_angle);
 }
 
 
@@ -387,12 +386,12 @@ void FOV::do_fov(uint x, uint y, uint radius,int start_angle,int end_angle)
 	{
 		for (uint i = start_octant; i < 8; i++)
 		{
-			set_slopes(start_octant, 7, i, start_angle, end_angle, start_slope, end_slope);
+			set_slopes(start_octant, 7, i, start_angle, 0, start_slope, end_slope);
 			cast_light(x, y, radius, 1, start_slope, end_slope, multipliers1[0][i], multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
 		}
 		for (uint i = 0; i < end_octant+1; i++)
 		{
-			set_slopes(0, end_octant, i, start_angle, end_angle, start_slope, end_slope);
+			set_slopes(0, end_octant, i, 0, end_angle, start_slope, end_slope);
 			cast_light(x, y, radius, 1, start_slope, end_slope, multipliers1[0][i], multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
 		}
 	}
