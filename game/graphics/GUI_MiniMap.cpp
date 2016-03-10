@@ -125,12 +125,17 @@ void GUI_MiniMap::render(GraphicalController* Graph, int px, int py)
 	Graph->draw_sprite(x0, y0, x0, y1, x1, y1, x1, y0);
 }
 
-GUI_FOV::GUI_FOV(position_t position, dimension_t size, AI_enemy* ai) :m_fov(ai->m_fov)
+GUI_FOV::GUI_FOV(position_t position, dimension_t size, GameObject* object)
 {
+	AI_enemy* ai = static_cast<AI_enemy*>(object->m_active_state->m_ai);
+	m_fov = ai->m_fov;
 	m_radius = 0;
-	for (auto current = ai->m_FOVs.begin(); current != ai->m_FOVs.end(); current++)
+	Vision_list* vl = static_cast<Vision_list*>(object->m_active_state->get_list(interaction_e::vision));
+	AI_FOV current;
+	for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); item++)
 	{
-		m_radius = max(m_radius, (*current).radius);
+		current = static_cast<Vision_item*>(*item)->m_value;
+		m_radius = max(m_radius, current.radius);
 	}
 	m_position = position;
 	m_size = size;

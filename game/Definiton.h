@@ -266,7 +266,9 @@ enum class interaction_e
 	skill_bow,
 	weapon_damage,
 	strength_bonus,
-	weapon_range
+	weapon_range,
+	vision,
+	vision_item
 };
 
 enum class effect_e
@@ -310,7 +312,9 @@ enum class feature_list_type_e
 	parameter,
 	tag,
 	action,
-	parts
+	parts,
+	vision,
+	vision_item
 };
 
 enum class ai_type_e
@@ -443,6 +447,7 @@ struct AI_FOV
 	int end_angle;
 
 	AI_FOV(int radius, predicat_t* qualifier, int start_angle, int end_angle) : radius(radius), qualifier(qualifier), start_angle(start_angle), end_angle(end_angle) {};
+	AI_FOV() : radius(0), qualifier(nullptr), start_angle(0), end_angle(0) {};
 };
 
 #endif //DEFINITION_H

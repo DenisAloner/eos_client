@@ -52,6 +52,42 @@ private:
 	void update_list(Object_interaction* list);
 };
 
+class Vision_list :public Interaction_list
+{
+public:
+	
+	Vision_list();
+	virtual std::string get_description();
+	virtual void update();
+	virtual Vision_list* clone();
+	virtual void description(std::list<std::string>* info, int level);
+
+	virtual void save();
+	virtual void load();
+
+private:
+	void update_list(Object_interaction* list);
+};
+
+class Vision_item :public Interaction_list
+{
+public:
+ 
+	AI_FOV m_basic_value;
+	AI_FOV m_value;
+	Vision_item();
+	virtual std::string get_description();
+	virtual void update();
+	virtual Vision_item* clone();
+	virtual void description(std::list<std::string>* info, int level);
+
+	virtual void save();
+	virtual void load();
+
+private:
+	void update_list(Object_interaction* list);
+};
+
 class Tag_list :public  Interaction_list
 {
 public:

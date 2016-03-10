@@ -171,7 +171,6 @@ void FOV::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
 		for (int x = 0; x < m_max_size; x++)
 		{
 			m_map[y][x].opaque = false;
-			m_map[y][x].visible = false;
 		}
 	}
 	for (int y = unit->cell()->y - fov.radius; y < unit->cell()->y + fov.radius + 1; y++)

@@ -31,7 +31,7 @@ class GUI_FOV :
 {
 public:
 
-	GUI_FOV(position_t position, dimension_t size, AI_enemy* ai);
+	GUI_FOV(position_t position, dimension_t size, GameObject* object);
 	
 	FOV* m_fov;
 	int m_radius;

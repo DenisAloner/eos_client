@@ -102,7 +102,7 @@ public:
 	GameObject* m_object;
 	GameMap* m_map;
 
-	std::list<AI_FOV> m_FOVs;
+	//std::list<AI_FOV> m_FOVs;
 
 	Action_wrapper* m_action_controller;
 

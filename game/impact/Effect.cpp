@@ -253,6 +253,245 @@ void Parameter_list::load()
 	LOG(INFO) << "Конец листа параметров";
 }
 
+// Vision_list
+
+Vision_list::Vision_list()
+{
+	m_list_type = feature_list_type_e::vision;
+};
+
+void Vision_list::update_list(Object_interaction* list)
+{
+	switch (list->m_interaction_message_type)
+	{
+	case interaction_message_type_e::list:
+	{
+		switch (static_cast<Interaction_list*>(list)->m_list_type)
+		{
+		case feature_list_type_e::vision_item:
+		{
+			Vision_item* list_item = static_cast<Vision_item*>(list);
+			list_item->update();
+			break;
+		}
+		default:
+		{
+			Interaction_list* list_item = static_cast<Interaction_list*>(list);
+			for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); current++)
+			{
+				update_list((*current));
+			}
+			break;
+		}
+		}
+		break;
+	}
+	}
+}
+
+void Vision_list::update()
+{
+	//LOG(INFO) << "ТИП ПАРАМЕТРА " << std::to_string((int)m_subtype);
+	update_list(this);
+}
+
+std::string Vision_list::get_description()
+{
+	/*std::string result = std::to_string(m_value) + "/" + std::to_string(m_limit) + ",";
+	for (auto current = m_effect.begin(); current != m_effect.end(); current++)
+	{
+		result += (*current)->get_description() + ",";
+	}
+	return result;*/
+	return "";
+}
+
+Vision_list* Vision_list::clone()
+{
+	Vision_list* result = new Vision_list;
+	result->m_list_type = m_list_type;
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		result->add((*item)->clone());
+	}
+	return result;
+}
+
+void Vision_list::description(std::list<std::string>* info, int level)
+{
+	//info->push_back(std::string(level, '.') + std::to_string(m_value) + "(" + std::to_string(m_basic_value) + ")/" + std::to_string(m_limit) + "(" + std::to_string(m_basic_limit) + "):");
+	for (auto current = m_effect.begin(); current != m_effect.end(); current++)
+	{
+		(*current)->description(info, level);
+	}
+}
+
+void Vision_list::save()
+{
+	/*LOG(INFO) << "Лист параметров";
+	FILE* file = Serialization_manager::instance().m_file;
+	type_e t = type_e::parameter_list;
+	fwrite(&t, sizeof(type_e), 1, file);
+
+	fwrite(&m_subtype, sizeof(interaction_e), 1, file);
+	fwrite(&m_basic_value, sizeof(int), 1, file);
+	fwrite(&m_basic_limit, sizeof(int), 1, file);
+
+	size_t s = m_effect.size();
+	fwrite(&s, sizeof(size_t), 1, file);
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		Serialization_manager::instance().serialize(*item);
+	}
+	LOG(INFO) << "Конец листа параметров";*/
+}
+
+void Vision_list::load()
+{
+	/*LOG(INFO) << "Лист параметров";
+	FILE* file = Serialization_manager::instance().m_file;
+	fread(&m_subtype, sizeof(interaction_e), 1, file);
+	LOG(INFO) << "ТИП листа параметров " << std::to_string((int)m_subtype);
+	fread(&m_basic_value, sizeof(int), 1, file);
+	fread(&m_basic_limit, sizeof(int), 1, file);
+	size_t s;
+	fread(&s, sizeof(size_t), 1, file);
+	m_effect.clear();
+	for (size_t i = 0; i < s; i++)
+	{
+		m_effect.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
+	}
+	LOG(INFO) << "Конец листа параметров";*/
+}
+
+
+// Vision_item
+
+Vision_item::Vision_item()
+{
+	m_list_type = feature_list_type_e::vision_item;
+};
+
+void Vision_item::update_list(Object_interaction* list)
+{
+
+	//switch (list->m_interaction_message_type)
+	//{
+	//case interaction_message_type_e::list:
+	//{
+	//	Interaction_list* list_item = static_cast<Interaction_list*>(list);
+	//	for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); current++)
+	//	{
+	//		update_list((*current));
+	//	}
+	//	break;
+	//}
+	//case interaction_message_type_e::slot_time:
+	//{
+	//	LOG(INFO) << "buff in parameter";
+	//	Interaction_time* item = static_cast<Interaction_time*>(list);
+	//	update_list(item->m_value);
+	//	break;
+	//}
+	//default:
+	//{
+	//	Effect* item;
+	//	item = static_cast<Effect*>(list);
+	//	switch (item->m_subtype)
+	//	{
+	//	case effect_e::value:
+	//	{
+	//		m_value = m_value + item->m_value;
+	//		break;
+	//	}
+	//	case effect_e::limit:
+	//	{
+	//		m_limit = m_limit + item->m_value;
+	//		break;
+	//	}
+	//	}
+	//}
+	//}
+
+}
+
+void Vision_item::update()
+{
+	//LOG(INFO) << "ТИП ПАРАМЕТРА " << std::to_string((int)m_subtype);
+	m_value = m_basic_value;
+	update_list(this);
+}
+
+std::string Vision_item::get_description()
+{
+	//std::string result = std::to_string(m_value) + "/" + std::to_string(m_limit) + ",";
+	//for (auto current = m_effect.begin(); current != m_effect.end(); current++)
+	//{
+	//	result += (*current)->get_description() + ",";
+	//}
+	//return result;
+	return "";
+}
+
+Vision_item* Vision_item::clone()
+{
+	Vision_item* result = new Vision_item();
+	result->m_basic_value = AI_FOV(m_basic_value.radius, m_basic_value.qualifier, m_basic_value.start_angle, m_basic_value.end_angle);
+	result->m_value = AI_FOV(m_value.radius, m_value.qualifier, m_value.start_angle, m_value.end_angle);
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		result->add((*item)->clone());
+	}
+	return result;
+}
+
+void Vision_item::description(std::list<std::string>* info, int level)
+{
+	/*info->push_back(std::string(level, '.') + std::to_string(m_value) + "(" + std::to_string(m_basic_value) + ")/" + std::to_string(m_limit) + "(" + std::to_string(m_basic_limit) + "):");
+	for (auto current = m_effect.begin(); current != m_effect.end(); current++)
+	{
+		(*current)->description(info, level);
+	}*/
+}
+
+void Vision_item::save()
+{
+	//LOG(INFO) << "Лист параметров";
+	//FILE* file = Serialization_manager::instance().m_file;
+	//type_e t = type_e::parameter_list;
+	//fwrite(&t, sizeof(type_e), 1, file);
+
+	//fwrite(&m_subtype, sizeof(interaction_e), 1, file);
+	//fwrite(&m_basic_value, sizeof(int), 1, file);
+	//fwrite(&m_basic_limit, sizeof(int), 1, file);
+
+	//size_t s = m_effect.size();
+	//fwrite(&s, sizeof(size_t), 1, file);
+	//for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	//{
+	//	Serialization_manager::instance().serialize(*item);
+	//}
+	//LOG(INFO) << "Конец листа параметров";
+}
+
+void Vision_item::load()
+{
+	//LOG(INFO) << "Лист параметров";
+	//FILE* file = Serialization_manager::instance().m_file;
+	//fread(&m_subtype, sizeof(interaction_e), 1, file);
+	//LOG(INFO) << "ТИП листа параметров " << std::to_string((int)m_subtype);
+	//fread(&m_basic_value, sizeof(int), 1, file);
+	//fread(&m_basic_limit, sizeof(int), 1, file);
+	//size_t s;
+	//fread(&s, sizeof(size_t), 1, file);
+	//m_effect.clear();
+	//for (size_t i = 0; i < s; i++)
+	//{
+	//	m_effect.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
+	//}
+	//LOG(INFO) << "Конец листа параметров";
+}
+
 // Tag_list
 
 Tag_list::Tag_list()

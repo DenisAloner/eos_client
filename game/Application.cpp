@@ -302,7 +302,7 @@ void Application::initialize()
 	//MenuLayer->add(MiniMap);
 
 	MiniMap = new GUI_Window(300, 0, 400, 400, "Поле зрения");
-	GUI_FOV* fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), static_cast<AI_enemy*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai));
+	GUI_FOV* fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), m_GUI->MapViewer->m_player->m_object);
 	MiniMap->add(fov);
 
 	//MenuLayer->add(m_GUI->Timer);
@@ -652,9 +652,12 @@ void Application::update()
 				AI_enemy* ai = static_cast<AI_enemy*>(object->m_active_state->m_ai);
 				ai->calculate_FOV(object, Application::instance().m_GUI->MapViewer->m_map);
 				int radius = 0;
-				for (auto current = ai->m_FOVs.begin(); current != ai->m_FOVs.end(); current++)
+				Vision_list* vl = static_cast<Vision_list*>(object->m_active_state->get_list(interaction_e::vision));
+				AI_FOV current;
+				for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); item++)
 				{
-					radius = max(radius, (*current).radius);
+					current = static_cast<Vision_item*>(*item)->m_value;
+					radius = max(radius, current.radius);
 				}
 				for (int y = object->cell()->y - radius; y < object->cell()->y + radius + 1; y++)
 				{

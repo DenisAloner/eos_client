@@ -13,6 +13,7 @@ class Interaction_slot;
 class Interaction_copyist;
 class Object_tag;
 class Attribute_map;
+class Interaction_list;
 
 class GameObjectManager:public iSerializable
 {
@@ -51,7 +52,10 @@ public:
 		add_slot,
 		add_slot_mem,
 		tag,
-		add_fov
+		add_fov,
+		copy_list_to_slot,
+		add_slot_to_mem_list,
+		mem_list
 	};
 
 	enum class parameter_e
@@ -88,6 +92,8 @@ public:
 	Object_interaction* m_slot;
 	Attribute_map* m_mem_state;
 	AI* m_ai;
+	Interaction_list* m_current_list;
+	Interaction_list* m_mem_list;
 
 
 	//std::list<GameObject*> m_object_templates;

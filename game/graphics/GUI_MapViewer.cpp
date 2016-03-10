@@ -944,9 +944,12 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	}
 	int max_fov_radius = 0;
 	AI_enemy* ai = static_cast<AI_enemy*>(m_player->m_object->m_active_state->m_ai);
-	for (auto current = ai->m_FOVs.begin(); current != ai->m_FOVs.end(); current++)
+	Vision_list* vl = static_cast<Vision_list*>(m_player->m_object->m_active_state->get_list(interaction_e::vision));
+	AI_FOV current;
+	for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); item++)
 	{
-		max_fov_radius = max(max_fov_radius, (*current).radius);
+		current = static_cast<Vision_item*>(*item)->m_value;
+		max_fov_radius = max(max_fov_radius, current.radius);
 	}
 	for (int r = 0; r < 2; r++)
 	{

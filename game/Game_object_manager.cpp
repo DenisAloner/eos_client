@@ -139,7 +139,7 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	case command_e::add_fov:
 	{
-		m_ai->m_FOVs.push_back(AI_FOV(std::stoi(arg[0]), Application::instance().m_ai_manager->m_fov_qualifiers[std::stoi(arg[1])], std::stoi(arg[2]), std::stoi(arg[3])));
+		//m_ai->m_FOVs.push_back(AI_FOV(std::stoi(arg[0]), Application::instance().m_ai_manager->m_fov_qualifiers[std::stoi(arg[1])], std::stoi(arg[2]), std::stoi(arg[3])));
 		break;
 	}
 	case command_e::size:
@@ -206,6 +206,21 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::add_slot_mem:
 	{
 		m_mem_state->add_effect(get_interaction_e(arg[0]), m_slot);
+		break;
+	}
+	case command_e::mem_list:
+	{
+		m_mem_list = m_current_list;
+		break;
+	}
+	case command_e::add_slot_to_mem_list:
+	{
+		m_mem_list->m_effect.push_back(m_slot);
+		break;
+	}
+	case command_e::copy_list_to_slot:
+	{
+		m_slot = m_current_list;
 		break;
 	}
 	case command_e::mem_action:
@@ -340,7 +355,14 @@ void GameObjectManager::parser(const std::string& command)
 				parameter_list->m_basic_limit = std::stoi(arg[3]);
 				break;
 			}
+		case feature_list_type_e::vision_item:
+		{
+			Vision_item* v_list = static_cast<Vision_item*>(list);
+			v_list->m_basic_value = AI_FOV(std::stoi(arg[2]), Application::instance().m_ai_manager->m_fov_qualifiers[std::stoi(arg[3])], std::stoi(arg[4]), std::stoi(arg[5]));
+			break;
 		}
+		}
+		m_current_list = list;
 		break;
 	}
 	case command_e::feature_list_mem:
@@ -436,6 +458,9 @@ void GameObjectManager::init()
 	m_commands["add_fov"] = command_e::add_fov;
 	m_commands["feature_list"] = command_e::feature_list;
 	m_commands["feature_list_mem"] = command_e::feature_list_mem;
+	m_commands["copy_list_to_slot"] = command_e::copy_list_to_slot;
+	m_commands["add_slot_to_mem_list"] = command_e::add_slot_to_mem_list;
+	m_commands["mem_list"] = command_e::mem_list;
 
 
 	m_to_object_state_e["alive"] = object_state_e::alive;
@@ -471,6 +496,8 @@ void GameObjectManager::init()
 	m_to_interaction_e["demand_weapon_skill"] = interaction_e::demand_weapon_skill;
 	m_to_interaction_e["evasion_skill"] = interaction_e::evasion_skill;
 	m_to_interaction_e["weapon_range"] = interaction_e::weapon_range;
+	m_to_interaction_e["vision"] = interaction_e::vision;
+	m_to_interaction_e["vision_item"] = interaction_e::vision_item;
 
 	m_effect_string[interaction_e::total_damage] = "общий дополнительный урон";
 	m_effect_string[interaction_e::damage] = "урон";
@@ -493,6 +520,9 @@ void GameObjectManager::init()
 	m_effect_string[interaction_e::demand_weapon_skill] = "требование к владению оружием";
 	m_effect_string[interaction_e::evasion_skill] = "навык уклонения";
 	m_effect_string[interaction_e::weapon_range] = "дальность";
+	m_effect_string[interaction_e::vision] = "зрение";
+	m_effect_string[interaction_e::vision_item] = "компонент зрения";
+
 
 	m_to_effect_e["value"] = effect_e::value;
 	m_to_effect_e["limit"] = effect_e::limit;
@@ -547,6 +577,8 @@ void GameObjectManager::init()
 	m_to_feature_list_type_e["generic"] = feature_list_type_e::generic;
 	m_to_feature_list_type_e["parameter"] = feature_list_type_e::parameter;
 	m_to_feature_list_type_e["parts"] = feature_list_type_e::parts;
+	m_to_feature_list_type_e["vision"] = feature_list_type_e::vision;
+	m_to_feature_list_type_e["vision_item"] = feature_list_type_e::vision_item;
 
 	m_to_ai_type_e["non_humanoid"] = ai_type_e::non_humanoid;
 	m_to_ai_type_e["trap"] = ai_type_e::trap;

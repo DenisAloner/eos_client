@@ -62,6 +62,16 @@ Interaction_list*  Attribute_map::create_feature_list(feature_list_type_e key, i
 			result = new Parts_list();
 			break;
 		}
+		case feature_list_type_e::vision:
+		{
+			result = new Vision_list();
+			break;
+		}
+		case feature_list_type_e::vision_item:
+		{
+			result = new Vision_item();
+			break;
+		}
 		}
 	m_item[name] = result;	
 	return result;
@@ -405,7 +415,7 @@ Interaction_list* GameObject::create_feature_list(feature_list_type_e key, inter
 		result = new Interaction_list();
 		break;
 	}
-	case feature_list_type_e::tag:
+	case feature_list_type_e::tag: 
 	{
 		result = new Tag_list();
 		break;
@@ -423,6 +433,16 @@ Interaction_list* GameObject::create_feature_list(feature_list_type_e key, inter
 	case feature_list_type_e::parts:
 	{
 		result = new Parts_list();
+		break;
+	}
+	case feature_list_type_e::vision:
+	{
+		result = new Vision_list();
+		break;
+	}
+	case feature_list_type_e::vision_item:
+	{
+		result = new Vision_item();
 		break;
 	}
 	}
@@ -690,9 +710,12 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 	AI_enemy* ai= static_cast<AI_enemy*>(m_object->m_active_state->m_ai);
 	ai->calculate_FOV(m_object, m_map);
 	int radius = 0;
-	for (auto current = ai->m_FOVs.begin(); current != ai->m_FOVs.end(); current++)
+	Vision_list* vl = static_cast<Vision_list*>(m_object->m_active_state->get_list(interaction_e::vision));
+	AI_FOV current;
+	for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); item++)
 	{
-		radius = max(radius, (*current).radius);
+		current = static_cast<Vision_item*>(*item)->m_value;
+		radius = max(radius, current.radius);
 	}
 	for (int y = m_object->cell()->y -radius; y < m_object->cell()->y + radius + 1; y++)
 	{
