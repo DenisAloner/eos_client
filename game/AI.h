@@ -102,11 +102,14 @@ public:
 	GameObject* m_object;
 	GameMap* m_map;
 
+	std::list<AI_FOV> m_FOVs;
+
 	Action_wrapper* m_action_controller;
 
 	virtual GameObject* find_goal() = 0;
 	virtual void create() = 0;
 	virtual AI* clone() = 0;
+	virtual void calculate_FOV(GameObject* object, GameMap* map) = 0;
 };
 
 class AI_enemy: public AI
@@ -118,8 +121,6 @@ public:
 	GameObject* m_goal;
 	MapCell* m_memory_goal_cell;
 
-	int m_fov_radius;
-	predicat_t* m_fov_qualifier;
 	predicat_t* m_path_qualifier;
 
 	AI_enemy();
@@ -132,6 +133,7 @@ public:
 	virtual void save();
 	virtual void load();
 
+	virtual void calculate_FOV(GameObject* object, GameMap* map);
 };
 
 class AI_trap : public AI
@@ -145,6 +147,8 @@ public:
 
 	virtual void save();
 	virtual void load();
+
+	virtual void calculate_FOV(GameObject* object, GameMap* map) {};
 };
 
 class AI_manager

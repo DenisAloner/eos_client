@@ -491,7 +491,6 @@ AI_enemy::AI_enemy()
 {
 	m_ai_type = ai_type_e::non_humanoid;
 	m_fov = new FOV();
-	m_fov_radius = 0;
 	m_goal = nullptr;
 	m_memory_goal_cell = nullptr;
 	m_action_controller = new Action_wrapper();
@@ -501,8 +500,10 @@ AI* AI_enemy::clone()
 {
 	AI_enemy* c = new AI_enemy();
 	c->m_ai_type = m_ai_type;
-	c->m_fov_radius = m_fov_radius;
-	c->m_fov_qualifier = m_fov_qualifier;
+	for (auto current = m_FOVs.begin(); current != m_FOVs.end(); current++)
+	{
+		c->m_FOVs.push_back(AI_FOV(current->radius, current->qualifier, current->start_angle, current->end_angle));
+	}
 	c->m_path_qualifier = m_path_qualifier;
 	return c;
 }
@@ -511,23 +512,26 @@ GameObject* AI_enemy::find_goal()
 {
 	FOV::cell* fc;
 	MapCell* mc;
-	for (int y = -m_fov->m_radius; y < m_fov->m_radius + 1; y++)
+	for (auto current = m_FOVs.begin(); current != m_FOVs.end(); current++)
 	{
-		if ((m_object->cell()->y + y >= 0) && (m_object->cell()->y + y < m_map->m_size.h))
+		for (int y = -(*current).radius; y < (*current).radius + 1; y++)
 		{
-			for (int x = -m_fov->m_radius; x < m_fov->m_radius + 1; x++)
+			if ((m_object->cell()->y + y >= 0) && (m_object->cell()->y + y < m_map->m_size.h))
 			{
-				if ((m_object->cell()->x + x >= 0) && (m_object->cell()->x + x < m_map->m_size.w))
+				for (int x = -(*current).radius; x < (*current).radius + 1; x++)
 				{
-					fc = &m_fov->m_map[m_fov->m_middle + y][m_fov->m_middle + x];
-					if (fc->visible)
+					if ((m_object->cell()->x + x >= 0) && (m_object->cell()->x + x < m_map->m_size.w))
 					{
-						mc = m_map->m_items[m_object->cell()->y + y][m_object->cell()->x + x];
-						for (std::list<GameObject*>::iterator item = mc->m_items.begin(); item != mc->m_items.end(); item++)
+						fc = &m_fov->m_map[m_fov->m_middle + y][m_fov->m_middle + x];
+						if (fc->visible)
 						{
-							if ((*item) == Application::instance().m_GUI->MapViewer->m_player->m_object)
+							mc = m_map->m_items[m_object->cell()->y + y][m_object->cell()->x + x];
+							for (std::list<GameObject*>::iterator item = mc->m_items.begin(); item != mc->m_items.end(); item++)
 							{
-								return Application::instance().m_GUI->MapViewer->m_player->m_object;
+								if ((*item) == Application::instance().m_GUI->MapViewer->m_player->m_object)
+								{
+									return Application::instance().m_GUI->MapViewer->m_player->m_object;
+								}
 							}
 						}
 					}
@@ -542,23 +546,26 @@ bool AI_enemy::check_goal()
 {
 	FOV::cell* fc;
 	MapCell* mc;
-	for (int y = -m_fov->m_radius; y < m_fov->m_radius + 1; y++)
+	for (auto current = m_FOVs.begin(); current != m_FOVs.end(); current++)
 	{
-		if ((m_object->cell()->y + y >= 0) && (m_object->cell()->y + y < m_map->m_size.h))
+		for (int y = -(*current).radius; y < (*current).radius + 1; y++)
 		{
-			for (int x = -m_fov->m_radius; x < m_fov->m_radius + 1; x++)
+			if ((m_object->cell()->y + y >= 0) && (m_object->cell()->y + y < m_map->m_size.h))
 			{
-				if ((m_object->cell()->x + x >= 0) && (m_object->cell()->x + x < m_map->m_size.w))
+				for (int x = -(*current).radius; x < (*current).radius + 1; x++)
 				{
-					fc = &m_fov->m_map[m_fov->m_middle + y][m_fov->m_middle + x];
-					if (fc->visible)
+					if ((m_object->cell()->x + x >= 0) && (m_object->cell()->x + x < m_map->m_size.w))
 					{
-						mc = m_map->m_items[m_object->cell()->y + y][m_object->cell()->x + x];
-						for (std::list<GameObject*>::iterator item = mc->m_items.begin(); item != mc->m_items.end(); item++)
+						fc = &m_fov->m_map[m_fov->m_middle + y][m_fov->m_middle + x];
+						if (fc->visible)
 						{
-							if ((*item) == m_goal)
+							mc = m_map->m_items[m_object->cell()->y + y][m_object->cell()->x + x];
+							for (std::list<GameObject*>::iterator item = mc->m_items.begin(); item != mc->m_items.end(); item++)
 							{
-								return true;
+								if ((*item) == m_goal)
+								{
+									return true;
+								}
 							}
 						}
 					}
@@ -569,12 +576,20 @@ bool AI_enemy::check_goal()
 	return false;
 }
 
+void AI_enemy::calculate_FOV(GameObject* object,GameMap* map)
+{
+	for (auto current=m_FOVs.begin();current!=m_FOVs.end();current++)
+	{
+		m_fov->calculate(object, map, *current);
+	}
+}
+
 void AI_enemy::create()
 {
 	if (m_object->m_active_state->m_ai == nullptr){ return; }
 	if (!m_action_controller->m_action)
 	{
-		m_fov->calculate(m_fov_radius, m_object, m_map,0,0);
+		calculate_FOV(m_object,m_map);
 		MapCell* c;
 		GameObject* goal;
 		if (m_goal)
@@ -668,7 +683,12 @@ void AI_enemy::create()
 						P->m_map = m_map;
 						m_action_controller->set(P->m_object, Application::instance().m_actions[action_e::move], P);
 			}*/
-			Path::instance().calculate(m_map, m_object, c, m_goal, m_fov_radius);
+			int radius = 0;
+			for (auto current = m_FOVs.begin(); current != m_FOVs.end(); current++)
+			{
+				radius = max(radius, (*current).radius);
+			}
+			Path::instance().calculate(m_map, m_object, c, m_goal, radius);
 			std::vector<MapCell*>* path;
 			path = Path::instance().get_path();
 			if (path)
@@ -710,7 +730,8 @@ void AI_enemy::reset_serialization_index()
 
 void AI_enemy::save()
 {
-	LOG(INFO) << "ÈÈ";
+	//???
+	/*LOG(INFO) << "ÈÈ";
 	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::ai_enemy;
 	fwrite(&t, sizeof(type_e), 1, file);
@@ -719,12 +740,13 @@ void AI_enemy::save()
 	fwrite(&m_fov_qualifier->index, sizeof(size_t), 1, file);
 	fwrite(&m_path_qualifier->index, sizeof(size_t), 1, file);
 	Serialization_manager::instance().serialize(m_action_controller);
-	LOG(INFO) << "Êîíåö ÈÈ";
+	LOG(INFO) << "Êîíåö ÈÈ";*/
 }
 
 void AI_enemy::load()
 {
-	LOG(INFO) << "ÈÈ";
+	//???
+	/*LOG(INFO) << "ÈÈ";
 	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_ai_type, sizeof(ai_type_e), 1, file);
 	fread(&m_fov_radius, sizeof(int), 1, file);
@@ -734,7 +756,7 @@ void AI_enemy::load()
 	fread(&s, sizeof(size_t), 1, file);
 	m_path_qualifier = Application::instance().m_ai_manager->m_path_qualifiers[s];
 	m_action_controller = dynamic_cast<Action_wrapper*>(Serialization_manager::instance().deserialize());
-	LOG(INFO) << "Êîíåö ÈÈ";
+	LOG(INFO) << "Êîíåö ÈÈ";*/
 }
 
 AI_trap::AI_trap(){};

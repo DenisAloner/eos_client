@@ -687,9 +687,13 @@ void GameObject::load()
 
 Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 {
-	m_fov = new FOV();
-	m_fov->calculate(static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_fov_radius, m_object, m_map,90,0);
-	int radius = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_fov_radius;
+	AI_enemy* ai= static_cast<AI_enemy*>(m_object->m_active_state->m_ai);
+	ai->calculate_FOV(m_object, m_map);
+	int radius = 0;
+	for (auto current = ai->m_FOVs.begin(); current != ai->m_FOVs.end(); current++)
+	{
+		radius = max(radius, (*current).radius);
+	}
 	for (int y = m_object->cell()->y -radius; y < m_object->cell()->y + radius + 1; y++)
 	{
 		if (!((y<0) || (y>map->m_size.h - 1)))
@@ -698,7 +702,7 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 			{
 				if (!((x<0) || (x>map->m_size.w - 1)))
 				{
-						if (m_fov->m_map[m_fov->m_middle + (y - m_object->cell()->y)][m_fov->m_middle + (x - m_object->cell()->x)].visible)
+						if (ai->m_fov->m_map[ai->m_fov->m_middle + (y - m_object->cell()->y)][ai->m_fov->m_middle + (x - m_object->cell()->x)].visible)
 						{
 							m_map->m_items[y][x]->m_notable = true;
 						}
@@ -707,7 +711,7 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 			}
 		}
 	}
-	LOG(INFO) << "Поле зрение " << std::to_string(static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_fov_radius);
+	//LOG(INFO) << "Поле зрение " << std::to_string(static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_fov_radius);
 	m_actions.push_front(Application::instance().m_actions[action_e::autoexplore]);
 	m_actions.push_front(Application::instance().m_actions[action_e::set_motion_path]);
 	m_actions.push_front(Application::instance().m_actions[action_e::open_inventory]);

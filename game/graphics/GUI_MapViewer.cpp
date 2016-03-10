@@ -942,6 +942,12 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	{
 		(*current)->init();
 	}
+	int max_fov_radius = 0;
+	AI_enemy* ai = static_cast<AI_enemy*>(m_player->m_object->m_active_state->m_ai);
+	for (auto current = ai->m_FOVs.begin(); current != ai->m_FOVs.end(); current++)
+	{
+		max_fov_radius = max(max_fov_radius, (*current).radius);
+	}
 	for (int r = 0; r < 2; r++)
 	{
 		for (int i = 0; i < (m_tile_count_x + m_tile_count_y) - 1; i++)
@@ -968,7 +974,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 				yf = y - m_player->m_object->cell()->y;
 				if ((x > -1) && (x<m_map->m_size.w) && (y>-1) && (y < m_map->m_size.h))
 				{
-					if ((xf >= -m_player->m_fov->m_radius) && (xf <= m_player->m_fov->m_radius) && (yf >= -m_player->m_fov->m_radius) && (yf <= m_player->m_fov->m_radius))
+					if ((xf >= -max_fov_radius) && (xf <= max_fov_radius) && (yf >= -max_fov_radius) && (yf <= max_fov_radius))
 					{
 						is_in_fov = true;
 					}
@@ -997,8 +1003,9 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 								size3d = (*Current)->m_active_state->m_size;
 								if (is_in_fov)
 								{
-									if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf][m_player->m_fov->m_middle + xf].visible)
+									if (ai->m_fov->m_map[ai->m_fov->m_middle + yf][ai->m_fov->m_middle + xf].visible)
 									{
+										
 										IsDraw = true;
 									}
 								}
@@ -1010,9 +1017,9 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 										{
 											for (int n = 0; n < size3d.x; n++)
 											{
-												if ((xf + n >= -m_player->m_fov->m_radius) && (xf + n <= m_player->m_fov->m_radius) && (yf - m >= -m_player->m_fov->m_radius) && (yf - m <= m_player->m_fov->m_radius))
+												if ((xf + n >= -max_fov_radius) && (xf + n <= max_fov_radius) && (yf - m >= -max_fov_radius) && (yf - m <= max_fov_radius))
 												{
-													if (m_player->m_fov->m_map[m_player->m_fov->m_middle + yf - m][m_player->m_fov->m_middle + xf + n].visible)
+													if (ai->m_fov->m_map[ai->m_fov->m_middle + yf - m][ai->m_fov->m_middle + xf + n].visible)
 													{
 														IsDraw = true;
 													}

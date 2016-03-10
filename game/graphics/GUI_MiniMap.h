@@ -6,6 +6,7 @@
 #include "FOV.h"
 
 class GUI_MapViewer;
+class AI_enemy;
 
 class GUI_MiniMap :
 	public GUI_Object
@@ -30,10 +31,10 @@ class GUI_FOV :
 {
 public:
 
-	GUI_FOV(position_t position, dimension_t size, FOV* fov);
-
+	GUI_FOV(position_t position, dimension_t size, AI_enemy* ai);
+	
 	FOV* m_fov;
-
+	int m_radius;
 	fdimension_t m_cell_size;
 
 	virtual void render(GraphicalController* Graph, int px, int py);

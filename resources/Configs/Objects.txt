@@ -1,6 +1,7 @@
 object snake
 state alive
-ai non_humanoid,20,0,0
+ai non_humanoid,0
+add_fov 20,0,0,0
 size 3,1,1
 tile_manager 0
 optical 0.7,0.7,0.7
@@ -88,7 +89,8 @@ tag seethrough_able
 
 object iso_unit
 state alive
-ai non_humanoid,32,0,0
+ai non_humanoid,0
+add_fov 32,0,270,90
 size 2,2,4
 tile_manager 8
 optical 0.3,0.3,0.3
@@ -139,7 +141,8 @@ tile_manager 10
 
 object rat
 state alive
-ai non_humanoid,20,0,0
+ai non_humanoid,0
+add_fov 20,0,0,0
 size 2,2,1
 tile_manager 11
 optical 0.8,0.8,0.8
@@ -165,7 +168,8 @@ tag seethrough_able
 
 object bat
 state alive
-ai non_humanoid,64,0,0
+ai non_humanoid,0
+add_fov 64,0,0,0
 size 2,2,4
 tile_manager 12
 optical 0.8,0.8,0.8
@@ -194,7 +198,8 @@ tag seethrough_able
 
 object skeleton
 state alive
-ai non_humanoid,20,0,0
+ai non_humanoid,0
+add_fov 20,0,0,0
 size 2,2,4
 tile_manager 13
 optical 0.9,0.9,0.9
@@ -220,7 +225,8 @@ tag seethrough_able
 
 object wolf
 state alive
-ai non_humanoid,20,0,0
+ai non_humanoid,0
+add_fov 20,0,0,0
 size 3,3,3
 tile_manager 14
 optical 0.5,0.5,0.5
@@ -246,7 +252,8 @@ tag seethrough_able
 
 object bear
 state alive
-ai non_humanoid,20,0,0
+ai non_humanoid,0
+add_fov 20,0,0,0
 size 4,4,4
 tile_manager 15
 optical 0.1,0.1,0.1

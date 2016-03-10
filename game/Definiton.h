@@ -435,4 +435,14 @@ struct common_action_t
 	}
 };
 
+struct AI_FOV
+{
+	int radius;
+	predicat_t* qualifier;
+	int start_angle;
+	int end_angle;
+
+	AI_FOV(int radius, predicat_t* qualifier, int start_angle, int end_angle) : radius(radius), qualifier(qualifier), start_angle(start_angle), end_angle(end_angle) {};
+};
+
 #endif //DEFINITION_H

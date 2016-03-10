@@ -228,8 +228,8 @@ void Application::initialize()
 	int rx = m_GUI->MapViewer->m_player->m_object->cell()->x;
 	int ry = m_GUI->MapViewer->m_player->m_object->cell()->y;*/
 
-	obj = m_game_object_manager->new_object("bat");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry+8][rx]);
+	//obj = m_game_object_manager->new_object("bat");
+	//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry+8][rx]);
 
 	/*obj = m_game_object_manager->new_object("bat");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx + 12]);
@@ -302,7 +302,7 @@ void Application::initialize()
 	//MenuLayer->add(MiniMap);
 
 	MiniMap = new GUI_Window(300, 0, 400, 400, "Поле зрения");
-	GUI_FOV* fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), m_GUI->MapViewer->m_player->m_fov);
+	GUI_FOV* fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), static_cast<AI_enemy*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai));
 	MiniMap->add(fov);
 
 	//MenuLayer->add(m_GUI->Timer);
@@ -648,9 +648,14 @@ void Application::update()
 			Application::instance().m_GUI->MapViewer->m_map->m_object_manager.calculate_ai(m_GUI->MapViewer->m_map);
 			if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
 			{
-				m_GUI->MapViewer->m_player->m_fov->calculate(static_cast<AI_enemy*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)->m_fov_radius, m_GUI->MapViewer->m_player->m_object, m_GUI->MapViewer->m_map,270,90);
 				GameObject* object = m_GUI->MapViewer->m_player->m_object;
-				int radius = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_fov_radius;
+				AI_enemy* ai = static_cast<AI_enemy*>(object->m_active_state->m_ai);
+				ai->calculate_FOV(object, Application::instance().m_GUI->MapViewer->m_map);
+				int radius = 0;
+				for (auto current = ai->m_FOVs.begin(); current != ai->m_FOVs.end(); current++)
+				{
+					radius = max(radius, (*current).radius);
+				}
 				for (int y = object->cell()->y - radius; y < object->cell()->y + radius + 1; y++)
 				{
 					if (!((y<0) || (y>m_GUI->MapViewer->m_map->m_size.h - 1)))
@@ -659,11 +664,10 @@ void Application::update()
 						{
 							if (!((x<0) || (x>m_GUI->MapViewer->m_map->m_size.w - 1)))
 							{
-								if (m_GUI->MapViewer->m_player->m_fov->m_map[m_GUI->MapViewer->m_player->m_fov->m_middle + (y - object->cell()->y)][m_GUI->MapViewer->m_player->m_fov->m_middle + (x - object->cell()->x)].visible)
+								if (ai->m_fov->m_map[ai->m_fov->m_middle + (y - object->cell()->y)][ai->m_fov->m_middle + (x - object->cell()->x)].visible)
 								{
 									m_GUI->MapViewer->m_map->m_items[y][x]->m_notable = true;
 								}
-
 							}
 						}
 					}
@@ -702,7 +706,7 @@ void Application::update_after_load()
 	m_update_mutex.lock();
 	if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
 	{
-		m_GUI->MapViewer->m_player->m_fov->calculate(static_cast<AI_enemy*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)->m_fov_radius, m_GUI->MapViewer->m_player->m_object, m_GUI->MapViewer->m_map,270,90);
+		static_cast<AI_enemy*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)->calculate_FOV(m_GUI->MapViewer->m_player->m_object, Application::instance().m_GUI->MapViewer->m_map);
 	}
 	m_update_mutex.unlock();
 }

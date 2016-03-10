@@ -122,19 +122,24 @@ void GameObjectManager::parser(const std::string& command)
 			AI_trap* ai = new AI_trap();
 			ai->m_ai_type = type;
 			m_object->m_active_state->m_ai = ai;
+			m_ai = ai;
 			break;
 		}
 		case ai_type_e::non_humanoid:
 		{
 			AI_enemy* ai = new AI_enemy();
 			ai->m_ai_type = type;
-			ai->m_fov_radius = std::stoi(arg[1]);
-			ai->m_fov_qualifier = Application::instance().m_ai_manager->m_fov_qualifiers[std::stoi(arg[2])];
-			ai->m_path_qualifier = Application::instance().m_ai_manager->m_path_qualifiers[std::stoi(arg[3])];
+			ai->m_path_qualifier = Application::instance().m_ai_manager->m_path_qualifiers[std::stoi(arg[1])];
 			m_object->m_active_state->m_ai = ai;
+			m_ai = ai;
 			break;
 		}
 		}
+		break;
+	}
+	case command_e::add_fov:
+	{
+		m_ai->m_FOVs.push_back(AI_FOV(std::stoi(arg[0]), Application::instance().m_ai_manager->m_fov_qualifiers[std::stoi(arg[1])], std::stoi(arg[2]), std::stoi(arg[3])));
 		break;
 	}
 	case command_e::size:
@@ -428,8 +433,10 @@ void GameObjectManager::init()
 	m_commands["mem_impact_copy_chance"] = command_e::mem_impact_copy_chance;
 	m_commands["mem_action"] = command_e::mem_action;
 	m_commands["tag"] = command_e::tag;
+	m_commands["add_fov"] = command_e::add_fov;
 	m_commands["feature_list"] = command_e::feature_list;
 	m_commands["feature_list_mem"] = command_e::feature_list_mem;
+
 
 	m_to_object_state_e["alive"] = object_state_e::alive;
 	m_to_object_state_e["dead"] = object_state_e::dead;

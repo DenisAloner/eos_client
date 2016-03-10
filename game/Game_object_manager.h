@@ -51,6 +51,7 @@ public:
 		add_slot,
 		add_slot_mem,
 		tag,
+		add_fov
 	};
 
 	enum class parameter_e
@@ -86,6 +87,7 @@ public:
 	Effect* m_effect;
 	Object_interaction* m_slot;
 	Attribute_map* m_mem_state;
+	AI* m_ai;
 
 
 	//std::list<GameObject*> m_object_templates;

@@ -44,14 +44,14 @@ public:
 	
 	//static const values m_values;
 
-	int m_radius;
+	//int m_radius;
 	//int m_sqr_radius;
 	//int m_quarter;
 
 	/*void quarter(int start_x, int start_y, float start_angle, float end_angle);
 	void cast_shadow(int start_x, int start_y, float start_angle, float end_angle);
 	void light_quarter(int start_x, int start_y, float start_angle, float end_angle);*/
-	void calculate(int radius, GameObject* unit, GameMap* map, int start_angle, int end_angle);
+	void calculate(GameObject* unit, GameMap* map, AI_FOV& fov);
 	void cast_light(uint x, uint y, uint radius, uint row, float start_slope, float end_slope, uint xx, uint xy, uint yx, uint yy);
 	/*void do_fov(uint x, uint y, uint radius);*/
 	void do_fov(uint x, uint y, uint radius, int start_angle, int end_angle);

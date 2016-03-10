@@ -163,29 +163,27 @@ FOV::FOV()
 //}
 
 
-void FOV::calculate(int radius,GameObject* unit, GameMap* map, int start_angle, int end_angle)
+void FOV::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
 {
-	m_radius = radius;
-	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(unit->m_active_state->m_ai)->m_fov_qualifier->predicat;
-	for (int y = 0; y <m_max_size; y++)
+	std::function<bool(GameObject*)> qualifier = fov.qualifier->predicat;
+	for (int y = 0; y < m_max_size; y++)
 	{
-		for (int x = 0; x <m_max_size; x++)
+		for (int x = 0; x < m_max_size; x++)
 		{
 			m_map[y][x].opaque = false;
 			m_map[y][x].visible = false;
 		}
 	}
-	for (int y = unit->cell()->y - radius; y < unit->cell()->y + radius+1; y++)
+	for (int y = unit->cell()->y - fov.radius; y < unit->cell()->y + fov.radius + 1; y++)
 	{
-		if (!((y<0) || (y>map->m_size.h - 1)))
+		if (!((y < 0) || (y > map->m_size.h - 1)))
 		{
-			for (int x = unit->cell()->x - radius; x < unit->cell()->x + radius + 1; x++)
+			for (int x = unit->cell()->x - fov.radius; x < unit->cell()->x + fov.radius + 1; x++)
 			{
-				if (!((x<0) || (x>map->m_size.w - 1)))
+				if (!((x < 0) || (x > map->m_size.w - 1)))
 				{
-					for (std::list<GameObject*>::iterator obj = map->m_items[y][x]->m_items.begin(); obj != map->m_items[y][x]->m_items.end(); obj++)
+					for (auto obj = map->m_items[y][x]->m_items.begin(); obj != map->m_items[y][x]->m_items.end(); obj++)
 					{
-						//if ((!(*obj)->m_active_state->find_property(property_e::permit_move))&&(*obj)!=unit)
 						if ((*obj) != unit&&qualifier((*obj)))
 						{
 							m_map[m_middle + (y - unit->cell()->y)][m_middle + (x - unit->cell()->x)].opaque = true;
@@ -195,14 +193,28 @@ void FOV::calculate(int radius,GameObject* unit, GameMap* map, int start_angle, 
 			}
 		}
 	}
-	if (m_radius > 128) 
+	/*if (m_radius > 128)
 	{
 		LOG(INFO) << "    Просчет поля зрения " << std::to_string(m_radius);
-	}
-	do_fov(m_middle, m_middle, m_radius, Game_algorithm::get_angle(unit,start_angle), Game_algorithm::get_angle(unit, end_angle));
+	}*/
+	do_fov(m_middle, m_middle, fov.radius, Game_algorithm::get_angle(unit, fov.start_angle), Game_algorithm::get_angle(unit, fov.end_angle));
+	/*for (int y = m_middle - fov.radius; y <m_middle + fov.radius + 1; y++)
+	{
+		std::string a="";
+			for (int x = m_middle - fov.radius; x < m_middle + fov.radius + 1; x++)
+			{
+					if (m_map[y][x].visible)
+					{
+						a = a + " " + "*";
+					}
+					else
+					{
+						a = a + " " + "X";
+					}
+			}
+			LOG(INFO) << a;
+	}*/
 }
-
-
 
 void FOV::cast_light(uint x, uint y, uint radius, uint row, float start_slope, float end_slope, uint xx, uint xy, uint yx, uint yy)
 {
