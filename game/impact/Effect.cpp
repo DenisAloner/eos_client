@@ -326,6 +326,78 @@ void Vision_list::description(std::list<std::string>* info, int level)
 	}
 }
 
+void Vision_list::equip(Object_interaction* item)
+{
+	switch (item->m_interaction_message_type)
+	{
+	case interaction_message_type_e::list:
+	{
+		switch (static_cast<Interaction_list*>(item)->m_list_type)
+		{
+		case feature_list_type_e::vision_item:
+		{
+			m_effect.push_back(item);
+			break;
+		}
+		default:
+		{
+			Interaction_list* list_item = static_cast<Interaction_list*>(item);
+			for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); current++)
+			{
+				equip(*current);
+			}
+			break;
+		}
+		}
+		break;
+	}
+	default:
+	{
+		for (auto current = m_effect.begin(); current != m_effect.end(); current++)
+		{
+			static_cast<Vision_item*>(*current)->equip(item);
+		}
+		break;
+	}
+	}
+}
+
+void Vision_list::unequip(Object_interaction* item)
+{
+	switch (item->m_interaction_message_type)
+	{
+	case interaction_message_type_e::list:
+	{
+		switch (static_cast<Interaction_list*>(item)->m_list_type)
+		{
+		case feature_list_type_e::vision_item:
+		{
+			m_effect.remove(item);
+			break;
+		}
+		default:
+		{
+			Interaction_list* list_item = static_cast<Interaction_list*>(item);
+			for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); current++)
+			{
+				unequip(*current);
+			}
+			break;
+		}
+		}
+		break;
+	}
+	default:
+	{
+		for (auto current = m_effect.begin(); current != m_effect.end(); current++)
+		{
+			static_cast<Vision_item*>(*current)->unequip(item);
+		}
+		break;
+	}
+	}
+}
+
 void Vision_list::save()
 {
 	/*LOG(INFO) << "Лист параметров";
@@ -375,44 +447,48 @@ Vision_item::Vision_item()
 void Vision_item::update_list(Object_interaction* list)
 {
 
-	//switch (list->m_interaction_message_type)
-	//{
-	//case interaction_message_type_e::list:
-	//{
-	//	Interaction_list* list_item = static_cast<Interaction_list*>(list);
-	//	for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); current++)
-	//	{
-	//		update_list((*current));
-	//	}
-	//	break;
-	//}
-	//case interaction_message_type_e::slot_time:
-	//{
-	//	LOG(INFO) << "buff in parameter";
-	//	Interaction_time* item = static_cast<Interaction_time*>(list);
-	//	update_list(item->m_value);
-	//	break;
-	//}
-	//default:
-	//{
-	//	Effect* item;
-	//	item = static_cast<Effect*>(list);
-	//	switch (item->m_subtype)
-	//	{
-	//	case effect_e::value:
-	//	{
-	//		m_value = m_value + item->m_value;
-	//		break;
-	//	}
-	//	case effect_e::limit:
-	//	{
-	//		m_limit = m_limit + item->m_value;
-	//		break;
-	//	}
-	//	}
-	//}
-	//}
-
+	switch (list->m_interaction_message_type)
+	{
+	case interaction_message_type_e::list:
+	{
+		Interaction_list* list_item = static_cast<Interaction_list*>(list);
+		for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); current++)
+		{
+			update_list((*current));
+		}
+		break;
+	}
+	case interaction_message_type_e::slot_time:
+	{
+		LOG(INFO) << "buff in parameter";
+		Interaction_time* item = static_cast<Interaction_time*>(list);
+		update_list(item->m_value);
+		break;
+	}
+	default:
+	{
+		Effect* item;
+		item = static_cast<Effect*>(list);
+		switch (item->m_subtype)
+		{
+		case effect_e::limit:
+		{
+			m_value.radius += item->m_value;
+			break;
+		}
+		case effect_e::start_angle:
+		{
+			m_value.start_angle += item->m_value;
+			break;
+		}
+		case effect_e::end_angle:
+		{
+			m_value.end_angle += item->m_value;
+			break;
+		}
+		}
+	}
+	}
 }
 
 void Vision_item::update()
@@ -955,7 +1031,7 @@ void Interaction_addon::description(std::list<std::string>* info, int level)
 
 void Interaction_addon::apply_effect(GameObject* unit, Object_interaction* object)
 {
-	unit->add_effect(m_subtype, m_value->clone());
+	unit->add_from(m_subtype, m_value->clone());
 }
 
 void Interaction_addon::save()

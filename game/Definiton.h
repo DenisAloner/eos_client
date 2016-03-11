@@ -275,6 +275,8 @@ enum class effect_e
 {
 	value,
 	limit,
+	start_angle,
+	end_angle
 };
 
 enum class body_part_e

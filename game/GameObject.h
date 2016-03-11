@@ -149,6 +149,7 @@ public:
 	void set_state(object_state_e state);
 	Object_state* get_state(object_state_e state);
 	void add_effect(interaction_e key, Object_interaction* item);
+	void add_from(interaction_e key, Object_interaction* item);
 	Interaction_list* get_effect(interaction_e key);
 	void remove_effect(interaction_e key, Object_interaction* item);
 	bool get_stat(object_tag_e key);

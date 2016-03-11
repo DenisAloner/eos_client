@@ -458,6 +458,14 @@ void GameObject::add_effect(interaction_e key, Object_interaction* item)
 	}
 }
 
+void GameObject::add_from(interaction_e key, Object_interaction* item)
+{
+	if (m_active_state->m_item.find(key) != m_active_state->m_item.end())
+	{
+		m_active_state->m_item[key]->equip(item);
+	}
+}
+
 void GameObject::add_from(interaction_e key, Interaction_list* feature)
 {
 	if (m_active_state)
@@ -468,7 +476,7 @@ void GameObject::add_from(interaction_e key, Interaction_list* feature)
 		}
 		else
 		{
-			m_active_state->m_item[key]->add(feature);
+			m_active_state->m_item[key]->equip(feature);
 		}
 	}
 }
@@ -497,7 +505,7 @@ void GameObject::remove_from(interaction_e key, Interaction_list* feature)
 			}
 			else
 			{
-				m_active_state->m_item[key]->remove(feature);
+				m_active_state->m_item[key]->unequip(feature);
 			}
 		}
 	}

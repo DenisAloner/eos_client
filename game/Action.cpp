@@ -1251,7 +1251,7 @@ void Action_use::interaction_handler(Parameter* arg)
 	{
 		p->m_object = static_cast<P_object*>(result)->m_object;
 		std::string a = "Выбран ";
-		a.append(p->m_unit->m_name);
+		a.append(p->m_object->m_name);
 		a = a + ".";
 		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
 	}
@@ -1266,7 +1266,7 @@ void Action_use::interaction_handler(Parameter* arg)
 	{
 		p->m_unit = static_cast<P_object*>(result)->m_object;
 		std::string a = "Выбран ";
-		a.append(p->m_object->m_name);
+		a.append(p->m_unit->m_name);
 		a = a + ".";
 		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
 	}
@@ -1291,7 +1291,7 @@ void Action_use::perfom(Parameter* parameter)
 	P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
 	if (check(p))
 	{
-		p->m_unit->set_direction(Game_algorithm::turn_to_object(p->m_unit, p->m_object));
+		//p->m_unit->set_direction(Game_algorithm::turn_to_object(p->m_unit, p->m_object));
 		auto reaction = p->m_object->get_effect(interaction_e::use);
 		if (reaction)
 		{

@@ -17,8 +17,12 @@ public:
 	virtual Interaction_list* clone();
 	virtual void description(std::list<std::string>* info, int level);
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
 	virtual void add(Object_interaction* item) { m_effect.push_back(item); };
 	virtual void remove(Object_interaction* item) { m_effect.remove(item); };
+	virtual void equip(Object_interaction* item) { m_effect.push_back(item); };
+	virtual void unequip(Object_interaction* item) { m_effect.remove(item); };
+
 	virtual void do_predicat(predicat func);
 
 	virtual void reset_serialization_index();
@@ -61,6 +65,9 @@ public:
 	virtual void update();
 	virtual Vision_list* clone();
 	virtual void description(std::list<std::string>* info, int level);
+
+	virtual void equip(Object_interaction* item);
+	virtual void unequip(Object_interaction* item);
 
 	virtual void save();
 	virtual void load();

@@ -33,6 +33,7 @@ public:
 
 	GUI_FOV(position_t position, dimension_t size, GameObject* object);
 	
+	GameObject* m_object;
 	FOV* m_fov;
 	int m_radius;
 	fdimension_t m_cell_size;

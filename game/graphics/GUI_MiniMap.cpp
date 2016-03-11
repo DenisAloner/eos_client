@@ -127,10 +127,11 @@ void GUI_MiniMap::render(GraphicalController* Graph, int px, int py)
 
 GUI_FOV::GUI_FOV(position_t position, dimension_t size, GameObject* object)
 {
-	AI_enemy* ai = static_cast<AI_enemy*>(object->m_active_state->m_ai);
+	m_object = object;
+	AI_enemy* ai = static_cast<AI_enemy*>(m_object->m_active_state->m_ai);
 	m_fov = ai->m_fov;
 	m_radius = 0;
-	Vision_list* vl = static_cast<Vision_list*>(object->m_active_state->get_list(interaction_e::vision));
+	Vision_list* vl = static_cast<Vision_list*>(m_object->m_active_state->get_list(interaction_e::vision));
 	AI_FOV current;
 	for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); item++)
 	{
@@ -144,6 +145,15 @@ GUI_FOV::GUI_FOV(position_t position, dimension_t size, GameObject* object)
 
 void GUI_FOV::render(GraphicalController* Graph, int px, int py)
 {
+	m_radius = 0;
+	Vision_list* vl = static_cast<Vision_list*>(m_object->m_active_state->get_list(interaction_e::vision));
+	AI_FOV current;
+	for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); item++)
+	{
+		current = static_cast<Vision_item*>(*item)->m_value;
+		m_radius = max(m_radius, current.radius);
+	}
+	m_cell_size = fdimension_t(static_cast<float>(m_size.w) / static_cast<float>(2 * m_radius + 1), static_cast<float>(m_size.h) / static_cast<float>(2 * m_radius + 1));
 	double x0, y0, x1, y1, x2, y2, x3, y3;
 	glDisable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);

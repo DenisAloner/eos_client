@@ -526,9 +526,13 @@ void GameObjectManager::init()
 
 	m_to_effect_e["value"] = effect_e::value;
 	m_to_effect_e["limit"] = effect_e::limit;
+	m_to_effect_e["start_angle"] = effect_e::start_angle;
+	m_to_effect_e["end_angle"] = effect_e::end_angle;
 
 	m_effect_subtype_string[effect_e::value] = "модификатор значения";
 	m_effect_subtype_string[effect_e::limit] = "модификатор лимита";
+	m_effect_subtype_string[effect_e::start_angle] = "модификатор начального угла обзора";
+	m_effect_subtype_string[effect_e::end_angle] = "модификатор конечного угла обзора";
 
 	m_effect_prefix_string[effect_prefix_e::physical_damage] = "физический урон";
 	m_effect_prefix_string[effect_prefix_e::poison_damage] = "урон от яда";
