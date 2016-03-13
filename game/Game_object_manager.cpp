@@ -52,6 +52,51 @@ object_state_e GameObjectManager::get_object_state_e(const std::string& key)
 //	return value->second;
 //}
 
+Interaction_list* GameObjectManager::create_feature_list(feature_list_type_e key, interaction_e name)
+{
+	Interaction_list* result;
+	switch (key)
+	{
+	case feature_list_type_e::generic:
+	{
+		result = new Interaction_list();
+		break;
+	}
+	case feature_list_type_e::tag:
+	{
+		result = new Tag_list();
+		break;
+	}
+	case feature_list_type_e::action:
+	{
+		result = new Action_list();
+		break;
+	}
+	case feature_list_type_e::parameter:
+	{
+		result = new Parameter_list(name);
+		break;
+	}
+	case feature_list_type_e::parts:
+	{
+		result = new Parts_list();
+		break;
+	}
+	case feature_list_type_e::vision:
+	{
+		result = new Vision_list();
+		break;
+	}
+	case feature_list_type_e::vision_item:
+	{
+		result = new Vision_item();
+		break;
+	}
+	}
+	return result;
+}
+
+
 void GameObjectManager::parser(const std::string& command)
 {
 	LOG(INFO) << command;
@@ -341,6 +386,30 @@ void GameObjectManager::parser(const std::string& command)
 		m_slot = item;
 		break;
 	}
+	case command_e::create_list:
+	{
+		feature_list_type_e list_type = get_feature_list_type_e(arg[0]);
+		Interaction_list* list = create_feature_list(list_type, get_interaction_e(arg[1]));
+		list->m_list_type = list_type;
+		switch (list_type)
+		{
+		case feature_list_type_e::parameter:
+		{
+			Parameter_list* parameter_list = static_cast<Parameter_list*>(list);
+			parameter_list->m_basic_value = std::stoi(arg[2]);
+			parameter_list->m_basic_limit = std::stoi(arg[3]);
+			break;
+		}
+		case feature_list_type_e::vision_item:
+		{
+			Vision_item* v_list = static_cast<Vision_item*>(list);
+			v_list->m_basic_value = AI_FOV(std::stoi(arg[2]), Application::instance().m_ai_manager->m_fov_qualifiers[std::stoi(arg[3])], std::stoi(arg[4]), std::stoi(arg[5]));
+			break;
+		}
+		}
+		m_current_list = list;
+		break;
+	}
 	case command_e::feature_list:
 	{
 		feature_list_type_e list_type = get_feature_list_type_e(arg[0]);
@@ -461,7 +530,7 @@ void GameObjectManager::init()
 	m_commands["copy_list_to_slot"] = command_e::copy_list_to_slot;
 	m_commands["add_slot_to_mem_list"] = command_e::add_slot_to_mem_list;
 	m_commands["mem_list"] = command_e::mem_list;
-
+	m_commands["create_list"] = command_e::create_list;
 
 	m_to_object_state_e["alive"] = object_state_e::alive;
 	m_to_object_state_e["dead"] = object_state_e::dead;

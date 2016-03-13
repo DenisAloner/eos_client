@@ -523,11 +523,11 @@ Vision_item* Vision_item::clone()
 
 void Vision_item::description(std::list<std::string>* info, int level)
 {
-	/*info->push_back(std::string(level, '.') + std::to_string(m_value) + "(" + std::to_string(m_basic_value) + ")/" + std::to_string(m_limit) + "(" + std::to_string(m_basic_limit) + "):");
+	info->push_back(std::string(level, '.') + std::to_string(m_value.radius)+","+ std::to_string(m_value.start_angle) + "," + std::to_string(m_value.end_angle)+"/" + std::to_string(m_basic_value.radius) + "," + std::to_string(m_basic_value.start_angle) + "," + std::to_string(m_basic_value.end_angle));
 	for (auto current = m_effect.begin(); current != m_effect.end(); current++)
 	{
-		(*current)->description(info, level);
-	}*/
+		(*current)->description(info, level+1);
+	}
 }
 
 void Vision_item::save()
