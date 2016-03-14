@@ -50,7 +50,7 @@ tile_manager 8
 optical 0.3,0.3,0.3
 feature_list vision,vision
 mem_list
-create_list vision_item,vision_item,32,0,270,90
+create_list vision_item,vision_item,10,0,315,45
 copy_list_to_slot
 add_slot_to_mem_list
 feature_list action,action

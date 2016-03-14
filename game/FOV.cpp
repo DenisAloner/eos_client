@@ -165,6 +165,10 @@ FOV::FOV()
 
 void FOV::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
 {
+	int xc = unit->cell()->x;
+	int yc = unit->cell()->y;
+	int dx = unit->m_active_state->m_size.x;
+	int dy = unit->m_active_state->m_size.y;
 	std::function<bool(GameObject*)> qualifier = fov.qualifier->predicat;
 	for (int y = 0; y < m_max_size; y++)
 	{
@@ -173,11 +177,11 @@ void FOV::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
 			m_map[y][x].opaque = false;
 		}
 	}
-	for (int y = unit->cell()->y - fov.radius; y < unit->cell()->y + fov.radius + 1; y++)
+	for (int y = yc - fov.radius; y < yc + fov.radius + 1; y++)
 	{
 		if (!((y < 0) || (y > map->m_size.h - 1)))
 		{
-			for (int x = unit->cell()->x - fov.radius; x < unit->cell()->x + fov.radius + 1; x++)
+			for (int x = xc - fov.radius; x < xc + fov.radius + 1; x++)
 			{
 				if (!((x < 0) || (x > map->m_size.w - 1)))
 				{
@@ -185,7 +189,7 @@ void FOV::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
 					{
 						if ((*obj) != unit&&qualifier((*obj)))
 						{
-							m_map[m_middle + (y - unit->cell()->y)][m_middle + (x - unit->cell()->x)].opaque = true;
+							m_map[m_middle + (y - yc)+ ((dy - 1) >> 1)][m_middle + (x - xc)-((dx - 1) >> 1)].opaque = true;
 						}
 					}
 				}
@@ -196,7 +200,7 @@ void FOV::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
 	{
 		LOG(INFO) << "    Просчет поля зрения " << std::to_string(m_radius);
 	}*/
-	do_fov(m_middle, m_middle, fov.radius, Game_algorithm::get_angle(unit, fov.start_angle), Game_algorithm::get_angle(unit, fov.end_angle));
+	do_fov(m_middle + ((dy-1) >> 1), m_middle- ((dx-1) >> 1), fov.radius, Game_algorithm::get_angle(unit, fov.start_angle), Game_algorithm::get_angle(unit, fov.end_angle), dx >> 1 == (dx + 1) >> 1);
 	/*for (int y = m_middle - fov.radius; y <m_middle + fov.radius + 1; y++)
 	{
 		std::string a="";
@@ -213,12 +217,19 @@ void FOV::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
 			}
 			LOG(INFO) << a;
 	}*/
+	for (int y = 0; y < unit->m_active_state->m_size.y; y++)
+	{
+		for (int x = 0; x < unit->m_active_state->m_size.x; x++)
+		{
+			m_map[m_middle - y ][m_middle + x ].visible = true;
+		}
+	}
 }
 
 void FOV::cast_light(uint x, uint y, uint radius, uint row, float start_slope, float end_slope, uint xx, uint xy, uint yx, uint yy)
 {
 	//LOG(INFO) << "    Вызов функции";
-	if (start_slope < end_slope) {
+	if (start_slope <= end_slope) {
 		return;
 	}
 	float next_start_slope = start_slope;
@@ -372,7 +383,24 @@ void set_slopes(uint start_octant, uint end_octant, uint current_octant, int sta
 	}
 }
 
-void FOV::do_fov(uint x, uint y, uint radius,int start_angle,int end_angle)
+int shift_x(const int& x,const int& octant)
+{
+	return x + (octant >> 2);
+}
+
+int shift_y(const int& y, const int& octant)
+{
+	switch(octant >> 1)
+	{
+	case 0: return y - 1;
+	case 1: return y;
+	case 2: return y;
+	case 3: return y - 1;
+	}
+}
+
+
+void FOV::do_fov(uint x, uint y, uint radius,int start_angle,int end_angle, bool fold)
 {
 	if (start_angle == end_angle)
 	{
@@ -385,26 +413,52 @@ void FOV::do_fov(uint x, uint y, uint radius,int start_angle,int end_angle)
 	uint end_octant = end_angle / 45;
 	float start_slope;
 	float end_slope;
-	if(start_octant<=end_octant)
-	{ 
-		for (uint i = start_octant; i <end_octant+1; i++)
+	if (!fold)
+	{
+		if (start_octant <= end_octant)
 		{
-			set_slopes(start_octant, end_octant, i, start_angle, end_angle, start_slope, end_slope);
-			cast_light(x, y, radius, 1, start_slope, end_slope, multipliers1[0][i], multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
+			for (uint i = start_octant; i <end_octant + 1; i++)
+			{
+				set_slopes(start_octant, end_octant, i, start_angle, end_angle, start_slope, end_slope);
+				cast_light(x, y, radius, 1, start_slope, end_slope, multipliers1[0][i], multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
+			}
+		}
+		else
+		{
+			for (uint i = start_octant; i < 8; i++)
+			{
+				set_slopes(start_octant, 7, i, start_angle, 0, start_slope, end_slope);
+				cast_light(x, y, radius, 1, start_slope, end_slope, multipliers1[0][i], multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
+			}
+			for (uint i = 0; i < end_octant + 1; i++)
+			{
+				set_slopes(0, end_octant, i, 0, end_angle, start_slope, end_slope);
+				cast_light(x, y, radius, 1, start_slope, end_slope, multipliers1[0][i], multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
+			}
 		}
 	}
 	else
 	{
-		for (uint i = start_octant; i < 8; i++)
+		if (start_octant <= end_octant)
 		{
-			set_slopes(start_octant, 7, i, start_angle, 0, start_slope, end_slope);
-			cast_light(x, y, radius, 1, start_slope, end_slope, multipliers1[0][i], multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
+			for (uint i = start_octant; i <end_octant + 1; i++)
+			{
+				set_slopes(start_octant, end_octant, i, start_angle, end_angle, start_slope, end_slope);
+				cast_light(shift_x(x,i), shift_y(y, i), radius, 1, start_slope, end_slope, multipliers1[0][i], multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
+			}
 		}
-		for (uint i = 0; i < end_octant+1; i++)
+		else
 		{
-			set_slopes(0, end_octant, i, 0, end_angle, start_slope, end_slope);
-			cast_light(x, y, radius, 1, start_slope, end_slope, multipliers1[0][i], multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
+			for (uint i = start_octant; i < 8; i++)
+			{
+				set_slopes(start_octant, 7, i, start_angle, 0, start_slope, end_slope);
+				cast_light(shift_x(x, i), shift_y(y, i), radius, 1, start_slope, end_slope, multipliers1[0][i], multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
+			}
+			for (uint i = 0; i < end_octant + 1; i++)
+			{
+				set_slopes(0, end_octant, i, 0, end_angle, start_slope, end_slope);
+				cast_light(shift_x(x, i), shift_y(y, i), radius, 1, start_slope, end_slope, multipliers1[0][i], multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
+			}
 		}
 	}
-	m_map[m_middle][m_middle].visible = true;
 }

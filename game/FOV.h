@@ -54,7 +54,7 @@ public:
 	void calculate(GameObject* unit, GameMap* map, AI_FOV& fov);
 	void cast_light(uint x, uint y, uint radius, uint row, float start_slope, float end_slope, uint xx, uint xy, uint yx, uint yy);
 	/*void do_fov(uint x, uint y, uint radius);*/
-	void do_fov(uint x, uint y, uint radius, int start_angle, int end_angle);
+	void do_fov(uint x, uint y, uint radius, int start_angle, int end_angle,bool fold);
 
 };
 
