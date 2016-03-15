@@ -165,10 +165,6 @@ FOV::FOV()
 
 void FOV::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
 {
-	int xc = unit->cell()->x;
-	int yc = unit->cell()->y;
-	int dx = unit->m_active_state->m_size.x;
-	int dy = unit->m_active_state->m_size.y;
 	std::function<bool(GameObject*)> qualifier = fov.qualifier->predicat;
 	for (int y = 0; y < m_max_size; y++)
 	{
@@ -177,30 +173,43 @@ void FOV::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
 			m_map[y][x].opaque = false;
 		}
 	}
-	for (int y = yc - fov.radius; y < yc + fov.radius + 1; y++)
+
+	int xc = unit->cell()->x;
+	int yc = unit->cell()->y;
+	int dx = unit->m_active_state->m_size.x;
+	int dy = unit->m_active_state->m_size.y;
+
+	int xs = ((dx - 1) >> 1);
+	int ys = ((dy - 1) >> 1);
+
+	int x_start = xc - fov.radius + xs;
+	x_start = max(x_start, 0);
+	x_start = min(x_start, map->m_size.w - 1);
+	int x_end = xc + fov.radius + xs;
+	x_end = max(x_end, 0);
+	x_end = min(x_end, map->m_size.w - 1);
+	int y_start = yc - fov.radius - ys;
+	y_start = max(y_start, 0);
+	y_start = min(y_start, map->m_size.h - 1);
+	int y_end = yc + fov.radius - ys;
+	y_end = max(y_end, 0);
+	y_end = min(y_end, map->m_size.h - 1);
+
+	for (int y = y_start; y < y_end +1; y++)
 	{
-		if (!((y < 0) || (y > map->m_size.h - 1)))
+		for (int x = x_start; x < x_end + 1; x++)
 		{
-			for (int x = xc - fov.radius; x < xc + fov.radius + 1; x++)
+			for (auto obj = map->m_items[y][x]->m_items.begin(); obj != map->m_items[y][x]->m_items.end(); obj++)
 			{
-				if (!((x < 0) || (x > map->m_size.w - 1)))
+				if ((*obj) != unit&&qualifier((*obj)))
 				{
-					for (auto obj = map->m_items[y][x]->m_items.begin(); obj != map->m_items[y][x]->m_items.end(); obj++)
-					{
-						if ((*obj) != unit&&qualifier((*obj)))
-						{
-							m_map[m_middle + (y - yc)+ ((dy - 1) >> 1)][m_middle + (x - xc)-((dx - 1) >> 1)].opaque = true;
-						}
-					}
+					m_map[y - y_start][x - x_start].opaque = true;
 				}
 			}
 		}
 	}
-	/*if (m_radius > 128)
-	{
-		LOG(INFO) << "    Просчет поля зрения " << std::to_string(m_radius);
-	}*/
-	do_fov(m_middle + ((dy-1) >> 1), m_middle- ((dx-1) >> 1), fov.radius, Game_algorithm::get_angle(unit, fov.start_angle), Game_algorithm::get_angle(unit, fov.end_angle), dx >> 1 == (dx + 1) >> 1);
+
+	do_fov(fov.radius, fov.radius, fov.radius, Game_algorithm::get_angle(unit, fov.start_angle), Game_algorithm::get_angle(unit, fov.end_angle), dx >> 1 == (dx + 1) >> 1);
 	/*for (int y = m_middle - fov.radius; y <m_middle + fov.radius + 1; y++)
 	{
 		std::string a="";
@@ -221,7 +230,7 @@ void FOV::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
 	{
 		for (int x = 0; x < unit->m_active_state->m_size.x; x++)
 		{
-			m_map[m_middle - y ][m_middle + x ].visible = true;
+			m_map[yc - (dx >> 1) - y_start + y - ys][fov.radius + x - xs].visible = true;
 		}
 	}
 }
@@ -392,10 +401,10 @@ int shift_y(const int& y, const int& octant)
 {
 	switch(octant >> 1)
 	{
-	case 0: return y - 1;
+	case 0: return y-1;
 	case 1: return y;
 	case 2: return y;
-	case 3: return y - 1;
+	case 3: return y-1;
 	}
 }
 

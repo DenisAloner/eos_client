@@ -951,6 +951,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 		current = static_cast<Vision_item*>(*item)->m_value;
 		max_fov_radius = max(max_fov_radius, current.radius);
 	}
+	position_t posc((m_player->m_object->m_active_state->m_size.x-1)>>1, (m_player->m_object->m_active_state->m_size.y - 1) >> 1);
 	for (int r = 0; r < 2; r++)
 	{
 		for (int i = 0; i < (m_tile_count_x + m_tile_count_y) - 1; i++)
@@ -973,11 +974,11 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 				gy += 1;
 				x = m_center.x + gx - m_tile_count_x / 2;
 				y = m_center.y + gy - m_tile_count_y / 2;
-				xf = x - m_player->m_object->cell()->x;
-				yf = y - m_player->m_object->cell()->y;
+				xf = x - m_player->m_object->cell()->x - posc.x;
+				yf = y - m_player->m_object->cell()->y + posc.y;
 				if ((x > -1) && (x<m_map->m_size.w) && (y>-1) && (y < m_map->m_size.h))
 				{
-					if ((xf >= -max_fov_radius) && (xf <= max_fov_radius) && (yf >= -max_fov_radius) && (yf <= max_fov_radius))
+					if ((xf >= -max_fov_radius) && (xf <= max_fov_radius) && (yf >= -max_fov_radius) && (yf<= max_fov_radius))
 					{
 						is_in_fov = true;
 					}
@@ -1006,7 +1007,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 								size3d = (*Current)->m_active_state->m_size;
 								if (is_in_fov)
 								{
-									if (ai->m_fov->m_map[ai->m_fov->m_middle + yf][ai->m_fov->m_middle + xf].visible)
+									if (ai->m_fov->m_map[max_fov_radius + yf][max_fov_radius + xf].visible)
 									{
 										
 										IsDraw = true;
@@ -1022,7 +1023,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 											{
 												if ((xf + n >= -max_fov_radius) && (xf + n <= max_fov_radius) && (yf - m >= -max_fov_radius) && (yf - m <= max_fov_radius))
 												{
-													if (ai->m_fov->m_map[ai->m_fov->m_middle + yf - m][ai->m_fov->m_middle + xf + n].visible)
+													if (ai->m_fov->m_map[max_fov_radius + yf - m][max_fov_radius + xf + n].visible)
 													{
 														IsDraw = true;
 													}

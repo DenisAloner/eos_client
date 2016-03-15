@@ -53,6 +53,9 @@ mem_list
 create_list vision_item,vision_item,10,0,315,45
 copy_list_to_slot
 add_slot_to_mem_list
+create_list vision_item,vision_item,10,0,135,225
+copy_list_to_slot
+add_slot_to_mem_list
 feature_list action,action
 add_action equip
 add_action open
