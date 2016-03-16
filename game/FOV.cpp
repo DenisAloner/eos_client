@@ -163,7 +163,7 @@ FOV::FOV()
 //}
 
 
-void FOV::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
+void FOV::calculate(GameObject* unit, GameMap* map, AI_FOV& fov,int shift)
 {
 	std::function<bool(GameObject*)> qualifier = fov.qualifier->predicat;
 	for (int y = 0; y < m_max_size; y++)
@@ -203,13 +203,13 @@ void FOV::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
 			{
 				if ((*obj) != unit&&qualifier((*obj)))
 				{
-					m_map[y - y_start][x - x_start].opaque = true;
+					m_map[y - y_start+shift][x - x_start+shift].opaque = true;
 				}
 			}
 		}
 	}
 
-	do_fov(fov.radius, fov.radius, fov.radius, Game_algorithm::get_angle(unit, fov.start_angle), Game_algorithm::get_angle(unit, fov.end_angle), dx >> 1 == (dx + 1) >> 1);
+	do_fov(fov.radius+shift, fov.radius+shift, fov.radius, Game_algorithm::get_angle(unit, fov.start_angle), Game_algorithm::get_angle(unit, fov.end_angle), dx >> 1 == (dx + 1) >> 1);
 	/*for (int y = m_middle - fov.radius; y <m_middle + fov.radius + 1; y++)
 	{
 		std::string a="";
@@ -230,7 +230,7 @@ void FOV::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
 	{
 		for (int x = 0; x < unit->m_active_state->m_size.x; x++)
 		{
-			m_map[yc - (dx >> 1) - y_start + y - ys][fov.radius + x - xs].visible = true;
+			m_map[yc - (dx >> 1) - y_start + y - ys+shift][fov.radius + x - xs+shift].visible = true;
 		}
 	}
 }

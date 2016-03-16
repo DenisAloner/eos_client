@@ -513,30 +513,41 @@ GameObject* AI_enemy::find_goal()
 	FOV::cell* fc;
 	MapCell* mc;
 	Vision_list* vl = static_cast<Vision_list*>(m_object->m_active_state->get_list(interaction_e::vision));
-	AI_FOV current;
-	for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); item++)
+	int radius = vl->m_max_radius;
+
+	int xc = m_object->cell()->x;
+	int yc = m_object->cell()->y;
+	int dx = m_object->m_active_state->m_size.x;
+	int dy = m_object->m_active_state->m_size.y;
+
+	int xs = ((dx - 1) >> 1);
+	int ys = ((dy - 1) >> 1);
+
+	int x_start = xc - radius + xs;
+	x_start = max(x_start, 0);
+	x_start = min(x_start, m_map->m_size.w - 1);
+	int x_end = xc + radius + xs;
+	x_end = max(x_end, 0);
+	x_end = min(x_end, m_map->m_size.w - 1);
+	int y_start = yc - radius - ys;
+	y_start = max(y_start, 0);
+	y_start = min(y_start, m_map->m_size.h - 1);
+	int y_end = yc + radius - ys;
+	y_end = max(y_end, 0);
+	y_end = min(y_end, m_map->m_size.h - 1);
+
+	for (int y = y_start; y < y_end + 1; y++)
 	{
-		current = static_cast<Vision_item*>(*item)->m_value;
-		for (int y = -current.radius; y < current.radius + 1; y++)
+		for (int x = x_start; x < x_end + 1; x++)
 		{
-			if ((m_object->cell()->y + y >= 0) && (m_object->cell()->y + y < m_map->m_size.h))
+			fc = &m_fov->m_map[y - y_start][x - x_start];
+			if (fc->visible)
 			{
-				for (int x = -current.radius; x < current.radius + 1; x++)
+				for (auto item = m_map->m_items[y][x]->m_items.begin(); item != m_map->m_items[y][x]->m_items.end(); item++)
 				{
-					if ((m_object->cell()->x + x >= 0) && (m_object->cell()->x + x < m_map->m_size.w))
+					if ((*item) == Application::instance().m_GUI->MapViewer->m_player->m_object)
 					{
-						fc = &m_fov->m_map[m_fov->m_middle + y][m_fov->m_middle + x];
-						if (fc->visible)
-						{
-							mc = m_map->m_items[m_object->cell()->y + y][m_object->cell()->x + x];
-							for (std::list<GameObject*>::iterator item = mc->m_items.begin(); item != mc->m_items.end(); item++)
-							{
-								if ((*item) == Application::instance().m_GUI->MapViewer->m_player->m_object)
-								{
-									return Application::instance().m_GUI->MapViewer->m_player->m_object;
-								}
-							}
-						}
+						return Application::instance().m_GUI->MapViewer->m_player->m_object;
 					}
 				}
 			}
@@ -550,30 +561,41 @@ bool AI_enemy::check_goal()
 	FOV::cell* fc;
 	MapCell* mc;
 	Vision_list* vl = static_cast<Vision_list*>(m_object->m_active_state->get_list(interaction_e::vision));
-	AI_FOV current;
-	for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); item++)
+	int radius = vl->m_max_radius;
+
+	int xc = m_object->cell()->x;
+	int yc = m_object->cell()->y;
+	int dx = m_object->m_active_state->m_size.x;
+	int dy = m_object->m_active_state->m_size.y;
+
+	int xs = ((dx - 1) >> 1);
+	int ys = ((dy - 1) >> 1);
+
+	int x_start = xc - radius + xs;
+	x_start = max(x_start, 0);
+	x_start = min(x_start, m_map->m_size.w - 1);
+	int x_end = xc + radius + xs;
+	x_end = max(x_end, 0);
+	x_end = min(x_end, m_map->m_size.w - 1);
+	int y_start = yc - radius - ys;
+	y_start = max(y_start, 0);
+	y_start = min(y_start, m_map->m_size.h - 1);
+	int y_end = yc + radius - ys;
+	y_end = max(y_end, 0);
+	y_end = min(y_end, m_map->m_size.h - 1);
+
+	for (int y = y_start; y < y_end + 1; y++)
 	{
-		current = static_cast<Vision_item*>(*item)->m_value;
-		for (int y = -current.radius; y < current.radius + 1; y++)
+		for (int x = x_start; x < x_end + 1; x++)
 		{
-			if ((m_object->cell()->y + y >= 0) && (m_object->cell()->y + y < m_map->m_size.h))
+			fc = &m_fov->m_map[y - y_start][x - x_start];
+			if (fc->visible)
 			{
-				for (int x = -current.radius; x < current.radius + 1; x++)
+				for (auto item = m_map->m_items[y][x]->m_items.begin(); item != m_map->m_items[y][x]->m_items.end(); item++)
 				{
-					if ((m_object->cell()->x + x >= 0) && (m_object->cell()->x + x < m_map->m_size.w))
+					if ((*item) == m_goal)
 					{
-						fc = &m_fov->m_map[m_fov->m_middle + y][m_fov->m_middle + x];
-						if (fc->visible)
-						{
-							mc = m_map->m_items[m_object->cell()->y + y][m_object->cell()->x + x];
-							for (std::list<GameObject*>::iterator item = mc->m_items.begin(); item != mc->m_items.end(); item++)
-							{
-								if ((*item) == m_goal)
-								{
-									return true;
-								}
-							}
-						}
+						return true;
 					}
 				}
 			}
@@ -597,7 +619,7 @@ void AI_enemy::calculate_FOV(GameObject* object,GameMap* map)
 	for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); item++)
 	{
 		current = static_cast<Vision_item*>(*item)->m_value;
-		m_fov->calculate(object, map, current);
+		m_fov->calculate(object, map, current, vl->m_max_radius - current.radius);
 	}
 }
 

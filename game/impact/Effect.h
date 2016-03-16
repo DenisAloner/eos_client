@@ -60,6 +60,8 @@ class Vision_list :public Interaction_list
 {
 public:
 	
+	int m_max_radius;
+
 	Vision_list();
 	virtual std::string get_description();
 	virtual void update();

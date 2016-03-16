@@ -715,33 +715,45 @@ void GameObject::load()
 
 Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 {
-	AI_enemy* ai= static_cast<AI_enemy*>(m_object->m_active_state->m_ai);
-	ai->calculate_FOV(m_object, m_map);
-	int radius = 0;
+	AI_enemy* ai = static_cast<AI_enemy*>(m_object->m_active_state->m_ai);
+	ai->calculate_FOV(m_object, Application::instance().m_GUI->MapViewer->m_map);
 	Vision_list* vl = static_cast<Vision_list*>(m_object->m_active_state->get_list(interaction_e::vision));
-	AI_FOV current;
-	for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); item++)
-	{
-		current = static_cast<Vision_item*>(*item)->m_value;
-		radius = max(radius, current.radius);
-	}
-	for (int y = m_object->cell()->y -radius; y < m_object->cell()->y + radius + 1; y++)
-	{
-		if (!((y<0) || (y>map->m_size.h - 1)))
-		{
-			for (int x = m_object->cell()->x - radius; x <  m_object->cell()->x + radius + 1; x++)
-			{
-				if (!((x<0) || (x>map->m_size.w - 1)))
-				{
-						if (ai->m_fov->m_map[ai->m_fov->m_middle + (y - m_object->cell()->y)][ai->m_fov->m_middle + (x - m_object->cell()->x)].visible)
-						{
-							m_map->m_items[y][x]->m_notable = true;
-						}
 
-				}
+
+	int radius = vl->m_max_radius;
+
+	int xc = m_object->cell()->x;
+	int yc = m_object->cell()->y;
+	int dx = m_object->m_active_state->m_size.x;
+	int dy = m_object->m_active_state->m_size.y;
+
+	int xs = ((dx - 1) >> 1);
+	int ys = ((dy - 1) >> 1);
+
+	int x_start = xc - radius + xs;
+	x_start = max(x_start, 0);
+	x_start = min(x_start, m_map->m_size.w - 1);
+	int x_end = xc + radius + xs;
+	x_end = max(x_end, 0);
+	x_end = min(x_end, m_map->m_size.w - 1);
+	int y_start = yc - radius - ys;
+	y_start = max(y_start, 0);
+	y_start = min(y_start, m_map->m_size.h - 1);
+	int y_end = yc + radius - ys;
+	y_end = max(y_end, 0);
+	y_end = min(y_end, m_map->m_size.h - 1);
+
+	for (int y = y_start; y < y_end + 1; y++)
+	{
+		for (int x = x_start; x < x_end + 1; x++)
+		{
+			if (ai->m_fov->m_map[y - y_start][x - x_start].visible)
+			{
+				m_map->m_items[y][x]->m_notable = true;
 			}
 		}
 	}
+
 	//LOG(INFO) << "Поле зрение " << std::to_string(static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_fov_radius);
 	m_actions.push_front(Application::instance().m_actions[action_e::autoexplore]);
 	m_actions.push_front(Application::instance().m_actions[action_e::set_motion_path]);

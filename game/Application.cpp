@@ -237,8 +237,7 @@ void Application::initialize()
 	int rx = m_GUI->MapViewer->m_player->m_object->cell()->x;
 	int ry = m_GUI->MapViewer->m_player->m_object->cell()->y;*/
 
-	//obj = m_game_object_manager->new_object("bat");
-	//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry+8][rx]);
+	
 
 	/*obj = m_game_object_manager->new_object("bat");
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx + 12]);
@@ -310,8 +309,15 @@ void Application::initialize()
 	MiniMap->add(mini_map);
 	//MenuLayer->add(MiniMap);
 
-	MiniMap = new GUI_Window(300, 0, 400, 400, "Поле зрения");
+	MiniMap = new GUI_Window(300, 0, 400, 400, "Поле зрения player");
 	GUI_FOV* fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), m_GUI->MapViewer->m_player->m_object);
+	MiniMap->add(fov);
+
+	obj = m_game_object_manager->new_object("bat");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry+8][rx]);
+
+	MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
+	fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), obj);
 	MiniMap->add(fov);
 
 	//MenuLayer->add(m_GUI->Timer);
@@ -660,27 +666,40 @@ void Application::update()
 				GameObject* object = m_GUI->MapViewer->m_player->m_object;
 				AI_enemy* ai = static_cast<AI_enemy*>(object->m_active_state->m_ai);
 				ai->calculate_FOV(object, Application::instance().m_GUI->MapViewer->m_map);
-				int radius = 0;
 				Vision_list* vl = static_cast<Vision_list*>(object->m_active_state->get_list(interaction_e::vision));
-				AI_FOV current;
-				for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); item++)
+				
+				GameMap* m_map = m_GUI->MapViewer->m_map;
+
+				int radius = vl->m_max_radius;
+
+				int xc = object->cell()->x;
+				int yc = object->cell()->y;
+				int dx = object->m_active_state->m_size.x;
+				int dy = object->m_active_state->m_size.y;
+
+				int xs = ((dx - 1) >> 1);
+				int ys = ((dy - 1) >> 1);
+
+				int x_start = xc - radius + xs;
+				x_start = max(x_start, 0);
+				x_start = min(x_start, m_map->m_size.w - 1);
+				int x_end = xc + radius + xs;
+				x_end = max(x_end, 0);
+				x_end = min(x_end, m_map->m_size.w - 1);
+				int y_start = yc - radius - ys;
+				y_start = max(y_start, 0);
+				y_start = min(y_start, m_map->m_size.h - 1);
+				int y_end = yc + radius - ys;
+				y_end = max(y_end, 0);
+				y_end = min(y_end, m_map->m_size.h - 1);
+
+				for (int y = y_start; y < y_end + 1; y++)
 				{
-					current = static_cast<Vision_item*>(*item)->m_value;
-					radius = max(radius, current.radius);
-				}
-				for (int y = object->cell()->y - radius; y < object->cell()->y + radius + 1; y++)
-				{
-					if (!((y<0) || (y>m_GUI->MapViewer->m_map->m_size.h - 1)))
+					for (int x = x_start; x < x_end + 1; x++)
 					{
-						for (int x = object->cell()->x - radius; x < object->cell()->x + radius + 1; x++)
+						if (ai->m_fov->m_map[y - y_start][x - x_start].visible)
 						{
-							if (!((x<0) || (x>m_GUI->MapViewer->m_map->m_size.w - 1)))
-							{
-								if (ai->m_fov->m_map[ai->m_fov->m_middle + (y - object->cell()->y)][ai->m_fov->m_middle + (x - object->cell()->x)].visible)
-								{
-									m_GUI->MapViewer->m_map->m_items[y][x]->m_notable = true;
-								}
-							}
+							m_map->m_items[y][x]->m_notable = true;
 						}
 					}
 				}

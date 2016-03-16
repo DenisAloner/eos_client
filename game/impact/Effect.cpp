@@ -272,6 +272,7 @@ void Vision_list::update_list(Object_interaction* list)
 		{
 			Vision_item* list_item = static_cast<Vision_item*>(list);
 			list_item->update();
+			m_max_radius = max(m_max_radius, list_item->m_value.radius);
 			break;
 		}
 		default:
@@ -292,6 +293,7 @@ void Vision_list::update_list(Object_interaction* list)
 void Vision_list::update()
 {
 	//LOG(INFO) << "ÒÈÏ ÏÀÐÀÌÅÒÐÀ " << std::to_string((int)m_subtype);
+	m_max_radius = 0;
 	update_list(this);
 }
 
