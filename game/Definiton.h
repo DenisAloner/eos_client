@@ -268,7 +268,7 @@ enum class interaction_e
 	strength_bonus,
 	weapon_range,
 	vision,
-	vision_item
+	vision_component
 };
 
 enum class effect_e
@@ -316,7 +316,7 @@ enum class feature_list_type_e
 	action,
 	parts,
 	vision,
-	vision_item
+	vision_component
 };
 
 enum class ai_type_e

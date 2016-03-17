@@ -52,7 +52,6 @@ public:
 		add_slot,
 		add_slot_mem,
 		tag,
-		add_fov,
 		copy_list_to_slot,
 		add_slot_to_mem_list,
 		mem_list,

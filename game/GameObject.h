@@ -22,7 +22,7 @@ class Object_interaction;
 class Interaction_list;
 class Parameter_list;
 class Vision_list;
-class Vision_item;
+class Vision_component;
 class Tag_list;
 struct object_parameter_t;
 class Action;

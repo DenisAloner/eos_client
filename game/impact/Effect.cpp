@@ -268,9 +268,9 @@ void Vision_list::update_list(Object_interaction* list)
 	{
 		switch (static_cast<Interaction_list*>(list)->m_list_type)
 		{
-		case feature_list_type_e::vision_item:
+		case feature_list_type_e::vision_component:
 		{
-			Vision_item* list_item = static_cast<Vision_item*>(list);
+			Vision_component* list_item = static_cast<Vision_component*>(list);
 			list_item->update();
 			m_max_radius = max(m_max_radius, list_item->m_value.radius);
 			break;
@@ -336,7 +336,7 @@ void Vision_list::equip(Object_interaction* item)
 	{
 		switch (static_cast<Interaction_list*>(item)->m_list_type)
 		{
-		case feature_list_type_e::vision_item:
+		case feature_list_type_e::vision_component:
 		{
 			m_effect.push_back(item);
 			break;
@@ -357,7 +357,7 @@ void Vision_list::equip(Object_interaction* item)
 	{
 		for (auto current = m_effect.begin(); current != m_effect.end(); current++)
 		{
-			static_cast<Vision_item*>(*current)->equip(item);
+			static_cast<Vision_component*>(*current)->equip(item);
 		}
 		break;
 	}
@@ -372,7 +372,7 @@ void Vision_list::unequip(Object_interaction* item)
 	{
 		switch (static_cast<Interaction_list*>(item)->m_list_type)
 		{
-		case feature_list_type_e::vision_item:
+		case feature_list_type_e::vision_component:
 		{
 			m_effect.remove(item);
 			break;
@@ -393,7 +393,7 @@ void Vision_list::unequip(Object_interaction* item)
 	{
 		for (auto current = m_effect.begin(); current != m_effect.end(); current++)
 		{
-			static_cast<Vision_item*>(*current)->unequip(item);
+			static_cast<Vision_component*>(*current)->unequip(item);
 		}
 		break;
 	}
@@ -439,14 +439,14 @@ void Vision_list::load()
 }
 
 
-// Vision_item
+// Vision_component
 
-Vision_item::Vision_item()
+Vision_component::Vision_component()
 {
-	m_list_type = feature_list_type_e::vision_item;
+	m_list_type = feature_list_type_e::vision_component;
 };
 
-void Vision_item::update_list(Object_interaction* list)
+void Vision_component::update_list(Object_interaction* list)
 {
 
 	switch (list->m_interaction_message_type)
@@ -493,14 +493,14 @@ void Vision_item::update_list(Object_interaction* list)
 	}
 }
 
-void Vision_item::update()
+void Vision_component::update()
 {
 	//LOG(INFO) << "ТИП ПАРАМЕТРА " << std::to_string((int)m_subtype);
 	m_value = m_basic_value;
 	update_list(this);
 }
 
-std::string Vision_item::get_description()
+std::string Vision_component::get_description()
 {
 	//std::string result = std::to_string(m_value) + "/" + std::to_string(m_limit) + ",";
 	//for (auto current = m_effect.begin(); current != m_effect.end(); current++)
@@ -511,9 +511,9 @@ std::string Vision_item::get_description()
 	return "";
 }
 
-Vision_item* Vision_item::clone()
+Vision_component* Vision_component::clone()
 {
-	Vision_item* result = new Vision_item();
+	Vision_component* result = new Vision_component();
 	result->m_basic_value = AI_FOV(m_basic_value.radius, m_basic_value.qualifier, m_basic_value.start_angle, m_basic_value.end_angle);
 	result->m_value = AI_FOV(m_value.radius, m_value.qualifier, m_value.start_angle, m_value.end_angle);
 	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
@@ -523,7 +523,7 @@ Vision_item* Vision_item::clone()
 	return result;
 }
 
-void Vision_item::description(std::list<std::string>* info, int level)
+void Vision_component::description(std::list<std::string>* info, int level)
 {
 	info->push_back(std::string(level, '.') + std::to_string(m_value.radius)+","+ std::to_string(m_value.start_angle) + "," + std::to_string(m_value.end_angle)+"/" + std::to_string(m_basic_value.radius) + "," + std::to_string(m_basic_value.start_angle) + "," + std::to_string(m_basic_value.end_angle));
 	for (auto current = m_effect.begin(); current != m_effect.end(); current++)
@@ -532,7 +532,7 @@ void Vision_item::description(std::list<std::string>* info, int level)
 	}
 }
 
-void Vision_item::save()
+void Vision_component::save()
 {
 	//LOG(INFO) << "Лист параметров";
 	//FILE* file = Serialization_manager::instance().m_file;
@@ -552,7 +552,7 @@ void Vision_item::save()
 	//LOG(INFO) << "Конец листа параметров";
 }
 
-void Vision_item::load()
+void Vision_component::load()
 {
 	//LOG(INFO) << "Лист параметров";
 	//FILE* file = Serialization_manager::instance().m_file;

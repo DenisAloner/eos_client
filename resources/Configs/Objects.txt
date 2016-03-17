@@ -43,14 +43,12 @@ tag seethrough_able
 object iso_unit
 state alive
 ai non_humanoid,0
-add_fov 32,0,270,90
-add_fov 10,0,135,225
 size 2,2,4
 tile_manager 8
 optical 0.3,0.3,0.3
 feature_list vision,vision
 mem_list
-create_list vision_item,vision_item,32,0,0,360
+create_list vision_component,vision_component,32,0,0,0
 copy_list_to_slot
 add_slot_to_mem_list
 feature_list action,action
@@ -101,13 +99,12 @@ tile_manager 10
 object bat
 state alive
 ai non_humanoid,0
-add_fov 64,0,0,0
 size 2,2,4
 tile_manager 12
 optical 0.8,0.8,0.8
 feature_list vision,vision
 mem_list
-create_list vision_item,vision_item,10,0,270,90
+create_list vision_component,vision_component,10,0,270,90
 copy_list_to_slot
 add_slot_to_mem_list
 feature_list action,action

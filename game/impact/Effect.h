@@ -78,16 +78,16 @@ private:
 	void update_list(Object_interaction* list);
 };
 
-class Vision_item :public Interaction_list
+class Vision_component :public Interaction_list
 {
 public:
  
 	AI_FOV m_basic_value;
 	AI_FOV m_value;
-	Vision_item();
+	Vision_component();
 	virtual std::string get_description();
 	virtual void update();
-	virtual Vision_item* clone();
+	virtual Vision_component* clone();
 	virtual void description(std::list<std::string>* info, int level);
 
 	virtual void save();

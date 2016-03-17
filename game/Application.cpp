@@ -313,12 +313,12 @@ void Application::initialize()
 	GUI_FOV* fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), m_GUI->MapViewer->m_player->m_object);
 	MiniMap->add(fov);
 
-	obj = m_game_object_manager->new_object("bat");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry+8][rx]);
+	/*obj = m_game_object_manager->new_object("bat");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry+8][rx]);*/
 
-	MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
+	/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
 	fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), obj);
-	MiniMap->add(fov);
+	MiniMap->add(fov);*/
 
 	//MenuLayer->add(m_GUI->Timer);
 	//MenuLayer->add(MiniMap);

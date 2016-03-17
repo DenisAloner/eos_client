@@ -135,7 +135,7 @@ GUI_FOV::GUI_FOV(position_t position, dimension_t size, GameObject* object)
 	AI_FOV current;
 	for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); item++)
 	{
-		current = static_cast<Vision_item*>(*item)->m_value;
+		current = static_cast<Vision_component*>(*item)->m_value;
 		m_radius = max(m_radius, current.radius);
 	}
 	m_position = position;
@@ -150,7 +150,7 @@ void GUI_FOV::render(GraphicalController* Graph, int px, int py)
 	AI_FOV current;
 	for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); item++)
 	{
-		current = static_cast<Vision_item*>(*item)->m_value;
+		current = static_cast<Vision_component*>(*item)->m_value;
 		m_radius = max(m_radius, current.radius);
 	}
 	m_cell_size = fdimension_t(static_cast<float>(m_size.w) / static_cast<float>(2 * m_radius + 1), static_cast<float>(m_size.h) / static_cast<float>(2 * m_radius + 1));

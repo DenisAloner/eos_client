@@ -413,10 +413,21 @@ void FOV::do_fov(uint x, uint y, uint radius,int start_angle,int end_angle, bool
 {
 	if (start_angle == end_angle)
 	{
-		for (uint i = 0; i <8; i++)
+		if (fold)
 		{
-			cast_light(x, y, radius, 1, 1.0, 0.0, multipliers1[0][i], multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
+			for (uint i = 0; i <8; i++)
+			{
+				cast_light(shift_x(x, i), shift_y(y, i), radius, 1, 1.0, 0.0, multipliers1[0][i], multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
+			}
 		}
+		else
+		{
+			for (uint i = 0; i <8; i++)
+			{
+				cast_light(x, y, radius, 1, 1.0, 0.0, multipliers1[0][i], multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
+			}
+		}
+		return;
 	}
 	uint start_octant = start_angle / 45;
 	uint end_octant = end_angle / 45;

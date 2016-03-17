@@ -67,9 +67,9 @@ Interaction_list*  Attribute_map::create_feature_list(feature_list_type_e key, i
 			result = new Vision_list();
 			break;
 		}
-		case feature_list_type_e::vision_item:
+		case feature_list_type_e::vision_component:
 		{
-			result = new Vision_item();
+			result = new Vision_component();
 			break;
 		}
 		}
@@ -440,9 +440,9 @@ Interaction_list* GameObject::create_feature_list(feature_list_type_e key, inter
 		result = new Vision_list();
 		break;
 	}
-	case feature_list_type_e::vision_item:
+	case feature_list_type_e::vision_component:
 	{
-		result = new Vision_item();
+		result = new Vision_component();
 		break;
 	}
 	}
