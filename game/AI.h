@@ -117,6 +117,7 @@ class AI_enemy: public AI
 public:
 
 	FOV* m_fov;
+	Event<VoidEventArgs> update;
 
 	GameObject* m_goal;
 	MapCell* m_memory_goal_cell;

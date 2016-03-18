@@ -31,6 +31,7 @@ public:
 	Event<GUI_Object*> lose_focus;
 
 	virtual void render(GraphicalController* Graph,int px,int py);
+	virtual void render_on_canvas() {};
 	virtual void on_mouse_click(MouseEventArgs const& e);
 	virtual void on_mouse_down(MouseEventArgs const& e);
 	virtual void on_mouse_wheel(MouseEventArgs const& e);

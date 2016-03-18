@@ -109,6 +109,8 @@ public:
 
 	GUI_Window_manager* m_window_manager;
 
+	std::list<GUI_Object*> m_update_canvas;
+
 	~Application(void);
 
 	static Application& instance()

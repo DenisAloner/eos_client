@@ -99,11 +99,17 @@ void Application::render()
 	m_update_mutex.lock();
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	if (Application::instance().m_GUI->MapViewer->m_map->m_update)
+	for (auto current = m_update_canvas.begin(); current != m_update_canvas.end(); current++)
 	{
-		Application::instance().m_GUI->MapViewer->m_map->update(VoidEventArgs());
-		Application::instance().m_GUI->MapViewer->m_map->m_update = false;
+		(*current)->render_on_canvas();
+		LOG(INFO) << "+";
 	}
+	m_update_canvas.clear();
+	//if (Application::instance().m_GUI->MapViewer->m_map->m_update)
+	//{
+	//	Application::instance().m_GUI->MapViewer->m_map->update(VoidEventArgs());
+	//	Application::instance().m_GUI->MapViewer->m_map->m_update = false;
+	//}
 	m_GUI->render(m_graph, 0, 0);
 	const position_t mouse = Application::instance().m_mouse->get_mouse_position();
 	glEnable(GL_BLEND);
@@ -707,7 +713,7 @@ void Application::update()
 			Application::instance().m_GUI->MapViewer->m_map->m_object_manager.update_buff();
 			m_GUI->MapViewer->m_map->calculate_lighting2();
 			Application::instance().m_GUI->MapViewer->update();
-			Application::instance().m_GUI->MapViewer->m_map->m_update = true;
+			Application::instance().m_GUI->MapViewer->m_map->update(VoidEventArgs());
 			m_update_mutex.unlock();
 			m_GUI->DescriptionBox->add_item_control(new GUI_Text("Õîä - " + std::to_string(m_game_turn) + ".", new GUI_TextFormat(10, 19, RGBA_t(0.0, 0.8, 0.0, 1.0))));
 			m_game_turn += 1;
@@ -730,7 +736,7 @@ void Application::update_after_load()
 	m_update_mutex.lock();
 	m_GUI->MapViewer->m_map->calculate_lighting2();
 	Application::instance().m_GUI->MapViewer->update();
-	Application::instance().m_GUI->MapViewer->m_map->m_update = true;
+	Application::instance().m_GUI->MapViewer->m_map->update(VoidEventArgs());
 	m_update_mutex.unlock();
 	std::chrono::milliseconds Duration(1);
 	std::this_thread::sleep_for(Duration);

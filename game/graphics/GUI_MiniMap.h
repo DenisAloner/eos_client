@@ -7,6 +7,7 @@
 
 class GUI_MapViewer;
 class AI_enemy;
+class Vision_list;
 
 class GUI_MiniMap :
 	public GUI_Object
@@ -24,6 +25,7 @@ public:
 
 	virtual void render(GraphicalController* Graph, int px, int py);
 	void render_on_canvas();
+	void on_update();
 };
 
 class GUI_FOV :
@@ -38,7 +40,13 @@ public:
 	int m_radius;
 	fdimension_t m_cell_size;
 
+	GLint m_canvas;
+	AI_enemy* m_AI;
+	Vision_list* m_vision_list;
+
 	virtual void render(GraphicalController* Graph, int px, int py);
+	void render_on_canvas();
+	void on_update();
 };
 
 

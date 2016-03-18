@@ -8,12 +8,17 @@ GUI_MiniMap::GUI_MiniMap(position_t position, dimension_t size, GUI_MapViewer* m
 	m_size = size;
 	m_cell_size = fdimension_t(static_cast<float>(1024) / static_cast<float>(m_map_viewer->m_map->m_size.w), static_cast<float>(1024) / static_cast<float>(m_map_viewer->m_map->m_size.h));
 	m_canvas = Application::instance().m_graph->create_empty_texture(dimension_t(1024, 1024));
-	m_map_viewer->m_map->update += std::bind(&GUI_MiniMap::render_on_canvas, this);
+	m_map_viewer->m_map->update += std::bind(&GUI_MiniMap::on_update, this);
 }
 
 
 GUI_MiniMap::~GUI_MiniMap()
 {
+}
+
+void GUI_MiniMap::on_update()
+{
+	Application::instance().m_update_canvas.push_back(this);
 }
 
 void GUI_MiniMap::render_on_canvas()
@@ -127,33 +132,44 @@ void GUI_MiniMap::render(GraphicalController* Graph, int px, int py)
 
 GUI_FOV::GUI_FOV(position_t position, dimension_t size, GameObject* object)
 {
+	m_canvas = Application::instance().m_graph->create_empty_texture(dimension_t(1024, 1024));
 	m_object = object;
-	AI_enemy* ai = static_cast<AI_enemy*>(m_object->m_active_state->m_ai);
-	m_fov = ai->m_fov;
-	m_radius = 0;
-	Vision_list* vl = static_cast<Vision_list*>(m_object->m_active_state->get_list(interaction_e::vision));
-	AI_FOV current;
-	for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); item++)
-	{
-		current = static_cast<Vision_component*>(*item)->m_value;
-		m_radius = max(m_radius, current.radius);
-	}
+	m_AI = static_cast<AI_enemy*>(m_object->m_active_state->m_ai);
+	m_fov = m_AI->m_fov;
+	
+	m_vision_list = static_cast<Vision_list*>(m_object->m_active_state->get_list(interaction_e::vision));
+	m_radius = m_vision_list->m_max_radius;
 	m_position = position;
 	m_size = size;
 	m_cell_size = fdimension_t(static_cast<float>(m_size.w) / static_cast<float>(2 * m_radius +1), static_cast<float>(m_size.h) / static_cast<float>(2 * m_radius +1));
+	m_AI->update += std::bind(&GUI_FOV::on_update, this);
 }
+
+void GUI_FOV::on_update()
+{
+	LOG(INFO) << "yes";
+	Application::instance().m_update_canvas.push_back(this);
+}
+
 
 void GUI_FOV::render(GraphicalController* Graph, int px, int py)
 {
-	m_radius = 0;
-	Vision_list* vl = static_cast<Vision_list*>(m_object->m_active_state->get_list(interaction_e::vision));
-	AI_FOV current;
-	for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); item++)
-	{
-		current = static_cast<Vision_component*>(*item)->m_value;
-		m_radius = max(m_radius, current.radius);
-	}
-	m_cell_size = fdimension_t(static_cast<float>(m_size.w) / static_cast<float>(2 * m_radius + 1), static_cast<float>(m_size.h) / static_cast<float>(2 * m_radius + 1));
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_TEXTURE_2D);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glUseProgram(0);
+	//glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01);
+	//glGenerateMipmap(GL_TEXTURE_2D);
+	glColor4d(1.0, 1.0, 1.0, 1.0);
+	glBindTexture(GL_TEXTURE_2D, m_canvas);
+	Graph->draw_sprite(px, py, px, py + m_size.h, px + m_size.w, py + m_size.h, px + m_size.w, py);
+}
+
+void GUI_FOV::render_on_canvas()
+{
+	m_radius = m_vision_list->m_max_radius;
+	m_cell_size = fdimension_t(static_cast<float>(1024) / static_cast<float>(2 * m_radius + 1), static_cast<float>(1024) / static_cast<float>(2 * m_radius + 1));
 	double x0, y0, x1, y1, x2, y2, x3, y3;
 	glDisable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);
@@ -161,16 +177,20 @@ void GUI_FOV::render(GraphicalController* Graph, int px, int py)
 	GLint default_fb = 0;
 	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &default_fb);
 	const GLuint fbo = Application::instance().m_graph->m_FBO;
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_canvas, 0);
+	glUseProgramObjectARB(0);
+	glClearColor(0.0, 0.0, 0.0, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
 	for (int y = 0; y < 2 * m_radius + 1; y++)
 	{
 		for (int x = 0; x < 2 * m_radius + 1; x++)
 		{
-			x0 = px+ x*m_cell_size.w;
-			y0 = py + (2 * m_radius +1 - y)*m_cell_size.h;
+			x0 = x*m_cell_size.w;
+			y0 = (2 * m_radius + 1 - y)*m_cell_size.h;
 			x1 = x0;
-			y1 = py + (2 * m_radius +1 - (y + 1))*m_cell_size.h;
-			x2 = px + (x + 1)*m_cell_size.w;
+			y1 = (2 * m_radius +1 - (y + 1))*m_cell_size.h;
+			x2 = (x + 1)*m_cell_size.w;
 			y2 = y1;
 			x3 = x2;
 			y3 = y0;
@@ -195,6 +215,7 @@ void GUI_FOV::render(GraphicalController* Graph, int px, int py)
 			glEnd();
 		}
 	}
+	glBindTexture(GL_TEXTURE_2D, m_canvas);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindFramebuffer(GL_FRAMEBUFFER, default_fb);
 }

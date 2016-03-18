@@ -110,7 +110,6 @@ GameMap::GameMap()
 
 void GameMap::init(dimension_t size)
 {
-	m_update = true;
 	m_size = size;
 	m_items.resize(m_size.h);
 	for (int i = 0; i < m_size.h; i++)
@@ -206,7 +205,6 @@ void GameMap::generate_room(void)
 	
 	}
 }
-
 
 
 void GameMap::add_object(GameObject* object, MapCell* cell)

@@ -39,6 +39,7 @@ public:
 
 	cell m_map[m_max_size][m_max_size];
 
+
 	FOV();
 
 	

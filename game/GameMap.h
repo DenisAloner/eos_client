@@ -43,7 +43,6 @@ public:
 
 	Object_manager m_object_manager;
 
-	bool m_update;
 	Event<VoidEventArgs> update;
 
 	Dijkstra_map* m_dijkstra_map;

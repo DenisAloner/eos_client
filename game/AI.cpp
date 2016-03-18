@@ -621,6 +621,7 @@ void AI_enemy::calculate_FOV(GameObject* object,GameMap* map)
 		current = static_cast<Vision_component*>(*item)->m_value;
 		m_fov->calculate(object, map, current, vl->m_max_radius - current.radius);
 	}
+	update(VoidEventArgs());
 }
 
 void AI_enemy::create()
