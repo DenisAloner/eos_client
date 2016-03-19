@@ -946,6 +946,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	AI_enemy* ai = static_cast<AI_enemy*>(m_player->m_object->m_active_state->m_ai);
 	Vision_list* vl = static_cast<Vision_list*>(m_player->m_object->m_active_state->get_list(interaction_e::vision));
 	int max_fov_radius = vl->m_max_radius;
+	view_t fov = ai->m_fov->m_view;
 	position_t posc((m_player->m_object->m_active_state->m_size.x-1)>>1, (m_player->m_object->m_active_state->m_size.y - 1) >> 1);
 	for (int r = 0; r < 2; r++)
 	{
@@ -973,7 +974,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 				yf = y - m_player->m_object->cell()->y + posc.y;
 				if ((x > -1) && (x<m_map->m_size.w) && (y>-1) && (y < m_map->m_size.h))
 				{
-					if ((xf >= -max_fov_radius) && (xf <= max_fov_radius) && (yf >= -max_fov_radius) && (yf<= max_fov_radius))
+					if ((xf >= -fov.l) && (xf <= fov.r) && (yf >= -fov.d) && (yf<= fov.u))
 					{
 						is_in_fov = true;
 					}
@@ -1002,7 +1003,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 								size3d = (*Current)->m_active_state->m_size;
 								if (is_in_fov)
 								{
-									if (ai->m_fov->m_map[max_fov_radius + yf][max_fov_radius + xf].visible)
+									if (ai->m_fov->m_map[fov.d + yf][fov.l + xf].visible)
 									{
 										
 										IsDraw = true;
@@ -1016,9 +1017,9 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 										{
 											for (int n = 0; n < size3d.x; n++)
 											{
-												if ((xf + n >= -max_fov_radius) && (xf + n <= max_fov_radius) && (yf - m >= -max_fov_radius) && (yf - m <= max_fov_radius))
+												if ((xf + n >= -fov.l) && (xf + n <= fov.r) && (yf - m >= -fov.d) && (yf - m <= fov.u))
 												{
-													if (ai->m_fov->m_map[max_fov_radius + yf - m][max_fov_radius + xf + n].visible)
+													if (ai->m_fov->m_map[fov.d + yf - m][fov.l + xf + n].visible)
 													{
 														IsDraw = true;
 													}

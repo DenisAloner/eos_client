@@ -102,7 +102,6 @@ void Application::render()
 	for (auto current = m_update_canvas.begin(); current != m_update_canvas.end(); current++)
 	{
 		(*current)->render_on_canvas();
-		LOG(INFO) << "+";
 	}
 	m_update_canvas.clear();
 	//if (Application::instance().m_GUI->MapViewer->m_map->m_update)

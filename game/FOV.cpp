@@ -163,78 +163,6 @@ FOV::FOV()
 //}
 
 
-void FOV::calculate(GameObject* unit, GameMap* map, AI_FOV& fov,int shift)
-{
-	std::function<bool(GameObject*)> qualifier = fov.qualifier->predicat;
-	for (int y = 0; y < m_max_size; y++)
-	{
-		for (int x = 0; x < m_max_size; x++)
-		{
-			m_map[y][x].opaque = false;
-		}
-	}
-
-	int xc = unit->cell()->x;
-	int yc = unit->cell()->y;
-	int dx = unit->m_active_state->m_size.x;
-	int dy = unit->m_active_state->m_size.y;
-
-	int xs = ((dx - 1) >> 1);
-	int ys = ((dy - 1) >> 1);
-
-	int x_start = xc - fov.radius + xs;
-	x_start = max(x_start, 0);
-	x_start = min(x_start, map->m_size.w - 1);
-	int x_end = xc + fov.radius + xs;
-	x_end = max(x_end, 0);
-	x_end = min(x_end, map->m_size.w - 1);
-	int y_start = yc - fov.radius - ys;
-	y_start = max(y_start, 0);
-	y_start = min(y_start, map->m_size.h - 1);
-	int y_end = yc + fov.radius - ys;
-	y_end = max(y_end, 0);
-	y_end = min(y_end, map->m_size.h - 1);
-
-	for (int y = y_start; y < y_end +1; y++)
-	{
-		for (int x = x_start; x < x_end + 1; x++)
-		{
-			for (auto obj = map->m_items[y][x]->m_items.begin(); obj != map->m_items[y][x]->m_items.end(); obj++)
-			{
-				if ((*obj) != unit&&qualifier((*obj)))
-				{
-					m_map[y - y_start+shift][x - x_start+shift].opaque = true;
-				}
-			}
-		}
-	}
-
-	do_fov(fov.radius+shift, fov.radius+shift, fov.radius, Game_algorithm::get_angle(unit, fov.start_angle), Game_algorithm::get_angle(unit, fov.end_angle), dx >> 1 == (dx + 1) >> 1);
-	/*for (int y = m_middle - fov.radius; y <m_middle + fov.radius + 1; y++)
-	{
-		std::string a="";
-			for (int x = m_middle - fov.radius; x < m_middle + fov.radius + 1; x++)
-			{
-					if (m_map[y][x].visible)
-					{
-						a = a + " " + "*";
-					}
-					else
-					{
-						a = a + " " + "X";
-					}
-			}
-			LOG(INFO) << a;
-	}*/
-	for (int y = 0; y < unit->m_active_state->m_size.y; y++)
-	{
-		for (int x = 0; x < unit->m_active_state->m_size.x; x++)
-		{
-			m_map[yc - (dx >> 1) - y_start + y - ys+shift][fov.radius + x - xs+shift].visible = true;
-		}
-	}
-}
-
 void FOV::cast_light(uint x, uint y, uint radius, uint row, float start_slope, float end_slope, uint xx, uint xy, uint yx, uint yy)
 {
 	//LOG(INFO) << "    Вызов функции";
@@ -409,11 +337,11 @@ int shift_y(const int& y, const int& octant)
 }
 
 
-void FOV::do_fov(uint x, uint y, uint radius,int start_angle,int end_angle, bool fold)
+void FOV::do_fov(uint x, uint y, uint radius,int start_angle,int end_angle)
 {
 	if (start_angle == end_angle)
 	{
-		if (fold)
+		if (m_fold)
 		{
 			for (uint i = 0; i <8; i++)
 			{
@@ -433,7 +361,7 @@ void FOV::do_fov(uint x, uint y, uint radius,int start_angle,int end_angle, bool
 	uint end_octant = end_angle / 45;
 	float start_slope;
 	float end_slope;
-	if (!fold)
+	if (!m_fold)
 	{
 		if (start_octant <= end_octant)
 		{
@@ -481,4 +409,131 @@ void FOV::do_fov(uint x, uint y, uint radius,int start_angle,int end_angle, bool
 			}
 		}
 	}
+}
+
+void FOV::calculate_FOV(GameObject* object, GameMap* map)
+{
+	for (int y = 0; y < m_max_size; y++)
+	{
+		for (int x = 0; x < m_max_size; x++)
+		{
+			m_map[y][x].opaque = false;
+			m_map[y][x].visible = false;
+		}
+	}
+
+	Vision_list* vl = static_cast<Vision_list*>(object->m_active_state->get_list(interaction_e::vision));
+	int radius = vl->m_max_radius;
+
+	int xc = object->cell()->x;
+	int yc = object->cell()->y;
+	int dx = object->m_active_state->m_size.x;
+	int dy = object->m_active_state->m_size.y;
+
+	m_fold = (dx >> 1 == (dx + 1) >> 1);
+
+	int xs = ((dx - 1) >> 1);
+	int ys = ((dy - 1) >> 1);
+
+	int i;
+
+	i = xc - radius + xs;
+	if (i < 0)
+	{
+		i = xc + xs;
+	}
+	else
+	{
+		i = radius;
+	}
+	m_view.l = i;
+
+	i = xc + radius + xs;
+	if (i > map->m_size.w - 1)
+	{
+		i = map->m_size.w - 1 - xc - xs;
+	}
+	m_view.r = i;
+
+	i = yc - radius + ys;
+	if (i < 0)
+	{
+		i = yc + ys;
+	}
+	else
+	{
+		i = radius;
+	}
+	m_view.d = i;
+
+	i = yc + radius + ys;
+	if (i > map->m_size.h - 1)
+	{
+		i = map->m_size.h - 1 - yc - ys;
+	}
+	else
+	{
+		i = radius;
+	}
+	m_view.u = i;
+
+	AI_FOV current;
+	for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); item++)
+	{
+		current = static_cast<Vision_component*>(*item)->m_value;
+		calculate(object, map, current);
+	}
+
+	for (int y = - dy+1; y < 1; y++)
+	{
+		for (int x = 0; x < dx; x++)
+		{
+			m_map[y - (ys - m_view.d)][x - (xs - m_view.l)].visible = true;
+		}
+	}
+}
+
+void FOV::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
+{
+	std::function<bool(GameObject*)> qualifier = fov.qualifier->predicat;
+	for (int y = 0; y < m_max_size; y++)
+	{
+		for (int x = 0; x < m_max_size; x++)
+		{
+			m_map[y][x].opaque = false;
+		}
+	}
+
+	int xc = unit->cell()->x;
+	int yc = unit->cell()->y;
+	int xs = ((unit->m_active_state->m_size.x - 1) >> 1);
+	int ys = ((unit->m_active_state->m_size.y - 1) >> 1);
+
+	int x_start = min(m_view.l, fov.radius);
+	int shift_x = m_view.l - x_start;
+	x_start = xc + xs - x_start;
+	int x_end = min(m_view.r, fov.radius);
+	x_end = xc + xs + x_end;
+	int y_start = min(m_view.d, fov.radius);
+	int shift_y = m_view.d - y_start;
+	y_start = yc - ys - y_start;
+	int y_end = min(m_view.u, fov.radius);
+	y_end = yc - ys + y_end;
+
+
+	for (int y = y_start; y < y_end + 1; y++)
+	{
+		for (int x = x_start; x < x_end + 1; x++)
+		{
+			for (auto obj = map->m_items[y][x]->m_items.begin(); obj != map->m_items[y][x]->m_items.end(); obj++)
+			{
+				if ((*obj) != unit&&qualifier((*obj)))
+				{
+					m_map[y - y_start + shift_y][x - x_start + shift_x].opaque = true;
+				}
+			}
+		}
+	}
+
+	do_fov(m_view.l, m_view.d, fov.radius, Game_algorithm::get_angle(unit, fov.start_angle), Game_algorithm::get_angle(unit, fov.end_angle));
 }

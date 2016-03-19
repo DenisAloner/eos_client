@@ -147,7 +147,6 @@ GUI_FOV::GUI_FOV(position_t position, dimension_t size, GameObject* object)
 
 void GUI_FOV::on_update()
 {
-	LOG(INFO) << "yes";
 	Application::instance().m_update_canvas.push_back(this);
 }
 

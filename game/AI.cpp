@@ -606,21 +606,7 @@ bool AI_enemy::check_goal()
 
 void AI_enemy::calculate_FOV(GameObject* object,GameMap* map)
 {
-	for (int y = 0; y < m_fov->m_max_size; y++)
-	{
-		for (int x = 0; x < m_fov->m_max_size; x++)
-		{
-			m_fov->m_map[y][x].opaque = false;
-			m_fov->m_map[y][x].visible = false;
-		}
-	}
-	Vision_list* vl = static_cast<Vision_list*>(object->m_active_state->get_list(interaction_e::vision));
-	AI_FOV current;
-	for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); item++)
-	{
-		current = static_cast<Vision_component*>(*item)->m_value;
-		m_fov->calculate(object, map, current, vl->m_max_radius - current.radius);
-	}
+	m_fov->calculate_FOV(object, map);
 	update(VoidEventArgs());
 }
 

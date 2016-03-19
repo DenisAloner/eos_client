@@ -38,7 +38,8 @@ public:
 	static const int m_middle = (m_max_size - 1) >> 1;
 
 	cell m_map[m_max_size][m_max_size];
-
+	view_t m_view;
+	bool m_fold;
 
 	FOV();
 
@@ -52,10 +53,11 @@ public:
 	/*void quarter(int start_x, int start_y, float start_angle, float end_angle);
 	void cast_shadow(int start_x, int start_y, float start_angle, float end_angle);
 	void light_quarter(int start_x, int start_y, float start_angle, float end_angle);*/
-	void calculate(GameObject* unit, GameMap* map, AI_FOV& fov,int shift);
+	void calculate_FOV(GameObject* object, GameMap* map);
+	
+private:
 	void cast_light(uint x, uint y, uint radius, uint row, float start_slope, float end_slope, uint xx, uint xy, uint yx, uint yy);
-	/*void do_fov(uint x, uint y, uint radius);*/
-	void do_fov(uint x, uint y, uint radius, int start_angle, int end_angle,bool fold);
-
+	void do_fov(uint x, uint y, uint radius, int start_angle, int end_angle);
+	void calculate(GameObject* unit, GameMap* map, AI_FOV& fov);
 };
 

@@ -36,6 +36,17 @@ struct dimension_t
 	dimension_t() : w(0), h(0) {}
 };
 
+struct view_t
+{
+	int l;
+	int r;
+	int u;
+	int d;
+
+	view_t(int l, int r, int u, int d) :l(l), r(r), u(u), d(d) {}
+	view_t():l(0), r(0), u(0), d(0) {}
+};
+
 struct rectangle_t : public position_t, public dimension_t
 {
 	rectangle_t(int x, int y, int w, int h) : position_t(x, y), dimension_t(w, h) {}
