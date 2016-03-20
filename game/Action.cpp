@@ -473,7 +473,7 @@ void ActionClass_Turn::perfom(Parameter* parameter)
 	Parameter_Position* p = static_cast<Parameter_Position*>(parameter);
 	if (check(p))
 	{
-		//p->m_map->turn_object(p->m_object);
+		p->m_map->turn_object(p->m_object);
 	}
 }
 

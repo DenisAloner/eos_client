@@ -52,51 +52,6 @@ object_state_e GameObjectManager::get_object_state_e(const std::string& key)
 //	return value->second;
 //}
 
-Interaction_list* GameObjectManager::create_feature_list(feature_list_type_e key, interaction_e name)
-{
-	Interaction_list* result;
-	switch (key)
-	{
-	case feature_list_type_e::generic:
-	{
-		result = new Interaction_list();
-		break;
-	}
-	case feature_list_type_e::tag:
-	{
-		result = new Tag_list();
-		break;
-	}
-	case feature_list_type_e::action:
-	{
-		result = new Action_list();
-		break;
-	}
-	case feature_list_type_e::parameter:
-	{
-		result = new Parameter_list(name);
-		break;
-	}
-	case feature_list_type_e::parts:
-	{
-		result = new Parts_list();
-		break;
-	}
-	case feature_list_type_e::vision:
-	{
-		result = new Vision_list();
-		break;
-	}
-	case feature_list_type_e::vision_component:
-	{
-		result = new Vision_component();
-		break;
-	}
-	}
-	return result;
-}
-
-
 void GameObjectManager::parser(const std::string& command)
 {
 	LOG(INFO) << command;
@@ -384,7 +339,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::create_list:
 	{
 		feature_list_type_e list_type = get_feature_list_type_e(arg[0]);
-		Interaction_list* list = create_feature_list(list_type, get_interaction_e(arg[1]));
+		Interaction_list* list = Effect_functions::create_feature_list(list_type, get_interaction_e(arg[1]));
 		list->m_list_type = list_type;
 		switch (list_type)
 		{
@@ -408,7 +363,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::feature_list:
 	{
 		feature_list_type_e list_type = get_feature_list_type_e(arg[0]);
-		Interaction_list* list = m_object->create_feature_list(list_type, get_interaction_e(arg[1]));
+		Interaction_list* list = m_object->m_active_state->create_feature_list(list_type, get_interaction_e(arg[1]));
 		list->m_list_type = list_type;
 		switch (list_type)
 		{

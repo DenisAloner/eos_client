@@ -41,6 +41,9 @@ public:
 	view_t m_view;
 	bool m_fold;
 
+	position_t m_map_center;
+	position_t m_view_center;
+
 	FOV();
 
 	

@@ -368,6 +368,16 @@ iSerializable* Serialization_manager::deserialize()
 			value = new Tag_list();
 			break;
 		}
+		case type_e::vision_list:
+		{
+			value = new Vision_list();
+			break;
+		}
+		case type_e::vision_component:
+		{
+			value = new Vision_component();
+			break;
+		}
 		case type_e::object_part:
 		{
 			value = new Object_part();

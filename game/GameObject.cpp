@@ -34,45 +34,7 @@ Attribute_map::Attribute_map(){};
 
 Interaction_list*  Attribute_map::create_feature_list(feature_list_type_e key, interaction_e name)
 {
-	Interaction_list* result=nullptr;
-	switch (key)
-		{
-		case feature_list_type_e::generic:
-		{
-			result = new Interaction_list();
-			break;
-		}
-		case feature_list_type_e::tag:
-		{
-			result = new Tag_list();
-			break;
-		}
-		case feature_list_type_e::action:
-		{
-			result = new Action_list();
-			break;
-		}
-		case feature_list_type_e::parameter:
-		{
-			result = new Parameter_list(name);
-			break;
-		}
-		case feature_list_type_e::parts:
-		{
-			result = new Parts_list();
-			break;
-		}
-		case feature_list_type_e::vision:
-		{
-			result = new Vision_list();
-			break;
-		}
-		case feature_list_type_e::vision_component:
-		{
-			result = new Vision_component();
-			break;
-		}
-		}
+	Interaction_list* result = Effect_functions::create_feature_list(key, name);
 	m_item[name] = result;	
 	return result;
 }
@@ -344,24 +306,24 @@ void GameObject::do_predicat(predicat func)
 
 void GameObject::turn()
 {
-	/*object_direction_e dir;
-	if (m_direction == object_direction_e_Down)
+	object_direction_e dir;
+	if (m_direction == object_direction_e::down)
 	{
-		dir = object_direction_e_Left;
+		dir = object_direction_e::left;
 	}
-	if (m_direction == object_direction_e_Left)
+	if (m_direction == object_direction_e::left)
 	{
-		dir = object_direction_e_Up;
+		dir = object_direction_e::top;
 	}
-	if (m_direction == object_direction_e_Up)
+	if (m_direction == object_direction_e::top)
 	{
-		dir = object_direction_e_Right;
+		dir = object_direction_e::right;
 	}
-	if (m_direction == object_direction_e_Right)
+	if (m_direction == object_direction_e::right)
 	{
-		dir = object_direction_e_Down;
+		dir = object_direction_e::down;
 	}
-	set_direction(dir);*/
+	set_direction(dir);
 }
 
 void GameObject::set_direction(object_direction_e dir)
@@ -402,52 +364,6 @@ Object_state* GameObject::get_state(object_state_e state)
 		}
 	}
 	return nullptr;
-}
-
-Interaction_list* GameObject::create_feature_list(feature_list_type_e key, interaction_e name)
-{
-	Interaction_list* result;
-
-	switch (key)
-	{
-	case feature_list_type_e::generic:
-	{
-		result = new Interaction_list();
-		break;
-	}
-	case feature_list_type_e::tag: 
-	{
-		result = new Tag_list();
-		break;
-	}
-	case feature_list_type_e::action:
-	{
-		result = new Action_list();
-		break;
-	}
-	case feature_list_type_e::parameter:
-	{
-		result = new Parameter_list(name);
-		break;
-	}
-	case feature_list_type_e::parts:
-	{
-		result = new Parts_list();
-		break;
-	}
-	case feature_list_type_e::vision:
-	{
-		result = new Vision_list();
-		break;
-	}
-	case feature_list_type_e::vision_component:
-	{
-		result = new Vision_component();
-		break;
-	}
-	}
-	m_active_state->m_item[name] = result;
-	return result;
 }
 
 void GameObject::add_effect(interaction_e key, Object_interaction* item)

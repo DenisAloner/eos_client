@@ -425,8 +425,9 @@ enum class type_e
 	parameter_unit_interaction,
 	parameter_interaction_cell,
 	action_wrapper,
-	parameter_bow_shoot
-
+	parameter_bow_shoot,
+	vision_list,
+	vision_component
 };
 
 struct predicat_t

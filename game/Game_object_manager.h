@@ -107,7 +107,6 @@ public:
 	body_part_e get_body_part_e(const std::string& key);
 	feature_list_type_e get_feature_list_type_e(const std::string& key);
 	ai_type_e get_ai_type_e(const std::string& key);
-	Interaction_list* create_feature_list(feature_list_type_e key, interaction_e name);
 
 	void parser(const std::string& command);
 	void init();

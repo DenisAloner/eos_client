@@ -388,3 +388,8 @@ namespace ObjectTag
 		virtual void load();
 	};
 }
+
+namespace Effect_functions
+{
+	Interaction_list* create_feature_list(feature_list_type_e key, interaction_e name);
+}
