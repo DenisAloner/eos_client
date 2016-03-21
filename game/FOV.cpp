@@ -413,14 +413,6 @@ void FOV::do_fov(uint x, uint y, uint radius,int start_angle,int end_angle)
 
 void FOV::calculate_FOV(GameObject* object, GameMap* map)
 {
-	for (int y = 0; y < m_max_size; y++)
-	{
-		for (int x = 0; x < m_max_size; x++)
-		{
-			m_map[y][x].opaque = false;
-			m_map[y][x].visible = false;
-		}
-	}
 
 	Vision_list* vl = static_cast<Vision_list*>(object->m_active_state->get_list(interaction_e::vision));
 	int radius = vl->m_max_radius;
@@ -473,6 +465,14 @@ void FOV::calculate_FOV(GameObject* object, GameMap* map)
 	}
 
 	m_view_center = position_t(m_view.l, m_view.d);
+
+	for (int y = 0; y < m_view.d + m_view.u + 1; y++)
+	{
+		for (int x = 0; x < m_view.l + m_view.r + 1; x++)
+		{
+			m_map[y][x].visible = false;
+		}
+	}
 
 	AI_FOV current;
 	for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); item++)

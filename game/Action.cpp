@@ -569,34 +569,33 @@ void Action_CellInfo::interaction_handler(Parameter* arg)
 {
 	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
-	//Parameter* result;
-	//Parameter_Position* p = new Parameter_Position();
-	//p->m_object = nullptr;
-	//p->m_map = Application::instance().m_GUI->MapViewer->m_map;
-	//result = Application::instance().command_select_location(p->m_object);
-	//if (result)
-	//{
-	//	p->m_place = static_cast<MapCell*>(static_cast<P_object_owner*>(result)->m_cell);
-	//	Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}:"));
-	//	Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(" - освещение {" + std::to_string(p->m_place->m_light.R) + "," + std::to_string(p->m_place->m_light.G) + "," + std::to_string(p->m_place->m_light.B) + "}."));
-	//	MapCell* c = Application::instance().m_GUI->MapViewer->m_player->m_object->cell();
-	//	int f = Application::instance().m_GUI->MapViewer->m_player->m_fov->m_radius;
-	//	int xf = p->m_place->x-c->x;
-	//	int yf = p->m_place->y - c->y;
-	//	if ((xf >= -f) && (xf <= f) && (yf >= -f) && (yf <=f))
-	//	{
-	//		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(std::to_string(Application::instance().m_GUI->MapViewer->m_player->m_fov->m_map[Application::instance().m_GUI->MapViewer->m_player->m_fov->m_middle + yf][Application::instance().m_GUI->MapViewer->m_player->m_fov->m_middle + xf].visible)));
-	//	}
-	//}
-	//else
-	//{
-	//	Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Не выбрана клетка карты."));
-	//	Application::instance().m_message_queue.m_busy = false;
-	//	return;
-	//}
+	Parameter* result;
+	Parameter_Position* p = new Parameter_Position();
+	p->m_object = nullptr;
+	p->m_map = Application::instance().m_GUI->MapViewer->m_map;
+	result = Application::instance().command_select_location(p->m_object);
+	if (result)
+	{
+		p->m_place = static_cast<MapCell*>(static_cast<P_object_owner*>(result)->m_cell);
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}:"));
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(" - освещение {" + std::to_string(p->m_place->m_light.R) + "," + std::to_string(p->m_place->m_light.G) + "," + std::to_string(p->m_place->m_light.B) + "}."));
+		MapCell* c = Application::instance().m_GUI->MapViewer->m_player->m_object->cell();
+		/*int f = Application::instance().m_GUI->MapViewer->m_player->m_fov->m_radius;
+		int xf = p->m_place->x-c->x;
+		int yf = p->m_place->y - c->y;
+		if ((xf >= -f) && (xf <= f) && (yf >= -f) && (yf <=f))
+		{
+			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(std::to_string(Application::instance().m_GUI->MapViewer->m_player->m_fov->m_map[Application::instance().m_GUI->MapViewer->m_player->m_fov->m_middle + yf][Application::instance().m_GUI->MapViewer->m_player->m_fov->m_middle + xf].visible)));
+		}*/
+	}
+	else
+	{
+		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Не выбрана клетка карты."));
+		Application::instance().m_message_queue.m_busy = false;
+		return;
+	}
 	Application::instance().m_message_queue.m_busy = false;
 }
-
 
 bool Action_CellInfo::check(Parameter* parameter)
 {
@@ -1397,7 +1396,8 @@ bool Action_autoexplore::get_child(GameTask*& task)
 	map->m_dijkstra_map->trace();
 	MapCell* c = map->m_dijkstra_map->next(Application::instance().m_GUI->MapViewer->m_player->m_object);
 	if (c)
-	{
+	{ 
+		LOG(INFO) << std::to_string(c->x) << " " << std::to_string(c->y);
 		Parameter_Position* P;
 		P = new Parameter_Position();
 		P->m_object = Application::instance().m_GUI->MapViewer->m_player->m_object;

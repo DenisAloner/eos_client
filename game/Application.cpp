@@ -231,8 +231,8 @@ void Application::initialize()
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx - 1]);
 	//obj = m_game_object_manager->new_object("dagger");
 	//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx - 1]);
-	obj = m_game_object_manager->new_object("blue potion");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-1][rx - 1]);
+	/*obj = m_game_object_manager->new_object("blue potion");
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-1][rx - 1]);*/
 
 
 	//Serialization_manager::instance().save("save", m_GUI->MapViewer->m_map);

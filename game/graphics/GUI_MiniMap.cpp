@@ -141,7 +141,6 @@ GUI_FOV::GUI_FOV(position_t position, dimension_t size, GameObject* object)
 	m_radius = m_vision_list->m_max_radius;
 	m_position = position;
 	m_size = size;
-	m_cell_size = fdimension_t(static_cast<float>(m_size.w) / static_cast<float>(2 * m_radius +1), static_cast<float>(m_size.h) / static_cast<float>(2 * m_radius +1));
 	m_AI->update += std::bind(&GUI_FOV::on_update, this);
 }
 
@@ -168,7 +167,7 @@ void GUI_FOV::render(GraphicalController* Graph, int px, int py)
 void GUI_FOV::render_on_canvas()
 {
 	m_radius = m_vision_list->m_max_radius;
-	m_cell_size = fdimension_t(static_cast<float>(1024) / static_cast<float>(2 * m_radius + 1), static_cast<float>(1024) / static_cast<float>(2 * m_radius + 1));
+	m_cell_size = fdimension_t(static_cast<float>(1024) / static_cast<float>(m_fov->m_view.l + m_fov->m_view.r), static_cast<float>(1024) / static_cast<float>(m_fov->m_view.d + m_fov->m_view.u));
 	double x0, y0, x1, y1, x2, y2, x3, y3;
 	glDisable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);
@@ -181,14 +180,16 @@ void GUI_FOV::render_on_canvas()
 	glUseProgramObjectARB(0);
 	glClearColor(0.0, 0.0, 0.0, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	for (int y = 0; y < 2 * m_radius + 1; y++)
+	int width = m_fov->m_view.l + m_fov->m_view.r;
+	int height = m_fov->m_view.d + m_fov->m_view.u;
+	for (int y = 0; y < height + 1; y++)
 	{
-		for (int x = 0; x < 2 * m_radius + 1; x++)
+		for (int x = 0; x < width+1; x++)
 		{
 			x0 = x*m_cell_size.w;
-			y0 = (2 * m_radius + 1 - y)*m_cell_size.h;
+			y0 = (height + 1 - y)*m_cell_size.h;
 			x1 = x0;
-			y1 = (2 * m_radius +1 - (y + 1))*m_cell_size.h;
+			y1 = (height +1 - (y + 1))*m_cell_size.h;
 			x2 = (x + 1)*m_cell_size.w;
 			y2 = y1;
 			x3 = x2;
