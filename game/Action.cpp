@@ -15,7 +15,7 @@ Action::Action(void)
 	m_kind = action_e::move;
 	m_name = "Нет";
 	m_error = "";
-	m_decay = 1;
+	m_decay = 10;
 }
 
 Action::~Action(void)
@@ -158,7 +158,7 @@ ActionClass_Move::ActionClass_Move()
 	m_kind = action_e::move;
 	m_icon = Application::instance().m_graph->m_actions[0];
 	m_name = "Идти";
-	m_decay = 2;
+	m_decay = 10;
 }
 
 
@@ -220,7 +220,7 @@ action_move_step::action_move_step()
 	m_kind = action_e::move_step;
 	m_icon = Application::instance().m_graph->m_actions[0];
 	m_name = "Идти на шаг";
-	m_decay = 2;
+	m_decay = 10;
 }
 
 bool action_move_step::check(Parameter* parameter)
@@ -443,7 +443,7 @@ ActionClass_Turn::ActionClass_Turn(void)
 	m_kind = action_e::turn;
 	m_icon = Application::instance().m_graph->m_actions[2];
 	m_name = "Повернуться";
-	m_decay = 4;
+	m_decay = 2;
 }
 
 
@@ -893,7 +893,7 @@ Action_hit::Action_hit()
 {
 	m_kind = action_e::hit;
 	m_icon = Application::instance().m_graph->m_actions[8];
-	m_decay = 1;
+	m_decay = 10;
 	m_name = "Ударить без оружия";
 }
 
@@ -1236,7 +1236,7 @@ Action_use::Action_use()
 	m_kind = action_e::use;
 	m_icon = Application::instance().m_graph->m_actions[11];
 	m_name = "Применить";
-	m_decay = 1;
+	m_decay = 10;
 }
 
 void Action_use::interaction_handler(Parameter* arg)
@@ -1413,7 +1413,7 @@ Action_shoot::Action_shoot()
 {
 	m_kind = action_e::shoot;
 	m_icon = Application::instance().m_graph->m_actions[14];
-	m_decay = 1;
+	m_decay = 10;
 	m_name = "Выстрелить из оружия";
 }
 

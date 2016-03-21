@@ -1095,6 +1095,7 @@ void GameMap::calculate_lighting2()
 	int c;
 	FOV_light fl;
 	light_t m_temp[41][41];
+
 	for (int y = 0; y < m_size.h; y++)
 	{
 		for (int x = 0; x < m_size.w; x++)
@@ -1102,6 +1103,7 @@ void GameMap::calculate_lighting2()
 			m_items[y][x]->m_light = light_t();
 		}
 	}
+
 	for (auto l = m_object_manager.m_items.begin(); l != m_object_manager.m_items.end(); l++)
 	{
 		if (!(*l)->m_active_state->m_light) { continue; }

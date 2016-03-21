@@ -318,8 +318,8 @@ void Application::initialize()
 	GUI_FOV* fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), m_GUI->MapViewer->m_player->m_object);
 	MiniMap->add(fov);
 
-	/*obj = m_game_object_manager->new_object("bat");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry+8][rx]);*/
+	//obj = m_game_object_manager->new_object("bat");
+	//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-8][rx]);
 
 	/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
 	fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), obj);
@@ -651,6 +651,10 @@ void Application::update()
 	//	}
 	//}
 	GameTask* A;
+	
+	std::chrono::time_point<std::chrono::steady_clock> start;
+	std::chrono::time_point<std::chrono::steady_clock> end;
+	std::chrono::milliseconds elapsed;
 	while (true)
 	{ 
 		A = m_action_manager->get_task();
@@ -665,7 +669,11 @@ void Application::update()
 			{
 				m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->update();
 			}
+			//start = std::chrono::high_resolution_clock::now();
 			Application::instance().m_GUI->MapViewer->m_map->m_object_manager.calculate_ai(m_GUI->MapViewer->m_map);
+			end = std::chrono::high_resolution_clock::now();
+			elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+			//LOG(INFO) << "Просчет ИИ: " << std::to_string(elapsed.count());
 			if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
 			{
 				GameObject* object = m_GUI->MapViewer->m_player->m_object;
@@ -709,9 +717,21 @@ void Application::update()
 					}
 				}
 			}
+			//start = std::chrono::high_resolution_clock::now();
 			Application::instance().m_GUI->MapViewer->m_map->m_object_manager.update_buff();
+			end = std::chrono::high_resolution_clock::now();
+			elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+			//LOG(INFO) <<"Просчет баффов: " <<std::to_string(elapsed.count());
+			//start = std::chrono::high_resolution_clock::now();
 			m_GUI->MapViewer->m_map->calculate_lighting2();
+			end = std::chrono::high_resolution_clock::now();
+			elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+			//LOG(INFO) << "Просчет освещения: " << std::to_string(elapsed.count());
+			//start = std::chrono::high_resolution_clock::now();
 			Application::instance().m_GUI->MapViewer->update();
+			end = std::chrono::high_resolution_clock::now();
+			elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+			//LOG(INFO) << "Просчет карты: " << std::to_string(elapsed.count());
 			Application::instance().m_GUI->MapViewer->m_map->update(VoidEventArgs());
 			m_update_mutex.unlock();
 			m_GUI->DescriptionBox->add_item_control(new GUI_Text("Ход - " + std::to_string(m_game_turn) + ".", new GUI_TextFormat(10, 19, RGBA_t(0.0, 0.8, 0.0, 1.0))));
@@ -984,12 +1004,19 @@ void Application::process_game()
 		std::this_thread::sleep_for(Duration);
 	}*/
 	update_after_load();
+	std::chrono::time_point<std::chrono::steady_clock> start;
+	std::chrono::time_point<std::chrono::steady_clock> end;
+	std::chrono::milliseconds elapsed;
 	while (true)
 	{
 		if (m_turn)
 		{
+			start = std::chrono::high_resolution_clock::now();
 			update();
 			m_turn = false;
+			end = std::chrono::high_resolution_clock::now();
+			elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+			LOG(INFO) << "Просчет 10 ходов: " << std::to_string(elapsed.count());
 		}
 	}
 }

@@ -104,7 +104,7 @@ tile_manager 12
 optical 0.8,0.8,0.8
 feature_list vision,vision
 mem_list
-create_list vision_component,vision_component,10,0,270,90
+create_list vision_component,vision_component,32,0,270,90
 copy_list_to_slot
 add_slot_to_mem_list
 feature_list action,action
