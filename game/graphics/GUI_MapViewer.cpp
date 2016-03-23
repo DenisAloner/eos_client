@@ -836,6 +836,59 @@ void mapviewer_object_move::render_on_cell(MapCell* c)
 	}
 }
 
+mapviewer_object_rotate::mapviewer_object_rotate(GUI_MapViewer* owner, GameObject* object) : gui_mapviewer_hint(owner), m_object(object) { init(); }
+
+//void mapviewer_object_rotate::init()
+//{
+//	if (m_owner->m_cursored)
+//	{
+//		m_dir =  Game_algorithm::turn_to_cell(m_object, m_owner->m_cursored);
+//	}
+//	else
+//	{
+//		m_dir = m_object->m_direction;
+//	}
+//}
+
+void mapviewer_object_rotate::render_on_cell(MapCell* c)
+{
+	if (m_owner->m_cursored)
+	{
+		if (c == m_object->cell())
+		{
+			double x0, y0, x1, y1, x2, y2, x3, y3;
+			glColor4f(0.0F, 1.0F, 0.0F, 0.75F);
+			dimension_t object_size;
+			game_object_size_t size3d;
+			object_size = m_object->m_active_state->m_tile_size;
+			size3d = m_object->m_active_state->m_size;
+			int x = c->x - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
+			int y = c->y - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
+			int yp = m_owner->m_tile_count_x - x;
+			int xp = m_owner->m_tile_count_y - y;
+			x0 = (xp - yp) * 16 + m_owner->m_shift.x;
+			y0 = (xp + yp) * 9 - (object_size.h) + m_owner->m_shift.y + (size3d.x - 1) * 9;
+			x1 = x0;
+			y1 = (xp + yp) * 9 + m_owner->m_shift.y + (size3d.x - 1) * 9;
+			x2 = (xp - yp) * 16 + object_size.w + m_owner->m_shift.x;
+			y2 = y1;
+			x3 = x2;
+			y3 = y0;
+			tile_t tile;
+			m_object->m_active_state->m_tile_manager->set_tile(tile, m_object, Application::instance().m_timer->m_tick / 7.0*3.0, Game_algorithm::turn_to_cell(m_object, m_owner->m_cursored));
+			GLuint Sprite = tile.unit;
+			glUseProgramObjectARB(0);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, Sprite);
+			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
+			Application::instance().m_graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
+			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_03, 0);
+			Application::instance().m_graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
+		}
+	}
+}
+
 GUI_MapViewer::GUI_MapViewer(Application* app = nullptr)
 {
 	m_tile_count_x = 90;

@@ -169,5 +169,16 @@ public:
 	virtual void render_on_cell(MapCell* c);
 };
 
+class mapviewer_object_rotate : public gui_mapviewer_hint
+{
+public:
+
+	GameObject* m_object;
+	mapviewer_object_rotate(GUI_MapViewer* owner, GameObject* object);
+	virtual void init() {};
+	virtual void render() {};
+	virtual void render_on_cell(MapCell* c);
+};
+
 #endif //GUI_MAPVIEWER_H
 

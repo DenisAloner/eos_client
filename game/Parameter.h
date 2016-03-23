@@ -161,4 +161,18 @@ public:
 	virtual void load();
 };
 
+class Parameter_direction : public Parameter
+{
+public:
+
+	GameObject* m_object;
+	object_direction_e m_direction;
+
+	Parameter_direction();
+
+	virtual void reset_serialization_index() {};
+	virtual void save() {};
+	virtual void load() {};
+};
+
 #endif //TPARAMETER_H

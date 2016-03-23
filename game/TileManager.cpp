@@ -68,7 +68,7 @@ TileManager_Map::TileManager_Map()
 
 int TileManager_Map::get_tile_index(const object_direction_e& direction, const int& frame)
 {
-	return direction * 4 + frame;
+	return static_cast<int>(direction) * 4 + frame;
 }
 
 
@@ -79,7 +79,7 @@ TileManager_rotating::TileManager_rotating()
 
 int TileManager_rotating::get_tile_index(const object_direction_e& direction, const int& frame)
 {
-	return direction/2;
+	return static_cast<int>(direction)/2;
 }
 
 TileManager_rotating8::TileManager_rotating8()
@@ -89,5 +89,5 @@ TileManager_rotating8::TileManager_rotating8()
 
 int TileManager_rotating8::get_tile_index(const object_direction_e& direction, const int& frame)
 {
-	return direction;
+	return static_cast<int>(direction);
 }

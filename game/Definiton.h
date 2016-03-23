@@ -157,21 +157,24 @@ enum ParameterKind
 	parameter_kind_unit_interaction,
 	parameter_interaction_cell,
 	parameter_accept,
-	parameter_bow_shoot
-
+	parameter_bow_shoot,
+	parameter_direction
 };
 
-enum object_direction_e
+enum class object_direction_e :int
 {
+	down,
+	downleft,
+	left,
+	topleft,
 	top,
 	topright,
 	right,
 	downright,
-	down,
-	downleft,
-	left,
-	topleft
+	none
 };
+
+
 
 struct tile_t
 {

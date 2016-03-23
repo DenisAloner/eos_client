@@ -391,3 +391,7 @@ void P_bow_shoot::load()
 	m_unit_body_part = dynamic_cast<Object_part*>(Serialization_manager::instance().deserialize());
 	m_cell = dynamic_cast<MapCell*>(Serialization_manager::instance().deserialize());
 }
+
+Parameter_direction::Parameter_direction() : Parameter(parameter_direction),m_object(nullptr), m_direction(object_direction_e::none)
+{
+}

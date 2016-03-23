@@ -454,7 +454,7 @@ ActionClass_Turn::~ActionClass_Turn(void)
 
 std::string ActionClass_Turn::get_description(Parameter* parameter)
 {
-	Parameter_Position* p = static_cast<Parameter_Position*>(parameter);
+	Parameter_direction* p = static_cast<Parameter_direction*>(parameter);
 	std::string s("Повернуть ");
 	s += p->m_object->m_name + ".";
 	return s;
@@ -463,44 +463,70 @@ std::string ActionClass_Turn::get_description(Parameter* parameter)
 
 bool ActionClass_Turn::check(Parameter* parameter)
 {
-	Parameter_Position* p = static_cast<Parameter_Position*>(parameter);
+	Parameter_direction* p = static_cast<Parameter_direction*>(parameter);
 	return true;
 }
 
 
 void ActionClass_Turn::perfom(Parameter* parameter)
 {
-	Parameter_Position* p = static_cast<Parameter_Position*>(parameter);
+	Parameter_direction* p = static_cast<Parameter_direction*>(parameter);
 	if (check(p))
 	{
-		p->m_map->turn_object(p->m_object);
+		p->m_object->set_direction(p->m_direction);
 	}
 }
-
 
 void ActionClass_Turn::interaction_handler(Parameter* arg)
 {
 	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
-	Parameter_Position* p = new Parameter_Position();
-	p->m_map = Application::instance().m_GUI->MapViewer->m_map;
-	result = Application::instance().command_select_object_on_map();
-	if (result)
+	Parameter_Position* arg_p = static_cast<Parameter_Position*>(arg);
+	Parameter_direction* p = new Parameter_direction();
+	if (arg_p)
 	{
-		p->m_object = static_cast<P_object*>(result)->m_object;
-		std::string a = "Выбран ";
-		a.append(p->m_object->m_name);
-		a = a + ".";
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+		p->m_object = arg_p->m_object;
+		p->m_direction = arg_p->m_object->m_direction;
 	}
-	else
+	if (!p->m_object)
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
-		Application::instance().m_message_queue.m_busy = false;
-		return;
+		result = Application::instance().command_select_object_on_map();
+		if (result)
+		{
+			p->m_object = static_cast<P_object*>(result)->m_object;
+			std::string a = "Выбран ";
+			a.append(p->m_object->m_name);
+			a = a + ".";
+			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+		}
+		else
+		{
+			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+			Application::instance().m_message_queue.m_busy = false;
+			return;
+		}
 	}
-	p->m_object = Application::instance().m_GUI->MapViewer->m_player->m_object;
+	if (p->m_direction == object_direction_e::none)
+	{
+		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_object_rotate(Application::instance().m_GUI->MapViewer, p->m_object));
+		result = Application::instance().command_select_location(p->m_object);
+		if (result)
+		{
+			MapCell* c = static_cast<MapCell*>(static_cast<P_object_owner*>(result)->m_cell);
+			p->m_direction = Game_algorithm::turn_to_cell(p->m_object, c);
+			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Направление выбрано."));
+
+		}
+		else
+		{
+			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+			Application::instance().m_message_queue.m_busy = false;
+			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+			return;
+		}
+	}
 	Application::instance().m_action_manager->add(new GameTask(this, p));
 	Application::instance().m_message_queue.m_busy = false;
 }
