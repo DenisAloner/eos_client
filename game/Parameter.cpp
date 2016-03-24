@@ -392,6 +392,6 @@ void P_bow_shoot::load()
 	m_cell = dynamic_cast<MapCell*>(Serialization_manager::instance().deserialize());
 }
 
-Parameter_direction::Parameter_direction() : Parameter(parameter_direction),m_object(nullptr), m_direction(object_direction_e::none)
-{
-}
+Parameter_direction::Parameter_direction() : Parameter(parameter_direction), m_object(nullptr), m_direction(object_direction_e::none) {};
+
+Parameter_direction::Parameter_direction(GameObject* object, object_direction_e direction) : Parameter(parameter_direction), m_object(object), m_direction(direction) {};

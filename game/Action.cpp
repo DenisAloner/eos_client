@@ -527,7 +527,12 @@ void ActionClass_Turn::interaction_handler(Parameter* arg)
 			return;
 		}
 	}
-	Application::instance().m_action_manager->add(new GameTask(this, p));
+	rotate_direction_e rotate = Game_algorithm::get_rotation(p->m_object->m_direction, p->m_direction);
+	for (auto i = p->m_object->m_direction; i!= p->m_direction;)
+	{
+		i = i + rotate;
+		Application::instance().m_action_manager->add(new GameTask(this, new Parameter_direction(p->m_object,i)));
+	}
 	Application::instance().m_message_queue.m_busy = false;
 }
 

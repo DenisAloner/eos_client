@@ -174,7 +174,14 @@ enum class object_direction_e :int
 	none
 };
 
+enum class rotate_direction_e :int
+{
+	counterclockwise = -1,
+	clockwise=1
+	
+};
 
+object_direction_e operator+(object_direction_e lhs, const rotate_direction_e& rhs);
 
 struct tile_t
 {

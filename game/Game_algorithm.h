@@ -21,5 +21,6 @@ public:
 	static int get_angle(GameObject* object, int angle);
 
 	//Функция возвращает минимальное количество поворотов между двумя ориентациями с учетов направления (по часовой стрелке для положительного результата)
-	int get_rotation(object_direction_e start, object_direction_e end);
+	//static int get_rotation(object_direction_e start, object_direction_e end);
+	static rotate_direction_e get_rotation(object_direction_e start, object_direction_e end);
 };
