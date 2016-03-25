@@ -457,6 +457,7 @@ struct cell_t
 struct common_action_t
 {
 	bool pick;
+
 	common_action_t()
 	{
 		pick = false;

@@ -55,7 +55,6 @@ feature_list action,action
 add_action equip
 add_action open
 add_action push
-add_action turn
 add_action use
 feature_list parameter,health,100,100
 feature_list parameter,strength,8,100
@@ -81,6 +80,8 @@ mem_part foot,ноги
 add_slot body
 feature_list_mem action,action
 mem_action move_step
+add_slot_mem action
+mem_action turn
 add_slot_mem action
 mem_effect value,1
 mem_slot_timer 5

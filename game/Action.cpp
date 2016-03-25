@@ -482,12 +482,12 @@ void ActionClass_Turn::interaction_handler(Parameter* arg)
 	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* result;
-	Parameter_Position* arg_p = static_cast<Parameter_Position*>(arg);
+	Parameter_direction* arg_p = static_cast<Parameter_direction*>(arg);
 	Parameter_direction* p = new Parameter_direction();
 	if (arg_p)
 	{
 		p->m_object = arg_p->m_object;
-		p->m_direction = arg_p->m_object->m_direction;
+		p->m_direction = arg_p->m_direction;
 	}
 	if (!p->m_object)
 	{

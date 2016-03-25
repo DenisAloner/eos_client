@@ -466,7 +466,6 @@ void Application::add_action_from_part(Object_interaction* object)
 				{
 				case action_e::pick:
 				{
-					//a->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));
 					GUI_ActionButton* ActionButton = new GUI_ActionButton();
 					ActionButton->m_action = a;
 					Parameter_destination* p = new Parameter_destination();
@@ -479,7 +478,6 @@ void Application::add_action_from_part(Object_interaction* object)
 				}
 				case action_e::move_step:
 				{
-					//a->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));
 					GUI_ActionButton* ActionButton = new GUI_ActionButton();
 					ActionButton->m_action = a;
 					Parameter_destination* p = new Parameter_destination();
@@ -487,7 +485,16 @@ void Application::add_action_from_part(Object_interaction* object)
 					p->m_owner = op;
 					ActionButton->m_parameter = p;
 					m_GUI->m_action_panel->add_item_control(ActionButton);
-					m_common_action.pick = true;
+					break;
+				}
+				case action_e::turn:
+				{
+					GUI_ActionButton* ActionButton = new GUI_ActionButton();
+					ActionButton->m_action = a;
+					Parameter_direction* p = new Parameter_direction();
+					p->m_object = m_GUI->MapViewer->m_player->m_object;
+					ActionButton->m_parameter = p;
+					m_GUI->m_action_panel->add_item_control(ActionButton);
 					break;
 				}
 				}
