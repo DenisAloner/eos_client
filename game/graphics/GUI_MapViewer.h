@@ -20,6 +20,7 @@ class GameMap;
 class GameObject;
 class gui_mapviewer_hint;
 class FOV;
+class FOV_help;
 class Player;
 
 class GUI_MapViewer : public GUI_Object
@@ -173,11 +174,15 @@ class mapviewer_object_rotate : public gui_mapviewer_hint
 {
 public:
 
+	FOV_help* m_fov;
+	object_direction_e m_direction;
+
 	GameObject* m_object;
 	mapviewer_object_rotate(GUI_MapViewer* owner, GameObject* object);
-	virtual void init() {};
-	virtual void render() {};
+	virtual void init();
+	virtual void render();
 	virtual void render_on_cell(MapCell* c);
+	void draw_cell(MapCell* a);
 };
 
 #endif //GUI_MAPVIEWER_H

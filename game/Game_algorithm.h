@@ -18,7 +18,7 @@ public:
 
 	static object_direction_e turn_to_cell(GameObject* object, MapCell* c);
 	static MapCell* step_in_direction(GameObject* object, object_direction_e d);
-	static int get_angle(GameObject* object, int angle);
+	static int get_angle(object_direction_e direction, int angle);
 
 	//Функция возвращает минимальное количество поворотов между двумя ориентациями с учетов направления (по часовой стрелке для положительного результата)
 	//static int get_rotation(object_direction_e start, object_direction_e end);

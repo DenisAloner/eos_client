@@ -43,6 +43,7 @@ public:
 
 	position_t m_map_center;
 	position_t m_view_center;
+	object_direction_e m_direction;
 
 	FOV();
 
@@ -56,11 +57,21 @@ public:
 	/*void quarter(int start_x, int start_y, float start_angle, float end_angle);
 	void cast_shadow(int start_x, int start_y, float start_angle, float end_angle);
 	void light_quarter(int start_x, int start_y, float start_angle, float end_angle);*/
-	void calculate_FOV(GameObject* object, GameMap* map);
-	
-private:
+	void calculate_FOV(GameObject* object, GameMap* map, object_direction_e direction = object_direction_e::none);
+
+protected:
 	void cast_light(uint x, uint y, uint radius, uint row, float start_slope, float end_slope, uint xx, uint xy, uint yx, uint yy);
+	virtual void calculate(GameObject* unit, GameMap* map, AI_FOV& fov);
 	void do_fov(uint x, uint y, uint radius, int start_angle, int end_angle);
-	void calculate(GameObject* unit, GameMap* map, AI_FOV& fov);
 };
 
+class FOV_help : public FOV
+{
+
+public:
+	FOV_help();
+
+protected:
+	virtual void calculate(GameObject* unit, GameMap* map, AI_FOV& fov);
+
+};

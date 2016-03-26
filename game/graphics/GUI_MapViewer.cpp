@@ -836,19 +836,67 @@ void mapviewer_object_move::render_on_cell(MapCell* c)
 	}
 }
 
-mapviewer_object_rotate::mapviewer_object_rotate(GUI_MapViewer* owner, GameObject* object) : gui_mapviewer_hint(owner), m_object(object) { init(); }
+mapviewer_object_rotate::mapviewer_object_rotate(GUI_MapViewer* owner, GameObject* object) : gui_mapviewer_hint(owner), m_object(object)
+{ 
+	m_fov = new FOV_help();
+	init(); 
+}
 
-//void mapviewer_object_rotate::init()
-//{
-//	if (m_owner->m_cursored)
-//	{
-//		m_dir =  Game_algorithm::turn_to_cell(m_object, m_owner->m_cursored);
-//	}
-//	else
-//	{
-//		m_dir = m_object->m_direction;
-//	}
-//}
+void mapviewer_object_rotate::init()
+{
+	if (m_owner->m_cursored)
+	{
+		m_direction =  Game_algorithm::turn_to_cell(m_object, m_owner->m_cursored);
+	}
+	else
+	{
+		m_direction = m_object->m_direction;
+	}
+	m_fov->calculate_FOV(m_object, m_object->cell()->m_map, m_direction);
+}
+
+void mapviewer_object_rotate::draw_cell(MapCell* a)
+{
+	double x0, y0, x1, y1, x2, y2, x3, y3;
+	int x = a->x - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
+	int y = a->y - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
+	int yp = m_owner->m_tile_count_x - x;
+	int xp = m_owner->m_tile_count_y - y;
+	x0 = (xp - yp) * 16 + m_owner->m_shift.x;
+	y0 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
+	x1 = x0;
+	y1 = (xp + yp) * 9 + m_owner->m_shift.y;
+	x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
+	y2 = y1;
+	x3 = x2;
+	y3 = y0;
+	Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+}
+
+void mapviewer_object_rotate::render()
+{
+	if (m_owner->m_cursored)
+	{
+		glUseProgramObjectARB(0);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_select);
+		glColor4f(0.0F, 1.0F, 0.0F, 0.25F);
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
+		
+		for (int y = m_fov->m_map_center.y - m_fov->m_view.d, yf = m_fov->m_view_center.y - m_fov->m_view.d; y < m_fov->m_map_center.y + m_fov->m_view.u + 1; y++, yf++)
+		{
+			for (int x = m_fov->m_map_center.x - m_fov->m_view.l, xf = m_fov->m_view_center.x - m_fov->m_view.l; x < m_fov->m_map_center.x + m_fov->m_view.r + 1; x++, xf++)
+			{
+				if (m_fov->m_map[yf][xf].visible)
+				{
+					draw_cell(m_owner->m_map->m_items[y][x]);
+				}
+			}
+		}
+
+	}
+}
 
 void mapviewer_object_rotate::render_on_cell(MapCell* c)
 {
@@ -875,7 +923,7 @@ void mapviewer_object_rotate::render_on_cell(MapCell* c)
 			x3 = x2;
 			y3 = y0;
 			tile_t tile;
-			m_object->m_active_state->m_tile_manager->set_tile(tile, m_object, Application::instance().m_timer->m_tick / 7.0*3.0, Game_algorithm::turn_to_cell(m_object, m_owner->m_cursored));
+			m_object->m_active_state->m_tile_manager->set_tile(tile, m_object, Application::instance().m_timer->m_tick / 7.0*3.0, m_direction);
 			GLuint Sprite = tile.unit;
 			glUseProgramObjectARB(0);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

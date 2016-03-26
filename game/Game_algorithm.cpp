@@ -194,10 +194,10 @@ MapCell* Game_algorithm::step_in_direction(GameObject* object, object_direction_
 	}
 }
 
-int Game_algorithm::get_angle(GameObject * object, int angle)
+int Game_algorithm::get_angle(object_direction_e direction, int angle)
 {
 	uint result;
-	switch (object->m_direction)
+	switch (direction)
 	{
 	case object_direction_e::down:
 	{
@@ -246,22 +246,6 @@ int Game_algorithm::get_angle(GameObject * object, int angle)
 	}
 	return result;
 }
-
-//int Game_algorithm::get_rotation(object_direction_e start, object_direction_e end)
-//{
-//	int a = static_cast<int>(start);
-//	int b = static_cast<int>(end);
-//	int ab = b - a;
-//	int ba = 8 - b + a;
-//	if (abs(ab) < abs(ba))
-//	{
-//		return ab;
-//	}
-//	else
-//	{
-//		return ba;
-//	}
-//}
 
 rotate_direction_e Game_algorithm::get_rotation(object_direction_e start, object_direction_e end)
 {

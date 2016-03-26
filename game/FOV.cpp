@@ -1,19 +1,5 @@
 #include "FOV.h"
 
-//static int multipliers1[4][8] = {
-//	{ 1, 0, 0, -1, -1, 0, 0, 1 },
-//	{ 0, 1, -1, 0, 0, -1, 1, 0 },
-//	{ 0, 1, 1, 0, 0, -1, -1, 0 },
-//	{ 1, 0, 0, 1, -1, 0, 0, -1 }
-//};
-
-//static int multipliers1[4][8] = {
-//		{ 0, 0, 0, -1, -1, 0, 0, 1 },
-//		{ -1, 1, -1, 0, 0, -1, 1, 0 },
-//		{ 1, 1, 1, 0, 0, -1, -1, 0 },
-//		{ 0, 0, 0, 1, -1, 0, 0, -1 }
-//};
-
 static int multipliers1[4][8] = {
 	{ 1, 0,  0,  1, -1,  0,  0, -1 },
 	{ 0, 1,  1,  0,  0, -1, -1,  0 },
@@ -21,147 +7,7 @@ static int multipliers1[4][8] = {
 	{ 1, 0,  0, -1, -1,  0,  0,  1 }
 };
 
-
-//float calculate_angle(float x, float y)
-//{
-//	float angle = std::atan2(y, x) * (180.0F / 3.141592653589793238462643383279502884F);
-//	return angle;
-//}
-
-//values::values(){
-//	for (int y = 0; y < middle + 1; y++)
-//	{
-//		for (int x = 0; x <middle + 1; x++)
-//		{
-//			item[y][x].angle = calculate_angle(x, y);
-//			item[y][x].shift_x = calculate_angle(x + 0.5, y - 0.5);
-//			item[y][x].shift_y = calculate_angle(x - 0.5, y + 0.5);
-//			item[y][x].distance = x*x + y*y;
-//		}
-//	}
-//}
-
-//const values FOV::m_values = values();
-
-FOV::FOV()
-{
-}
-
-//void FOV::quarter(int start_x, int start_y, float start_angle, float end_angle)
-//{
-//	int z;
-//	fov_cell* c;
-//	for (int y = start_y; y < m_radius; y++)
-//	{
-//		for (int x = start_x; x <m_radius; x++)
-//		{
-//			c = &m_map[middle + y*multipliers[m_quarter][1]][middle + x*multipliers[m_quarter][0]];
-//			if (m_values.item[y][x].angle < end_angle || m_values.item[y][x].distance > m_sqr_radius) break;
-//			if (m_values.item[y][x].angle <= start_angle)
-//			{
-//				if (c->opaque)
-//				{
-//					c->visible = true;
-//					quarter(start_x, y + 1, start_angle, m_values.item[y][x].shift_y);
-//					for (z = x + 1; z < m_radius; z++)
-//					{
-//						if (m_values.item[y][z].distance <= m_sqr_radius &&m_values.item[y][z].angle >= end_angle){
-//							c = &m_map[middle + y*multipliers[m_quarter][1]][middle + z*multipliers[m_quarter][0]];
-//							if (!c->opaque)
-//							{
-//								x = z - 1;
-//								break;
-//							}
-//							c->visible = true;
-//						}
-//					}
-//					start_angle = m_values.item[y][x].shift_x;
-//					start_x = x;
-//				}
-//				else {
-//					c->visible = true;
-//				}
-//			} else start_x = x;
-//		}
-//	}
-//}
-//
-//void FOV::cast_shadow(int start_x, int start_y, float start_angle, float end_angle)
-//{
-//	int z;
-//	int xs, ys;
-//	fov_cell* c;
-//	for (int y = start_y; y < m_radius; y++)
-//	{
-//		for (int x = start_x; x <m_radius; x++)
-//		{
-//			c = &m_map[middle + y*multipliers[m_quarter][1]][middle + x*multipliers[m_quarter][0]];
-//			if (m_values.item[y][x].angle < end_angle || m_values.item[y][x].distance > m_sqr_radius) break;
-//			if (m_values.item[y][x].angle <= start_angle)
-//			{
-//				c->visible = false;
-//			}
-//			else start_x = x;
-//		}
-//	}
-//}
-//
-//void FOV::light_quarter(int start_x, int start_y, float start_angle, float end_angle)
-//{
-//	int z;
-//	int xs, ys;
-//	fov_cell* c;
-//	for (int y = start_y; y < m_radius; y++)
-//	{
-//		for (int x = start_x; x <m_radius; x++)
-//		{
-//			c = &m_map[middle + y*multipliers[m_quarter][1]][middle + x*multipliers[m_quarter][0]];
-//			if (m_values.item[y][x].angle < end_angle || m_values.item[y][x].distance > m_sqr_radius) break;
-//			if (m_values.item[y][x].angle <= start_angle)
-//			{
-//				if (c->opaque)
-//				{
-//					c->visible = true;
-//					ys = y;
-//					for (z = y + 1; z < m_radius; z++)
-//					{
-//						if (m_values.item[z][x].distance <= m_sqr_radius &&m_values.item[z][x].angle >= end_angle){
-//							c = &m_map[middle + z*multipliers[m_quarter][1]][middle + y*multipliers[m_quarter][0]];
-//							if (!c->opaque)
-//							{
-//								break;
-//							}
-//							ys = z;
-//							c->visible = true;
-//						}
-//					}
-//					xs = x;
-//					for (z = x + 1; z < m_radius; z++)
-//					{
-//						if (m_values.item[y][z].distance <= m_sqr_radius &&m_values.item[y][z].angle >= end_angle){
-//							c = &m_map[middle + y*multipliers[m_quarter][1]][middle + z*multipliers[m_quarter][0]];
-//							if (!c->opaque)
-//							{
-//								break;
-//							}
-//							xs = z;
-//							c->visible = true;
-//						}
-//					}
-//					light_quarter(start_x, y + 1, start_angle, m_values.item[y][x].shift_y);
-//					cast_shadow(x, y + 1, m_values.item[ys][x].shift_y, m_values.item[y][xs].shift_x);
-//					start_angle = m_values.item[y][xs].shift_x;
-//					start_x = x;
-//				}
-//				else {
-//					c->visible = true;
-//				}
-//			}
-//			else start_x = x;
-//		}
-//	}
-//}
-
+FOV::FOV(){}
 
 void FOV::cast_light(uint x, uint y, uint radius, uint row, float start_slope, float end_slope, uint xx, uint xy, uint yx, uint yy)
 {
@@ -411,9 +257,9 @@ void FOV::do_fov(uint x, uint y, uint radius,int start_angle,int end_angle)
 	}
 }
 
-void FOV::calculate_FOV(GameObject* object, GameMap* map)
+void FOV::calculate_FOV(GameObject* object, GameMap* map, object_direction_e direction)
 {
-
+	if (direction == object_direction_e::none) { m_direction = object->m_direction; } else { m_direction = direction; }
 	Vision_list* vl = static_cast<Vision_list*>(object->m_active_state->get_list(interaction_e::vision));
 	int radius = vl->m_max_radius;
 
@@ -511,5 +357,34 @@ void FOV::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
 		}
 	}
 
-	do_fov(m_view.l, m_view.d, fov.radius, Game_algorithm::get_angle(unit, fov.start_angle), Game_algorithm::get_angle(unit, fov.end_angle));
+	do_fov(m_view.l, m_view.d, fov.radius, Game_algorithm::get_angle(m_direction, fov.start_angle), Game_algorithm::get_angle(m_direction, fov.end_angle));
+}
+
+FOV_help::FOV_help(){}
+
+void FOV_help::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
+{
+	std::function<bool(GameObject*)> qualifier = fov.qualifier->predicat;
+
+	view_t view(min(m_view.l, fov.radius), min(m_view.r, fov.radius), min(m_view.u, fov.radius), min(m_view.d, fov.radius));
+
+	for (int y = m_map_center.y - view.d, yf = m_view_center.y - view.d; y < m_map_center.y + view.u + 1; y++, yf++)
+	{
+		for (int x = m_map_center.x - view.l, xf = m_view_center.x - view.l; x < m_map_center.x + view.r + 1; x++, xf++)
+		{
+			m_map[yf][xf].opaque = false;
+			if (map->m_items[y][x]->m_notable == true)
+			{
+				for (auto obj = map->m_items[y][x]->m_items.begin(); obj != map->m_items[y][x]->m_items.end(); obj++)
+				{
+					if ((*obj) != unit&&qualifier((*obj)))
+					{
+						m_map[yf][xf].opaque = true;
+					}
+				}
+			}
+		}
+	}
+
+	do_fov(m_view.l, m_view.d, fov.radius, Game_algorithm::get_angle(m_direction, fov.start_angle), Game_algorithm::get_angle(m_direction, fov.end_angle));
 }

@@ -39,8 +39,7 @@ public:
 	GLuint m_select;
 	GLuint m_font;
 	GLuint m_no_image;
-	GLuint m_no_visible;
-	GLuint m_novisible;
+	GLuint m_visible;
 	GLuint m_blur;
 
 	enum class command_e
