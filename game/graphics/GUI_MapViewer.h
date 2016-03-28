@@ -182,7 +182,6 @@ public:
 	virtual void init();
 	virtual void render();
 	virtual void render_on_cell(MapCell* c);
-	void draw_cell(MapCell* a);
 };
 
 #endif //GUI_MAPVIEWER_H

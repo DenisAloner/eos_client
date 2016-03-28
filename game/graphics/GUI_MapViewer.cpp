@@ -855,46 +855,107 @@ void mapviewer_object_rotate::init()
 	m_fov->calculate_FOV(m_object, m_object->cell()->m_map, m_direction);
 }
 
-void mapviewer_object_rotate::draw_cell(MapCell* a)
-{
-	double x0, y0, x1, y1, x2, y2, x3, y3;
-	int x = a->x - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
-	int y = a->y - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
-	int yp = m_owner->m_tile_count_x - x;
-	int xp = m_owner->m_tile_count_y - y;
-	x0 = (xp - yp) * 16 + m_owner->m_shift.x;
-	y0 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
-	x1 = x0;
-	y1 = (xp + yp) * 9 + m_owner->m_shift.y;
-	x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
-	y2 = y1;
-	x3 = x2;
-	y3 = y0;
-	Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
-}
-
 void mapviewer_object_rotate::render()
 {
 	if (m_owner->m_cursored)
 	{
+		bool top_bound;
+		bool down_bound;
+		bool left_bound;
+		bool right_bound;
+		double xt, yt;
+		int yp;
+		int xp;
+		MapCell* c;
 		glUseProgramObjectARB(0);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_select);
-		glColor4f(0.0F, 1.0F, 0.0F, 0.25F);
 		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
-		
+		glLineWidth(4);
+		glColor4f(0.0F, 1.0F, 0.0F, 0.25F);
 		for (int y = m_fov->m_map_center.y - m_fov->m_view.d, yf = m_fov->m_view_center.y - m_fov->m_view.d; y < m_fov->m_map_center.y + m_fov->m_view.u + 1; y++, yf++)
 		{
 			for (int x = m_fov->m_map_center.x - m_fov->m_view.l, xf = m_fov->m_view_center.x - m_fov->m_view.l; x < m_fov->m_map_center.x + m_fov->m_view.r + 1; x++, xf++)
 			{
 				if (m_fov->m_map[yf][xf].visible)
-				{
-					draw_cell(m_owner->m_map->m_items[y][x]);
+				{  
+					c = m_owner->m_map->m_items[y][x];
+					yp = m_owner->m_tile_count_x / 2 - c->x + m_owner->m_center.x;
+					xp = m_owner->m_tile_count_y / 2 - c->y + m_owner->m_center.y;
+					xt = (xp - yp) * 16 + m_owner->m_shift.x;
+					yt = (xp + yp) * 9 + m_owner->m_shift.y;
+					Application::instance().m_graph->draw_sprite(xt, yt - 18, xt, yt, xt + 32, yt, xt + 32, yt - 18);
+					glDisable(GL_BLEND);
+					glDisable(GL_TEXTURE_2D);
+					top_bound = false;
+					if (yf == m_fov->m_view_center.y + m_fov->m_view.u)
+					{
+						top_bound = true;
+					}
+					else
+					{
+						if (!m_fov->m_map[yf + 1][xf].visible) { top_bound = true; }
+					}
+
+					right_bound = false;
+					if (xf == m_fov->m_view_center.x + m_fov->m_view.r)
+					{
+						right_bound = true;
+					}
+					else
+					{
+						if (!m_fov->m_map[yf][xf + 1].visible) { right_bound = true; }
+					}
+
+					down_bound = false;
+					if (yf == m_fov->m_view_center.y - m_fov->m_view.d)
+					{
+						down_bound = true;
+					}
+					else
+					{
+						if (!m_fov->m_map[yf - 1][xf].visible) { down_bound = true; }
+					}
+
+					left_bound = false;
+					if (xf == m_fov->m_view_center.x - m_fov->m_view.l)
+					{
+						left_bound = true;
+					}
+					else
+					{
+						if (!m_fov->m_map[yf][xf - 1].visible) { left_bound = true; }
+					}
+					glBegin(GL_LINES);
+					if (top_bound)
+					{
+						glVertex2d(xt, yt - 9);
+						glVertex2d(xt + 16, yt - 18);
+					}
+					if (right_bound)
+					{
+						glVertex2d(xt + 16, yt - 18);
+						glVertex2d(xt + 32, yt-9);
+					}
+					if (down_bound)
+					{
+						glVertex2d(xt + 32, yt-9);
+						glVertex2d(xt + 16, yt);
+					}
+					if (left_bound)
+					{
+						glVertex2d(xt + 16, yt);
+						glVertex2d(xt, yt - 9);
+					}
+					glEnd();
+
+					glEnable(GL_BLEND);
+					glEnable(GL_TEXTURE_2D);
 				}
 			}
 		}
-
+		glLineWidth(1);
 	}
 }
 
