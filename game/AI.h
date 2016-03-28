@@ -8,6 +8,7 @@
 #include "ActionManager.h"
 #include "Game_algorithm.h"
 #include "FOV.h"
+#include <mutex>
 
 class GameMap;
 class GameObject;

@@ -106,6 +106,7 @@ GameMap::GameMap(dimension_t size)
 
 GameMap::GameMap()
 {
+	m_dijkstra_map = new Dijkstra_map();
 }
 
 void GameMap::init(dimension_t size)
@@ -168,9 +169,9 @@ void GameMap::generate_room(void)
 	}
 
 	int light_source_count = 0;
-	for (int i = 1; i<m_size.h; i=i+20)
+	for (int i = 1; i<m_size.h; i=i+10)
 	{
-		for (int j = 1; j<m_size.w; j=j+20)
+		for (int j = 1; j<m_size.w; j=j+10)
 		{
 			GameObject* obj = Application::instance().m_game_object_manager->new_object("torch");
 			add_to_map(obj, m_items[i][j]);
@@ -189,21 +190,6 @@ void GameMap::generate_room(void)
 	//*obj->m_active_state->m_light = light_t(0, 0, 80);
 	//add_to_map(obj, m_items[35][25]);
 
-	
-	for (int i =0; i < m_size.h-5; i++)
-	{
-		if (i>10)
-		{
-			GameObject* obj = Application::instance().m_game_object_manager->new_object("wall");
-			add_object(obj, m_items[i][10]);
-		}
-		else
-		{
-			GameObject* obj = Application::instance().m_game_object_manager->new_object("glass_wall");
-			add_object(obj, m_items[i][10]);
-		}
-	
-	}
 }
 
 
@@ -1213,6 +1199,7 @@ void GameMap::save()
 		for (int j = 0; j < m_size.w; j++)
 		{
 			cell = m_items[i][j];
+			fwrite(&cell->m_notable, sizeof(bool), 1, file);
 			s = cell->m_items.size();
 			fwrite(&s, sizeof(size_t), 1, file);
 			for (auto item = cell->m_items.begin(); item != cell->m_items.end(); item++)
@@ -1229,6 +1216,7 @@ void GameMap::load()
 	fread(&m_size, sizeof(dimension_t), 1, file);
 	init(m_size);
 	Serialization_manager::instance().m_map = this;
+	Application::instance().m_GUI->MapViewer->m_map = this;
 	m_object_manager.load();
 	MapCell* cell;
 	size_t s;
@@ -1238,6 +1226,7 @@ void GameMap::load()
 		for (int j = 0; j < m_size.w; j++)
 		{
 			cell = m_items[i][j];
+			fread(&cell->m_notable, sizeof(bool), 1, file);
 			fread(&s, sizeof(size_t), 1, file);
 			for (int k = 0; k < s; k++)
 			{

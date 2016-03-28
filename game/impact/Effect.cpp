@@ -402,32 +402,23 @@ void Vision_list::unequip(Object_interaction* item)
 
 void Vision_list::save()
 {
-	/*LOG(INFO) << "Лист параметров";
+	LOG(INFO) << "Лист зрения";
 	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::parameter_list;
+	type_e t = type_e::vision_list;
 	fwrite(&t, sizeof(type_e), 1, file);
-
-	fwrite(&m_subtype, sizeof(interaction_e), 1, file);
-	fwrite(&m_basic_value, sizeof(int), 1, file);
-	fwrite(&m_basic_limit, sizeof(int), 1, file);
-
 	size_t s = m_effect.size();
 	fwrite(&s, sizeof(size_t), 1, file);
 	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
 	{
 		Serialization_manager::instance().serialize(*item);
 	}
-	LOG(INFO) << "Конец листа параметров";*/
+	LOG(INFO) << "Конец листа зрения";
 }
 
 void Vision_list::load()
 {
-	/*LOG(INFO) << "Лист параметров";
+	LOG(INFO) << "Лист зрения";
 	FILE* file = Serialization_manager::instance().m_file;
-	fread(&m_subtype, sizeof(interaction_e), 1, file);
-	LOG(INFO) << "ТИП листа параметров " << std::to_string((int)m_subtype);
-	fread(&m_basic_value, sizeof(int), 1, file);
-	fread(&m_basic_limit, sizeof(int), 1, file);
 	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
 	m_effect.clear();
@@ -435,7 +426,7 @@ void Vision_list::load()
 	{
 		m_effect.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
 	}
-	LOG(INFO) << "Конец листа параметров";*/
+	LOG(INFO) << "Конец листа зрения";
 }
 
 
@@ -534,40 +525,33 @@ void Vision_component::description(std::list<std::string>* info, int level)
 
 void Vision_component::save()
 {
-	//LOG(INFO) << "Лист параметров";
-	//FILE* file = Serialization_manager::instance().m_file;
-	//type_e t = type_e::parameter_list;
-	//fwrite(&t, sizeof(type_e), 1, file);
-
-	//fwrite(&m_subtype, sizeof(interaction_e), 1, file);
-	//fwrite(&m_basic_value, sizeof(int), 1, file);
-	//fwrite(&m_basic_limit, sizeof(int), 1, file);
-
-	//size_t s = m_effect.size();
-	//fwrite(&s, sizeof(size_t), 1, file);
-	//for (auto item = m_effect.begin(); item != m_effect.end(); item++)
-	//{
-	//	Serialization_manager::instance().serialize(*item);
-	//}
-	//LOG(INFO) << "Конец листа параметров";
+	LOG(INFO) << "Компонент зрения";
+	FILE* file = Serialization_manager::instance().m_file;
+	type_e t = type_e::vision_component;
+	fwrite(&t, sizeof(type_e), 1, file);
+	FileSystem::instance().serialize_AI_FOV(m_basic_value, file);
+	size_t s = m_effect.size();
+	fwrite(&s, sizeof(size_t), 1, file);
+	for (auto item = m_effect.begin(); item != m_effect.end(); item++)
+	{
+		Serialization_manager::instance().serialize(*item);
+	}
+	LOG(INFO) << "Конец компонента зрения";
 }
 
 void Vision_component::load()
 {
-	//LOG(INFO) << "Лист параметров";
-	//FILE* file = Serialization_manager::instance().m_file;
-	//fread(&m_subtype, sizeof(interaction_e), 1, file);
-	//LOG(INFO) << "ТИП листа параметров " << std::to_string((int)m_subtype);
-	//fread(&m_basic_value, sizeof(int), 1, file);
-	//fread(&m_basic_limit, sizeof(int), 1, file);
-	//size_t s;
-	//fread(&s, sizeof(size_t), 1, file);
-	//m_effect.clear();
-	//for (size_t i = 0; i < s; i++)
-	//{
-	//	m_effect.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
-	//}
-	//LOG(INFO) << "Конец листа параметров";
+	LOG(INFO) << "Компонент зрения";
+	FILE* file = Serialization_manager::instance().m_file;
+	FileSystem::instance().deserialize_AI_FOV(m_basic_value, file);
+	size_t s;
+	fread(&s, sizeof(size_t), 1, file);
+	m_effect.clear();
+	for (size_t i = 0; i < s; i++)
+	{
+		m_effect.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
+	}
+	LOG(INFO) << "Конец компонента зрения";
 }
 
 // Tag_list

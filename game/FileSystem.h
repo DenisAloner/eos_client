@@ -28,6 +28,8 @@ public:
 
 	bool load_from_file(const std::string& path, bytearray& data);
 	bool save_to_file(const std::string& path, bytearray& data);
+	void serialize_AI_FOV(AI_FOV& text, FILE* file);
+	void deserialize_AI_FOV(AI_FOV& text, FILE* file);
 	void serialize_string(std::string& text, FILE* file);
 	void deserialize_string(std::string& text, FILE* file);
 	void serialize_pointer(const void* value, type_e object_type, FILE* file);

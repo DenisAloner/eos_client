@@ -85,6 +85,24 @@ void FileSystem::deserialize_string(std::string& text, FILE* file)
 	text.assign(str, s);
 }
 
+void FileSystem::serialize_AI_FOV(AI_FOV& value, FILE* file)
+{
+	fwrite(&value.radius, sizeof(int), 1, file);
+	fwrite(&value.qualifier->index, sizeof(size_t), 1, file);
+	fwrite(&value.start_angle, sizeof(int), 1, file);
+	fwrite(&value.end_angle, sizeof(int), 1, file);
+}
+
+void FileSystem::deserialize_AI_FOV(AI_FOV& value, FILE* file)
+{
+	fread(&value.radius, sizeof(int), 1, file);
+	size_t s;
+	fread(&s, sizeof(size_t), 1, file);
+	value.qualifier = Application::instance().m_ai_manager->m_fov_qualifiers[s];
+	fread(&value.start_angle, sizeof(int), 1, file);
+	fread(&value.end_angle, sizeof(int), 1, file);
+}
+
 void FileSystem::serialize_pointer(const void* value, type_e object_type, FILE* file)
 {
 	if (value == nullptr)
@@ -526,6 +544,11 @@ iSerializable* Serialization_manager::deserialize()
 		case type_e::parameter_interaction_cell:
 		{
 			value = new P_interaction_cell();
+			break;
+		}
+		case type_e::parameter_direction:
+		{
+			value = new Parameter_direction();
 			break;
 		}
 		case type_e::action_wrapper:

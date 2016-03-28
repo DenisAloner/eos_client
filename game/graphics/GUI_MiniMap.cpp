@@ -167,7 +167,7 @@ void GUI_FOV::render(GraphicalController* Graph, int px, int py)
 void GUI_FOV::render_on_canvas()
 {
 	m_radius = m_vision_list->m_max_radius;
-	m_cell_size = fdimension_t(static_cast<float>(1024) / static_cast<float>(m_fov->m_view.l + m_fov->m_view.r), static_cast<float>(1024) / static_cast<float>(m_fov->m_view.d + m_fov->m_view.u));
+	m_cell_size = fdimension_t(static_cast<float>(1024) / static_cast<float>(m_fov->m_view.l + m_fov->m_view.r+1), static_cast<float>(1024) / static_cast<float>(m_fov->m_view.d + m_fov->m_view.u+1));
 	double x0, y0, x1, y1, x2, y2, x3, y3;
 	glDisable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);

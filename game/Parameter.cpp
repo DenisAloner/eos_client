@@ -395,3 +395,35 @@ void P_bow_shoot::load()
 Parameter_direction::Parameter_direction() : Parameter(parameter_direction), m_object(nullptr), m_direction(object_direction_e::none) {};
 
 Parameter_direction::Parameter_direction(GameObject* object, object_direction_e direction) : Parameter(parameter_direction), m_object(object), m_direction(direction) {};
+
+void Parameter_direction::reset_serialization_index()
+{
+	m_serialization_index = 0;
+	if (m_object)
+	{
+		if (m_object->m_serialization_index > 1)
+		{
+			m_object->reset_serialization_index();
+		}
+	}
+}
+
+void Parameter_direction::save()
+{
+	LOG(INFO) << "Запись параметра направления";
+	FILE* file = Serialization_manager::instance().m_file;
+	type_e t = type_e::parameter_direction;
+	fwrite(&t, sizeof(type_e), 1, file);
+	Serialization_manager::instance().serialize(m_object);
+	fwrite(&m_direction, sizeof(object_direction_e), 1, file);
+	LOG(INFO) << "Конец записи параметра направления";
+}
+
+void Parameter_direction::load()
+{
+	FILE* file = Serialization_manager::instance().m_file;
+	LOG(INFO) << "in";
+	m_object = dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize());
+	LOG(INFO) << "out";
+	fread(&m_direction, sizeof(object_direction_e), 1, file);
+}

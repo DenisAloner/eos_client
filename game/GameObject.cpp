@@ -22,6 +22,7 @@ void MapCell::save()
 	fwrite(&t, sizeof(type_e), 1, file);
 	fwrite(&x, sizeof(int), 1, file);
 	fwrite(&y, sizeof(int), 1, file);
+	//fwrite(&m_notable, sizeof(bool), 1, file);
 	LOG(INFO) << "Конец записи клетки карты";
 }
 
@@ -222,7 +223,7 @@ void Object_state::save()
 	fwrite(&m_weight, sizeof(float), 1, file);
 	FileSystem::instance().serialize_pointer(m_light, type_e::light_t, file);
 	FileSystem::instance().serialize_pointer(m_optical, type_e::optical_properties_t, file);
-	if(m_tile_manager->m_index>23)
+	if(m_tile_manager->m_index>25)
 	{
 		LOG(FATAL) << "Тайловый менеджер с ошибкой " <<std::to_string(m_tile_manager->m_index);
 	}

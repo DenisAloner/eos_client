@@ -434,10 +434,11 @@ enum class type_e
 	parameter_object_owner,
 	parameter_unit_interaction,
 	parameter_interaction_cell,
+	parameter_direction,
 	action_wrapper,
 	parameter_bow_shoot,
 	vision_list,
-	vision_component
+	vision_component,
 };
 
 struct predicat_t

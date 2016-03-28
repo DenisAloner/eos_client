@@ -172,9 +172,9 @@ public:
 
 	Parameter_direction(GameObject* object, object_direction_e direction);
 
-	virtual void reset_serialization_index() {};
-	virtual void save() {};
-	virtual void load() {};
+	virtual void reset_serialization_index();
+	virtual void save();
+	virtual void load();
 };
 
 #endif //TPARAMETER_H
