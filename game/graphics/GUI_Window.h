@@ -45,6 +45,11 @@ public:
 	virtual void on_header_close();
 	virtual void resize(int _width, int _height);
 	virtual void on_mouse_wheel(MouseEventArgs const& e);
+	virtual void add(GUI_Object* object);
+
+private:
+	GUI_Header* m_header;
+
 };
 
 class GUI_description_window :

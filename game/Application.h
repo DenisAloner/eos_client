@@ -19,6 +19,7 @@
 #include "Game_object_manager.h"
 #include "GUI_Window_manager.h"
 #include "GUI_button.h"
+#include "GUI_Button_list.h"
 
 class Action;
 class ActionManager;
@@ -136,6 +137,7 @@ public:
 	Parameter* command_select_location(GameObject* object);
 	Parameter* command_select_object_on_map();
 	Parameter* command_select_object();
+	void command_main_menu_select();
 	bool command_open_body(GameObject*& Object);
 	void command_gui_show_characterization(GameObject*& object);
 	bool command_check_position(GameObject*& object, MapCell*& position, GameMap*& map);

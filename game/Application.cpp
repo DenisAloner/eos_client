@@ -147,6 +147,250 @@ void Application::render()
 	m_update_mutex.unlock();
 }
 
+//void Application::initialize()
+//{
+//	music = NULL;
+//	m_game_turn = 1;
+//	m_ready = false;
+//	m_graph = new GraphicalController();
+//	m_mouse = new MouseController();
+//	command_set_cursor(m_graph->m_cursor);
+//	command_set_cursor_visibility(true);
+//
+//	m_GUI = new ApplicationGUI(0,0,1024,1024);
+//	
+//	key_press += std::bind(&Application::on_key_press, this, std::placeholders::_1);
+//	m_mouse->mouse_click += std::bind(&Application::on_mouse_click, this, std::placeholders::_1);
+//	m_mouse->mouse_down += std::bind(&Application::on_mouse_down, this, std::placeholders::_1);
+//	m_mouse->mouse_wheel += std::bind(&Application::on_mouse_wheel, this, std::placeholders::_1);
+//	m_mouse->mouse_move += std::bind(&Application::on_mouse_move, this, std::placeholders::_1);
+//	m_action_manager = new ActionManager();
+//
+//	m_actions[action_e::move] = new ActionClass_Move(); 
+//	m_actions[action_e::move_step] = new action_move_step();
+//	m_actions[action_e::push] = new ActionClass_Push();
+//	m_actions[action_e::turn] = new ActionClass_Turn();
+//	m_actions[action_e::open_inventory] = new Action_OpenInventory();
+//	m_actions[action_e::cell_info] = new Action_CellInfo();
+//	m_actions[action_e::set_motion_path] = new action_set_motion_path();
+//	m_actions[action_e::pick] = new Action_pick();
+//	m_actions[action_e::open] = new Action_open();
+//	m_actions[action_e::hit] = new Action_hit();
+//	m_actions[action_e::hit_melee] = new action_hit_melee();
+//	m_actions[action_e::equip] = new Action_equip();
+//	m_actions[action_e::show_parameters] = new Action_show_parameters();
+//	m_actions[action_e::use] = new Action_use();
+//	m_actions[action_e::save] = new Action_save();
+//	m_actions[action_e::autoexplore] = new Action_autoexplore();
+//	m_actions[action_e::shoot] = new Action_shoot();
+//
+//	for (size_t i = 0; i < c_action_size; i++)
+//	{
+//		m_actions[i]->m_index = i;
+//	}
+//
+//	m_ai_manager = new AI_manager();
+//	m_game_object_manager = new GameObjectManager();
+//	m_game_object_manager->init();
+//	LOG(INFO) << "Менеджер игровых объектов успешно инициализирован";
+//
+//	m_GUI->MapViewer = new GUI_MapViewer(this);
+//	m_GUI->MapViewer->m_position.x = 0;
+//	m_GUI->MapViewer->m_position.y = 0;
+//	m_GUI->MapViewer->m_size.w = 1024;
+//	m_GUI->MapViewer->m_size.h = 1024;
+//	
+//	m_GUI->MapViewer->m_map = new GameMap(dimension_t(20,20));
+//	///m_GUI->MapViewer->m_map->generate_level();
+//
+//	m_GUI->MapViewer->m_map->generate_room();
+//
+//	int rx = 10;
+//	int ry = 10;
+//
+//	GameObject* obj;
+//
+//	obj = m_game_object_manager->new_object("iso_unit");
+//	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx]);
+//	m_GUI->MapViewer->m_player = new Player(obj, m_GUI->MapViewer->m_map);
+//
+//	//m_GUI->MapViewer->m_map = Serialization_manager::instance().load("save");
+//
+//	m_window_manager = new GUI_Window_manager(0, 0, 1024, 1024);
+//
+//	GUI_ActionManager* AMTextBox;
+//	AMTextBox = new GUI_ActionManager(m_action_manager);
+//	AMTextBox->m_position.x = 650;
+//	AMTextBox->m_position.y = 710;
+//	AMTextBox->resize(372, 263);
+//	GUI_ActionPanel* ActionPanel;
+//	ActionPanel = new GUI_ActionPanel(2,975,898,47);
+//	m_GUI->m_action_panel = ActionPanel;
+//	update_action_panel();
+//	GUI_Layer* MenuLayer;
+//	MenuLayer = new GUI_Layer(0,0,1024,1024);
+//	GUI_TextBox* TextBox = new GUI_TextBox();
+//	TextBox->m_position.x = 2;
+//	TextBox->m_position.y = 710;
+//	TextBox->resize(646, 263);
+//
+//	m_GUI->DescriptionBox = TextBox;
+//
+//	//m_GUI->Timer = new GUI_Timer(902, 975, 120, 47, 0);
+//
+//	GUI_button* button = new GUI_button(902, 975, 120, 47, "Ход");
+//	button->mouse_click += std::bind(&Application::on_turn, this);
+//
+//	MenuLayer->add(AMTextBox);
+//	MenuLayer->add(ActionPanel);
+//	MenuLayer->add(TextBox);
+//	MenuLayer->add(button);
+//
+//	GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
+//	GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), m_GUI->MapViewer);
+//	MiniMap->add(mini_map);
+//	//MenuLayer->add(MiniMap);
+//
+//	MiniMap = new GUI_Window(300, 0, 400, 400, "Поле зрения player");
+//	GUI_FOV* fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), m_GUI->MapViewer->m_player->m_object);
+//	MiniMap->add(fov);
+//
+//	/*obj = m_game_object_manager->new_object("bat");
+//	obj->set_direction(object_direction_e::top);
+//	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx-2]);
+//
+//	obj = m_game_object_manager->new_object("bat");
+//	obj->set_direction(object_direction_e::top);
+//	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 4]);
+//
+//	obj = m_game_object_manager->new_object("bat");
+//	obj->set_direction(object_direction_e::top);
+//	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 6]);
+//	
+//	obj = m_game_object_manager->new_object("bat");
+//	obj->set_direction(object_direction_e::top);
+//	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-8][rx]);*/
+//
+//
+//	/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
+//	fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), obj);
+//	MiniMap->add(fov);*/
+//
+//	//MenuLayer->add(m_GUI->Timer);
+//	//MenuLayer->add(MiniMap);
+//	
+//	
+//	//MenuLayer->add(new GUI_Item(0, 0, 100,21, "4565656"));
+//	m_GUI->add(m_window_manager);
+//	m_GUI->add(MenuLayer);
+//	m_GUI->add(m_GUI->MapViewer);
+//	m_GUI->MapViewer->m_GUI = MenuLayer;
+//
+//	m_graph->set_VSync(false);
+//	//if (SDL_Init(SDL_INIT_AUDIO) < 0)
+//	//{
+//	//	MessageBox(NULL, "Error", "Audio", MB_OK);
+//	//}
+//	//static Uint32 wav_length; // length of our sample
+//	//static Uint8 *wav_buffer; // buffer containing our audio file
+//	//static SDL_AudioSpec wav_spec; // the specs of our piece of music
+//	//static Uint32 wav_length2; // length of our sample
+//	//static Uint8 *wav_buffer2; // buffer containing our audio file
+//	//static SDL_AudioSpec wav_spec2; // the specs of our piece of music
+//	//if (SDL_LoadWAV("C:\\ExplorersOfSaarum\\123.wav", &wav_spec, &wav_buffer, &wav_length) == NULL){
+//	//	MessageBox(NULL, "Error", "Audio", MB_OK);
+//	//}
+//	//if (SDL_LoadWAV("C:\\ExplorersOfSaarum\\456.wav", &wav_spec2, &wav_buffer2, &wav_length2) == NULL){
+//	//	MessageBox(NULL, "Error", "Audio", MB_OK);
+//	//}
+//	//wav_spec.callback = my_audio_callback;
+//	//wav_spec.userdata = NULL;
+//	//// set our global static variables
+//	//audio_pos = wav_buffer; // copy sound buffer
+//	//audio_len = wav_length; // copy file length
+//
+//	///* Open the audio device */
+//	//if (SDL_OpenAudio(NULL, NULL) < 0){
+//	//	MessageBox(NULL, "Error", "Audio", MB_OK);
+//	//	exit(-1);
+//	//}
+//
+//	///* Start playing */
+//	//SDL_PauseAudio(0);
+//	//SDL_Delay(900);
+//	//SDL_MixAudio(audio_pos, wav_buffer2, audio_len, SDL_MIX_MAXVOLUME);// mix from one buffer into another
+//	//// wait until we're don't playing
+//	///*while (audio_len > 0) {
+//	//}*/
+//	//// shut everything down
+//	///*SDL_CloseAudio();
+//	//SDL_FreeWAV(wav_buffer);*/
+//
+//	int audio_rate = 44100;
+//	Uint16 audio_format = AUDIO_S16; /* 16-bit stereo */
+//	int audio_channels = 2;
+//	int audio_buffers = 4096;
+//
+//	if (SDL_Init(SDL_INIT_AUDIO) < 0)
+//	{
+//		MessageBox(NULL, "Error", "Audio", MB_OK);
+//	}
+//	if (Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers)) {
+//		MessageBox(NULL, "Error", "Audio", MB_OK);
+//		exit(1);
+//	}
+//	Mix_QuerySpec(&audio_rate, &audio_format, &audio_channels);
+//	if (music == NULL) {
+//
+//		/* Actually loads up the music */
+//		music = Mix_LoadWAV((FileSystem::instance().m_resource_path+"Sounds\\Click.wav").c_str());
+//
+//		/* This begins playing the music - the first argument is a
+//		pointer to Mix_Music structure, and the second is how many
+//		times you want it to loop (use -1 for infinite, and 0 to
+//		have it just play once) */
+//	}
+//
+//	/*obj = m_game_object_manager->new_object("torch");
+//	m_GUI->MapViewer->m_map->add_new_object(obj, m_GUI->MapViewer->m_map->m_items[ry + 15][rx]);*/
+//
+//	/*int ru;
+//	for (int i = 0; i <15; i++){
+//		index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
+//		room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);
+//		ru = rand() % 4;
+//		rx = rand() % room->rect.w;
+//		ry = rand() % room->rect.h;
+//		switch (ru)
+//		{
+//		case 0:
+//		{
+//			obj = m_game_object_manager->new_object("snake");
+//			break;
+//		}
+//		case 1:
+//		{
+//			obj = m_game_object_manager->new_object("bear");
+//			break;
+//		}
+//		case 2:
+//		{
+//			obj = m_game_object_manager->new_object("ghost");
+//			break;
+//		}
+//		case 3:
+//		{
+//			obj = m_game_object_manager->new_object("slime");
+//			break;
+//		}
+//		}
+//		obj->set_direction(object_direction_e_Left);
+//		m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
+//	}*/
+//
+//	m_ready = true;
+//}
+
 void Application::initialize()
 {
 	music = NULL;
@@ -157,8 +401,8 @@ void Application::initialize()
 	command_set_cursor(m_graph->m_cursor);
 	command_set_cursor_visibility(true);
 
-	m_GUI = new ApplicationGUI(0,0,1024,1024);
-	
+	m_GUI = new ApplicationGUI(0, 0, 1024, 1024);
+
 	key_press += std::bind(&Application::on_key_press, this, std::placeholders::_1);
 	m_mouse->mouse_click += std::bind(&Application::on_mouse_click, this, std::placeholders::_1);
 	m_mouse->mouse_down += std::bind(&Application::on_mouse_down, this, std::placeholders::_1);
@@ -166,7 +410,7 @@ void Application::initialize()
 	m_mouse->mouse_move += std::bind(&Application::on_mouse_move, this, std::placeholders::_1);
 	m_action_manager = new ActionManager();
 
-	m_actions[action_e::move] = new ActionClass_Move(); 
+	m_actions[action_e::move] = new ActionClass_Move();
 	m_actions[action_e::move_step] = new action_move_step();
 	m_actions[action_e::push] = new ActionClass_Push();
 	m_actions[action_e::turn] = new ActionClass_Turn();
@@ -194,201 +438,25 @@ void Application::initialize()
 	m_game_object_manager->init();
 	LOG(INFO) << "Менеджер игровых объектов успешно инициализирован";
 
-	m_GUI->MapViewer = new GUI_MapViewer(this);
-	m_GUI->MapViewer->m_position.x = 0;
-	m_GUI->MapViewer->m_position.y = 0;
-	m_GUI->MapViewer->m_size.w = 1024;
-	m_GUI->MapViewer->m_size.h = 1024;
-	
-	m_GUI->MapViewer->m_map = new GameMap(dimension_t(20,20));
-	///m_GUI->MapViewer->m_map->generate_level();
-
-	m_GUI->MapViewer->m_map->generate_room();
-
-	int rx = 10;
-	int ry = 10;
-
-	GameObject* obj;
-
-	obj = m_game_object_manager->new_object("iso_unit");
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx]);
-	m_GUI->MapViewer->m_player = new Player(obj, m_GUI->MapViewer->m_map);
-
-	//m_GUI->MapViewer->m_map = Serialization_manager::instance().load("save");
-
 	m_window_manager = new GUI_Window_manager(0, 0, 1024, 1024);
 
-	GUI_ActionManager* AMTextBox;
-	AMTextBox = new GUI_ActionManager(m_action_manager);
-	AMTextBox->m_position.x = 650;
-	AMTextBox->m_position.y = 710;
-	AMTextBox->resize(372, 263);
-	GUI_ActionPanel* ActionPanel;
-	ActionPanel = new GUI_ActionPanel(2,975,898,47);
-	m_GUI->m_action_panel = ActionPanel;
-	update_action_panel();
-	GUI_Layer* MenuLayer;
-	MenuLayer = new GUI_Layer(0,0,1024,1024);
-	GUI_TextBox* TextBox = new GUI_TextBox();
-	TextBox->m_position.x = 2;
-	TextBox->m_position.y = 710;
-	TextBox->resize(646, 263);
-
-	m_GUI->DescriptionBox = TextBox;
-
-	//m_GUI->Timer = new GUI_Timer(902, 975, 120, 47, 0);
-
-	GUI_button* button = new GUI_button(902, 975, 120, 47, "Ход");
-	button->mouse_click += std::bind(&Application::on_turn, this);
-
-	MenuLayer->add(AMTextBox);
-	MenuLayer->add(ActionPanel);
-	MenuLayer->add(TextBox);
-	MenuLayer->add(button);
-
-	GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
-	GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), m_GUI->MapViewer);
-	MiniMap->add(mini_map);
-	//MenuLayer->add(MiniMap);
-
-	MiniMap = new GUI_Window(300, 0, 400, 400, "Поле зрения player");
-	GUI_FOV* fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), m_GUI->MapViewer->m_player->m_object);
-	MiniMap->add(fov);
-
-	/*obj = m_game_object_manager->new_object("bat");
-	obj->set_direction(object_direction_e::top);
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx-2]);
-
-	obj = m_game_object_manager->new_object("bat");
-	obj->set_direction(object_direction_e::top);
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 4]);
-
-	obj = m_game_object_manager->new_object("bat");
-	obj->set_direction(object_direction_e::top);
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 6]);
-	
-	obj = m_game_object_manager->new_object("bat");
-	obj->set_direction(object_direction_e::top);
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-8][rx]);*/
-
-
-	/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
-	fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), obj);
-	MiniMap->add(fov);*/
-
-	//MenuLayer->add(m_GUI->Timer);
-	//MenuLayer->add(MiniMap);
-	
-	
-	//MenuLayer->add(new GUI_Item(0, 0, 100,21, "4565656"));
 	m_GUI->add(m_window_manager);
-	m_GUI->add(MenuLayer);
-	m_GUI->add(m_GUI->MapViewer);
-	m_GUI->MapViewer->m_GUI = MenuLayer;
 
+	GUI_Window* MainMenu = new GUI_Window(0, 0, 400, 400, "Главное меню");
+	GUI_Button_list* menu = new GUI_Button_list(0, 0, 400, 400);
+	GUI_Mainmenu_button* button;
+	/*button = new GUI_button(0, 0, 396, 47, "Новая игра");
+	menu->add_item_control(button);
+	button = new GUI_button(0, 0, 396, 47, "Загрузить игру");
+	menu->add_item_control(button);*/
+	button = new GUI_Mainmenu_button(0, 0, 396, 47, "Выход", ParameterKind::parameter_game_quit);
+	menu->add_item_control(button);
+	MainMenu->add(menu);
+	//	button->mouse_click += std::bind(&Application::on_turn, this);
 	m_graph->set_VSync(false);
-	//if (SDL_Init(SDL_INIT_AUDIO) < 0)
-	//{
-	//	MessageBox(NULL, "Error", "Audio", MB_OK);
-	//}
-	//static Uint32 wav_length; // length of our sample
-	//static Uint8 *wav_buffer; // buffer containing our audio file
-	//static SDL_AudioSpec wav_spec; // the specs of our piece of music
-	//static Uint32 wav_length2; // length of our sample
-	//static Uint8 *wav_buffer2; // buffer containing our audio file
-	//static SDL_AudioSpec wav_spec2; // the specs of our piece of music
-	//if (SDL_LoadWAV("C:\\ExplorersOfSaarum\\123.wav", &wav_spec, &wav_buffer, &wav_length) == NULL){
-	//	MessageBox(NULL, "Error", "Audio", MB_OK);
-	//}
-	//if (SDL_LoadWAV("C:\\ExplorersOfSaarum\\456.wav", &wav_spec2, &wav_buffer2, &wav_length2) == NULL){
-	//	MessageBox(NULL, "Error", "Audio", MB_OK);
-	//}
-	//wav_spec.callback = my_audio_callback;
-	//wav_spec.userdata = NULL;
-	//// set our global static variables
-	//audio_pos = wav_buffer; // copy sound buffer
-	//audio_len = wav_length; // copy file length
-
-	///* Open the audio device */
-	//if (SDL_OpenAudio(NULL, NULL) < 0){
-	//	MessageBox(NULL, "Error", "Audio", MB_OK);
-	//	exit(-1);
-	//}
-
-	///* Start playing */
-	//SDL_PauseAudio(0);
-	//SDL_Delay(900);
-	//SDL_MixAudio(audio_pos, wav_buffer2, audio_len, SDL_MIX_MAXVOLUME);// mix from one buffer into another
-	//// wait until we're don't playing
-	///*while (audio_len > 0) {
-	//}*/
-	//// shut everything down
-	///*SDL_CloseAudio();
-	//SDL_FreeWAV(wav_buffer);*/
-
-	int audio_rate = 44100;
-	Uint16 audio_format = AUDIO_S16; /* 16-bit stereo */
-	int audio_channels = 2;
-	int audio_buffers = 4096;
-
-	if (SDL_Init(SDL_INIT_AUDIO) < 0)
-	{
-		MessageBox(NULL, "Error", "Audio", MB_OK);
-	}
-	if (Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers)) {
-		MessageBox(NULL, "Error", "Audio", MB_OK);
-		exit(1);
-	}
-	Mix_QuerySpec(&audio_rate, &audio_format, &audio_channels);
-	if (music == NULL) {
-
-		/* Actually loads up the music */
-		music = Mix_LoadWAV((FileSystem::instance().m_resource_path+"Sounds\\Click.wav").c_str());
-
-		/* This begins playing the music - the first argument is a
-		pointer to Mix_Music structure, and the second is how many
-		times you want it to loop (use -1 for infinite, and 0 to
-		have it just play once) */
-	}
-
-	/*obj = m_game_object_manager->new_object("torch");
-	m_GUI->MapViewer->m_map->add_new_object(obj, m_GUI->MapViewer->m_map->m_items[ry + 15][rx]);*/
-
-	/*int ru;
-	for (int i = 0; i <15; i++){
-		index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
-		room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);
-		ru = rand() % 4;
-		rx = rand() % room->rect.w;
-		ry = rand() % room->rect.h;
-		switch (ru)
-		{
-		case 0:
-		{
-			obj = m_game_object_manager->new_object("snake");
-			break;
-		}
-		case 1:
-		{
-			obj = m_game_object_manager->new_object("bear");
-			break;
-		}
-		case 2:
-		{
-			obj = m_game_object_manager->new_object("ghost");
-			break;
-		}
-		case 3:
-		{
-			obj = m_game_object_manager->new_object("slime");
-			break;
-		}
-		}
-		obj->set_direction(object_direction_e_Left);
-		m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
-	}*/
-
+	
 	m_ready = true;
+	start();
 }
 
 void Application::get_action_predicat(Object_interaction* object)
@@ -725,6 +793,36 @@ void Application::update_after_load()
 	m_update_mutex.unlock();
 }
 
+void Application::command_main_menu_select()
+{
+	LOG(INFO) << "Ожидание выбора в главном меню";
+	bool Exit = false;
+	while (Exit == false)
+	{
+		std::unique_lock<std::mutex> lk(m_message_queue.m_mutex);
+		m_message_queue.m_reader = true;
+		while (!m_message_queue.m_read_message)
+		{
+			m_message_queue.m_condition_variable.wait(lk);
+		}
+		m_message_queue.m_processed_message = true;
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_game_quit)
+		{
+			stop();
+			Exit = true;
+		}
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind_Cancel)
+		{
+			Exit = true;
+		}
+		m_message_queue.m_read_message = false;
+		lk.unlock();
+		m_message_queue.m_condition_variable.notify_one();
+		m_message_queue.m_reader = false;
+	}
+	LOG(INFO) << "Окончание ожидания выбора в главном меню";
+}
+
 Parameter* Application::command_select_location(GameObject* object)
 {
 	Parameter* Result = nullptr;
@@ -961,7 +1059,9 @@ void Application::process_game()
 		std::chrono::milliseconds Duration(250);
 		std::this_thread::sleep_for(Duration);
 	}*/
-	update_after_load();
+
+	command_main_menu_select();
+	//???? update_after_load();
 	std::chrono::time_point<std::chrono::steady_clock> start;
 	std::chrono::time_point<std::chrono::steady_clock> end;
 	std::chrono::milliseconds elapsed;

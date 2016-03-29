@@ -55,10 +55,15 @@ void Renderer::work()
 
 	// Инициализируем приложение
 	Application::instance().initialize();
-	Application::instance().m_GUI->MapViewer->m_center.x = Application::instance().m_GUI->MapViewer->m_player->m_object->cell()->x;
-	Application::instance().m_GUI->MapViewer->m_center.y = Application::instance().m_GUI->MapViewer->m_player->m_object->cell()->y;
+
+
+	//???? Application::instance().m_GUI->MapViewer->m_center.x = Application::instance().m_GUI->MapViewer->m_player->m_object->cell()->x;
+	//???? Application::instance().m_GUI->MapViewer->m_center.y = Application::instance().m_GUI->MapViewer->m_player->m_object->cell()->y;
+
+
 	// Запускаем потоки приложения
-	Application::instance().start();
+
+	//???? Application::instance().start();
 
 	// Для контроля fps определяем максимальный fps = 60
 	std::chrono::time_point<std::chrono::system_clock> start, end;
@@ -67,7 +72,7 @@ void Renderer::work()
 	while (m_working)
 	{
 		start = std::chrono::system_clock::now();
-		Application::instance().m_GUI->MapViewer->update();
+		//???? Application::instance().m_GUI->MapViewer->update();
 		Application::instance().render();
 		SwapBuffers(m_hDC);
 		end = std::chrono::system_clock::now();

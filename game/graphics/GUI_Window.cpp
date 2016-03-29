@@ -39,14 +39,20 @@ void GUI_Header::resize(int width, int height)
 GUI_Window::GUI_Window(int _x, int _y, int _width, int _height, std::string _Name) :GUI_Container(_x, _y, _width, _height)
 {
 	m_is_moving = false;
-	GUI_Header* Header = new GUI_Header(2, 2, m_size.w- 4, 21, _Name);
-	Header->close += std::bind(&GUI_Window::on_header_close, this);
-	GUI_Layer::add(Header);
+	m_header = new GUI_Header(2, 2, m_size.w- 4, 21, _Name);
+	m_header->close += std::bind(&GUI_Window::on_header_close, this);
+	GUI_Layer::add(m_header);
 	start_moving += std::bind(&GUI_Window::on_start_moving, this, std::placeholders::_1);
 	move += std::bind(&GUI_Window::on_move, this, std::placeholders::_1);
 	end_moving += std::bind(&GUI_Window::on_ending_move, this, std::placeholders::_1);
 	close += std::bind(&GUI_Window::on_close, this, std::placeholders::_1);
 	Application::instance().m_window_manager->add_front(this);
+}
+
+void GUI_Window::add(GUI_Object* object)
+{
+	object->m_position = position_t(object->m_position.x, object->m_position.y + m_header->m_position.y + m_header->m_size.h);
+	GUI_Layer::add(object);
 }
 
 

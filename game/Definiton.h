@@ -158,7 +158,8 @@ enum ParameterKind
 	parameter_interaction_cell,
 	parameter_accept,
 	parameter_bow_shoot,
-	parameter_direction
+	parameter_direction,
+	parameter_game_quit
 };
 
 enum class object_direction_e :int
