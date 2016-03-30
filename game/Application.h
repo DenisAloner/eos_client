@@ -134,6 +134,9 @@ public:
 	void update_after_load();
 	void update_action_panel();
 
+	void new_game();
+	void load_game();
+
 	Parameter* command_select_location(GameObject* object);
 	Parameter* command_select_object_on_map();
 	Parameter* command_select_object();

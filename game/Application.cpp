@@ -52,6 +52,7 @@ Application::Application()
 : m_timer(new Timer(8, 300))
 {
 	m_turn = false;
+	m_GUI = nullptr;
 }
 
 Application::~Application(void)
@@ -194,97 +195,7 @@ void Application::render()
 //	m_game_object_manager->init();
 //	LOG(INFO) << "Менеджер игровых объектов успешно инициализирован";
 //
-//	m_GUI->MapViewer = new GUI_MapViewer(this);
-//	m_GUI->MapViewer->m_position.x = 0;
-//	m_GUI->MapViewer->m_position.y = 0;
-//	m_GUI->MapViewer->m_size.w = 1024;
-//	m_GUI->MapViewer->m_size.h = 1024;
-//	
-//	m_GUI->MapViewer->m_map = new GameMap(dimension_t(20,20));
-//	///m_GUI->MapViewer->m_map->generate_level();
-//
-//	m_GUI->MapViewer->m_map->generate_room();
-//
-//	int rx = 10;
-//	int ry = 10;
-//
-//	GameObject* obj;
-//
-//	obj = m_game_object_manager->new_object("iso_unit");
-//	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx]);
-//	m_GUI->MapViewer->m_player = new Player(obj, m_GUI->MapViewer->m_map);
-//
-//	//m_GUI->MapViewer->m_map = Serialization_manager::instance().load("save");
-//
-//	m_window_manager = new GUI_Window_manager(0, 0, 1024, 1024);
-//
-//	GUI_ActionManager* AMTextBox;
-//	AMTextBox = new GUI_ActionManager(m_action_manager);
-//	AMTextBox->m_position.x = 650;
-//	AMTextBox->m_position.y = 710;
-//	AMTextBox->resize(372, 263);
-//	GUI_ActionPanel* ActionPanel;
-//	ActionPanel = new GUI_ActionPanel(2,975,898,47);
-//	m_GUI->m_action_panel = ActionPanel;
-//	update_action_panel();
-//	GUI_Layer* MenuLayer;
-//	MenuLayer = new GUI_Layer(0,0,1024,1024);
-//	GUI_TextBox* TextBox = new GUI_TextBox();
-//	TextBox->m_position.x = 2;
-//	TextBox->m_position.y = 710;
-//	TextBox->resize(646, 263);
-//
-//	m_GUI->DescriptionBox = TextBox;
-//
-//	//m_GUI->Timer = new GUI_Timer(902, 975, 120, 47, 0);
-//
-//	GUI_button* button = new GUI_button(902, 975, 120, 47, "Ход");
-//	button->mouse_click += std::bind(&Application::on_turn, this);
-//
-//	MenuLayer->add(AMTextBox);
-//	MenuLayer->add(ActionPanel);
-//	MenuLayer->add(TextBox);
-//	MenuLayer->add(button);
-//
-//	GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
-//	GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), m_GUI->MapViewer);
-//	MiniMap->add(mini_map);
-//	//MenuLayer->add(MiniMap);
-//
-//	MiniMap = new GUI_Window(300, 0, 400, 400, "Поле зрения player");
-//	GUI_FOV* fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), m_GUI->MapViewer->m_player->m_object);
-//	MiniMap->add(fov);
-//
-//	/*obj = m_game_object_manager->new_object("bat");
-//	obj->set_direction(object_direction_e::top);
-//	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx-2]);
-//
-//	obj = m_game_object_manager->new_object("bat");
-//	obj->set_direction(object_direction_e::top);
-//	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 4]);
-//
-//	obj = m_game_object_manager->new_object("bat");
-//	obj->set_direction(object_direction_e::top);
-//	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 6]);
-//	
-//	obj = m_game_object_manager->new_object("bat");
-//	obj->set_direction(object_direction_e::top);
-//	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-8][rx]);*/
-//
-//
-//	/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
-//	fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), obj);
-//	MiniMap->add(fov);*/
-//
-//	//MenuLayer->add(m_GUI->Timer);
-//	//MenuLayer->add(MiniMap);
-//	
-//	
-//	//MenuLayer->add(new GUI_Item(0, 0, 100,21, "4565656"));
-//	m_GUI->add(m_window_manager);
-//	m_GUI->add(MenuLayer);
-//	m_GUI->add(m_GUI->MapViewer);
-//	m_GUI->MapViewer->m_GUI = MenuLayer;
+
 //
 //	m_graph->set_VSync(false);
 //	//if (SDL_Init(SDL_INIT_AUDIO) < 0)
@@ -445,18 +356,201 @@ void Application::initialize()
 	GUI_Window* MainMenu = new GUI_Window(0, 0, 400, 400, "Главное меню");
 	GUI_Button_list* menu = new GUI_Button_list(0, 0, 400, 400);
 	GUI_Mainmenu_button* button;
-	/*button = new GUI_button(0, 0, 396, 47, "Новая игра");
+	button = new GUI_Mainmenu_button(0, 0, 396, 47, "Новая игра", ParameterKind::parameter_new_game);
+	button->mouse_click += std::bind(&GUI_Window::on_close, MainMenu, MainMenu);
 	menu->add_item_control(button);
-	button = new GUI_button(0, 0, 396, 47, "Загрузить игру");
-	menu->add_item_control(button);*/
+	button = new GUI_Mainmenu_button(0, 0, 396, 47, "Загрузка игры", ParameterKind::parameter_load_game);
+	button->mouse_click += std::bind(&GUI_Window::on_close, MainMenu, MainMenu);
+	menu->add_item_control(button);
 	button = new GUI_Mainmenu_button(0, 0, 396, 47, "Выход", ParameterKind::parameter_game_quit);
+	button->mouse_click += std::bind(&GUI_Window::on_close, MainMenu, MainMenu);
 	menu->add_item_control(button);
 	MainMenu->add(menu);
-	//	button->mouse_click += std::bind(&Application::on_turn, this);
+
 	m_graph->set_VSync(false);
 	
 	m_ready = true;
 	start();
+}
+
+
+void Application::new_game()
+{
+		m_GUI->MapViewer = new GUI_MapViewer(this);
+		m_GUI->MapViewer->m_position.x = 0;
+		m_GUI->MapViewer->m_position.y = 0;
+		m_GUI->MapViewer->m_size.w = 1024;
+		m_GUI->MapViewer->m_size.h = 1024;
+		
+		m_GUI->MapViewer->m_map = new GameMap(dimension_t(20,20));
+		///m_GUI->MapViewer->m_map->generate_level();
+	
+		m_GUI->MapViewer->m_map->generate_room();
+	
+		int rx = 10;
+		int ry = 10;
+	
+		GameObject* obj;
+	
+		obj = m_game_object_manager->new_object("iso_unit");
+		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx]);
+		m_GUI->MapViewer->m_player = new Player(obj, m_GUI->MapViewer->m_map);
+	
+		//m_GUI->MapViewer->m_map = Serialization_manager::instance().load("save");
+	
+		GUI_ActionManager* AMTextBox;
+		AMTextBox = new GUI_ActionManager(m_action_manager);
+		AMTextBox->m_position.x = 650;
+		AMTextBox->m_position.y = 710;
+		AMTextBox->resize(372, 263);
+		GUI_ActionPanel* ActionPanel;
+		ActionPanel = new GUI_ActionPanel(2,975,898,47);
+		m_GUI->m_action_panel = ActionPanel;
+		update_action_panel();
+		GUI_Layer* MenuLayer;
+		MenuLayer = new GUI_Layer(0,0,1024,1024);
+		GUI_TextBox* TextBox = new GUI_TextBox();
+		TextBox->m_position.x = 2;
+		TextBox->m_position.y = 710;
+		TextBox->resize(646, 263);
+	
+		m_GUI->DescriptionBox = TextBox;
+	
+		GUI_button* button = new GUI_button(902, 975, 120, 47, "Ход");
+		button->mouse_click += std::bind(&Application::on_turn, this);
+	
+		MenuLayer->add(AMTextBox);
+		MenuLayer->add(ActionPanel);
+		MenuLayer->add(TextBox);
+		MenuLayer->add(button);
+	
+		GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
+		GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(5, 5), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 30), m_GUI->MapViewer);
+		MiniMap->add(mini_map);
+	
+		MiniMap = new GUI_Window(300, 0, 400, 400, "Поле зрения player");
+		GUI_FOV* fov = new GUI_FOV(position_t(5, 5), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 30), m_GUI->MapViewer->m_player->m_object);
+		MiniMap->add(fov);
+	
+		/*obj = m_game_object_manager->new_object("bat");
+		obj->set_direction(object_direction_e::top);
+		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx-2]);
+	
+		obj = m_game_object_manager->new_object("bat");
+		obj->set_direction(object_direction_e::top);
+		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 4]);
+	
+		obj = m_game_object_manager->new_object("bat");
+		obj->set_direction(object_direction_e::top);
+		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 6]);
+		
+		obj = m_game_object_manager->new_object("bat");
+		obj->set_direction(object_direction_e::top);
+		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-8][rx]);*/
+	
+	
+		/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
+		fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), obj);
+		MiniMap->add(fov);*/
+	
+		/*MenuLayer->add(m_GUI->Timer);
+		MenuLayer->add(MiniMap);*/
+		
+		m_GUI->add(MenuLayer);
+		m_GUI->add(m_GUI->MapViewer);
+		m_GUI->MapViewer->m_GUI = MenuLayer;
+		update_after_load();
+}
+
+void Application::load_game()
+{
+	m_GUI->MapViewer = new GUI_MapViewer(this);
+	m_GUI->MapViewer->m_position.x = 0;
+	m_GUI->MapViewer->m_position.y = 0;
+	m_GUI->MapViewer->m_size.w = 1024;
+	m_GUI->MapViewer->m_size.h = 1024;
+
+	m_GUI->MapViewer->m_map = Serialization_manager::instance().load("save");
+
+	GUI_ActionManager* AMTextBox;
+	AMTextBox = new GUI_ActionManager(m_action_manager);
+	AMTextBox->m_position.x = 650;
+	AMTextBox->m_position.y = 710;
+	AMTextBox->resize(372, 263);
+	GUI_ActionPanel* ActionPanel;
+	ActionPanel = new GUI_ActionPanel(2, 975, 898, 47);
+	m_GUI->m_action_panel = ActionPanel;
+	update_action_panel();
+	GUI_Layer* MenuLayer;
+	MenuLayer = new GUI_Layer(0, 0, 1024, 1024);
+	GUI_TextBox* TextBox = new GUI_TextBox();
+	TextBox->m_position.x = 2;
+	TextBox->m_position.y = 710;
+	TextBox->resize(646, 263);
+
+	m_GUI->DescriptionBox = TextBox;
+
+	GUI_button* button = new GUI_button(902, 975, 120, 47, "Ход");
+	button->mouse_click += std::bind(&Application::on_turn, this);
+
+	MenuLayer->add(AMTextBox);
+	MenuLayer->add(ActionPanel);
+	MenuLayer->add(TextBox);
+	MenuLayer->add(button);
+
+	GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
+	GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(5, 5), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 30), m_GUI->MapViewer);
+	MiniMap->add(mini_map);
+	//MenuLayer->add(MiniMap);
+
+	MiniMap = new GUI_Window(300, 0, 400, 400, "Поле зрения player");
+	GUI_FOV* fov = new GUI_FOV(position_t(5, 5), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 30), m_GUI->MapViewer->m_player->m_object);
+	MiniMap->add(fov);
+
+	/*obj = m_game_object_manager->new_object("bat");
+	obj->set_direction(object_direction_e::top);
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx-2]);
+
+	obj = m_game_object_manager->new_object("bat");
+	obj->set_direction(object_direction_e::top);
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 4]);
+
+	obj = m_game_object_manager->new_object("bat");
+	obj->set_direction(object_direction_e::top);
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 6]);
+
+	obj = m_game_object_manager->new_object("bat");
+	obj->set_direction(object_direction_e::top);
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-8][rx]);*/
+
+
+	/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
+	fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), obj);
+	MiniMap->add(fov);*/
+
+	/*MenuLayer->add(m_GUI->Timer);
+	MenuLayer->add(MiniMap);*/
+
+	m_GUI->add(MenuLayer);
+	m_GUI->add(m_GUI->MapViewer);
+	m_GUI->MapViewer->m_GUI = MenuLayer;
+	update_after_load();
+}
+
+
+void Application::update_after_load()
+{
+	//m_update_mutex.lock();
+	m_GUI->MapViewer->m_map->calculate_lighting2();
+	Application::instance().m_GUI->MapViewer->update();
+	Application::instance().m_GUI->MapViewer->m_map->update(VoidEventArgs());
+	//m_update_mutex.unlock();
+	//m_update_mutex.lock();
+	if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
+	{
+		static_cast<AI_enemy*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)->calculate_FOV(m_GUI->MapViewer->m_player->m_object, Application::instance().m_GUI->MapViewer->m_map);
+	}
+	//m_update_mutex.unlock();
 }
 
 void Application::get_action_predicat(Object_interaction* object)
@@ -776,23 +870,6 @@ void Application::update()
 	}
 }
 
-void Application::update_after_load()
-{
-	m_update_mutex.lock();
-	m_GUI->MapViewer->m_map->calculate_lighting2();
-	Application::instance().m_GUI->MapViewer->update();
-	Application::instance().m_GUI->MapViewer->m_map->update(VoidEventArgs());
-	m_update_mutex.unlock();
-	std::chrono::milliseconds Duration(1);
-	std::this_thread::sleep_for(Duration);
-	m_update_mutex.lock();
-	if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
-	{
-		static_cast<AI_enemy*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)->calculate_FOV(m_GUI->MapViewer->m_player->m_object, Application::instance().m_GUI->MapViewer->m_map);
-	}
-	m_update_mutex.unlock();
-}
-
 void Application::command_main_menu_select()
 {
 	LOG(INFO) << "Ожидание выбора в главном меню";
@@ -806,6 +883,16 @@ void Application::command_main_menu_select()
 			m_message_queue.m_condition_variable.wait(lk);
 		}
 		m_message_queue.m_processed_message = true;
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_new_game)
+		{
+			new_game();
+			Exit = true;
+		}
+		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_load_game)
+		{
+			load_game();
+			Exit = true;
+		}
 		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_game_quit)
 		{
 			stop();
@@ -1038,28 +1125,6 @@ bool Application::command_check_position(GameObject*& object, MapCell*& position
 
 void Application::process_game()
 {
-	/*int time = 1;
-	while (true)
-	{
-		if (time == 1)
-		{
-			time = 15;
-		}
-		else
-		{
-			time -= 1;
-		}
-		m_GUI->Timer->Update(time);
-		if (time == 15)
-		{
-			update();
-			m_GUI->DescriptionBox->add_item_control(new GUI_Text("Ход - " + std::to_string(m_game_turn) + ".", new GUI_TextFormat(10, 19, RGBA_t(0.0, 0.8, 0.0, 1.0))));
-			m_game_turn += 1;
-		}
-		std::chrono::milliseconds Duration(250);
-		std::this_thread::sleep_for(Duration);
-	}*/
-
 	command_main_menu_select();
 	//???? update_after_load();
 	std::chrono::time_point<std::chrono::steady_clock> start;

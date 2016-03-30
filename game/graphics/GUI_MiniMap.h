@@ -26,6 +26,9 @@ public:
 	virtual void render(GraphicalController* Graph, int px, int py);
 	void render_on_canvas();
 	void on_update();
+
+private:
+	bool m_canvas_create;
 };
 
 class GUI_FOV :
@@ -47,6 +50,9 @@ public:
 	virtual void render(GraphicalController* Graph, int px, int py);
 	void render_on_canvas();
 	void on_update();
+
+private:
+	bool m_canvas_create;
 };
 
 

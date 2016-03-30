@@ -159,7 +159,9 @@ enum ParameterKind
 	parameter_accept,
 	parameter_bow_shoot,
 	parameter_direction,
-	parameter_game_quit
+	parameter_game_quit,
+	parameter_new_game,
+	parameter_load_game
 };
 
 enum class object_direction_e :int

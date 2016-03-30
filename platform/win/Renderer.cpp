@@ -72,7 +72,7 @@ void Renderer::work()
 	while (m_working)
 	{
 		start = std::chrono::system_clock::now();
-		//???? Application::instance().m_GUI->MapViewer->update();
+		//if (Application::instance().m_GUI) { if (Application::instance().m_GUI->MapViewer) { Application::instance().m_GUI->MapViewer->update(); } }
 		Application::instance().render();
 		SwapBuffers(m_hDC);
 		end = std::chrono::system_clock::now();
