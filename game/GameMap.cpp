@@ -35,31 +35,34 @@ void Object_manager::update_buff()
 	}
 }
 
-void Object_manager::calculate_ai(GameMap* game_map)
+void Object_manager::calculate_ai()
 {
 	for (auto object = m_items.begin(); object != m_items.end(); object++)
 	{
-		if (((*object)->m_active_state->m_ai) && ((*object) != Application::instance().m_GUI->MapViewer->m_player->m_object))
+		if ((*object)->m_owner->m_kind == entity_e::cell)
 		{
-			switch ((*object)->m_active_state->m_ai->m_ai_type)
+			if (((*object)->m_active_state->m_ai) && ((*object) != Application::instance().m_GUI->MapViewer->m_player->m_object))
 			{
-			case ai_type_e::trap:
-			{
-				AI_trap obj;
-				obj = *static_cast<AI_trap*>((*object)->m_active_state->m_ai);
-				obj.m_object = (*object);
-				obj.create();
-				break;
-			}
-			case ai_type_e::non_humanoid:
-			{
-				AI_enemy* obj;
-				obj = static_cast<AI_enemy*>((*object)->m_active_state->m_ai);
-				obj->m_map = Application::instance().m_GUI->MapViewer->m_map;
-				obj->m_object = (*object);
-				obj->create();
-				break;
-			}
+				switch ((*object)->m_active_state->m_ai->m_ai_type)
+				{
+				case ai_type_e::trap:
+				{
+					AI_trap obj;
+					obj = *static_cast<AI_trap*>((*object)->m_active_state->m_ai);
+					obj.m_object = (*object);
+					obj.create();
+					break;
+				}
+				case ai_type_e::non_humanoid:
+				{
+					AI_enemy* obj;
+					obj = static_cast<AI_enemy*>((*object)->m_active_state->m_ai);
+					obj->m_map = static_cast<MapCell*>((*object)->m_owner)->m_map;
+					obj->m_object = (*object);
+					obj->create();
+					break;
+				}
+				}
 			}
 		}
 	}
@@ -112,6 +115,7 @@ GameMap::GameMap()
 void GameMap::init(dimension_t size)
 {
 	m_size = size;
+	LOG(INFO) << "Карта инициализирована с размером: " <<std::to_string( m_size.w )<< "x" << std::to_string(m_size.h);
 	m_items.resize(m_size.h);
 	for (int i = 0; i < m_size.h; i++)
 	{
@@ -119,13 +123,6 @@ void GameMap::init(dimension_t size)
 		for (int j = 0; j < m_size.w; j++)
 		{
 			m_items[i][j] = new MapCell(j, i, this);
-		}
-	}
-	for (int y = 0; y < 21; y++)
-	{
-		for (int x = 0; x< 21; x++)
-		{
-			m_coefficient[y][x] = (float)sqrt(x*x + y*y) * 5;
 		}
 	}
 }
@@ -1074,114 +1071,9 @@ bool GameMap::check(int x, int y)
 //	if (x<0 && x>m_size.h - 1 && y<0 && y>m_size.w - 1) { return false; };
 //}
 
-void GameMap::calculate_lighting2()
-{
-	int lx;
-	int ly;
-	int c;
-	FOV_light fl;
-	light_t m_temp[41][41];
-
-	for (int y = 0; y < m_size.h; y++)
-	{
-		for (int x = 0; x < m_size.w; x++)
-		{
-			m_items[y][x]->m_light = light_t();
-		}
-	}
-
-	for (auto l = m_object_manager.m_items.begin(); l != m_object_manager.m_items.end(); l++)
-	{
-		if (!(*l)->m_active_state->m_light) { continue; }
-		fl.calculate(20, *l, this);
-		for (int y = 0; y < 41; y++)
-		{
-			for (int x = 0; x < 41; x++)
-			{
-				lx = abs(x - 20);
-				ly = abs(y - 20);
-				c = ((*l)->m_active_state->m_light->R - m_coefficient[ly][lx])*fl.m_map[y][x].damping.R;
-				if (c < 0){ c = 0; }
-				fl.m_map[y][x].light.R = c;
-				c = ((*l)->m_active_state->m_light->G - m_coefficient[ly][lx])*fl.m_map[y][x].damping.G;
-				if (c < 0){ c = 0; }
-				fl.m_map[y][x].light.G = c;
-				c = ((*l)->m_active_state->m_light->B - m_coefficient[ly][lx])*fl.m_map[y][x].damping.B;
-				if (c < 0){ c = 0; }
-				fl.m_map[y][x].light.B = c;
-			}
-		}
-
-		//light_t l1;
-		//float Gauss[] = { 0.44198F, 0.27901F };
-		////float Gauss[] = { 0.39894228F, 0.241970725F, 0.053990967F };
-		////float Gauss[] = { 0.2270270270, 0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162 };
-		//for (int y = 0; y < 41; y++)
-		//{
-		//	for (int x = 0; x < 41; x++)
-		//	{
-		//		l1 = light_t();
-		//		for (int i = -1; i < 2; i++)
-		//		{
-		//			int mx = x + i;
-		//			int my = y;
-		//			if (mx < 0) { mx = 0; }
-		//			if (mx > 40) { mx = 40; }
-		//			if (my < 0) { my = 0; }
-		//			if (my > 40) { my = 40; }
-		//			l1.R = l1.R + fl.m_map[my][mx].light.R*Gauss[abs(i)];
-		//			l1.G = l1.G + fl.m_map[my][mx].light.G*Gauss[abs(i)];
-		//			l1.B = l1.B + fl.m_map[my][mx].light.B*Gauss[abs(i)];
-		//		}
-		//		m_temp[y][x] = l1;
-		//	}
-		//}
-		//for (int y = 0; y < 41; y++)
-		//{
-		//	for (int x = 0; x < 41; x++)
-		//	{
-		//		l1 = light_t();
-		//		for (int i = -1; i < 2; i++)
-		//		{
-		//			int mx = x;
-		//			int my = y + i;
-		//			if (mx < 0) { mx = 0; }
-		//			if (mx > 40) { mx = 40; }
-		//			if (my < 0) { my = 0; }
-		//			if (my > 40) { my = 40; }
-		//			l1.R = l1.R + m_temp[my][mx].R*Gauss[abs(i)];
-		//			l1.G = l1.G + m_temp[my][mx].G*Gauss[abs(i)];
-		//			l1.B = l1.B + m_temp[my][mx].B*Gauss[abs(i)];
-		//		}
-		//		fl.m_map[y][x].light = l1;
-		//	}
-		//}
-
-		for (int y = 0; y < 41; y++)
-		{
-			ly = (*l)->cell()->y + y - 20;
-			if (!((ly<0) || (ly>m_size.h - 1)))
-			{
-				for (int x = 0; x < 41; x++)
-				{
-					lx = (*l)->cell()->x + x - 20;
-					if (!((lx<0) || (lx>m_size.w - 1)))
-					{
-						m_items[ly][lx]->m_light.R += fl.m_map[y][x].light.R;
-						m_items[ly][lx]->m_light.G += fl.m_map[y][x].light.G;
-						m_items[ly][lx]->m_light.B += fl.m_map[y][x].light.B;
-					}
-				}
-			}
-		}
-	}
-	blur_lighting();
-}
-
 void GameMap::reset_serialization_index()
 {
 	m_serialization_index = 0;
-	m_object_manager.reset_serialization_index();
 }
 
 void GameMap::save()
@@ -1189,13 +1081,11 @@ void GameMap::save()
 	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::gamemap;
 	fwrite(&t, sizeof(type_e), 1, file);
-	fwrite(&m_size, sizeof(dimension_t), 1, file);
-	m_object_manager.save();
+	size_t s = m_index;
+	fwrite(&s, sizeof(std::size_t), 1, file);
 	MapCell* cell;
-	size_t s;
 	for (int i = 0; i < m_size.h; i++)
 	{
-		m_items[i].resize(m_size.w);
 		for (int j = 0; j < m_size.w; j++)
 		{
 			cell = m_items[i][j];
@@ -1213,16 +1103,10 @@ void GameMap::save()
 void GameMap::load()
 {
 	FILE* file = Serialization_manager::instance().m_file;
-	fread(&m_size, sizeof(dimension_t), 1, file);
-	init(m_size);
-	Serialization_manager::instance().m_map = this;
-	Application::instance().m_GUI->MapViewer->m_map = this;
-	m_object_manager.load();
-	MapCell* cell;
 	size_t s;
+	MapCell* cell;
 	for (int i = 0; i < m_size.h; i++)
 	{
-		m_items[i].resize(m_size.w);
 		for (int j = 0; j < m_size.w; j++)
 		{
 			cell = m_items[i][j];
@@ -1233,5 +1117,127 @@ void GameMap::load()
 				cell->m_items.push_back(dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize()));
 			}
 		}
+	}
+}
+
+Game_world::Game_world()
+{
+	for (int y = 0; y < 21; y++)
+	{
+		for (int x = 0; x< 21; x++)
+		{
+			m_coefficient[y][x] = (float)sqrt(x*x + y*y) * 5;
+		}
+	}
+}
+
+void Game_world::reset_serialization_index()
+{
+	m_serialization_index = 0;
+	m_object_manager.reset_serialization_index();
+	for (auto i = m_maps.begin(); i != m_maps.end(); ++i)
+	{
+		(*i)->reset_serialization_index();
+	}
+}
+
+void Game_world::save()
+{
+	FILE* file = Serialization_manager::instance().m_file;
+	type_e t = type_e::game_world;
+	fwrite(&t, sizeof(type_e), 1, file);
+	m_object_manager.save();
+	size_t s = m_maps.size();
+	fwrite(&s, sizeof(std::size_t), 1, file);
+	std::size_t index = 0;
+	for (auto m = m_maps.begin(); m != m_maps.end(); ++m)
+	{ 
+		Serialization_manager::instance().serialize(*m);
+	}
+	Serialization_manager::instance().serialize(m_player->m_object);
+}
+
+void Game_world::load()
+{
+	FILE* file = Serialization_manager::instance().m_file;
+	m_object_manager.load();
+	size_t s;
+	fread(&s, sizeof(size_t), 1, file);
+	GameMap* map;
+	for (size_t i = 0; i < s; i++)
+	{
+		map = dynamic_cast<GameMap*>(Serialization_manager::instance().deserialize());
+		m_maps.push_back(map);
+	}
+	GameObject* object = dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize());
+	map = static_cast<MapCell*>(object->m_owner)->m_map;
+	m_player = new Player(object, map);
+}
+
+void Game_world::calculate_lighting()
+{
+	int lx;
+	int ly;
+	int c;
+	FOV_light fl;
+	light_t m_temp[41][41];
+
+	for (auto m = m_maps.begin(); m != m_maps.end(); ++m)
+	{
+		GameMap& map = *(*m);
+		for (int y = 0; y < map.m_size.h; y++)
+		{
+			for (int x = 0; x < map.m_size.w; x++)
+			{
+				map.m_items[y][x]->m_light = light_t();
+			}
+		}
+	}
+
+	for (auto l = m_object_manager.m_items.begin(); l != m_object_manager.m_items.end(); l++)
+	{
+		GameObject& object = *(*l);
+		if (!object.m_active_state->m_light) { continue; }
+		if (object.m_owner->m_kind != cell) { continue; }
+		GameMap* map = static_cast<MapCell*>(object.m_owner)->m_map;
+		fl.calculate(20, *l, map);
+		for (int y = 0; y < 41; y++)
+		{
+			for (int x = 0; x < 41; x++)
+			{
+				lx = abs(x - 20);
+				ly = abs(y - 20);
+				c = ((*l)->m_active_state->m_light->R - m_coefficient[ly][lx])*fl.m_map[y][x].damping.R;
+				if (c < 0) { c = 0; }
+				fl.m_map[y][x].light.R = c;
+				c = ((*l)->m_active_state->m_light->G - m_coefficient[ly][lx])*fl.m_map[y][x].damping.G;
+				if (c < 0) { c = 0; }
+				fl.m_map[y][x].light.G = c;
+				c = ((*l)->m_active_state->m_light->B - m_coefficient[ly][lx])*fl.m_map[y][x].damping.B;
+				if (c < 0) { c = 0; }
+				fl.m_map[y][x].light.B = c;
+			}
+		}
+		for (int y = 0; y < 41; y++)
+		{
+			ly = (*l)->cell()->y + y - 20;
+			if (!((ly < 0) || (ly > map->m_size.h - 1)))
+			{
+				for (int x = 0; x < 41; x++)
+				{
+					lx = (*l)->cell()->x + x - 20;
+					if (!((lx < 0) || (lx > map->m_size.w - 1)))
+					{
+						map->m_items[ly][lx]->m_light.R += fl.m_map[y][x].light.R;
+						map->m_items[ly][lx]->m_light.G += fl.m_map[y][x].light.G;
+						map->m_items[ly][lx]->m_light.B += fl.m_map[y][x].light.B;
+					}
+				}
+			}
+		}
+	}
+	for (auto m = m_maps.begin(); m != m_maps.end(); ++m)
+	{
+		(*m)->blur_lighting();
 	}
 }

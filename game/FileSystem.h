@@ -11,6 +11,7 @@
 
 class AI;
 class GameMap;
+class Game_world;
 
 class FileSystem
 {
@@ -48,7 +49,7 @@ public:
 
 	FILE* m_file;
 	size_t m_index;
-	GameMap* m_map;
+	std::vector<GameMap*> m_maps;
 
 	std::vector<iSerializable*>* m_items;
 
@@ -63,8 +64,8 @@ public:
 
 	void serialize(iSerializable* value);
 	iSerializable* deserialize();
-	void save(const std::string& path, GameMap* map);
-	GameMap* load(const std::string& path);
+	void save(const std::string& path, Game_world* world);
+	Game_world* load(const std::string& path);
 
 
 private:

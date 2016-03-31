@@ -274,6 +274,18 @@ public:
 
 };
 
+class Action_load :
+	public Action
+{
+public:
+
+	Action_load();
+
+	virtual std::string get_description(Parameter* parameter);
+	virtual void interaction_handler(Parameter* arg);
+
+};
+
 class Action_autoexplore :
 	public Action
 {

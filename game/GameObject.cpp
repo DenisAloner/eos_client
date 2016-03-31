@@ -22,14 +22,14 @@ void MapCell::save()
 	fwrite(&t, sizeof(type_e), 1, file);
 	fwrite(&x, sizeof(int), 1, file);
 	fwrite(&y, sizeof(int), 1, file);
-	//fwrite(&m_notable, sizeof(bool), 1, file);
+	fwrite(&(m_map->m_index), sizeof(std::size_t), 1, file);
+	LOG(INFO) << "Координаты " << std::to_string(x) << " " << std::to_string(y) << " " << std::to_string(m_map->m_index);
 	LOG(INFO) << "Конец записи клетки карты";
 }
 
 void MapCell::load()
 {
 }
-
 
 Attribute_map::Attribute_map(){};
 
@@ -633,7 +633,7 @@ void GameObject::load()
 Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 {
 	AI_enemy* ai = static_cast<AI_enemy*>(m_object->m_active_state->m_ai);
-	ai->calculate_FOV(m_object, Application::instance().m_GUI->MapViewer->m_map);
+	ai->calculate_FOV(m_object, map);
 	Vision_list* vl = static_cast<Vision_list*>(m_object->m_active_state->get_list(interaction_e::vision));
 
 
@@ -678,6 +678,7 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 	m_actions.push_front(Application::instance().m_actions[action_e::cell_info]);
 	m_actions.push_front(Application::instance().m_actions[action_e::show_parameters]);
 	m_actions.push_front(Application::instance().m_actions[action_e::save]);
+	m_actions.push_front(Application::instance().m_actions[action_e::load]);
 }
 
 Inventory_cell::Inventory_cell(GameObject* item = nullptr) : m_item(item)

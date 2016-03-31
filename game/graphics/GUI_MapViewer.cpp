@@ -839,7 +839,8 @@ void mapviewer_object_move::render_on_cell(MapCell* c)
 mapviewer_object_rotate::mapviewer_object_rotate(GUI_MapViewer* owner, GameObject* object) : gui_mapviewer_hint(owner), m_object(object)
 { 
 	m_fov = new FOV_help();
-	init(); 
+	init();
+	
 }
 
 void mapviewer_object_rotate::init()

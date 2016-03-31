@@ -347,8 +347,10 @@ iSerializable* Serialization_manager::deserialize()
 		int y;
 		fread(&x, sizeof(int), 1, m_file);
 		fread(&y, sizeof(int), 1, m_file);
-		LOG(INFO) << "Координаты " << std::to_string(x)<<" " << std::to_string(y);
-		return m_map->m_items[y][x];
+		std::size_t map_index;
+		fread(&map_index, sizeof(std::size_t), 1, m_file);
+		LOG(INFO) << "Координаты " << std::to_string(x)<<" " << std::to_string(y)<<" "<< std::to_string(map_index);
+		return m_maps[map_index]->m_items[y][x];
 		break;
 	}
 	default:
@@ -498,7 +500,10 @@ iSerializable* Serialization_manager::deserialize()
 		}
 		case type_e::gamemap:
 		{
-			value = new GameMap();
+			LOG(INFO) << "Назначаем карту";
+			std::size_t s;
+			fread(&s, sizeof(std::size_t), 1, m_file);
+			value = m_maps[s];
 			break;
 		}
 		case type_e::inventory_cell:
@@ -556,6 +561,11 @@ iSerializable* Serialization_manager::deserialize()
 			value = new Action_wrapper();
 			break;
 		}
+		case type_e::game_world:
+		{
+			value = new Game_world();
+			break;
+		}
 		}
 		LOG(INFO) << "Тип обьекта: " << std::to_string((int)type);
 		m_index += 1;
@@ -567,9 +577,8 @@ iSerializable* Serialization_manager::deserialize()
 	}
 }
 
-void Serialization_manager::save(const std::string& path, GameMap* map)
+void Serialization_manager::save(const std::string& path, Game_world* world)
 {
-	m_map = map;
 	errno_t err;
 	LOG(INFO) << "Сохранение игры";
 	err = fopen_s(&m_file, (FileSystem::instance().m_resource_path + "Saves\\" + path + ".txt").c_str(), "wb");
@@ -578,11 +587,21 @@ void Serialization_manager::save(const std::string& path, GameMap* map)
 		m_index = 1;
 		LOG(INFO) << "шаг 1";
 		fwrite(&m_index, sizeof(size_t), 1, m_file);
+		std::size_t index = 0;
+		for (auto m = world->m_maps.begin(); m != world->m_maps.end(); ++m, ++index)
+		{
+			(*m)->m_index = index;
+		}
+		fwrite(&index, sizeof(size_t), 1, m_file);
+		for (auto m =world->m_maps.begin(); m != world->m_maps.end(); ++m)
+		{
+			LOG(INFO) << "Карта сохранена с размером: " << std::to_string((*m)->m_size.w) << "x" << std::to_string((*m)->m_size.h);
+			fwrite(&((*m)->m_size), sizeof(dimension_t), 1, m_file);
+		}
 		LOG(INFO) << "шаг 2";
-		map->reset_serialization_index();
+		world->reset_serialization_index();
 		LOG(INFO) << "шаг 3";
-		serialize(map);
-		serialize(Application::instance().m_GUI->MapViewer->m_player->m_object);
+		serialize(world);
 		rewind(m_file);
 		m_index += 1;
 		fwrite(&m_index, sizeof(size_t), 1, m_file);
@@ -596,7 +615,7 @@ void Serialization_manager::save(const std::string& path, GameMap* map)
 	}
 }
 
-GameMap* Serialization_manager::load(const std::string& path)
+Game_world* Serialization_manager::load(const std::string& path)
 {
 	errno_t err;
 	LOG(INFO) << "Загрузка игры";
@@ -606,13 +625,21 @@ GameMap* Serialization_manager::load(const std::string& path)
 		fread(&m_index, sizeof(size_t), 1, m_file);
 		LOG(INFO) << "Количество сущностей: " << std::to_string(m_index);
 		m_items = new std::vector<iSerializable*>(m_index, nullptr);
+		fread(&m_index, sizeof(std::size_t), 1, m_file);
+		LOG(INFO) << "Количество карт в мире: " << std::to_string(m_index);
+		m_maps.resize(m_index, nullptr);
+		dimension_t size;
+		for (int i = 0; i < m_index; ++i)
+		{
+			fread(&size, sizeof(dimension_t), 1, m_file);
+			m_maps[i] = new GameMap(size);
+		}
 		m_index = 1;
-		m_map = dynamic_cast<GameMap*>(deserialize());
-		Application::instance().m_GUI->MapViewer->m_player = new Player(dynamic_cast<GameObject*>(deserialize()), m_map);
+		Game_world* world = dynamic_cast<Game_world*>(deserialize());
 		m_items->clear();
 		fclose(m_file);
 		LOG(INFO) << "Загрузка завершена успешно";
-		return m_map;
+		return world;
 	}
 	else
 	{

@@ -1351,7 +1351,7 @@ void Action_use::perfom(Parameter* parameter)
 			break;
 		}
 		}
-		Application::instance().m_GUI->MapViewer->m_map->m_object_manager.m_items.remove(p->m_object);
+		Application::instance().m_world->m_object_manager.m_items.remove(p->m_object);
 		p->m_unit->update_interaction();
 		p->m_unit->event_update(VoidEventArgs());
 	}
@@ -1374,11 +1374,36 @@ void Action_save::interaction_handler(Parameter* arg)
 {
 	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
-	Serialization_manager::instance().save("save", Application::instance().m_GUI->MapViewer->m_map);
+	Serialization_manager::instance().save("save", Application::instance().m_world);
 	Application::instance().m_message_queue.m_busy = false;
 }
 
 std::string Action_save::get_description(Parameter* parameter)
+{
+	std::string s("Игра сохранена");
+	return s;
+}
+
+Action_load::Action_load()
+{
+	m_kind = action_e::load;
+	m_icon = Application::instance().m_graph->m_actions[15];
+}
+
+void Action_load::interaction_handler(Parameter* arg)
+{
+	std::mutex update_lock;
+	Action::interaction_handler(nullptr);
+	Application::instance().m_message_queue.m_busy = true;
+	update_lock.lock();
+	Application::instance().stop();
+	Application::instance().m_GUI->remove(Application::instance().m_GUI->MapViewer);
+	Application::instance().load_game();
+	update_lock.unlock();
+	Application::instance().m_message_queue.m_busy = false;
+}
+
+std::string Action_load::get_description(Parameter* parameter)
 {
 	std::string s("Игра сохранена");
 	return s;
@@ -1426,16 +1451,17 @@ std::string Action_autoexplore::get_description(Parameter* parameter)
 
 bool Action_autoexplore::get_child(GameTask*& task)
 {
-	GameMap* map = Application::instance().m_GUI->MapViewer->m_map;
-	map->m_dijkstra_map->calculate_cost_autoexplore(map, Application::instance().m_GUI->MapViewer->m_player->m_object);
+	GameObject* object = Application::instance().m_GUI->MapViewer->m_player->m_object;
+	GameMap* map = static_cast<MapCell*>(object->m_owner)->m_map;
+	map->m_dijkstra_map->calculate_cost_autoexplore(map, object);
 	map->m_dijkstra_map->trace();
-	MapCell* c = map->m_dijkstra_map->next(Application::instance().m_GUI->MapViewer->m_player->m_object);
+	MapCell* c = map->m_dijkstra_map->next(object);
 	if (c)
 	{ 
 		LOG(INFO) << std::to_string(c->x) << " " << std::to_string(c->y);
 		Parameter_Position* P;
 		P = new Parameter_Position();
-		P->m_object = Application::instance().m_GUI->MapViewer->m_player->m_object;
+		P->m_object = object;
 		P->m_place = c;
 		P->m_map = map;
 		task = new GameTask(Application::instance().m_actions[action_e::move_step], P);

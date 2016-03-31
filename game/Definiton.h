@@ -126,7 +126,8 @@ enum action_e
 	use,
 	save,
 	autoexplore,
-	shoot
+	shoot,
+	load
 };
 
 enum class object_state_e
@@ -442,6 +443,7 @@ enum class type_e
 	parameter_bow_shoot,
 	vision_list,
 	vision_component,
+	game_world
 };
 
 struct predicat_t

@@ -18,6 +18,7 @@ class Object_feature;
 class MapCell;
 class AI;
 class Dijkstra_map;
+class Player;
 
 const int max_light_radius = 20;
 
@@ -30,7 +31,7 @@ public:
 	Object_manager() {};
 
 	void update_buff();
-	void calculate_ai(GameMap* game_map);
+	void calculate_ai();
 
 	virtual void reset_serialization_index();
 	virtual void save();
@@ -41,9 +42,9 @@ class GameMap: public iSerializable
 {
 public:
 
-	Object_manager m_object_manager;
-
 	Event<VoidEventArgs> update;
+
+	std::size_t m_index;
 
 	Dijkstra_map* m_dijkstra_map;
 
@@ -55,8 +56,6 @@ public:
 
 	dimension_t m_size;
 
-	float m_coefficient[21][21];
-	
 	std::vector<std::vector<MapCell*> > m_items;
 
 	std::list<block_t*> m_rooms;
@@ -91,13 +90,31 @@ public:
 	bool check(int x,int y);
 	//MapCell* get_cell(int x, int y);
 
-	void calculate_lighting2();
 	void blur_lighting();
 
 	virtual void reset_serialization_index();
 	virtual void save();
 	virtual void load();
 
+};
+
+class Game_world : public iSerializable
+{
+public:
+
+	float m_coefficient[21][21];
+
+	Object_manager m_object_manager;
+
+	std::list<GameMap*> m_maps;
+
+	Player* m_player;
+
+	Game_world();
+	void calculate_lighting();
+	virtual void reset_serialization_index();
+	virtual void save();
+	virtual void load();
 };
 
 #endif //GAMEMAP_H

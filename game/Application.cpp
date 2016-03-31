@@ -148,160 +148,6 @@ void Application::render()
 	m_update_mutex.unlock();
 }
 
-//void Application::initialize()
-//{
-//	music = NULL;
-//	m_game_turn = 1;
-//	m_ready = false;
-//	m_graph = new GraphicalController();
-//	m_mouse = new MouseController();
-//	command_set_cursor(m_graph->m_cursor);
-//	command_set_cursor_visibility(true);
-//
-//	m_GUI = new ApplicationGUI(0,0,1024,1024);
-//	
-//	key_press += std::bind(&Application::on_key_press, this, std::placeholders::_1);
-//	m_mouse->mouse_click += std::bind(&Application::on_mouse_click, this, std::placeholders::_1);
-//	m_mouse->mouse_down += std::bind(&Application::on_mouse_down, this, std::placeholders::_1);
-//	m_mouse->mouse_wheel += std::bind(&Application::on_mouse_wheel, this, std::placeholders::_1);
-//	m_mouse->mouse_move += std::bind(&Application::on_mouse_move, this, std::placeholders::_1);
-//	m_action_manager = new ActionManager();
-//
-//	m_actions[action_e::move] = new ActionClass_Move(); 
-//	m_actions[action_e::move_step] = new action_move_step();
-//	m_actions[action_e::push] = new ActionClass_Push();
-//	m_actions[action_e::turn] = new ActionClass_Turn();
-//	m_actions[action_e::open_inventory] = new Action_OpenInventory();
-//	m_actions[action_e::cell_info] = new Action_CellInfo();
-//	m_actions[action_e::set_motion_path] = new action_set_motion_path();
-//	m_actions[action_e::pick] = new Action_pick();
-//	m_actions[action_e::open] = new Action_open();
-//	m_actions[action_e::hit] = new Action_hit();
-//	m_actions[action_e::hit_melee] = new action_hit_melee();
-//	m_actions[action_e::equip] = new Action_equip();
-//	m_actions[action_e::show_parameters] = new Action_show_parameters();
-//	m_actions[action_e::use] = new Action_use();
-//	m_actions[action_e::save] = new Action_save();
-//	m_actions[action_e::autoexplore] = new Action_autoexplore();
-//	m_actions[action_e::shoot] = new Action_shoot();
-//
-//	for (size_t i = 0; i < c_action_size; i++)
-//	{
-//		m_actions[i]->m_index = i;
-//	}
-//
-//	m_ai_manager = new AI_manager();
-//	m_game_object_manager = new GameObjectManager();
-//	m_game_object_manager->init();
-//	LOG(INFO) << "Менеджер игровых объектов успешно инициализирован";
-//
-
-//
-//	m_graph->set_VSync(false);
-//	//if (SDL_Init(SDL_INIT_AUDIO) < 0)
-//	//{
-//	//	MessageBox(NULL, "Error", "Audio", MB_OK);
-//	//}
-//	//static Uint32 wav_length; // length of our sample
-//	//static Uint8 *wav_buffer; // buffer containing our audio file
-//	//static SDL_AudioSpec wav_spec; // the specs of our piece of music
-//	//static Uint32 wav_length2; // length of our sample
-//	//static Uint8 *wav_buffer2; // buffer containing our audio file
-//	//static SDL_AudioSpec wav_spec2; // the specs of our piece of music
-//	//if (SDL_LoadWAV("C:\\ExplorersOfSaarum\\123.wav", &wav_spec, &wav_buffer, &wav_length) == NULL){
-//	//	MessageBox(NULL, "Error", "Audio", MB_OK);
-//	//}
-//	//if (SDL_LoadWAV("C:\\ExplorersOfSaarum\\456.wav", &wav_spec2, &wav_buffer2, &wav_length2) == NULL){
-//	//	MessageBox(NULL, "Error", "Audio", MB_OK);
-//	//}
-//	//wav_spec.callback = my_audio_callback;
-//	//wav_spec.userdata = NULL;
-//	//// set our global static variables
-//	//audio_pos = wav_buffer; // copy sound buffer
-//	//audio_len = wav_length; // copy file length
-//
-//	///* Open the audio device */
-//	//if (SDL_OpenAudio(NULL, NULL) < 0){
-//	//	MessageBox(NULL, "Error", "Audio", MB_OK);
-//	//	exit(-1);
-//	//}
-//
-//	///* Start playing */
-//	//SDL_PauseAudio(0);
-//	//SDL_Delay(900);
-//	//SDL_MixAudio(audio_pos, wav_buffer2, audio_len, SDL_MIX_MAXVOLUME);// mix from one buffer into another
-//	//// wait until we're don't playing
-//	///*while (audio_len > 0) {
-//	//}*/
-//	//// shut everything down
-//	///*SDL_CloseAudio();
-//	//SDL_FreeWAV(wav_buffer);*/
-//
-//	int audio_rate = 44100;
-//	Uint16 audio_format = AUDIO_S16; /* 16-bit stereo */
-//	int audio_channels = 2;
-//	int audio_buffers = 4096;
-//
-//	if (SDL_Init(SDL_INIT_AUDIO) < 0)
-//	{
-//		MessageBox(NULL, "Error", "Audio", MB_OK);
-//	}
-//	if (Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers)) {
-//		MessageBox(NULL, "Error", "Audio", MB_OK);
-//		exit(1);
-//	}
-//	Mix_QuerySpec(&audio_rate, &audio_format, &audio_channels);
-//	if (music == NULL) {
-//
-//		/* Actually loads up the music */
-//		music = Mix_LoadWAV((FileSystem::instance().m_resource_path+"Sounds\\Click.wav").c_str());
-//
-//		/* This begins playing the music - the first argument is a
-//		pointer to Mix_Music structure, and the second is how many
-//		times you want it to loop (use -1 for infinite, and 0 to
-//		have it just play once) */
-//	}
-//
-//	/*obj = m_game_object_manager->new_object("torch");
-//	m_GUI->MapViewer->m_map->add_new_object(obj, m_GUI->MapViewer->m_map->m_items[ry + 15][rx]);*/
-//
-//	/*int ru;
-//	for (int i = 0; i <15; i++){
-//		index = rand() % m_GUI->MapViewer->m_map->m_link_rooms.size();
-//		room = *std::next(m_GUI->MapViewer->m_map->m_link_rooms.begin(), index);
-//		ru = rand() % 4;
-//		rx = rand() % room->rect.w;
-//		ry = rand() % room->rect.h;
-//		switch (ru)
-//		{
-//		case 0:
-//		{
-//			obj = m_game_object_manager->new_object("snake");
-//			break;
-//		}
-//		case 1:
-//		{
-//			obj = m_game_object_manager->new_object("bear");
-//			break;
-//		}
-//		case 2:
-//		{
-//			obj = m_game_object_manager->new_object("ghost");
-//			break;
-//		}
-//		case 3:
-//		{
-//			obj = m_game_object_manager->new_object("slime");
-//			break;
-//		}
-//		}
-//		obj->set_direction(object_direction_e_Left);
-//		m_GUI->MapViewer->m_map->add_ai_object(obj, m_GUI->MapViewer->m_map->m_items[room->rect.y + ry][room->rect.x + rx]);
-//	}*/
-//
-//	m_ready = true;
-//}
-
 void Application::initialize()
 {
 	music = NULL;
@@ -338,6 +184,7 @@ void Application::initialize()
 	m_actions[action_e::save] = new Action_save();
 	m_actions[action_e::autoexplore] = new Action_autoexplore();
 	m_actions[action_e::shoot] = new Action_shoot();
+	m_actions[action_e::load] = new Action_load();
 
 	for (size_t i = 0; i < c_action_size; i++)
 	{
@@ -376,13 +223,16 @@ void Application::initialize()
 
 void Application::new_game()
 {
+	m_world = new Game_world();
+	GameMap* map= new GameMap(dimension_t(20, 20));
+	m_world->m_maps.push_back(map);
 		m_GUI->MapViewer = new GUI_MapViewer(this);
 		m_GUI->MapViewer->m_position.x = 0;
 		m_GUI->MapViewer->m_position.y = 0;
 		m_GUI->MapViewer->m_size.w = 1024;
 		m_GUI->MapViewer->m_size.h = 1024;
 		
-		m_GUI->MapViewer->m_map = new GameMap(dimension_t(20,20));
+		m_GUI->MapViewer->m_map = map;
 		///m_GUI->MapViewer->m_map->generate_level();
 	
 		m_GUI->MapViewer->m_map->generate_room();
@@ -394,7 +244,8 @@ void Application::new_game()
 	
 		obj = m_game_object_manager->new_object("iso_unit");
 		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx]);
-		m_GUI->MapViewer->m_player = new Player(obj, m_GUI->MapViewer->m_map);
+		m_world->m_player = new Player(obj, m_GUI->MapViewer->m_map);
+		m_GUI->MapViewer->m_player = m_world->m_player;
 	
 		//m_GUI->MapViewer->m_map = Serialization_manager::instance().load("save");
 	
@@ -464,13 +315,16 @@ void Application::new_game()
 
 void Application::load_game()
 {
+
+	m_world = Serialization_manager::instance().load("save");
+
 	m_GUI->MapViewer = new GUI_MapViewer(this);
 	m_GUI->MapViewer->m_position.x = 0;
 	m_GUI->MapViewer->m_position.y = 0;
 	m_GUI->MapViewer->m_size.w = 1024;
 	m_GUI->MapViewer->m_size.h = 1024;
-
-	m_GUI->MapViewer->m_map = Serialization_manager::instance().load("save");
+	m_GUI->MapViewer->m_map = m_world->m_maps.front();
+	m_GUI->MapViewer->m_player = m_world->m_player;
 
 	GUI_ActionManager* AMTextBox;
 	AMTextBox = new GUI_ActionManager(m_action_manager);
@@ -498,14 +352,14 @@ void Application::load_game()
 	MenuLayer->add(TextBox);
 	MenuLayer->add(button);
 
-	GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
-	GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(5, 5), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 30), m_GUI->MapViewer);
-	MiniMap->add(mini_map);
-	//MenuLayer->add(MiniMap);
+	//GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
+	//GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(5, 5), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 30), m_GUI->MapViewer);
+	//MiniMap->add(mini_map);
+	////MenuLayer->add(MiniMap);
 
-	MiniMap = new GUI_Window(300, 0, 400, 400, "Поле зрения player");
-	GUI_FOV* fov = new GUI_FOV(position_t(5, 5), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 30), m_GUI->MapViewer->m_player->m_object);
-	MiniMap->add(fov);
+	//MiniMap = new GUI_Window(300, 0, 400, 400, "Поле зрения player");
+	//GUI_FOV* fov = new GUI_FOV(position_t(5, 5), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 30), m_GUI->MapViewer->m_player->m_object);
+	//MiniMap->add(fov);
 
 	/*obj = m_game_object_manager->new_object("bat");
 	obj->set_direction(object_direction_e::top);
@@ -541,14 +395,19 @@ void Application::load_game()
 void Application::update_after_load()
 {
 	//m_update_mutex.lock();
-	m_GUI->MapViewer->m_map->calculate_lighting2();
-	Application::instance().m_GUI->MapViewer->update();
-	Application::instance().m_GUI->MapViewer->m_map->update(VoidEventArgs());
+	m_world->calculate_lighting();
+	m_GUI->MapViewer->update();
+	for (auto m = m_world->m_maps.begin(); m != m_world->m_maps.end(); ++m)
+	{
+		(*m)->update(VoidEventArgs());
+	}
 	//m_update_mutex.unlock();
 	//m_update_mutex.lock();
 	if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
 	{
-		static_cast<AI_enemy*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)->calculate_FOV(m_GUI->MapViewer->m_player->m_object, Application::instance().m_GUI->MapViewer->m_map);
+		GameObject* object = m_GUI->MapViewer->m_player->m_object;
+		GameMap* map = static_cast<MapCell*>(object->m_owner)->m_map;
+		static_cast<AI_enemy*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)->calculate_FOV(m_GUI->MapViewer->m_player->m_object, map);
 	}
 	//m_update_mutex.unlock();
 }
@@ -790,19 +649,19 @@ void Application::update()
 				m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->update();
 			}
 			//start = std::chrono::high_resolution_clock::now();
-			Application::instance().m_GUI->MapViewer->m_map->m_object_manager.calculate_ai(m_GUI->MapViewer->m_map);
+			m_world->m_object_manager.calculate_ai();
 			end = std::chrono::high_resolution_clock::now();
 			elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 			//LOG(INFO) << "Просчет ИИ: " << std::to_string(elapsed.count());
 			if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
 			{
 				GameObject* object = m_GUI->MapViewer->m_player->m_object;
+				GameMap* map = static_cast<MapCell*>(object->m_owner)->m_map;
+
 				AI_enemy* ai = static_cast<AI_enemy*>(object->m_active_state->m_ai);
-				ai->calculate_FOV(object, Application::instance().m_GUI->MapViewer->m_map);
+				ai->calculate_FOV(object, map);
 				Vision_list* vl = static_cast<Vision_list*>(object->m_active_state->get_list(interaction_e::vision));
 				
-				GameMap* m_map = m_GUI->MapViewer->m_map;
-
 				int radius = vl->m_max_radius;
 
 				int xc = object->cell()->x;
@@ -815,16 +674,16 @@ void Application::update()
 
 				int x_start = xc - radius + xs;
 				x_start = max(x_start, 0);
-				x_start = min(x_start, m_map->m_size.w - 1);
+				x_start = min(x_start, map->m_size.w - 1);
 				int x_end = xc + radius + xs;
 				x_end = max(x_end, 0);
-				x_end = min(x_end, m_map->m_size.w - 1);
+				x_end = min(x_end, map->m_size.w - 1);
 				int y_start = yc - radius - ys;
 				y_start = max(y_start, 0);
-				y_start = min(y_start, m_map->m_size.h - 1);
+				y_start = min(y_start, map->m_size.h - 1);
 				int y_end = yc + radius - ys;
 				y_end = max(y_end, 0);
-				y_end = min(y_end, m_map->m_size.h - 1);
+				y_end = min(y_end, map->m_size.h - 1);
 
 				for (int y = y_start; y < y_end + 1; y++)
 				{
@@ -832,18 +691,18 @@ void Application::update()
 					{
 						if (ai->m_fov->m_map[y - y_start][x - x_start].visible)
 						{
-							m_map->m_items[y][x]->m_notable = true;
+							map->m_items[y][x]->m_notable = true;
 						}
 					}
 				}
 			}
 			//start = std::chrono::high_resolution_clock::now();
-			Application::instance().m_GUI->MapViewer->m_map->m_object_manager.update_buff();
+			m_world->m_object_manager.update_buff();
 			end = std::chrono::high_resolution_clock::now();
 			elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 			//LOG(INFO) <<"Просчет баффов: " <<std::to_string(elapsed.count());
 			//start = std::chrono::high_resolution_clock::now();
-			m_GUI->MapViewer->m_map->calculate_lighting2();
+			m_world->calculate_lighting();
 			end = std::chrono::high_resolution_clock::now();
 			elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 			//LOG(INFO) << "Просчет освещения: " << std::to_string(elapsed.count());
@@ -852,7 +711,10 @@ void Application::update()
 			end = std::chrono::high_resolution_clock::now();
 			elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 			//LOG(INFO) << "Просчет карты: " << std::to_string(elapsed.count());
-			Application::instance().m_GUI->MapViewer->m_map->update(VoidEventArgs());
+			for (auto m = m_world->m_maps.begin(); m != m_world->m_maps.end(); ++m)
+			{
+				(*m)->update(VoidEventArgs());
+			}
 			m_update_mutex.unlock();
 			m_GUI->DescriptionBox->add_item_control(new GUI_Text("Ход - " + std::to_string(m_game_turn) + ".", new GUI_TextFormat(10, 19, RGBA_t(0.0, 0.8, 0.0, 1.0))));
 			m_game_turn += 1;

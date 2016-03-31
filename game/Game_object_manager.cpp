@@ -650,7 +650,7 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 	obj->m_active_state = obj->m_state.front();
 	//register_object(obj);
 	obj->update_interaction();
-	Application::instance().m_GUI->MapViewer->m_map->m_object_manager.m_items.push_back(obj);
+	Application::instance().m_world->m_object_manager.m_items.push_back(obj);
 	return obj;
 }
 

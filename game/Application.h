@@ -46,6 +46,7 @@ class GameObjectManager;
 class Object_part;
 class Object_interaction;
 class GUI_Window_manager;
+class Game_world;
 
 class gui_MessageQueue
 {
@@ -79,7 +80,7 @@ class Application
 {
 public:
 
-	static const std::size_t c_action_size = 17;
+	static const std::size_t c_action_size = 18;
 
 	int m_game_turn;
 	bool m_ready;
@@ -111,6 +112,8 @@ public:
 	GUI_Window_manager* m_window_manager;
 
 	std::list<GUI_Object*> m_update_canvas;
+
+	Game_world* m_world;
 
 	~Application(void);
 
