@@ -72,3 +72,24 @@ void GUI_Object::on_get_focus(GUI_Object* sender)
 void GUI_Object::on_lose_focus(GUI_Object* sender)
 {
 }
+
+GUI_Image::GUI_Image(int x, int y, int width, int height, GLuint texture)
+{
+	m_position = position_t(x, y);
+	m_size = dimension_t(width, height);
+	m_texture = texture;
+}
+
+void GUI_Image::render(GraphicalController* Graph, int px, int py)
+{
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_TEXTURE_2D);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glUseProgram(0);
+	//glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01);
+	//glGenerateMipmap(GL_TEXTURE_2D);
+	glColor4d(1.0, 1.0, 1.0, 1.0);
+	glBindTexture(GL_TEXTURE_2D, m_texture);
+	Graph->draw_sprite(px, py, px, py + m_size.h, px + m_size.w, py + m_size.h, px + m_size.w, py);
+}

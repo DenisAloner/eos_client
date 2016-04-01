@@ -1397,7 +1397,8 @@ void Action_load::interaction_handler(Parameter* arg)
 	Application::instance().m_message_queue.m_busy = true;
 	update_lock.lock();
 	Application::instance().stop();
-	Application::instance().m_GUI->remove(Application::instance().m_GUI->MapViewer);
+	Application::instance().m_GUI = nullptr;
+	//Application::instance().m_GUI->remove(Application::instance().m_GUI->MapViewer);
 	Application::instance().load_game();
 	update_lock.unlock();
 	Application::instance().m_message_queue.m_busy = false;

@@ -38,6 +38,7 @@ public:
 	GLuint m_preselect;
 	GLuint m_select;
 	GLuint m_font;
+	GLuint m_logo;
 	GLuint m_no_image;
 	GLuint m_visible;
 	GLuint m_blur;

@@ -63,35 +63,35 @@ Application::~Application(void)
 void Application::on_key_press(WPARAM w)
 {
 	m_update_mutex.lock();
-	m_GUI->key_press(w);
+	if (m_GUI) { m_GUI->key_press(w); }
 	m_update_mutex.unlock();
 }
 
 void Application::on_mouse_click(MouseEventArgs const& e)
 {
 	m_update_mutex.lock();
-	m_GUI->mouse_click(e);
+	if (m_GUI) { m_GUI->mouse_click(e); }
 	m_update_mutex.unlock();
 }
 
 void Application::on_mouse_down(MouseEventArgs const& e)
 {
 	m_update_mutex.lock();
-	m_GUI->mouse_down(e);
+	if (m_GUI) { m_GUI->mouse_down(e); }
 	m_update_mutex.unlock();
 }
 
 void Application::on_mouse_move(MouseEventArgs const& e)
 {
 	m_update_mutex.lock();
-	m_GUI->mouse_move(e);
+	if (m_GUI) { m_GUI->mouse_move(e); }
 	m_update_mutex.unlock();
 }
 
 void Application::on_mouse_wheel(MouseEventArgs const& e)
 {
 	m_update_mutex.lock();
-	m_GUI->mouse_wheel(e);
+	if (m_GUI) { m_GUI->mouse_wheel(e); }
 	m_update_mutex.unlock();
 }
 
@@ -110,7 +110,10 @@ void Application::render()
 	//	Application::instance().m_GUI->MapViewer->m_map->update(VoidEventArgs());
 	//	Application::instance().m_GUI->MapViewer->m_map->m_update = false;
 	//}
-	m_GUI->render(m_graph, 0, 0);
+	if (m_GUI)
+	{
+		m_GUI->render(m_graph, 0, 0);
+	}
 	const position_t mouse = Application::instance().m_mouse->get_mouse_position();
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -158,8 +161,6 @@ void Application::initialize()
 	command_set_cursor(m_graph->m_cursor);
 	command_set_cursor_visibility(true);
 
-	m_GUI = new ApplicationGUI(0, 0, 1024, 1024);
-
 	key_press += std::bind(&Application::on_key_press, this, std::placeholders::_1);
 	m_mouse->mouse_click += std::bind(&Application::on_mouse_click, this, std::placeholders::_1);
 	m_mouse->mouse_down += std::bind(&Application::on_mouse_down, this, std::placeholders::_1);
@@ -196,11 +197,13 @@ void Application::initialize()
 	m_game_object_manager->init();
 	LOG(INFO) << "Менеджер игровых объектов успешно инициализирован";
 
+	m_GUI = new ApplicationGUI(0, 0, 1024, 1024);
 	m_window_manager = new GUI_Window_manager(0, 0, 1024, 1024);
-
 	m_GUI->add(m_window_manager);
+	m_GUI->add(new GUI_Image(0,0,1024,1024, m_graph->m_logo));
 
 	GUI_Window* MainMenu = new GUI_Window(0, 0, 400, 400, "Главное меню");
+	MainMenu->m_position = position_t((1024- MainMenu->m_size.w)/2, (1024 - MainMenu->m_size.h) / 2);
 	GUI_Button_list* menu = new GUI_Button_list(0, 0, 400, 400);
 	GUI_Mainmenu_button* button;
 	button = new GUI_Mainmenu_button(0, 0, 396, 47, "Новая игра", ParameterKind::parameter_new_game);
@@ -226,6 +229,11 @@ void Application::new_game()
 	m_world = new Game_world();
 	GameMap* map= new GameMap(dimension_t(20, 20));
 	m_world->m_maps.push_back(map);
+
+	m_GUI = new ApplicationGUI(0, 0, 1024, 1024);
+	m_window_manager = new GUI_Window_manager(0, 0, 1024, 1024);
+	m_GUI->add(m_window_manager);
+
 		m_GUI->MapViewer = new GUI_MapViewer(this);
 		m_GUI->MapViewer->m_position.x = 0;
 		m_GUI->MapViewer->m_position.y = 0;
@@ -317,6 +325,10 @@ void Application::load_game()
 {
 
 	m_world = Serialization_manager::instance().load("save");
+
+	m_GUI = new ApplicationGUI(0, 0, 1024, 1024);
+	m_window_manager = new GUI_Window_manager(0, 0, 1024, 1024);
+	m_GUI->add(m_window_manager);
 
 	m_GUI->MapViewer = new GUI_MapViewer(this);
 	m_GUI->MapViewer->m_position.x = 0;

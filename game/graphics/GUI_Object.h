@@ -44,4 +44,14 @@ public:
 
 };
 
+class GUI_Image : public GUI_Object
+{
+
+public:
+
+	GLuint m_texture;
+	GUI_Image(int x, int y, int width, int height, GLuint texture);
+	virtual void render(GraphicalController* Graph, int px, int py);
+};
+
 #endif //GUI_OBJECT_H

@@ -7,17 +7,16 @@
 
 
 class GUI_MapViewer;
-class GUI_Timer;
 
 class ApplicationGUI : public GUI_Layer
 {
 public:
+
 	ApplicationGUI(int x, int y, int width, int height);
 	~ApplicationGUI();
 
 	GUI_MapViewer* MapViewer;
 	GUI_TextBox* DescriptionBox;
-	//GUI_Timer* Timer;
 	GUI_ActionPanel* m_action_panel;
 };
 
