@@ -219,6 +219,7 @@ void Object_state::save()
 	Attribute_map::save();
 	fwrite(&m_state, sizeof(object_state_e), 1, file);
 	fwrite(&m_layer, sizeof(int), 1, file);
+	//????	fwrite(&m_layer, sizeof(int), 1, file);
 	fwrite(&m_size, sizeof(game_object_size_t), 1, file);
 	fwrite(&m_weight, sizeof(float), 1, file);
 	FileSystem::instance().serialize_pointer(m_light, type_e::light_t, file);
@@ -566,6 +567,118 @@ void GameObject::update_interaction()
 	}
 }
 
+
+void GameObject::get_action_predicat(Object_interaction* object)
+{
+	if (object->m_interaction_message_type == interaction_message_type_e::action)
+	{
+		m_actions_list->push_back(Action_helper_t(static_cast<Action*>(object)));
+	}
+}
+
+void GameObject::add_action_from_part(Object_interaction* object)
+{
+	if (object->m_interaction_message_type == interaction_message_type_e::part)
+	{
+		Object_part* op = static_cast<Object_part*>(object);
+		Action_list* al = static_cast<Action_list*>(op->m_object_state.get_list(interaction_e::action));
+		Action* a;
+		if (al)
+		{
+			for (auto action = al->m_effect.begin(); action != al->m_effect.end(); action++)
+			{
+				a = static_cast<Action*>(*action);
+				switch (a->m_kind)
+				{
+				case action_e::pick:
+				{
+					Parameter_destination* p = new Parameter_destination();
+					p->m_unit =this;
+					p->m_owner = op;
+					m_common_actions.pick = true;
+					m_actions_list->push_back(Action_helper_t(a,p));
+					break;
+				}
+				case action_e::move_step:
+				{
+					Parameter_destination* p = new Parameter_destination();
+					p->m_unit = this;
+					p->m_owner = op;
+					m_actions_list->push_back(Action_helper_t(a, p));
+					break;
+				}
+				case action_e::turn:
+				{
+					Parameter_direction* p = new Parameter_direction();
+					p->m_object = this;
+					m_actions_list->push_back(Action_helper_t(a, p));
+					break;
+				}
+				}
+			}
+		}
+		if (op->m_item)
+		{
+			al = static_cast<Action_list*>(op->m_item->get_effect(interaction_e::action));
+			if (al)
+			{
+				for (auto action = al->m_effect.begin(); action != al->m_effect.end(); action++)
+				{
+					a = static_cast<Action*>(*action);
+					switch (a->m_kind)
+					{
+					case action_e::hit_melee:
+					{
+						P_interaction_cell* p = new P_interaction_cell();
+						p->m_unit = this;
+						p->m_unit_body_part = op;
+						m_actions_list->push_back(Action_helper_t(a, p));
+						break;
+					}
+					case action_e::shoot:
+					{
+						P_bow_shoot* p = new P_bow_shoot();
+						p->m_unit = this;
+						p->m_unit_body_part = op;
+						m_actions_list->push_back(Action_helper_t(a, p));
+						break;
+					}
+					}
+				}
+			}
+		}
+	}
+}
+
+std::list<Action_helper_t>* GameObject::m_actions_list = nullptr;
+common_action_t GameObject::m_common_actions;
+
+void GameObject::get_actions_list(std::list<Action_helper_t>& value)
+{
+	m_actions_list = &value;
+	m_common_actions.pick = false;
+	Parts_list* parts = get_parts_list(interaction_e::body);
+	Action_list* al;
+
+	al = static_cast<Action_list*>(get_effect(interaction_e::action));
+	if (al)
+	{
+		for (auto action = al->m_effect.begin(); action != al->m_effect.end(); action++)
+		{
+			(*action)->do_predicat(std::bind(&GameObject::get_action_predicat, this, std::placeholders::_1));
+		}
+	}
+	m_common_actions.pick = false;
+	for (auto item = parts->m_effect.begin(); item != parts->m_effect.end(); item++)
+	{
+		(*item)->do_predicat(std::bind(&GameObject::add_action_from_part, this, std::placeholders::_1));
+	}
+	if (m_common_actions.pick)
+	{
+		m_actions_list->push_back(Action_helper_t(Application::instance().m_actions[action_e::pick]));
+	}
+}
+
 void GameObject::reset_serialization_index()
 {
 	m_serialization_index = 0;
@@ -679,6 +792,22 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 	m_actions.push_front(Application::instance().m_actions[action_e::show_parameters]);
 	m_actions.push_front(Application::instance().m_actions[action_e::save]);
 	m_actions.push_front(Application::instance().m_actions[action_e::load]);
+
+	m_object->event_update += std::bind(&Player::on_item_update, this);
+}
+
+void Player::on_item_update()
+{
+	event_update(VoidEventArgs());
+}
+
+void Player::get_actions_list(std::list<Action_helper_t>& value)
+{
+	for (auto item = m_actions.begin(); item != m_actions.end(); item++)
+	{
+		value.push_back(Action_helper_t(*item));
+	}
+	m_object->get_actions_list(value);
 }
 
 Inventory_cell::Inventory_cell(GameObject* item = nullptr) : m_item(item)

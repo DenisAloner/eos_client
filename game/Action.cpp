@@ -91,6 +91,13 @@ Action_wrapper* Action_wrapper::clone()
 void Action_wrapper::reset_serialization_index()
 {
 	m_serialization_index = 0;
+	if (m_action)
+	{
+		if (m_action->m_serialization_index > 1)
+		{
+			m_action->reset_serialization_index();
+		}
+	}
 	if (m_parameter)
 	{
 		if (m_parameter->m_serialization_index > 1)
@@ -124,6 +131,7 @@ void Action_wrapper::load()
 	LOG(INFO) << " - загрузка параметра";
 	m_parameter = dynamic_cast<Parameter*>(Serialization_manager::instance().deserialize());
 	LOG(INFO) << "Конец выполняемого действия";
+	done = false;
 }
 
 void Action_wrapper::set(GameObject* unit, Action* action, Parameter* parameter)

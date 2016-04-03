@@ -6,7 +6,6 @@ GUI_ActionButton::GUI_ActionButton()
 {
 	m_size.w = 40;
 	m_size.h = 40;
-	m_parameter = nullptr;
 }
 
 
@@ -21,7 +20,7 @@ void GUI_ActionButton::render(GraphicalController* Graph, int px, int py)
 	glColor4d(1, 1, 1, 1);
 	glEnable(GL_TEXTURE_2D);
 	glActiveTextureARB(GL_TEXTURE0_ARB);
-	glBindTexture(GL_TEXTURE_2D, m_action->m_icon);
+	glBindTexture(GL_TEXTURE_2D, m_value.action->m_icon);
 	Graph->draw_sprite(px, py, px, py + m_size.h, px + m_size.w, py +m_size.h, px + m_size.w, py);
 	glDisable(GL_TEXTURE_2D);
 	glBegin(GL_LINES);
@@ -40,7 +39,7 @@ void GUI_ActionButton::render(GraphicalController* Graph, int px, int py)
 void GUI_ActionButton::on_mouse_click(MouseEventArgs const& e)
 {
 	set_focus(true);
-	std::thread t(&Action::interaction_handler, m_action, m_parameter);
+	std::thread t(&Action::interaction_handler, m_value.action, m_value.parameter);
 	t.detach();
 }
 

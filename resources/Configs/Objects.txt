@@ -122,7 +122,7 @@ tag poison_resist
 tag mortal
 tag seethrough_able
 tag fast_move
-mem_effect value,-5
+mem_effect value,-50
 mem_slot_copyist health
 add_slot total_damage
 state dead
@@ -169,3 +169,25 @@ tag seethrough_able
 feature_list vision,vision
 mem_effect limit,-16
 add_slot vision
+
+object dagger
+state equip,hand
+size 1,1,0
+icon dagger_icon
+tile_manager 1
+feature_list tag,tag
+tag pick_able
+tag pass_able
+tag seethrough_able
+feature_list parameter,weapon_damage,10,25
+feature_list parameter,strength_bonus,25,100
+feature_list parameter,demand_weapon_skill,15000,100000
+feature_list generic,action
+add_action hit_melee
+feature_list generic,damage
+mem_effect value,-6
+mem_slot_prefix poison_damage
+mem_slot_copyist health
+mem_slot_time 5
+mem_slot_addon buff
+add_slot damage

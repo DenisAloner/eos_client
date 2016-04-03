@@ -10,8 +10,9 @@ const float cos22_5 = cos(22.5F*Pi / 180.0);
 const float cos67_5 = cos(67.5F*Pi / 180.0);
 
 class GameObject;
-
 class GUI_Object;
+class Action;
+class Parameter;
 
 const int tile_size_x = 32;
 const int tile_size_y = 18;
@@ -479,6 +480,14 @@ struct AI_FOV
 
 	AI_FOV(int radius, predicat_t* qualifier, int start_angle, int end_angle) : radius(radius), qualifier(qualifier), start_angle(start_angle), end_angle(end_angle) {};
 	AI_FOV() : radius(0), qualifier(nullptr), start_angle(0), end_angle(0) {};
+};
+
+struct Action_helper_t
+{
+	Action* action;
+	Parameter* parameter;
+
+	Action_helper_t(Action* action = nullptr, Parameter* parameter = nullptr) :action(action), parameter(parameter) {};
 };
 
 #endif //DEFINITION_H

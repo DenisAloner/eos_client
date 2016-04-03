@@ -238,6 +238,9 @@ void P_object_owner::load()
 
 P_unit_interaction::P_unit_interaction() : Parameter(parameter_kind_unit_interaction)
 {
+	m_unit = nullptr;
+	m_object = nullptr;
+	m_unit_body_part = nullptr;
 }
 
 void P_unit_interaction::reset_serialization_index()

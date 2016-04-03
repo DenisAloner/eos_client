@@ -7,6 +7,7 @@
 
 
 class GUI_MapViewer;
+class GUI_ActionPanel;
 
 class ApplicationGUI : public GUI_Layer
 {

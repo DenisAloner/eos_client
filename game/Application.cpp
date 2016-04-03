@@ -265,7 +265,7 @@ void Application::new_game()
 		GUI_ActionPanel* ActionPanel;
 		ActionPanel = new GUI_ActionPanel(2,975,898,47);
 		m_GUI->m_action_panel = ActionPanel;
-		update_action_panel();
+		ActionPanel->bind(m_world->m_player);
 		GUI_Layer* MenuLayer;
 		MenuLayer = new GUI_Layer(0,0,1024,1024);
 		GUI_TextBox* TextBox = new GUI_TextBox();
@@ -297,15 +297,15 @@ void Application::new_game()
 	
 		obj = m_game_object_manager->new_object("bat");
 		obj->set_direction(object_direction_e::top);
-		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 4]);
+		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 4]);*/
 	
-		obj = m_game_object_manager->new_object("bat");
+		obj = m_game_object_manager->new_object("dagger");
 		obj->set_direction(object_direction_e::top);
-		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 6]);
+		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-1][rx - 1]);
 		
 		obj = m_game_object_manager->new_object("bat");
 		obj->set_direction(object_direction_e::top);
-		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-8][rx]);*/
+		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-6][rx]);
 	
 	
 		/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
@@ -346,7 +346,7 @@ void Application::load_game()
 	GUI_ActionPanel* ActionPanel;
 	ActionPanel = new GUI_ActionPanel(2, 975, 898, 47);
 	m_GUI->m_action_panel = ActionPanel;
-	update_action_panel();
+	ActionPanel->bind(m_world->m_player);
 	GUI_Layer* MenuLayer;
 	MenuLayer = new GUI_Layer(0, 0, 1024, 1024);
 	GUI_TextBox* TextBox = new GUI_TextBox();
@@ -422,150 +422,6 @@ void Application::update_after_load()
 		static_cast<AI_enemy*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)->calculate_FOV(m_GUI->MapViewer->m_player->m_object, map);
 	}
 	//m_update_mutex.unlock();
-}
-
-void Application::get_action_predicat(Object_interaction* object)
-{
-	if (object->m_interaction_message_type == interaction_message_type_e::action)
-	{
-		GUI_ActionButton* ActionButton = new GUI_ActionButton();
-		ActionButton->m_action = static_cast<Action*>(object);
-		m_GUI->m_action_panel->add_item_control(ActionButton);
-	}
-}
-
-void Application::add_action_from_part(Object_interaction* object)
-{
-	if (object->m_interaction_message_type == interaction_message_type_e::part)
-	{
-		Object_part* op = static_cast<Object_part*>(object);
-		Action_list* al = static_cast<Action_list*>(op->m_object_state.get_list(interaction_e::action));
-		Action* a;
-		if (al)
-		{
-			for (auto action = al->m_effect.begin(); action != al->m_effect.end(); action++)
-			{
-				a = static_cast<Action*>(*action);
-				switch (a->m_kind)
-				{
-				case action_e::pick:
-				{
-					GUI_ActionButton* ActionButton = new GUI_ActionButton();
-					ActionButton->m_action = a;
-					Parameter_destination* p = new Parameter_destination();
-					p->m_unit = m_GUI->MapViewer->m_player->m_object;
-					p->m_owner = op;
-					ActionButton->m_parameter = p;
-					m_GUI->m_action_panel->add_item_control(ActionButton);
-					m_common_action.pick = true;
-					break;
-				}
-				case action_e::move_step:
-				{
-					GUI_ActionButton* ActionButton = new GUI_ActionButton();
-					ActionButton->m_action = a;
-					Parameter_destination* p = new Parameter_destination();
-					p->m_unit = m_GUI->MapViewer->m_player->m_object;
-					p->m_owner = op;
-					ActionButton->m_parameter = p;
-					m_GUI->m_action_panel->add_item_control(ActionButton);
-					break;
-				}
-				case action_e::turn:
-				{
-					GUI_ActionButton* ActionButton = new GUI_ActionButton();
-					ActionButton->m_action = a;
-					Parameter_direction* p = new Parameter_direction();
-					p->m_object = m_GUI->MapViewer->m_player->m_object;
-					ActionButton->m_parameter = p;
-					m_GUI->m_action_panel->add_item_control(ActionButton);
-					break;
-				}
-				}
-			}
-		}
-		if (op->m_item)
-		{
-			al = static_cast<Action_list*>(op->m_item->get_effect(interaction_e::action));
-			if (al)
-			{
-				//al->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));
-				for (auto action = al->m_effect.begin(); action != al->m_effect.end(); action++)
-				{
-					a = static_cast<Action*>(*action);
-					switch (a->m_kind)
-					{
-					case action_e::hit_melee:
-					{
-						//a->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));
-						GUI_ActionButton* ActionButton = new GUI_ActionButton();
-						ActionButton->m_action = a;
-						P_interaction_cell* p = new P_interaction_cell();
-						p->m_unit = m_GUI->MapViewer->m_player->m_object;
-						p->m_unit_body_part = op;
-						ActionButton->m_parameter = p;
-						m_GUI->m_action_panel->add_item_control(ActionButton);
-						break;
-					}
-					case action_e::shoot:
-					{
-
-						//a->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));
-						GUI_ActionButton* ActionButton = new GUI_ActionButton();
-						ActionButton->m_action = a;
-						P_bow_shoot* p = new P_bow_shoot();
-						p->m_unit = m_GUI->MapViewer->m_player->m_object;
-						p->m_unit_body_part = op;
-						ActionButton->m_parameter = p;
-						m_GUI->m_action_panel->add_item_control(ActionButton);
-						break;
-					}
-					}
-				}
-			}
-		}
-	}
-}
-
-void Application::update_action_panel()
-{
-	GUI_ActionButton* ActionButton;
-	GUI_ActionPanel* panel = m_GUI->m_action_panel;
-	while (!panel->m_items.empty())
-	{
-		panel->remove(panel->m_items.front());
-	}
-	auto player_action_list = m_GUI->MapViewer->m_player->m_actions;
-	for (auto item = player_action_list.begin(); item != player_action_list.end(); item++)
-	{
-		ActionButton = new GUI_ActionButton();
-		ActionButton->m_action = (*item);
-		m_GUI->m_action_panel->add_item_control(ActionButton);
-	}
-
-	Parts_list* parts = m_GUI->MapViewer->m_player->m_object->get_parts_list(interaction_e::body);
-	Action_list* al;
-
-	al = static_cast<Action_list*>(m_GUI->MapViewer->m_player->m_object->get_effect(interaction_e::action));
-	if (al)
-	{
-		for (auto action = al->m_effect.begin(); action != al->m_effect.end(); action++)
-		{
-			(*action)->do_predicat(std::bind(&Application::get_action_predicat, this, std::placeholders::_1));
-		}
-	}
-	m_common_action.pick = false;
-	for (auto item = parts->m_effect.begin(); item != parts->m_effect.end(); item++)
-	{
-		(*item)->do_predicat(std::bind(&Application::add_action_from_part, this, std::placeholders::_1));
-	}
-	if (m_common_action.pick)
-	{
-		GUI_ActionButton* ActionButton = new GUI_ActionButton();
-		ActionButton->m_action = m_actions[action_e::pick];
-		ActionButton->m_parameter = nullptr;
-		m_GUI->m_action_panel->add_item_control(ActionButton);
-	}
 }
 
 void Application::start()
@@ -1212,7 +1068,7 @@ void Application::command_equip(GameObject*& unit, Object_part* part, GameObject
 	}
 	unit->update_interaction();
 	unit->event_update(VoidEventArgs());
-	if (m_GUI->MapViewer->m_player->m_object == unit) { update_action_panel(); }
+	//???? if (m_GUI->MapViewer->m_player->m_object == unit) { update_action_panel(); }
 }
 
 void Application::command_unequip(GameObject*& unit, Object_part* part, GameObject*& object)
@@ -1236,7 +1092,7 @@ void Application::command_unequip(GameObject*& unit, Object_part* part, GameObje
 	}
 	unit->update_interaction();
 	unit->event_update(VoidEventArgs());
-	if (m_GUI->MapViewer->m_player->m_object == unit) { update_action_panel(); }
+	////???? if (m_GUI->MapViewer->m_player->m_object == unit) { update_action_panel(); }
 }
 
 void Application::console(std::string text)

@@ -135,7 +135,6 @@ public:
 	void render();
 	void update();
 	void update_after_load();
-	void update_action_panel();
 
 	void new_game();
 	void load_game();
@@ -161,8 +160,6 @@ public:
 	
 	void PlaySound1();
 
-	void get_action_predicat(Object_interaction* object);
-
 private:
 	std::shared_ptr<std::thread> m_game_thread;
 	std::shared_ptr<std::thread> m_animation_thread;
@@ -175,7 +172,6 @@ private:
 	void on_turn();
 
 	bool check_action_completion(GameObject*& object);
-	void Application::add_action_from_part(Object_interaction* object);
 
 	common_action_t m_common_action;
 };

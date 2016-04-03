@@ -127,11 +127,9 @@ public:
 
 };
 
-class GameObject : public  Object_interaction
+class GameObject : public  Object_interaction, public GUI_connectable_i
 {
 public:
-
-	Event<VoidEventArgs> event_update;
 
 	std::string m_name;
 	object_direction_e m_direction;
@@ -173,9 +171,17 @@ public:
 	virtual void reset_serialization_index();
 	virtual void save();
 	virtual void load();
+
+	virtual void get_actions_list(std::list<Action_helper_t>& value);
+
+private:
+	static std::list<Action_helper_t>* m_actions_list;
+	static common_action_t m_common_actions;
+	void add_action_from_part(Object_interaction* object);
+	void get_action_predicat(Object_interaction* object);
 };
 
-class Player
+class Player: public GUI_connectable_i
 {
 public:
 
@@ -183,7 +189,9 @@ public:
 	GameObject* m_object;
 	GameMap* m_map;
 	Player(GameObject* object, GameMap* map);
+	void on_item_update();
 
+	virtual void get_actions_list(std::list<Action_helper_t>& value);
 };
 
 class Inventory_cell: public Game_object_owner

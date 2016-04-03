@@ -29,3 +29,26 @@ void GUI_ActionPanel::add_item_control(GUI_Object* object)
 	}
 	GUI_Layer::add(object);
 }
+
+void GUI_ActionPanel::bind(GUI_connectable_i* object)
+{
+	m_object = object;
+	update_binding();
+	object->event_update += std::bind(&GUI_ActionPanel::update_binding, this);
+}
+
+void GUI_ActionPanel::update_binding()
+{
+	while (!m_items.empty())
+	{
+		remove(m_items.front());
+	}
+	std::list<Action_helper_t> info;
+	m_object->get_actions_list(info);
+	for (auto item = info.begin(); item != info.end(); ++item)
+	{
+		GUI_ActionButton* ActionButton = new GUI_ActionButton();
+		ActionButton->m_value = (*item);
+		add_item_control(ActionButton);
+	}
+}

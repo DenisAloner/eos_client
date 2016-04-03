@@ -52,4 +52,12 @@ private:
 	std::map<int, EventSignature> functions;
 };
 
+class GUI_connectable_i
+{
+public:
+
+	Event<VoidEventArgs> event_update;
+	virtual void get_actions_list(std::list<Action_helper_t>& value) = 0;
+};
+
 #endif //EVENT_H
