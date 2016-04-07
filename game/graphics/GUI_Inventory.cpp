@@ -49,7 +49,7 @@ void GUI_body_cell::render(GraphicalController* Graph, int px, int py)
 	{
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_BLEND);
-		glBindTexture(GL_TEXTURE_2D, m_item->m_item->m_active_state->m_icon);
+		glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_icons[m_item->m_item->m_active_state->m_icon]);
 		Graph->draw_sprite(px, py, px, py + m_size.h, px + 64, py + m_size.h, px + 64, py);
 	}
 	glEnable(GL_TEXTURE_2D);

@@ -49,10 +49,13 @@ public:
 		single_animate,
 		rotating,
 		rotating8,
+		icon
+
 	};
 
 	std::list<frectangle_t> m_scissors;
 	std::vector<TileManager*> m_tile_managers;
+	std::vector<GLuint> m_icons;
 	std::map<std::string, command_e> m_commands;
 
 	GLuint m_FBO;

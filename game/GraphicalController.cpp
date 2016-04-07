@@ -510,6 +510,11 @@ void GraphicalController::parser(const std::string& command)
 		m_tile_managers.push_back(m_tile_manager);
 		break;
 	}
+	case command_e::icon:
+	{
+		m_icons.push_back(load_texture(FileSystem::instance().m_resource_path + "Tiles\\" + arg[0] + ".bmp"));
+		break;
+	}
 	}
 }
 
@@ -519,6 +524,7 @@ void GraphicalController::load_configuration()
 	m_commands["single_animate"] = command_e::single_animate;
 	m_commands["rotating"] = command_e::rotating;
 	m_commands["rotating8"] = command_e::rotating8;
+	m_commands["icon"] = command_e::icon;
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Tiles.txt", buffer);
 	std::string config(buffer);

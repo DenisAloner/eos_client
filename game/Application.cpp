@@ -124,7 +124,7 @@ void Application::render()
 		if (m_clipboard.m_item)
 		{
 			glColor4d(1.0, 1.0, 1.0, 1.0);
-			glBindTexture(GL_TEXTURE_2D, m_clipboard.m_item->m_active_state->m_icon);
+			glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_icons[m_clipboard.m_item->m_active_state->m_icon]);
 			m_graph->draw_sprite(mouse.x - 32, mouse.y - 32, mouse.x - 32, mouse.y + 32, mouse.x + 32, mouse.y + 32, mouse.x + 32, mouse.y - 32);
 			glDisable(GL_TEXTURE_2D);
 			glDisable(GL_BLEND);

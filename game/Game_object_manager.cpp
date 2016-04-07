@@ -169,7 +169,7 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	case command_e::icon:
 	{
-		m_object->m_active_state->m_icon = Application::instance().m_graph->load_texture(FileSystem::instance().m_resource_path + "Tiles\\" + arg[0] + ".bmp");
+		m_object->m_active_state->m_icon = std::stoul(arg[0]);
 		break;
 	}
 	case command_e::tile_manager:

@@ -95,7 +95,7 @@ public:
 	object_state_e m_state;
 	int m_layer;
 	game_object_size_t m_size;
-	GLuint m_icon;
+	unsigned int m_icon;
 	float m_weight;
 	light_t* m_light;
 	optical_properties_t* m_optical;
@@ -189,7 +189,6 @@ public:
 	GameObject* m_object;
 	GameMap* m_map;
 	Player(GameObject* object, GameMap* map);
-	void on_item_update();
 
 	virtual void get_actions_list(std::list<Action_helper_t>& value);
 };

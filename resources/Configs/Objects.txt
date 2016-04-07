@@ -143,7 +143,7 @@ layer 2
 object blue potion
 state alive
 size 1,1,1
-icon blue_potion_icon
+icon 1
 tile_manager 21
 feature_list tag,tag
 tag seethrough_able
@@ -160,7 +160,7 @@ add_slot use
 object ring
 state equip,hand
 size 1,1,0
-icon ring_icon
+icon 2
 tile_manager 25
 feature_list tag,tag
 tag pick_able
@@ -173,7 +173,7 @@ add_slot vision
 object dagger
 state equip,hand
 size 1,1,0
-icon dagger_icon
+icon 3
 tile_manager 1
 feature_list tag,tag
 tag pick_able

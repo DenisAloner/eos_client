@@ -112,7 +112,7 @@ Object_state::Object_state()
 	m_layer = 1;
 	m_light = nullptr;
 	m_tile_manager = nullptr;
-	m_icon = Application::instance().m_graph->m_no_image;
+	m_icon = Application::instance().m_graph->m_icons[0];
 	m_ai = nullptr;
 	m_optical = nullptr;
 	m_visibility = nullptr;
@@ -219,7 +219,7 @@ void Object_state::save()
 	Attribute_map::save();
 	fwrite(&m_state, sizeof(object_state_e), 1, file);
 	fwrite(&m_layer, sizeof(int), 1, file);
-	//????	fwrite(&m_layer, sizeof(int), 1, file);
+	fwrite(&m_icon, sizeof(unsigned int), 1, file);
 	fwrite(&m_size, sizeof(game_object_size_t), 1, file);
 	fwrite(&m_weight, sizeof(float), 1, file);
 	FileSystem::instance().serialize_pointer(m_light, type_e::light_t, file);
@@ -241,6 +241,7 @@ void Object_state::load()
 	Attribute_map::load();
 	fread(&m_state, sizeof(object_state_e), 1, file);
 	fread(&m_layer, sizeof(int), 1, file);
+	fread(&m_icon, sizeof(unsigned int), 1, file);
 	fread(&m_size, sizeof(game_object_size_t), 1, file);
 	fread(&m_weight, sizeof(float), 1, file);
 	m_light = static_cast<light_t*>(FileSystem::instance().deserialize_pointer(file));
@@ -793,12 +794,8 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 	m_actions.push_front(Application::instance().m_actions[action_e::save]);
 	m_actions.push_front(Application::instance().m_actions[action_e::load]);
 
-	m_object->event_update += std::bind(&Player::on_item_update, this);
-}
-
-void Player::on_item_update()
-{
-	event_update(VoidEventArgs());
+	m_object->event_update += std::bind(&Event<VoidEventArgs>::operator(),&event_update, std::placeholders::_1);
+	
 }
 
 void Player::get_actions_list(std::list<Action_helper_t>& value)
