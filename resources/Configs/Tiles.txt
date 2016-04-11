@@ -2,6 +2,7 @@ icon no_tile
 icon blue_potion_icon
 icon ring_icon
 icon dagger_icon
+icon bow_icon
 single snake
 single dagger
 single iso_wall

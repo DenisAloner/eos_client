@@ -292,7 +292,7 @@ void GraphicalController::center_text(int x, int y, std::string Text, int sizex,
 		width += fs.size.w;
 	}
 	int cx = x - (width / 2);
-	int cy = y;
+	int cy = y-((m_face->size->metrics.ascender- m_face->size->metrics.descender) >> 7);
 	output_text(cx, cy, Text, sizex, sizey);
 }
 

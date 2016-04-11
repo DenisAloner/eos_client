@@ -191,3 +191,25 @@ mem_slot_copyist health
 mem_slot_time 5
 mem_slot_addon buff
 add_slot damage
+
+object bow
+state equip,hand
+size 3,3,0
+icon 4
+tile_manager 23
+feature_list tag,tag
+tag pick_able
+tag seethrough_able
+feature_list parameter,weapon_damage,10,25
+feature_list parameter,weapon_range,7,10
+feature_list parameter,strength_bonus,25,100
+feature_list parameter,demand_weapon_skill,15000,100000
+feature_list generic,action
+add_action shoot
+feature_list generic,damage
+mem_effect value,-6
+mem_slot_prefix poison_damage
+mem_slot_copyist health
+mem_slot_time 5
+mem_slot_addon buff
+add_slot damage

@@ -9,10 +9,10 @@ GUI_Header::GUI_Header(int x, int y, int width, int height, std::string text) :G
 	m_size.h = m_text->m_size.h + m_text->m_position.y + 2;
 	GUI_Layer::add(m_text);
 	GUI_ItemButton* m_button = new GUI_ItemButton();
-	m_button->m_position.x = m_size.w - (m_size.h - 4) - 2;
-	m_button->m_position.y = 2;
-	m_button->m_size.w = m_size.h - 4;
-	m_button->m_size.h = m_size.h - 4;
+	m_button->m_position.x = m_size.w - (m_size.h - 8) - 4;
+	m_button->m_position.y = 4;
+	m_button->m_size.w = m_size.h - 8;
+	m_button->m_size.h = m_size.h - 8;
 	GUI_Layer::add_front(m_button);
 	m_button->mouse_click += std::bind(&GUI_Header::on_close_button_click, this);
 }
@@ -170,8 +170,10 @@ GUI_description_window::GUI_description_window(int x, int y, int width, int heig
 {
 	m_textbox = new GUI_TextBox();
 	m_textbox->m_position.x = 2;
-	m_textbox->m_position.y = 25;
-	m_textbox->resize(m_size.w - 4, m_size.h - 25 - 2);
+	m_textbox->m_position.y = 2;
+	//m_item->resize(m_size.w - 4, m_size.h - 25 - 2);
+	add(m_textbox);
+	m_textbox->resize(m_size.w - 4, m_size.h - m_textbox->m_position.y - 2);
 	GUI_Layer::add(m_textbox);
 	update_info();
 	object->event_update += std::bind(&GUI_description_window::update_info, this);
@@ -203,9 +205,9 @@ GUI_body_window::GUI_body_window(int x, int y, int width, int height, std::strin
 {
 	m_item = new GUI_Body(m_object->m_active_state);
 	m_item->m_position.x = 2;
-	m_item->m_position.y = m_size.h - m_item->m_size.h - 2;
+	m_item->m_position.y = 2;
 	//m_item->resize(m_size.w - 4, m_size.h - 25 - 2);
-	GUI_Layer::add(m_item);
+	add(m_item);
 	update_info();
 	object->event_update += std::bind(&GUI_body_window::update_info, this);
 }
