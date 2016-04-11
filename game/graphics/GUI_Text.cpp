@@ -28,5 +28,5 @@ void GUI_Text::set(std::string t)
 {
 	m_text = t;
 	m_size.w = m_text.length() * m_format->m_symbol_size.w;
-	m_size.h = m_format->m_symbol_size.h;
+	m_size.h = (Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender) >> 6;
 }

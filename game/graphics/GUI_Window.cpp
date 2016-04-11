@@ -6,6 +6,7 @@ GUI_Header::GUI_Header(int x, int y, int width, int height, std::string text) :G
 	GUI_Text* m_text = new GUI_Text(text);
 	m_text->m_position.x = 2;
 	m_text->m_position.y = 2;
+	m_size.h = m_text->m_size.h + m_text->m_position.y + 2;
 	GUI_Layer::add(m_text);
 	GUI_ItemButton* m_button = new GUI_ItemButton();
 	m_button->m_position.x = m_size.w - (m_size.h - 4) - 2;
@@ -39,7 +40,7 @@ void GUI_Header::resize(int width, int height)
 GUI_Window::GUI_Window(int _x, int _y, int _width, int _height, std::string _Name) :GUI_Container(_x, _y, _width, _height)
 {
 	m_is_moving = false;
-	m_header = new GUI_Header(2, 2, m_size.w- 4, 21, _Name);
+	m_header = new GUI_Header(2, 2, m_size.w - 4, 21, _Name);
 	m_header->close += std::bind(&GUI_Window::on_header_close, this);
 	GUI_Layer::add(m_header);
 	start_moving += std::bind(&GUI_Window::on_start_moving, this, std::placeholders::_1);

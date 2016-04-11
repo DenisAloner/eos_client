@@ -45,7 +45,7 @@ void GUI_TextBox::add_item_control(GUI_Object* object)
 	if (!m_items.empty())
 	{
 		GUI_Text* LastElement = static_cast<GUI_Text*>(m_items.back());
-		object->m_position.x = 0;
+		object->m_position.x = 2;
 		object->m_position.y = LastElement->m_position.y + LastElement->m_size.h;
 		if (object->m_position.y + object->m_size.h>m_size.h)
 		{
@@ -54,7 +54,7 @@ void GUI_TextBox::add_item_control(GUI_Object* object)
 	}
 	else
 	{
-		object->m_position.x = 0;
+		object->m_position.x = 2;
 		object->m_position.y = 0;
 		m_scroll.y = 0;
 	}

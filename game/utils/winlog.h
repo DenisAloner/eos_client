@@ -4,7 +4,6 @@
 #include "log.h"
 #include <iomanip>
 
-
 class WinDebugSink : public google::LogSink
 {
 	virtual void send(google::LogSeverity severity, const char* full_filename,
@@ -35,5 +34,7 @@ class WinDebugSink : public google::LogSink
 		OutputDebugString(msg.c_str());
 	}
 };
+
+
 
 #endif //WINLOG_HPP

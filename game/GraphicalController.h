@@ -11,10 +11,18 @@
 #include "FileSystem.h"
 #include <map>
 
+#include <ft2build.h>
+#include <freetype/freetype.h>
+#include <freetype/ftglyph.h>
+#include <freetype/ftoutln.h>
+#include <freetype/fttrigon.h>
+
 #define WIDTH   640
 #define HEIGHT  480
 
 class TileManager;
+
+const int font_size_c = 26;
 
 class GraphicalController
 {
@@ -37,11 +45,18 @@ public:
 	GLuint m_close;
 	GLuint m_preselect;
 	GLuint m_select;
-	GLuint m_font;
 	GLuint m_logo;
 	GLuint m_no_image;
 	GLuint m_visible;
 	GLuint m_blur;
+
+	FT_Library    m_library;
+	FT_Error      m_error;
+	FT_Face       m_face;
+	FT_GlyphSlot  m_slot;
+
+	font_symbol_t m_font_symbols[256];
+	FT_ULong Unicode_to_ASCII[256];
 
 	enum class command_e
 	{
@@ -84,6 +99,10 @@ public:
 	GLint create_empty_texture(dimension_t size);
 	void load_configuration();
 	void parser(const std::string& command);
+	void Load_font(std::string font_filename);
+	int get_width(std::string text);
+
+	position_t center_aling_to_point(int x, int y,std::string text);
 
 private:
 	bool CompileSuccessful(int obj);

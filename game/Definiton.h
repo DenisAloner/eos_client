@@ -490,4 +490,13 @@ struct Action_helper_t
 	Action_helper_t(Action* action = nullptr, Parameter* parameter = nullptr) :action(action), parameter(parameter) {};
 };
 
+struct font_symbol_t
+{
+	GLuint id;
+	dimension_t size;
+	dimension_t bearing;
+
+	font_symbol_t(GLuint id = 0, dimension_t size = dimension_t()) :id(id), size(size) {};
+};
+
 #endif //DEFINITION_H

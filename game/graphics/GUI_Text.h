@@ -3,7 +3,7 @@
 
 #include "GUI_Object.h"
 #include <string>
-
+#include "Application.h"
 
 class GUI_TextFormat
 {
@@ -30,7 +30,6 @@ public:
 	virtual void render(GraphicalController* Graph, int px, int py);
 	void set(std::string t);
 
-private:
 	std::string m_text;
 };
 

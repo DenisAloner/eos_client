@@ -7,6 +7,7 @@ GUI_Item::GUI_Item(int _x, int _y, int _width, int _height, std::string text, ta
 	GUI_Text* m_text = new GUI_Text(text);
 	m_text->m_position.x = 2;
 	m_text->m_position.y = 2;
+	m_size.h = m_text->m_size.h + m_text->m_position.y + 2;
 	GUI_Layer::add(m_text);
 	GUI_ItemButton* m_button = new GUI_ItemButton();
 	m_button->m_position.x = m_size.w - (m_size.h - 4) - 2;
@@ -30,7 +31,7 @@ void GUI_Item::on_close_button_click()
 void GUI_Item::resize(int _width, int _height)
 {
 	m_size.w = _width;
-	m_size.h = _height;
+	//m_size.h = m_text->m_size.h + m_text->m_position.y + 2;
 	m_items.front()->m_position.x = m_size.w - (m_size.h - 4) - 2;
 	m_items.front()->m_position.y = 2;
 	m_items.front()->m_size.w = m_size.h - 4;

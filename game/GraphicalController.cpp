@@ -5,6 +5,21 @@
 
 GraphicalController::GraphicalController()
 {
+	for (int i = 0; i < 192; ++i)
+	{
+		Unicode_to_ASCII[i] = i;
+	}
+	for (int i = 192; i < 224; ++i)
+	{
+		Unicode_to_ASCII[i] = i - 192 + 1040;
+	}
+	for (int i = 224; i < 256; ++i)
+	{
+		Unicode_to_ASCII[i] = i - 224 + 1072;
+	}
+
+	Load_font(FileSystem::instance().m_resource_path + "Fonts\\9746.ttf");
+
 	try
 	{
 		m_actions[0] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_0.bmp");
@@ -38,7 +53,6 @@ GraphicalController::GraphicalController()
 		m_close = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Close.bmp");
 		m_preselect = load_texture(FileSystem::instance().m_resource_path + "Tiles\\preselection.bmp");
 		m_select = load_texture(FileSystem::instance().m_resource_path + "Tiles\\iso_select.bmp");
-		m_font = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Font.bmp");
 		m_cursor = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Cursor.bmp");
 		m_no_image = load_texture(FileSystem::instance().m_resource_path + "Tiles\\no_tile.bmp");
 		m_visible = load_texture(FileSystem::instance().m_resource_path + "Tiles\\visible.bmp");
@@ -53,6 +67,51 @@ GraphicalController::GraphicalController()
 
 	m_scissors.push_front(frectangle_t(0.0f, 0.0f, 1024.0f, 1024.0f));
 	glGenFramebuffers(1, &m_FBO);
+}
+
+void GraphicalController::Load_font(std::string font_filename)
+{
+	m_error = FT_Init_FreeType(&m_library);
+	if (m_error != 0)
+	{
+		LOG(FATAL) << "Ошибка инициализации FreeType";
+	}
+
+	m_error = FT_New_Face(m_library, font_filename.c_str(), 0, &m_face);
+	if (m_error != 0)
+	{
+		LOG(FATAL) << "Ошибка инициализации шрифта";
+	}
+
+	m_error = FT_Set_Pixel_Sizes(m_face, font_size_c, 0);
+	m_slot = m_face->glyph;
+	for (int i = 0; i < 256; ++i)
+	{
+		m_error = FT_Load_Char(m_face, Unicode_to_ASCII[i], FT_LOAD_RENDER);
+
+		if (m_error != 0)
+		{
+			LOG(INFO) << "Ошибка загрузки символа";
+		}
+
+		GLuint texture;
+		glGenTextures(1, &texture);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, m_slot->bitmap.width, m_slot->bitmap.rows, 0, GL_ALPHA, GL_UNSIGNED_BYTE, m_slot->bitmap.buffer);
+		m_font_symbols[i].id = texture;
+		m_font_symbols[i].size.w = m_slot->bitmap.width;
+		m_font_symbols[i].size.h = m_slot->bitmap.rows;
+		m_font_symbols[i].bearing.w = m_slot->bitmap_left;
+		m_font_symbols[i].bearing.h = m_font_symbols[i].size.h - m_slot->bitmap_top;
+	}
+	m_font_symbols[32].size.w = m_font_symbols[97].size.w;
+	m_font_symbols[32].size.h = m_font_symbols[97].size.h;
+	m_font_symbols[32].bearing.w = m_font_symbols[97].bearing.w;
+	m_font_symbols[32].bearing.h = m_font_symbols[97].bearing.h;
 }
 
 void GraphicalController::draw_sprite(double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3)
@@ -128,13 +187,6 @@ void GraphicalController::draw_tile_FBO(double tx1, double ty1, double tx2, doub
 	glEnd();
 }
 
-void GraphicalController::center_text(int x,int y,std::string Text,int sizex,int sizey)
-{
-	int cx=x-(Text.length())*(sizex+1)/2;
-	int cy=y-sizey/2;
-	output_text(cx,cy,Text,sizex,sizey);
-}
-
 void GraphicalController::set_VSync(bool sync)
 {
 	// Function pointer for the wgl extention function we need to enable/disable
@@ -157,45 +209,107 @@ void GraphicalController::set_VSync(bool sync)
 	}
 }
 
+//void GraphicalController::output_text(int x, int y, std::string& Text, int sizex, int sizey)
+//{
+//	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//	glUseProgram(0);
+//	glActiveTexture(GL_TEXTURE0);
+//	glBindTexture(GL_TEXTURE_2D, m_font);
+//	int x0, y0, x1, y1, x2, y2, x3, y3;
+//	double xt0, yt0, xt1, yt1, xt2, yt2, xt3, yt3;
+//	unsigned char  i, j;
+//	unsigned char ASCII;
+//	for (int k = 0; k<Text.length(); k++)
+//	{
+//		ASCII = (unsigned char)Text[k];
+//		j = ASCII / 16;
+//		i = ASCII - j * 16;
+//		j = 15 - j;
+//		x0 = x + k*(sizex + 1);
+//		y0 = y;
+//		x1 = x + k*(sizex + 1);
+//		y1 = y + sizey;
+//		x2 = x + sizex + k*(sizex + 1);
+//		y2 = y + sizey;
+//		x3 = x + sizex + k*(sizex + 1);
+//		y3 = y;
+//		xt0 = i*0.0625;
+//		yt0 = (j + 1)*0.0625;
+//		xt1 = i*0.0625;
+//		yt1 = j*0.0625;
+//		xt2 = (i + 1)*0.0625;
+//		yt2 = j*0.0625;
+//		xt3 = (i + 1)*0.0625;
+//		yt3 = (j + 1)*0.0625;
+//		glBegin(GL_QUADS);
+//		glTexCoord2d(xt0, yt0); glVertex2d(x0, y0);
+//		glTexCoord2d(xt1, yt1); glVertex2d(x1, y1);
+//		glTexCoord2d(xt2, yt2); glVertex2d(x2, y2);
+//		glTexCoord2d(xt3, yt3); glVertex2d(x3, y3);
+//		glEnd();
+//	}
+//}
+
 void GraphicalController::output_text(int x, int y, std::string& Text, int sizex, int sizey)
 {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glUseProgram(0);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_font);
+	y = y + (m_face->size->metrics.ascender >> 6);
 	int x0, y0, x1, y1, x2, y2, x3, y3;
-	double xt0, yt0, xt1, yt1, xt2, yt2, xt3, yt3;
-	unsigned char  i, j;
-	unsigned char ASCII;
+	int shift_x = 0;
+	for (int k = 0; k<Text.length(); k++)
+	{ 
+		font_symbol_t& fs = m_font_symbols[(unsigned char)Text[k]];
+		if ((unsigned char)Text[k] != 32)
+		{
+			glBindTexture(GL_TEXTURE_2D, fs.id);
+			x0 = x + shift_x;
+			y0 = y + fs.bearing.h;
+			x1 = x0;
+			y1 = y - fs.size.h + fs.bearing.h + 1;
+			x2 = x + shift_x + fs.size.w - 1;
+			y2 = y1;
+			x3 = x2;
+			y3 = y0;
+			glBegin(GL_QUADS);
+			glTexCoord2d(0, 1); glVertex2d(x0, y0);
+			glTexCoord2d(0, 0); glVertex2d(x1, y1);
+			glTexCoord2d(1, 0); glVertex2d(x2, y2);
+			glTexCoord2d(1, 1); glVertex2d(x3, y3);
+			glEnd();
+		}
+		shift_x += fs.size.w;
+	}
+}
+
+void GraphicalController::center_text(int x, int y, std::string Text, int sizex, int sizey)
+{
+	int width = 0;
 	for (int k = 0; k<Text.length(); k++)
 	{
-		ASCII = (unsigned char)Text[k];
-		j = ASCII / 16;
-		i = ASCII - j * 16;
-		j = 15 - j;
-		x0 = x + k*(sizex + 1);
-		y0 = y;
-		x1 = x + k*(sizex + 1);
-		y1 = y + sizey;
-		x2 = x + sizex + k*(sizex + 1);
-		y2 = y + sizey;
-		x3 = x + sizex + k*(sizex + 1);
-		y3 = y;
-		xt0 = i*0.0625;
-		yt0 = (j + 1)*0.0625;
-		xt1 = i*0.0625;
-		yt1 = j*0.0625;
-		xt2 = (i + 1)*0.0625;
-		yt2 = j*0.0625;
-		xt3 = (i + 1)*0.0625;
-		yt3 = (j + 1)*0.0625;
-		glBegin(GL_QUADS);
-		glTexCoord2d(xt0, yt0); glVertex2d(x0, y0);
-		glTexCoord2d(xt1, yt1); glVertex2d(x1, y1);
-		glTexCoord2d(xt2, yt2); glVertex2d(x2, y2);
-		glTexCoord2d(xt3, yt3); glVertex2d(x3, y3);
-		glEnd();
+		font_symbol_t& fs = m_font_symbols[(unsigned char)Text[k]];
+		width += fs.size.w;
 	}
+	int cx = x - (width / 2);
+	int cy = y;
+	output_text(cx, cy, Text, sizex, sizey);
+}
+
+int GraphicalController::get_width(std::string text)
+{
+	int width = 0;
+	for (int k = 0; k<text.length(); k++)
+	{
+		font_symbol_t& fs = m_font_symbols[(unsigned char)text[k]];
+		width += fs.size.w;
+	}
+	return width;
+}
+
+position_t GraphicalController::center_aling_to_point(int x, int y, std::string text)
+{
+	return position_t(x - (get_width(text) / 2), y);
 }
 
 bool GraphicalController::add_scissor(const frectangle_t& rect)
@@ -353,7 +467,7 @@ GLuint GraphicalController::load_texture(const std::string& path)
 	bytearray buff;
 	if (!FileSystem::instance().load_from_file(path, buff))
 	{
-		MessageBox(NULL, path.c_str(), "", MB_OK);
+		//MessageBox(NULL, path.c_str(), "", MB_OK);
 		throw std::logic_error("Не удалось загрузить файл `" + path + "`");
 	}
 	header = reinterpret_cast<BITMAPFILEHEADER*>(buff.get());

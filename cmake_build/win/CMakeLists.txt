@@ -18,7 +18,7 @@ set(SOURCE_FILES
 	${SRC_GAME}
 	${SRC_GAME_GRAPHICS}
 	${SRC_GAME_UTILS}
-        ${SRC_GAME_IMPACT}
+    ${SRC_GAME_IMPACT}
 )
 
 source_group("platform" FILES ${SRC_PLATFORM})
@@ -56,13 +56,18 @@ find_library(GLOG_LIB libglog
 	DOC "Logging library"
 )
 
+find_library(FREETYPE_LIB FreeType
+	PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}
+	DOC "FreeType libraries"
+)
+
 
 include_directories(
 	${PROJECT_DIR}
 	${PROJECT_DIR}/game
 	${PROJECT_DIR}/game/graphics
 	${PROJECT_DIR}/game/utils
-        ${PROJECT_DIR}/game/impact
+    ${PROJECT_DIR}/game/impact
 	${PROJECT_DIR}/include
 	${PROJECT_DIR}/lib/glog/src/windows
 )
@@ -73,6 +78,7 @@ set(EXT_LIBRARIES
 	${SDL_LIB}
 	${SDLMIXER_LIB}
 	${GLOG_LIB}
+	${FREETYPE_LIB}
 )
 
 include(${PROJECT_DIR}/cmake_build/common/game.cmake)

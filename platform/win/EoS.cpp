@@ -48,7 +48,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	// create main window
 	const dimension_t win_size(1024, 1024);
 	hWnd = CreateWindow(
-		"Explorers of Saarum", "Explorers of Saarum", 
+		("Explorers of Saarum"), "Explorers of Saarum", 
 		WS_CAPTION | WS_POPUPWINDOW | WS_VISIBLE,
 		0, 0, 1024, 1024,
 		NULL, NULL, hInstance, NULL);

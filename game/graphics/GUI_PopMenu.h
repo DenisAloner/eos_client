@@ -7,7 +7,6 @@
 #include "GameObject.h"
 #include "Application.h"
 
-
 class GameObject;
 class Application;
 
@@ -27,7 +26,7 @@ public:
 
 		GUI_PopMenu* m_owner;
 
-		Item(void){ m_size.h = 18; }
+		Item(void){ m_size.h = (Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender) >> 6; }
 		~Item(void);
 
 		virtual void on_mouse_click(MouseEventArgs const& e)
@@ -86,20 +85,19 @@ public:
 		}
 		GUI_Layer::add(object);
 		std::size_t maxlen = 0;
+		std::size_t height = 0;
 		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); Current++)
 		{
 			object = (GUI_PopMenu::Item*)(*Current);
-			if (object->m_text.length() > maxlen)
-			{
-				maxlen = object->m_text.length();
-			}
+			maxlen = max(Application::instance().m_graph->get_width(object->m_text), maxlen);
 		}
-		resize(maxlen * 9 + 8, m_items.size() * 18);
+		resize(maxlen + 8, m_items.size() * ((Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender) >> 6));
 		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); Current++)
 		{
 			(*Current)->m_size.w = m_size.w - 1;
 		}
-	}
+	};
+
 	virtual void on_lose_focus(GUI_Object* sender){ destroy(this); }
 	virtual void on_mouse_move(MouseEventArgs const& e)
 	{
@@ -111,7 +109,7 @@ public:
 				return;
 			}
 		}
-	}
+	};
 
 	virtual void on_item_click(Item* sender){};
 };
