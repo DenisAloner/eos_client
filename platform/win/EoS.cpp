@@ -45,19 +45,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wc.lpszClassName = "Explorers of Saarum";
 	RegisterClass(&wc);
 	
+	const dimension_t window_size(1024, 1024);
+
+	rectangle_t window_rect((GetSystemMetrics(SM_CXFULLSCREEN)-window_size.w)/2, (GetSystemMetrics(SM_CYFULLSCREEN) - window_size.w) / 2,window_size);
+
 	// create main window
-	const dimension_t win_size(1024, 1024);
+	
 	hWnd = CreateWindow(
 		("Explorers of Saarum"), "Explorers of Saarum", 
 		WS_CAPTION | WS_POPUPWINDOW | WS_VISIBLE,
-		0, 0, 1024, 1024,
+		window_rect.x, window_rect.y, window_rect.right(), window_rect.bottom(),
 		NULL, NULL, hInstance, NULL);
 
 	// enable OpenGL for the window
-	SetClientRect(hWnd, win_size.w, win_size.h);
+	SetClientRect(hWnd, window_size.w, window_size.h);
 	EnableGraphics(hWnd, hDC);
 	//Map.GenerateLevel();
-	Renderer renderer(hDC, win_size);
+	Renderer renderer(hDC, window_size);
 	renderer.start();
 
 	// message handling loop in main thread

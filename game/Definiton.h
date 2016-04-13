@@ -53,6 +53,16 @@ struct rectangle_t : public position_t, public dimension_t
 	rectangle_t(int x, int y, int w, int h) : position_t(x, y), dimension_t(w, h) {}
 	rectangle_t(int x, int y, const dimension_t &dimension) : position_t(x, y), dimension_t(dimension) {}
 	rectangle_t() : position_t(), dimension_t() {}
+
+	inline int right()
+	{
+		return x + w;
+	}
+
+	inline int bottom()
+	{
+		return y + h;
+	}
 };
 
 struct fposition_t
