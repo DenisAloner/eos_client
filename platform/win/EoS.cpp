@@ -45,23 +45,28 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wc.lpszClassName = "Explorers of Saarum";
 	RegisterClass(&wc);
 	
-	const dimension_t window_size(1024, 1024);
 
-	rectangle_t window_rect((GetSystemMetrics(SM_CXFULLSCREEN)-window_size.w)/2, (GetSystemMetrics(SM_CYFULLSCREEN) - window_size.w) / 2,window_size);
-
-	// create main window
+	RECT work_area;
+	// Get the current work area
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &work_area, 0);
+	const dimension_t window_size(work_area.right, work_area.bottom);
+	rectangle_t window_rect(work_area.left, work_area.top, window_size);
 	
+	//LOG(INFO) << "Workarea: ["<<std::to_string(workarea.left)<<"," << std::to_string(workarea.top) << "," << std::to_string(workarea.right) << "," << std::to_string(workarea.bottom) << "]";
+	
+	// create main window
 	hWnd = CreateWindow(
 		("Explorers of Saarum"), "Explorers of Saarum", 
 		WS_CAPTION | WS_POPUPWINDOW | WS_VISIBLE,
 		window_rect.x, window_rect.y, window_rect.right(), window_rect.bottom(),
 		NULL, NULL, hInstance, NULL);
-
+	RECT client_rect_win;
+	GetClientRect(hWnd, &client_rect_win);
+	rectangle_t client_rect(0, 0, client_rect_win.right, client_rect_win.bottom);
 	// enable OpenGL for the window
-	SetClientRect(hWnd, window_size.w, window_size.h);
+	SetClientRect(hWnd, client_rect.right(), client_rect.bottom());
 	EnableGraphics(hWnd, hDC);
-	//Map.GenerateLevel();
-	Renderer renderer(hDC, window_size);
+	Renderer renderer(hDC, client_rect);
 	renderer.start();
 
 	// message handling loop in main thread

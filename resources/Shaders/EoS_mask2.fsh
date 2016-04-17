@@ -1,7 +1,7 @@
 uniform sampler2D Map1;
 uniform sampler2D Unit;
 uniform sampler2D Map2;
-const float TexStep = 1.0/1024.0;
+
 
 void main (void)
 {

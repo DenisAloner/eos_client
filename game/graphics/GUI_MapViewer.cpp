@@ -999,7 +999,7 @@ void mapviewer_object_rotate::render_on_cell(MapCell* c)
 	}
 }
 
-GUI_MapViewer::GUI_MapViewer(Application* app = nullptr)
+GUI_MapViewer::GUI_MapViewer(Application* app)
 {
 	m_tile_count_x = 90;
 	m_tile_count_y = 90;
@@ -1012,8 +1012,9 @@ GUI_MapViewer::GUI_MapViewer(Application* app = nullptr)
 	start_moving += std::bind(&GUI_MapViewer::on_start_moving, this, std::placeholders::_1);
 	move += std::bind(&GUI_MapViewer::on_move, this, std::placeholders::_1);
 	end_moving += std::bind(&GUI_MapViewer::on_end_moving, this, std::placeholders::_1);
-	m_shift.x = (1024 / 2) - 16;// (m_tile_count_x)* 32 * 0.5;
-	m_shift.y = (1024 / 2) - (m_tile_count_y)* 9 - 9;// 1024 * 0.5 - (m_tile_count_y + 6) * 18 * 0.5;
+	m_size = app->m_size;
+	m_shift.x = (m_size.w / 2) - 16;// (m_tile_count_x)* 32 * 0.5;
+	m_shift.y = (m_size.h / 2) - (m_tile_count_y)* 9 - 9;// 1024 * 0.5 - (m_tile_count_y + 6) * 18 * 0.5;
 }
 
 GUI_MapViewer::~GUI_MapViewer(void)
@@ -1226,7 +1227,6 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 								}
 							}
 						}
-
 						if (IsDraw)
 						{
 							object_size = (*Current)->m_active_state->m_tile_size;
@@ -1365,7 +1365,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 								glBindTexture(GL_TEXTURE_2D, Graph->m_empty_02);
 								Graph->set_uniform_sampler(Graph->m_mask_shader2, "Map2", 2);
 								glActiveTexture(GL_TEXTURE0);
-								Graph->draw_tile_FBO(x1 / 1024.0, (1024 - y1) / 1024.0, x3 / 1024.0, (1024 - y3) / 1024.0, x0, y0, x1, y1, x2, y2, x3, y3);
+								Graph->draw_tile_FBO(x1 /(float)m_size.w, (m_size.h - y1) / (float)m_size.h, x3 / (float)m_size.w, (m_size.h - y3) /(float) m_size.h, x0, y0, x1, y1, x2, y2, x3, y3);
 
 								glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
 								glUseProgram(Graph->m_mask_shader);
@@ -1376,7 +1376,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 								glBindTexture(GL_TEXTURE_2D, Sprite);
 								Graph->set_uniform_sampler(Graph->m_mask_shader, "Unit", 1);
 								glActiveTexture(GL_TEXTURE0);
-								Graph->draw_tile_FBO(x1 / 1024.0, (1024 - y1) / 1024.0, x3 / 1024.0, (1024 - y3) / 1024.0, x0, y0, x1, y1, x2, y2, x3, y3);
+								Graph->draw_tile_FBO(x1 / (float)m_size.w, (m_size.h - y1) / (float)m_size.h, x3 / (float)m_size.w, (m_size.h - y3) / (float)m_size.h, x0, y0, x1, y1, x2, y2, x3, y3);
 							}
 
 						}
@@ -1491,7 +1491,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	//Graph->blur_rect(0, 0, 1024 / 4, 1024 / 4);
 	//glBindTexture(GL_TEXTURE_2D, Graph->m_blur);
 	//glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 1024 - 1024 / 4, 1024 /4, 1024 /4);
-	Graph->draw_sprite(0, 0, 0, 1024, 1024, 1024, 1024, 0);
+	Graph->draw_sprite(0, 0, 0, m_size.h, m_size.w, m_size.h, m_size.w, 0);
 	glDisable(GL_TEXTURE_2D);
 }
 

@@ -1,9 +1,9 @@
 uniform sampler2D Map;
 
-const float blurSize = 1.0/1024.0;
-
 void main (void)
 {
+   ivec2 size = textureSize(Map,0);
+   float blurSize = 1.0/size[1];
    vec4 sum = vec4(0.0,0.0,0.0,1.0);   
    sum += texture2D(Map, vec2(gl_TexCoord[0].x, gl_TexCoord[0].y - 4.0*blurSize)) * 0.0162162162;
    sum += texture2D(Map, vec2(gl_TexCoord[0].x, gl_TexCoord[0].y - 3.0*blurSize)) * 0.0540540541;

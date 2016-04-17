@@ -30,17 +30,17 @@ void GUI_Header::resize(int width, int height)
 {
 	m_size.w = width;
 	m_size.h = height;
-	m_items.front()->m_position.x = m_size.w - (m_size.h - 4) - 2;
-	m_items.front()->m_position.y = 2;
-	m_items.front()->m_size.w = m_size.h - 4;
-	m_items.front()->m_size.h = m_size.h - 4;
+	m_items.front()->m_position.x = m_size.w - (m_size.h - 8) - 4;
+	m_items.front()->m_position.y = 4;
+	m_items.front()->m_size.w = m_size.h - 8;
+	m_items.front()->m_size.h = m_size.h - 8;
 
 }
 
 GUI_Window::GUI_Window(int _x, int _y, int _width, int _height, std::string _Name) :GUI_Container(_x, _y, _width, _height)
 {
 	m_is_moving = false;
-	m_header = new GUI_Header(2, 2, m_size.w - 4, 21, _Name);
+	m_header = new GUI_Header(2, 2, m_size.w - 4, 0, _Name);
 	m_header->close += std::bind(&GUI_Window::on_header_close, this);
 	GUI_Layer::add(m_header);
 	start_moving += std::bind(&GUI_Window::on_start_moving, this, std::placeholders::_1);
@@ -50,9 +50,14 @@ GUI_Window::GUI_Window(int _x, int _y, int _width, int _height, std::string _Nam
 	Application::instance().m_window_manager->add_front(this);
 }
 
+rectangle_t GUI_Window::client_rect()
+{
+	return rectangle_t(1, m_header->m_position.y + m_header->m_size.h + 1, m_size.w - 2, m_size.h - (m_header->m_position.y + m_header->m_size.h + 1));
+}
+
 void GUI_Window::add(GUI_Object* object)
 {
-	object->m_position = position_t(object->m_position.x, object->m_position.y + m_header->m_position.y + m_header->m_size.h);
+	object->m_position = position_t(object->m_position.x + 1, object->m_position.y + m_header->m_position.y + m_header->m_size.h + 1);
 	GUI_Layer::add(object);
 }
 

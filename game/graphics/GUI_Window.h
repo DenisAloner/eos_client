@@ -46,6 +46,7 @@ public:
 	virtual void resize(int _width, int _height);
 	virtual void on_mouse_wheel(MouseEventArgs const& e);
 	virtual void add(GUI_Object* object);
+	virtual rectangle_t client_rect();
 
 private:
 	GUI_Header* m_header;

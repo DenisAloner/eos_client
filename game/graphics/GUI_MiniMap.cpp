@@ -6,7 +6,8 @@ GUI_MiniMap::GUI_MiniMap(position_t position, dimension_t size, GUI_MapViewer* m
 {
 	m_position = position;
 	m_size = size;
-	m_cell_size = fdimension_t(static_cast<float>(1024) / static_cast<float>(m_map_viewer->m_map->m_size.w), static_cast<float>(1024) / static_cast<float>(m_map_viewer->m_map->m_size.h));
+	dimension_t cr = Application::instance().m_size;
+	m_cell_size = fdimension_t(static_cast<float>(cr.w) / static_cast<float>(m_map_viewer->m_map->m_size.w), static_cast<float>(cr.h) / static_cast<float>(m_map_viewer->m_map->m_size.h));
 	m_canvas_create = false;
 	m_map_viewer->m_map->update += std::bind(&GUI_MiniMap::on_update, this);
 }
@@ -25,7 +26,8 @@ void GUI_MiniMap::render_on_canvas()
 {
 	if (!m_canvas_create)
 	{
-		m_canvas = Application::instance().m_graph->create_empty_texture(dimension_t(1024, 1024));
+		dimension_t cr = Application::instance().m_size;
+		m_canvas = Application::instance().m_graph->create_empty_texture(dimension_t(cr.w, cr.h));
 		m_canvas_create = true;
 	};
 	double x0, y0, x1, y1, x2, y2, x3, y3;
@@ -106,7 +108,7 @@ void GUI_MiniMap::render_on_canvas()
 
 
 void GUI_MiniMap::render(GraphicalController* Graph, int px, int py)
-{
+{ 
 	if (m_canvas_create)
 	{
 		glEnable(GL_BLEND);
@@ -177,13 +179,15 @@ void GUI_FOV::render(GraphicalController* Graph, int px, int py)
 
 void GUI_FOV::render_on_canvas()
 {
+	dimension_t cr = Application::instance().m_size;
 	if (!m_canvas_create)
 	{
-		m_canvas = Application::instance().m_graph->create_empty_texture(dimension_t(1024, 1024));
+		
+		m_canvas = Application::instance().m_graph->create_empty_texture(dimension_t(cr.w, cr.h));
 		m_canvas_create = true;
 	};
 	m_radius = m_vision_list->m_max_radius;
-	m_cell_size = fdimension_t(static_cast<float>(1024) / static_cast<float>(m_fov->m_view.l + m_fov->m_view.r+1), static_cast<float>(1024) / static_cast<float>(m_fov->m_view.d + m_fov->m_view.u+1));
+	m_cell_size = fdimension_t(static_cast<float>(cr.w) / static_cast<float>(m_fov->m_view.l + m_fov->m_view.r + 1), static_cast<float>(cr.h) / static_cast<float>(m_fov->m_view.d + m_fov->m_view.u + 1));
 	double x0, y0, x1, y1, x2, y2, x3, y3;
 	glDisable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);

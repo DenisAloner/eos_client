@@ -151,12 +151,13 @@ void Application::render()
 	m_update_mutex.unlock();
 }
 
-void Application::initialize()
+void Application::initialize(dimension_t work_area_size)
 {
+	m_size = work_area_size;
 	music = NULL;
 	m_game_turn = 1;
 	m_ready = false;
-	m_graph = new GraphicalController();
+	m_graph = new GraphicalController(m_size);
 	m_mouse = new MouseController();
 	command_set_cursor(m_graph->m_cursor);
 	command_set_cursor_visibility(true);
@@ -197,13 +198,13 @@ void Application::initialize()
 	m_game_object_manager->init();
 	LOG(INFO) << "Менеджер игровых объектов успешно инициализирован";
 
-	m_GUI = new ApplicationGUI(0, 0, 1024, 1024);
-	m_window_manager = new GUI_Window_manager(0, 0, 1024, 1024);
+	m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h);
+	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
 	m_GUI->add(m_window_manager);
-	m_GUI->add(new GUI_Image(0,0,1024,1024, m_graph->m_logo));
+	m_GUI->add(new GUI_Image((m_size.w - 1024) / 2, (m_size.h - 1024) / 2, 1024, 1024, m_graph->m_logo));
 
 	GUI_Window* MainMenu = new GUI_Window(0, 0, 400, 400, "Главное меню");
-	MainMenu->m_position = position_t((1024- MainMenu->m_size.w)/2, (1024 - MainMenu->m_size.h) / 2);
+	MainMenu->m_position = position_t((m_size.w - MainMenu->m_size.w)/2, (m_size.h - MainMenu->m_size.h) / 2);
 	GUI_Button_list* menu = new GUI_Button_list(0, 0, 400, 400);
 	GUI_Mainmenu_button* button;
 	button = new GUI_Mainmenu_button(0, 0, 396, 47, "Новая игра", ParameterKind::parameter_new_game);
@@ -230,15 +231,15 @@ void Application::new_game()
 	GameMap* map= new GameMap(dimension_t(20, 20));
 	m_world->m_maps.push_back(map);
 
-	m_GUI = new ApplicationGUI(0, 0, 1024, 1024);
-	m_window_manager = new GUI_Window_manager(0, 0, 1024, 1024);
+	m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h);
+	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
 	m_GUI->add(m_window_manager);
 
 		m_GUI->MapViewer = new GUI_MapViewer(this);
 		m_GUI->MapViewer->m_position.x = 0;
 		m_GUI->MapViewer->m_position.y = 0;
-		m_GUI->MapViewer->m_size.w = 1024;
-		m_GUI->MapViewer->m_size.h = 1024;
+		m_GUI->MapViewer->m_size.w = m_size.w;
+		m_GUI->MapViewer->m_size.h = m_size.h;
 		
 		m_GUI->MapViewer->m_map = map;
 		///m_GUI->MapViewer->m_map->generate_level();
@@ -257,25 +258,27 @@ void Application::new_game()
 	
 		//m_GUI->MapViewer->m_map = Serialization_manager::instance().load("save");
 	
+		GUI_ActionPanel* ActionPanel;
+		ActionPanel = new GUI_ActionPanel(2, m_size.h-49, 898, 47);
+		m_GUI->m_action_panel = ActionPanel;
+		ActionPanel->bind(m_world->m_player);
+
 		GUI_ActionManager* AMTextBox;
 		AMTextBox = new GUI_ActionManager(m_action_manager);
 		AMTextBox->m_position.x = 650;
-		AMTextBox->m_position.y = 710;
+		AMTextBox->m_position.y = ActionPanel->m_position.y-265;
 		AMTextBox->resize(372, 263);
-		GUI_ActionPanel* ActionPanel;
-		ActionPanel = new GUI_ActionPanel(2,975,898,47);
-		m_GUI->m_action_panel = ActionPanel;
-		ActionPanel->bind(m_world->m_player);
+	
 		GUI_Layer* MenuLayer;
-		MenuLayer = new GUI_Layer(0,0,1024,1024);
+		MenuLayer = new GUI_Layer(0,0, m_size.w, m_size.h);
 		GUI_TextBox* TextBox = new GUI_TextBox();
 		TextBox->m_position.x = 2;
-		TextBox->m_position.y = 710;
+		TextBox->m_position.y = ActionPanel->m_position.y - 265;
 		TextBox->resize(646, 263);
 	
 		m_GUI->DescriptionBox = TextBox;
 	
-		GUI_button* button = new GUI_button(902, 975, 120, 47, "Ход");
+		GUI_button* button = new GUI_button(902, m_size.h - 49, 120, 47, "Ход");
 		button->mouse_click += std::bind(&Application::on_turn, this);
 	
 		MenuLayer->add(AMTextBox);
@@ -284,11 +287,13 @@ void Application::new_game()
 		MenuLayer->add(button);
 	
 		GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
-		GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(5, 5), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 30), m_GUI->MapViewer);
+		rectangle_t cr = MiniMap->client_rect();
+		GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(0, 0), dimension_t(cr.w, cr.h), m_GUI->MapViewer);
 		MiniMap->add(mini_map);
-	
+
 		MiniMap = new GUI_Window(300, 0, 400, 400, "Поле зрения player");
-		GUI_FOV* fov = new GUI_FOV(position_t(5, 5), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 30), m_GUI->MapViewer->m_player->m_object);
+		cr = MiniMap->client_rect();
+		GUI_FOV* fov = new GUI_FOV(position_t(0, 0), dimension_t(cr.w, cr.h), m_GUI->MapViewer->m_player->m_object);
 		MiniMap->add(fov);
 	
 		/*obj = m_game_object_manager->new_object("bat");
@@ -326,37 +331,39 @@ void Application::load_game()
 
 	m_world = Serialization_manager::instance().load("save");
 
-	m_GUI = new ApplicationGUI(0, 0, 1024, 1024);
-	m_window_manager = new GUI_Window_manager(0, 0, 1024, 1024);
+	m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h);
+	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
 	m_GUI->add(m_window_manager);
 
 	m_GUI->MapViewer = new GUI_MapViewer(this);
 	m_GUI->MapViewer->m_position.x = 0;
 	m_GUI->MapViewer->m_position.y = 0;
-	m_GUI->MapViewer->m_size.w = 1024;
-	m_GUI->MapViewer->m_size.h = 1024;
+	m_GUI->MapViewer->m_size.w = m_size.w;
+	m_GUI->MapViewer->m_size.h = m_size.h;
 	m_GUI->MapViewer->m_map = m_world->m_maps.front();
 	m_GUI->MapViewer->m_player = m_world->m_player;
+
+	GUI_ActionPanel* ActionPanel;
+	ActionPanel = new GUI_ActionPanel(2, m_size.h - 49, 898, 47);
+	m_GUI->m_action_panel = ActionPanel;
+	ActionPanel->bind(m_world->m_player);
 
 	GUI_ActionManager* AMTextBox;
 	AMTextBox = new GUI_ActionManager(m_action_manager);
 	AMTextBox->m_position.x = 650;
-	AMTextBox->m_position.y = 710;
+	AMTextBox->m_position.y = ActionPanel->m_position.y - 265;
 	AMTextBox->resize(372, 263);
-	GUI_ActionPanel* ActionPanel;
-	ActionPanel = new GUI_ActionPanel(2, 975, 898, 47);
-	m_GUI->m_action_panel = ActionPanel;
-	ActionPanel->bind(m_world->m_player);
+
 	GUI_Layer* MenuLayer;
-	MenuLayer = new GUI_Layer(0, 0, 1024, 1024);
+	MenuLayer = new GUI_Layer(0, 0, m_size.w, m_size.h);
 	GUI_TextBox* TextBox = new GUI_TextBox();
 	TextBox->m_position.x = 2;
-	TextBox->m_position.y = 710;
+	TextBox->m_position.y = ActionPanel->m_position.y - 265;
 	TextBox->resize(646, 263);
 
 	m_GUI->DescriptionBox = TextBox;
 
-	GUI_button* button = new GUI_button(902, 975, 120, 47, "Ход");
+	GUI_button* button = new GUI_button(902, m_size.h - 49, 120, 47, "Ход");
 	button->mouse_click += std::bind(&Application::on_turn, this);
 
 	MenuLayer->add(AMTextBox);
@@ -796,7 +803,7 @@ bool Application::command_open_body(GameObject*& Object)
 	Parts_list* Property = static_cast<Parts_list*>(Object->get_effect(interaction_e::body));
 	if (Property != nullptr)
 	{
-		GUI_body_window* Window = new GUI_body_window(1024 / 2 - (192 + 2) / 2, 1024 / 2 - (4 * 64 + 2) / 2, 192 + 4, 4 * 64 + 27, Object->m_name + "::body",Object);
+		GUI_body_window* Window = new GUI_body_window(m_size.w / 2 - (192 + 2) / 2, m_size.h / 2 - (4 * 64 + 2) / 2, 192 + 4, 4 * 64 + 27, Object->m_name + "::body",Object);
 		/*GUI_Body* Inv = new GUI_Body(static_cast<Interaction_feature*>(Object->get_feature(object_feature_e::interaction_feature)));
 		Inv->m_position.x = 2;
 		Inv->m_position.y = Window->m_size.h - Inv->m_size.h - 2;
@@ -809,7 +816,7 @@ bool Application::command_open_body(GameObject*& Object)
 
 void Application::command_gui_show_characterization(GameObject*& object)
 {
-	GUI_description_window* Window = new GUI_description_window(1024 / 2 - (192 + 2) / 2, 1024 / 2 - (4 * 64 + 2) / 2, 800 + 4, 8 * 64 + 27, object->m_name + "::Характеристика",object);
+	GUI_description_window* Window = new GUI_description_window(m_size.w / 2 - (192 + 2) / 2, m_size.h / 2 - (4 * 64 + 2) / 2, 800 + 4, 8 * 64 + 27, object->m_name + "::Характеристика",object);
 	//m_GUI->add_front(Window);
 }
 

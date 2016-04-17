@@ -3,8 +3,9 @@
 #include "TileManager.h"
 
 
-GraphicalController::GraphicalController()
+GraphicalController::GraphicalController(dimension_t size)
 {
+	m_size = size;
 	for (int i = 0; i < 192; ++i)
 	{
 		Unicode_to_ASCII[i] = i;
@@ -45,10 +46,10 @@ GraphicalController::GraphicalController()
 		m_mask_shader2 = load_shader("EoS_mask", "EoS_mask2");
 		m_tile_shader = load_shader("EoS_tile", "EoS_tile");
 		m_tile_shader_hide = load_shader("EoS_tile", "EoS_tile_hide");
-		m_empty_01 = create_empty_texture(dimension_t(1024, 1024));
-		m_empty_02 = create_empty_texture(dimension_t(1024, 1024));
-		m_empty_03 = create_empty_texture(dimension_t(1024, 1024));
-		m_blur = create_empty_texture(dimension_t(1024/4, 1024/4));
+		m_empty_01 = create_empty_texture(m_size);
+		m_empty_02 = create_empty_texture(m_size);
+		m_empty_03 = create_empty_texture(m_size);
+		m_blur = create_empty_texture(dimension_t(m_size.w/4, m_size.h/4));
 
 		m_close = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Close.bmp");
 		m_preselect = load_texture(FileSystem::instance().m_resource_path + "Tiles\\preselection.bmp");
@@ -65,7 +66,7 @@ GraphicalController::GraphicalController()
 		LOG(FATAL) << "Ошибка при загрузке ресурсов: " << e.what();
 	}
 
-	m_scissors.push_front(frectangle_t(0.0f, 0.0f, 1024.0f, 1024.0f));
+	m_scissors.push_front(frectangle_t(0.0f, 0.0f, (float)m_size.w, (float)m_size.h));
 	glGenFramebuffers(1, &m_FBO);
 }
 
@@ -315,7 +316,7 @@ position_t GraphicalController::center_aling_to_point(int x, int y, std::string 
 bool GraphicalController::add_scissor(const frectangle_t& rect)
 {
 	frectangle_t GlobalScissor = m_scissors.front();
-	frectangle_t LocalScissor(rect.x, 1024 - rect.y - rect.h, rect.x + rect.w, 1024 - rect.y);
+	frectangle_t LocalScissor(rect.x, (float)m_size.h - rect.y - rect.h, rect.x + rect.w, (float)m_size.h - rect.y);
 	if ((GlobalScissor.x > LocalScissor.w) || (GlobalScissor.w < LocalScissor.x) || (GlobalScissor.y > LocalScissor.h) || (GlobalScissor.h < LocalScissor.y)) return false;
 	if (LocalScissor.x < GlobalScissor.x) LocalScissor.x = GlobalScissor.x;
 	if (LocalScissor.w > GlobalScissor.w) LocalScissor.w = GlobalScissor.w;
@@ -340,19 +341,19 @@ void GraphicalController::blur_rect(int x, int y, int width, int height)
 	glDisable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, m_empty_01);
-	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, x, 1024 - y - height, width, height);
-	double Tx = width / 1024.0;
-	double Ty = height / 1024.0;
+	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, x, m_size.h - y - height, width, height);
+	double Tx = width / (float)m_size.w;
+	double Ty = height / (float)m_size.h;
 	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_empty_02, 0);
 	glUseProgram(m_horizontal_shader);
 	set_uniform_sampler(m_horizontal_shader, "Map",0);
-	draw_sprite_FBO(Tx, Ty, 0, 1024 - height, 0, 1024, width, 1024, width, 1024 - height);
+	draw_sprite_FBO(Tx, Ty, 0, m_size.h - height, 0, m_size.h, width, m_size.h, width, m_size.h - height);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_empty_01, 0);
 	glUseProgram(m_vertical_shader);
 	set_uniform_sampler(m_vertical_shader, "Map",0);
 	glBindTexture(GL_TEXTURE_2D, m_empty_02);
-	draw_sprite_FBO(Tx, Ty, 0, 1024 - height, 0, 1024, width, 1024, width, 1024 - height);
+	draw_sprite_FBO(Tx, Ty, 0, m_size.h - height, 0, m_size.h, width, m_size.h, width, m_size.h - height);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(0);
 	glEnable(GL_SCISSOR_TEST);

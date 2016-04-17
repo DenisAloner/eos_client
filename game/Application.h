@@ -86,6 +86,8 @@ public:
 	bool m_ready;
 	bool m_turn;
 
+	dimension_t m_size;
+
 	Timer* m_timer;
 	MouseController* m_mouse;
 	gui_MessageQueue m_message_queue;
@@ -123,7 +125,7 @@ public:
 		return Singleton;
 	}
 
-	void initialize();
+	void initialize(dimension_t work_area_size);
 	void start();
 	void stop();
 

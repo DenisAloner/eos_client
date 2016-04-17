@@ -17,9 +17,6 @@
 #include <freetype/ftoutln.h>
 #include <freetype/fttrigon.h>
 
-#define WIDTH   640
-#define HEIGHT  480
-
 class TileManager;
 
 const int font_size_c = 26;
@@ -58,6 +55,8 @@ public:
 	font_symbol_t m_font_symbols[256];
 	FT_ULong Unicode_to_ASCII[256];
 
+	dimension_t m_size;
+
 	enum class command_e
 	{
 		single,
@@ -75,7 +74,7 @@ public:
 
 	GLuint m_FBO;
 
-	GraphicalController();
+	GraphicalController(dimension_t size);
 
 	GLuint load_shader(const std::string& vPath,const std::string& fPath);
 	std::string load_shader_source(const std::string& path);
@@ -108,9 +107,6 @@ private:
 	bool CompileSuccessful(int obj);
 	bool LinkSuccessful(int obj);
 	bool ValidateSuccessful(int obj);
-
-
-	
 };
 
 #endif //GRAPHICALCONTROLLER_H
