@@ -31,6 +31,7 @@ public:
 	GLuint m_vertical_shader;
 	GLuint m_tile_shader;
 	GLuint m_tile_shader_hide;
+	GLuint m_tile_shader_alpha;
 	GLuint m_mask_shader;
 	GLuint m_mask_shader2;
 

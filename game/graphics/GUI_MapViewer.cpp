@@ -1279,6 +1279,10 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 							{
 								glUseProgram(Graph->m_tile_shader);
 							}
+							if ((*Current)->m_active_state->m_layer == 2)
+							{
+								glUseProgram(Graph->m_tile_shader_alpha);
+							}
 							(*Current)->m_active_state->m_tile_manager->set_tile(tile, (*Current), Application::instance().m_timer->m_tick / 7.0*3.0, dx);
 							GLuint Sprite = tile.unit;
 							glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1353,7 +1357,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 
 							if ((*Current)->m_active_state->m_layer == 2)
 							{
-								glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
+								/*glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
 								glUseProgram(Graph->m_mask_shader2);
 								glActiveTexture(GL_TEXTURE0);
 								glBindTexture(GL_TEXTURE_2D, Graph->m_empty_03);
@@ -1376,7 +1380,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 								glBindTexture(GL_TEXTURE_2D, Sprite);
 								Graph->set_uniform_sampler(Graph->m_mask_shader, "Unit", 1);
 								glActiveTexture(GL_TEXTURE0);
-								Graph->draw_tile_FBO(x1 / (float)m_size.w, (m_size.h - y1) / (float)m_size.h, x3 / (float)m_size.w, (m_size.h - y3) / (float)m_size.h, x0, y0, x1, y1, x2, y2, x3, y3);
+								Graph->draw_tile_FBO(x1 / (float)m_size.w, (m_size.h - y1) / (float)m_size.h, x3 / (float)m_size.w, (m_size.h - y3) / (float)m_size.h, x0, y0, x1, y1, x2, y2, x3, y3);*/
 							}
 
 						}

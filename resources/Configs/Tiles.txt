@@ -29,3 +29,5 @@ single glass_wall
 single bow
 single arrow
 single ring
+single iso_wall_2
+single iso_wall_3

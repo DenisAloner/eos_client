@@ -58,7 +58,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	hWnd = CreateWindow(
 		("Explorers of Saarum"), "Explorers of Saarum", 
 		WS_CAPTION | WS_POPUPWINDOW | WS_VISIBLE,
-		window_rect.x, window_rect.y, window_rect.right(), window_rect.bottom(),
+		10, 10, window_rect.right()-20, window_rect.bottom()-20,
 		NULL, NULL, hInstance, NULL);
 	RECT client_rect_win;
 	GetClientRect(hWnd, &client_rect_win);
@@ -124,15 +124,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 	};
 
+	if (message == WM_SETCURSOR && LOWORD(lParam) == HTCLIENT)
+	{
+		SetCursor(NULL);
+		return TRUE;
+	}
+	
 	switch (message)
 	{
+
 	case WM_CREATE:
 		return 0;
 
 	case WM_CLOSE:
+	{
 		PostQuitMessage(0);
 		return 0;
-	
+	}
+
 	case WM_DESTROY:
 		return 0;
 
@@ -142,43 +151,47 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			Application::instance().m_mouse->mouse_wheel(MouseEventArgs(Extractor::position(hWnd, lParam), mk_none, Extractor::wheel_delta(wParam)));
 		return 0;
 	}
-	
+
 	case WM_LBUTTONDOWN:
 	{
 		if (Application::instance().m_ready)
 			Application::instance().m_mouse->mouse_down(MouseEventArgs(Extractor::position(hWnd, lParam), mk_left));
 		return 0;
 	}
-	
+
 	case WM_RBUTTONDOWN:
 	{
 		if (Application::instance().m_ready)
 			Application::instance().m_mouse->mouse_down(MouseEventArgs(Extractor::position(hWnd, lParam), mk_right));
 		return 0;
 	}
-	
+
 	case WM_LBUTTONUP:
 	{
 		if (Application::instance().m_ready)
 			Application::instance().m_mouse->mouse_up(MouseEventArgs(Extractor::position(hWnd, lParam), mk_left));
 		return 0;
 	}
-	
+
 	case WM_RBUTTONUP:
 	{
 		if (Application::instance().m_ready)
 			Application::instance().m_mouse->mouse_up(MouseEventArgs(Extractor::position(hWnd, lParam), mk_right));
 		return 0;
 	}
-	
+
 	case WM_MOUSEMOVE:
 	{
 		if (Application::instance().m_ready)
+		{
+			Application::instance().command_set_cursor_visibility(true);
 			Application::instance().m_mouse->mouse_move(MouseEventArgs(Extractor::position(hWnd, lParam), Extractor::key_pressed(wParam)));
+		}
 		return 0;
 	}
 
 	case WM_KEYDOWN:
+	{
 		switch (wParam)
 		{
 		case VK_ESCAPE:
@@ -200,19 +213,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return 0;
 		}
 		return 0;
+	}
 
 	case WM_CHAR:
+	{
 		Application::instance().key_press(wParam);
 		return 0;
-
-	case WM_SETCURSOR:
-		SetCursor(NULL);
-		return 0;
-	
-	default:
-		return DefWindowProc(hWnd, message, wParam, lParam);	
 	}
-	
+
+
+	default:
+	{
+		return DefWindowProc(hWnd, message, wParam, lParam);
+	}
+
+	}
+
 }
 
 void EnableGraphics(HWND hWnd, HDC &hDC)
