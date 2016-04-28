@@ -516,6 +516,7 @@ void GameObjectManager::init()
 	m_to_interaction_e["weapon_range"] = interaction_e::weapon_range;
 	m_to_interaction_e["vision"] = interaction_e::vision;
 	m_to_interaction_e["vision_component"] = interaction_e::vision_component;
+	m_to_interaction_e["skill_unarmed_combat"] = interaction_e::skill_unarmed_combat;
 
 	m_effect_string[interaction_e::total_damage] = "общий дополнительный урон";
 	m_effect_string[interaction_e::damage] = "урон";
@@ -540,7 +541,7 @@ void GameObjectManager::init()
 	m_effect_string[interaction_e::weapon_range] = "дальность";
 	m_effect_string[interaction_e::vision] = "зрение";
 	m_effect_string[interaction_e::vision_component] = "компонент зрения";
-
+	m_effect_string[interaction_e::skill_unarmed_combat] = "владение безоружным боем";
 
 	m_to_effect_e["value"] = effect_e::value;
 	m_to_effect_e["limit"] = effect_e::limit;

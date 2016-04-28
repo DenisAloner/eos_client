@@ -77,6 +77,7 @@ feature_list parameter,dexterity,25,100
 feature_list parameter,hunger,0,1000
 feature_list parameter,thirst,0,1000
 feature_list parameter,skill_sword,50000,100000
+feature_list parameter,skill_unarmed_combat,50000,100000
 feature_list generic,buff
 feature_list generic,damage
 feature_list parts,body
@@ -84,6 +85,8 @@ mem_part hand,рука
 add_slot body
 feature_list_mem action,action
 mem_action pick
+add_slot_mem action
+mem_action hit_melee
 add_slot_mem action
 mem_part hand,рука
 add_slot body
@@ -136,7 +139,7 @@ tag poison_resist
 tag mortal
 tag seethrough_able
 tag fast_move
-mem_effect value,-50
+mem_effect value,-5
 mem_slot_copyist health
 add_slot total_damage
 state dead

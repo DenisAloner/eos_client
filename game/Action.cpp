@@ -1115,8 +1115,6 @@ void action_hit_melee::perfom(Parameter* parameter)
 			Object_interaction* msg = reaction->clone();
 			msg->apply_effect(p->m_object, nullptr);
 		}
-		if (p->m_unit_body_part)
-		{
 			srand(time(NULL));
 			Parameter_list* dexterity_subject = p->m_unit->get_parameter(interaction_e::dexterity);
 			Parameter_list* dexterity_object = p->m_object->get_parameter(interaction_e::dexterity);
@@ -1135,11 +1133,25 @@ void action_hit_melee::perfom(Parameter* parameter)
 			if (rand() % 100>evasion)
 			{
 				Parameter_list* str = p->m_unit->get_parameter(interaction_e::strength);
-				Parameter_list* ms = p->m_unit->get_parameter(interaction_e::skill_sword);
-				Parameter_list* dws = p->m_unit_body_part->m_item->get_parameter(interaction_e::demand_weapon_skill);
-				Parameter_list* wd = p->m_unit_body_part->m_item->get_parameter(interaction_e::weapon_damage);
-				Parameter_list* sb = p->m_unit_body_part->m_item->get_parameter(interaction_e::strength_bonus);
-				int accuracy = (ms->m_value - dws->m_value);
+				Parameter_list* ms;
+				int dws;
+				int wd;
+				int sb;
+				if (p->m_unit_body_part->m_item)
+				{
+					ms = p->m_unit->get_parameter(interaction_e::skill_sword);
+					dws = p->m_unit_body_part->m_item->get_parameter(interaction_e::demand_weapon_skill)->m_value;
+					wd = p->m_unit_body_part->m_item->get_parameter(interaction_e::weapon_damage)->m_value;
+					sb = p->m_unit_body_part->m_item->get_parameter(interaction_e::strength_bonus)->m_value;
+				}
+				else
+				{
+					ms = p->m_unit->get_parameter(interaction_e::skill_unarmed_combat);
+					dws = 0;
+					wd = str->m_value;
+					sb = 100;
+				}
+				int accuracy = (ms->m_value - dws);
 				int light = (p->m_cell->m_light.R > p->m_cell->m_light.G ? p->m_cell->m_light.R : p->m_cell->m_light.G);
 				light = (light > p->m_cell->m_light.B ? light : p->m_cell->m_light.B);
 				if (light > 100) { light = 100; };
@@ -1157,7 +1169,7 @@ void action_hit_melee::perfom(Parameter* parameter)
 					Effect* item = new Effect();
 					item->m_interaction_message_type = interaction_message_type_e::single;
 					item->m_subtype = effect_e::value;
-					item->m_value = -accuracy*0.0000001*sb->m_value*0.01*wd->m_value*str->m_value*0.001;
+					item->m_value = -accuracy*0.0000001*sb*0.01*wd*str->m_value*0.001;
 					Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(std::to_string(item->m_value)));
 					Interaction_copyist* item1 = new Interaction_copyist();
 					item1->m_interaction_message_type = interaction_message_type_e::single;
@@ -1166,15 +1178,21 @@ void action_hit_melee::perfom(Parameter* parameter)
 					item1->apply_effect(p->m_object, nullptr);
 					ms->m_basic_value += 1;
 					ms->update();
+					if (p->m_unit_body_part->m_item)
+					{
+						reaction = p->m_unit_body_part->m_item->get_effect(interaction_e::damage);
+						if (reaction)
+						{
+							Object_interaction* msg = reaction->clone();
+							msg->apply_effect(p->m_object, nullptr);
+						}
+					}
 				}
-			} else { Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Объект уклонился!")); }
-			reaction = p->m_unit_body_part->m_item->get_effect(interaction_e::damage);
-			if (reaction)
-			{
-				Object_interaction* msg = reaction->clone();
-				msg->apply_effect(p->m_object, nullptr);
+			} 
+			else 
+			{ 
+				Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Объект уклонился!")); 
 			}
-		}
 		p->m_object->update_interaction();
 		p->m_object->event_update(VoidEventArgs());
 	}
