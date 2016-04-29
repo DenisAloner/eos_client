@@ -65,6 +65,14 @@ struct rectangle_t : public position_t, public dimension_t
 	}
 };
 
+struct area_t
+{
+	position_t p1;
+	position_t p2;
+
+	area_t(position_t p1, position_t p2) :p1(p1), p2(p2) {}
+};
+
 struct fposition_t
 {
 	float x;
