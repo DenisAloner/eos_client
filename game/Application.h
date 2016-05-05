@@ -20,6 +20,7 @@
 #include "GUI_Window_manager.h"
 #include "GUI_button.h"
 #include "GUI_Button_list.h"
+#include "game/Game_log.h"
 
 class Action;
 class ActionManager;
@@ -115,6 +116,8 @@ public:
 
 	std::list<GUI_Object*> m_update_canvas;
 
+	Game_log m_game_log;
+
 	Game_world* m_world;
 
 	~Application(void);
@@ -159,6 +162,8 @@ public:
 	Parameter* command_select_body_part();
 	bool command_agreement();
 	void console(std::string text);
+
+	void on_turn();
 	
 	void PlaySound1();
 
@@ -171,7 +176,6 @@ private:
 	Application& operator=(const Application&);
 
 	void process_game();
-	void on_turn();
 
 	bool check_action_completion(GameObject*& object);
 

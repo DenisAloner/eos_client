@@ -13,7 +13,6 @@
 #include "utils/log.h"
 #include <chrono>
 
-
 void my_audio_callback(void *userdata, uint8_t *stream, uint32_t len);
 
 // variable declarations
@@ -229,63 +228,19 @@ void Application::new_game()
 {
 	m_world = new Game_world();
 	GameMap* map= new GameMap(dimension_t(20, 20));
+	map->generate_room();
 	m_world->m_maps.push_back(map);
-
-	m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h);
+	int rx = 10;
+	int ry = 10;
+	GameObject* obj;
+	obj = m_game_object_manager->new_object("iso_unit");
+	map->add_to_map(obj, map->m_items[ry][rx]);
+	m_world->m_player = new Player(obj, map);
 	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
-	m_GUI->add(m_window_manager);
 
-		m_GUI->MapViewer = new GUI_MapViewer(this);
-		m_GUI->MapViewer->m_position.x = 0;
-		m_GUI->MapViewer->m_position.y = 0;
-		m_GUI->MapViewer->m_size.w = m_size.w;
-		m_GUI->MapViewer->m_size.h = m_size.h;
-		
-		m_GUI->MapViewer->m_map = map;
-		///m_GUI->MapViewer->m_map->generate_level();
+	m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player,map,m_action_manager,m_game_log);
 	
-		m_GUI->MapViewer->m_map->generate_room();
-	
-		int rx = 10;
-		int ry = 10;
-	
-		GameObject* obj;
-	
-		obj = m_game_object_manager->new_object("iso_unit");
-		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry][rx]);
-		m_world->m_player = new Player(obj, m_GUI->MapViewer->m_map);
-		m_GUI->MapViewer->m_player = m_world->m_player;
-	
-		//m_GUI->MapViewer->m_map = Serialization_manager::instance().load("save");
-	
-		GUI_ActionPanel* ActionPanel;
-		ActionPanel = new GUI_ActionPanel(2, m_size.h-49, 898, 47);
-		m_GUI->m_action_panel = ActionPanel;
-		ActionPanel->bind(m_world->m_player);
 
-		GUI_ActionManager* AMTextBox;
-		AMTextBox = new GUI_ActionManager(m_action_manager);
-		AMTextBox->m_position.x = 650;
-		AMTextBox->m_position.y = ActionPanel->m_position.y-265;
-		AMTextBox->resize(372, 263);
-	
-		GUI_Layer* MenuLayer;
-		MenuLayer = new GUI_Layer(0,0, m_size.w, m_size.h);
-		GUI_TextBox* TextBox = new GUI_TextBox();
-		TextBox->m_position.x = 2;
-		TextBox->m_position.y = ActionPanel->m_position.y - 265;
-		TextBox->resize(646, 263);
-	
-		m_GUI->DescriptionBox = TextBox;
-	
-		GUI_button* button = new GUI_button(902, m_size.h - 49, 120, 47, "Ход");
-		button->mouse_click += std::bind(&Application::on_turn, this);
-	
-		MenuLayer->add(AMTextBox);
-		MenuLayer->add(ActionPanel);
-		MenuLayer->add(TextBox);
-		MenuLayer->add(button);
-	
 		GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
 		rectangle_t cr = MiniMap->client_rect();
 		GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(0, 0), dimension_t(cr.w, cr.h), m_GUI->MapViewer);
@@ -308,9 +263,9 @@ void Application::new_game()
 		obj->set_direction(object_direction_e::top);
 		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-1][rx - 1]);*/
 		
-		obj = m_game_object_manager->new_object("bat");
+	/*	obj = m_game_object_manager->new_object("bat");
 		obj->set_direction(object_direction_e::top);
-		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-2][rx]);
+		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-2][rx]);*/
 	
 	
 		/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
@@ -320,9 +275,6 @@ void Application::new_game()
 		/*MenuLayer->add(m_GUI->Timer);
 		MenuLayer->add(MiniMap);*/
 		
-		m_GUI->add(MenuLayer);
-		m_GUI->add(m_GUI->MapViewer);
-		m_GUI->MapViewer->m_GUI = MenuLayer;
 		update_after_load();
 }
 
@@ -330,47 +282,9 @@ void Application::load_game()
 {
 
 	m_world = Serialization_manager::instance().load("save");
-
-	m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h);
 	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
-	m_GUI->add(m_window_manager);
-
-	m_GUI->MapViewer = new GUI_MapViewer(this);
-	m_GUI->MapViewer->m_position.x = 0;
-	m_GUI->MapViewer->m_position.y = 0;
-	m_GUI->MapViewer->m_size.w = m_size.w;
-	m_GUI->MapViewer->m_size.h = m_size.h;
-	m_GUI->MapViewer->m_map = m_world->m_maps.front();
-	m_GUI->MapViewer->m_player = m_world->m_player;
-
-	GUI_ActionPanel* ActionPanel;
-	ActionPanel = new GUI_ActionPanel(2, m_size.h - 49, 898, 47);
-	m_GUI->m_action_panel = ActionPanel;
-	ActionPanel->bind(m_world->m_player);
-
-	GUI_ActionManager* AMTextBox;
-	AMTextBox = new GUI_ActionManager(m_action_manager);
-	AMTextBox->m_position.x = 650;
-	AMTextBox->m_position.y = ActionPanel->m_position.y - 265;
-	AMTextBox->resize(372, 263);
-
-	GUI_Layer* MenuLayer;
-	MenuLayer = new GUI_Layer(0, 0, m_size.w, m_size.h);
-	GUI_TextBox* TextBox = new GUI_TextBox();
-	TextBox->m_position.x = 2;
-	TextBox->m_position.y = ActionPanel->m_position.y - 265;
-	TextBox->resize(646, 263);
-
-	m_GUI->DescriptionBox = TextBox;
-
-	GUI_button* button = new GUI_button(902, m_size.h - 49, 120, 47, "Ход");
-	button->mouse_click += std::bind(&Application::on_turn, this);
-
-	MenuLayer->add(AMTextBox);
-	MenuLayer->add(ActionPanel);
-	MenuLayer->add(TextBox);
-	MenuLayer->add(button);
-
+	m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player, m_world->m_maps.front(), m_action_manager, m_game_log);
+	
 	//GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
 	//GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(5, 5), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 30), m_GUI->MapViewer);
 	//MiniMap->add(mini_map);
@@ -404,9 +318,6 @@ void Application::load_game()
 	/*MenuLayer->add(m_GUI->Timer);
 	MenuLayer->add(MiniMap);*/
 
-	m_GUI->add(MenuLayer);
-	m_GUI->add(m_GUI->MapViewer);
-	m_GUI->MapViewer->m_GUI = MenuLayer;
 	update_after_load();
 }
 
@@ -591,7 +502,7 @@ void Application::update()
 				(*m)->update(VoidEventArgs());
 			}
 			m_update_mutex.unlock();
-			m_GUI->DescriptionBox->add_item_control(new GUI_Text("Ход - " + std::to_string(m_game_turn) + ".", new GUI_TextFormat(10, 19, RGBA_t(0.0, 0.8, 0.0, 1.0))));
+			m_game_log.add(game_log_message_t(game_log_message_type_e::message_time,"Ход - " + std::to_string(m_game_turn)));
 			m_game_turn += 1;
 			std::chrono::milliseconds Duration(1);
 			std::this_thread::sleep_for(Duration);
@@ -660,7 +571,7 @@ Parameter* Application::command_select_location(GameObject* object)
 		m_GUI->MapViewer->m_cursor_x = 1;
 		m_GUI->MapViewer->m_cursor_y = 1;
 	}
-	m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выберите клетку."));
+	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Выберите клетку")));
 	bool Exit = false;
 	while (Exit == false)
 	{
@@ -699,7 +610,7 @@ Parameter* Application::command_select_object_on_map()
 	Parameter* Result = nullptr;
 	m_GUI->MapViewer->m_cursor_x = 1;
 	m_GUI->MapViewer->m_cursor_y = 1;
-	m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выберите обьект."));
+	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Выберите обьект")));
 	bool Exit = false;
 	while (Exit == false)
 	{
@@ -736,7 +647,7 @@ Parameter* Application::command_select_object()
 	P_object* Result = nullptr;
 	m_GUI->MapViewer->m_cursor_x = 1;
 	m_GUI->MapViewer->m_cursor_y = 1;
-	m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выберите обьект."));
+	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Выберите обьект")));
 	bool Exit = false;
 	while (Exit == false)
 	{
@@ -901,7 +812,7 @@ void my_audio_callback(void *userdata, uint8_t *stream, uint32_t len) {
 
 Parameter* Application::command_select_transfer(Parameter_destination* parameter){
 	Parameter* Result = nullptr;
-	m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выберите назначение."));
+	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Выберите назначение")));
 	bool Exit = false;
 	while (Exit == false)
 	{
@@ -931,7 +842,7 @@ Parameter* Application::command_select_transfer(Parameter_destination* parameter
 
 P_object* Application::command_select_transfer_source(Parameter_destination* parameter){
 	P_object* Result = nullptr;
-	m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выберите объект."));
+	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Выберите объект")));
 	bool Exit = false;
 	while (Exit == false)
 	{
@@ -991,7 +902,7 @@ P_object* Application::command_select_transfer_source(Parameter_destination* par
 Parameter* Application::command_select_body_part()
 {
 	Parameter* Result = nullptr;
-	m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выберите назначение."));
+	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Выберите назначение")));
 	bool Exit = false;
 	while (Exit == false)
 	{
@@ -1104,6 +1015,5 @@ void Application::command_unequip(GameObject*& unit, Object_part* part, GameObje
 
 void Application::console(std::string text)
 {
-	m_GUI->DescriptionBox->add_item_control(new GUI_Text(text,new GUI_TextFormat(8,17,RGBA_t(1.0,1.0,1.0,1.0))));
+	//m_GUI->DescriptionBox->add_item_control(new GUI_Text(text,new GUI_TextFormat(8,17,RGBA_t(1.0,1.0,1.0,1.0))));
 }
-

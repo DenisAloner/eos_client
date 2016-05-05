@@ -518,4 +518,36 @@ struct font_symbol_t
 	font_symbol_t(GLuint id = 0, dimension_t size = dimension_t()) :id(id), size(size) {};
 };
 
+enum game_log_message_type_e
+{
+	message_time,
+	message_action_interaction,
+	message_damage
+};
+
+struct game_log_message_t
+{
+	game_log_message_type_e type;
+	std::string value;
+
+	game_log_message_t(game_log_message_type_e type, std::string& value) :type(type), value(value) {};
+};
+
+class GUI_TextFormat
+{
+public:
+
+	GUI_TextFormat(int _SizeX, int _SizeY, RGBA_t _Color) : m_symbol_size(dimension_t(_SizeX, _SizeY)), m_color(_Color) {};
+	RGBA_t m_color;
+	dimension_t m_symbol_size;
+
+};
+
+
+//struct Game_log_message_EventArgs
+//{
+//	game_log_message_t value;
+//
+//	Game_log_message_EventArgs(game_log_message_t& value) : value(value) {};
+//};
 #endif //DEFINITION_H

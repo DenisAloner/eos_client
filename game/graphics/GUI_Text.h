@@ -5,17 +5,6 @@
 #include <string>
 #include "Application.h"
 
-class GUI_TextFormat
-{
-public:
-
-	GUI_TextFormat(int _SizeX, int _SizeY, RGBA_t _Color) : m_symbol_size(dimension_t(_SizeX,_SizeY)), m_color(_Color) {};
-	~GUI_TextFormat();
-	RGBA_t m_color;
-	dimension_t m_symbol_size;
-
-};
-
 class GUI_Text :
 	public GUI_Object
 {

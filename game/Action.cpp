@@ -205,12 +205,11 @@ void ActionClass_Move::interaction_handler(Parameter* arg)
 			p->m_place = static_cast<MapCell*>(static_cast<P_object_owner*>(result)->m_cell);
 			p->m_place = Game_algorithm::step_in_direction(p->m_object, Game_algorithm::turn_to_cell(p->m_object, p->m_place));
 			p->m_map = p->m_place->m_map;
-
-			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, "Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}"));
 		}
 		else
 		{
-			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 			Application::instance().m_message_queue.m_busy = false;
 			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 			return;
@@ -420,11 +419,11 @@ void ActionClass_Push::interaction_handler(Parameter* arg)
 		std::string a = "Выбран ";
 		a.append(p->m_object->m_name);
 		a = a + ".";
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, a));
 	}
 	else
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 		Application::instance().m_message_queue.m_busy = false;
 		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 		return;
@@ -435,11 +434,11 @@ void ActionClass_Push::interaction_handler(Parameter* arg)
 	if (result)
 	{
 		p->m_place = static_cast<MapCell*>(static_cast<P_object_owner*>(result)->m_cell);
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, "Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}"));
 	}
 	else
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 		Application::instance().m_message_queue.m_busy = false;
 		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 		return;
@@ -510,11 +509,11 @@ void ActionClass_Turn::interaction_handler(Parameter* arg)
 			std::string a = "Выбран ";
 			a.append(p->m_object->m_name);
 			a = a + ".";
-			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, a));
 		}
 		else
 		{
-			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 			Application::instance().m_message_queue.m_busy = false;
 			return;
 		}
@@ -528,12 +527,11 @@ void ActionClass_Turn::interaction_handler(Parameter* arg)
 			MapCell* c = static_cast<MapCell*>(static_cast<P_object_owner*>(result)->m_cell);
 			p->m_direction = Game_algorithm::turn_to_cell(p->m_object, c);
 			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
-			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Направление выбрано."));
-
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Направление выбрано")));
 		}
 		else
 		{
-			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 			Application::instance().m_message_queue.m_busy = false;
 			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 			return;
@@ -574,11 +572,11 @@ void Action_OpenInventory::interaction_handler(Parameter* arg)
 		std::string a = "Выбран ";
 		a.append(p->m_object->m_name);
 		a = a + ".";
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, a));
 	}
 	else
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
@@ -620,8 +618,8 @@ void Action_CellInfo::interaction_handler(Parameter* arg)
 	if (result)
 	{
 		p->m_place = static_cast<MapCell*>(static_cast<P_object_owner*>(result)->m_cell);
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}:"));
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(" - освещение {" + std::to_string(p->m_place->m_light.R) + "," + std::to_string(p->m_place->m_light.G) + "," + std::to_string(p->m_place->m_light.B) + "}."));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, "Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}:"));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, " - освещение {" + std::to_string(p->m_place->m_light.R) + "," + std::to_string(p->m_place->m_light.G) + "," + std::to_string(p->m_place->m_light.B) + "}"));
 		MapCell* c = Application::instance().m_GUI->MapViewer->m_player->m_object->cell();
 		/*int f = Application::instance().m_GUI->MapViewer->m_player->m_fov->m_radius;
 		int xf = p->m_place->x-c->x;
@@ -633,7 +631,7 @@ void Action_CellInfo::interaction_handler(Parameter* arg)
 	}
 	else
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Не выбрана клетка карты."));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Не выбрана клетка карты")));
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
@@ -673,11 +671,11 @@ void action_set_motion_path::interaction_handler(Parameter* arg)
 	if (result)
 	{
 		p->m_place = static_cast<MapCell*>(static_cast<P_object_owner*>(result)->m_cell);
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, "Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}"));
 	}
 	else
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Не выбрана клетка карты."));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Не выбрана клетка карты")));
 		Application::instance().m_message_queue.m_busy = false;
 		//Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 		return;
@@ -690,7 +688,7 @@ void action_set_motion_path::interaction_handler(Parameter* arg)
 	if (path)
 	{
 		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_path(Application::instance().m_GUI->MapViewer, path));
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Следовать под данному пути? [Y/N]"));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Следовать под данному пути? [Y/N]")));
 		if(Application::instance().command_agreement())
 		{
 			for (int i = 0; i < path->size(); i++)
@@ -705,14 +703,14 @@ void action_set_motion_path::interaction_handler(Parameter* arg)
 		}
 		else
 		{
-			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Игрок отменил действие."));
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Игрок отменил действие")));
 		}
 		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 		Path::instance().m_heap.m_items.clear();
 	}
 	else
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Нет пути в указанную клетку."));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Нет пути в указанную клетку")));
 	}
 	Application::instance().m_message_queue.m_busy = false;
 }
@@ -767,7 +765,7 @@ void Action_pick::interaction_handler(Parameter* arg)
 		}
 		else
 		{
-			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 			Application::instance().m_message_queue.m_busy = false;
 			Application::instance().m_clipboard.m_item = nullptr;
 			return;
@@ -783,11 +781,11 @@ void Action_pick::interaction_handler(Parameter* arg)
 			std::string a = "Выбран ";
 			a.append(p->m_object->m_name);
 			a = a + ".";
-			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, a));
 		}
 		else
 		{
-			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 			Application::instance().m_message_queue.m_busy = false;
 			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 			return;
@@ -881,11 +879,11 @@ void Action_open::interaction_handler(Parameter* arg)
 		std::string a = "Выбран ";
 		a.append(p->m_object->m_name);
 		a = a + ".";
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, a));
 	}
 	else
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
@@ -954,7 +952,7 @@ void Action_hit::interaction_handler(Parameter* arg)
 	}
 	else
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 		Application::instance().m_message_queue.m_busy = false;
 		Application::instance().m_clipboard.m_item = nullptr;
 		return;
@@ -967,11 +965,11 @@ void Action_hit::interaction_handler(Parameter* arg)
 		std::string a = "Выбран ";
 		a.append(p->m_object->m_name);
 		a = a + ".";
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, a));
 	}
 	else
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 		Application::instance().m_message_queue.m_busy = false;
 		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 		return;
@@ -1055,7 +1053,7 @@ void action_hit_melee::interaction_handler(Parameter* arg)
 		}
 		else
 		{
-			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 			Application::instance().m_message_queue.m_busy = false;
 			Application::instance().m_clipboard.m_item = nullptr;
 			return;
@@ -1071,11 +1069,11 @@ void action_hit_melee::interaction_handler(Parameter* arg)
 			std::string a = "Выбран ";
 			a.append(p->m_object->m_name);
 			a = a + ".";
-			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, a));
 		}
 		else
 		{
-			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 			Application::instance().m_message_queue.m_busy = false;
 			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 			return;
@@ -1089,11 +1087,11 @@ void action_hit_melee::interaction_handler(Parameter* arg)
 		if (result)
 		{
 			p->m_cell = static_cast<MapCell*>(static_cast<P_object_owner*>(result)->m_cell);
-			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_cell->x) + "," + std::to_string(p->m_cell->y) + "}:"));
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, "Выбрана клетка {" + std::to_string(p->m_cell->x) + "," + std::to_string(p->m_cell->y) + "}:"));
 		}
 		else
 		{
-			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 			Application::instance().m_message_queue.m_busy = false;
 			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 			return;
@@ -1129,7 +1127,7 @@ void action_hit_melee::perfom(Parameter* parameter)
 				evasion = 100;
 			}
 			if (evasion > 100) { evasion = 100; }
-			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(std::to_string(evasion)));
+			//???Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(std::to_string(evasion)));
 			if (rand() % 100>evasion)
 			{
 				Parameter_list* str = p->m_unit->get_parameter(interaction_e::strength);
@@ -1158,7 +1156,7 @@ void action_hit_melee::perfom(Parameter* parameter)
 				if (accuracy > 0)
 				{
 					accuracy = (ms->m_value + rand() % accuracy)*(light + rand() % (100 - light + 1)*0.5);
-					Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Точность: "+std::to_string(accuracy*0.0000001)));
+					//???Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Точность: "+std::to_string(accuracy*0.0000001)));
 				}
 				else
 				{
@@ -1170,7 +1168,7 @@ void action_hit_melee::perfom(Parameter* parameter)
 					item->m_interaction_message_type = interaction_message_type_e::single;
 					item->m_subtype = effect_e::value;
 					item->m_value = -accuracy*0.0000001*sb*0.01*wd*str->m_value;
-					Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Урон: " + std::to_string(item->m_value)));
+					//???Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Урон: " + std::to_string(item->m_value)));
 					Interaction_copyist* item1 = new Interaction_copyist();
 					item1->m_interaction_message_type = interaction_message_type_e::single;
 					item1->m_subtype = interaction_e::health;
@@ -1190,8 +1188,8 @@ void action_hit_melee::perfom(Parameter* parameter)
 				}
 			} 
 			else 
-			{ 
-				Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Объект уклонился!")); 
+			{
+				Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Объект уклонился")));
 			}
 		p->m_object->update_interaction();
 		p->m_object->event_update(VoidEventArgs());
@@ -1225,11 +1223,11 @@ void Action_equip::interaction_handler(Parameter* arg)
 		std::string a = "Выбран ";
 		a.append(p->m_object->m_name);
 		a = a + ".";
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, a));
 	}
 	else
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
@@ -1272,11 +1270,11 @@ void Action_show_parameters::interaction_handler(Parameter* arg)
 		std::string a = "Выбран ";
 		a.append(p->m_object->m_name);
 		a = a + ".";
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, a));
 	}
 	else
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
@@ -1313,11 +1311,11 @@ void Action_use::interaction_handler(Parameter* arg)
 		std::string a = "Выбран ";
 		a.append(p->m_object->m_name);
 		a = a + ".";
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction,a));
 	}
 	else
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
@@ -1328,11 +1326,11 @@ void Action_use::interaction_handler(Parameter* arg)
 		std::string a = "Выбран ";
 		a.append(p->m_unit->m_name);
 		a = a + ".";
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(a));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, a));
 	}
 	else
 	{
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
@@ -1547,7 +1545,7 @@ void Action_shoot::interaction_handler(Parameter* arg)
 		}
 		else
 		{
-			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 			Application::instance().m_message_queue.m_busy = false;
 			Application::instance().m_clipboard.m_item = nullptr;
 			return;
@@ -1563,13 +1561,12 @@ void Action_shoot::interaction_handler(Parameter* arg)
 		}
 		else
 		{
-			Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 			Application::instance().m_message_queue.m_busy = false;
 			Application::instance().m_clipboard.m_item = nullptr;
 			return;
 		}
-		Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрать еще заряд? [Y/N]"));
-		
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Выбрать еще заряд? [Y/N]")));
 	} while (Application::instance().command_agreement());
 	
 	/*if (!p->m_object)
@@ -1607,17 +1604,17 @@ void Action_shoot::interaction_handler(Parameter* arg)
 				p->m_cell = static_cast<MapCell*>(static_cast<P_object_owner*>(result)->m_cell);
 				if (check_cell(p->m_cell))
 				{
-					Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_cell->x) + "," + std::to_string(p->m_cell->y) + "}:"));
+					Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, "Выбрана клетка {" + std::to_string(p->m_cell->x) + "," + std::to_string(p->m_cell->y) + "}:"));
 					valid = true;
 				}
 				else
 				{
-					Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Слишком большая дистанция!"));
+					Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Слишком большая дистанция")));
 				}
 			}
 			else
 			{
-				Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Действие отменено."));
+				Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 				Application::instance().m_message_queue.m_busy = false;
 				Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 				Application::instance().m_GUI->MapViewer->m_hints.pop_front();
