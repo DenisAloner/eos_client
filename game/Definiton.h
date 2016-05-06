@@ -522,7 +522,7 @@ enum game_log_message_type_e
 {
 	message_time,
 	message_action_interaction,
-	message_damage
+	message_battle
 };
 
 struct game_log_message_t

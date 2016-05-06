@@ -227,7 +227,7 @@ void Application::initialize(dimension_t work_area_size)
 void Application::new_game()
 {
 	m_world = new Game_world();
-	GameMap* map= new GameMap(dimension_t(20, 20));
+	GameMap* map = new GameMap(dimension_t(20, 20));
 	map->generate_room();
 	m_world->m_maps.push_back(map);
 	int rx = 10;
@@ -238,44 +238,43 @@ void Application::new_game()
 	m_world->m_player = new Player(obj, map);
 	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
 
-	m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player,map,m_action_manager,m_game_log);
-	
+	m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player, map, m_action_manager, m_game_log);
 
-		GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
-		rectangle_t cr = MiniMap->client_rect();
-		GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(0, 0), dimension_t(cr.w, cr.h), m_GUI->MapViewer);
-		MiniMap->add(mini_map);
+	GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
+	rectangle_t cr = MiniMap->client_rect();
+	GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(0, 0), dimension_t(cr.w, cr.h), m_GUI->MapViewer);
+	MiniMap->add(mini_map);
 
-		MiniMap = new GUI_Window(300, 0, 400, 400, "Поле зрения player");
-		cr = MiniMap->client_rect();
-		GUI_FOV* fov = new GUI_FOV(position_t(0, 0), dimension_t(cr.w, cr.h), m_GUI->MapViewer->m_player->m_object);
-		MiniMap->add(fov);
-	
-		/*obj = m_game_object_manager->new_object("bat");
-		obj->set_direction(object_direction_e::top);
-		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx-2]);
-	
-		obj = m_game_object_manager->new_object("bat");
-		obj->set_direction(object_direction_e::top);
-		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 4]);*/
-	
+	MiniMap = new GUI_Window(300, 0, 400, 400, "Поле зрения player");
+	cr = MiniMap->client_rect();
+	GUI_FOV* fov = new GUI_FOV(position_t(0, 0), dimension_t(cr.w, cr.h), m_GUI->MapViewer->m_player->m_object);
+	MiniMap->add(fov);
+
+	/*obj = m_game_object_manager->new_object("bat");
+	obj->set_direction(object_direction_e::top);
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx-2]);
+
+	obj = m_game_object_manager->new_object("bat");
+	obj->set_direction(object_direction_e::top);
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 4]);*/
+
 	/*	obj = m_game_object_manager->new_object("bow");
 		obj->set_direction(object_direction_e::top);
 		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-1][rx - 1]);*/
-		
-	/*	obj = m_game_object_manager->new_object("bat");
-		obj->set_direction(object_direction_e::top);
-		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-2][rx]);*/
-	
-	
-		/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
-		fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), obj);
-		MiniMap->add(fov);*/
-	
-		/*MenuLayer->add(m_GUI->Timer);
-		MenuLayer->add(MiniMap);*/
-		
-		update_after_load();
+
+			obj = m_game_object_manager->new_object("bat");
+			obj->set_direction(object_direction_e::top);
+			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-2][rx]);
+
+
+			/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
+			fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), obj);
+			MiniMap->add(fov);*/
+
+			/*MenuLayer->add(m_GUI->Timer);
+			MenuLayer->add(MiniMap);*/
+
+	update_after_load();
 }
 
 void Application::load_game()
