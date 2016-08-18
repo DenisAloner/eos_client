@@ -12,7 +12,7 @@ GUI_ItemButton::~GUI_ItemButton()
 
 bool GUI_ItemButton::check_region(MouseEventArgs const& e)
 {
-	float Radius = m_size.w*0.5;
+	float Radius = m_size.w*0.5F;
 	float LocalX = (e.position.x - (m_position.x + Radius));
 	float LocalY = (e.position.y - (m_position.y + Radius));
 	if (LocalX*LocalX+LocalY*LocalY-Radius*Radius<=0)

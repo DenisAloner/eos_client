@@ -258,13 +258,17 @@ void Application::new_game()
 	obj->set_direction(object_direction_e::top);
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 4]);*/
 
-	/*	obj = m_game_object_manager->new_object("bow");
+		obj = m_game_object_manager->new_object("bow");
 		obj->set_direction(object_direction_e::top);
-		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-1][rx - 1]);*/
+		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-1][rx - 1]);
 
-			obj = m_game_object_manager->new_object("bat");
-			obj->set_direction(object_direction_e::top);
-			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-2][rx]);
+		obj = m_game_object_manager->new_object("arrow");
+		obj->set_direction(object_direction_e::top);
+		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 1][rx - 1]);
+
+			//obj = m_game_object_manager->new_object("bat");
+			//obj->set_direction(object_direction_e::top);
+			//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-2][rx]);
 
 
 			/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");

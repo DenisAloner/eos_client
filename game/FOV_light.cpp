@@ -58,8 +58,8 @@ void FOV_light::cast_light(uint x, uint y, uint radius, uint row, float start_sl
 	for (uint i = row; i <= radius; i++) {
 		bool blocked = false;
 		for (int dx = -i, dy = -i; dx <= 0; dx++) {
-			float l_slope = (dx - 0.5) / (dy + 0.5);
-			float r_slope = (dx + 0.5) / (dy - 0.5);
+			float l_slope = (dx - 0.5F) / (dy + 0.5F);
+			float r_slope = (dx + 0.5F) / (dy - 0.5F);
 			if (start_slope < r_slope) {
 				continue;
 			}

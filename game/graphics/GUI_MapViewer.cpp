@@ -299,14 +299,18 @@ void mapviewer_hint_weapon_range::render()
 	int ay = 2*m_range + m_object->m_active_state->m_size.y;
 	int xr = ax / 2;
 	int yr = ay / 2;
+	float xrf = ax / 2.0F - 0.5F;
+	float yrf = ay / 2.0F - 0.5F;
+	float rf = m_range + m_object->m_active_state->m_size.x / 2.0F;
 	for (int i = 0; i < ay; i++)
 	{
 		for (int j = 0; j < ax; j++)
 		{
+			
 			//if (i*i + j*j <= m_range*m_range)
 			int xp = xc + j - xr;
 			int yp = yc - i + yr;
-			if (!m_object->is_own(xp,yp))
+			if ((!m_object->is_own(xp,yp))&&(rf*rf >= ((j - xrf)*(j - xrf) + (i - yrf)*(i - yrf))))
 			{
 				int x = px + xp - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
 				int y = py + yp - m_owner->m_center.y + m_owner->m_tile_count_y / 2;

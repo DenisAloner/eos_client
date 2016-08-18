@@ -6,8 +6,8 @@
 #include <list>
 
 const float Pi = 3.14159265F;
-const float cos22_5 = cos(22.5F*Pi / 180.0);
-const float cos67_5 = cos(67.5F*Pi / 180.0);
+const float cos22_5 = cos(22.5F*Pi / 180.0F);
+const float cos67_5 = cos(67.5F*Pi / 180.0F);
 
 class GameObject;
 class GUI_Object;
