@@ -399,8 +399,11 @@ void mapviewer_hint_shoot::draw_cell(MapCell* a)
 		x3 = x2;
 		y3 = y0;
 		bool pass_able = true;
+		float xrf = a->x - m_object->cell()->x - m_object->m_active_state->m_size.x / 2.0F + 0.5F;
+		float yrf = a->y - m_object->cell()->y + m_object->m_active_state->m_size.y / 2.0F - 0.5F;
+		float rf = m_range + m_object->m_active_state->m_size.x / 2.0F;
 		glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_select);
-		if (m_step_count > m_range)
+		if (rf*rf < (xrf*xrf + yrf*yrf))
 		{
 			pass_able = false;
 		}
