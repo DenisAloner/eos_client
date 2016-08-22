@@ -1397,10 +1397,10 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 
 						}
 					}
-					for (auto current = m_hints.begin(); current != m_hints.end(); current++)
-					{
-						(*current)->render_on_cell(m_map->m_items[y][x]);
-					}
+						for (auto current = m_hints.begin(); current != m_hints.end(); current++)
+						{
+							(*current)->render_on_cell(m_map->m_items[y][x]);
+						}
 				}
 			}
 		}

@@ -33,7 +33,7 @@ public:
 	~Action(void);
 
 	virtual bool check(Parameter* parameter);
-	virtual void perfom(Parameter* parameter);
+	virtual char perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter) = 0;
 	virtual void interaction_handler(Parameter* arg);
 	virtual bool on_turn(){ return false; };
@@ -85,7 +85,7 @@ public:
 	~ActionClass_Move();
 
 	virtual bool check(Parameter* parameter);
-	virtual void perfom(Parameter* parameter);
+	virtual char perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 };
@@ -109,7 +109,7 @@ public:
 	~ActionClass_Push();
 
 	virtual bool check(Parameter* parameter);
-	virtual void perfom(Parameter* parameter);
+	virtual char perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 
@@ -124,7 +124,7 @@ public:
 	~ActionClass_Turn();
 
 	virtual bool check(Parameter* parameter);
-	virtual void perfom(Parameter* parameter);
+	virtual char perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 
@@ -139,7 +139,7 @@ public:
 	~Action_OpenInventory();
 
 	virtual bool check(Parameter* parameter);
-	virtual void perfom(Parameter* parameter);
+	virtual char perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 
@@ -153,7 +153,7 @@ public:
 	Action_CellInfo();
 
 	virtual bool check(Parameter* parameter);
-	virtual void perfom(Parameter* parameter);
+	virtual char perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 
@@ -166,7 +166,7 @@ public:
 
 	action_set_motion_path();
 
-	virtual void perfom(Parameter* parameter);
+	virtual char perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 };
@@ -179,7 +179,7 @@ public:
 
 	Action_pick();
 
-	virtual void perfom(Parameter* parameter);
+	virtual char perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 	virtual void description(std::list<std::string>* info, int level);
@@ -193,7 +193,7 @@ public:
 
 	Action_open();
 
-	virtual void perfom(Parameter* parameter);
+	virtual char perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 
@@ -206,7 +206,7 @@ public:
 
 	Action_hit();
 	virtual bool check(Parameter* parameter);
-	virtual void perfom(Parameter* parameter);
+	virtual char perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 
@@ -219,7 +219,7 @@ public:
 
 	action_hit_melee();
 	virtual void interaction_handler(Parameter* arg);
-	virtual void perfom(Parameter* parameter);
+	virtual char perfom(Parameter* parameter);
 };
 
 class Action_equip :
@@ -230,7 +230,7 @@ public:
 	Action_equip();
 
 	virtual bool check(Parameter* parameter);
-	virtual void perfom(Parameter* parameter);
+	virtual char perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 
@@ -257,7 +257,7 @@ public:
 	Action_use();
 
 	virtual bool check(Parameter* parameter);
-	virtual void perfom(Parameter* parameter);
+	virtual char perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 };
@@ -308,7 +308,7 @@ public:
 
 	Action_shoot();
 	virtual bool check(Parameter* parameter);
-	virtual void perfom(Parameter* parameter);
+	virtual char perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 	bool process_cell(MapCell* a);

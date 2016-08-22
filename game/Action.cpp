@@ -35,8 +35,9 @@ bool Action::check(Parameter* parameter)
 }
 
 
-void Action::perfom(Parameter* parameter)
+char Action::perfom(Parameter* parameter)
 {
+	return 0;
 }
 
 
@@ -244,7 +245,7 @@ bool action_move_step::check(Parameter* parameter)
 	else return false;
 }
 
-void ActionClass_Move::perfom(Parameter* parameter)
+char ActionClass_Move::perfom(Parameter* parameter)
 {
 	Parameter_Position* p = static_cast<Parameter_Position*>(parameter);
 	if (check(p))
@@ -289,7 +290,9 @@ void ActionClass_Move::perfom(Parameter* parameter)
 	else {
 		LOG(INFO) << "errror";
 		//LOG(INFO) << p->m_object->m_name << " движение не вышло";
+		return 1;
 	}
+		return 0;
 	
 }
 
@@ -392,7 +395,7 @@ bool ActionClass_Push::check(Parameter* parameter)
 }
 
 
-void ActionClass_Push::perfom(Parameter* parameter)
+char ActionClass_Push::perfom(Parameter* parameter)
 {
 	Parameter_MoveObjectByUnit* p = static_cast<Parameter_MoveObjectByUnit*>(parameter);
 	if (check(p))
@@ -400,6 +403,8 @@ void ActionClass_Push::perfom(Parameter* parameter)
 		p->m_map->move_object(p->m_unit, p->m_map->m_items[p->m_unit->cell()->y + (p->m_place->y - p->m_object->cell()->y)][p->m_unit->cell()->x + (p->m_place->x - p->m_object->cell()->x)]);
 		p->m_map->move_object(p->m_object, p->m_place);
 	}
+	else return 1;
+	return 0;
 }
 
 
@@ -479,13 +484,15 @@ bool ActionClass_Turn::check(Parameter* parameter)
 }
 
 
-void ActionClass_Turn::perfom(Parameter* parameter)
+char ActionClass_Turn::perfom(Parameter* parameter)
 {
 	Parameter_direction* p = static_cast<Parameter_direction*>(parameter);
 	if (check(p))
 	{
 		p->m_object->set_direction(p->m_direction);
 	}
+	else return 1;
+	return 0;
 }
 
 void ActionClass_Turn::interaction_handler(Parameter* arg)
@@ -590,8 +597,9 @@ bool Action_OpenInventory::check(Parameter* parameter)
 }
 
 
-void Action_OpenInventory::perfom(Parameter* parameter)
+char Action_OpenInventory::perfom(Parameter* parameter)
 {
+	return 0;
 }
 
 
@@ -643,8 +651,9 @@ bool Action_CellInfo::check(Parameter* parameter)
 	return true;
 }
 
-void Action_CellInfo::perfom(Parameter* parameter)
+char Action_CellInfo::perfom(Parameter* parameter)
 {
+	return 0;
 }
 
 std::string Action_CellInfo::get_description(Parameter* parameter)
@@ -715,8 +724,9 @@ void action_set_motion_path::interaction_handler(Parameter* arg)
 	Application::instance().m_message_queue.m_busy = false;
 }
 
-void action_set_motion_path::perfom(Parameter* parameter)
+char action_set_motion_path::perfom(Parameter* parameter)
 {
+	return 0;
 }
 
 std::string action_set_motion_path::get_description(Parameter* parameter)
@@ -798,7 +808,7 @@ void Action_pick::interaction_handler(Parameter* arg)
 	Application::instance().m_message_queue.m_busy = false;
 }
 
-void Action_pick::perfom(Parameter* parameter)
+char Action_pick::perfom(Parameter* parameter)
 {
 	Parameter_destination* p = static_cast<Parameter_destination*>(parameter);
 	if (check(p))
@@ -844,6 +854,8 @@ void Action_pick::perfom(Parameter* parameter)
 		}
 		}
 	}
+	else return 1;
+	return 0;
 }
 
 std::string Action_pick::get_description(Parameter* parameter)
@@ -891,7 +903,7 @@ void Action_open::interaction_handler(Parameter* arg)
 	Application::instance().m_message_queue.m_busy = false;
 }
 
-void Action_open::perfom(Parameter* parameter)
+char Action_open::perfom(Parameter* parameter)
 {
 	P_object* p = static_cast<P_object*>(parameter);
 	if (check(p))
@@ -920,6 +932,8 @@ void Action_open::perfom(Parameter* parameter)
 		}
 		}
 	}
+	else return 1;
+	return 0;
 }
 
 std::string Action_open::get_description(Parameter* parameter)
@@ -992,7 +1006,7 @@ bool Action_hit::check(Parameter* parameter)
 	return true;
 }
 
-void Action_hit::perfom(Parameter* parameter)
+char Action_hit::perfom(Parameter* parameter)
 {
 	P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
 	if (check(p))
@@ -1017,6 +1031,8 @@ void Action_hit::perfom(Parameter* parameter)
 		p->m_object->event_update(VoidEventArgs());
 		LOG(INFO)  << p->m_unit->m_name << "  " << "атакует"<<"   "<<std::to_string(m_decay);
 	}
+	else return 1;
+	return 0;
 }
 
 action_hit_melee::action_hit_melee()
@@ -1102,7 +1118,7 @@ void action_hit_melee::interaction_handler(Parameter* arg)
 	Application::instance().m_message_queue.m_busy = false;
 }
 
-void action_hit_melee::perfom(Parameter* parameter)
+char action_hit_melee::perfom(Parameter* parameter)
 {
 
 	P_interaction_cell* p = static_cast<P_interaction_cell*>(parameter);
@@ -1203,6 +1219,8 @@ void action_hit_melee::perfom(Parameter* parameter)
 		}
 		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_battle, msg));
 	}
+	else return 1;
+	return 0;
 }
 
 std::string Action_hit::get_description(Parameter* parameter)
@@ -1251,8 +1269,9 @@ bool Action_equip::check(Parameter* parameter)
 }
 
 
-void Action_equip::perfom(Parameter* parameter)
+char Action_equip::perfom(Parameter* parameter)
 {
+	return 0;
 }
 
 std::string Action_equip::get_description(Parameter* parameter)
@@ -1353,7 +1372,7 @@ bool Action_use::check(Parameter* parameter)
 	return true;
 }
 
-void Action_use::perfom(Parameter* parameter)
+char Action_use::perfom(Parameter* parameter)
 {
 	P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
 	if (check(p))
@@ -1388,6 +1407,8 @@ void Action_use::perfom(Parameter* parameter)
 		p->m_unit->update_interaction();
 		p->m_unit->event_update(VoidEventArgs());
 	}
+	else return 1;
+	return 0;
 }
 
 std::string Action_use::get_description(Parameter* parameter)
@@ -1490,6 +1511,7 @@ bool Action_autoexplore::get_child(GameTask*& task)
 	map->m_dijkstra_map->calculate_cost_autoexplore(map, object);
 	map->m_dijkstra_map->trace();
 	MapCell* c = map->m_dijkstra_map->next(object);
+	task = nullptr;
 	if (c)
 	{ 
 		LOG(INFO) << std::to_string(c->x) << " " << std::to_string(c->y);
@@ -1498,9 +1520,11 @@ bool Action_autoexplore::get_child(GameTask*& task)
 		P->m_object = object;
 		P->m_place = c;
 		P->m_map = map;
-		task = new GameTask(Application::instance().m_actions[action_e::move_step], P);
+		if (Application::instance().m_actions[action_e::move_step]->check(P))
+		{
+			task = new GameTask(Application::instance().m_actions[action_e::move_step], P);
+		}
 	}
-	else task = nullptr;
 	return true;
 }
 
@@ -1640,6 +1664,12 @@ void Action_shoot::interaction_handler(Parameter* arg)
 bool Action_shoot::check(Parameter* parameter)
 {
 	m_error = "";
+	P_bow_shoot* p = static_cast<P_bow_shoot*>(parameter);
+	if (!p->m_ammo_owner.front()->m_item)
+	{
+		m_error = "Нет снарядов.";
+		return false;
+	}
 	/*P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
 	MapCell* cell;
 	if (!Game_algorithm::check_distance(p->m_unit->cell(), p->m_unit->m_active_state->m_size, p->m_object->cell(), p->m_object->m_active_state->m_size))
@@ -1665,7 +1695,7 @@ bool Action_shoot::process_cell(MapCell* a)
 	return false;
 }
 
-void Action_shoot::perfom(Parameter* parameter)
+char Action_shoot::perfom(Parameter* parameter)
 {
 	P_bow_shoot* p = static_cast<P_bow_shoot*>(parameter);
 	if (check(p))
@@ -1706,6 +1736,12 @@ void Action_shoot::perfom(Parameter* parameter)
 		///*p->m_object->update_interaction();
 		//p->m_object->event_update(VoidEventArgs());*/
 	}
+	else
+	{
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, m_error));
+		return 1;
+	}
+	return 0;
 }
 
 std::string Action_shoot::get_description(Parameter* parameter)
