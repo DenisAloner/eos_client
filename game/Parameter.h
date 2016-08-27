@@ -12,6 +12,15 @@ class GameMap;
 class Object_part;
 class Action;
 
+struct Parameter_argument
+{
+	type_e kind;
+	union
+	{
+		MapCell* m_ñell;
+	};
+};
+
 class Parameter: public iSerializable
 {
 public:
