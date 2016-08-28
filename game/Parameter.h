@@ -12,13 +12,42 @@ class GameMap;
 class Object_part;
 class Action;
 
-struct Parameter_argument
+struct Parameter_argument_t
 {
 	type_e kind;
+
 	union
 	{
-		MapCell* m_ñell;
+		GameObject* m_object;
+		GameMap* m_map;
+		Game_object_owner* m_owner;
+		object_direction_e m_direction;
 	};
+
+	void set(GameObject* value);
+	void set(GameMap* value);
+	void set(Game_object_owner* value);
+	void set(object_direction_e value);
+
+	void reset_serialization_index();
+	void save();
+	void load();
+
+};
+
+class Parameters : public iSerializable
+{
+public:
+
+	ParameterKind m_kind;
+	Parameter_argument_t* m_args;
+	size_t m_size;
+
+	Parameters(ParameterKind kind);
+
+	virtual void reset_serialization_index();
+	virtual void save();
+	virtual void load();
 };
 
 class Parameter: public iSerializable

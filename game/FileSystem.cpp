@@ -566,6 +566,13 @@ iSerializable* Serialization_manager::deserialize()
 			value = new Game_world();
 			break;
 		}
+		case type_e::parameters:
+		{
+			ParameterKind k;
+			fread(&k, sizeof(ParameterKind), 1, m_file);
+			value = new Parameters(k);
+			break;
+		}
 		}
 		LOG(INFO) << "Тип обьекта: " << std::to_string((int)type);
 		m_index += 1;

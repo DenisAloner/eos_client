@@ -1,5 +1,265 @@
 #include "Parameter.h"
 
+void Parameter_argument_t::set(GameObject* value)
+{
+	if (kind == type_e::gameobject)
+	{
+		m_object = value;
+	}
+	else
+	{
+		LOG(FATAL) << "“ип аргумента дл€ Parameter не соотвутствует ожидаемому";
+	}
+};
+
+void Parameter_argument_t::set(GameMap* value)
+{
+	if (kind == type_e::gamemap)
+	{
+		m_map = value;
+	}
+	else
+	{
+		LOG(FATAL) << "“ип аргумента дл€ Parameter не соотвутствует ожидаемому";
+	}
+};
+
+void Parameter_argument_t::set(Game_object_owner* value)
+{
+	switch (kind)
+	{
+	case::type_e::mapcell:
+	{
+		if (value->m_kind == entity_e::cell)
+		{
+			return;
+		}
+	}
+	case::type_e::object_part:
+	{
+		if (value->m_kind == entity_e::body_part)
+		{
+			return;
+		}
+	}
+	case::type_e::inventory_cell:
+	{
+		if (value->m_kind == entity_e::inventory_cell)
+		{
+			return;
+		}
+	}
+	case::type_e::object_owner:
+	{
+	
+		return;
+	}
+	}
+	LOG(FATAL) << "“ип аргумента дл€ Parameter не соотвутствует ожидаемому";
+};
+
+void Parameter_argument_t::set(object_direction_e value)
+{
+	if (kind == type_e::direction)
+	{
+		m_direction = value;
+	}
+	else
+	{
+		LOG(FATAL) << "“ип аргумента дл€ Parameter не соотвутствует ожидаемому";
+	}
+};
+
+void Parameter_argument_t::reset_serialization_index()
+{
+	switch (kind)
+	{
+	case::type_e::gameobject:
+	{
+		if (m_object)
+		{
+			if (m_object->m_serialization_index > 1)
+			{
+				m_object->reset_serialization_index();
+			}
+		}
+		break;
+	}
+	case::type_e::object_owner:
+	{
+		if (m_owner)
+		{
+			if (m_owner->m_serialization_index > 1)
+			{
+				m_owner->reset_serialization_index();
+			}
+		}
+		break;
+	}
+	case::type_e::mapcell:
+	{
+		if (m_owner)
+		{
+			if (m_owner->m_serialization_index > 1)
+			{
+				m_owner->reset_serialization_index();
+			}
+		}
+		break;
+	}
+	case::type_e::inventory_cell:
+	{
+		if (m_owner)
+		{
+			if (m_owner->m_serialization_index > 1)
+			{
+				m_owner->reset_serialization_index();
+			}
+		}
+		break;
+	}
+	case::type_e::object_part:
+	{
+		if (m_owner)
+		{
+			if (m_owner->m_serialization_index > 1)
+			{
+				m_owner->reset_serialization_index();
+			}
+		}
+		break;
+	}
+	}
+};
+
+void Parameter_argument_t::save()
+{
+	switch (kind)
+	{
+	case::type_e::object_owner:
+	{
+		Serialization_manager::instance().serialize(m_owner);
+		break;
+	}
+	case::type_e::mapcell:
+	{
+		Serialization_manager::instance().serialize(m_owner);
+		break;
+	}
+	case::type_e::inventory_cell:
+	{
+		Serialization_manager::instance().serialize(m_owner);
+		break;
+	}
+	case::type_e::object_part:
+	{
+		Serialization_manager::instance().serialize(m_owner);
+		break;
+	}
+	case::type_e::gameobject:
+	{
+		Serialization_manager::instance().serialize(m_object);
+		break;
+	}
+	case::type_e::gamemap:
+	{
+		Serialization_manager::instance().serialize(m_map);
+		break;
+	}
+	case::type_e::direction:
+	{
+		FILE* file = Serialization_manager::instance().m_file;
+		fwrite(&m_direction, sizeof(object_direction_e), 1, file);
+		break;
+	}
+	}
+};
+
+void Parameter_argument_t::load()
+{
+	switch (kind)
+	{
+	case::type_e::object_owner:
+	{
+		m_owner = dynamic_cast<Game_object_owner*>(Serialization_manager::instance().deserialize());
+		break;
+	}
+	case::type_e::mapcell:
+	{
+		m_owner = dynamic_cast<Game_object_owner*>(Serialization_manager::instance().deserialize());
+		break;
+	}
+	case::type_e::inventory_cell:
+	{
+		m_owner = dynamic_cast<Game_object_owner*>(Serialization_manager::instance().deserialize());
+		break;
+	}
+	case::type_e::object_part:
+	{
+		m_owner = dynamic_cast<Game_object_owner*>(Serialization_manager::instance().deserialize());
+		break;
+	}
+	case::type_e::gameobject:
+	{
+		m_object = dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize());
+		break;
+	}
+	case::type_e::gamemap:
+	{
+		m_map = dynamic_cast<GameMap*>(Serialization_manager::instance().deserialize());
+		break;
+	}
+	case::type_e::direction:
+	{
+		FILE* file = Serialization_manager::instance().m_file;
+		fread(&m_direction, sizeof(object_direction_e), 1, file);
+		break;
+	}
+	}
+};
+
+Parameters::Parameters(ParameterKind kind) :m_kind(kind)
+{
+	switch (kind)
+	{
+	case::ParameterKind_MapCell:
+	{  
+		m_size = 1;
+		m_args = new Parameter_argument_t[m_size];
+		m_args[0].kind = type_e::mapcell;
+		break;
+	}
+	}
+}
+
+void Parameters::reset_serialization_index()
+{
+	m_serialization_index = 0;
+	for (int i = 0; i < m_size; i++)
+	{
+		m_args[i].reset_serialization_index();
+	}
+}
+
+void Parameters::save()
+{
+	FILE* file = Serialization_manager::instance().m_file;
+	type_e t = type_e::parameters;
+	fwrite(&t, sizeof(type_e), 1, file);
+	fwrite(&m_kind, sizeof(ParameterKind), 1, file);
+	for (int i = 0; i < m_size; i++)
+	{
+		m_args[i].save();
+	}
+}
+
+void Parameters::load()
+{
+	for (int i = 0; i < m_size; i++)
+	{
+		m_args[i].load();
+	}
+}
 
 Parameter::Parameter(ParameterKind _kind) :m_kind (_kind)
 {

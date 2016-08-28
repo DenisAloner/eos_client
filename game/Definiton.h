@@ -463,7 +463,10 @@ enum class type_e
 	parameter_bow_shoot,
 	vision_list,
 	vision_component,
-	game_world
+	game_world,
+	parameters,
+	object_owner,
+	direction
 };
 
 struct predicat_t
@@ -542,7 +545,6 @@ public:
 	dimension_t m_symbol_size;
 
 };
-
 
 //struct Game_log_message_EventArgs
 //{
