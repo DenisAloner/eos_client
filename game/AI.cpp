@@ -654,7 +654,7 @@ void AI_enemy::create()
 			{
 				if (i->action->m_kind == action_e::hit_melee)
 				{
-					P_interaction_cell* p = static_cast<P_interaction_cell*>(i->parameter);
+					/*?1? P_interaction_cell* p = static_cast<P_interaction_cell*>(i->parameter);
 					p->m_object = m_goal;
 					area_t attack_area = area_t(position_t(m_object->cell()->x - 1, m_object->cell()->y + 1), position_t(m_object->cell()->x - m_object->m_active_state->m_size.x, m_object->cell()->y - m_object->m_active_state->m_size.y));
 					attack_area.p1.x = max(attack_area.p1.x, m_goal->cell()->x);
@@ -664,7 +664,7 @@ void AI_enemy::create()
 					GameMap* map = c->m_map;
 					p->m_cell = map->m_items[attack_area.p1.y][attack_area.p1.x];
 					LOG(INFO) << "Удар противника в точку [" << std::to_string(attack_area.p1.x) << "," << std::to_string(attack_area.p1.y) << "]";
-					m_action_controller->set(p->m_unit, i->action, p);
+					m_action_controller->set(p->m_unit, i->action, p);*/
 					break;
 				}
 			}
@@ -746,13 +746,12 @@ void AI_enemy::create()
 			{
 				if (path->size() >= 2)
 				{
-					Parameter_Position* P;
-					P = new Parameter_Position();
-					P->m_object = m_object;
-					P->m_place = (*path)[path->size() - 2];
-					P->m_map = m_map;
+					Parameter* P=new Parameter(ParameterKind::ParameterKind_Position);
+					(*P)[0].set(m_object);
+					(*P)[1].set((*path)[path->size() - 2]);
+					(*P)[2].set(m_map);
 					//Application::instance().m_action_manager->add(m_object, new GameTask(Application::instance().m_actions[action_e::move], P));
-					m_action_controller->set(P->m_object, Application::instance().m_actions[action_e::move], P);
+					m_action_controller->set((*P)[0].m_object, Application::instance().m_actions[action_e::move], P);
 				}
 				else
 				{
@@ -823,11 +822,11 @@ void AI_trap::create()
 		{
 			if (m_object != (*item) && (*item)->m_name != "floor")
 			{
-				P_unit_interaction* p = new P_unit_interaction();
+				/*?1? P_unit_interaction* p = new P_unit_interaction();
 				p->m_unit = m_object;
 				p->m_object = (*item);
 				p->m_unit_body_part = nullptr;
-				Application::instance().m_action_manager->add(new GameTask(Application::instance().m_actions[action_e::hit], p));
+				Application::instance().m_action_manager->add(new GameTask(Application::instance().m_actions[action_e::hit], p));*/
 			}
 		}
 	}

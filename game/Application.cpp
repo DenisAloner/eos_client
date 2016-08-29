@@ -258,6 +258,7 @@ void Application::new_game()
 	obj->set_direction(object_direction_e::top);
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 4]);*/
 
+/*
 		obj = m_game_object_manager->new_object("bow");
 		obj->set_direction(object_direction_e::top);
 		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-1][rx - 1]);
@@ -265,6 +266,7 @@ void Application::new_game()
 		obj = m_game_object_manager->new_object("arrow");
 		obj->set_direction(object_direction_e::top);
 		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 1][rx - 1]);
+*/
 
 			//obj = m_game_object_manager->new_object("bat");
 			//obj->set_direction(object_direction_e::top);
@@ -587,8 +589,8 @@ Parameter* Application::command_select_location(GameObject* object)
 		m_message_queue.m_processed_message = true;
 		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_owner)
 		{
-			P_object_owner* p = static_cast<P_object_owner*>(m_message_queue.m_items.front());
-			if (p->m_cell->m_kind == entity_e::cell)
+			Parameter* p = m_message_queue.m_items.front();
+			if ((*p)[0].m_owner->m_kind == entity_e::cell)
 			{
 				Result = m_message_queue.m_items.front();
 				Exit = true;
@@ -627,7 +629,7 @@ Parameter* Application::command_select_object_on_map()
 		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_object)
 		{
 			Result = m_message_queue.m_items.front();
-			if(static_cast<P_object*>(Result)->m_object->m_owner->Game_object_owner::m_kind==entity_e::cell)
+			if((*Result)[0].m_object->m_owner->Game_object_owner::m_kind==entity_e::cell)
 			{
 				Exit = true;
 			}
@@ -645,9 +647,9 @@ Parameter* Application::command_select_object_on_map()
 	return Result;
 }
 
-Parameter* Application::command_select_object()
+GameObject* Application::command_select_object()
 {
-	P_object* Result = nullptr;
+	GameObject* Result = nullptr;
 	m_GUI->MapViewer->m_cursor_x = 1;
 	m_GUI->MapViewer->m_cursor_y = 1;
 	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Выберите обьект")));
@@ -663,7 +665,7 @@ Parameter* Application::command_select_object()
 		m_message_queue.m_processed_message = true;
 		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_object)
 		{
-			Result = static_cast<P_object*>(m_message_queue.m_items.front());
+			Result = (*m_message_queue.m_items.front())[0].m_object;
 			//if (static_cast<P_object*>(Result)->m_object->m_owner->Game_object_owner::m_kind == entity_e::cell)
 			{
 				Exit = true;
@@ -672,15 +674,14 @@ Parameter* Application::command_select_object()
 		}
 		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_owner)
 		{
-			P_object_owner* temp = static_cast<P_object_owner*>(m_message_queue.m_items.front());
-			switch (temp->m_cell->m_kind)
+			Parameter* temp = m_message_queue.m_items.front();
+			switch ((*temp)[0].m_owner->m_kind)
 			{
 			case entity_e::inventory_cell:
 			{
-				if (static_cast<Inventory_cell*>(temp->m_cell)->m_item)
+				if (static_cast<Inventory_cell*>((*temp)[0].m_owner)->m_item)
 				{
-					Result = new P_object();
-					Result->m_object = static_cast<Inventory_cell*>(temp->m_cell)->m_item;
+					Result = static_cast<Inventory_cell*>((*temp)[0].m_owner)->m_item;
 					Exit = true;
 				}
 				else Result = nullptr;
@@ -688,10 +689,9 @@ Parameter* Application::command_select_object()
 			}
 			case entity_e::body_part:
 			{
-				if (static_cast<Object_part*>(temp->m_cell)->m_item)
+				if (static_cast<Object_part*>((*temp)[0].m_owner)->m_item)
 				{
-					Result = new P_object();
-					Result->m_object = static_cast<Object_part*>(temp->m_cell)->m_item;
+					Result = static_cast<Object_part*>((*temp)[0].m_owner)->m_item;
 					Exit = true;
 				}
 				else Result = nullptr;
@@ -843,64 +843,64 @@ Parameter* Application::command_select_transfer(Parameter_destination* parameter
 	return Result;
 }
 
-P_object* Application::command_select_transfer_source(Parameter_destination* parameter){
-	P_object* Result = nullptr;
-	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Выберите объект")));
-	bool Exit = false;
-	while (Exit == false)
-	{
-		std::unique_lock<std::mutex> lk(m_message_queue.m_mutex);
-		m_message_queue.m_reader = true;
-		while (!m_message_queue.m_read_message)
-		{
-			m_message_queue.m_condition_variable.wait(lk);
-		}
-		m_message_queue.m_processed_message = true;
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_object)
-		{
-			Result = static_cast<P_object*>(m_message_queue.m_items.front());
-			Exit = true;
-		}
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_owner)
-		{
-			P_object_owner* temp = static_cast<P_object_owner*>(m_message_queue.m_items.front());
-			switch (temp->m_cell->m_kind)
-			{
-			case entity_e::inventory_cell:
-				{
-					if (static_cast<Inventory_cell*>(temp->m_cell)->m_item)
-					{
-						Result = new P_object();
-						Result->m_object = static_cast<Inventory_cell*>(temp->m_cell)->m_item;
-						Exit = true;
-					}
-					else Result = nullptr;
-					break;
-				}
-			case entity_e::body_part:
-			{
-				if (static_cast<Object_part*>(temp->m_cell)->m_item)
-				{
-					Result = new P_object();
-					Result->m_object = static_cast<Object_part*>(temp->m_cell)->m_item;
-					Exit = true;
-				}
-				else Result = nullptr;
-				break;
-			}
-			}
-		}
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind_Cancel)
-		{
-			Exit = true;
-		}
-		m_message_queue.m_read_message = false;
-		lk.unlock();
-		m_message_queue.m_condition_variable.notify_one();
-		m_message_queue.m_reader = false;
-	}
-	return Result;
-}
+//Parameter* Application::command_select_transfer_source(Parameter_destination* parameter){
+//	Parameter* Result = nullptr;
+//	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Выберите объект")));
+//	bool Exit = false;
+//	while (Exit == false)
+//	{
+//		std::unique_lock<std::mutex> lk(m_message_queue.m_mutex);
+//		m_message_queue.m_reader = true;
+//		while (!m_message_queue.m_read_message)
+//		{
+//			m_message_queue.m_condition_variable.wait(lk);
+//		}
+//		m_message_queue.m_processed_message = true;
+//		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_object)
+//		{
+//			Result = m_message_queue.m_items.front();
+//			Exit = true;
+//		}
+//		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_owner)
+//		{
+//			Parameter* temp = m_message_queue.m_items.front();
+//			switch (temp->m_cell->m_kind)
+//			{
+//			case entity_e::inventory_cell:
+//				{
+//					if (static_cast<Inventory_cell*>(temp->m_cell)->m_item)
+//					{
+//						Result = new P_object();
+//						Result->m_object = static_cast<Inventory_cell*>(temp->m_cell)->m_item;
+//						Exit = true;
+//					}
+//					else Result = nullptr;
+//					break;
+//				}
+//			case entity_e::body_part:
+//			{
+//				if (static_cast<Object_part*>(temp->m_cell)->m_item)
+//				{
+//					Result = new P_object();
+//					Result->m_object = static_cast<Object_part*>(temp->m_cell)->m_item;
+//					Exit = true;
+//				}
+//				else Result = nullptr;
+//				break;
+//			}
+//			}
+//		}
+//		if (m_message_queue.m_items.front()->m_kind == ParameterKind_Cancel)
+//		{
+//			Exit = true;
+//		}
+//		m_message_queue.m_read_message = false;
+//		lk.unlock();
+//		m_message_queue.m_condition_variable.notify_one();
+//		m_message_queue.m_reader = false;
+//	}
+//	return Result;
+//}
 
 Parameter* Application::command_select_body_part()
 {
@@ -918,12 +918,12 @@ Parameter* Application::command_select_body_part()
 		m_message_queue.m_processed_message = true;
 		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_owner)
 		{
-			P_object_owner* p = static_cast<P_object_owner*>(m_message_queue.m_items.front());
-			if (p->m_cell->m_kind == entity_e::body_part)
-			{
-				Result = m_message_queue.m_items.front();
-				Exit = true;
-			}
+			//?1? P_object_owner* p = static_cast<P_object_owner*>(m_message_queue.m_items.front());
+			//if (p->m_cell->m_kind == entity_e::body_part)
+			//{
+			//	Result = m_message_queue.m_items.front();
+			//	Exit = true;
+			//}
 		}
 		if (m_message_queue.m_items.front()->m_kind == ParameterKind_Cancel)
 		{

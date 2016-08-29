@@ -593,34 +593,33 @@ void GameObject::add_action_from_part(Object_interaction* object)
 				{
 				case action_e::pick:
 				{
-					Parameter_destination* p = new Parameter_destination();
+					/*?1? Parameter_destination* p = new Parameter_destination();
 					p->m_unit =this;
 					p->m_owner = op;
 					m_common_actions.pick = true;
-					m_actions_list->push_back(Action_helper_t(a,p));
+					m_actions_list->push_back(Action_helper_t(a,p));*/
 					break;
 				}
 				case action_e::move_step:
 				{
-					Parameter_destination* p = new Parameter_destination();
-					p->m_unit = this;
-					p->m_owner = op;
+					Parameter* p = new Parameter(ParameterKind::ParameterKind_Position);
+					(*p)[0].set(this);
 					m_actions_list->push_back(Action_helper_t(a, p));
 					break;
 				}
 				case action_e::turn:
 				{
-					Parameter_direction* p = new Parameter_direction();
+					/*?1? Parameter_direction* p = new Parameter_direction();
 					p->m_object = this;
-					m_actions_list->push_back(Action_helper_t(a, p));
+					m_actions_list->push_back(Action_helper_t(a, p));*/
 					break;
 				}
 				case action_e::hit_melee:
 				{
-					P_interaction_cell* p = new P_interaction_cell();
+					/*?1? P_interaction_cell* p = new P_interaction_cell();
 					p->m_unit = this;
 					p->m_unit_body_part = op;
-					m_actions_list->push_back(Action_helper_t(a, p));
+					m_actions_list->push_back(Action_helper_t(a, p));*/
 					break;
 				}
 				}
@@ -637,19 +636,19 @@ void GameObject::add_action_from_part(Object_interaction* object)
 					switch (a->m_kind)
 					{
 					case action_e::hit_melee:
-					{
+					{/*
 						P_interaction_cell* p = new P_interaction_cell();
 						p->m_unit = this;
 						p->m_unit_body_part = op;
-						m_actions_list->push_back(Action_helper_t(a, p));
+						m_actions_list->push_back(Action_helper_t(a, p));*/
 						break;
 					}
 					case action_e::shoot:
 					{
-						P_bow_shoot* p = new P_bow_shoot();
+						/*P_bow_shoot* p = new P_bow_shoot();
 						p->m_unit = this;
 						p->m_unit_body_part = op;
-						m_actions_list->push_back(Action_helper_t(a, p));
+						m_actions_list->push_back(Action_helper_t(a, p));*/
 						break;
 					}
 					}

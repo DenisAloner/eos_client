@@ -146,7 +146,7 @@ public:
 
 	Parameter* command_select_location(GameObject* object);
 	Parameter* command_select_object_on_map();
-	Parameter* command_select_object();
+	GameObject* command_select_object();
 	void command_main_menu_select();
 	bool command_open_body(GameObject*& Object);
 	void command_gui_show_characterization(GameObject*& object);
@@ -157,7 +157,7 @@ public:
 	void command_set_pickup_item(GLuint _Tile);
 	void command_set_cursor_visibility(bool _Visibility);
 	void command_set_pickup_item_visibility(bool _Visibility);
-	P_object* command_select_transfer_source(Parameter_destination* parameter);
+	/*Parameter* command_select_transfer_source(Parameter_destination* parameter);*/
 	Parameter* command_select_transfer(Parameter_destination* parameter);
 	Parameter* command_select_body_part();
 	bool command_agreement();

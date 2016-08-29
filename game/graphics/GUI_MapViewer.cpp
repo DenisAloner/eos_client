@@ -1513,7 +1513,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 
 void GUI_MapViewer::on_key_press(WPARAM w)
 {
-	Parameter_Position* P;
+	//Parameter_Position* P;
 	switch (w)
 	{
 	case VK_ESCAPE:
@@ -1589,11 +1589,11 @@ void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
 		{
 			if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
 			{
-				P_object_owner* pr = new P_object_owner();
-				pr->m_cell = m_map->m_items[y][x];
+				Parameter* p = new Parameter(parameter_kind_owner);
+				(*p)[0].set(m_map->m_items[y][x]);
 				if (Application::instance().m_message_queue.m_reader)
 				{
-					Application::instance().m_message_queue.push(pr);
+					Application::instance().m_message_queue.push(p);
 				}
 			}
 		}
