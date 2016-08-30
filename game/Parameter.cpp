@@ -261,33 +261,33 @@ void Parameter_argument_t::load()
 	}
 };
 
-Parameter::Parameter(ParameterKind kind) :m_kind(kind)
+Parameter::Parameter(parameter_type_e kind) :m_kind(kind)
 {
 	m_args = nullptr;
 	switch (kind)
 	{
-	case::ParameterKind::parameter_kind_object:
+	case::parameter_type_e::parameter_kind_object:
 	{
 		m_size = 1;
 		m_args = new Parameter_argument_t[m_size];
 		m_args[0].kind = type_e::gameobject;
 		break;
 	}
-	case::ParameterKind_MapCell:
+	case::parameter_type_e::ParameterKind_MapCell:
 	{  
 		m_size = 1;
 		m_args = new Parameter_argument_t[m_size];
 		m_args[0].kind = type_e::mapcell;
 		break;
 	}
-	case::parameter_kind_owner:
+	case::parameter_type_e::parameter_kind_owner:
 	{
 		m_size = 1;
 		m_args = new Parameter_argument_t[m_size];
 		m_args[0].kind = type_e::object_owner;
 		break;
 	}
-	case::ParameterKind_Position:
+	case::parameter_type_e::ParameterKind_Position:
 	{
 		m_size = 3;
 		m_args = new Parameter_argument_t[m_size];
@@ -296,7 +296,7 @@ Parameter::Parameter(ParameterKind kind) :m_kind(kind)
 		m_args[2].kind = type_e::gamemap;
 		break;
 	}
-	case::ParameterKind::ParameterKind_Destination:
+	case::parameter_type_e::ParameterKind_Destination:
 	{
 		m_size = 3;
 		m_args = new Parameter_argument_t[m_size];
@@ -329,7 +329,7 @@ void Parameter::save()
 	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::parameters;
 	fwrite(&t, sizeof(type_e), 1, file);
-	fwrite(&m_kind, sizeof(ParameterKind), 1, file);
+	fwrite(&m_kind, sizeof(parameter_type_e), 1, file);
 	for (int i = 0; i < m_size; i++)
 	{
 		m_args[i].save();

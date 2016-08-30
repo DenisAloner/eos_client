@@ -4,6 +4,7 @@
 #include <functional>
 #include "graphics/gl.hpp"
 #include <list>
+#include <log.h>
 
 const float Pi = 3.14159265F;
 const float cos22_5 = cos(22.5F*Pi / 180.0F);
@@ -164,7 +165,7 @@ enum class object_state_e
 	growth_06
 };
 
-enum ParameterKind
+enum class parameter_type_e
 {
 	ParameterKind_Simple,
 	ParameterKind_Position,
@@ -509,7 +510,7 @@ struct Action_helper_t
 	Action* action;
 	Parameter* parameter;
 
-	Action_helper_t(Action* action = nullptr, Parameter* parameter = nullptr) :action(action), parameter(parameter) {};
+	Action_helper_t(Action* action = nullptr, Parameter* parameter = nullptr) :action(action), parameter(parameter) { /*if ((!action) || (!parameter)) { LOG(FATAL) << "Action_helper_t инициализирован нулевым указателем"; }*/ };
 };
 
 struct font_symbol_t

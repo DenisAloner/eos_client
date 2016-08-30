@@ -44,7 +44,7 @@ void GUI_button::render(GraphicalController* Graph, int px, int py)
 	}
 }
 
-GUI_Mainmenu_button::GUI_Mainmenu_button(int x, int y, int width, int height, std::string text, ParameterKind kind) :GUI_button(x, y, width, height, text), m_parameter(new Parameter(kind))
+GUI_Mainmenu_button::GUI_Mainmenu_button(int x, int y, int width, int height, std::string text, parameter_type_e kind) :GUI_button(x, y, width, height, text), m_parameter(new Parameter(kind))
 {
 }
 

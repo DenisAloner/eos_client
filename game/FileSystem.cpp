@@ -523,8 +523,8 @@ iSerializable* Serialization_manager::deserialize()
 		}
 		case type_e::parameters:
 		{
-			ParameterKind k;
-			fread(&k, sizeof(ParameterKind), 1, m_file);
+			parameter_type_e k;
+			fread(&k, sizeof(parameter_type_e), 1, m_file);
 			value = new Parameter(k);
 			break;
 		}

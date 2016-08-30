@@ -41,11 +41,11 @@ class Parameter : public iSerializable
 {
 public:
 
-	ParameterKind m_kind;
+	parameter_type_e m_kind;
 	Parameter_argument_t* m_args;
 	size_t m_size;
 
-	Parameter(ParameterKind kind);
+	Parameter(parameter_type_e kind);
 
 	Parameter_argument_t& operator[](std::size_t i)
 	{

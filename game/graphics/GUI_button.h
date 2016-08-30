@@ -23,7 +23,7 @@ class GUI_Mainmenu_button :
 {
 public:
 	Parameter* m_parameter;
-	GUI_Mainmenu_button(int x, int y, int width, int height, std::string text, ParameterKind kind);
+	GUI_Mainmenu_button(int x, int y, int width, int height, std::string text, parameter_type_e kind);
 
 	virtual void on_mouse_click(MouseEventArgs const& e);
 };

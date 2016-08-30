@@ -48,7 +48,7 @@ void Action::interaction_handler(Parameter* arg)
 	{
 		if (Application::instance().m_message_queue.m_reader)
 		{
-			Parameter* p = new Parameter(ParameterKind_Cancel);
+			Parameter* p = new Parameter(parameter_type_e::ParameterKind_Cancel);
 			Application::instance().m_message_queue.push(p);
 		}
 		while (Application::instance().m_message_queue.m_busy){}
@@ -172,6 +172,7 @@ ActionClass_Move::ActionClass_Move()
 	m_icon = Application::instance().m_graph->m_actions[0];
 	m_name = "Идти";
 	m_decay = 10;
+	m_parameter_kind = parameter_type_e::ParameterKind_Position;
 }
 
 
@@ -180,16 +181,21 @@ ActionClass_Move::~ActionClass_Move()
 }
 
 
-void ActionClass_Move::interaction_handler(Parameter* filled_parameter)
+void ActionClass_Move::interaction_handler(Parameter* parameter)
 {
-	if (!filled_parameter)
-	{
-		LOG(FATAL) << "В обработчик создния игрового действия передан нулевой указатель";
-	}
 	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
-	Parameter* temp;
-	Parameter& p(*filled_parameter);
+	MapCell* temp;
+	Parameter* out_parameter;
+	if (parameter)
+	{
+		out_parameter = parameter->clone();
+	}
+	else
+	{
+		out_parameter = new Parameter(m_parameter_kind);
+	}
+	Parameter& p(*out_parameter);
 	if (!p[0].m_object)
 	{
 		p[0].m_object = Application::instance().m_GUI->MapViewer->m_player->m_object;
@@ -200,8 +206,7 @@ void ActionClass_Move::interaction_handler(Parameter* filled_parameter)
 		temp = Application::instance().command_select_location(p[0].m_object);
 		if (temp)
 		{
-			p[1].m_cell = (*temp)[0].m_cell;
-			p[1].m_cell = Game_algorithm::step_in_direction(p[0].m_object, Game_algorithm::turn_to_cell(p[0].m_object, p[1].m_cell));
+			p[1].m_cell = Game_algorithm::step_in_direction(p[0].m_object, Game_algorithm::turn_to_cell(p[0].m_object, temp));
 			p[2].m_map = p[1].m_cell->m_map;
 			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, "Выбрана клетка {" + std::to_string(p[1].m_cell->x) + "," + std::to_string(p[1].m_cell->y) + "}"));
 		}
@@ -214,7 +219,7 @@ void ActionClass_Move::interaction_handler(Parameter* filled_parameter)
 		}
 		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 	}
-	Application::instance().m_action_manager->add(new GameTask(this, filled_parameter));
+	Application::instance().m_action_manager->add(new GameTask(this, out_parameter));
 	Application::instance().m_message_queue.m_busy = false;
 }
 
@@ -230,6 +235,7 @@ action_move_step::action_move_step()
 	m_icon = Application::instance().m_graph->m_actions[0];
 	m_name = "Идти на шаг";
 	m_decay = 10;
+	m_parameter_kind = parameter_type_e::ParameterKind_Position;
 }
 
 bool action_move_step::check(Parameter* parameter)
@@ -557,6 +563,7 @@ Action_OpenInventory::Action_OpenInventory()
 {
 	m_kind = action_e::open_inventory;
 	m_icon = Application::instance().m_graph->m_actions[3];
+	m_parameter_kind = parameter_type_e::parameter_kind_object;
 }
 
 
@@ -565,18 +572,26 @@ Action_OpenInventory::~Action_OpenInventory()
 }
 
 
-void Action_OpenInventory::interaction_handler(Parameter* arg)
+void Action_OpenInventory::interaction_handler(Parameter* parameter)
 {
-	/*Action::interaction_handler(nullptr);
+	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
-	Parameter* result;
-	P_object* p = new P_object();
-	result = Application::instance().command_select_object_on_map();
+	Parameter* out_parameter;
+	if (parameter)
+	{
+		out_parameter = parameter->clone();
+	}
+	else
+	{
+		out_parameter = new Parameter(m_parameter_kind);
+	}
+	Parameter& p(*out_parameter);
+	GameObject* result = Application::instance().command_select_object_on_map();
 	if (result)
 	{
-		p->m_object = static_cast<P_object*>(result)->m_object;
+		p[0].m_object = result;
 		std::string a = "Выбран ";
-		a.append(p->m_object->m_name);
+		a.append(p[0].m_object->m_name);
 		a = a + ".";
 		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, a));
 	}
@@ -586,7 +601,7 @@ void Action_OpenInventory::interaction_handler(Parameter* arg)
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
-	Application::instance().m_message_queue.m_busy = false;*/
+	Application::instance().m_message_queue.m_busy = false;
 }
 
 
@@ -738,122 +753,117 @@ Action_pick::Action_pick()
 	m_kind = action_e::pick;
 	m_icon = Application::instance().m_graph->m_actions[6];
 	m_name = "Поднять";
+	m_parameter_kind = parameter_type_e::ParameterKind_Destination;
 }
 
-void Action_pick::interaction_handler(Parameter* arg)
+void Action_pick::interaction_handler(Parameter* parameter)
 {
-	//Action::interaction_handler(nullptr);
-	//Application::instance().m_message_queue.m_busy = true;
-	//Parameter* result;
-	//Parameter_destination* arg_p = static_cast<Parameter_destination*>(arg);
-	//Parameter_destination* p = new Parameter_destination();
-	//if (arg_p)
-	//{
-	//	p->m_unit = arg_p->m_unit;
-	//	p->m_object = arg_p->m_object;
-	//	p->m_owner = arg_p->m_owner;
-	//}
-	//if (!p->m_unit)
-	//{
-	//	p->m_unit = Application::instance().m_GUI->MapViewer->m_player->m_object;
-	//}
-	//if (!p->m_owner)
-	//{
-	//	result = Application::instance().command_select_transfer(p);
-	//	if (result)
-	//	{
-	//		switch (result->m_kind)
-	//		{
-	//		case ParameterKind::parameter_kind_owner:
-	//		{
-	//			p->m_owner = static_cast<P_object_owner*>(result)->m_cell;
-	//			break;
-	//		}
-	//		}
-	//		//Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));
-	//	}
-	//	else
-	//	{
-	//		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
-	//		Application::instance().m_message_queue.m_busy = false;
-	//		Application::instance().m_clipboard.m_item = nullptr;
-	//		return;
-	//	}
-	//}
-	//if (!p->m_object)
-	//{
-	//	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_unit, true));
-	//	P_object* object = Application::instance().command_select_transfer_source(p);
-	//	if (object)
-	//	{
-	//		p->m_object = object->m_object;
-	//		std::string a = "Выбран ";
-	//		a.append(p->m_object->m_name);
-	//		a = a + ".";
-	//		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, a));
-	//	}
-	//	else
-	//	{
-	//		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
-	//		Application::instance().m_message_queue.m_busy = false;
-	//		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
-	//		return;
-	//	}
-	//	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
-	//	Application::instance().m_clipboard.m_item = p->m_object;
-	//}
-	//Application::instance().m_action_manager->add(new GameTask(this, p));
-	//Application::instance().m_clipboard.m_item = nullptr;
-	//Application::instance().m_message_queue.m_busy = false;
+	Action::interaction_handler(nullptr);
+	Application::instance().m_message_queue.m_busy = true;
+	Parameter* out_parameter;
+	if (parameter)
+	{
+		out_parameter = parameter->clone();
+	}
+	else
+	{
+		out_parameter = new Parameter(m_parameter_kind);
+	}
+	Parameter& p(*out_parameter);
+	if (!p[0].m_object)
+	{
+		p[0].m_object = Application::instance().m_GUI->MapViewer->m_player->m_object;
+	}
+	if (!p[2].m_owner)
+	{
+		Game_object_owner* result = Application::instance().command_select_transfer(nullptr);
+		if (result)
+		{
+			p[2].m_owner = result;
+			//Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}."));
+		}
+		else
+		{
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
+			Application::instance().m_message_queue.m_busy = false;
+			Application::instance().m_clipboard.m_item = nullptr;
+			return;
+		}
+	}
+	if (!p[1].m_object)
+	{
+		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p[0].m_object, true));
+		GameObject* result = Application::instance().command_select_object();
+		if (result)
+		{
+			p[1].m_object = result;
+			std::string a = "Выбран ";
+			a.append(p[1].m_object->m_name);
+			a = a + ".";
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, a));
+		}
+		else
+		{
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
+			Application::instance().m_message_queue.m_busy = false;
+			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+			return;
+		}
+		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+		Application::instance().m_clipboard.m_item = p[1].m_object;
+	}
+	Application::instance().m_action_manager->add(new GameTask(this, out_parameter));
+	Application::instance().m_clipboard.m_item = nullptr;
+	Application::instance().m_message_queue.m_busy = false;
 }
 
 char Action_pick::perfom(Parameter* parameter)
 {
-	//Parameter_destination* p = static_cast<Parameter_destination*>(parameter);
-	//if (check(p))
-	//{
-	//	switch (p->m_object->m_owner->m_kind)
-	//	{
-	//	case entity_e::cell:
-	//	{
-	//		//static_cast<MapCell*>(p->m_object->m_owner)->m_items.remove(p->m_object);
-	//		static_cast<MapCell*>(p->m_object->m_owner)->m_map->remove_object(p->m_object);
-	//		break;
-	//	}
-	//	case entity_e::inventory_cell:
-	//	{
-	//		static_cast<Inventory_cell*>(p->m_object->m_owner)->m_item = nullptr;
-	//		break;
-	//	}
-	//	case entity_e::body_part:
-	//	{
-	//		Application::instance().command_unequip(p->m_unit, static_cast<Object_part*>(p->m_object->m_owner), p->m_object);
-	//		break;
-	//	}
-	//	}
-	//	switch (p->m_owner->m_kind)
-	//	{
-	//	case entity_e::cell:
-	//	{
-	//		//static_cast<MapCell*>(p->m_owner)->m_items.push_back(p->m_object);
-	//		static_cast<MapCell*>(p->m_owner)->m_map->add_object(p->m_object, static_cast<MapCell*>(p->m_owner));
-	//		p->m_object->m_owner = p->m_owner;
-	//		break;
-	//	}
-	//	case entity_e::inventory_cell:
-	//	{
-	//		static_cast<Inventory_cell*>(p->m_owner)->m_item = p->m_object;
-	//		p->m_object->m_owner = p->m_owner;
-	//		break;
-	//	}
-	//	case entity_e::body_part:
-	//	{
-	//		Application::instance().command_equip(p->m_unit, static_cast<Object_part*>(p->m_owner), p->m_object);
-	//		break;
-	//	}
-	//	}
-	//}
-	//else return 1;
+	Parameter& p(*parameter);
+	if (check(parameter))
+	{
+		switch (p[1].m_object->m_owner->m_kind)
+		{
+		case entity_e::cell:
+		{
+			//static_cast<MapCell*>(p->m_object->m_owner)->m_items.remove(p->m_object);
+			static_cast<MapCell*>(p[1].m_object->m_owner)->m_map->remove_object(p[1].m_object);
+			break;
+		}
+		case entity_e::inventory_cell:
+		{
+			static_cast<Inventory_cell*>(p[1].m_object->m_owner)->m_item = nullptr;
+			break;
+		}
+		case entity_e::body_part:
+		{
+			Application::instance().command_unequip(p[0].m_object, static_cast<Object_part*>(p[1].m_object->m_owner), p[1].m_object);
+			break;
+		}
+		}
+		switch (p[2].m_owner->m_kind)
+		{
+		case entity_e::cell:
+		{
+			//static_cast<MapCell*>(p->m_owner)->m_items.push_back(p->m_object);
+			static_cast<MapCell*>(p[2].m_owner)->m_map->add_object(p[1].m_object, static_cast<MapCell*>(p[2].m_owner));
+			p[1].m_object->m_owner = p[2].m_owner;
+			break;
+		}
+		case entity_e::inventory_cell:
+		{
+			static_cast<Inventory_cell*>(p[2].m_owner)->m_item = p[1].m_object;
+			p[1].m_object->m_owner = p[2].m_owner;
+			break;
+		}
+		case entity_e::body_part:
+		{
+			Application::instance().command_equip(p[0].m_object, static_cast<Object_part*>(p[2].m_owner), p[1].m_object);
+			break;
+		}
+		}
+	}
+	else return 1;
 	return 0;
 }
 
@@ -861,7 +871,7 @@ std::string Action_pick::get_description(Parameter* parameter)
 {
 	Parameter& p(*parameter);
 	std::string s("Поднять ");
-	/*s += p->m_object->m_name + ".";*/
+	s += p[1].m_object->m_name + ".";
 	return s;
 }
 
@@ -1234,20 +1244,29 @@ Action_equip::Action_equip()
 {
 	m_kind = action_e::equip;
 	m_icon = Application::instance().m_graph->m_actions[9];
+	m_parameter_kind = parameter_type_e::parameter_kind_object;
 }
 
-void Action_equip::interaction_handler(Parameter* arg)
+void Action_equip::interaction_handler(Parameter* parameter)
 {
-	/*Action::interaction_handler(nullptr);
+	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
-	Parameter* result;
-	P_object* p = new P_object();
-	result = Application::instance().command_select_object_on_map();
+	Parameter* out_parameter;
+	if (parameter)
+	{
+		out_parameter = parameter->clone();
+	}
+	else
+	{
+		out_parameter = new Parameter(m_parameter_kind);
+	}
+	Parameter& p(*out_parameter);
+	GameObject* result = Application::instance().command_select_object_on_map();
 	if (result)
 	{
-		p->m_object = static_cast<P_object*>(result)->m_object;
+		p[0].m_object = result;
 		std::string a = "Выбран ";
-		a.append(p->m_object->m_name);
+		a.append(p[0].m_object->m_name);
 		a = a + ".";
 		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, a));
 	}
@@ -1257,8 +1276,8 @@ void Action_equip::interaction_handler(Parameter* arg)
 		Application::instance().m_message_queue.m_busy = false;
 		return;
 	}
-	Application::instance().command_open_body(p->m_object);
-	Application::instance().m_message_queue.m_busy = false;*/
+	Application::instance().command_open_body(p[0].m_object);
+	Application::instance().m_message_queue.m_busy = false;
 }
 
 bool Action_equip::check(Parameter* parameter)

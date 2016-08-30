@@ -144,8 +144,8 @@ public:
 	void new_game();
 	void load_game();
 
-	Parameter* command_select_location(GameObject* object);
-	Parameter* command_select_object_on_map();
+	MapCell* command_select_location(GameObject* object);
+	GameObject* command_select_object_on_map();
 	GameObject* command_select_object();
 	void command_main_menu_select();
 	bool command_open_body(GameObject*& Object);
@@ -158,7 +158,7 @@ public:
 	void command_set_cursor_visibility(bool _Visibility);
 	void command_set_pickup_item_visibility(bool _Visibility);
 	/*Parameter* command_select_transfer_source(Parameter_destination* parameter);*/
-	Parameter* command_select_transfer(Parameter_destination* parameter);
+	Game_object_owner* command_select_transfer(Parameter_destination* parameter);
 	Parameter* command_select_body_part();
 	bool command_agreement();
 	void console(std::string text);

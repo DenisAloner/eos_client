@@ -39,7 +39,7 @@ void GUI_ActionButton::render(GraphicalController* Graph, int px, int py)
 void GUI_ActionButton::on_mouse_click(MouseEventArgs const& e)
 {
 	set_focus(true);
-	std::thread t(&Action::interaction_handler, m_value.action, m_value.parameter->clone());
+	std::thread t(&Action::interaction_handler, m_value.action, m_value.parameter);
 	t.detach();
 }
 

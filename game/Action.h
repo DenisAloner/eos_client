@@ -28,6 +28,7 @@ public:
 	std::string m_name;
 	std::string m_error;
 	int m_decay;
+	parameter_type_e m_parameter_kind;
 
 	Action(void);
 	~Action(void);

@@ -593,16 +593,16 @@ void GameObject::add_action_from_part(Object_interaction* object)
 				{
 				case action_e::pick:
 				{
-					/*?1? Parameter_destination* p = new Parameter_destination();
-					p->m_unit =this;
-					p->m_owner = op;
+					Parameter* p = new Parameter(parameter_type_e::ParameterKind_Destination);
+					(*p)[0].set(this);
+					(*p)[2].set(op);
 					m_common_actions.pick = true;
-					m_actions_list->push_back(Action_helper_t(a,p));*/
+					m_actions_list->push_back(Action_helper_t(a,p));
 					break;
 				}
 				case action_e::move_step:
 				{
-					Parameter* p = new Parameter(ParameterKind::ParameterKind_Position);
+					Parameter* p = new Parameter(parameter_type_e::ParameterKind_Position);
 					(*p)[0].set(this);
 					m_actions_list->push_back(Action_helper_t(a, p));
 					break;

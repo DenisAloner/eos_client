@@ -746,7 +746,7 @@ void AI_enemy::create()
 			{
 				if (path->size() >= 2)
 				{
-					Parameter* P=new Parameter(ParameterKind::ParameterKind_Position);
+					Parameter* P=new Parameter(parameter_type_e::ParameterKind_Position);
 					(*P)[0].set(m_object);
 					(*P)[1].set((*path)[path->size() - 2]);
 					(*P)[2].set(m_map);

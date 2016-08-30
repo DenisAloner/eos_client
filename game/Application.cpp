@@ -206,13 +206,13 @@ void Application::initialize(dimension_t work_area_size)
 	MainMenu->m_position = position_t((m_size.w - MainMenu->m_size.w)/2, (m_size.h - MainMenu->m_size.h) / 2);
 	GUI_Button_list* menu = new GUI_Button_list(0, 0, 400, 400);
 	GUI_Mainmenu_button* button;
-	button = new GUI_Mainmenu_button(0, 0, 396, 47, "Новая игра", ParameterKind::parameter_new_game);
+	button = new GUI_Mainmenu_button(0, 0, 396, 47, "Новая игра", parameter_type_e::parameter_new_game);
 	button->mouse_click += std::bind(&GUI_Window::on_close, MainMenu, MainMenu);
 	menu->add_item_control(button);
-	button = new GUI_Mainmenu_button(0, 0, 396, 47, "Загрузка игры", ParameterKind::parameter_load_game);
+	button = new GUI_Mainmenu_button(0, 0, 396, 47, "Загрузка игры", parameter_type_e::parameter_load_game);
 	button->mouse_click += std::bind(&GUI_Window::on_close, MainMenu, MainMenu);
 	menu->add_item_control(button);
-	button = new GUI_Mainmenu_button(0, 0, 396, 47, "Выход", ParameterKind::parameter_game_quit);
+	button = new GUI_Mainmenu_button(0, 0, 396, 47, "Выход", parameter_type_e::parameter_game_quit);
 	button->mouse_click += std::bind(&GUI_Window::on_close, MainMenu, MainMenu);
 	menu->add_item_control(button);
 	MainMenu->add(menu);
@@ -258,7 +258,7 @@ void Application::new_game()
 	obj->set_direction(object_direction_e::top);
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 4]);*/
 
-/*
+
 		obj = m_game_object_manager->new_object("bow");
 		obj->set_direction(object_direction_e::top);
 		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-1][rx - 1]);
@@ -266,7 +266,7 @@ void Application::new_game()
 		obj = m_game_object_manager->new_object("arrow");
 		obj->set_direction(object_direction_e::top);
 		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 1][rx - 1]);
-*/
+
 
 			//obj = m_game_object_manager->new_object("bat");
 			//obj->set_direction(object_direction_e::top);
@@ -536,22 +536,22 @@ void Application::command_main_menu_select()
 			m_message_queue.m_condition_variable.wait(lk);
 		}
 		m_message_queue.m_processed_message = true;
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_new_game)
+		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::parameter_new_game)
 		{
 			new_game();
 			Exit = true;
 		}
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_load_game)
+		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::parameter_load_game)
 		{
 			load_game();
 			Exit = true;
 		}
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_game_quit)
+		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::parameter_game_quit)
 		{
 			stop();
 			Exit = true;
 		}
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind_Cancel)
+		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::ParameterKind_Cancel)
 		{
 			Exit = true;
 		}
@@ -563,9 +563,9 @@ void Application::command_main_menu_select()
 	LOG(INFO) << "Окончание ожидания выбора в главном меню";
 }
 
-Parameter* Application::command_select_location(GameObject* object)
+MapCell* Application::command_select_location(GameObject* object)
 {
-	Parameter* Result = nullptr;
+	MapCell* Result = nullptr;
 	if (object)
 	{
 		m_GUI->MapViewer->m_cursor_x = object->m_active_state->m_size.x;
@@ -587,16 +587,16 @@ Parameter* Application::command_select_location(GameObject* object)
 			m_message_queue.m_condition_variable.wait(lk);
 		}
 		m_message_queue.m_processed_message = true;
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_owner)
+		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::parameter_kind_owner)
 		{
 			Parameter* p = m_message_queue.m_items.front();
 			if ((*p)[0].m_owner->m_kind == entity_e::cell)
 			{
-				Result = m_message_queue.m_items.front();
+				Result = static_cast<MapCell*>((*p)[0].m_owner);
 				Exit = true;
 			}
 		}
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind_Cancel)
+		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::ParameterKind_Cancel)
 		{
 			Exit = true;
 		}
@@ -610,9 +610,9 @@ Parameter* Application::command_select_location(GameObject* object)
 	return Result;
 }
 
-Parameter* Application::command_select_object_on_map()
+GameObject* Application::command_select_object_on_map()
 {
-	Parameter* Result = nullptr;
+	GameObject* Result = nullptr;
 	m_GUI->MapViewer->m_cursor_x = 1;
 	m_GUI->MapViewer->m_cursor_y = 1;
 	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Выберите обьект")));
@@ -626,16 +626,16 @@ Parameter* Application::command_select_object_on_map()
 			m_message_queue.m_condition_variable.wait(lk);
 		}
 		m_message_queue.m_processed_message = true;
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_object)
+		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::parameter_kind_object)
 		{
-			Result = m_message_queue.m_items.front();
-			if((*Result)[0].m_object->m_owner->Game_object_owner::m_kind==entity_e::cell)
+			Parameter* p = m_message_queue.m_items.front();
+			if((*p)[0].m_object->m_owner->Game_object_owner::m_kind==entity_e::cell)
 			{
+				Result = (*p)[0].m_object;
 				Exit = true;
 			}
-			else Result = nullptr;
 		}
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind_Cancel)
+		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::ParameterKind_Cancel)
 		{
 			Exit = true;
 		}
@@ -663,7 +663,7 @@ GameObject* Application::command_select_object()
 			m_message_queue.m_condition_variable.wait(lk);
 		}
 		m_message_queue.m_processed_message = true;
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_object)
+		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::parameter_kind_object)
 		{
 			Result = (*m_message_queue.m_items.front())[0].m_object;
 			//if (static_cast<P_object*>(Result)->m_object->m_owner->Game_object_owner::m_kind == entity_e::cell)
@@ -672,7 +672,7 @@ GameObject* Application::command_select_object()
 			}
 			//else Result = nullptr;
 		}
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_owner)
+		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::parameter_kind_owner)
 		{
 			Parameter* temp = m_message_queue.m_items.front();
 			switch ((*temp)[0].m_owner->m_kind)
@@ -699,7 +699,7 @@ GameObject* Application::command_select_object()
 			}
 			}
 		}
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind_Cancel)
+		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::ParameterKind_Cancel)
 		{
 			Exit = true;
 		}
@@ -813,8 +813,8 @@ void my_audio_callback(void *userdata, uint8_t *stream, uint32_t len) {
 	audio_len -= len;
 }
 
-Parameter* Application::command_select_transfer(Parameter_destination* parameter){
-	Parameter* Result = nullptr;
+Game_object_owner* Application::command_select_transfer(Parameter_destination* parameter){
+	Game_object_owner* Result = nullptr;
 	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Выберите назначение")));
 	bool Exit = false;
 	while (Exit == false)
@@ -826,12 +826,12 @@ Parameter* Application::command_select_transfer(Parameter_destination* parameter
 			m_message_queue.m_condition_variable.wait(lk);
 		}
 		m_message_queue.m_processed_message = true;
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_owner)
+		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::parameter_kind_owner)
 		{
-			Result = m_message_queue.m_items.front();
+			Result = (*m_message_queue.m_items.front())[0].m_owner;
 			Exit = true;
 		}
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind_Cancel)
+		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::ParameterKind_Cancel)
 		{
 			Exit = true;
 		}
@@ -916,7 +916,7 @@ Parameter* Application::command_select_body_part()
 			m_message_queue.m_condition_variable.wait(lk);
 		}
 		m_message_queue.m_processed_message = true;
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_kind_owner)
+		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::parameter_kind_owner)
 		{
 			//?1? P_object_owner* p = static_cast<P_object_owner*>(m_message_queue.m_items.front());
 			//if (p->m_cell->m_kind == entity_e::body_part)
@@ -925,7 +925,7 @@ Parameter* Application::command_select_body_part()
 			//	Exit = true;
 			//}
 		}
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind_Cancel)
+		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::ParameterKind_Cancel)
 		{
 			Exit = true;
 		}
@@ -950,12 +950,12 @@ bool Application::command_agreement()
 			m_message_queue.m_condition_variable.wait(lk);
 		}
 		m_message_queue.m_processed_message = true;
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind::parameter_accept)
+		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::parameter_accept)
 		{
 			result= true;
 			Exit = true;
 		}
-		if (m_message_queue.m_items.front()->m_kind == ParameterKind_Cancel)
+		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::ParameterKind_Cancel)
 		{
 			result= false;
 			Exit = true;
