@@ -654,17 +654,17 @@ void AI_enemy::create()
 			{
 				if (i->action->m_kind == action_e::hit_melee)
 				{
-					/*?1? P_interaction_cell* p = static_cast<P_interaction_cell*>(i->parameter);
-					p->m_object = m_goal;
+					Parameter* p = i->parameter;
+					(*p)[1].set(m_goal);
 					area_t attack_area = area_t(position_t(m_object->cell()->x - 1, m_object->cell()->y + 1), position_t(m_object->cell()->x - m_object->m_active_state->m_size.x, m_object->cell()->y - m_object->m_active_state->m_size.y));
 					attack_area.p1.x = max(attack_area.p1.x, m_goal->cell()->x);
 					attack_area.p2.x = min(attack_area.p2.x, m_goal->cell()->x + m_goal->m_active_state->m_size.x - 1);
 					attack_area.p1.y = min(attack_area.p1.y, m_goal->cell()->y);
 					attack_area.p2.y = max(attack_area.p2.y, m_goal->cell()->y - m_goal->m_active_state->m_size.y + 1);
 					GameMap* map = c->m_map;
-					p->m_cell = map->m_items[attack_area.p1.y][attack_area.p1.x];
+					(*p)[3].set(map->m_items[attack_area.p1.y][attack_area.p1.x]);
 					LOG(INFO) << "Удар противника в точку [" << std::to_string(attack_area.p1.x) << "," << std::to_string(attack_area.p1.y) << "]";
-					m_action_controller->set(p->m_unit, i->action, p);*/
+					m_action_controller->set((*p)[0].m_object, i->action, p);
 					break;
 				}
 			}

@@ -22,6 +22,7 @@ struct Parameter_argument_t
 		GameMap* m_map;
 		MapCell* m_cell;
 		Game_object_owner* m_owner;
+		Object_part* m_part;
 		object_direction_e m_direction;
 	};
 
@@ -34,6 +35,8 @@ struct Parameter_argument_t
 	void reset_serialization_index();
 	void save();
 	void load();
+
+	operator bool();
 
 };
 
@@ -64,49 +67,6 @@ public:
 	virtual void load();
 };
 
-//class Parameter: public iSerializable
-//{
-//public:
-//
-//	ParameterKind m_kind;
-//
-//	Parameter(ParameterKind _kind);
-//	~Parameter(void);
-//
-//	virtual void save() {};
-//	virtual void load() {};
-//};
-//
-//class Parameter_MapCell : public Parameter
-//{
-//public:
-//	MapCell* m_place;
-//
-//	Parameter_MapCell();
-//	~Parameter_MapCell();
-//
-//	virtual void save();
-//	virtual void load();
-//};
-//
-//class Parameter_Position : public Parameter
-//{
-//public:
-//
-//	GameObject* m_object;
-//	MapCell* m_place;
-//	GameMap* m_map;
-//
-//	Parameter_Position(GameObject* object, MapCell* place, GameMap* map);
-//
-//	Parameter_Position(void);
-//	~Parameter_Position(void);
-//
-//	virtual void reset_serialization_index();
-//	virtual void save();
-//	virtual void load();
-//};
-//
 //class Parameter_MoveObjectByUnit : public Parameter
 //{
 //public:
@@ -122,48 +82,7 @@ public:
 //	virtual void save();
 //	virtual void load();
 //};
-//
-//class Parameter_destination : public Parameter
-//{
-//public:
-//
-//	GameObject* m_unit;
-//	GameObject* m_object;
-//	Game_object_owner* m_owner;
-//
-//	Parameter_destination();
-//
-//	virtual void reset_serialization_index();
-//	virtual void save();
-//	virtual void load();
-//};
-//
-//class P_object : public Parameter
-//{
-//public:
-//
-//	GameObject* m_object;
-//
-//	P_object();
-//
-//	virtual void reset_serialization_index();
-//	virtual void save();
-//	virtual void load();
-//};
-//
-//class P_object_owner : public Parameter
-//{
-//public:
-//
-//	Game_object_owner* m_cell;
-//
-//	P_object_owner();
-//
-//	virtual void reset_serialization_index();
-//	virtual void save();
-//	virtual void load();
-//};
-//
+
 //class P_unit_interaction : public Parameter
 //{
 //public:
@@ -178,8 +97,7 @@ public:
 //	virtual void save();
 //	virtual void load();
 //};
-//
-//
+
 //class P_interaction_cell : public Parameter
 //{
 //public:

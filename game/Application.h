@@ -159,7 +159,7 @@ public:
 	void command_set_pickup_item_visibility(bool _Visibility);
 	/*Parameter* command_select_transfer_source(Parameter_destination* parameter);*/
 	Game_object_owner* command_select_transfer(Parameter_destination* parameter);
-	Parameter* command_select_body_part();
+	Object_part* command_select_body_part();
 	bool command_agreement();
 	void console(std::string text);
 

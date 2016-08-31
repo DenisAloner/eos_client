@@ -616,10 +616,10 @@ void GameObject::add_action_from_part(Object_interaction* object)
 				}
 				case action_e::hit_melee:
 				{
-					/*?1? P_interaction_cell* p = new P_interaction_cell();
-					p->m_unit = this;
-					p->m_unit_body_part = op;
-					m_actions_list->push_back(Action_helper_t(a, p));*/
+					Parameter* p = new Parameter(parameter_type_e::parameter_interaction_cell);
+					(*p)[0].set(this);
+					(*p)[2].set(op);
+					m_actions_list->push_back(Action_helper_t(a, p));
 					break;
 				}
 				}
@@ -636,11 +636,11 @@ void GameObject::add_action_from_part(Object_interaction* object)
 					switch (a->m_kind)
 					{
 					case action_e::hit_melee:
-					{/*
-						P_interaction_cell* p = new P_interaction_cell();
-						p->m_unit = this;
-						p->m_unit_body_part = op;
-						m_actions_list->push_back(Action_helper_t(a, p));*/
+					{
+						Parameter* p = new Parameter(parameter_type_e::parameter_interaction_cell);
+						(*p)[0].set(this);
+						(*p)[2].set(op);
+						m_actions_list->push_back(Action_helper_t(a, p));
 						break;
 					}
 					case action_e::shoot:

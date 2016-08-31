@@ -259,18 +259,18 @@ void Application::new_game()
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 4]);*/
 
 
-		obj = m_game_object_manager->new_object("bow");
+	/*	obj = m_game_object_manager->new_object("bow");
 		obj->set_direction(object_direction_e::top);
 		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-1][rx - 1]);
 
 		obj = m_game_object_manager->new_object("arrow");
 		obj->set_direction(object_direction_e::top);
-		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 1][rx - 1]);
+		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 1][rx - 1]);*/
 
 
-			//obj = m_game_object_manager->new_object("bat");
-			//obj->set_direction(object_direction_e::top);
-			//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-2][rx]);
+			obj = m_game_object_manager->new_object("bat");
+			obj->set_direction(object_direction_e::top);
+			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-2][rx]);
 
 
 			/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
@@ -902,10 +902,10 @@ Game_object_owner* Application::command_select_transfer(Parameter_destination* p
 //	return Result;
 //}
 
-Parameter* Application::command_select_body_part()
+Object_part* Application::command_select_body_part()
 {
-	Parameter* Result = nullptr;
-	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Выберите назначение")));
+	Object_part* Result = nullptr;
+	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Выберите слот")));
 	bool Exit = false;
 	while (Exit == false)
 	{
@@ -918,12 +918,12 @@ Parameter* Application::command_select_body_part()
 		m_message_queue.m_processed_message = true;
 		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::parameter_kind_owner)
 		{
-			//?1? P_object_owner* p = static_cast<P_object_owner*>(m_message_queue.m_items.front());
-			//if (p->m_cell->m_kind == entity_e::body_part)
-			//{
-			//	Result = m_message_queue.m_items.front();
-			//	Exit = true;
-			//}
+			Parameter* p = m_message_queue.m_items.front();
+			if ((*p)[0].m_owner->m_kind == entity_e::body_part)
+			{
+				Result = static_cast<Object_part*>((*p)[0].m_owner);
+				Exit = true;
+			}
 		}
 		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::ParameterKind_Cancel)
 		{

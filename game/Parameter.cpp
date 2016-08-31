@@ -35,13 +35,16 @@ void Parameter_argument_t::set(Game_object_owner* value)
 			m_cell = static_cast<MapCell*>(value);
 			return;
 		}
+		break;
 	}
 	case::type_e::object_part:
 	{
 		if (value->m_kind == entity_e::body_part)
 		{
+			m_part = static_cast<Object_part*>(value);
 			return;
 		}
+		break;
 	}
 	case::type_e::inventory_cell:
 	{
@@ -49,6 +52,7 @@ void Parameter_argument_t::set(Game_object_owner* value)
 		{
 			return;
 		}
+		break;
 	}
 	case::type_e::object_owner:
 	{
@@ -99,11 +103,11 @@ void Parameter_argument_t::reset_serialization_index()
 	}
 	case::type_e::mapcell:
 	{
-		if (m_owner)
+		if (m_cell)
 		{
-			if (m_owner->m_serialization_index > 1)
+			if (m_cell->m_serialization_index > 1)
 			{
-				m_owner->reset_serialization_index();
+				m_cell->reset_serialization_index();
 			}
 		}
 		break;
@@ -121,11 +125,11 @@ void Parameter_argument_t::reset_serialization_index()
 	}
 	case::type_e::object_part:
 	{
-		if (m_owner)
+		if (m_part)
 		{
-			if (m_owner->m_serialization_index > 1)
+			if (m_part->m_serialization_index > 1)
 			{
-				m_owner->reset_serialization_index();
+				m_part->reset_serialization_index();
 			}
 		}
 		break;
@@ -144,7 +148,7 @@ void Parameter_argument_t::save()
 	}
 	case::type_e::mapcell:
 	{
-		Serialization_manager::instance().serialize(m_owner);
+		Serialization_manager::instance().serialize(m_cell);
 		break;
 	}
 	case::type_e::inventory_cell:
@@ -154,7 +158,7 @@ void Parameter_argument_t::save()
 	}
 	case::type_e::object_part:
 	{
-		Serialization_manager::instance().serialize(m_owner);
+		Serialization_manager::instance().serialize(m_part);
 		break;
 	}
 	case::type_e::gameobject:
@@ -171,6 +175,53 @@ void Parameter_argument_t::save()
 	{
 		FILE* file = Serialization_manager::instance().m_file;
 		fwrite(&m_direction, sizeof(object_direction_e), 1, file);
+		break;
+	}
+	}
+};
+
+Parameter_argument_t::operator bool()
+{ 
+	switch (kind)
+	{
+	case::type_e::object_owner:
+	{
+		return m_owner;
+		break;
+	}
+	case::type_e::mapcell:
+	{
+		return m_cell;
+		break;
+	}
+	case::type_e::inventory_cell:
+	{
+		return m_owner;
+		break;
+	}
+	case::type_e::object_part:
+	{
+		return m_part;
+		break;
+	}
+	case::type_e::gameobject:
+	{
+		return m_object;
+		break;
+	}
+	case::type_e::gamemap:
+	{
+		return m_map;
+		break;
+	}
+	case::type_e::direction:
+	{
+		return m_direction != object_direction_e::none;
+		break;
+	}
+	default:
+	{
+		LOG(FATAL) << "Неверный тип для Parameter_argument_t::operator bool()";
 		break;
 	}
 	}
@@ -197,7 +248,7 @@ void Parameter_argument_t::init()
 	}
 	case::type_e::object_part:
 	{
-		m_owner = nullptr;
+		m_part = nullptr;
 		break;
 	}
 	case::type_e::gameobject:
@@ -229,7 +280,7 @@ void Parameter_argument_t::load()
 	}
 	case::type_e::mapcell:
 	{
-		m_owner = dynamic_cast<Game_object_owner*>(Serialization_manager::instance().deserialize());
+		m_cell = dynamic_cast<MapCell*>(Serialization_manager::instance().deserialize());
 		break;
 	}
 	case::type_e::inventory_cell:
@@ -239,7 +290,7 @@ void Parameter_argument_t::load()
 	}
 	case::type_e::object_part:
 	{
-		m_owner = dynamic_cast<Game_object_owner*>(Serialization_manager::instance().deserialize());
+		m_part = dynamic_cast<Object_part*>(Serialization_manager::instance().deserialize());
 		break;
 	}
 	case::type_e::gameobject:
@@ -303,6 +354,16 @@ Parameter::Parameter(parameter_type_e kind) :m_kind(kind)
 		m_args[0].kind = type_e::gameobject;
 		m_args[1].kind = type_e::gameobject;
 		m_args[2].kind = type_e::object_owner;
+		break;
+	}
+	case::parameter_type_e::parameter_interaction_cell:
+	{
+		m_size = 4;
+		m_args = new Parameter_argument_t[m_size];
+		m_args[0].kind = type_e::gameobject;
+		m_args[1].kind = type_e::gameobject;
+		m_args[2].kind = type_e::object_part;
+		m_args[3].kind = type_e::mapcell;
 		break;
 	}
 	}
