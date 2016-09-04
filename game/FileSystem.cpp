@@ -521,7 +521,7 @@ iSerializable* Serialization_manager::deserialize()
 			value = new Game_world();
 			break;
 		}
-		case type_e::parameters:
+		case type_e::parameter:
 		{
 			parameter_type_e k;
 			fread(&k, sizeof(parameter_type_e), 1, m_file);

@@ -167,22 +167,21 @@ enum class object_state_e
 
 enum class parameter_type_e
 {
-	ParameterKind_Simple,
-	ParameterKind_Position,
-	ParameterKind_MapCell,
-	ParameterKind_MoveObjectByUnit,
-	ParameterKind_Cancel,
-	ParameterKind_Destination,
-	parameter_kind_object,
-	parameter_kind_owner,
-	parameter_kind_unit_interaction,
-	parameter_interaction_cell,
-	parameter_accept,
-	parameter_bow_shoot,
-	parameter_direction,
-	parameter_game_quit,
-	parameter_new_game,
-	parameter_load_game
+	position,
+	mapcell,
+	//ParameterKind_MoveObjectByUnit,
+	cancel,
+	destination,
+	object,
+	owner,
+	unit_interaction,
+	interaction_cell,
+	accept,
+	bow_shoot,
+	direction,
+	game_quit,
+	new_game,
+	load_game
 };
 
 enum class object_direction_e :int
@@ -451,21 +450,11 @@ enum class type_e
 	gamemap,
 	mapcell,
 	inventory_cell,
-	parameter_mapcell,
-	parameter_position,
-	parameter_movegameobject,
-	parameter_destination,
-	parameter_gameobject,
-	parameter_object_owner,
-	parameter_unit_interaction,
-	parameter_interaction_cell,
-	parameter_direction,
 	action_wrapper,
-	parameter_bow_shoot,
 	vision_list,
 	vision_component,
 	game_world,
-	parameters,
+	parameter,
 	object_owner,
 	direction
 };

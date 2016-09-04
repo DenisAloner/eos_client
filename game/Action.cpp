@@ -48,7 +48,7 @@ void Action::interaction_handler(Parameter* arg)
 	{
 		if (Application::instance().m_message_queue.m_reader)
 		{
-			Parameter* p = new Parameter(parameter_type_e::ParameterKind_Cancel);
+			Parameter* p = new Parameter(parameter_type_e::cancel);
 			Application::instance().m_message_queue.push(p);
 		}
 		while (Application::instance().m_message_queue.m_busy){}
@@ -172,7 +172,7 @@ ActionClass_Move::ActionClass_Move()
 	m_icon = Application::instance().m_graph->m_actions[0];
 	m_name = "Идти";
 	m_decay = 10;
-	m_parameter_kind = parameter_type_e::ParameterKind_Position;
+	m_parameter_kind = parameter_type_e::position;
 }
 
 
@@ -207,7 +207,6 @@ void ActionClass_Move::interaction_handler(Parameter* parameter)
 		if (temp)
 		{
 			p[1].set(Game_algorithm::step_in_direction(p[0].m_object, Game_algorithm::turn_to_cell(p[0].m_object, temp)));
-			p[2].set(p[1].m_cell->m_map);
 			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, "Выбрана клетка {" + std::to_string(p[1].m_cell->x) + "," + std::to_string(p[1].m_cell->y) + "}"));
 		}
 		else
@@ -226,7 +225,7 @@ void ActionClass_Move::interaction_handler(Parameter* parameter)
 bool ActionClass_Move::check(Parameter* parameter)
 {
 	Parameter& p(*parameter);
-	return Application::instance().command_check_position(p[0].m_object, p[1].m_cell, p[2].m_map);
+	return Application::instance().command_check_position(p[0].m_object, p[1].m_cell, p[1].m_cell->m_map);
 }
 
 action_move_step::action_move_step()
@@ -235,7 +234,7 @@ action_move_step::action_move_step()
 	m_icon = Application::instance().m_graph->m_actions[0];
 	m_name = "Идти на шаг";
 	m_decay = 10;
-	m_parameter_kind = parameter_type_e::ParameterKind_Position;
+	m_parameter_kind = parameter_type_e::position;
 }
 
 bool action_move_step::check(Parameter* parameter)
@@ -244,7 +243,7 @@ bool action_move_step::check(Parameter* parameter)
 	if (abs(p[0].m_object->cell()->x - p[1].m_cell->x) < 2 && abs(p[0].m_object->cell()->y - p[1].m_cell->y)< 2)
 	{
 		LOG(INFO) << "yes";
-		return Application::instance().command_check_position(p[0].m_object, p[1].m_cell, p[2].m_map);
+		return Application::instance().command_check_position(p[0].m_object, p[1].m_cell, p[1].m_cell->m_map);
 	}
 	else return false;
 }
@@ -288,7 +287,7 @@ char ActionClass_Move::perfom(Parameter* parameter)
 			break;
 		}
 		}
-		p[2].m_map->move_object(p[0].m_object, p[1].m_cell);
+		p[1].m_cell->m_map->move_object(p[0].m_object, p[1].m_cell);
 		//LOG(INFO) << p->m_object->m_name << "  " << "двигается:" << std::to_string(p->m_place->x) << "," << std::to_string(p->m_place->y);
 	}
 	else {
@@ -464,6 +463,7 @@ ActionClass_Turn::ActionClass_Turn(void)
 	m_icon = Application::instance().m_graph->m_actions[2];
 	m_name = "Повернуться";
 	m_decay = 2;
+	m_parameter_kind = parameter_type_e::direction;
 }
 
 
@@ -476,7 +476,7 @@ std::string ActionClass_Turn::get_description(Parameter* parameter)
 {
 	Parameter& p(*parameter);
 	std::string s("Повернуть ");
-	//s += p->m_object->m_name + ".";
+	s += p[0].m_object->m_name + ".";
 	return s;
 }
 
@@ -487,38 +487,39 @@ bool ActionClass_Turn::check(Parameter* parameter)
 	return true;
 }
 
-
 char ActionClass_Turn::perfom(Parameter* parameter)
 {
-	//Parameter_direction* p = static_cast<Parameter_direction*>(parameter);
-	//if (check(p))
-	//{
-	//	p->m_object->set_direction(p->m_direction);
-	//}
-	//else return 1;
+	Parameter& p(*parameter);
+	if (check(parameter))
+	{
+		p[0].m_object->set_direction(p[1].m_direction);
+	}
+	else return 1;
 	return 0;
 }
 
-void ActionClass_Turn::interaction_handler(Parameter* arg)
+void ActionClass_Turn::interaction_handler(Parameter* parameter)
 {
-	/*Action::interaction_handler(nullptr);
+	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
-	Parameter* result;
-	Parameter_direction* arg_p = static_cast<Parameter_direction*>(arg);
-	Parameter_direction* p = new Parameter_direction();
-	if (arg_p)
+	Parameter* out_parameter;
+	if (parameter)
 	{
-		p->m_object = arg_p->m_object;
-		p->m_direction = arg_p->m_direction;
+		out_parameter = parameter->clone();
 	}
-	if (!p->m_object)
+	else
 	{
-		result = Application::instance().command_select_object_on_map();
+		out_parameter = new Parameter(m_parameter_kind);
+	}
+	Parameter& p(*out_parameter);
+	if (!p[0])
+	{
+		GameObject* result = Application::instance().command_select_object_on_map();
 		if (result)
 		{
-			p->m_object = static_cast<P_object*>(result)->m_object;
+			p[0].set(result);
 			std::string a = "Выбран ";
-			a.append(p->m_object->m_name);
+			a.append(p[0].m_object->m_name);
 			a = a + ".";
 			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, a));
 		}
@@ -529,14 +530,13 @@ void ActionClass_Turn::interaction_handler(Parameter* arg)
 			return;
 		}
 	}
-	if (p->m_direction == object_direction_e::none)
+	if (!p[1])
 	{
-		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_object_rotate(Application::instance().m_GUI->MapViewer, p->m_object));
-		result = Application::instance().command_select_location(p->m_object);
+		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_object_rotate(Application::instance().m_GUI->MapViewer, p[0].m_object));
+		MapCell* result = Application::instance().command_select_location(p[0].m_object);
 		if (result)
 		{
-			MapCell* c = static_cast<MapCell*>(static_cast<P_object_owner*>(result)->m_cell);
-			p->m_direction = Game_algorithm::turn_to_cell(p->m_object, c);
+			p[1].set(Game_algorithm::turn_to_cell(p[0].m_object, result));
 			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
 			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Направление выбрано")));
 		}
@@ -548,13 +548,13 @@ void ActionClass_Turn::interaction_handler(Parameter* arg)
 			return;
 		}
 	}
-	rotate_direction_e rotate = Game_algorithm::get_rotation(p->m_object->m_direction, p->m_direction);
-	for (auto i = p->m_object->m_direction; i!= p->m_direction;)
+	rotate_direction_e rotate = Game_algorithm::get_rotation(p[0].m_object->m_direction, p[1].m_direction);
+	for (auto i = p[0].m_object->m_direction; i!= p[1].m_direction;)
 	{
 		i = i + rotate;
-		Application::instance().m_action_manager->add(new GameTask(this, new Parameter_direction(p->m_object,i)));
+		Application::instance().m_action_manager->add(new GameTask(this, new Parameter(parameter_type_e::direction,p[0].m_object,i)));
 	}
-	Application::instance().m_message_queue.m_busy = false;*/
+	Application::instance().m_message_queue.m_busy = false;
 }
 
 
@@ -562,7 +562,7 @@ Action_OpenInventory::Action_OpenInventory()
 {
 	m_kind = action_e::open_inventory;
 	m_icon = Application::instance().m_graph->m_actions[3];
-	m_parameter_kind = parameter_type_e::parameter_kind_object;
+	m_parameter_kind = parameter_type_e::object;
 }
 
 
@@ -752,7 +752,7 @@ Action_pick::Action_pick()
 	m_kind = action_e::pick;
 	m_icon = Application::instance().m_graph->m_actions[6];
 	m_name = "Поднять";
-	m_parameter_kind = parameter_type_e::ParameterKind_Destination;
+	m_parameter_kind = parameter_type_e::destination;
 }
 
 void Action_pick::interaction_handler(Parameter* parameter)
@@ -958,7 +958,7 @@ Action_hit::Action_hit()
 	m_icon = Application::instance().m_graph->m_actions[8];
 	m_decay = 10;
 	m_name = "Ударить без оружия";
-	m_parameter_kind = parameter_type_e::parameter_kind_unit_interaction;
+	m_parameter_kind = parameter_type_e::unit_interaction;
 }
 
 void Action_hit::interaction_handler(Parameter* arg)
@@ -1049,7 +1049,7 @@ action_hit_melee::action_hit_melee()
 	m_kind = action_e::hit_melee;
 	m_icon = Application::instance().m_graph->m_actions[8];
 	m_name = "Ударить оружием";
-	m_parameter_kind = parameter_type_e::parameter_interaction_cell;
+	m_parameter_kind = parameter_type_e::interaction_cell;
 }
 
 void action_hit_melee::interaction_handler(Parameter* parameter)
@@ -1244,7 +1244,7 @@ Action_equip::Action_equip()
 {
 	m_kind = action_e::equip;
 	m_icon = Application::instance().m_graph->m_actions[9];
-	m_parameter_kind = parameter_type_e::parameter_kind_object;
+	m_parameter_kind = parameter_type_e::object;
 }
 
 void Action_equip::interaction_handler(Parameter* parameter)
@@ -1342,46 +1342,61 @@ Action_use::Action_use()
 	m_icon = Application::instance().m_graph->m_actions[11];
 	m_name = "Применить";
 	m_decay = 10;
+	m_parameter_kind = parameter_type_e::unit_interaction;
 }
 
-void Action_use::interaction_handler(Parameter* arg)
+void Action_use::interaction_handler(Parameter* parameter)
 {
-	/*Action::interaction_handler(nullptr);
+	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
-	Parameter* result;
-	P_unit_interaction* p = new P_unit_interaction();
-	result = Application::instance().command_select_object();
-	if (result)
+	Parameter* out_parameter;
+	if (parameter)
 	{
-		p->m_object = static_cast<P_object*>(result)->m_object;
-		std::string a = "Выбран ";
-		a.append(p->m_object->m_name);
-		a = a + ".";
-		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction,a));
+		out_parameter = parameter->clone();
 	}
 	else
 	{
-		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
-		Application::instance().m_message_queue.m_busy = false;
-		return;
+		out_parameter = new Parameter(m_parameter_kind);
 	}
-	result = Application::instance().command_select_object();
-	if (result)
+	Parameter& p(*out_parameter);
+	if (!p[0])
 	{
-		p->m_unit = static_cast<P_object*>(result)->m_object;
-		std::string a = "Выбран ";
-		a.append(p->m_unit->m_name);
-		a = a + ".";
-		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, a));
+		GameObject* result = Application::instance().command_select_object();
+		if (result)
+		{
+			p[0].set(result);
+			std::string a = "Выбран ";
+			a.append(p[0].m_object->m_name);
+			a = a + ".";
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, a));
+		}
+		else
+		{
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
+			Application::instance().m_message_queue.m_busy = false;
+			return;
+		}
 	}
-	else
+	if (!p[1])
 	{
-		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
-		Application::instance().m_message_queue.m_busy = false;
-		return;
+		GameObject* result = Application::instance().command_select_object();
+		if (result)
+		{
+			p[1].set(result);
+			std::string a = "Выбран ";
+			a.append(p[1].m_object->m_name);
+			a = a + ".";
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, a));
+		}
+		else
+		{
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
+			Application::instance().m_message_queue.m_busy = false;
+			return;
+		}
 	}
-	Application::instance().m_action_manager->add(new GameTask(this, p));
-	Application::instance().m_message_queue.m_busy = false;*/
+	Application::instance().m_action_manager->add(new GameTask(this, out_parameter));
+	Application::instance().m_message_queue.m_busy = false;
 }
 
 
@@ -1392,40 +1407,40 @@ bool Action_use::check(Parameter* parameter)
 
 char Action_use::perfom(Parameter* parameter)
 {
-	//P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
-	//if (check(p))
-	//{
-	//	//p->m_unit->set_direction(Game_algorithm::turn_to_object(p->m_unit, p->m_object));
-	//	auto reaction = p->m_object->get_effect(interaction_e::use);
-	//	if (reaction)
-	//	{
-	//		Object_interaction* msg = reaction->clone();
-	//		msg->apply_effect(p->m_unit, nullptr);
-	//	}
-	//	switch (p->m_object->m_owner->m_kind)
-	//	{
-	//	case entity_e::cell:
-	//	{
-	//		//static_cast<MapCell*>(p->m_object->m_owner)->m_items.remove(p->m_object);
-	//		static_cast<MapCell*>(p->m_object->m_owner)->m_map->remove_object(p->m_object);
-	//		break;
-	//	}
-	//	case entity_e::inventory_cell:
-	//	{
-	//		static_cast<Inventory_cell*>(p->m_object->m_owner)->m_item = nullptr;
-	//		break;
-	//	}
-	//	case entity_e::body_part:
-	//	{
-	//		Application::instance().command_unequip(p->m_unit, static_cast<Object_part*>(p->m_object->m_owner), p->m_object);
-	//		break;
-	//	}
-	//	}
-	//	Application::instance().m_world->m_object_manager.m_items.remove(p->m_object);
-	//	p->m_unit->update_interaction();
-	//	p->m_unit->event_update(VoidEventArgs());
-	//}
-	//else return 1;
+	Parameter& p(*parameter);
+	if (check(parameter))
+	{
+		//p->m_unit->set_direction(Game_algorithm::turn_to_object(p->m_unit, p->m_object));
+		auto reaction = p[1].m_object->get_effect(interaction_e::use);
+		if (reaction)
+		{
+			Object_interaction* msg = reaction->clone();
+			msg->apply_effect(p[0].m_object, nullptr);
+		}
+		switch (p[1].m_object->m_owner->m_kind)
+		{
+		case entity_e::cell:
+		{
+			//static_cast<MapCell*>(p->m_object->m_owner)->m_items.remove(p->m_object);
+			static_cast<MapCell*>(p[1].m_object->m_owner)->m_map->remove_object(p[1].m_object);
+			break;
+		}
+		case entity_e::inventory_cell:
+		{
+			static_cast<Inventory_cell*>(p[1].m_object->m_owner)->m_item = nullptr;
+			break;
+		}
+		case entity_e::body_part:
+		{
+			Application::instance().command_unequip(p[0].m_object, static_cast<Object_part*>(p[1].m_object->m_owner), p[1].m_object);
+			break;
+		}
+		}
+		Application::instance().m_world->m_object_manager.m_items.remove(p[1].m_object);
+		p[0].m_object->update_interaction();
+		p[0].m_object->event_update(VoidEventArgs());
+	}
+	else return 1;
 	return 0;
 }
 

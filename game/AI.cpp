@@ -746,10 +746,9 @@ void AI_enemy::create()
 			{
 				if (path->size() >= 2)
 				{
-					Parameter* P=new Parameter(parameter_type_e::ParameterKind_Position);
+					Parameter* P=new Parameter(parameter_type_e::position);
 					(*P)[0].set(m_object);
 					(*P)[1].set((*path)[path->size() - 2]);
-					(*P)[2].set(m_map);
 					//Application::instance().m_action_manager->add(m_object, new GameTask(Application::instance().m_actions[action_e::move], P));
 					m_action_controller->set((*P)[0].m_object, Application::instance().m_actions[action_e::move], P);
 				}

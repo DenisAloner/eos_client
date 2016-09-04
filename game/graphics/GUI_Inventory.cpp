@@ -68,7 +68,7 @@ void GUI_body_cell::on_mouse_down(MouseEventArgs const& e)
 	set_focus(true);
 	if (Application::instance().m_message_queue.m_reader)
 	{
-		Parameter* p = new Parameter(parameter_type_e::parameter_kind_owner);
+		Parameter* p = new Parameter(parameter_type_e::owner);
 		(*p)[0].set(m_item);
 		Application::instance().m_message_queue.push(p);
 	}

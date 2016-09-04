@@ -1559,7 +1559,7 @@ void GUI_MapViewer::on_key_press(WPARAM w)
 	{
 		if (Application::instance().m_message_queue.m_reader)
 		{
-			Parameter* p = new Parameter(parameter_type_e::parameter_accept);
+			Parameter* p = new Parameter(parameter_type_e::accept);
 			Application::instance().m_message_queue.push(p);
 		}
 		return;
@@ -1568,7 +1568,7 @@ void GUI_MapViewer::on_key_press(WPARAM w)
 	{
 		if (Application::instance().m_message_queue.m_reader)
 		{
-			Parameter* p = new Parameter(parameter_type_e::ParameterKind_Cancel);
+			Parameter* p = new Parameter(parameter_type_e::cancel);
 			Application::instance().m_message_queue.push(p);
 		}
 		return;
@@ -1589,7 +1589,7 @@ void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
 		{
 			if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
 			{
-				Parameter* p = new Parameter(parameter_type_e::parameter_kind_owner);
+				Parameter* p = new Parameter(parameter_type_e::owner);
 				(*p)[0].set(m_map->m_items[y][x]);
 				if (Application::instance().m_message_queue.m_reader)
 				{

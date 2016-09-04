@@ -593,7 +593,7 @@ void GameObject::add_action_from_part(Object_interaction* object)
 				{
 				case action_e::pick:
 				{
-					Parameter* p = new Parameter(parameter_type_e::ParameterKind_Destination);
+					Parameter* p = new Parameter(parameter_type_e::destination);
 					(*p)[0].set(this);
 					(*p)[2].set(op);
 					m_common_actions.pick = true;
@@ -602,21 +602,21 @@ void GameObject::add_action_from_part(Object_interaction* object)
 				}
 				case action_e::move_step:
 				{
-					Parameter* p = new Parameter(parameter_type_e::ParameterKind_Position);
+					Parameter* p = new Parameter(parameter_type_e::position);
 					(*p)[0].set(this);
 					m_actions_list->push_back(Action_helper_t(a, p));
 					break;
 				}
 				case action_e::turn:
 				{
-					/*?1? Parameter_direction* p = new Parameter_direction();
-					p->m_object = this;
-					m_actions_list->push_back(Action_helper_t(a, p));*/
+					Parameter* p = new Parameter(parameter_type_e::direction);
+					(*p)[0].m_object = this;
+					m_actions_list->push_back(Action_helper_t(a, p));
 					break;
 				}
 				case action_e::hit_melee:
 				{
-					Parameter* p = new Parameter(parameter_type_e::parameter_interaction_cell);
+					Parameter* p = new Parameter(parameter_type_e::interaction_cell);
 					(*p)[0].set(this);
 					(*p)[2].set(op);
 					m_actions_list->push_back(Action_helper_t(a, p));
@@ -637,7 +637,7 @@ void GameObject::add_action_from_part(Object_interaction* object)
 					{
 					case action_e::hit_melee:
 					{
-						Parameter* p = new Parameter(parameter_type_e::parameter_interaction_cell);
+						Parameter* p = new Parameter(parameter_type_e::interaction_cell);
 						(*p)[0].set(this);
 						(*p)[2].set(op);
 						m_actions_list->push_back(Action_helper_t(a, p));

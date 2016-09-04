@@ -19,7 +19,6 @@ struct Parameter_argument_t
 	union
 	{
 		GameObject* m_object;
-		GameMap* m_map;
 		MapCell* m_cell;
 		Game_object_owner* m_owner;
 		Object_part* m_part;
@@ -27,7 +26,6 @@ struct Parameter_argument_t
 	};
 
 	void set(GameObject* value);
-	void set(GameMap* value);
 	void set(Game_object_owner* value);
 	void set(object_direction_e value);
 
@@ -50,6 +48,12 @@ public:
 
 	Parameter(parameter_type_e kind);
 
+	template<typename... T> 
+	Parameter(parameter_type_e kind, T... args):Parameter(kind)
+	{
+		set_helper(0, args...);
+	}
+
 	Parameter_argument_t& operator[](std::size_t i)
 	{
 		return m_args[i];
@@ -65,6 +69,22 @@ public:
 	virtual void reset_serialization_index();
 	virtual void save();
 	virtual void load();
+
+private:
+
+	template<typename T, typename... args>
+	void set_helper(int i, T value)
+	{
+		m_args[i].set(value);
+	};
+
+	template<typename T, typename... args>
+	void set_helper(int i, T value, args... a)
+	{
+		m_args[i].set(value);
+		if (i < m_size) { set_helper(i + 1, a...); }
+	};
+
 };
 
 //class Parameter_MoveObjectByUnit : public Parameter
@@ -83,37 +103,7 @@ public:
 //	virtual void load();
 //};
 
-//class P_unit_interaction : public Parameter
-//{
-//public:
-//
-//	GameObject* m_unit;
-//	GameObject* m_object;
-//	Object_part* m_unit_body_part;
-//	
-//	P_unit_interaction();
-//
-//	virtual void reset_serialization_index();
-//	virtual void save();
-//	virtual void load();
-//};
 
-//class P_interaction_cell : public Parameter
-//{
-//public:
-//
-//	GameObject* m_unit;
-//	GameObject* m_object;
-//	Object_part* m_unit_body_part;
-//	MapCell* m_cell;
-//
-//	P_interaction_cell();
-//
-//	virtual void reset_serialization_index();
-//	virtual void save();
-//	virtual void load();
-//};
-//
 //class P_bow_shoot : public Parameter
 //{
 //public:
@@ -131,20 +121,5 @@ public:
 //	virtual void load();
 //};
 //
-//class Parameter_direction : public Parameter
-//{
-//public:
-//
-//	GameObject* m_object;
-//	object_direction_e m_direction;
-//
-//	Parameter_direction();
-//
-//	Parameter_direction(GameObject* object, object_direction_e direction);
-//
-//	virtual void reset_serialization_index();
-//	virtual void save();
-//	virtual void load();
-//};
 
 #endif //TPARAMETER_H
