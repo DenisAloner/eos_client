@@ -643,7 +643,7 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 	obj->m_direction = config->m_direction;
 	obj->m_name = config->m_name;
 	Object_state* state;
-	for (std::list<Object_state*>::iterator item = config->m_state.begin(); item != config->m_state.end(); item++)
+	for (std::list<Object_state*>::iterator item = config->m_state.begin(); item != config->m_state.end(); ++item)
 	{
 		state = (*item)->clone();
 		obj->m_state.push_back(state);

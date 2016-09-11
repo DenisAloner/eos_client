@@ -99,7 +99,7 @@ void Application::render()
 	m_update_mutex.lock();
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	for (auto current = m_update_canvas.begin(); current != m_update_canvas.end(); current++)
+	for (auto current = m_update_canvas.begin(); current != m_update_canvas.end(); ++current)
 	{
 		(*current)->render_on_canvas();
 	}
@@ -762,7 +762,7 @@ bool Application::command_check_position(GameObject*& object, MapCell*& position
 		for (int j = 0; j<object->m_active_state->m_size.x; j++)
 		{
 			if (map->m_items[position->y + i][position->x + j] == nullptr){ return false; }
-			for (std::list<GameObject*>::iterator item = map->m_items[position->y - i][position->x + j]->m_items.begin(); item != map->m_items[position->y - i][position->x + j]->m_items.end(); item++)
+			for (std::list<GameObject*>::iterator item = map->m_items[position->y - i][position->x + j]->m_items.begin(); item != map->m_items[position->y - i][position->x + j]->m_items.end(); ++item)
 			{
 				if (((*item) != object) && qualifier((*item)))
 				{

@@ -321,7 +321,7 @@ void FOV::calculate_FOV(GameObject* object, GameMap* map, object_direction_e dir
 	}
 
 	AI_FOV current;
-	for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); item++)
+	for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); ++item)
 	{
 		current = static_cast<Vision_component*>(*item)->m_value;
 		calculate(object, map, current);
@@ -346,7 +346,7 @@ void FOV::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
 	{
 		for (int x = m_map_center.x - view.l, xf = m_view_center.x - view.l; x < m_map_center.x + view.r + 1; x++, xf++)
 		{
-			for (auto obj = map->m_items[y][x]->m_items.begin(); obj != map->m_items[y][x]->m_items.end(); obj++)
+			for (auto obj = map->m_items[y][x]->m_items.begin(); obj != map->m_items[y][x]->m_items.end(); ++obj)
 			{
 				m_map[yf][xf].opaque = false;
 				if ((*obj) != unit&&qualifier((*obj)))
@@ -375,7 +375,7 @@ void FOV_help::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
 			m_map[yf][xf].opaque = false;
 			if (map->m_items[y][x]->m_notable == true)
 			{
-				for (auto obj = map->m_items[y][x]->m_items.begin(); obj != map->m_items[y][x]->m_items.end(); obj++)
+				for (auto obj = map->m_items[y][x]->m_items.begin(); obj != map->m_items[y][x]->m_items.end(); ++obj)
 				{
 					if ((*obj) != unit&&qualifier((*obj)))
 					{

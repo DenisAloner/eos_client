@@ -121,7 +121,7 @@ void Path::calculate(GameMap* map, GameObject* object, MapCell* gc,GameObject* g
 			c->m_closed = false;
 			c->m_state = 0;
 			c->m_mark = false;
-			for (std::list<GameObject*>::iterator item =c->m_items.begin(); item != c->m_items.end(); item++)
+			for (std::list<GameObject*>::iterator item =c->m_items.begin(); item != c->m_items.end(); ++item)
 			{
 				if (((*item) != object) && ((*item) != goal) && qualifier((*item)))
 				{
@@ -162,7 +162,7 @@ void Path::map_costing(GameMap* map, GameObject* object, MapCell* gc, int radius
 			c = map->m_items[y][x];
 			c->m_closed = false;
 			c->m_state = 0;
-			for (std::list<GameObject*>::iterator item = c->m_items.begin(); item != c->m_items.end(); item++)
+			for (std::list<GameObject*>::iterator item = c->m_items.begin(); item != c->m_items.end(); ++item)
 			{
 				if (((*item) != object) && qualifier((*item)))
 				{
@@ -349,7 +349,7 @@ void Dijkstra_map::calculate_cost(GameMap* map, GameObject* object, GameObject* 
 			c = m_map->m_items[y][x];
 			c->m_pathfind_info.opaque = false;
 			c->m_pathfind_info.value = 100000;
-			for (std::list<GameObject*>::iterator item = c->m_items.begin(); item != c->m_items.end(); item++)
+			for (std::list<GameObject*>::iterator item = c->m_items.begin(); item != c->m_items.end(); ++item)
 			{
 				if ((*item) == goal)
 				{
@@ -388,7 +388,7 @@ void Dijkstra_map::calculate_cost_autoexplore(GameMap* map, GameObject* object)
 			{
 				c->m_pathfind_info.opaque = false;
 				c->m_pathfind_info.value = 100000;
-				for (std::list<GameObject*>::iterator item = c->m_items.begin(); item != c->m_items.end(); item++)
+				for (std::list<GameObject*>::iterator item = c->m_items.begin(); item != c->m_items.end(); ++item)
 				{
 					if (((*item) != object) && qualifier((*item)))
 					{
@@ -543,7 +543,7 @@ GameObject* AI_enemy::find_goal()
 			fc = &m_fov->m_map[y - y_start][x - x_start];
 			if (fc->visible)
 			{
-				for (auto item = m_map->m_items[y][x]->m_items.begin(); item != m_map->m_items[y][x]->m_items.end(); item++)
+				for (auto item = m_map->m_items[y][x]->m_items.begin(); item != m_map->m_items[y][x]->m_items.end(); ++item)
 				{
 					if ((*item) == Application::instance().m_GUI->MapViewer->m_player->m_object)
 					{
@@ -591,7 +591,7 @@ bool AI_enemy::check_goal()
 			fc = &m_fov->m_map[y - y_start][x - x_start];
 			if (fc->visible)
 			{
-				for (auto item = m_map->m_items[y][x]->m_items.begin(); item != m_map->m_items[y][x]->m_items.end(); item++)
+				for (auto item = m_map->m_items[y][x]->m_items.begin(); item != m_map->m_items[y][x]->m_items.end(); ++item)
 				{
 					if ((*item) == m_goal)
 					{
@@ -734,7 +734,7 @@ void AI_enemy::create()
 			int radius = 0;
 			Vision_list* vl = static_cast<Vision_list*>(m_object->m_active_state->get_list(interaction_e::vision));
 			AI_FOV current;
-			for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); item++)
+			for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); ++item)
 			{
 				current = static_cast<Vision_component*>(*item)->m_value;
 				radius = max(radius, current.radius);
@@ -808,7 +808,7 @@ GameObject* AI_trap::find_goal(){ return nullptr; };
 void AI_trap::create()
 {
 	m_object->set_state(object_state_e::off);
-	for (auto item = m_object->cell()->m_items.begin(); item != m_object->cell()->m_items.end(); item++)
+	for (auto item = m_object->cell()->m_items.begin(); item != m_object->cell()->m_items.end(); ++item)
 	{
 		if (m_object != (*item) && (*item)->m_name != "floor")
 		{
@@ -817,7 +817,7 @@ void AI_trap::create()
 	}
 	if (m_object->m_active_state->m_state == object_state_e::on)
 	{
-		for (auto item = m_object->cell()->m_items.begin(); item != m_object->cell()->m_items.end(); item++)
+		for (auto item = m_object->cell()->m_items.begin(); item != m_object->cell()->m_items.end(); ++item)
 		{
 			if (m_object != (*item) && (*item)->m_name != "floor")
 			{

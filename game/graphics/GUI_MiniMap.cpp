@@ -65,7 +65,7 @@ void GUI_MiniMap::render_on_canvas()
 				glEnd();
 				continue;
 			}
-			for (std::list<GameObject*>::iterator obj = m_map_viewer->m_map->m_items[y][x]->m_items.begin(); obj != m_map_viewer->m_map->m_items[y][x]->m_items.end(); obj++)
+			for (std::list<GameObject*>::iterator obj = m_map_viewer->m_map->m_items[y][x]->m_items.begin(); obj != m_map_viewer->m_map->m_items[y][x]->m_items.end(); ++obj)
 			{
 				glColor4d(0.0, 0.0, 0.0, 0.0);
 				if ((*obj)->m_name == "floor")

@@ -43,7 +43,7 @@ void GUI_Container::on_mouse_down(MouseEventArgs const& e)
 void GUI_Container::on_mouse_move(MouseEventArgs const& e)
 {
 	MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
-	for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); Current++)
+	for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); ++Current)
 	{
 		if ((*Current)->check_region(LocalMouseEventArgs))
 		{

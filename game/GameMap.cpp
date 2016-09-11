@@ -10,7 +10,7 @@ void Object_manager::update_buff()
 	Interaction_list* list;
 	Interaction_list* e;
 
-	for (auto object = m_items.begin(); object !=m_items.end(); object++)
+	for (auto object = m_items.begin(); object !=m_items.end(); ++object)
 	{
 		list = static_cast<Interaction_list*>((*object)->get_effect(interaction_e::buff));
 		if (list)
@@ -37,7 +37,7 @@ void Object_manager::update_buff()
 
 void Object_manager::calculate_ai()
 {
-	for (auto object = m_items.begin(); object != m_items.end(); object++)
+	for (auto object = m_items.begin(); object != m_items.end(); ++object)
 	{
 		if ((*object)->m_owner->m_kind == entity_e::cell)
 		{
@@ -71,7 +71,7 @@ void Object_manager::calculate_ai()
 void Object_manager::reset_serialization_index()
 {
 	m_serialization_index = 0;
-	for (auto item = m_items.begin(); item != m_items.end(); item++)
+	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
 		(*item)->reset_serialization_index();
 	}
@@ -82,7 +82,7 @@ void Object_manager::save()
 	FILE* file = Serialization_manager::instance().m_file;
 	size_t s = m_items.size();
 	fwrite(&s, sizeof(size_t), 1, file);
-	for (auto item = m_items.begin(); item != m_items.end(); item++)
+	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
 		Serialization_manager::instance().serialize(*item);
 	}
@@ -338,7 +338,7 @@ void GameMap::random_block(block_t* block)
 void GameMap::fill()
 {
 	block_t* block;
-	for (std::list<block_t*>::iterator Current = m_rooms.begin(); Current != m_rooms.end(); Current++)
+	for (std::list<block_t*>::iterator Current = m_rooms.begin(); Current != m_rooms.end(); ++Current)
 	{
 		block = (*Current);
 		random_block(block);
@@ -469,7 +469,7 @@ void  GameMap::add_doors()
 	rectangle_t rect;
 	int s;
 	bool b;
-	for (std::list<block_t*>::iterator Current = m_link_rooms.begin(); Current != m_link_rooms.end(); Current++)
+	for (std::list<block_t*>::iterator Current = m_link_rooms.begin(); Current != m_link_rooms.end(); ++Current)
 	{
 		rect = (*Current)->rect;
 		s = rect.x;
@@ -1027,7 +1027,7 @@ MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, std::function<bool(Map
 void GameMap::add_lighting()
 {
 	block_t* block;
-	for (std::list<block_t*>::iterator Current = m_link_rooms.begin(); Current != m_link_rooms.end(); Current++)
+	for (std::list<block_t*>::iterator Current = m_link_rooms.begin(); Current != m_link_rooms.end(); ++Current)
 	{
 		block = (*Current);
 		//int tk;
@@ -1100,7 +1100,7 @@ void GameMap::save()
 			fwrite(&cell->m_notable, sizeof(bool), 1, file);
 			s = cell->m_items.size();
 			fwrite(&s, sizeof(size_t), 1, file);
-			for (auto item = cell->m_items.begin(); item != cell->m_items.end(); item++)
+			for (auto item = cell->m_items.begin(); item != cell->m_items.end(); ++item)
 			{
 				Serialization_manager::instance().serialize(*item);
 			}
@@ -1202,7 +1202,7 @@ void Game_world::calculate_lighting()
 		}
 	}
 
-	for (auto l = m_object_manager.m_items.begin(); l != m_object_manager.m_items.end(); l++)
+	for (auto l = m_object_manager.m_items.begin(); l != m_object_manager.m_items.end(); ++l)
 	{
 		GameObject& object = *(*l);
 		if (!object.m_active_state->m_light) { continue; }

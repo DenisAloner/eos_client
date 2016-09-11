@@ -23,7 +23,7 @@ MouseEventArgs GUI_Layer::set_local_mouse_position(MouseEventArgs const& source)
 void GUI_Layer::on_mouse_click(MouseEventArgs const& e)
 { 
 	MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
-	for(std::list<GUI_Object*>::iterator Current=m_items.begin();Current!=m_items.end();Current++)
+	for(std::list<GUI_Object*>::iterator Current=m_items.begin();Current!=m_items.end();++Current)
 	{
 		
 		if ((*Current)->check_region(LocalMouseEventArgs))
@@ -37,7 +37,7 @@ void GUI_Layer::on_mouse_click(MouseEventArgs const& e)
 void GUI_Layer::on_mouse_down(MouseEventArgs const& e)
 {
 	MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
-	for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); Current++)
+	for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); ++Current)
 	{
 		if ((*Current)->check_region(LocalMouseEventArgs))
 		{
@@ -70,7 +70,7 @@ void GUI_Layer::render(GraphicalController* Graph, int px, int py)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glUseProgram(0);
-	for (std::list<GUI_Object*>::reverse_iterator Current = m_items.rbegin(); Current != m_items.rend(); Current++)
+	for (std::list<GUI_Object*>::reverse_iterator Current = m_items.rbegin(); Current != m_items.rend(); ++Current)
 	{
 		(*Current)->render(Graph, px + (*Current)->m_position.x, py + (*Current)->m_position.y);
 	}
@@ -134,7 +134,7 @@ bool GUI_Layer::check_region(MouseEventArgs const& e)
 	MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
 	if (this->m_position.x <= e.position.x&&this->m_position.x + m_size.w >= e.position.x&&this->m_position.y <= e.position.y&&this->m_position.y + m_size.h >= e.position.y)
 	{
-		for(std::list<GUI_Object*>::iterator Current=m_items.begin();Current!=m_items.end();Current++)
+		for(std::list<GUI_Object*>::iterator Current=m_items.begin();Current!=m_items.end();++Current)
 		{
 			if ((*Current)->check_region(LocalMouseEventArgs))
 			{

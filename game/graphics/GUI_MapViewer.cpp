@@ -409,7 +409,7 @@ void mapviewer_hint_shoot::draw_cell(MapCell* a)
 		}
 		else
 		{
-			for (auto object = a->m_items.begin(); object != a->m_items.end(); object++)
+			for (auto object = a->m_items.begin(); object != a->m_items.end(); ++object)
 			{
 				if (!(*object)->get_tag(object_tag_e::pass_able))
 				{
@@ -1109,7 +1109,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	bool passable;
 	bool is_hide;
 	bool is_in_fov;
-	for (auto current = m_hints.begin(); current != m_hints.end(); current++)
+	for (auto current = m_hints.begin(); current != m_hints.end(); ++current)
 	{
 		(*current)->init();
 	}
@@ -1171,7 +1171,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 					}
 
 					
-					for (std::list<GameObject*>::iterator Current = m_map->m_items[y][x]->m_items.begin(); Current != m_map->m_items[y][x]->m_items.end(); Current++)
+					for (std::list<GameObject*>::iterator Current = m_map->m_items[y][x]->m_items.begin(); Current != m_map->m_items[y][x]->m_items.end(); ++Current)
 					{
 						light[0] = (m_map->m_items[y][x]->m_light.R / 100.0F);
 						light[1] = (m_map->m_items[y][x]->m_light.G / 100.0F);
@@ -1397,7 +1397,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 
 						}
 					}
-						for (auto current = m_hints.begin(); current != m_hints.end(); current++)
+						for (auto current = m_hints.begin(); current != m_hints.end(); ++current)
 						{
 							(*current)->render_on_cell(m_map->m_items[y][x]);
 						}
@@ -1406,7 +1406,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 		}
 		if (r == 0)
 		{
-			for (std::list<gui_mapviewer_hint*>::iterator current = m_hints.begin(); current != m_hints.end(); current++)
+			for (std::list<gui_mapviewer_hint*>::iterator current = m_hints.begin(); current != m_hints.end(); ++current)
 			{
 				if (!(*current)->m_top)
 				{
@@ -1416,7 +1416,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 		}
 		else
 		{
-			for (std::list<gui_mapviewer_hint*>::iterator current = m_hints.begin(); current != m_hints.end(); current++)
+			for (std::list<gui_mapviewer_hint*>::iterator current = m_hints.begin(); current != m_hints.end(); ++current)
 			{
 				if ((*current)->m_top)
 				{
@@ -1612,7 +1612,7 @@ void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
 		if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
 		{
 			//UnderCursor(CursorEventArgs(e.x, e.y));
-			for (std::list<GameObject*>::iterator Current = m_map->m_items[y][x]->m_items.begin(); Current != m_map->m_items[y][x]->m_items.end(); Current++)
+			for (std::list<GameObject*>::iterator Current = m_map->m_items[y][x]->m_items.begin(); Current != m_map->m_items[y][x]->m_items.end(); ++Current)
 			{
 				PopMenu->add((*Current)->m_name, (*Current));
 			}

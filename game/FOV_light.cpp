@@ -33,7 +33,7 @@ void FOV_light::calculate(int radius, GameObject* unit, GameMap* map)
 			{
 				if (!((x<0) || (x>map->m_size.w - 1)))
 				{
-					for (std::list<GameObject*>::iterator obj = map->m_items[y][x]->m_items.begin(); obj != map->m_items[y][x]->m_items.end(); obj++)
+					for (std::list<GameObject*>::iterator obj = map->m_items[y][x]->m_items.begin(); obj != map->m_items[y][x]->m_items.end(); ++obj)
 					{
 						op = (*obj)->m_active_state->m_optical;
 						if (op)

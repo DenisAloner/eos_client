@@ -86,13 +86,13 @@ public:
 		GUI_Layer::add(object);
 		std::size_t maxlen = 0;
 		std::size_t height = 0;
-		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); Current++)
+		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); ++Current)
 		{
 			object = (GUI_PopMenu::Item*)(*Current);
 			maxlen = max(Application::instance().m_graph->get_width(object->m_text), maxlen);
 		}
 		resize(maxlen + 8, m_items.size() * ((Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender) >> 6));
-		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); Current++)
+		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); ++Current)
 		{
 			(*Current)->m_size.w = m_size.w - 1;
 		}
@@ -101,7 +101,7 @@ public:
 	virtual void on_lose_focus(GUI_Object* sender){ destroy(this); }
 	virtual void on_mouse_move(MouseEventArgs const& e)
 	{
-		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); Current++)
+		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); ++Current)
 		{
 			if ((*Current)->check_region(MouseEventArgs(position_t(e.position.x - m_position.x, e.position.y - m_position.y), e.key, e.value)))
 			{

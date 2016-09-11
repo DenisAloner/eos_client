@@ -106,7 +106,7 @@ void GUI_Window::on_mouse_move(MouseEventArgs const& e)
 	}
 	else {
 		MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
-		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); Current++)
+		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); ++Current)
 		{
 			if ((*Current)->check_region(LocalMouseEventArgs))
 			{
@@ -200,7 +200,7 @@ void GUI_description_window::update_info()
 			current->second->description(&m_text,2);
 		}
 	}
-	for (auto item = m_text.begin(); item != m_text.end(); item++)
+	for (auto item = m_text.begin(); item != m_text.end(); ++item)
 	{
 		m_textbox->add_item_control(new GUI_Text((*item), new GUI_TextFormat(8, 17, RGBA_t(0.7, 0.9, 1.0, 1.0))));
 	}

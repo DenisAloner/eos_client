@@ -338,7 +338,7 @@ void GameObject::set_direction(object_direction_e dir)
 			(*item)->m_size = game_object_size_t((*item)->m_size.y, (*item)->m_size.x, (*item)->m_size.z);
 		}
 	}*/
-	for (std::list<Object_state*>::iterator item = m_state.begin(); item != m_state.end(); item++)
+	for (std::list<Object_state*>::iterator item = m_state.begin(); item != m_state.end(); ++item)
 	{
 		(*item)->set_tile_size();
 	}
@@ -347,7 +347,7 @@ void GameObject::set_direction(object_direction_e dir)
 
 void GameObject::set_state(object_state_e state)
 {
-	for (std::list<Object_state*>::iterator item = m_state.begin(); item != m_state.end(); item++)
+	for (std::list<Object_state*>::iterator item = m_state.begin(); item != m_state.end(); ++item)
 	{
 		if ((*item)->m_state == state)
 		{
@@ -359,7 +359,7 @@ void GameObject::set_state(object_state_e state)
 
 Object_state* GameObject::get_state(object_state_e state)
 {
-	for (std::list<Object_state*>::iterator item = m_state.begin(); item != m_state.end(); item++)
+	for (std::list<Object_state*>::iterator item = m_state.begin(); item != m_state.end(); ++item)
 	{
 		if ((*item)->m_state == state)
 		{
@@ -477,7 +477,7 @@ bool GameObject::get_stat(object_tag_e key)
 		if (list != m_active_state->m_item.end())
 		{
 			Tag_list* taglist = static_cast<Tag_list*>(list->second);
-			for (auto item = taglist->m_effect.begin(); item != taglist->m_effect.end(); item++)
+			for (auto item = taglist->m_effect.begin(); item != taglist->m_effect.end(); ++item)
 			{
 				if (static_cast<Object_tag*>(*item)->m_type == key){ return true; }
 			}
@@ -494,7 +494,7 @@ Object_tag* GameObject::get_tag(object_tag_e key)
 		if (list != m_active_state->m_item.end())
 		{
 			Tag_list* taglist = static_cast<Tag_list*>(list->second);
-			for (auto item = taglist->m_effect.begin(); item != taglist->m_effect.end(); item++)
+			for (auto item = taglist->m_effect.begin(); item != taglist->m_effect.end(); ++item)
 			{
 				if (static_cast<Object_tag*>(*item)->m_type == key){ return static_cast<Object_tag*>(*item); }
 			}
@@ -586,7 +586,7 @@ void GameObject::add_action_from_part(Object_interaction* object)
 		Action* a;
 		if (al)
 		{
-			for (auto action = al->m_effect.begin(); action != al->m_effect.end(); action++)
+			for (auto action = al->m_effect.begin(); action != al->m_effect.end(); ++action)
 			{
 				a = static_cast<Action*>(*action);
 				switch (a->m_kind)
@@ -630,7 +630,7 @@ void GameObject::add_action_from_part(Object_interaction* object)
 			al = static_cast<Action_list*>(op->m_item->get_effect(interaction_e::action));
 			if (al)
 			{
-				for (auto action = al->m_effect.begin(); action != al->m_effect.end(); action++)
+				for (auto action = al->m_effect.begin(); action != al->m_effect.end(); ++action)
 				{
 					a = static_cast<Action*>(*action);
 					switch (a->m_kind)
@@ -671,13 +671,13 @@ void GameObject::get_actions_list(std::list<Action_helper_t>& value)
 	al = static_cast<Action_list*>(get_effect(interaction_e::action));
 	if (al)
 	{
-		for (auto action = al->m_effect.begin(); action != al->m_effect.end(); action++)
+		for (auto action = al->m_effect.begin(); action != al->m_effect.end(); ++action)
 		{
 			(*action)->do_predicat(std::bind(&GameObject::get_action_predicat, this, std::placeholders::_1));
 		}
 	}
 	m_common_actions.pick = false;
-	for (auto item = parts->m_effect.begin(); item != parts->m_effect.end(); item++)
+	for (auto item = parts->m_effect.begin(); item != parts->m_effect.end(); ++item)
 	{
 		(*item)->do_predicat(std::bind(&GameObject::add_action_from_part, this, std::placeholders::_1));
 	}
@@ -694,7 +694,7 @@ void GameObject::reset_serialization_index()
 	{
 		m_owner->reset_serialization_index();
 	}
-	for (auto item = m_state.begin(); item != m_state.end(); item++)
+	for (auto item = m_state.begin(); item != m_state.end(); ++item)
 	{
 		(*item)->reset_serialization_index();
 	}
@@ -713,7 +713,7 @@ void GameObject::save()
 	LOG(INFO) << " --- Конец запись владельца";
 	size_t s = m_state.size();
 	fwrite(&s, sizeof(size_t), 1, file);
-	for (auto item = m_state.begin(); item != m_state.end(); item++)
+	for (auto item = m_state.begin(); item != m_state.end(); ++item)
 	{
 		Serialization_manager::instance().serialize(*item);
 	}
@@ -807,7 +807,7 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 
 void Player::get_actions_list(std::list<Action_helper_t>& value)
 {
-	for (auto item = m_actions.begin(); item != m_actions.end(); item++)
+	for (auto item = m_actions.begin(); item != m_actions.end(); ++item)
 	{
 		value.push_back(Action_helper_t(*item));
 	}
