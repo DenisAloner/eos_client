@@ -63,6 +63,95 @@ void Parameter_argument_t::set(object_direction_e value)
 	}
 };
 
+Parameter_argument_t::operator bool()
+{ 
+	switch (kind)
+	{
+	case::type_e::object_owner:
+	{
+		return m_owner;
+		break;
+	}
+	case::type_e::mapcell:
+	{
+		return m_cell;
+		break;
+	}
+	case::type_e::inventory_cell:
+	{
+		return m_owner;
+		break;
+	}
+	case::type_e::object_part:
+	{
+		return m_part;
+		break;
+	}
+	case::type_e::gameobject:
+	{
+		return m_object;
+		break;
+	}
+	//case::type_e::object_part_group:
+	//{
+	//	return m_part_group;
+	//	break;
+	//}
+	case::type_e::direction:
+	{
+		return m_direction != object_direction_e::none;
+		break;
+	}
+	default:
+	{
+		LOG(FATAL) << "Неверный тип для Parameter_argument_t::operator bool()";
+		break;
+	}
+	}
+};
+
+void Parameter_argument_t::init()
+{
+	switch (kind)
+	{
+	case::type_e::object_owner:
+	{
+		m_owner = nullptr;
+		break;
+	}
+	case::type_e::mapcell:
+	{
+		m_cell = nullptr;
+		break;
+	}
+	case::type_e::inventory_cell:
+	{
+		m_owner = nullptr;
+		break;
+	}
+	case::type_e::object_part:
+	{
+		m_part = nullptr;
+		break;
+	}
+	case::type_e::gameobject:
+	{
+		m_object = nullptr;
+		break;
+	}
+	//case::type_e::object_part_group:
+	//{
+	//	m_part_group = nullptr;
+	//	break;
+	//}
+	case::type_e::direction:
+	{
+		m_direction = object_direction_e::none;
+		break;
+	}
+	}
+};
+
 void Parameter_argument_t::reset_serialization_index()
 {
 	switch (kind)
@@ -122,8 +211,26 @@ void Parameter_argument_t::reset_serialization_index()
 		}
 		break;
 	}
+	//case::type_e::object_part_group:
+	//{
+	//	if (m_part_group)
+	//	{
+	//		for (auto group = m_part_group->begin(); group != m_part_group->end(); ++group)
+	//		{
+	//			for (auto part = group->begin(); part != group->end(); ++part)
+	//			{
+	//				if ((*part)->m_serialization_index > 1)
+	//				{
+	//					(*part)->reset_serialization_index();
+	//				}
+	//			}
+	//		}
+	//	}
+	//	break;
+	//}
 	}
 };
+
 
 void Parameter_argument_t::save()
 {
@@ -154,89 +261,28 @@ void Parameter_argument_t::save()
 		Serialization_manager::instance().serialize(m_object);
 		break;
 	}
+	//case::type_e::object_part_group:
+	//{
+	//	LOG(INFO) << "object_part_group";
+	//	FILE* file = Serialization_manager::instance().m_file;
+	//	size_t s = m_part_group->size();
+	//	fwrite(&s, sizeof(size_t), 1, file);
+	//	for (auto group = m_part_group->begin(); group != m_part_group->end(); ++group)
+	//	{
+	//		s = group->size();
+	//		fwrite(&s, sizeof(size_t), 1, file);
+	//		for (auto part = group->begin(); part != group->end(); ++part)
+	//		{
+	//			Serialization_manager::instance().serialize(*part);
+	//		}
+	//	}
+	//	LOG(INFO) << "Конец object_part_group";
+	//	break;
+	//}
 	case::type_e::direction:
 	{
 		FILE* file = Serialization_manager::instance().m_file;
 		fwrite(&m_direction, sizeof(object_direction_e), 1, file);
-		break;
-	}
-	}
-};
-
-Parameter_argument_t::operator bool()
-{ 
-	switch (kind)
-	{
-	case::type_e::object_owner:
-	{
-		return m_owner;
-		break;
-	}
-	case::type_e::mapcell:
-	{
-		return m_cell;
-		break;
-	}
-	case::type_e::inventory_cell:
-	{
-		return m_owner;
-		break;
-	}
-	case::type_e::object_part:
-	{
-		return m_part;
-		break;
-	}
-	case::type_e::gameobject:
-	{
-		return m_object;
-		break;
-	}
-	case::type_e::direction:
-	{
-		return m_direction != object_direction_e::none;
-		break;
-	}
-	default:
-	{
-		LOG(FATAL) << "Неверный тип для Parameter_argument_t::operator bool()";
-		break;
-	}
-	}
-};
-
-void Parameter_argument_t::init()
-{
-	switch (kind)
-	{
-	case::type_e::object_owner:
-	{
-		m_owner = nullptr;
-		break;
-	}
-	case::type_e::mapcell:
-	{
-		m_cell = nullptr;
-		break;
-	}
-	case::type_e::inventory_cell:
-	{
-		m_owner = nullptr;
-		break;
-	}
-	case::type_e::object_part:
-	{
-		m_part = nullptr;
-		break;
-	}
-	case::type_e::gameobject:
-	{
-		m_object = nullptr;
-		break;
-	}
-	case::type_e::direction:
-	{
-		m_direction = object_direction_e::none;
 		break;
 	}
 	}
@@ -271,6 +317,25 @@ void Parameter_argument_t::load()
 		m_object = dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize());
 		break;
 	}
+	/*case::type_e::object_part_group:
+	{
+		LOG(INFO) << "object_part_group";
+		FILE* file = Serialization_manager::instance().m_file;
+		size_t s;
+		fread(&s, sizeof(size_t), 1, file);
+		m_part_group = new Object_part_group(s);
+		for (auto group = m_part_group->begin(); group != m_part_group->end(); ++group)
+		{
+			fread(&s, sizeof(size_t), 1, file);
+			group->resize(s,nullptr);
+			for (auto part = group->begin(); part != group->end(); ++part)
+			{
+				(*part) = dynamic_cast<Object_part*>(Serialization_manager::instance().deserialize());
+			}
+		}
+		LOG(INFO) << "Конец object_part_group";
+		break;
+	}*/
 	case::type_e::direction:
 	{
 		FILE* file = Serialization_manager::instance().m_file;
@@ -347,6 +412,17 @@ Parameter::Parameter(parameter_type_e kind) :m_kind(kind)
 		m_args[1].kind = type_e::gameobject;
 		m_args[2].kind = type_e::object_part;
 		m_args[3].kind = type_e::mapcell;
+		break;
+	}
+	case::parameter_type_e::bow_shoot:
+	{
+		m_size = 5;
+		m_args = new Parameter_argument_t[m_size];
+		m_args[0].kind = type_e::gameobject;
+		m_args[1].kind = type_e::gameobject;
+		m_args[2].kind = type_e::object_part;
+		m_args[3].kind = type_e::object_part;
+		m_args[4].kind = type_e::mapcell;
 		break;
 	}
 	}
@@ -448,56 +524,3 @@ Parameter* Parameter::clone()
 //}
 //
 //
-//P_bow_shoot::P_bow_shoot() : Parameter(parameter_bow_shoot)
-//{
-//	m_unit = nullptr;
-//	m_object = nullptr;
-//	m_unit_body_part = nullptr;
-//	m_cell = nullptr;
-//}
-//
-//void P_bow_shoot::reset_serialization_index()
-//{
-//	m_serialization_index = 0;
-//	if (m_unit)
-//	{
-//		if (m_unit->m_serialization_index > 1)
-//		{
-//			m_unit->reset_serialization_index();
-//		}
-//	}
-//	if (m_object)
-//	{
-//		if (m_object->m_serialization_index > 1)
-//		{
-//			m_object->reset_serialization_index();
-//		}
-//	}
-//	if (m_unit_body_part)
-//	{
-//		if (m_unit_body_part->m_serialization_index > 1)
-//		{
-//			m_unit_body_part->reset_serialization_index();
-//		}
-//	}
-//}
-//
-//void P_bow_shoot::save()
-//{
-//	FILE* file = Serialization_manager::instance().m_file;
-//	type_e t = type_e::parameter_bow_shoot;
-//	fwrite(&t, sizeof(type_e), 1, file);
-//	Serialization_manager::instance().serialize(m_unit);
-//	Serialization_manager::instance().serialize(m_object);
-//	Serialization_manager::instance().serialize(m_unit_body_part);
-//	Serialization_manager::instance().serialize(m_cell);
-//}
-//
-//void P_bow_shoot::load()
-//{
-//	FILE* file = Serialization_manager::instance().m_file;
-//	m_unit = dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize());
-//	m_object = dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize());
-//	m_unit_body_part = dynamic_cast<Object_part*>(Serialization_manager::instance().deserialize());
-//	m_cell = dynamic_cast<MapCell*>(Serialization_manager::instance().deserialize());
-//}

@@ -305,17 +305,15 @@ class Action_shoot :
 {
 public:
 
-	P_bow_shoot* m_arg;
-
 	Action_shoot();
 	virtual bool check(Parameter* parameter);
 	virtual char perfom(Parameter* parameter);
 	virtual std::string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
-	bool process_cell(MapCell* a);
+	bool process_cell(Parameter* parameter,MapCell* cell);
 private:
 	int m_distance;
-	bool check_cell(MapCell* a);
+	bool check_cell(Parameter* parameter);
 };
 
 #endif //TACTION_H

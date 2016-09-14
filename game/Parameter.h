@@ -104,22 +104,4 @@ private:
 //};
 
 
-//class P_bow_shoot : public Parameter
-//{
-//public:
-//
-//	GameObject* m_unit;
-//	GameObject* m_object;
-//	Object_part* m_unit_body_part;
-//	std::vector<Object_part*> m_ammo_owner;
-//	MapCell* m_cell;
-//
-//	P_bow_shoot();
-//
-//	virtual void reset_serialization_index();
-//	virtual void save();
-//	virtual void load();
-//};
-//
-
 #endif //TPARAMETER_H
