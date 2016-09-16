@@ -795,7 +795,7 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 	//LOG(INFO) << "Поле зрение " << std::to_string(static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_fov_radius);
 	m_actions.push_front(Application::instance().m_actions[action_e::autoexplore]);
 	m_actions.push_front(Application::instance().m_actions[action_e::set_motion_path]);
-	m_actions.push_front(Application::instance().m_actions[action_e::open_inventory]);
+	//m_actions.push_front(Application::instance().m_actions[action_e::open_inventory]);
 	m_actions.push_front(Application::instance().m_actions[action_e::cell_info]);
 	m_actions.push_front(Application::instance().m_actions[action_e::show_parameters]);
 	m_actions.push_front(Application::instance().m_actions[action_e::save]);

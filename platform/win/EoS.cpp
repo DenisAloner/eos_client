@@ -67,6 +67,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	SetClientRect(hWnd, client_rect.right(), client_rect.bottom());
 	EnableGraphics(hWnd, hDC);
 	Renderer renderer(hDC, client_rect);
+
+	//RECT windowRect;
+	//GetWindowRect(hWnd, &windowRect);
+
+	//RECT clientRect;
+	//GetClientRect(hWnd, &clientRect);
+
+	//int borderWidth = ((windowRect.right - windowRect.left) - (clientRect.right - clientRect.left)) / 2;
+	//int border_thickness = GetSystemMetrics(SM_CXSIZEFRAME);
+	//LOG(INFO) << std::to_string(border_thickness);
+	//LOG(FATAL) << std::to_string(borderWidth);
+
 	renderer.start();
 
 	// message handling loop in main thread

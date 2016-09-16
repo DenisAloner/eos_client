@@ -303,10 +303,14 @@ char ActionClass_Move::perfom(Parameter* parameter)
 std::string ActionClass_Move::get_description(Parameter* parameter)
 {
 	Parameter& p(*parameter);
-	std::string s("Идти в X:");
-	s += std::to_string(p[1].m_cell->x);
-	s += ",Y:";
-	s += std::to_string(p[1].m_cell->y);
+	std::string s("Идти");
+	if (p[1])
+	{
+		s += " в X:";
+		s += std::to_string(p[1].m_cell->x);
+		s += ",Y:";
+		s += std::to_string(p[1].m_cell->y);
+	}
 	return s;
 }
 
@@ -475,8 +479,15 @@ ActionClass_Turn::~ActionClass_Turn(void)
 std::string ActionClass_Turn::get_description(Parameter* parameter)
 {
 	Parameter& p(*parameter);
-	std::string s("Повернуть ");
-	s += p[0].m_object->m_name + ".";
+	std::string s("Повернуть");
+	if (parameter)
+	{
+		Parameter& p(*parameter);
+		if (p[0])
+		{
+			s += " " + p[0].m_object->m_name + ".";
+		}
+	}
 	return s;
 }
 
@@ -618,13 +629,14 @@ char Action_OpenInventory::perfom(Parameter* parameter)
 
 std::string Action_OpenInventory::get_description(Parameter* parameter)
 {
-	return "";
+	return "Открыть инвернтарь";
 }
 
 Action_CellInfo::Action_CellInfo()
 {
 	m_kind = action_e::cell_info;
 	m_icon = Application::instance().m_graph->m_actions[4];
+	m_name = "Информация о клетке";
 }
 
 void Action_CellInfo::interaction_handler(Parameter* arg)
@@ -671,13 +683,14 @@ char Action_CellInfo::perfom(Parameter* parameter)
 
 std::string Action_CellInfo::get_description(Parameter* parameter)
 {
-	return "";
+	return "Информация о клетке";
 }
 
 action_set_motion_path::action_set_motion_path()
 {
 	m_kind = action_e::set_motion_path;
 	m_icon = Application::instance().m_graph->m_actions[5];
+	m_name = "Идти в указанную позицию";
 }
 
 void action_set_motion_path::interaction_handler(Parameter* arg)
@@ -744,7 +757,7 @@ char action_set_motion_path::perfom(Parameter* parameter)
 
 std::string action_set_motion_path::get_description(Parameter* parameter)
 {
-	return "";
+	return "Идти в указанную позицию";
 }
 
 Action_pick::Action_pick()
@@ -868,9 +881,40 @@ char Action_pick::perfom(Parameter* parameter)
 
 std::string Action_pick::get_description(Parameter* parameter)
 {
-	Parameter& p(*parameter);
-	std::string s("Поднять ");
-	s += p[1].m_object->m_name + ".";
+	
+	std::string s("Поднять");
+	if (parameter)
+	{
+		Parameter& p(*parameter);
+		if (p[1])
+		{
+			s += " " + p[1].m_object->m_name;
+		}
+		if (p[2])
+		{
+			switch (p[2].m_owner->m_kind)
+			{
+			case entity_e::cell:
+			{
+				////static_cast<MapCell*>(p->m_owner)->m_items.push_back(p->m_object);
+				//static_cast<MapCell*>(p[2].m_owner)->m_map->add_object(p[1].m_object, static_cast<MapCell*>(p[2].m_owner));
+				//p[1].m_object->m_owner = p[2].m_owner;
+				break;
+			}
+			case entity_e::inventory_cell:
+			{
+				/*static_cast<Inventory_cell*>(p[2].m_owner)->m_item = p[1].m_object;
+				p[1].m_object->m_owner = p[2].m_owner;*/
+				break;
+			}
+			case entity_e::body_part:
+			{
+				s += " в " + static_cast<Object_part*>(p[2].m_owner)->m_name;
+				break;
+			}
+			}
+		}
+	}
 	return s;
 }
 
@@ -1294,13 +1338,24 @@ char Action_equip::perfom(Parameter* parameter)
 
 std::string Action_equip::get_description(Parameter* parameter)
 {
-	return "";
+	Parameter& p(*parameter);
+	std::string s("Экипировка");
+	if (parameter)
+	{
+		Parameter& p(*parameter);
+		if (p[0])
+		{
+			s += " " + p[0].m_object->m_name;
+		}
+	}
+	return s;
 }
 
 Action_show_parameters::Action_show_parameters()
 {
 	m_kind = action_e::show_parameters;
 	m_icon = Application::instance().m_graph->m_actions[10];
+	m_name = "Показать характеристики";
 }
 
 void Action_show_parameters::interaction_handler(Parameter* arg)
@@ -1331,8 +1386,15 @@ void Action_show_parameters::interaction_handler(Parameter* arg)
 std::string Action_show_parameters::get_description(Parameter* parameter)
 {
 	Parameter& p(*parameter);
-	std::string s("Показать меню характеристик для ");
-	//s += p->m_object->m_name + ".";
+	std::string s("Показать характеристики");
+	if (parameter)
+	{
+		Parameter& p(*parameter);
+		if (p[0])
+		{
+			s += " " + p[0].m_object->m_name;
+		}
+	}
 	return s;
 }
 
@@ -1455,6 +1517,7 @@ Action_save::Action_save()
 {
 	m_kind = action_e::save;
 	m_icon = Application::instance().m_graph->m_actions[12];
+	m_name = "Сохранить игру";
 }
 
 void Action_save::interaction_handler(Parameter* arg)
@@ -1467,7 +1530,7 @@ void Action_save::interaction_handler(Parameter* arg)
 
 std::string Action_save::get_description(Parameter* parameter)
 {
-	std::string s("Игра сохранена");
+	std::string s("Сохранить игру");
 	return s;
 }
 
@@ -1475,6 +1538,7 @@ Action_load::Action_load()
 {
 	m_kind = action_e::load;
 	m_icon = Application::instance().m_graph->m_actions[15];
+	m_name = "Загрузить игру";
 }
 
 void Action_load::interaction_handler(Parameter* arg)
@@ -1493,7 +1557,7 @@ void Action_load::interaction_handler(Parameter* arg)
 
 std::string Action_load::get_description(Parameter* parameter)
 {
-	std::string s("Игра сохранена");
+	std::string s("Загрузить игру");
 	return s;
 }
 
@@ -1501,6 +1565,7 @@ Action_autoexplore::Action_autoexplore()
 {
 	m_kind = action_e::autoexplore;
 	m_icon = Application::instance().m_graph->m_actions[13];
+	m_name = "Автоисследование";
 }
 
 void Action_autoexplore::interaction_handler(Parameter* arg)
@@ -1539,7 +1604,7 @@ std::string Action_autoexplore::get_description(Parameter* parameter)
 
 bool Action_autoexplore::get_child(GameTask*& task)
 {
-	/*GameObject* object = Application::instance().m_GUI->MapViewer->m_player->m_object;
+	GameObject* object = Application::instance().m_GUI->MapViewer->m_player->m_object;
 	GameMap* map = static_cast<MapCell*>(object->m_owner)->m_map;
 	map->m_dijkstra_map->calculate_cost_autoexplore(map, object);
 	map->m_dijkstra_map->trace();
@@ -1548,16 +1613,14 @@ bool Action_autoexplore::get_child(GameTask*& task)
 	if (c)
 	{ 
 		LOG(INFO) << std::to_string(c->x) << " " << std::to_string(c->y);
-		Parameter_Position* P;
-		P = new Parameter_Position();
-		P->m_object = object;
-		P->m_place = c;
-		P->m_map = map;
-		if (Application::instance().m_actions[action_e::move_step]->check(P))
+		Parameter* p = new Parameter(parameter_type_e::position);
+		(*p)[0].set(object);
+		(*p)[1].set(c);
+		if (Application::instance().m_actions[action_e::move_step]->check(p))
 		{
-			task = new GameTask(Application::instance().m_actions[action_e::move_step], P);
+			task = new GameTask(Application::instance().m_actions[action_e::move_step], p);
 		}
-	}*/
+	}
 	return true;
 }
 
@@ -1796,8 +1859,28 @@ char Action_shoot::perfom(Parameter* parameter)
 
 std::string Action_shoot::get_description(Parameter* parameter)
 {
-	Parameter& p(*parameter);
-	std::string s("Выстрелить в клетку [");
+	/*Parameter& p(*parameter);
+	std::string s(" [");
 	s += std::to_string(p[4].m_cell->x) + "," + std::to_string(p[4].m_cell->y) + "]";
+	return s;*/
+
+	Parameter& p(*parameter);
+	std::string s("Выстрелить");
+	if (parameter)
+	{
+		Parameter& p(*parameter);
+		if (p[2])
+		{
+			s += " из " + p[2].m_part->m_item->m_name;
+		}
+		if (p[3])
+		{
+			s += "(" + p[3].m_part->m_item->m_name+")";
+		}
+		if (p[4])
+		{
+			s +=" в "+ std::to_string(p[4].m_cell->x) + "," + std::to_string(p[4].m_cell->y);
+		}
+	}
 	return s;
 }

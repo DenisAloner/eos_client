@@ -15,10 +15,11 @@ public:
 
 	Action_helper_t m_value;
 
-	GUI_ActionButton();
+	GUI_ActionButton(int width, int height);
 	~GUI_ActionButton();
 
 	virtual void on_mouse_click(MouseEventArgs const& e);
+	virtual void on_mouse_move(MouseEventArgs const& e);
 	virtual void render(GraphicalController* Graph, int px, int py);	
 	virtual bool check_region(MouseEventArgs const& e);
 };

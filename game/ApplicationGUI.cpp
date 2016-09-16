@@ -14,34 +14,41 @@ ApplicationGUI::ApplicationGUI(int x, int y, int width, int height, Player* p, G
 	MapViewer->m_map = m;
 	MapViewer->m_player = p;
 
-	GUI_ActionPanel* ActionPanel;
-	ActionPanel = new GUI_ActionPanel(2, m_size.h - 49, 898, 47);
+	/*GUI_ActionPanel* ActionPanel;
+	ActionPanel = new GUI_ActionPanel(2, m_size.h - 49, 898, 47);*/
 	//m_action_panel = ActionPanel;
-	ActionPanel->bind(p);
-
-	GUI_ActionManager* AMTextBox;
-	AMTextBox = new GUI_ActionManager(am);
-	AMTextBox->m_position.x = 650;
-	AMTextBox->m_position.y = ActionPanel->m_position.y - 265;
-	AMTextBox->resize(372, 263);
+	//ActionPanel->bind(p);
 
 	GUI_Layer* MenuLayer;
 	MenuLayer = new GUI_Layer(0, 0, m_size.w, m_size.h);
 
+	int b = 2;
+	int w1 = m_size.w / 5;
+	int w2 = w1 * 2;
+	int w3 = w2 + w2;
+	int h1 = m_size.h / 4;
+	int h2 = 47;
+
 	GUI_game_console* console = new GUI_game_console(gl);
-	console->m_position.x = 2;
-	console->m_position.y = ActionPanel->m_position.y - 265;
-	console->resize(646, 263);
+	console->m_position.x = b;
+	console->m_position.y = m_size.h - h1;
+	console->resize(w2 - b, h1 - b);
 
-	//m_GUI->DescriptionBox = console;
+	GUI_ActionManager* AMTextBox;
+	AMTextBox = new GUI_ActionManager(w2 + b, m_size.h - h1, w2 - b, h1 - b, am);
 
-	GUI_button* button = new GUI_button(902, m_size.h - 49, 120, 47, "Õîä");
+	GUI_button* button = new GUI_button(w3 + b, m_size.h - (h2 + b*2), m_size.w - w3 - b * 2, h2, "Õîä");
 	button->mouse_click += std::bind(&Application::on_turn, &Application::instance());
 
+	m_action_bar = new GUI_Action_bar(w3 + b, y + b, m_size.w - w3 - b * 2, m_size.h - (h2 + b * 4));
+	m_action_bar->bind(p);
+
 	MenuLayer->add(AMTextBox);
-	MenuLayer->add(ActionPanel);
+	//MenuLayer->add(ActionPanel);
 	MenuLayer->add(console);
 	MenuLayer->add(button);
+	MenuLayer->add(m_action_bar);
+
 
 	add(Application::instance().m_window_manager);
 	add(MenuLayer);

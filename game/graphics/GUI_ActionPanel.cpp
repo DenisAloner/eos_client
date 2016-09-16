@@ -47,8 +47,8 @@ void GUI_ActionPanel::update_binding()
 	m_object->get_actions_list(info);
 	for (auto item = info.begin(); item != info.end(); ++item)
 	{
-		GUI_ActionButton* ActionButton = new GUI_ActionButton();
+		/*GUI_ActionButton* ActionButton = new GUI_ActionButton();
 		ActionButton->m_value = (*item);
-		add_item_control(ActionButton);
+		add_item_control(ActionButton);*/
 	}
 }

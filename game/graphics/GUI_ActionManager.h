@@ -18,7 +18,7 @@ class GUI_ActionManager : public GUI_Container
 public:
 	ActionManager* m_item;
 
-	GUI_ActionManager(ActionManager* ActionManager);
+	GUI_ActionManager(int x, int y, int width, int height,ActionManager* ActionManager);
 	~GUI_ActionManager(void);
 
 	/*virtual void Render(GraphicalController* Graph);*/

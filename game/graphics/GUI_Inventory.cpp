@@ -18,11 +18,21 @@ void GUI_body_cell::render(GraphicalController* Graph, int px, int py)
 	glDisable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glColor4f(1.0, 0.9, 0.0, 0.25);
+	
 	if (focused)
 	{
+		glColor4d(1.0, 1.0, 1.0, 0.75);
 		Graph->draw_sprite(px, py, px, py + m_size.h, px + m_size.w, py + m_size.h, px + m_size.w, py);
+		glColor4d(0, 0, 0, 1);
 	}
+	else
+	{
+		glColor4f(1.0, 1.0, 1.0, 1.0);
+	}
+
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	Graph->center_text(px + 128, py + 32, m_item->m_name, 8, 17);
 	glDisable(GL_BLEND);
 	glColor4f(1.0, 1.0, 1.0, 1.0);
 	glBegin(GL_LINES);
@@ -52,10 +62,6 @@ void GUI_body_cell::render(GraphicalController* Graph, int px, int py)
 		glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_icons[m_item->m_item->m_active_state->m_icon]);
 		Graph->draw_sprite(px, py, px, py + m_size.h, px + 64, py + m_size.h, px + 64, py);
 	}
-	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_BLEND);
-	glColor4f(1.0, 1.0, 1.0, 1.0);
-	Graph->center_text(px + 128, py+32, m_item->m_name, 8, 17);
 }
 
 void GUI_body_cell::on_mouse_move(MouseEventArgs const& e)
