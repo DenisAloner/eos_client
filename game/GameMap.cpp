@@ -174,9 +174,9 @@ void GameMap::generate_room(void)
 	}
 
 	int light_source_count = 0;
-	for (int i = 1; i<m_size.h; i=i+10)
+	for (int i = 1; i<m_size.h; i=i+20)
 	{
-		for (int j = 1; j<m_size.w; j=j+10)
+		for (int j = 1; j<m_size.w; j=j+20)
 		{
 			GameObject* obj = Application::instance().m_game_object_manager->new_object("torch");
 			add_to_map(obj, m_items[i][j]);
@@ -1219,11 +1219,15 @@ void GameMap::load()
 
 Game_world::Game_world()
 {
+	float l;
 	for (int y = 0; y < 21; y++)
 	{
 		for (int x = 0; x< 21; x++)
 		{
-			m_coefficient[y][x] = (float)sqrt(x*x + y*y) * 5;
+			l = (float)sqrt(x*x + y*y);
+			l = l / 20.0;
+			m_coefficient[y][x] = 1 - l;
+			if (m_coefficient[y][x] < 0) { m_coefficient[y][x] = 0; }
 		}
 	}
 }
@@ -1290,7 +1294,6 @@ void Game_world::calculate_lighting()
 			}
 		}
 	}
-
 	for (auto l = m_object_manager.m_items.begin(); l != m_object_manager.m_items.end(); ++l)
 	{
 		GameObject& object = *(*l);
@@ -1304,13 +1307,13 @@ void Game_world::calculate_lighting()
 			{
 				lx = abs(x - 20);
 				ly = abs(y - 20);
-				c = ((*l)->m_active_state->m_light->R - m_coefficient[ly][lx])*fl.m_map[y][x].damping.R;
+				c = ((*l)->m_active_state->m_light->R * m_coefficient[ly][lx])*fl.m_map[y][x].damping.R;
 				if (c < 0) { c = 0; }
 				fl.m_map[y][x].light.R = c;
-				c = ((*l)->m_active_state->m_light->G - m_coefficient[ly][lx])*fl.m_map[y][x].damping.G;
+				c = ((*l)->m_active_state->m_light->G * m_coefficient[ly][lx])*fl.m_map[y][x].damping.G;
 				if (c < 0) { c = 0; }
 				fl.m_map[y][x].light.G = c;
-				c = ((*l)->m_active_state->m_light->B - m_coefficient[ly][lx])*fl.m_map[y][x].damping.B;
+				c = ((*l)->m_active_state->m_light->B * m_coefficient[ly][lx])*fl.m_map[y][x].damping.B;
 				if (c < 0) { c = 0; }
 				fl.m_map[y][x].light.B = c;
 			}

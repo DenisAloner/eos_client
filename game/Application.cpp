@@ -227,7 +227,7 @@ void Application::initialize(dimension_t work_area_size)
 void Application::new_game()
 {
 	m_world = new Game_world();
-	GameMap* map = new GameMap(dimension_t(20, 20));
+	GameMap* map = new GameMap(dimension_t(25, 25));
 	map->generate_room();
 	m_world->m_maps.push_back(map);
 	int rx = 10;
