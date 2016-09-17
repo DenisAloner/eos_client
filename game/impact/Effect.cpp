@@ -71,6 +71,16 @@ void Interaction_list::do_predicat(predicat func)
 	}
 }
 
+void Interaction_list::do_predicat_ex(predicat_ex func)
+{
+	func(this,true);
+	for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+	{
+		(*item)->do_predicat_ex(func);
+	}
+	func(this, false);
+}
+
 void Interaction_list::description(std::list<std::string>* info, int level)
 {
 	for (auto current = m_effect.begin(); current != m_effect.end(); ++current)

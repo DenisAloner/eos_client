@@ -37,10 +37,10 @@ ApplicationGUI::ApplicationGUI(int x, int y, int width, int height, Player* p, G
 	GUI_ActionManager* AMTextBox;
 	AMTextBox = new GUI_ActionManager(w2 + b, m_size.h - h1, w2 - b, h1 - b, am);
 
-	GUI_button* button = new GUI_button(w3 + b, m_size.h - (h2 + b*2), m_size.w - w3 - b * 2, h2, "Õîä");
+	GUI_button* button = new GUI_button(w3 + b, m_size.h - (h2 + b), m_size.w - w3 - b * 2, h2, "Õîä");
 	button->mouse_click += std::bind(&Application::on_turn, &Application::instance());
 
-	m_action_bar = new GUI_Action_bar(w3 + b, y + b, m_size.w - w3 - b * 2, m_size.h - (h2 + b * 4));
+	m_action_bar = new GUI_Action_bar(w3 + b, y + b, m_size.w - w3 - b * 2, m_size.h - (h2 + b * 3));
 	m_action_bar->bind(p);
 
 	MenuLayer->add(AMTextBox);

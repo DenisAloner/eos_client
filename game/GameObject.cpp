@@ -854,14 +854,13 @@ Object_part::Object_part(GameObject* item) :Inventory_cell(item)
 
 Object_part* Object_part::clone()
 {
-	Object_part* effect = new Object_part();
-	//effect->m_interaction_message_type = m_interaction_message_type;
-	effect->m_kind = m_kind;
-	effect->m_name = m_name;
-	effect->m_part_kind = m_part_kind;
-	effect->m_item = nullptr;
-	effect->m_object_state = *m_object_state.clone();
-	return effect;
+	Object_part* result = new Object_part();
+	result->m_kind = m_kind;
+	result->m_name = m_name;
+	result->m_part_kind = m_part_kind;
+	result->m_item = nullptr;
+	result->m_object_state = *m_object_state.clone();
+	return result;
 }
 
 bool Object_part::on_turn()
@@ -892,6 +891,16 @@ void Object_part::do_predicat(predicat func)
 	{
 		item->second->do_predicat(func);
 	}
+}
+
+void Object_part::do_predicat_ex(predicat_ex func)
+{
+	func(this,true);
+	for (auto item = m_object_state.m_item.begin(); item != m_object_state.m_item.end(); item++)
+	{
+		item->second->do_predicat_ex(func);
+	}
+	func(this, false);
 }
 
 void Object_part::reset_serialization_index()

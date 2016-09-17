@@ -1,13 +1,14 @@
 #include "GUI_Inventory.h"
 #include "game/utils/log.h"
 
-GUI_body_cell::GUI_body_cell(int width, int height, Object_part* item, GUI_Body* owner) : m_item(item), m_owner(owner)
+GUI_Part_slot::GUI_Part_slot(int width, int height, Object_part* item, GUI_Body* owner) : m_item(item), m_owner(owner)
 {
 	m_size.w = width;
 	m_size.h = height;
+	m_name = "";
 }
 
-void GUI_body_cell::render(GraphicalController* Graph, int px, int py)
+void GUI_Part_slot::render(GraphicalController* Graph, int px, int py)
 {
 	//glColor4d(1.0, 1.0, 1.0, 1.0);
 	//glEnable(GL_BLEND);
@@ -18,7 +19,7 @@ void GUI_body_cell::render(GraphicalController* Graph, int px, int py)
 	glDisable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+
 	if (focused)
 	{
 		glColor4d(1.0, 1.0, 1.0, 0.75);
@@ -32,7 +33,7 @@ void GUI_body_cell::render(GraphicalController* Graph, int px, int py)
 
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
-	Graph->center_text(px + 128, py + 32, m_item->m_name, 8, 17);
+	Graph->center_text(px + 128, py + 32, m_name, 8, 17);
 	glDisable(GL_BLEND);
 	glColor4f(1.0, 1.0, 1.0, 1.0);
 	glBegin(GL_LINES);
@@ -64,12 +65,12 @@ void GUI_body_cell::render(GraphicalController* Graph, int px, int py)
 	}
 }
 
-void GUI_body_cell::on_mouse_move(MouseEventArgs const& e)
+void GUI_Part_slot::on_mouse_move(MouseEventArgs const& e)
 {
 	set_focus(true);
 }
 
-void GUI_body_cell::on_mouse_down(MouseEventArgs const& e)
+void GUI_Part_slot::on_mouse_down(MouseEventArgs const& e)
 {
 	set_focus(true);
 	if (Application::instance().m_message_queue.m_reader)
@@ -80,13 +81,100 @@ void GUI_body_cell::on_mouse_down(MouseEventArgs const& e)
 	}
 }
 
-void GUI_Body::get_part_predicat(Object_interaction* object)
+//void GUI_body_cell::add_item_control(GUI_Object* object)
+//{
+//	if (!m_items.empty())
+//	{
+//		GUI_Object* LastElement = m_items.back();
+//		object->m_position.x = 2;
+//		object->m_position.y = LastElement->m_position.y + LastElement->m_size.h;
+//		/*if (object->m_position.y + object->m_size.h>m_size.h)
+//		{
+//			m_scroll.y -= object->m_size.h;
+//		}*/
+//	}
+//	else
+//	{
+//		object->m_position.x = 2;
+//		object->m_position.y = 30;
+//	}
+//	GUI_Layer::add(object);
+//	GUI_Object* LastElement = m_items.back();
+//	resize(m_size.w, LastElement->m_position.y + LastElement->m_size.h+1);
+//}
+//
+//GUI_body_cell::GUI_body_cell(int width, int height, Object_part* item, GUI_Body* owner) : GUI_Container(0, 0, width, 0,false),m_item(item), m_owner(owner)
+//{
+//	m_size.w = width;
+//	m_size.h = height;
+//	//Object_part* part = m_item;
+//	//for (auto slot = part->m_items.begin(); slot != part->m_items.end(); ++slot)
+//	//{
+//	//	GUI_Part_slot* gui_slot = new GUI_Part_slot(width - 4, 64, (*slot), this);
+//	//	add_item_control(gui_slot);
+//	//}
+//	GUI_Part_slot* gui_slot = new GUI_Part_slot(width - 4, 64, item, this);
+//	add_item_control(gui_slot);
+//}
+//
+//void GUI_body_cell::render(GraphicalController* Graph, int px, int py)
+//{
+//	GUI_Container::render(Graph, px, py);
+//	glEnable(GL_TEXTURE_2D);
+//	glEnable(GL_BLEND);
+//	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//	Graph->center_text(px + m_size.w/2, py + 12, m_item->m_name, 8, 17);
+//}
+
+//void GUI_body_cell::on_mouse_down(MouseEventArgs const& e)
+//{
+//
+//		GUI_Container::on_mouse_down(e);
+//
+//}
+//
+//void GUI_body_cell::set_focus(bool state)
+//{
+//	if (!state)
+//	{
+//		m_already_active = false;
+//	}
+//	GUI_Container::set_focus(state);
+//}
+
+void GUI_Body::get_part_predicat(Object_interaction* object,bool add_mode)
 {
-	GUI_body_cell* item;
-	if (object->m_interaction_message_type == interaction_message_type_e::part)
+	if (add_mode)
 	{
-		item = new GUI_body_cell(192, 64, static_cast<Object_part*>(object), this);
-		add_item_control(item);
+		if (object->m_interaction_message_type == interaction_message_type_e::part)
+		{
+			LOG(INFO) << "добавление";
+			Object_part* part = static_cast<Object_part*>(object);
+			m_owner_name.push_front(&part->m_name);
+			std::string name = "";
+			for (auto i = m_owner_name.begin(); i != m_owner_name.end(); i++)
+			{
+				if(name == "")
+				{
+					name += *(*i); 
+				}
+				else
+				{
+					name += " < " + *(*i);
+				}
+			}
+			GUI_Part_slot* item = new GUI_Part_slot(m_size.w - 4, 64, static_cast<Object_part*>(object), this);
+			item->m_name = name;
+			add_item_control(item);
+		}
+	}
+	else
+	{
+		if (object->m_interaction_message_type == interaction_message_type_e::part)
+		{
+			LOG(INFO) << "удаление";
+			m_owner_name.pop_front();
+		}
 	}
 }
 
@@ -96,9 +184,9 @@ void GUI_Body::update(Attribute_map* feature)
 	{
 		remove(*m_items.begin());
 	}
-	for (auto item = feature->m_item.begin(); item != feature->m_item.end(); item++)
+	for (auto item = feature->m_item.begin(); item != feature->m_item.end(); ++item)
 	{
-		item->second->do_predicat(std::bind(&GUI_Body::get_part_predicat, this, std::placeholders::_1));
+		item->second->do_predicat_ex(std::bind(&GUI_Body::get_part_predicat, this, std::placeholders::_1,std::placeholders::_2));
 	}
 }
 
@@ -112,30 +200,32 @@ void GUI_Body::add_item_control(GUI_Object* object)
 {
 	if (!m_items.empty())
 	{
-		GUI_body_cell* LastElement = static_cast<GUI_body_cell*>(m_items.back());
-		object->m_position.x = 0;
-		object->m_position.y = LastElement->m_position.y + LastElement->m_size.h;
-		if (object->m_position.y + object->m_size.h>m_size.h)
+		GUI_Object* LastElement = m_items.back();
+		object->m_position.x = 2;
+		object->m_position.y = LastElement->m_position.y + LastElement->m_size.h+2;
+		/*if (object->m_position.y + object->m_size.h>m_size.h)
 		{
 			m_scroll.y -= object->m_size.h;
-		}
+		}*/
 	}
 	else
 	{
-		object->m_position.x = 0;
-		object->m_position.y = 0;
+		object->m_position.x = 2;
+		object->m_position.y = 2;
 	}
-	GUI_Layer::add(object);
+	GUI_Container::add(object);
+	GUI_Object* LastElement = m_items.back();
+	resize(m_size.w, LastElement->m_position.y + LastElement->m_size.h+2);
 }
 
 void GUI_Body::set_scroll(int dy)
 {
 	if (!m_items.empty())
 	{
-		GUI_body_cell* Item;
+		GUI_Object* Item;
 		if (dy < 0)
 		{
-			Item = static_cast<GUI_body_cell*>(m_items.back());
+			Item = m_items.back();
 			if (Item->m_position.y + Item->m_size.h + m_scroll.y + dy< m_size.h)
 			{
 				if (m_scroll.y != 0)
@@ -146,7 +236,7 @@ void GUI_Body::set_scroll(int dy)
 			}
 		}
 		else{
-			Item = static_cast<GUI_body_cell*>(m_items.front());
+			Item = m_items.front();
 			if (Item->m_position.y + m_scroll.y + dy > 0)
 			{
 				m_scroll.y = 0;

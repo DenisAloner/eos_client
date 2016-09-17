@@ -8,9 +8,10 @@ class GUI_Container :
 {
 public:
 
-	GUI_Container(int x, int y, int width, int height);
+	GUI_Container(int x, int y, int width, int height, bool border_visible = true);
 	~GUI_Container();
 
+	bool m_border_visible;
 	position_t m_scroll;
 
 	virtual bool check_region(MouseEventArgs const& e);

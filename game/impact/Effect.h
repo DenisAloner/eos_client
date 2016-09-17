@@ -24,6 +24,7 @@ public:
 	virtual void unequip(Object_interaction* item) { m_effect.remove(item); };
 
 	virtual void do_predicat(predicat func);
+	virtual void do_predicat_ex(predicat_ex func);
 
 	virtual void reset_serialization_index();
 	virtual void save();

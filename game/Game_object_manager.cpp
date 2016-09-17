@@ -233,6 +233,16 @@ void GameObjectManager::parser(const std::string& command)
 		item->m_name = arg[1];
 		m_slot = item;
 		m_mem_state = &item->m_object_state;
+		m_part = item;
+		break;
+	}
+	case command_e::add_part:
+	{
+		Object_part* item = new Object_part();
+		item->m_interaction_message_type = interaction_message_type_e::single;
+		item->m_part_kind = get_body_part_e(arg[0]);
+		item->m_name = arg[1];
+		m_slot = item;
 		break;
 	}
 	case command_e::mem_slot_set_state:
@@ -480,6 +490,7 @@ void GameObjectManager::init()
 	m_commands["add_slot_to_mem_list"] = command_e::add_slot_to_mem_list;
 	m_commands["mem_list"] = command_e::mem_list;
 	m_commands["create_list"] = command_e::create_list;
+	m_commands["add_part"] = command_e::add_part;
 
 	m_to_object_state_e["alive"] = object_state_e::alive;
 	m_to_object_state_e["dead"] = object_state_e::dead;

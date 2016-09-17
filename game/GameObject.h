@@ -193,6 +193,8 @@ public:
 	virtual void get_actions_list(std::list<Action_helper_t>& value);
 };
 
+
+
 class Inventory_cell: public Game_object_owner
 {
 public:
@@ -212,12 +214,14 @@ public:
 	Attribute_map m_object_state;
 	body_part_e m_part_kind;
 	std::string m_name;
+
 	Object_part(GameObject* item = nullptr);
 	virtual bool on_turn();
 	virtual std::string get_description();
 	virtual Object_part* clone();
 	virtual void description(std::list<std::string>* info, int level);
 	virtual void do_predicat(predicat func);
+	virtual void do_predicat_ex(predicat_ex func);
 
 	virtual void reset_serialization_index();
 	virtual void save();

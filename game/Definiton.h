@@ -376,6 +376,7 @@ class Object_interaction: public virtual iSerializable
 public:
 
 	typedef std::function<void(Object_interaction*)> predicat;
+	typedef std::function<void(Object_interaction*,bool)> predicat_ex;
 
 	interaction_message_type_e m_interaction_message_type;
 	Object_interaction(){};
@@ -384,7 +385,8 @@ public:
 	virtual std::string get_description() = 0;
 	virtual Object_interaction* clone() = 0;
 	virtual void description(std::list<std::string>* info, int level) = 0;
-	virtual void do_predicat(predicat func){ func(this); };
+	virtual void do_predicat(predicat func) { func(this); };
+	virtual void do_predicat_ex(predicat_ex func) { func(this,true); func(this, false);};
 };
 
 class GameTask;
@@ -534,6 +536,11 @@ public:
 	RGBA_t m_color;
 	dimension_t m_symbol_size;
 
+};
+
+struct item_slot_info_t
+{
+	std::string m_name;
 };
 
 //struct Game_log_message_EventArgs

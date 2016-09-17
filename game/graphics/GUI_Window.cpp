@@ -155,12 +155,8 @@ void GUI_Window::on_header_close()
 
 void GUI_Window::resize(int _width, int _height)
 {
-	//width = _width;
-	//height = _height;
-	//ManagingControls->width = width;
-	//ManagingControls->height = height;
-	//ItemControls->width = width;
-	//ItemControls->height = height;
+	m_size.w = _width;
+	m_size.h = _height;
 }
 
 void GUI_Window::on_mouse_wheel(MouseEventArgs const& e)
@@ -209,8 +205,8 @@ void GUI_description_window::update_info()
 GUI_body_window::GUI_body_window(int x, int y, int width, int height, std::string Name, GameObject*& object) :GUI_Window(x, y, width, height, Name), m_object(object)
 {
 	m_item = new GUI_Body(m_object->m_active_state);
-	m_item->m_position.x = 2;
-	m_item->m_position.y = 2;
+	m_item->m_position.x = 1;
+	m_item->m_position.y = 1;
 	//m_item->resize(m_size.w - 4, m_size.h - 25 - 2);
 	add(m_item);
 	update_info();
@@ -220,4 +216,5 @@ GUI_body_window::GUI_body_window(int x, int y, int width, int height, std::strin
 void GUI_body_window::update_info()
 {
 	m_item->update(m_object->m_active_state);
+	resize(m_size.w, m_item->m_position.y + m_item->m_size.h + 2);
 }

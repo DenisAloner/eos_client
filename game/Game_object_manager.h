@@ -55,7 +55,8 @@ public:
 		copy_list_to_slot,
 		add_slot_to_mem_list,
 		mem_list,
-		create_list
+		create_list,
+		add_part
 	};
 
 	enum class parameter_e
@@ -94,6 +95,7 @@ public:
 	AI* m_ai;
 	Interaction_list* m_current_list;
 	Interaction_list* m_mem_list;
+	Object_part* m_part;
 
 
 	//std::list<GameObject*> m_object_templates;

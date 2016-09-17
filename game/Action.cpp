@@ -1356,31 +1356,43 @@ Action_show_parameters::Action_show_parameters()
 	m_kind = action_e::show_parameters;
 	m_icon = Application::instance().m_graph->m_actions[10];
 	m_name = "Показать характеристики";
+	m_parameter_kind = parameter_type_e::object;
 }
 
-void Action_show_parameters::interaction_handler(Parameter* arg)
+void Action_show_parameters::interaction_handler(Parameter* parameter)
 {
-	/*Action::interaction_handler(nullptr);
+	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
-	Parameter* result;
-	P_object* p = new P_object();
-	result = Application::instance().command_select_object_on_map();
-	if (result)
+	Parameter* out_parameter;
+	if (parameter)
 	{
-		p->m_object = static_cast<P_object*>(result)->m_object;
-		std::string a = "Выбран ";
-		a.append(p->m_object->m_name);
-		a = a + ".";
-		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, a));
+		out_parameter = parameter->clone();
 	}
 	else
 	{
-		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
-		Application::instance().m_message_queue.m_busy = false;
-		return;
+		out_parameter = new Parameter(m_parameter_kind);
 	}
-	Application::instance().command_gui_show_characterization(p->m_object);
-	Application::instance().m_message_queue.m_busy = false;*/
+	Parameter& p(*out_parameter);
+	if (!p[0])
+	{
+		GameObject* result = Application::instance().command_select_object_on_map();
+		if (result)
+		{
+			p[0].set(result);
+			std::string a = "Выбран ";
+			a.append(p[0].m_object->m_name);
+			a = a + ".";
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, a));
+		}
+		else
+		{
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
+			Application::instance().m_message_queue.m_busy = false;
+			return;
+		}
+	}
+	Application::instance().command_gui_show_characterization(p[0].m_object);
+	Application::instance().m_message_queue.m_busy = false;
 }
 
 std::string Action_show_parameters::get_description(Parameter* parameter)

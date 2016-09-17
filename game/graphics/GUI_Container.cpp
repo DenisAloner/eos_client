@@ -1,8 +1,9 @@
 #include "GUI_Container.h"
 
 
-GUI_Container::GUI_Container(int x, int y, int width, int height) :GUI_Layer(x, y, width, height)
+GUI_Container::GUI_Container(int x, int y, int width, int height, bool border_visible) :GUI_Layer(x, y, width, height)
 {
+	m_border_visible = border_visible;
 }
 
 
@@ -73,19 +74,22 @@ void GUI_Container::render(GraphicalController* Graph, int px, int py)
 			(current)->render(Graph, px + current->m_position.x + m_scroll.x, py + current->m_position.y + m_scroll.y);
 		}
 		Graph->remove_scissor();
-		glDisable(GL_BLEND);
-		glDisable(GL_TEXTURE_2D);
-		glBegin(GL_LINES);
-		glColor4f(1.0, 1.0, 1.0, 1.0);
-		glVertex2d(px, py);
-		glVertex2d(px, py + m_size.h);
-		glVertex2d(px, py + m_size.h);
-		glVertex2d(px + m_size.w, py + m_size.h);
-		glVertex2d(px + m_size.w, py + m_size.h);
-		glVertex2d(px + m_size.w, py);
-		glVertex2d(px + m_size.w, py);
-		glVertex2d(px, py);
-		glEnd();
+		if (m_border_visible)
+		{
+			glDisable(GL_BLEND);
+			glDisable(GL_TEXTURE_2D);
+			glBegin(GL_LINES);
+			glColor4f(1.0, 1.0, 1.0, 1.0);
+			glVertex2d(px, py);
+			glVertex2d(px, py + m_size.h);
+			glVertex2d(px, py + m_size.h);
+			glVertex2d(px + m_size.w, py + m_size.h);
+			glVertex2d(px + m_size.w, py + m_size.h);
+			glVertex2d(px + m_size.w, py);
+			glVertex2d(px + m_size.w, py);
+			glVertex2d(px, py);
+			glEnd();
+		}
 	}
 }
 

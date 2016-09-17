@@ -89,6 +89,9 @@ mem_action pick
 add_slot_mem action
 mem_action hit_melee
 add_slot_mem action
+feature_list_mem parts,body
+add_part hand,палец
+add_slot_mem body
 mem_part hand,рука
 add_slot body
 feature_list_mem action,action
