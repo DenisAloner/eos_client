@@ -1276,6 +1276,11 @@ char action_hit_melee::perfom(Parameter* parameter)
 	return 0;
 }
 
+void action_hit_melee::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "<ударить>");
+}
+
 std::string Action_hit::get_description(Parameter* parameter)
 {
 	Parameter& p(*parameter);

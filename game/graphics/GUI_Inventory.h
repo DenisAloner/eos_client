@@ -56,8 +56,9 @@ public:
 
 	bool m_already_active;
 	GUI_Body(Attribute_map* feature);
-
+	
 	std::list<std::string*> m_owner_name;
+	std::size_t m_max_item_name;
 
 	//virtual void Render(GraphicalController* Graph);
 	virtual void add_item_control(GUI_Object* object);

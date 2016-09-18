@@ -10,12 +10,6 @@ GUI_Part_slot::GUI_Part_slot(int width, int height, Object_part* item, GUI_Body*
 
 void GUI_Part_slot::render(GraphicalController* Graph, int px, int py)
 {
-	//glColor4d(1.0, 1.0, 1.0, 1.0);
-	//glEnable(GL_BLEND);
-	//glEnable(GL_TEXTURE_2D);
-	//glActiveTextureARB(GL_TEXTURE0_ARB);
-	//glBindTexture(GL_TEXTURE_2D, Graph->Sprites[18]);
-	//Graph->draw_sprite(px, py, px, py + height, px + width, py + height, px + width, py);
 	glDisable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -33,29 +27,24 @@ void GUI_Part_slot::render(GraphicalController* Graph, int px, int py)
 
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
-	Graph->center_text(px + 128, py + 32, m_name, 8, 17);
+	Graph->center_text(px + m_size.w/2+32, py + 32, m_name, 8, 17);
 	glDisable(GL_BLEND);
 	glColor4f(1.0, 1.0, 1.0, 1.0);
-	glBegin(GL_LINES);
+
+	glBegin(GL_LINE_LOOP);
 	glVertex2d(px, py);
-	glVertex2d(px, py + m_size.h);
-	glVertex2d(px, py + m_size.h);
-	glVertex2d(px + m_size.w, py + m_size.h);
-	glVertex2d(px + m_size.w, py + m_size.h);
 	glVertex2d(px + m_size.w, py);
-	glVertex2d(px + m_size.w, py);
-	glVertex2d(px, py);
-	glEnd();
-	glBegin(GL_LINES);
-	glVertex2d(px, py);
+	glVertex2d(px + m_size.w, py + m_size.h);
 	glVertex2d(px, py + m_size.h);
-	glVertex2d(px, py + m_size.h);
-	glVertex2d(px + 64, py + m_size.h);
-	glVertex2d(px + 64, py + m_size.h);
-	glVertex2d(px + 64, py);
-	glVertex2d(px + 64, py);
-	glVertex2d(px, py);
 	glEnd();
+
+	glBegin(GL_LINE_LOOP);
+	glVertex2d(px, py);
+	glVertex2d(px + 64, py);
+	glVertex2d(px + 64, py + m_size.h);
+	glVertex2d(px, py + m_size.h);
+	glEnd();
+
 	if (m_item->m_item)
 	{
 		glEnable(GL_TEXTURE_2D);
@@ -148,7 +137,6 @@ void GUI_Body::get_part_predicat(Object_interaction* object,bool add_mode)
 	{
 		if (object->m_interaction_message_type == interaction_message_type_e::part)
 		{
-			LOG(INFO) << "добавление";
 			Object_part* part = static_cast<Object_part*>(object);
 			m_owner_name.push_front(&part->m_name);
 			std::string name = "";
@@ -163,16 +151,17 @@ void GUI_Body::get_part_predicat(Object_interaction* object,bool add_mode)
 					name += " < " + *(*i);
 				}
 			}
-			GUI_Part_slot* item = new GUI_Part_slot(m_size.w - 4, 64, static_cast<Object_part*>(object), this);
-			item->m_name = name;
-			add_item_control(item);
+			std::size_t s = Application::instance().m_graph->measure_text_width(name);
+			if (s > m_max_item_name) { m_max_item_name = s; }
+			GUI_Part_slot* gui_item = new GUI_Part_slot(0, 64, part, this);
+			gui_item->m_name = name;
+			add_item_control(gui_item);
 		}
 	}
 	else
 	{
 		if (object->m_interaction_message_type == interaction_message_type_e::part)
 		{
-			LOG(INFO) << "удаление";
 			m_owner_name.pop_front();
 		}
 	}
@@ -184,13 +173,26 @@ void GUI_Body::update(Attribute_map* feature)
 	{
 		remove(*m_items.begin());
 	}
+	m_max_item_name = 0;
 	for (auto item = feature->m_item.begin(); item != feature->m_item.end(); ++item)
 	{
 		item->second->do_predicat_ex(std::bind(&GUI_Body::get_part_predicat, this, std::placeholders::_1,std::placeholders::_2));
 	}
+	m_max_item_name += 80;
+	for (auto item = m_items.begin(); item != m_items.end(); ++item)
+	{
+		(*item)->resize(m_max_item_name, 64);
+	}
+	GUI_Object* LastElement = m_items.back();
+	int h = LastElement->m_position.y + LastElement->m_size.h + 2;
+	if (h > Application::instance().m_GUI->m_main_layer->m_size.h-50)
+	{
+		h = Application::instance().m_GUI->m_main_layer->m_size.h - 50;
+	}
+	resize(LastElement->m_size.w+4, h);
 }
 
-GUI_Body::GUI_Body(Attribute_map* feature) :GUI_Container(0, 0, 192, 4 * 64)
+GUI_Body::GUI_Body(Attribute_map* feature) :GUI_Container(0, 0, 0, 0)
 {
 	m_already_active = false;
 	update(feature);
@@ -250,7 +252,7 @@ void GUI_Body::set_scroll(int dy)
 void GUI_Body::on_mouse_wheel(MouseEventArgs const& e)
 {
 	//#warning FIXME Что за магическое 30?
-	set_scroll(e.value/30);
+	set_scroll(e.value/5);
 }
 
 void GUI_Body::on_mouse_down(MouseEventArgs const& e)

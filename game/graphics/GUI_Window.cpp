@@ -29,12 +29,11 @@ void GUI_Header::on_close_button_click()
 void GUI_Header::resize(int width, int height)
 {
 	m_size.w = width;
-	m_size.h = height;
+	m_size.h = m_items.back()->m_size.h + m_items.back()->m_position.y + 2;
 	m_items.front()->m_position.x = m_size.w - (m_size.h - 8) - 4;
 	m_items.front()->m_position.y = 4;
 	m_items.front()->m_size.w = m_size.h - 8;
 	m_items.front()->m_size.h = m_size.h - 8;
-
 }
 
 GUI_Window::GUI_Window(int _x, int _y, int _width, int _height, std::string _Name) :GUI_Container(_x, _y, _width, _height)
@@ -157,6 +156,7 @@ void GUI_Window::resize(int _width, int _height)
 {
 	m_size.w = _width;
 	m_size.h = _height;
+	m_header->resize(m_size.w - 4, 0);
 }
 
 void GUI_Window::on_mouse_wheel(MouseEventArgs const& e)
@@ -216,5 +216,5 @@ GUI_body_window::GUI_body_window(int x, int y, int width, int height, std::strin
 void GUI_body_window::update_info()
 {
 	m_item->update(m_object->m_active_state);
-	resize(m_size.w, m_item->m_position.y + m_item->m_size.h + 2);
+	resize(m_item->m_size.w+4, m_item->m_position.y + m_item->m_size.h + 2);
 }

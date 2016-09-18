@@ -326,6 +326,14 @@ enum class effect_e
 
 enum class body_part_e
 {
+	//eye,
+	//mouth,
+	//ear,
+	//nose,
+	//teeth,
+	//tongue,
+	wrist,
+	finger,
 	head,
 	hand,
 	foot

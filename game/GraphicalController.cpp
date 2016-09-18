@@ -285,6 +285,17 @@ void GraphicalController::output_text(int x, int y, std::string& Text, int sizex
 	}
 }
 
+std::size_t GraphicalController::measure_text_width(std::string& Text)
+{
+	int result = 0;
+	for (int k = 0; k<Text.length(); k++)
+	{
+		font_symbol_t& fs = m_font_symbols[(unsigned char)Text[k]];
+		result += fs.size.w;
+	}
+	return result;
+}
+
 void GraphicalController::center_text(int x, int y, std::string Text, int sizex, int sizey)
 {
 	int width = 0;

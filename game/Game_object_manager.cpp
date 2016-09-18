@@ -110,6 +110,8 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->m_active_state->m_state = state;
 		m_object->m_state.push_back(m_object->m_active_state);
 		m_object->m_active_state->m_ai = nullptr;
+
+		m_stack_attribute_map.push_front(m_object->m_active_state);
 		break;
 	}
 	case command_e::ai:
@@ -233,7 +235,7 @@ void GameObjectManager::parser(const std::string& command)
 		item->m_name = arg[1];
 		m_slot = item;
 		m_mem_state = &item->m_object_state;
-		m_part = item;
+		m_stack_attribute_map.push_front(&item->m_object_state);
 		break;
 	}
 	case command_e::add_part:
@@ -450,6 +452,74 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->add_effect(interaction_e::tag,tag);
 		break;
 	}
+	case command_e::stack_list_push:
+	{
+		feature_list_type_e list_type = get_feature_list_type_e(arg[0]);
+		Interaction_list* list = m_stack_attribute_map.front()->create_feature_list(list_type, get_interaction_e(arg[1]));
+		list->m_list_type = list_type;
+		switch (list_type)
+		{
+		case feature_list_type_e::parameter:
+		{
+			Parameter_list* parameter_list = static_cast<Parameter_list*>(list);
+			parameter_list->m_basic_value = std::stoi(arg[2]);
+			parameter_list->m_basic_limit = std::stoi(arg[3]);
+			break;
+		}
+		case feature_list_type_e::vision_component:
+		{
+			Vision_component* v_list = static_cast<Vision_component*>(list);
+			v_list->m_basic_value = AI_FOV(std::stoi(arg[2]), Application::instance().m_ai_manager->m_fov_qualifiers[std::stoi(arg[3])], std::stoi(arg[4]), std::stoi(arg[5]));
+			break;
+		}
+		}
+		m_stack_list.push_front(list);
+		break;
+	}
+	case command_e::stack_list_pop:
+	{
+		m_stack_list.pop_front();
+		break;
+	}
+	case command_e::stack_attribute_map_pop:
+	{
+		m_stack_attribute_map.pop_front();
+		break;
+	}
+	case command_e::new_template_part:
+	{
+		Object_part* item = new Object_part();
+		item->m_interaction_message_type = interaction_message_type_e::single;
+		item->m_part_kind = get_body_part_e(arg[0]);
+		item->m_name = arg[1];
+		m_stack_attribute_map.push_front(&item->m_object_state);
+		m_template_part[arg[2]] = item;
+		break;
+	}
+	case command_e::template_part:
+	{
+		Object_part* item = m_template_part[arg[0]]->clone();
+		m_stack_attribute_map.push_front(&item->m_object_state);
+		m_stack_list.front()->add(item);
+		break;
+	}
+	case command_e::part:
+	{
+		Object_part* item = new Object_part();
+		item->m_interaction_message_type = interaction_message_type_e::single;
+		item->m_part_kind = get_body_part_e(arg[0]);
+		item->m_name = arg[1];
+		m_stack_attribute_map.push_front(&item->m_object_state);
+		m_stack_list.front()->add(item);
+		break;
+	}
+	case command_e::action:
+	{
+		action_e action = get_action_e(arg[0]);
+		Action* item = Application::instance().m_actions[action];
+		m_stack_list.front()->add(item);
+		break;
+	}
 	}
 }
 
@@ -491,6 +561,14 @@ void GameObjectManager::init()
 	m_commands["mem_list"] = command_e::mem_list;
 	m_commands["create_list"] = command_e::create_list;
 	m_commands["add_part"] = command_e::add_part;
+
+	m_commands["stack_list_push"] = command_e::stack_list_push;
+	m_commands["stack_list_pop"] = command_e::stack_list_pop;
+	m_commands["stack_attribute_map_pop"] = command_e::stack_attribute_map_pop;
+	m_commands["part"] = command_e::part;
+	m_commands["action"] = command_e::action;
+	m_commands["new_template_part"] = command_e::new_template_part;
+	m_commands["template_part"] = command_e::template_part;
 
 	m_to_object_state_e["alive"] = object_state_e::alive;
 	m_to_object_state_e["dead"] = object_state_e::dead;
@@ -602,6 +680,8 @@ void GameObjectManager::init()
 	m_to_action_e["use"] = action_e::use;
 	m_to_action_e["shoot"] = action_e::shoot;
 
+	m_to_body_part_e["wrist"] = body_part_e::wrist;
+	m_to_body_part_e["finger"] = body_part_e::finger;
 	m_to_body_part_e["head"] = body_part_e::head;
 	m_to_body_part_e["hand"] = body_part_e::hand;
 	m_to_body_part_e["foot"] = body_part_e::foot;

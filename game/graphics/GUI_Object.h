@@ -41,6 +41,7 @@ public:
 	virtual void on_lose_focus(GUI_Object* sender);
 	virtual bool check_region(MouseEventArgs const& e);
 	virtual void set_focus(bool state);
+	virtual void resize(int width, int height);
 
 };
 

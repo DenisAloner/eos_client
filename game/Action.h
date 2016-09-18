@@ -221,6 +221,7 @@ public:
 	action_hit_melee();
 	virtual void interaction_handler(Parameter* arg);
 	virtual char perfom(Parameter* parameter);
+	virtual void description(std::list<std::string>* info, int level);
 };
 
 class Action_equip :

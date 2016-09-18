@@ -27,7 +27,7 @@ public:
 	~ApplicationGUI();
 
 	GUI_MapViewer* MapViewer;
-	//GUI_TextBox* DescriptionBox;
+	GUI_Layer* m_main_layer;
 	GUI_ActionPanel* m_action_panel;
 	GUI_Action_bar* m_action_bar;
 };

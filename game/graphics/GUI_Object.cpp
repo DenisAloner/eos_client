@@ -22,6 +22,12 @@ void GUI_Object::render(GraphicalController* Graph, int px, int py)
 {
 }
 
+void GUI_Object::resize(int width, int height)
+{
+	m_size.w = width;
+	m_size.h = height;
+}
+
 
 void GUI_Object::on_mouse_click(MouseEventArgs const& e)
 {

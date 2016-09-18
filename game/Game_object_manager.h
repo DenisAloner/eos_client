@@ -20,7 +20,7 @@ class GameObjectManager:public iSerializable
 public:
 
 	enum class command_e
-	{ 
+	{
 		obj,
 		state,
 		ai,
@@ -56,7 +56,14 @@ public:
 		add_slot_to_mem_list,
 		mem_list,
 		create_list,
-		add_part
+		add_part,
+		stack_list_push,
+		stack_list_pop,
+		stack_attribute_map_pop,
+		part,
+		action,
+		new_template_part,
+		template_part
 	};
 
 	enum class parameter_e
@@ -97,6 +104,10 @@ public:
 	Interaction_list* m_mem_list;
 	Object_part* m_part;
 
+	std::list<Interaction_list*> m_stack_list;
+	std::list<Attribute_map*> m_stack_attribute_map;
+
+	std::map<std::string, Object_part*> m_template_part;
 
 	//std::list<GameObject*> m_object_templates;
 

@@ -101,6 +101,7 @@ public:
 	void parser(const std::string& command);
 	void Load_font(std::string font_filename);
 	int get_width(std::string text);
+	std::size_t measure_text_width(std::string& Text);
 
 	position_t center_aling_to_point(int x, int y,std::string text);
 
