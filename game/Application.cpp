@@ -259,18 +259,22 @@ void Application::new_game()
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 4]);*/
 
 
-		obj = m_game_object_manager->new_object("bow");
+		/*obj = m_game_object_manager->new_object("bow");
 		obj->set_direction(object_direction_e::top);
 		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-1][rx - 1]);
 
 		obj = m_game_object_manager->new_object("arrow");
 		obj->set_direction(object_direction_e::top);
-		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 1][rx - 1]);
+		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 1][rx - 1]);*/
 
 
 			/*obj = m_game_object_manager->new_object("blue potion");
 			obj->set_direction(object_direction_e::top);
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-2][rx]);*/
+
+			obj = m_game_object_manager->new_object("ring of bow");
+			obj->set_direction(object_direction_e::top);
+			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-2][rx]);
 
 
 			/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
@@ -973,19 +977,38 @@ void Application::command_equip(GameObject*& unit, Object_part* part, GameObject
 	part->m_item = object;
 	object->m_owner = part;
 	Object_state* obj_state = object->get_state(object_state_e::equip);
+	//if (obj_state)
+	//{
+	//	if (object->m_active_state)
+	//	{
+	//		for (auto kind = object->m_active_state->m_item.begin(); kind != object->m_active_state->m_item.end(); kind++)
+	//		{
+	//			if (kind->first != interaction_e::damage&&kind->first != interaction_e::action)
+	//			{
+	//				//unit->add_effect(kind->first, kind->second);
+	//				unit->add_from(kind->first, static_cast<Interaction_list*>(kind->second));
+	//			}
+	//		}
+	//	}
+	//}
 	if (obj_state)
 	{
-		if (object->m_active_state)
+		Interaction_list* list = obj_state->get_list(interaction_e::equip);
+		if (list)
 		{
-			for (auto kind = object->m_active_state->m_item.begin(); kind != object->m_active_state->m_item.end(); kind++)
-			{
-				if (kind->first != interaction_e::damage&&kind->first != interaction_e::action)
-				{
-					//unit->add_effect(kind->first, kind->second);
-					unit->add_from(kind->first, static_cast<Interaction_list*>(kind->second));
-				}
-			}
+			list->apply_effect(unit, part);
 		}
+		//if (object->m_active_state)
+		//{
+		//	for (auto kind = object->m_active_state->m_item.begin(); kind != object->m_active_state->m_item.end(); kind++)
+		//	{
+		//		if (kind->first != interaction_e::damage&&kind->first != interaction_e::action)
+		//		{
+		//			//unit->add_effect(kind->first, kind->second);
+		//			unit->add_from(kind->first, static_cast<Interaction_list*>(kind->second));
+		//		}
+		//	}
+		//}
 	}
 	unit->update_interaction();
 	unit->event_update(VoidEventArgs());
@@ -996,19 +1019,28 @@ void Application::command_unequip(GameObject*& unit, Object_part* part, GameObje
 {
 	part->m_item = nullptr;
 	object->m_owner = nullptr;
+	//Object_state* obj_state = object->get_state(object_state_e::equip);
+	//if (obj_state)
+	//{
+	//	if (object->m_active_state)
+	//	{
+	//		for (auto kind = object->m_active_state->m_item.begin(); kind != object->m_active_state->m_item.end(); kind++)
+	//		{
+	//			if (kind->first != interaction_e::damage&&kind->first != interaction_e::action)
+	//			{
+	//				//unit->remove_effect(kind->first, kind->second);
+	//				unit->remove_from(kind->first, static_cast<Interaction_list*>(kind->second));
+	//			}
+	//		}
+	//	}
+	//}
 	Object_state* obj_state = object->get_state(object_state_e::equip);
 	if (obj_state)
 	{
-		if (object->m_active_state)
+		Interaction_list* list = obj_state->get_list(interaction_e::equip);
+		if (list)
 		{
-			for (auto kind = object->m_active_state->m_item.begin(); kind != object->m_active_state->m_item.end(); kind++)
-			{
-				if (kind->first != interaction_e::damage&&kind->first != interaction_e::action)
-				{
-					//unit->remove_effect(kind->first, kind->second);
-					unit->remove_from(kind->first, static_cast<Interaction_list*>(kind->second));
-				}
-			}
+			list->apply_effect(unit, part);
 		}
 	}
 	unit->update_interaction();

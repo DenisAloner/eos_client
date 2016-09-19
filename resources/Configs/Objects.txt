@@ -4,6 +4,9 @@ action hit_melee
 stack_list_pop
 stack_list_push parts,body
 part wrist,кисть
+stack_list_push tag,tag
+stack_tag pick_able
+stack_list_pop
 stack_list_push action,action
 action pick
 stack_list_pop
@@ -104,8 +107,6 @@ stack_list_push parameter,skill_unarmed_combat,50000,100000
 stack_list_push generic,buff
 stack_list_push generic,damage
 stack_list_push parts,body
-template_part humanoid_hand
-stack_attribute_map_pop
 template_part humanoid_hand
 stack_attribute_map_pop
 state dead
@@ -242,3 +243,33 @@ feature_list tag,tag
 tag pick_able
 tag pass_able
 tag seethrough_able
+
+object ring of bow
+state equip,finger
+size 1,1,0
+icon 2
+tile_manager 25
+feature_list tag,tag
+tag pick_able
+tag pass_able
+tag seethrough_able
+feature_list generic,equip
+mem_effect value,6
+mem_instruction_slot_link health
+Instruction_slot_check_tag pick_able
+add_slot equip
+stack_attribute_map_pop
+stack_attribute_map_pop
+
+object red potion
+state alive
+size 1,1,1
+icon 1
+tile_manager 21
+feature_list tag,tag
+tag seethrough_able
+feature_list generic,use
+mem_part hand,тестированиееее
+mem_slot_time 5
+mem_slot_addon body
+add_slot use

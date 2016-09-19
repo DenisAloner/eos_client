@@ -313,7 +313,8 @@ enum class interaction_e
 	weapon_range,
 	vision,
 	vision_component,
-	skill_unarmed_combat
+	skill_unarmed_combat,
+	equip
 };
 
 enum class effect_e

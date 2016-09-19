@@ -137,7 +137,9 @@ void GUI_Body::get_part_predicat(Object_interaction* object,bool add_mode)
 	{
 		if (object->m_interaction_message_type == interaction_message_type_e::part)
 		{
+			
 			Object_part* part = static_cast<Object_part*>(object);
+			LOG(INFO) << "parts: " << part->m_name;
 			m_owner_name.push_front(&part->m_name);
 			std::string name = "";
 			for (auto i = m_owner_name.begin(); i != m_owner_name.end(); i++)
@@ -176,7 +178,10 @@ void GUI_Body::update(Attribute_map* feature)
 	m_max_item_name = 0;
 	for (auto item = feature->m_item.begin(); item != feature->m_item.end(); ++item)
 	{
-		item->second->do_predicat_ex(std::bind(&GUI_Body::get_part_predicat, this, std::placeholders::_1,std::placeholders::_2));
+		if (item->first == interaction_e::body) 
+		{LOG(INFO)<<"Тело: "<<std::to_string(item->second->m_effect.size()) ; 
+		item->second->do_predicat_ex(std::bind(&GUI_Body::get_part_predicat, this, std::placeholders::_1, std::placeholders::_2));
+		}
 	}
 	m_max_item_name += 80;
 	for (auto item = m_items.begin(); item != m_items.end(); ++item)

@@ -24,7 +24,7 @@ void Object_manager::update_buff()
 			if ((*item).second->m_interaction_message_type == interaction_message_type_e::list)
 			{
 				e = static_cast<Interaction_list*>((*item).second);
-				if (e->m_list_type == feature_list_type_e::parameter)
+				if (e->m_list_type == feature_list_type_e::parameter|| e->m_list_type == feature_list_type_e::parts)
 				{
 					e->on_turn();
 				}

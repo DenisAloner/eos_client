@@ -195,6 +195,15 @@ void GUI_description_window::update_info()
 			m_text.push_back("." + Application::instance().m_game_object_manager->get_effect_string(current->first) + ":");
 			current->second->description(&m_text,2);
 		}
+		if (m_object->m_active_state->m_state == object_state_e::equip)
+		{
+			Object_state_equip* obj = static_cast<Object_state_equip*>(m_object->m_active_state);
+			for (auto current = obj->m_equip.m_item.begin(); current != obj->m_equip.m_item.end(); current++)
+			{
+				m_text.push_back("." + Application::instance().m_game_object_manager->get_effect_string(current->first) + ":");
+				current->second->description(&m_text, 2);
+			}
+		}
 	}
 	for (auto item = m_text.begin(); item != m_text.end(); ++item)
 	{

@@ -94,7 +94,7 @@ void GUI_TextBox::set_scroll(int dy)
 void GUI_TextBox::on_mouse_wheel(MouseEventArgs const& e)
 {
 //#warning FIXME Что за магическое 30?
-	set_scroll(e.value / 30);
+	set_scroll(e.value / 5);
 }
 
 GUI_game_console::GUI_game_console(Game_log& log) :m_log(log) 

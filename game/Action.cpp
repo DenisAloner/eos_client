@@ -764,6 +764,7 @@ Action_pick::Action_pick()
 {
 	m_kind = action_e::pick;
 	m_icon = Application::instance().m_graph->m_actions[6];
+	m_decay = 1;
 	m_name = "Поднять";
 	m_parameter_kind = parameter_type_e::destination;
 }
@@ -1420,7 +1421,7 @@ Action_use::Action_use()
 	m_kind = action_e::use;
 	m_icon = Application::instance().m_graph->m_actions[11];
 	m_name = "Применить";
-	m_decay = 10;
+	m_decay = 1;
 	m_parameter_kind = parameter_type_e::unit_interaction;
 }
 
@@ -1526,7 +1527,7 @@ char Action_use::perfom(Parameter* parameter)
 std::string Action_use::get_description(Parameter* parameter)
 {
 	Parameter& p(*parameter);
-	std::string s("Применять");
+	std::string s("Применить");
 	return s;
 }
 

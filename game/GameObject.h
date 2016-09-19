@@ -85,6 +85,7 @@ public:
 	virtual void load();
 
 	Interaction_list* get_list(interaction_e key);
+	bool get_stat(object_tag_e key);
 
 };
 
@@ -122,6 +123,7 @@ class Object_state_equip :public Object_state
 public:
 
 	body_part_e m_body_part;
+	Attribute_map m_equip;
 	Object_state_equip();
 	virtual Object_state* clone();
 

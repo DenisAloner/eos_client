@@ -63,7 +63,10 @@ public:
 		part,
 		action,
 		new_template_part,
-		template_part
+		template_part,
+		mem_instruction_slot_link,
+		Instruction_slot_check_tag,
+		stack_tag
 	};
 
 	enum class parameter_e

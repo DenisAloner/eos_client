@@ -116,9 +116,15 @@ public:
 
 	Parts_list();
 	virtual Parts_list* clone();
-
+	//virtual void update();
 	virtual void save();
 	virtual void load();
+
+	virtual void equip(Object_interaction* item);
+
+
+//private:
+//	void update_list(Object_interaction* list);
 };
 
 class Action_list :public Interaction_list
@@ -208,6 +214,7 @@ public:
 	Interaction_slot();
 	virtual bool on_turn();
 	virtual void do_predicat(predicat func);
+	virtual void do_predicat_ex(predicat_ex func);
 	virtual void reset_serialization_index();
 };
 
@@ -394,3 +401,35 @@ namespace Effect_functions
 {
 	Interaction_list* create_feature_list(feature_list_type_e key, interaction_e name);
 }
+
+class Instruction_slot_link :public Interaction_slot
+{
+public:
+
+	interaction_e m_subtype;
+	bool m_enable;
+	Instruction_slot_link();
+	virtual std::string get_description();
+	virtual Object_interaction* clone();
+	virtual void description(std::list<std::string>* info, int level);
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+	virtual void save();
+	virtual void load();
+};
+
+class Instruction_slot_check_tag :public Interaction_slot
+{
+public:
+
+	object_tag_e m_subtype;
+	bool m_enable;
+	Instruction_slot_check_tag();
+	virtual std::string get_description();
+	virtual Object_interaction* clone();
+	virtual void description(std::list<std::string>* info, int level);
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+	virtual void save();
+	virtual void load();
+};

@@ -98,6 +98,7 @@ void GameObjectManager::parser(const std::string& command)
 		{
 			Object_state_equip* obj_state = new Object_state_equip();
 			obj_state->m_body_part = get_body_part_e(arg[1]);
+			m_stack_attribute_map.push_front(&obj_state->m_equip);
 			m_object->m_active_state = obj_state;
 			break;
 		}
@@ -489,7 +490,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::new_template_part:
 	{
 		Object_part* item = new Object_part();
-		item->m_interaction_message_type = interaction_message_type_e::single;
+		item->m_interaction_message_type = interaction_message_type_e::part;
 		item->m_part_kind = get_body_part_e(arg[0]);
 		item->m_name = arg[1];
 		m_stack_attribute_map.push_front(&item->m_object_state);
@@ -506,7 +507,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::part:
 	{
 		Object_part* item = new Object_part();
-		item->m_interaction_message_type = interaction_message_type_e::single;
+		item->m_interaction_message_type = interaction_message_type_e::part;
 		item->m_part_kind = get_body_part_e(arg[0]);
 		item->m_name = arg[1];
 		m_stack_attribute_map.push_front(&item->m_object_state);
@@ -518,6 +519,63 @@ void GameObjectManager::parser(const std::string& command)
 		action_e action = get_action_e(arg[0]);
 		Action* item = Application::instance().m_actions[action];
 		m_stack_list.front()->add(item);
+		break;
+	}
+	case command_e::mem_instruction_slot_link:
+	{
+		Instruction_slot_link* item = new Instruction_slot_link();
+		item->m_interaction_message_type = interaction_message_type_e::single;
+		item->m_subtype = get_interaction_e(arg[0]);
+		item->m_value = m_slot;
+		m_slot = item;
+		break;
+	}
+	case command_e::Instruction_slot_check_tag:
+	{
+		Instruction_slot_check_tag* item = new Instruction_slot_check_tag();
+		item->m_interaction_message_type = interaction_message_type_e::single;
+		item->m_subtype = get_object_tag_e(arg[0]);
+		item->m_value = m_slot;
+		m_slot = item;
+		break;
+	}
+	case command_e::stack_tag:
+	{
+		Object_tag* tag;
+		switch (get_object_tag_e(arg[0]))
+		{
+		case object_tag_e::poison_resist:
+		{
+			tag = new ObjectTag::Poison_resist();
+			break;
+		}
+		case object_tag_e::mortal:
+		{
+			tag = new ObjectTag::Mortal();
+			break;
+		}
+		case object_tag_e::purification_from_poison:
+		{
+			tag = new ObjectTag::Purification_from_poison();
+			break;
+		}
+		case object_tag_e::activator:
+		{
+			tag = new ObjectTag::Activator();
+			break;
+		}
+		case object_tag_e::fast_move:
+		{
+			tag = new ObjectTag::Fast_move();
+			break;
+		}
+		default:
+		{
+			tag = new ObjectTag::Label(get_object_tag_e(arg[0]));
+			break;
+		}
+		}
+		m_stack_list.front()->add(tag);
 		break;
 	}
 	}
@@ -569,6 +627,9 @@ void GameObjectManager::init()
 	m_commands["action"] = command_e::action;
 	m_commands["new_template_part"] = command_e::new_template_part;
 	m_commands["template_part"] = command_e::template_part;
+	m_commands["mem_instruction_slot_link"] = command_e::mem_instruction_slot_link;
+	m_commands["Instruction_slot_check_tag"] = command_e::Instruction_slot_check_tag;
+	m_commands["stack_tag"] = command_e::stack_tag;
 
 	m_to_object_state_e["alive"] = object_state_e::alive;
 	m_to_object_state_e["dead"] = object_state_e::dead;
@@ -606,6 +667,7 @@ void GameObjectManager::init()
 	m_to_interaction_e["vision"] = interaction_e::vision;
 	m_to_interaction_e["vision_component"] = interaction_e::vision_component;
 	m_to_interaction_e["skill_unarmed_combat"] = interaction_e::skill_unarmed_combat;
+	m_to_interaction_e["equip"] = interaction_e::equip;
 
 	m_effect_string[interaction_e::total_damage] = "общий дополнительный урон";
 	m_effect_string[interaction_e::damage] = "урон";

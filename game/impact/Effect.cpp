@@ -18,12 +18,13 @@ bool Interaction_list::on_turn()
 	{
 		if ((*item)->on_turn())
 		{
+			LOG(INFO) << "удалить!!";
 			item = m_effect.erase(item);
 		}
 		else
 			++item;
 	}
-	return true;
+	return false;
 }
 
 std::string Interaction_list::get_description()
@@ -628,6 +629,66 @@ Parts_list* Parts_list::clone()
 	return result;
 }
 
+//void Parts_list::update_list(Object_interaction* list)
+//{
+//
+//	switch (list->m_interaction_message_type)
+//	{
+//	case interaction_message_type_e::list:
+//	{
+//		Interaction_list* list_item = static_cast<Interaction_list*>(list);
+//		for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); ++current)
+//		{
+//			update_list((*current));
+//		}
+//		break;
+//	}
+//	case interaction_message_type_e::slot_time:
+//	{
+//		LOG(INFO) << "buff in parameter";
+//		Interaction_time* item = static_cast<Interaction_time*>(list);
+//		update_list(item->m_value);
+//		break;
+//	}
+//	default:
+//	{
+//	/*	Effect* item;
+//		item = static_cast<Effect*>(list);
+//		switch (item->m_subtype)
+//		{
+//		case effect_e::value:
+//		{
+//			m_value = m_value + item->m_value;
+//			break;
+//		}
+//		case effect_e::limit:
+//		{
+//			m_limit = m_limit + item->m_value;
+//			break;
+//		}
+//		}*/
+//	}
+//	}
+//
+//}
+//
+//void Parts_list::update()
+//{
+//	update_list(this);
+//}
+
+void Parts_list::equip(Object_interaction* item)
+{
+	LOG(INFO) << std::to_string((int)m_list_type); m_effect.push_back(item); LOG(INFO) << std::to_string(m_effect.size());
+
+	for (auto current = m_effect.begin(); current != m_effect.end(); ++current)
+	{
+		//Object_part* a = dynamic_cast<Object_part*>(*current);
+		LOG(INFO) <<std::to_string((int)((*current)->m_interaction_message_type));
+		
+	}
+};
+
 void Parts_list::save()
 {
 	LOG(INFO) << "Ћист частей";
@@ -875,6 +936,13 @@ void Interaction_slot::do_predicat(predicat func)
 {
 	func(this);
 	m_value->do_predicat(func);
+}
+
+void Interaction_slot::do_predicat_ex(predicat_ex func)
+{
+	func(this, true);
+	m_value->do_predicat_ex(func);
+	func(this, false);
 }
 
 void Interaction_slot::reset_serialization_index()
@@ -1574,4 +1642,130 @@ Interaction_list* Effect_functions::create_feature_list(feature_list_type_e key,
 	}
 	}
 	return result;
+}
+
+// Interaction_copyist
+
+Instruction_slot_link::Instruction_slot_link()
+{
+	m_enable = false;
+}
+
+std::string Instruction_slot_link::get_description()
+{
+	return "slot";
+}
+
+
+Object_interaction* Instruction_slot_link::clone()
+{
+	Instruction_slot_link* effect = new Instruction_slot_link();
+	effect->m_interaction_message_type = m_interaction_message_type;
+	effect->m_subtype = m_subtype;
+	effect->m_value = m_value->clone();
+	effect->m_enable = m_enable;
+	return effect;
+}
+
+void Instruction_slot_link::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "<тип параметра:" + Application::instance().m_game_object_manager->get_effect_string(m_subtype) + ">:");
+	m_value->description(info, level + 1);
+}
+
+void Instruction_slot_link::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	auto i = unit->get_effect(m_subtype);
+	if (i)
+	{
+		if (m_enable)
+		{
+			i->remove(m_value);
+			m_enable = false;
+		}
+		else
+		{
+			i->add(m_value);
+			m_enable = true;
+		}
+	}
+}
+
+void Instruction_slot_link::save()
+{
+	//FILE* file = Serialization_manager::instance().m_file;
+	//type_e t = type_e::interaction_copyist;
+	//fwrite(&t, sizeof(type_e), 1, file);
+	//fwrite(&m_subtype, sizeof(interaction_e), 1, file);
+	//Serialization_manager::instance().serialize(m_value);
+}
+
+void Instruction_slot_link::load()
+{
+	//FILE* file = Serialization_manager::instance().m_file;
+	//fread(&m_subtype, sizeof(interaction_e), 1, file);
+	//m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
+}
+
+// Instruction_slot_check_tag
+
+Instruction_slot_check_tag::Instruction_slot_check_tag()
+{
+	m_enable = false;
+}
+
+std::string Instruction_slot_check_tag::get_description()
+{
+	return "slot";
+}
+
+
+Object_interaction* Instruction_slot_check_tag::clone()
+{
+	Instruction_slot_check_tag* effect = new Instruction_slot_check_tag();
+	effect->m_interaction_message_type = m_interaction_message_type;
+	effect->m_subtype = m_subtype;
+	effect->m_value = m_value->clone();
+	effect->m_enable = m_enable;
+	return effect;
+}
+
+void Instruction_slot_check_tag::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "<тип параметра:" + Application::instance().m_game_object_manager->get_object_tag_string(m_subtype) + ">:");
+	m_value->description(info, level + 1);
+}
+
+void Instruction_slot_check_tag::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	if (m_enable)
+	{
+		m_value->apply_effect(unit, object);
+		m_enable = false;
+	}
+	else
+	{
+		Object_part* o = static_cast<Object_part*>(object);
+		if (o->m_object_state.get_stat(m_subtype))
+		{
+			m_value->apply_effect(unit, object);
+			m_enable = true;
+		}
+	}
+}
+
+void Instruction_slot_check_tag::save()
+{
+	//FILE* file = Serialization_manager::instance().m_file;
+	//type_e t = type_e::interaction_copyist;
+	//fwrite(&t, sizeof(type_e), 1, file);
+	//fwrite(&m_subtype, sizeof(interaction_e), 1, file);
+	//Serialization_manager::instance().serialize(m_value);
+}
+
+void Instruction_slot_check_tag::load()
+{
+	//FILE* file = Serialization_manager::instance().m_file;
+	//fread(&m_subtype, sizeof(interaction_e), 1, file);
+	//m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
 }

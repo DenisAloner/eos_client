@@ -107,6 +107,20 @@ void Attribute_map::load()
 	}
 }
 
+bool Attribute_map::get_stat(object_tag_e key)
+{
+		auto list = m_item.find(interaction_e::tag);
+		if (list != m_item.end())
+		{
+			Tag_list* taglist = static_cast<Tag_list*>(list->second);
+			for (auto item = taglist->m_effect.begin(); item != taglist->m_effect.end(); ++item)
+			{
+				if (static_cast<Object_tag*>(*item)->m_type == key) { return true; }
+			}
+		}
+	return false;
+}
+
 Object_state::Object_state()
 {
 	m_layer = 1;
@@ -179,6 +193,11 @@ Object_state* Object_state_equip::clone()
 	for (auto item = m_item.begin(); item != m_item.end(); item++)
 	{
 		state->m_item[item->first] = item->second->clone();
+	}
+
+	for (auto item = m_equip.m_item.begin(); item != m_equip.m_item.end(); item++)
+	{
+		state->m_equip.m_item[item->first] = item->second->clone();
 	}
 	return state;
 }
@@ -865,6 +884,7 @@ Object_part* Object_part::clone()
 
 bool Object_part::on_turn()
 {
+	LOG(INFO) <<"не удалять "<< m_name;
 	return false;
 }
 
