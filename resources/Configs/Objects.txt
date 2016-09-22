@@ -256,7 +256,7 @@ tag seethrough_able
 feature_list generic,equip
 mem_effect value,6
 mem_instruction_slot_link health
-Instruction_slot_check_tag pick_able
+Instruction_slot_equip
 add_slot equip
 stack_attribute_map_pop
 stack_attribute_map_pop

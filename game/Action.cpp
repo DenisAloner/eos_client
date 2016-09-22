@@ -835,46 +835,9 @@ char Action_pick::perfom(Parameter* parameter)
 	Parameter& p(*parameter);
 	if (check(parameter))
 	{
-		switch (p[1].m_object->m_owner->m_kind)
-		{
-		case entity_e::cell:
-		{
-			//static_cast<MapCell*>(p->m_object->m_owner)->m_items.remove(p->m_object);
-			static_cast<MapCell*>(p[1].m_object->m_owner)->m_map->remove_object(p[1].m_object);
-			break;
-		}
-		case entity_e::inventory_cell:
-		{
-			static_cast<Inventory_cell*>(p[1].m_object->m_owner)->m_item = nullptr;
-			break;
-		}
-		case entity_e::body_part:
-		{
-			Application::instance().command_unequip(p[0].m_object, static_cast<Object_part*>(p[1].m_object->m_owner), p[1].m_object);
-			break;
-		}
-		}
-		switch (p[2].m_owner->m_kind)
-		{
-		case entity_e::cell:
-		{
-			//static_cast<MapCell*>(p->m_owner)->m_items.push_back(p->m_object);
-			static_cast<MapCell*>(p[2].m_owner)->m_map->add_object(p[1].m_object, static_cast<MapCell*>(p[2].m_owner));
-			p[1].m_object->m_owner = p[2].m_owner;
-			break;
-		}
-		case entity_e::inventory_cell:
-		{
-			static_cast<Inventory_cell*>(p[2].m_owner)->m_item = p[1].m_object;
-			p[1].m_object->m_owner = p[2].m_owner;
-			break;
-		}
-		case entity_e::body_part:
-		{
-			Application::instance().command_equip(p[0].m_object, static_cast<Object_part*>(p[2].m_owner), p[1].m_object);
-			break;
-		}
-		}
+		Instruction_slot_parameter* np = new Instruction_slot_parameter();
+		np->m_parameter = parameter;
+		Application::instance().command_change_owner(np);
 	}
 	else return 1;
 	return 0;
@@ -1487,40 +1450,40 @@ bool Action_use::check(Parameter* parameter)
 
 char Action_use::perfom(Parameter* parameter)
 {
-	Parameter& p(*parameter);
-	if (check(parameter))
-	{
-		//p->m_unit->set_direction(Game_algorithm::turn_to_object(p->m_unit, p->m_object));
-		auto reaction = p[1].m_object->get_effect(interaction_e::use);
-		if (reaction)
-		{
-			Object_interaction* msg = reaction->clone();
-			msg->apply_effect(p[0].m_object, nullptr);
-		}
-		switch (p[1].m_object->m_owner->m_kind)
-		{
-		case entity_e::cell:
-		{
-			//static_cast<MapCell*>(p->m_object->m_owner)->m_items.remove(p->m_object);
-			static_cast<MapCell*>(p[1].m_object->m_owner)->m_map->remove_object(p[1].m_object);
-			break;
-		}
-		case entity_e::inventory_cell:
-		{
-			static_cast<Inventory_cell*>(p[1].m_object->m_owner)->m_item = nullptr;
-			break;
-		}
-		case entity_e::body_part:
-		{
-			Application::instance().command_unequip(p[0].m_object, static_cast<Object_part*>(p[1].m_object->m_owner), p[1].m_object);
-			break;
-		}
-		}
-		Application::instance().m_world->m_object_manager.m_items.remove(p[1].m_object);
-		p[0].m_object->update_interaction();
-		p[0].m_object->event_update(VoidEventArgs());
-	}
-	else return 1;
+	//Parameter& p(*parameter);
+	//if (check(parameter))
+	//{
+	//	//p->m_unit->set_direction(Game_algorithm::turn_to_object(p->m_unit, p->m_object));
+	//	auto reaction = p[1].m_object->get_effect(interaction_e::use);
+	//	if (reaction)
+	//	{
+	//		Object_interaction* msg = reaction->clone();
+	//		msg->apply_effect(p[0].m_object, nullptr);
+	//	}
+	//	switch (p[1].m_object->m_owner->m_kind)
+	//	{
+	//	case entity_e::cell:
+	//	{
+	//		//static_cast<MapCell*>(p->m_object->m_owner)->m_items.remove(p->m_object);
+	//		static_cast<MapCell*>(p[1].m_object->m_owner)->m_map->remove_object(p[1].m_object);
+	//		break;
+	//	}
+	//	case entity_e::inventory_cell:
+	//	{
+	//		static_cast<Inventory_cell*>(p[1].m_object->m_owner)->m_item = nullptr;
+	//		break;
+	//	}
+	//	case entity_e::body_part:
+	//	{
+	//		Application::instance().command_unequip(p[0].m_object, static_cast<Object_part*>(p[1].m_object->m_owner), p[1].m_object);
+	//		break;
+	//	}
+	//	}
+	//	Application::instance().m_world->m_object_manager.m_items.remove(p[1].m_object);
+	//	p[0].m_object->update_interaction();
+	//	p[0].m_object->event_update(VoidEventArgs());
+	//}
+	//else return 1;
 	return 0;
 }
 
@@ -1832,12 +1795,12 @@ char Action_shoot::perfom(Parameter* parameter)
 	Parameter& p(*parameter);
 	if (check(parameter))
 	{
-		MapCell* center= p[0].m_object->get_center(p[4].m_cell);
+	/*	MapCell* center= p[0].m_object->get_center(p[4].m_cell);
 		MapCell* c= p[4].m_cell->m_map->bresenham_line2(center, p[4].m_cell,parameter, std::bind(&Action_shoot::process_cell, this, std::placeholders::_1, std::placeholders::_2));
 		GameObject* temp = p[3].m_part->m_item;
 		Application::instance().command_unequip(p[0].m_object, p[3].m_part, temp);
 		c->m_map->add_object(temp, c);
-		temp->m_owner = c;
+		temp->m_owner = c;*/
 
 		//switch (p->m_owner->m_kind)
 		//{

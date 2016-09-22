@@ -48,6 +48,7 @@ class Object_part;
 class Object_interaction;
 class GUI_Window_manager;
 class Game_world;
+class Instruction_slot_parameter;
 
 class gui_MessageQueue
 {
@@ -151,12 +152,11 @@ public:
 	bool command_open_body(GameObject*& Object);
 	void command_gui_show_characterization(GameObject*& object);
 	bool command_check_position(GameObject*& object, MapCell*& position, GameMap*& map);
-	void command_equip(GameObject*& unit, Object_part* part, GameObject*& object);
-	void command_unequip(GameObject*& unit, Object_part* part, GameObject*& object);
 	void command_set_cursor(GLuint _Tile);
 	void command_set_pickup_item(GLuint _Tile);
 	void command_set_cursor_visibility(bool _Visibility);
 	void command_set_pickup_item_visibility(bool _Visibility);
+	void command_change_owner(Instruction_slot_parameter* parameter);
 	/*Parameter* command_select_transfer_source(Parameter_destination* parameter);*/
 	Game_object_owner* command_select_transfer(Parameter_destination* parameter);
 	Object_part* command_select_body_part();

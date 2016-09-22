@@ -433,3 +433,70 @@ public:
 	virtual void save();
 	virtual void load();
 };
+
+class Instruction_slot_equip :public Interaction_slot
+{
+public:
+	bool m_enable;
+
+	Instruction_slot_equip();
+	virtual std::string get_description();
+	virtual Object_interaction* clone();
+	virtual void description(std::list<std::string>* info, int level);
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+	virtual void save();
+	virtual void load();
+};
+
+class Instruction_slot_parameter :public Interaction_slot
+{
+public:
+
+	enum class mode_t
+	{
+		equip,
+		unequip,
+		check
+	};
+
+	Parameter* m_parameter;
+	mode_t m_mode;
+	bool m_result;
+
+	Instruction_slot_parameter();
+	virtual std::string get_description();
+	virtual Object_interaction* clone();
+	virtual void description(std::list<std::string>* info, int level);
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+	virtual void save();
+	virtual void load();
+
+};
+
+class Instruction_slot_parameter :public Interaction_slot
+{
+public:
+
+	enum class mode_t
+	{
+		equip,
+		unequip,
+		check
+	};
+
+	Parameter* m_parameter;
+	mode_t m_mode;
+	bool m_result;
+
+	Instruction_slot_parameter();
+	virtual std::string get_description();
+	virtual Object_interaction* clone();
+	virtual void description(std::list<std::string>* info, int level);
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+	virtual void save();
+	virtual void load();
+
+};

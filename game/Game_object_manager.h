@@ -14,6 +14,7 @@ class Interaction_copyist;
 class Object_tag;
 class Attribute_map;
 class Interaction_list;
+class Game_object_owner;
 
 class GameObjectManager:public iSerializable
 {
@@ -66,7 +67,8 @@ public:
 		template_part,
 		mem_instruction_slot_link,
 		Instruction_slot_check_tag,
-		stack_tag
+		stack_tag,
+		Instruction_slot_equip
 	};
 
 	enum class parameter_e
@@ -134,7 +136,12 @@ public:
 	std::string get_object_tag_string(object_tag_e key);
 	std::string get_effect_prefix_string(effect_prefix_e key);
 
+	void GameObjectManager::bind_body_predicat(Object_interaction* object, bool add_mode);
+	void GameObjectManager::bind_body(GameObject* object);
 
 	virtual void save();
 	virtual void load();
+
+private:
+	std::list<Game_object_owner*> m_game_object_owner_stack;
 };

@@ -1298,7 +1298,7 @@ void Game_world::calculate_lighting()
 	{
 		GameObject& object = *(*l);
 		if (!object.m_active_state->m_light) { continue; }
-		if (object.m_owner->m_kind != cell) { continue; }
+		if (object.m_owner->m_kind != entity_e::cell) { continue; }
 		GameMap* map = static_cast<MapCell*>(object.m_owner)->m_map;
 		fl.calculate(20, *l, map);
 		for (int y = 0; y < 41; y++)

@@ -1678,15 +1678,14 @@ void Instruction_slot_link::apply_effect(GameObject* unit, Object_interaction* o
 	auto i = unit->get_effect(m_subtype);
 	if (i)
 	{
-		if (m_enable)
+		Instruction_slot_parameter* p = static_cast<Instruction_slot_parameter*>(object);
+		if (p->m_mode == Instruction_slot_parameter::mode_t::equip)
 		{
-			i->remove(m_value);
-			m_enable = false;
+			i->add(m_value);
 		}
 		else
 		{
-			i->add(m_value);
-			m_enable = true;
+			i->remove(m_value);
 		}
 	}
 }
@@ -1738,20 +1737,22 @@ void Instruction_slot_check_tag::description(std::list<std::string>* info, int l
 
 void Instruction_slot_check_tag::apply_effect(GameObject* unit, Object_interaction* object)
 {
-	if (m_enable)
-	{
-		m_value->apply_effect(unit, object);
-		m_enable = false;
-	}
-	else
-	{
-		Object_part* o = static_cast<Object_part*>(object);
-		if (o->m_object_state.get_stat(m_subtype))
-		{
-			m_value->apply_effect(unit, object);
-			m_enable = true;
-		}
-	}
+	LOG(INFO) << "Instruction_slot_parameter";
+	//if (m_enable)
+	//{
+	//	m_value->apply_effect(unit, object);
+	//	m_enable = false;
+	//}
+	//else
+	//{
+	//	Object_part* o = static_cast<Object_part*>(object);
+	//	if (o->m_object_state.get_stat(m_subtype))
+	//	{
+	//		m_value->apply_effect(unit, object);
+	//		m_enable = true;
+	//	}
+	//}
+	m_value->apply_effect(unit, object);
 }
 
 void Instruction_slot_check_tag::save()
@@ -1764,6 +1765,166 @@ void Instruction_slot_check_tag::save()
 }
 
 void Instruction_slot_check_tag::load()
+{
+	//FILE* file = Serialization_manager::instance().m_file;
+	//fread(&m_subtype, sizeof(interaction_e), 1, file);
+	//m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
+}
+
+// Instruction_slot_check_tag
+
+Instruction_slot_equip::Instruction_slot_equip()
+{
+	m_enable=false;
+}
+
+std::string Instruction_slot_equip::get_description()
+{
+	return "slot";
+}
+
+
+Object_interaction* Instruction_slot_equip::clone()
+{
+	Instruction_slot_equip* effect = new Instruction_slot_equip();
+	effect->m_interaction_message_type = m_interaction_message_type;
+	effect->m_value = m_value->clone();
+	return effect;
+}
+
+void Instruction_slot_equip::description(std::list<std::string>* info, int level)
+{
+	info->push_back(std::string(level, '.') + "<тип параметра: >:");
+	m_value->description(info, level + 1);
+}
+
+void Instruction_slot_equip::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	Instruction_slot_parameter* parameter = static_cast<Instruction_slot_parameter*>(object);
+	Parameter& p(*(parameter->m_parameter));
+	switch (p[1].m_object->m_owner->m_kind)
+	{
+	case entity_e::cell:
+	{
+		//static_cast<MapCell*>(p->m_object->m_owner)->m_items.remove(p->m_object);
+		static_cast<MapCell*>(p[1].m_object->m_owner)->m_map->remove_object(p[1].m_object);
+		break;
+	}
+	case entity_e::inventory_cell:
+	{
+		static_cast<Inventory_cell*>(p[1].m_object->m_owner)->m_item = nullptr;
+		break;
+	}
+	case entity_e::body_part:
+	{		
+		Parameter* p = static_cast<Instruction_slot_parameter*>(parameter)->m_parameter;
+		Object_part* part = static_cast<Object_part*>((*p)[1].m_object->m_owner);
+		part->m_item = nullptr;
+		part = nullptr;
+		parameter->m_mode = Instruction_slot_parameter::mode_t::unequip;
+		m_value->apply_effect(unit, object);
+		break;
+	}
+	}
+	switch (p[2].m_owner->m_kind)
+	{
+	case entity_e::cell:
+	{
+		//static_cast<MapCell*>(p->m_owner)->m_items.push_back(p->m_object);
+		static_cast<MapCell*>(p[2].m_owner)->m_map->add_object(p[1].m_object, static_cast<MapCell*>(p[2].m_owner));
+		p[1].m_object->m_owner = p[2].m_owner;
+		break;
+	}
+	case entity_e::inventory_cell:
+	{
+		static_cast<Inventory_cell*>(p[2].m_owner)->m_item = p[1].m_object;
+		p[1].m_object->m_owner = p[2].m_owner;
+		break;
+	}
+	case entity_e::body_part:
+	{
+		Parameter* p = static_cast<Instruction_slot_parameter*>(parameter)->m_parameter;
+		Object_part* part = static_cast<Object_part*>((*p)[2].m_owner);
+		part->m_item = (*p)[1].m_object;
+		(*p)[1].m_object->m_owner = part;
+		parameter->m_mode = Instruction_slot_parameter::mode_t::equip;
+		m_value->apply_effect(unit, object);
+		break;
+	}
+	}
+}
+
+void Instruction_slot_equip::save()
+{
+	//FILE* file = Serialization_manager::instance().m_file;
+	//type_e t = type_e::interaction_copyist;
+	//fwrite(&t, sizeof(type_e), 1, file);
+	//fwrite(&m_subtype, sizeof(interaction_e), 1, file);
+	//Serialization_manager::instance().serialize(m_value);
+}
+
+void Instruction_slot_equip::load()
+{
+	//FILE* file = Serialization_manager::instance().m_file;
+	//fread(&m_subtype, sizeof(interaction_e), 1, file);
+	//m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
+}
+
+// Instruction_slot_parameter
+
+Instruction_slot_parameter::Instruction_slot_parameter()
+{
+	m_value = nullptr;
+}
+
+std::string Instruction_slot_parameter::get_description()
+{
+	return "slot";
+}
+
+
+Object_interaction* Instruction_slot_parameter::clone()
+{
+	Instruction_slot_parameter* effect = new Instruction_slot_parameter();
+	effect->m_interaction_message_type = m_interaction_message_type;
+	//effect->m_value = m_value->clone();
+	return effect;
+}
+
+void Instruction_slot_parameter::description(std::list<std::string>* info, int level)
+{
+	/*info->push_back(std::string(level, '.') + "<тип параметра:" + Application::instance().m_game_object_manager->get_object_tag_string(m_subtype) + ">:");*/
+	m_value->description(info, level + 1);
+}
+
+void Instruction_slot_parameter::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	/*if (m_enable)
+	{
+		m_value->apply_effect(unit, object);
+		m_enable = false;
+	}
+	else
+	{
+		Object_part* o = static_cast<Object_part*>(object);
+		if (o->m_object_state.get_stat(m_subtype))
+		{
+			m_value->apply_effect(unit, object);
+			m_enable = true;
+		}
+	}*/
+}
+
+void Instruction_slot_parameter::save()
+{
+	//FILE* file = Serialization_manager::instance().m_file;
+	//type_e t = type_e::interaction_copyist;
+	//fwrite(&t, sizeof(type_e), 1, file);
+	//fwrite(&m_subtype, sizeof(interaction_e), 1, file);
+	//Serialization_manager::instance().serialize(m_value);
+}
+
+void Instruction_slot_parameter::load()
 {
 	//FILE* file = Serialization_manager::instance().m_file;
 	//fread(&m_subtype, sizeof(interaction_e), 1, file);

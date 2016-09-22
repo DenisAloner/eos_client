@@ -972,11 +972,10 @@ bool Application::command_agreement()
 	return result;
 }
 
-void Application::command_equip(GameObject*& unit, Object_part* part, GameObject*& object)
+void Application::command_change_owner(Instruction_slot_parameter* parameter)
 {
-	part->m_item = object;
-	object->m_owner = part;
-	Object_state* obj_state = object->get_state(object_state_e::equip);
+	Parameter* p = static_cast<Instruction_slot_parameter*>(parameter)->m_parameter;
+	Object_state* obj_state = (*p)[1].m_object->get_state(object_state_e::equip);
 	//if (obj_state)
 	//{
 	//	if (object->m_active_state)
@@ -996,7 +995,7 @@ void Application::command_equip(GameObject*& unit, Object_part* part, GameObject
 		Interaction_list* list = obj_state->get_list(interaction_e::equip);
 		if (list)
 		{
-			list->apply_effect(unit, part);
+			list->apply_effect((*p)[0].m_object, parameter);
 		}
 		//if (object->m_active_state)
 		//{
@@ -1010,42 +1009,9 @@ void Application::command_equip(GameObject*& unit, Object_part* part, GameObject
 		//	}
 		//}
 	}
-	unit->update_interaction();
-	unit->event_update(VoidEventArgs());
+	(*p)[0].m_object->update_interaction();
+	(*p)[0].m_object->event_update(VoidEventArgs());
 	//???? if (m_GUI->MapViewer->m_player->m_object == unit) { update_action_panel(); }
-}
-
-void Application::command_unequip(GameObject*& unit, Object_part* part, GameObject*& object)
-{
-	part->m_item = nullptr;
-	object->m_owner = nullptr;
-	//Object_state* obj_state = object->get_state(object_state_e::equip);
-	//if (obj_state)
-	//{
-	//	if (object->m_active_state)
-	//	{
-	//		for (auto kind = object->m_active_state->m_item.begin(); kind != object->m_active_state->m_item.end(); kind++)
-	//		{
-	//			if (kind->first != interaction_e::damage&&kind->first != interaction_e::action)
-	//			{
-	//				//unit->remove_effect(kind->first, kind->second);
-	//				unit->remove_from(kind->first, static_cast<Interaction_list*>(kind->second));
-	//			}
-	//		}
-	//	}
-	//}
-	Object_state* obj_state = object->get_state(object_state_e::equip);
-	if (obj_state)
-	{
-		Interaction_list* list = obj_state->get_list(interaction_e::equip);
-		if (list)
-		{
-			list->apply_effect(unit, part);
-		}
-	}
-	unit->update_interaction();
-	unit->event_update(VoidEventArgs());
-	////???? if (m_GUI->MapViewer->m_player->m_object == unit) { update_action_panel(); }
 }
 
 void Application::console(std::string text)

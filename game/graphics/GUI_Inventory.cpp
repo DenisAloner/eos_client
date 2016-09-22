@@ -179,8 +179,8 @@ void GUI_Body::update(Attribute_map* feature)
 	for (auto item = feature->m_item.begin(); item != feature->m_item.end(); ++item)
 	{
 		if (item->first == interaction_e::body) 
-		{LOG(INFO)<<"Тело: "<<std::to_string(item->second->m_effect.size()) ; 
-		item->second->do_predicat_ex(std::bind(&GUI_Body::get_part_predicat, this, std::placeholders::_1, std::placeholders::_2));
+		{
+			item->second->do_predicat_ex(std::bind(&GUI_Body::get_part_predicat, this, std::placeholders::_1, std::placeholders::_2));
 		}
 	}
 	m_max_item_name += 80;

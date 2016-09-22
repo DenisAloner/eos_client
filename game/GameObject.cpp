@@ -3,6 +3,22 @@
 #include "log.h"
 #include "AI.h"
 
+Game_object_owner* Game_object_owner::get_owner(entity_e kind)
+{
+	if (m_owner)
+	{
+		if (m_owner->m_kind == kind)
+		{
+			return m_owner;
+		}
+		else
+		{
+			return m_owner->get_owner(kind);
+		}
+	}
+	return nullptr;
+}
+
 MapCell::MapCell(int x, int y, GameMap* map) :x(x), y(y), m_map(map)
 {
 	m_kind = entity_e::cell;
@@ -291,6 +307,8 @@ void Object_state::load()
 
 GameObject::GameObject()
 {
+	m_kind = entity_e::game_object;
+	m_owner = nullptr;
 	m_direction = object_direction_e::down;
 	m_selected = false;
 	m_active_state = nullptr;
@@ -869,6 +887,7 @@ Object_part::Object_part(GameObject* item) :Inventory_cell(item)
 {
 	m_interaction_message_type = interaction_message_type_e::part;
 	m_kind = entity_e::body_part;
+	m_owner = nullptr;
 };
 
 Object_part* Object_part::clone()

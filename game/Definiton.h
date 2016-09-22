@@ -121,11 +121,12 @@ struct VoidEventArgs
 {
 };
 
-enum entity_e
+enum class entity_e
 {
 	cell,
 	inventory_cell,
-	body_part
+	body_part,
+	game_object
 };
 
 enum action_e

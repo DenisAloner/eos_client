@@ -32,6 +32,10 @@ class Game_object_owner: public virtual iSerializable
 {
 public:
 	entity_e m_kind;
+	Game_object_owner* m_owner;
+	
+	Game_object_owner* get_owner(entity_e kind);
+
 };
 
 class MapCell : public Game_object_owner
@@ -129,15 +133,13 @@ public:
 
 };
 
-class GameObject : public  Object_interaction, public GUI_connectable_i
+class GameObject : public  Object_interaction, public GUI_connectable_i,public Game_object_owner
 {
 public:
 
 	std::string m_name;
 	object_direction_e m_direction;
 	bool m_selected;
-
-	Game_object_owner* m_owner;
 
 	Object_state* m_active_state;
 	std::list<Object_state*> m_state;
