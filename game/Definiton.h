@@ -286,7 +286,9 @@ enum class interaction_message_type_e
 	select_location,
 	mover,
 	allocator,
-	slot_time
+	slot_time,
+	instruction_slot_parameter,
+	instruction_game_owner
 };
 
 enum class interaction_e
@@ -338,7 +340,9 @@ enum class body_part_e
 	finger,
 	head,
 	hand,
-	foot
+	foot,
+	waist,
+	container
 };
 
 enum class effect_prefix_e
@@ -360,7 +364,10 @@ enum class object_tag_e
 	pick_able,
 	seethrough_able,
 	activator,
-	fast_move
+	fast_move,
+	equippable,
+	ring,
+	requirements_to_object
 };
 
 enum class feature_list_type_e
@@ -390,7 +397,7 @@ public:
 
 	interaction_message_type_e m_interaction_message_type;
 	Object_interaction(){};
-	virtual void apply_effect(GameObject* unit, Object_interaction* object){};
+	virtual void apply_effect(GameObject* unit, Object_interaction* object) {};
 	virtual bool on_turn() = 0;
 	virtual std::string get_description() = 0;
 	virtual Object_interaction* clone() = 0;
@@ -548,9 +555,10 @@ public:
 
 };
 
-struct item_slot_info_t
+enum class instruction_action_type_e
 {
-	std::string m_name;
+	equip,
+	unequip
 };
 
 //struct Game_log_message_EventArgs
@@ -559,4 +567,5 @@ struct item_slot_info_t
 //
 //	Game_log_message_EventArgs(game_log_message_t& value) : value(value) {};
 //};
+
 #endif //DEFINITION_H

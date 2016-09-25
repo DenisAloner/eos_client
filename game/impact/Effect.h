@@ -3,6 +3,8 @@
 #include "Parameter.h"
 #include <functional>
 
+class Game_object_owner;
+
 class Interaction_list :public Object_interaction
 {
 public:
@@ -116,15 +118,15 @@ public:
 
 	Parts_list();
 	virtual Parts_list* clone();
-	//virtual void update();
+	virtual void update();
 	virtual void save();
 	virtual void load();
 
 	virtual void equip(Object_interaction* item);
 
 
-//private:
-//	void update_list(Object_interaction* list);
+private:
+	void update_list(Object_interaction* list);
 };
 
 class Action_list :public Interaction_list
@@ -395,6 +397,36 @@ namespace ObjectTag
 		virtual void save();
 		virtual void load();
 	};
+
+	class Equippable : public Object_tag
+	{
+	public:
+
+		Object_interaction* m_value;
+		Interaction_list* m_condition;
+
+		Equippable();
+		virtual Equippable* clone();
+		virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+		virtual void save();
+		virtual void load();
+	};
+
+	class Requirements_to_object : public Object_tag
+	{
+	public:
+
+		Object_interaction* m_value;
+		bool m_result;
+
+		Requirements_to_object();
+		virtual Requirements_to_object* clone();
+		virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+		virtual void save();
+		virtual void load();
+	};
 }
 
 namespace Effect_functions
@@ -418,37 +450,6 @@ public:
 	virtual void load();
 };
 
-class Instruction_slot_check_tag :public Interaction_slot
-{
-public:
-
-	object_tag_e m_subtype;
-	bool m_enable;
-	Instruction_slot_check_tag();
-	virtual std::string get_description();
-	virtual Object_interaction* clone();
-	virtual void description(std::list<std::string>* info, int level);
-	virtual void apply_effect(GameObject* unit, Object_interaction* object);
-
-	virtual void save();
-	virtual void load();
-};
-
-class Instruction_slot_equip :public Interaction_slot
-{
-public:
-	bool m_enable;
-
-	Instruction_slot_equip();
-	virtual std::string get_description();
-	virtual Object_interaction* clone();
-	virtual void description(std::list<std::string>* info, int level);
-	virtual void apply_effect(GameObject* unit, Object_interaction* object);
-
-	virtual void save();
-	virtual void load();
-};
-
 class Instruction_slot_parameter :public Interaction_slot
 {
 public:
@@ -475,28 +476,57 @@ public:
 
 };
 
-class Instruction_slot_parameter :public Interaction_slot
+class Instruction_game_owner :public Object_interaction
 {
 public:
 
-	enum class mode_t
-	{
-		equip,
-		unequip,
-		check
-	};
-
-	Parameter* m_parameter;
-	mode_t m_mode;
+	Game_object_owner* m_value;
 	bool m_result;
 
-	Instruction_slot_parameter();
-	virtual std::string get_description();
-	virtual Object_interaction* clone();
-	virtual void description(std::list<std::string>* info, int level);
+	Instruction_game_owner();
+	virtual std::string get_description() { return nullptr; };
+	virtual bool on_turn() { return false; };
+	virtual Object_interaction* clone() { return nullptr; };
+	virtual void description(std::list<std::string>* info, int level) {};
+	virtual void apply_effect(GameObject* unit, Object_interaction* object) {};
+
+	virtual void save() {};
+	virtual void load() {};
+
+};
+
+class Instruction_check_tag :public Object_interaction
+{
+public:
+
+	object_tag_e m_value;
+
+	Instruction_check_tag();
+	virtual std::string get_description() { return nullptr; };
+	virtual bool on_turn() { return false; };
+	virtual Instruction_check_tag* clone();
+	virtual void description(std::list<std::string>* info, int level) {};
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
-	virtual void save();
-	virtual void load();
+	virtual void save() {};
+	virtual void load() {};
+
+};
+
+class Instruction_check_part_type :public Object_interaction
+{
+public:
+
+	body_part_e m_value;
+
+	Instruction_check_part_type();
+	virtual std::string get_description() { return nullptr; };
+	virtual bool on_turn() { return false; };
+	virtual Instruction_check_part_type* clone();
+	virtual void description(std::list<std::string>* info, int level) {};
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+	virtual void save() {};
+	virtual void load() {};
 
 };

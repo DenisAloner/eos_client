@@ -4,6 +4,8 @@ icon ring_icon
 icon dagger_icon
 icon bow_icon
 icon arrow_icon
+icon belt_icon
+icon bag_icon
 single snake
 single dagger
 single iso_wall
@@ -32,3 +34,5 @@ single arrow
 single ring
 single iso_wall_2
 single iso_wall_3
+single belt
+single bag

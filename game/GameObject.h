@@ -90,7 +90,7 @@ public:
 
 	Interaction_list* get_list(interaction_e key);
 	bool get_stat(object_tag_e key);
-
+	Object_tag* get_tag(object_tag_e key);
 };
 
 class Object_state : public Attribute_map

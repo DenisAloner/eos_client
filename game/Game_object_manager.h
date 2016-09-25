@@ -66,9 +66,11 @@ public:
 		new_template_part,
 		template_part,
 		mem_instruction_slot_link,
-		Instruction_slot_check_tag,
 		stack_tag,
-		Instruction_slot_equip
+		instruction_check_part_type,
+		instruction_check_tag,
+		slot_to_list,
+		list_to_slot
 	};
 
 	enum class parameter_e

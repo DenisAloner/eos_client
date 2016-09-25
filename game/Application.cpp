@@ -233,7 +233,7 @@ void Application::new_game()
 	int rx = 10;
 	int ry = 10;
 	GameObject* obj;
-	obj = m_game_object_manager->new_object("iso_unit");
+	obj = m_game_object_manager->new_object("human");
 	map->add_to_map(obj, map->m_items[ry][rx]);
 	m_world->m_player = new Player(obj, map);
 	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
@@ -272,10 +272,17 @@ void Application::new_game()
 			obj->set_direction(object_direction_e::top);
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-2][rx]);*/
 
-			obj = m_game_object_manager->new_object("ring of bow");
+			obj = m_game_object_manager->new_object("belt");
 			obj->set_direction(object_direction_e::top);
-			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-2][rx]);
+			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx]);
 
+			obj = m_game_object_manager->new_object("bag");
+			obj->set_direction(object_direction_e::top);
+			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx-1]);
+
+			obj = m_game_object_manager->new_object("ring");
+			obj->set_direction(object_direction_e::top);
+			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx + 1]);
 
 			/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
 			fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), obj);
@@ -992,9 +999,10 @@ void Application::command_change_owner(Instruction_slot_parameter* parameter)
 	//}
 	if (obj_state)
 	{
-		Interaction_list* list = obj_state->get_list(interaction_e::equip);
+		Object_tag* list = obj_state->get_tag(object_tag_e::equippable);
 		if (list)
 		{
+			LOG(INFO) << "step 0  "<<std::to_string((int)static_cast<ObjectTag::Equippable*>(list)->m_value->m_interaction_message_type);
 			list->apply_effect((*p)[0].m_object, parameter);
 		}
 		//if (object->m_active_state)

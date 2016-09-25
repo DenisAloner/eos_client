@@ -629,53 +629,53 @@ Parts_list* Parts_list::clone()
 	return result;
 }
 
-//void Parts_list::update_list(Object_interaction* list)
-//{
-//
-//	switch (list->m_interaction_message_type)
-//	{
-//	case interaction_message_type_e::list:
-//	{
-//		Interaction_list* list_item = static_cast<Interaction_list*>(list);
-//		for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); ++current)
-//		{
-//			update_list((*current));
-//		}
-//		break;
-//	}
-//	case interaction_message_type_e::slot_time:
-//	{
-//		LOG(INFO) << "buff in parameter";
-//		Interaction_time* item = static_cast<Interaction_time*>(list);
-//		update_list(item->m_value);
-//		break;
-//	}
-//	default:
-//	{
-//	/*	Effect* item;
-//		item = static_cast<Effect*>(list);
-//		switch (item->m_subtype)
-//		{
-//		case effect_e::value:
-//		{
-//			m_value = m_value + item->m_value;
-//			break;
-//		}
-//		case effect_e::limit:
-//		{
-//			m_limit = m_limit + item->m_value;
-//			break;
-//		}
-//		}*/
-//	}
-//	}
-//
-//}
-//
-//void Parts_list::update()
-//{
-//	update_list(this);
-//}
+void Parts_list::update_list(Object_interaction* list)
+{
+
+	switch (list->m_interaction_message_type)
+	{
+	case interaction_message_type_e::list:
+	{
+		Interaction_list* list_item = static_cast<Interaction_list*>(list);
+		for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); ++current)
+		{
+			update_list((*current));
+		}
+		break;
+	}
+	case interaction_message_type_e::slot_time:
+	{
+		LOG(INFO) << "buff in parameter";
+		Interaction_time* item = static_cast<Interaction_time*>(list);
+		update_list(item->m_value);
+		break;
+	}
+	default:
+	{
+	/*	Effect* item;
+		item = static_cast<Effect*>(list);
+		switch (item->m_subtype)
+		{
+		case effect_e::value:
+		{
+			m_value = m_value + item->m_value;
+			break;
+		}
+		case effect_e::limit:
+		{
+			m_limit = m_limit + item->m_value;
+			break;
+		}
+		}*/
+	}
+	}
+
+}
+
+void Parts_list::update()
+{
+	update_list(this);
+}
 
 void Parts_list::equip(Object_interaction* item)
 {
@@ -1675,7 +1675,10 @@ void Instruction_slot_link::description(std::list<std::string>* info, int level)
 
 void Instruction_slot_link::apply_effect(GameObject* unit, Object_interaction* object)
 {
-	auto i = unit->get_effect(m_subtype);
+	Instruction_slot_parameter* parameter = static_cast<Instruction_slot_parameter*>(object);
+	Parameter& p(*(parameter->m_parameter));
+	Object_part* part = static_cast<Object_part*>(p[1].m_object->m_owner);
+	auto i = part->m_object_state.get_list(m_subtype);
 	if (i)
 	{
 		Instruction_slot_parameter* p = static_cast<Instruction_slot_parameter*>(object);
@@ -1706,175 +1709,13 @@ void Instruction_slot_link::load()
 	//m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
 }
 
-// Instruction_slot_check_tag
-
-Instruction_slot_check_tag::Instruction_slot_check_tag()
-{
-	m_enable = false;
-}
-
-std::string Instruction_slot_check_tag::get_description()
-{
-	return "slot";
-}
-
-
-Object_interaction* Instruction_slot_check_tag::clone()
-{
-	Instruction_slot_check_tag* effect = new Instruction_slot_check_tag();
-	effect->m_interaction_message_type = m_interaction_message_type;
-	effect->m_subtype = m_subtype;
-	effect->m_value = m_value->clone();
-	effect->m_enable = m_enable;
-	return effect;
-}
-
-void Instruction_slot_check_tag::description(std::list<std::string>* info, int level)
-{
-	info->push_back(std::string(level, '.') + "<тип параметра:" + Application::instance().m_game_object_manager->get_object_tag_string(m_subtype) + ">:");
-	m_value->description(info, level + 1);
-}
-
-void Instruction_slot_check_tag::apply_effect(GameObject* unit, Object_interaction* object)
-{
-	LOG(INFO) << "Instruction_slot_parameter";
-	//if (m_enable)
-	//{
-	//	m_value->apply_effect(unit, object);
-	//	m_enable = false;
-	//}
-	//else
-	//{
-	//	Object_part* o = static_cast<Object_part*>(object);
-	//	if (o->m_object_state.get_stat(m_subtype))
-	//	{
-	//		m_value->apply_effect(unit, object);
-	//		m_enable = true;
-	//	}
-	//}
-	m_value->apply_effect(unit, object);
-}
-
-void Instruction_slot_check_tag::save()
-{
-	//FILE* file = Serialization_manager::instance().m_file;
-	//type_e t = type_e::interaction_copyist;
-	//fwrite(&t, sizeof(type_e), 1, file);
-	//fwrite(&m_subtype, sizeof(interaction_e), 1, file);
-	//Serialization_manager::instance().serialize(m_value);
-}
-
-void Instruction_slot_check_tag::load()
-{
-	//FILE* file = Serialization_manager::instance().m_file;
-	//fread(&m_subtype, sizeof(interaction_e), 1, file);
-	//m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
-}
-
-// Instruction_slot_check_tag
-
-Instruction_slot_equip::Instruction_slot_equip()
-{
-	m_enable=false;
-}
-
-std::string Instruction_slot_equip::get_description()
-{
-	return "slot";
-}
-
-
-Object_interaction* Instruction_slot_equip::clone()
-{
-	Instruction_slot_equip* effect = new Instruction_slot_equip();
-	effect->m_interaction_message_type = m_interaction_message_type;
-	effect->m_value = m_value->clone();
-	return effect;
-}
-
-void Instruction_slot_equip::description(std::list<std::string>* info, int level)
-{
-	info->push_back(std::string(level, '.') + "<тип параметра: >:");
-	m_value->description(info, level + 1);
-}
-
-void Instruction_slot_equip::apply_effect(GameObject* unit, Object_interaction* object)
-{
-	Instruction_slot_parameter* parameter = static_cast<Instruction_slot_parameter*>(object);
-	Parameter& p(*(parameter->m_parameter));
-	switch (p[1].m_object->m_owner->m_kind)
-	{
-	case entity_e::cell:
-	{
-		//static_cast<MapCell*>(p->m_object->m_owner)->m_items.remove(p->m_object);
-		static_cast<MapCell*>(p[1].m_object->m_owner)->m_map->remove_object(p[1].m_object);
-		break;
-	}
-	case entity_e::inventory_cell:
-	{
-		static_cast<Inventory_cell*>(p[1].m_object->m_owner)->m_item = nullptr;
-		break;
-	}
-	case entity_e::body_part:
-	{		
-		Parameter* p = static_cast<Instruction_slot_parameter*>(parameter)->m_parameter;
-		Object_part* part = static_cast<Object_part*>((*p)[1].m_object->m_owner);
-		part->m_item = nullptr;
-		part = nullptr;
-		parameter->m_mode = Instruction_slot_parameter::mode_t::unequip;
-		m_value->apply_effect(unit, object);
-		break;
-	}
-	}
-	switch (p[2].m_owner->m_kind)
-	{
-	case entity_e::cell:
-	{
-		//static_cast<MapCell*>(p->m_owner)->m_items.push_back(p->m_object);
-		static_cast<MapCell*>(p[2].m_owner)->m_map->add_object(p[1].m_object, static_cast<MapCell*>(p[2].m_owner));
-		p[1].m_object->m_owner = p[2].m_owner;
-		break;
-	}
-	case entity_e::inventory_cell:
-	{
-		static_cast<Inventory_cell*>(p[2].m_owner)->m_item = p[1].m_object;
-		p[1].m_object->m_owner = p[2].m_owner;
-		break;
-	}
-	case entity_e::body_part:
-	{
-		Parameter* p = static_cast<Instruction_slot_parameter*>(parameter)->m_parameter;
-		Object_part* part = static_cast<Object_part*>((*p)[2].m_owner);
-		part->m_item = (*p)[1].m_object;
-		(*p)[1].m_object->m_owner = part;
-		parameter->m_mode = Instruction_slot_parameter::mode_t::equip;
-		m_value->apply_effect(unit, object);
-		break;
-	}
-	}
-}
-
-void Instruction_slot_equip::save()
-{
-	//FILE* file = Serialization_manager::instance().m_file;
-	//type_e t = type_e::interaction_copyist;
-	//fwrite(&t, sizeof(type_e), 1, file);
-	//fwrite(&m_subtype, sizeof(interaction_e), 1, file);
-	//Serialization_manager::instance().serialize(m_value);
-}
-
-void Instruction_slot_equip::load()
-{
-	//FILE* file = Serialization_manager::instance().m_file;
-	//fread(&m_subtype, sizeof(interaction_e), 1, file);
-	//m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
-}
 
 // Instruction_slot_parameter
 
 Instruction_slot_parameter::Instruction_slot_parameter()
 {
 	m_value = nullptr;
+	m_interaction_message_type = interaction_message_type_e::instruction_slot_parameter;
 }
 
 std::string Instruction_slot_parameter::get_description()
@@ -1930,3 +1771,254 @@ void Instruction_slot_parameter::load()
 	//fread(&m_subtype, sizeof(interaction_e), 1, file);
 	//m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
 }
+
+// ObjectTag::Equippable
+
+ObjectTag::Equippable::Equippable(): Object_tag(object_tag_e::equippable){};
+
+ObjectTag::Equippable* ObjectTag::Equippable::clone()
+{
+	ObjectTag::Equippable* result = new ObjectTag::Equippable;
+	result->m_interaction_message_type = m_interaction_message_type;
+	result->m_value = m_value->clone();
+	result->m_condition = m_condition->clone();
+	return result;
+}
+
+void ObjectTag::Equippable::apply_effect(GameObject* unit, Object_interaction* object) 
+{
+	switch (object->m_interaction_message_type)
+	{
+	case interaction_message_type_e::instruction_slot_parameter:
+	{
+		
+		Instruction_slot_parameter* parameter = static_cast<Instruction_slot_parameter*>(object);
+		Parameter& p(*(parameter->m_parameter));
+
+		switch (p[2].m_owner->m_kind)
+		{
+		case entity_e::cell:
+		{
+			break;
+		}
+		case entity_e::inventory_cell:
+		{
+			break;
+		}
+		case entity_e::body_part:
+		{
+			Instruction_game_owner* i = new Instruction_game_owner();
+			i->m_value = p[2].m_owner;
+			m_condition->apply_effect(unit, i);
+			if (!i->m_result) { return; };
+			if (p[2].m_owner->m_kind == entity_e::body_part)
+			{
+				Object_part* part =static_cast<Object_part*>( p[2].m_owner);
+				Object_tag* t = part->m_object_state.get_tag(object_tag_e::requirements_to_object);
+				if (t)
+				{
+					i->m_result = false;
+					i->m_value = p[1].m_object;
+					t->apply_effect(unit, i);
+					if (!i->m_result) { return; };
+				}
+			}
+			break;
+		}
+		}
+
+		switch (p[1].m_object->m_owner->m_kind)
+		{
+		case entity_e::cell:
+		{
+			//static_cast<MapCell*>(p->m_object->m_owner)->m_items.remove(p->m_object);
+			static_cast<MapCell*>(p[1].m_object->m_owner)->m_map->remove_object(p[1].m_object);
+			break;
+		}
+		case entity_e::inventory_cell:
+		{
+			static_cast<Inventory_cell*>(p[1].m_object->m_owner)->m_item = nullptr;
+			break;
+		}
+		case entity_e::body_part:
+		{
+			Object_part* part = static_cast<Object_part*>(p[1].m_object->m_owner);
+			part->m_item = nullptr;
+			part = nullptr;
+			parameter->m_mode = Instruction_slot_parameter::mode_t::unequip;
+			m_value->apply_effect(unit, object);
+			break;
+		}
+		}
+
+		switch (p[2].m_owner->m_kind)
+		{
+		case entity_e::cell:
+		{
+			//static_cast<MapCell*>(p->m_owner)->m_items.push_back(p->m_object);
+			static_cast<MapCell*>(p[2].m_owner)->m_map->add_object(p[1].m_object, static_cast<MapCell*>(p[2].m_owner));
+			p[1].m_object->m_owner = p[2].m_owner;
+			break;
+		}
+		case entity_e::inventory_cell:
+		{
+			static_cast<Inventory_cell*>(p[2].m_owner)->m_item = p[1].m_object;
+			p[1].m_object->m_owner = p[2].m_owner;
+			break;
+		}
+		case entity_e::body_part:
+		{
+			Parameter* p = static_cast<Instruction_slot_parameter*>(parameter)->m_parameter;
+			Object_part* part = static_cast<Object_part*>((*p)[2].m_owner);
+			part->m_item = (*p)[1].m_object;
+			(*p)[1].m_object->m_owner = part;
+			parameter->m_mode = Instruction_slot_parameter::mode_t::equip;
+			m_value->apply_effect(unit, object);
+			break;
+		}
+		}
+		break;
+	}
+	}
+};
+
+void ObjectTag::Equippable::save()
+{
+	/*FILE* file = Serialization_manager::instance().m_file;
+	type_e t = type_e::tag_label;
+	fwrite(&t, sizeof(type_e), 1, file);
+	fwrite(&m_type, sizeof(object_tag_e), 1, file);*/
+}
+
+void ObjectTag::Equippable::load()
+{
+	/*FILE* file = Serialization_manager::instance().m_file;
+	fread(&m_type, sizeof(object_tag_e), 1, file);*/
+}
+
+
+// ObjectTag::Equippable
+
+ObjectTag::Requirements_to_object::Requirements_to_object() : Object_tag(object_tag_e::requirements_to_object) 
+{
+	m_value = nullptr;
+	m_result = false;
+};
+
+ObjectTag::Requirements_to_object* ObjectTag::Requirements_to_object::clone()
+{
+	ObjectTag::Requirements_to_object* result = new ObjectTag::Requirements_to_object;
+	result->m_interaction_message_type = m_interaction_message_type;
+	result->m_value = m_value->clone();
+	result->m_result = m_result;
+	return result;
+}
+
+void ObjectTag::Requirements_to_object::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	switch (object->m_interaction_message_type)
+	{
+	case interaction_message_type_e::instruction_game_owner:
+	{
+		m_value->apply_effect(unit, object);
+		Instruction_game_owner* i = static_cast<Instruction_game_owner*>(object);
+		m_result = i->m_result;
+		break;
+	}
+	default:
+	{
+		break;
+	}
+	}
+};
+
+void ObjectTag::Requirements_to_object::save()
+{
+	/*FILE* file = Serialization_manager::instance().m_file;
+	type_e t = type_e::tag_label;
+	fwrite(&t, sizeof(type_e), 1, file);
+	fwrite(&m_type, sizeof(object_tag_e), 1, file);*/
+}
+
+void ObjectTag::Requirements_to_object::load()
+{
+	/*FILE* file = Serialization_manager::instance().m_file;
+	fread(&m_type, sizeof(object_tag_e), 1, file);*/
+}
+
+
+// Instruction_game_owner
+
+Instruction_game_owner::Instruction_game_owner() 
+{
+	m_value = nullptr;
+	m_result = false;
+	m_interaction_message_type = interaction_message_type_e::instruction_game_owner;
+};
+
+// Instruction_check_tag
+
+Instruction_check_tag::Instruction_check_tag()
+{
+};
+
+Instruction_check_tag* Instruction_check_tag::clone()
+{
+	Instruction_check_tag* result = new Instruction_check_tag();
+	result->m_interaction_message_type = m_interaction_message_type;
+	result->m_value = m_value;
+	return result;
+}
+
+void Instruction_check_tag::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	switch (object->m_interaction_message_type)
+	{
+	case interaction_message_type_e::instruction_game_owner:
+	{
+		Instruction_game_owner* i = static_cast<Instruction_game_owner*>(object);
+		switch (i->m_value->m_kind)
+		{
+		case entity_e::game_object:
+		{
+			GameObject* obj = static_cast<GameObject*>(i->m_value);
+			i->m_result = obj->get_stat(m_value);
+			break;
+		}
+		}
+		break;
+	}
+	}
+};
+
+// Instruction_check_part_type
+
+Instruction_check_part_type::Instruction_check_part_type()
+{
+};
+
+Instruction_check_part_type* Instruction_check_part_type::clone()
+{
+	Instruction_check_part_type* result = new Instruction_check_part_type();
+	result->m_interaction_message_type = m_interaction_message_type;
+	result->m_value = m_value;
+	return result;
+}
+
+void Instruction_check_part_type::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	switch (object->m_interaction_message_type)
+	{
+	case interaction_message_type_e::instruction_slot_parameter:
+	{
+		break;
+	}
+	default:
+	{
+		Instruction_game_owner* i = static_cast<Instruction_game_owner*>(object);
+		Object_part* op = static_cast<Object_part*>(i->m_value);
+		i->m_result = (op->m_part_kind == m_value);
+		break;
+	}
+	}
+};

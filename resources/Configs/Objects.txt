@@ -23,6 +23,13 @@ stack_attribute_map_pop
 stack_attribute_map_pop
 stack_attribute_map_pop
 
+new_template_part container,сумка,cell_for_ring
+stack_list_push tag,tag
+instruction_check_tag ring
+stack_tag requirements_to_object
+stack_list_pop
+stack_attribute_map_pop
+
 object wall
 state alive
 size 1,1,5
@@ -50,18 +57,6 @@ size 1,1,0
 tile_manager 3
 layer 2
 
-object door
-state off
-size 1,1,5
-tile_manager 4
-layer 2
-state on
-size 1,1,5
-tile_manager 5
-feature_list tag,tag
-tag pass_able
-tag seethrough_able
-
 object floor
 state alive
 size 1,1,0
@@ -79,7 +74,7 @@ light 80,80,80
 feature_list tag,tag
 tag seethrough_able
 
-object iso_unit
+object human
 state alive
 ai non_humanoid,0
 size 2,2,4
@@ -107,169 +102,70 @@ stack_list_push parameter,skill_unarmed_combat,50000,100000
 stack_list_push generic,buff
 stack_list_push generic,damage
 stack_list_push parts,body
+part waist,талия
 template_part humanoid_hand
 stack_attribute_map_pop
 state dead
 size 2,2,2
 tile_manager 10
 
-object bat
-state alive
-ai non_humanoid,0
-size 2,2,4
-tile_manager 12
-optical 0.8,0.8,0.8
-feature_list vision,vision
-mem_list
-create_list vision_component,vision_component,32,0,270,90
-copy_list_to_slot
-add_slot_to_mem_list
-feature_list action,action
-feature_list generic,buff
-add_action move
-feature_list parameter,health,100,100
-feature_list parameter,strength,5,100
-feature_list parameter,dexterity,50,100
-feature_list parameter,evasion_skill,50000,100000
-feature_list parameter,skill_unarmed_combat,50000,100000
-feature_list generic,total_damage
-feature_list generic,damage
-feature_list parts,body
-mem_part head,морда
-add_slot body
-feature_list_mem action,action
-mem_action hit_melee
-add_slot_mem action
-feature_list tag,tag
-tag poison_resist
-tag mortal
-tag seethrough_able
-tag fast_move
-state dead
-size 2,2,1
-tile_manager 9
-feature_list tag,tag
-tag seethrough_able
-
-object glass_wall
-state alive
-size 1,1,5
-optical 0.5,1.0,0.5
-tile_manager 22
-feature_list tag,tag
-tag seethrough_able
-layer 2
-
-object blue potion
-state alive
-size 1,1,1
-icon 1
-tile_manager 21
-feature_list tag,tag
-tag seethrough_able
-tag pick_able
-feature_list generic,use
-mem_effect value,2
-mem_slot_time 5
-mem_slot_addon weapon_damage
-add_slot use
-mem_effect start_angle,-45
-mem_slot_addon vision
-add_slot use
-
 object ring
-state equip,hand
-size 1,1,0
-icon 2
-tile_manager 25
-feature_list tag,tag
-tag pick_able
-tag pass_able
-tag seethrough_able
-feature_list vision,vision
-mem_effect limit,-16
-add_slot vision
-
-object dagger
-state equip,hand
-size 1,1,0
-icon 3
-tile_manager 1
-feature_list tag,tag
-tag pick_able
-tag pass_able
-tag seethrough_able
-feature_list parameter,weapon_damage,10,25
-feature_list parameter,strength_bonus,25,100
-feature_list parameter,demand_weapon_skill,15000,100000
-feature_list generic,action
-add_action hit_melee
-feature_list generic,damage
-mem_effect value,-6
-mem_slot_prefix poison_damage
-mem_slot_copyist health
-mem_slot_time 5
-mem_slot_addon buff
-add_slot damage
-
-object bow
-state equip,hand
-size 3,3,0
-icon 4
-tile_manager 23
-feature_list tag,tag
-tag pick_able
-tag seethrough_able
-feature_list parameter,weapon_damage,10,25
-feature_list parameter,weapon_range,7,10
-feature_list parameter,strength_bonus,25,100
-feature_list parameter,demand_weapon_skill,15000,100000
-feature_list generic,action
-add_action shoot
-feature_list generic,damage
-mem_effect value,-6
-mem_slot_prefix poison_damage
-mem_slot_copyist health
-mem_slot_time 5
-mem_slot_addon buff
-add_slot damage
-
-object arrow
-state equip,hand
-size 1,1,0
-icon 5
-tile_manager 24
-feature_list tag,tag
-tag pick_able
-tag pass_able
-tag seethrough_able
-
-object ring of bow
 state equip,finger
 size 1,1,0
 icon 2
 tile_manager 25
-feature_list tag,tag
+stack_list_push tag,tag
 tag pick_able
 tag pass_able
 tag seethrough_able
-feature_list generic,equip
 mem_effect value,6
 mem_instruction_slot_link health
-Instruction_slot_equip
-add_slot equip
-stack_attribute_map_pop
+stack_tag equippable
+instruction_check_part_type container
+slot_to_list
+stack_list_pop
+stack_list_pop
 stack_attribute_map_pop
 
-object red potion
-state alive
+object belt
+state equip,finger
 size 1,1,1
-icon 1
-tile_manager 21
-feature_list tag,tag
+icon 6
+tile_manager 28
+stack_list_push tag,tag
+tag pick_able
+tag pass_able
 tag seethrough_able
-feature_list generic,use
-mem_part hand,тестированиееее
-mem_slot_time 5
-mem_slot_addon body
-add_slot use
+mem_part container,пояс
+stack_attribute_map_pop
+mem_instruction_slot_link body
+stack_tag equippable
+instruction_check_part_type waist
+slot_to_list
+stack_list_pop
+stack_list_pop
+stack_attribute_map_pop
+
+object bag
+state equip,finger
+size 1,1,1
+icon 7
+tile_manager 29
+stack_list_push tag,tag
+tag pick_able
+tag pass_able
+tag seethrough_able
+create_list generic,body
+template_part cell_for_ring
+stack_attribute_map_pop
+template_part cell_for_ring
+stack_attribute_map_pop
+list_to_slot
+stack_list_pop
+mem_instruction_slot_link body
+stack_tag equippable
+instruction_check_part_type container
+slot_to_list
+stack_list_pop
+stack_list_pop
+stack_attribute_map_pop

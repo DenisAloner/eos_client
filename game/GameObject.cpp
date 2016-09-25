@@ -137,6 +137,20 @@ bool Attribute_map::get_stat(object_tag_e key)
 	return false;
 }
 
+Object_tag* Attribute_map::get_tag(object_tag_e key)
+{
+		auto list = m_item.find(interaction_e::tag);
+		if (list != m_item.end())
+		{
+			Tag_list* taglist = static_cast<Tag_list*>(list->second);
+			for (auto item = taglist->m_effect.begin(); item != taglist->m_effect.end(); ++item)
+			{
+				if (static_cast<Object_tag*>(*item)->m_type == key) { return static_cast<Object_tag*>(*item); }
+			}
+		}
+	return nullptr;
+}
+
 Object_state::Object_state()
 {
 	m_layer = 1;
@@ -414,6 +428,17 @@ void GameObject::add_effect(interaction_e key, Object_interaction* item)
 	}
 }
 
+void GameObject::remove_effect(interaction_e key, Object_interaction* item)
+{
+	if (m_active_state)
+	{
+		if (m_active_state->m_item.find(key) != m_active_state->m_item.end())
+		{
+			m_active_state->m_item[key]->remove(item);
+		}
+	}
+}
+
 void GameObject::add_from(interaction_e key, Object_interaction* item)
 {
 	if (m_active_state->m_item.find(key) != m_active_state->m_item.end())
@@ -433,17 +458,6 @@ void GameObject::add_from(interaction_e key, Interaction_list* feature)
 		else
 		{
 			m_active_state->m_item[key]->equip(feature);
-		}
-	}
-}
-
-void GameObject::remove_effect(interaction_e key, Object_interaction* item)
-{
-	if (m_active_state)
-	{
-		if (m_active_state->m_item.find(key) != m_active_state->m_item.end())
-		{
-			m_active_state->m_item[key]->remove(item);
 		}
 	}
 }
@@ -888,6 +902,7 @@ Object_part::Object_part(GameObject* item) :Inventory_cell(item)
 	m_interaction_message_type = interaction_message_type_e::part;
 	m_kind = entity_e::body_part;
 	m_owner = nullptr;
+	m_object_state.create_feature_list(feature_list_type_e::parts, interaction_e::body);
 };
 
 Object_part* Object_part::clone()

@@ -231,7 +231,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::mem_part:
 	{
 		Object_part* item = new Object_part();
-		item->m_interaction_message_type = interaction_message_type_e::single;
+		item->m_interaction_message_type = interaction_message_type_e::part;
 		item->m_part_kind = get_body_part_e(arg[0]);
 		item->m_name = arg[1];
 		m_slot = item;
@@ -371,6 +371,7 @@ void GameObjectManager::parser(const std::string& command)
 		}
 		}
 		m_current_list = list;
+		m_stack_list.push_front(list);
 		break;
 	}
 	case command_e::feature_list:
@@ -530,15 +531,6 @@ void GameObjectManager::parser(const std::string& command)
 		m_slot = item;
 		break;
 	}
-	case command_e::Instruction_slot_check_tag:
-	{
-		Instruction_slot_check_tag* item = new Instruction_slot_check_tag();
-		item->m_interaction_message_type = interaction_message_type_e::single;
-		item->m_subtype = get_object_tag_e(arg[0]);
-		item->m_value = m_slot;
-		m_slot = item;
-		break;
-	}
 	case command_e::stack_tag:
 	{
 		Object_tag* tag;
@@ -547,43 +539,84 @@ void GameObjectManager::parser(const std::string& command)
 		case object_tag_e::poison_resist:
 		{
 			tag = new ObjectTag::Poison_resist();
+			m_stack_list.front()->add(tag);
 			break;
 		}
 		case object_tag_e::mortal:
 		{
 			tag = new ObjectTag::Mortal();
+			m_stack_list.front()->add(tag);
 			break;
 		}
 		case object_tag_e::purification_from_poison:
 		{
 			tag = new ObjectTag::Purification_from_poison();
+			m_stack_list.front()->add(tag);
 			break;
 		}
 		case object_tag_e::activator:
 		{
 			tag = new ObjectTag::Activator();
+			m_stack_list.front()->add(tag);
 			break;
 		}
 		case object_tag_e::fast_move:
 		{
 			tag = new ObjectTag::Fast_move();
+			m_stack_list.front()->add(tag);
+			break;
+		}
+		case object_tag_e::equippable:
+		{
+			tag = new ObjectTag::Equippable();
+			static_cast<ObjectTag::Equippable*>(tag)->m_value = m_slot;
+			static_cast<ObjectTag::Equippable*>(tag)->m_condition = Effect_functions::create_feature_list(feature_list_type_e::generic, interaction_e::action);
+			m_stack_list.front()->add(tag);
+			m_stack_list.push_front(static_cast<ObjectTag::Equippable*>(tag)->m_condition);
+			m_slot = tag;
+			break;
+		}
+		case object_tag_e::requirements_to_object:
+		{
+			tag = new ObjectTag::Requirements_to_object();
+			static_cast<ObjectTag::Requirements_to_object*>(tag)->m_value = m_slot;
+			m_stack_list.front()->add(tag);
+			m_slot = tag;
 			break;
 		}
 		default:
 		{
 			tag = new ObjectTag::Label(get_object_tag_e(arg[0]));
+			m_stack_list.front()->add(tag);
 			break;
 		}
 		}
-		m_stack_list.front()->add(tag);
 		break;
 	}
-	case command_e::Instruction_slot_equip:
+	case command_e::instruction_check_part_type:
 	{
-		Instruction_slot_equip* item = new Instruction_slot_equip();
+		Instruction_check_part_type* item = new Instruction_check_part_type();
 		item->m_interaction_message_type = interaction_message_type_e::single;
-		item->m_value = m_slot;
+		item->m_value = get_body_part_e(arg[0]);
 		m_slot = item;
+		break;
+	}
+	case command_e::instruction_check_tag:
+	{
+		Instruction_check_tag* item = new Instruction_check_tag();
+		item->m_interaction_message_type = interaction_message_type_e::single;
+		item->m_value = get_object_tag_e(arg[0]);
+		m_slot = item;
+		break;
+	}
+	case command_e::slot_to_list:
+	{
+		m_stack_list.front()->add(m_slot);
+		break;
+	}
+	case command_e::list_to_slot:
+	{
+		m_slot = m_stack_list.front();
 		break;
 	}
 	}
@@ -636,9 +669,11 @@ void GameObjectManager::init()
 	m_commands["new_template_part"] = command_e::new_template_part;
 	m_commands["template_part"] = command_e::template_part;
 	m_commands["mem_instruction_slot_link"] = command_e::mem_instruction_slot_link;
-	m_commands["Instruction_slot_check_tag"] = command_e::Instruction_slot_check_tag;
 	m_commands["stack_tag"] = command_e::stack_tag;
-	m_commands["Instruction_slot_equip"] = command_e::Instruction_slot_equip;
+	m_commands["instruction_check_part_type"] = command_e::instruction_check_part_type;
+	m_commands["instruction_check_tag"] = command_e::instruction_check_tag;
+	m_commands["slot_to_list"] = command_e::slot_to_list;
+	m_commands["list_to_slot"] = command_e::list_to_slot;
 
 	m_to_object_state_e["alive"] = object_state_e::alive;
 	m_to_object_state_e["dead"] = object_state_e::dead;
@@ -728,6 +763,9 @@ void GameObjectManager::init()
 	m_to_object_tag_e["seethrough_able"] = object_tag_e::seethrough_able;
 	m_to_object_tag_e["activator"] = object_tag_e::activator;
 	m_to_object_tag_e["fast_move"] = object_tag_e::fast_move;
+	m_to_object_tag_e["equippable"] = object_tag_e::equippable;
+	m_to_object_tag_e["ring"] = object_tag_e::ring;
+	m_to_object_tag_e["requirements_to_object"] = object_tag_e::requirements_to_object;
 
 	m_object_tag_string[object_tag_e::poison_resist] = "сопротивление к яду";
 	m_object_tag_string[object_tag_e::purification_from_poison] = "очищение от яда";
@@ -737,6 +775,9 @@ void GameObjectManager::init()
 	m_object_tag_string[object_tag_e::seethrough_able] = "не загораживает обзор";
 	m_object_tag_string[object_tag_e::activator] = "активирует/деактивирует механизмы";
 	m_object_tag_string[object_tag_e::fast_move] = "быстрое передвижение";
+	m_object_tag_string[object_tag_e::equippable] = "можно одеть";
+	m_object_tag_string[object_tag_e::ring] = "кольцо";
+	m_object_tag_string[object_tag_e::requirements_to_object] = "требования к предмету";
 
 	m_to_action_e["equip"] = action_e::equip;
 	m_to_action_e["hit"] = action_e::hit;
@@ -756,6 +797,8 @@ void GameObjectManager::init()
 	m_to_body_part_e["head"] = body_part_e::head;
 	m_to_body_part_e["hand"] = body_part_e::hand;
 	m_to_body_part_e["foot"] = body_part_e::foot;
+	m_to_body_part_e["waist"] = body_part_e::waist;
+	m_to_body_part_e["container"] = body_part_e::container;
 
 	m_to_feature_list_type_e["action"] = feature_list_type_e::action;
 	m_to_feature_list_type_e["tag"] = feature_list_type_e::tag;
