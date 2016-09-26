@@ -1,34 +1,34 @@
 new_template_part hand,рука,humanoid_hand
-stack_list_push action,action
+list yy,action,action
 action hit_melee
-stack_list_pop
-stack_list_push parts,body
+list_pop
+list yy,parts,body
 part wrist,кисть
-stack_list_push tag,tag
+list yy,tag,tag
 stack_tag pick_able
-stack_list_pop
-stack_list_push action,action
+list_pop
+list yy,action,action
 action pick
-stack_list_pop
-stack_list_push parts,body
+list_pop
+list yy,parts,body
 part finger,палец
 part finger,палец
 part finger,палец
 part finger,палец
 part finger,палец
-stack_list_pop
-stack_list_pop
-stack_attribute_map_pop
-stack_attribute_map_pop
-stack_attribute_map_pop
-stack_attribute_map_pop
+list_pop
+list_pop
+map_pop
+map_pop
+map_pop
+map_pop
 
 new_template_part container,сумка,cell_for_ring
-stack_list_push tag,tag
+list yy,tag,tag
 instruction_check_tag ring
 stack_tag requirements_to_object
-stack_list_pop
-stack_attribute_map_pop
+list_pop
+map_pop
 
 object wall
 state alive
@@ -80,31 +80,33 @@ ai non_humanoid,0
 size 2,2,4
 tile_manager 8
 optical 0.3,0.3,0.3
-feature_list vision,vision
-mem_list
-create_list vision_component,vision_component,32,0,300,60
-copy_list_to_slot
-add_slot_to_mem_list
-feature_list action,action
-add_action equip
-add_action open
-add_action push
-add_action use
-stack_list_push parameter,health,100,100
-stack_list_push parameter,strength,8,100
-stack_list_push parameter,intelligence,8,100
-stack_list_push parameter,dexterity,25,100
-stack_list_push parameter,hunger,0,1000
-stack_list_push parameter,thirst,0,1000
-stack_list_push parameter,skill_sword,50000,100000
-stack_list_push parameter,evasion_skill,25000,100000
-stack_list_push parameter,skill_unarmed_combat,50000,100000
-stack_list_push generic,buff
-stack_list_push generic,damage
-stack_list_push parts,body
+list yy,vision,vision
+list ny,vision_component,vision_component,32,0,300,60
+list_to_slot
+list_pop
+slot_to_list
+list_pop
+list yy,action,action
+action equip
+action open
+action push
+action use
+list_pop
+list yn,parameter,health,100,100
+list yn,parameter,strength,8,100
+list yn,parameter,intelligence,8,100
+list yn,parameter,dexterity,25,100
+list yn,parameter,hunger,0,1000
+list yn,parameter,thirst,0,1000
+list yn,parameter,skill_sword,50000,100000
+list yn,parameter,evasion_skill,25000,100000
+list yn,parameter,skill_unarmed_combat,50000,100000
+list yn,generic,buff
+list yn,generic,damage
+list yy,parts,body
 part waist,талия
 template_part humanoid_hand
-stack_attribute_map_pop
+map_pop
 state dead
 size 2,2,2
 tile_manager 10
@@ -114,58 +116,59 @@ state equip,finger
 size 1,1,0
 icon 2
 tile_manager 25
-stack_list_push tag,tag
+list yy,tag,tag
 tag pick_able
 tag pass_able
 tag seethrough_able
+tag ring
 mem_effect value,6
 mem_instruction_slot_link health
 stack_tag equippable
 instruction_check_part_type container
 slot_to_list
-stack_list_pop
-stack_list_pop
-stack_attribute_map_pop
+list_pop
+list_pop
+map_pop
 
 object belt
 state equip,finger
 size 1,1,1
 icon 6
 tile_manager 28
-stack_list_push tag,tag
+list yy,tag,tag
 tag pick_able
 tag pass_able
 tag seethrough_able
 mem_part container,пояс
-stack_attribute_map_pop
+map_pop
 mem_instruction_slot_link body
 stack_tag equippable
 instruction_check_part_type waist
 slot_to_list
-stack_list_pop
-stack_list_pop
-stack_attribute_map_pop
+list_pop
+list_pop
+map_pop
 
 object bag
 state equip,finger
 size 1,1,1
 icon 7
 tile_manager 29
-stack_list_push tag,tag
+list yy,tag,tag
 tag pick_able
 tag pass_able
 tag seethrough_able
-create_list generic,body
+list ny,generic,body
 template_part cell_for_ring
-stack_attribute_map_pop
+map_pop
 template_part cell_for_ring
-stack_attribute_map_pop
+map_pop
 list_to_slot
-stack_list_pop
+list_pop
 mem_instruction_slot_link body
 stack_tag equippable
 instruction_check_part_type container
 slot_to_list
-stack_list_pop
-stack_list_pop
-stack_attribute_map_pop
+list_pop
+list_pop
+map_pop
