@@ -189,43 +189,6 @@ void GameObjectManager::parser(const std::string& command)
 		m_object->m_active_state->m_light = light;
 		break;
 	}
-	case command_e::add_slot:
-	{
-		m_object->add_effect(get_interaction_e(arg[0]), m_slot);
-		break;
-	}
-	case command_e::add_slot_mem:
-	{
-		m_mem_state->add_effect(get_interaction_e(arg[0]), m_slot);
-		break;
-	}
-	case command_e::mem_action:
-	{
-		action_e action = get_action_e(arg[0]);
-		Action* item = Application::instance().m_actions[action];
-		m_slot = item;
-		break;
-	}
-	case command_e::mem_part:
-	{
-		Object_part* item = new Object_part();
-		item->m_interaction_message_type = interaction_message_type_e::part;
-		item->m_part_kind = get_body_part_e(arg[0]);
-		item->m_name = arg[1];
-		m_slot = item;
-		m_mem_state = &item->m_object_state;
-		m_stack_attribute_map.push_front(&item->m_object_state);
-		break;
-	}
-	case command_e::add_part:
-	{
-		Object_part* item = new Object_part();
-		item->m_interaction_message_type = interaction_message_type_e::single;
-		item->m_part_kind = get_body_part_e(arg[0]);
-		item->m_name = arg[1];
-		m_slot = item;
-		break;
-	}
 	case command_e::mem_slot_set_state:
 	{
 		Slot_set_state* item = new Slot_set_state();
@@ -327,86 +290,6 @@ void GameObjectManager::parser(const std::string& command)
 		m_slot = item;
 		break;
 	}
-	case command_e::feature_list:
-	{
-		feature_list_type_e list_type = get_feature_list_type_e(arg[0]);
-		Interaction_list* list = m_object->m_active_state->create_feature_list(list_type, get_interaction_e(arg[1]));
-		list->m_list_type = list_type;
-		switch (list_type)
-		{
-		case feature_list_type_e::parameter:
-			{
-				Parameter_list* parameter_list = static_cast<Parameter_list*>(list);
-				parameter_list->m_basic_value = std::stoi(arg[2]);
-				parameter_list->m_basic_limit = std::stoi(arg[3]);
-				break;
-			}
-		case feature_list_type_e::vision_component:
-		{
-			Vision_component* v_list = static_cast<Vision_component*>(list);
-			v_list->m_basic_value = AI_FOV(std::stoi(arg[2]), Application::instance().m_ai_manager->m_fov_qualifiers[std::stoi(arg[3])], std::stoi(arg[4]), std::stoi(arg[5]));
-			break;
-		}
-		}
-		m_current_list = list;
-		break;
-	}
-	case command_e::feature_list_mem:
-	{
-		feature_list_type_e list_type = get_feature_list_type_e(arg[0]);
-		Interaction_list* list= m_mem_state->create_feature_list(list_type, get_interaction_e(arg[1]));
-		list->m_list_type = list_type;
-		switch (list_type)
-		{
-		case feature_list_type_e::parameter:
-		{
-			Parameter_list* parameter_list = static_cast<Parameter_list*>(list);
-			parameter_list->m_basic_value = std::stoi(arg[2]);
-			parameter_list->m_basic_limit = std::stoi(arg[3]);
-			break;
-		}
-		}
-		break;
-	}
-	case command_e::tag:
-	{
-		Object_tag* tag;
-		switch (get_object_tag_e(arg[0]))
-		{
-		case object_tag_e::poison_resist:
-		{
-			tag = new ObjectTag::Poison_resist();
-			break;
-		}
-		case object_tag_e::mortal:
-		{
-			tag = new ObjectTag::Mortal();
-			break;
-		}
-		case object_tag_e::purification_from_poison:
-		{
-			tag = new ObjectTag::Purification_from_poison();
-			break;
-		}
-		case object_tag_e::activator:
-		{
-			tag = new ObjectTag::Activator();
-			break;
-		}
-		case object_tag_e::fast_move:
-		{
-			tag = new ObjectTag::Fast_move();
-			break;
-		}
-		default:
-		{
-			tag = new ObjectTag::Label(get_object_tag_e(arg[0]));
-			break;
-		}
-		}
-		m_object->add_effect(interaction_e::tag,tag);
-		break;
-	}
 	case command_e::list:
 	{
 		feature_list_type_e list_type = get_feature_list_type_e(arg[1]);
@@ -444,12 +327,12 @@ void GameObjectManager::parser(const std::string& command)
 		}
 		break;
 	}
-	case command_e::list_pop:
+	case command_e::pop_list:
 	{
 		m_stack_list.pop_front();
 		break;
 	}
-	case command_e::map_pop:
+	case command_e::pop_map:
 	{
 		m_stack_attribute_map.pop_front();
 		break;
@@ -475,10 +358,20 @@ void GameObjectManager::parser(const std::string& command)
 	{
 		Object_part* item = new Object_part();
 		item->m_interaction_message_type = interaction_message_type_e::part;
-		item->m_part_kind = get_body_part_e(arg[0]);
-		item->m_name = arg[1];
-		m_stack_attribute_map.push_front(&item->m_object_state);
-		m_stack_list.front()->add(item);
+		item->m_part_kind = get_body_part_e(arg[1]);
+		item->m_name = arg[2];
+		if (arg[0][0] == 'y')
+		{
+			m_stack_attribute_map.push_front(&item->m_object_state);
+		}
+		if (arg[0][1] == 'y')
+		{
+			m_stack_list.front()->add(item);
+		}
+		if (arg[0][2] == 'y')
+		{
+			m_slot = item;
+		}
 		break;
 	}
 	case command_e::action:
@@ -497,10 +390,10 @@ void GameObjectManager::parser(const std::string& command)
 		m_slot = item;
 		break;
 	}
-	case command_e::stack_tag:
+	case command_e::tag:
 	{
 		Object_tag* tag;
-		switch (get_object_tag_e(arg[0]))
+		switch (get_object_tag_e(arg[1]))
 		{
 		case object_tag_e::poison_resist:
 		{
@@ -539,7 +432,6 @@ void GameObjectManager::parser(const std::string& command)
 			static_cast<ObjectTag::Equippable*>(tag)->m_condition = Effect_functions::create_feature_list(feature_list_type_e::generic, interaction_e::action);
 			m_stack_list.front()->add(tag);
 			m_stack_list.push_front(static_cast<ObjectTag::Equippable*>(tag)->m_condition);
-			m_slot = tag;
 			break;
 		}
 		case object_tag_e::requirements_to_object:
@@ -547,15 +439,18 @@ void GameObjectManager::parser(const std::string& command)
 			tag = new ObjectTag::Requirements_to_object();
 			static_cast<ObjectTag::Requirements_to_object*>(tag)->m_value = m_slot;
 			m_stack_list.front()->add(tag);
-			m_slot = tag;
 			break;
 		}
 		default:
 		{
-			tag = new ObjectTag::Label(get_object_tag_e(arg[0]));
+			tag = new ObjectTag::Label(get_object_tag_e(arg[1]));
 			m_stack_list.front()->add(tag);
 			break;
 		}
+		}
+		if (arg[0][0] == 'y')
+		{
+			m_slot = tag;
 		}
 		break;
 	}
@@ -600,11 +495,8 @@ void GameObjectManager::init()
 	m_commands["icon"] = command_e::icon;
 	m_commands["tile_manager"] = command_e::tile_manager;
 	m_commands["light"] = command_e::light;
-	m_commands["add_slot"] = command_e::add_slot;
-	m_commands["add_slot_mem"] = command_e::add_slot_mem;
 	m_commands["state"] = command_e::state;
 	m_commands["mem_effect"] = command_e::mem_effect;
-	m_commands["mem_part"] = command_e::mem_part;
 	m_commands["mem_slot_timer"] = command_e::mem_slot_timer;
 	m_commands["mem_slot_set_state"] = command_e::mem_slot_set_state;
 	m_commands["mem_slot_time"] = command_e::mem_slot_time;
@@ -616,21 +508,16 @@ void GameObjectManager::init()
 	m_commands["mem_slot_allocator"] = command_e::mem_slot_allocator;
 	m_commands["mem_impact_random_value"] = command_e::mem_impact_random_value;
 	m_commands["mem_impact_copy_chance"] = command_e::mem_impact_copy_chance;
-	m_commands["mem_action"] = command_e::mem_action;
+	
 	m_commands["tag"] = command_e::tag;
-	m_commands["feature_list"] = command_e::feature_list;
-	m_commands["feature_list_mem"] = command_e::feature_list_mem;
-	m_commands["add_part"] = command_e::add_part;
-
 	m_commands["list"] = command_e::list;
-	m_commands["list_pop"] = command_e::list_pop;
-	m_commands["map_pop"] = command_e::map_pop;
+	m_commands["pop_list"] = command_e::pop_list;
+	m_commands["pop_map"] = command_e::pop_map;
 	m_commands["part"] = command_e::part;
 	m_commands["action"] = command_e::action;
 	m_commands["new_template_part"] = command_e::new_template_part;
 	m_commands["template_part"] = command_e::template_part;
 	m_commands["mem_instruction_slot_link"] = command_e::mem_instruction_slot_link;
-	m_commands["stack_tag"] = command_e::stack_tag;
 	m_commands["instruction_check_part_type"] = command_e::instruction_check_part_type;
 	m_commands["instruction_check_tag"] = command_e::instruction_check_tag;
 	m_commands["slot_to_list"] = command_e::slot_to_list;

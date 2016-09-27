@@ -1,34 +1,32 @@
 new_template_part hand,рука,humanoid_hand
 list yy,action,action
 action hit_melee
-list_pop
+pop_list
 list yy,parts,body
-part wrist,кисть
+part yy,wrist,кисть
 list yy,tag,tag
-stack_tag pick_able
-list_pop
+tag y,pick_able
+pop_list
 list yy,action,action
 action pick
-list_pop
+pop_list
 list yy,parts,body
-part finger,палец
-part finger,палец
-part finger,палец
-part finger,палец
-part finger,палец
-list_pop
-list_pop
-map_pop
-map_pop
-map_pop
-map_pop
+part nyn,finger,палец
+part nyn,finger,палец
+part nyn,finger,палец
+part nyn,finger,палец
+part nyn,finger,палец
+pop_list
+pop_list
+pop_map
+pop_map
 
 new_template_part container,сумка,cell_for_ring
 list yy,tag,tag
 instruction_check_tag ring
-stack_tag requirements_to_object
-list_pop
-map_pop
+tag n,requirements_to_object
+pop_list
+pop_map
 
 object wall
 state alive
@@ -61,9 +59,10 @@ object floor
 state alive
 size 1,1,0
 tile_manager 6
-feature_list tag,tag
-tag pass_able
-tag seethrough_able
+list yy,tag,tag
+tag y,pass_able
+tag y,seethrough_able
+pop_list
 layer 0
 
 object torch
@@ -71,8 +70,9 @@ state alive
 size 1,1,3
 tile_manager 7
 light 80,80,80
-feature_list tag,tag
-tag seethrough_able
+list yy,tag,tag
+tag y,seethrough_able
+pop_list
 
 object human
 state alive
@@ -83,15 +83,15 @@ optical 0.3,0.3,0.3
 list yy,vision,vision
 list ny,vision_component,vision_component,32,0,300,60
 list_to_slot
-list_pop
+pop_list
 slot_to_list
-list_pop
+pop_list
 list yy,action,action
 action equip
 action open
 action push
 action use
-list_pop
+pop_list
 list yn,parameter,health,100,100
 list yn,parameter,strength,8,100
 list yn,parameter,intelligence,8,100
@@ -104,9 +104,9 @@ list yn,parameter,skill_unarmed_combat,50000,100000
 list yn,generic,buff
 list yn,generic,damage
 list yy,parts,body
-part waist,талия
+part nyn,waist,талия
 template_part humanoid_hand
-map_pop
+pop_map
 state dead
 size 2,2,2
 tile_manager 10
@@ -117,18 +117,18 @@ size 1,1,0
 icon 2
 tile_manager 25
 list yy,tag,tag
-tag pick_able
-tag pass_able
-tag seethrough_able
-tag ring
+tag n,pick_able
+tag n,pass_able
+tag n,seethrough_able
+tag n,ring
 mem_effect value,6
 mem_instruction_slot_link health
-stack_tag equippable
+tag n,equippable
 instruction_check_part_type container
 slot_to_list
-list_pop
-list_pop
-map_pop
+pop_list
+pop_list
+pop_map
 
 object belt
 state equip,finger
@@ -136,18 +136,17 @@ size 1,1,1
 icon 6
 tile_manager 28
 list yy,tag,tag
-tag pick_able
-tag pass_able
-tag seethrough_able
-mem_part container,пояс
-map_pop
+tag n,pick_able
+tag n,pass_able
+tag n,seethrough_able
+part nny,container,пояс
 mem_instruction_slot_link body
-stack_tag equippable
+tag n,equippable
 instruction_check_part_type waist
 slot_to_list
-list_pop
-list_pop
-map_pop
+pop_list
+pop_list
+pop_map
 
 object bag
 state equip,finger
@@ -155,20 +154,20 @@ size 1,1,1
 icon 7
 tile_manager 29
 list yy,tag,tag
-tag pick_able
-tag pass_able
-tag seethrough_able
+tag n,pick_able
+tag n,pass_able
+tag n,seethrough_able
 list ny,generic,body
 template_part cell_for_ring
-map_pop
+pop_map
 template_part cell_for_ring
-map_pop
+pop_map
 list_to_slot
-list_pop
+pop_list
 mem_instruction_slot_link body
-stack_tag equippable
+tag n,equippable
 instruction_check_part_type container
 slot_to_list
-list_pop
-list_pop
-map_pop
+pop_list
+pop_list
+pop_map
