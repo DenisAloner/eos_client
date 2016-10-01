@@ -287,6 +287,7 @@ enum class interaction_message_type_e
 	mover,
 	allocator,
 	slot_time,
+	tag,
 	instruction_slot_parameter,
 	instruction_game_owner
 };
@@ -367,7 +368,8 @@ enum class object_tag_e
 	fast_move,
 	equippable,
 	ring,
-	requirements_to_object
+	requirements_to_object,
+	cursed
 };
 
 enum class feature_list_type_e
@@ -555,10 +557,11 @@ public:
 
 };
 
-enum class instruction_action_type_e
+enum class mode_t
 {
 	equip,
-	unequip
+	unequip,
+	check
 };
 
 //struct Game_log_message_EventArgs

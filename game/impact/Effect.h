@@ -107,9 +107,11 @@ public:
 	Tag_list();
 	virtual Tag_list* clone();
 
-
+	virtual void update();
 	virtual void save();
 	virtual void load();
+private:
+	void update_list(Object_interaction* list);
 };
 
 class Parts_list :public  Interaction_list
@@ -454,13 +456,7 @@ class Instruction_slot_parameter :public Interaction_slot
 {
 public:
 
-	enum class mode_t
-	{
-		equip,
-		unequip,
-		check
-	};
-
+	
 	Parameter* m_parameter;
 	mode_t m_mode;
 	bool m_result;
@@ -481,6 +477,7 @@ class Instruction_game_owner :public Object_interaction
 public:
 
 	Game_object_owner* m_value;
+	mode_t m_mode;
 	bool m_result;
 
 	Instruction_game_owner();

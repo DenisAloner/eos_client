@@ -57,9 +57,41 @@ Interaction_list* Interaction_list::clone()
 
 void Interaction_list::apply_effect(GameObject* unit, Object_interaction* object)
 {
-	for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+	if (object)
 	{
-		(*item)->apply_effect(unit, object);
+		switch (object->m_interaction_message_type)
+		{
+		case interaction_message_type_e::instruction_game_owner:
+		{
+			Instruction_game_owner* i = static_cast<Instruction_game_owner*>(object);
+			for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+			{
+				i->m_result = false;
+				(*item)->apply_effect(unit, object);
+				if (!i->m_result)
+				{
+					return;
+				}
+			}
+			i->m_result = true;
+			break;
+		}
+		default:
+		{
+			for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+			{
+				(*item)->apply_effect(unit, object);
+			}
+			break;
+		}
+		}
+	}
+	else
+	{
+		for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+		{
+			(*item)->apply_effect(unit, object);
+		}
 	}
 }
 
@@ -583,6 +615,51 @@ Tag_list* Tag_list::clone()
 	return result;
 }
 
+void Tag_list::update_list(Object_interaction* list)
+{
+
+	switch (list->m_interaction_message_type)
+	{
+	case interaction_message_type_e::list:
+	{
+		Interaction_list* list_item = static_cast<Interaction_list*>(list);
+		for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); ++current)
+		{
+			update_list((*current));
+		}
+		break;
+	}
+	case interaction_message_type_e::slot_time:
+	{
+		LOG(INFO) << "buff in parameter";
+		Interaction_time* item = static_cast<Interaction_time*>(list);
+		update_list(item->m_value);
+		break;
+	}
+	default:
+	{
+		Object_tag* item = static_cast<Object_tag*>(list);
+		switch (item->m_type)
+		{
+		case object_tag_e::equippable:
+		{
+			ObjectTag::Equippable* t = static_cast<ObjectTag::Equippable*>(item);
+			//m_value = m_value + item->m_value;
+			break;
+		}
+
+		}
+	}
+	}
+
+}
+
+void Tag_list::update()
+{
+	//LOG(INFO) << "ÒÈÏ ÏÀÐÀÌÅÒÐÀ " << std::to_string((int)m_subtype);
+	update_list(this);
+}
+
 void Tag_list::save()
 {
 	LOG(INFO) << "Ëèñò ìåòîê";
@@ -650,23 +727,44 @@ void Parts_list::update_list(Object_interaction* list)
 		update_list(item->m_value);
 		break;
 	}
-	default:
+	case interaction_message_type_e::part:
 	{
-	/*	Effect* item;
-		item = static_cast<Effect*>(list);
-		switch (item->m_subtype)
+		Object_part* item = static_cast<Object_part*>(list);
+		if (item->m_item)
 		{
-		case effect_e::value:
-		{
-			m_value = m_value + item->m_value;
-			break;
+			ObjectTag::Equippable* tag_equippable = static_cast<ObjectTag::Equippable*>(item->m_item->get_tag(object_tag_e::equippable));
+			if (tag_equippable)
+			{
+				Instruction_game_owner* i = new Instruction_game_owner();
+				i->m_value = item;
+				tag_equippable->m_condition->apply_effect(nullptr, i);
+				if (!i->m_result)
+				{
+					item->m_item = nullptr;
+					item->m_owner = nullptr;
+					i->m_mode = mode_t::unequip;
+					tag_equippable->m_value->apply_effect(nullptr, i);
+					return;
+				};
+				Object_tag* tag_requirements = item->m_object_state.get_tag(object_tag_e::requirements_to_object);
+				if (tag_requirements)
+				{
+					i->m_result = false;
+					i->m_value = item->m_item;
+					tag_requirements->apply_effect(nullptr, i);
+					if (!i->m_result) 
+					{ 
+						item->m_item = nullptr;
+						item->m_owner = nullptr;
+						i->m_value = item;
+						i->m_mode = mode_t::unequip;
+						tag_equippable->m_value->apply_effect(nullptr, i);
+						return; 
+					};
+					LOG(INFO) << "yeah";
+				}
+			}
 		}
-		case effect_e::limit:
-		{
-			m_limit = m_limit + item->m_value;
-			break;
-		}
-		}*/
 	}
 	}
 
@@ -1318,7 +1416,10 @@ void Effect::load()
 
 // Object_tag
 
-Object_tag::Object_tag(object_tag_e key) :m_type(key){};
+Object_tag::Object_tag(object_tag_e key) :m_type(key)
+{
+	m_interaction_message_type = interaction_message_type_e::tag;
+};
 
 void Object_tag::description(std::list<std::string>* info, int level)
 {
@@ -1675,21 +1776,47 @@ void Instruction_slot_link::description(std::list<std::string>* info, int level)
 
 void Instruction_slot_link::apply_effect(GameObject* unit, Object_interaction* object)
 {
-	Instruction_slot_parameter* parameter = static_cast<Instruction_slot_parameter*>(object);
-	Parameter& p(*(parameter->m_parameter));
-	Object_part* part = static_cast<Object_part*>(p[1].m_object->m_owner);
-	auto i = part->m_object_state.get_list(m_subtype);
-	if (i)
+	switch (object->m_interaction_message_type)
 	{
-		Instruction_slot_parameter* p = static_cast<Instruction_slot_parameter*>(object);
-		if (p->m_mode == Instruction_slot_parameter::mode_t::equip)
+	case interaction_message_type_e::instruction_game_owner:
+	{
+		Instruction_game_owner* parameter = static_cast<Instruction_game_owner*>(object);
+		Object_part* part = static_cast<Object_part*>(parameter->m_value);
+		LOG(INFO) << std::to_string((int)parameter->m_value->m_kind);
+		auto i = part->m_object_state.get_list(m_subtype);
+		if (i)
 		{
-			i->add(m_value);
+			if (parameter->m_mode == mode_t::equip)
+			{
+				i->add(m_value);
+			}
+			else
+			{
+				i->remove(m_value);
+			}
 		}
-		else
+		break;
+	}
+	default:
+	{
+		Instruction_slot_parameter* parameter = static_cast<Instruction_slot_parameter*>(object);
+		Parameter& p(*(parameter->m_parameter));
+		Object_part* part = static_cast<Object_part*>(p[1].m_object->m_owner);
+		auto i = part->m_object_state.get_list(m_subtype);
+		if (i)
 		{
-			i->remove(m_value);
+			Instruction_slot_parameter* p = static_cast<Instruction_slot_parameter*>(object);
+			if (p->m_mode == mode_t::equip)
+			{
+				i->add(m_value);
+			}
+			else
+			{
+				i->remove(m_value);
+			}
 		}
+		break;
+	}
 	}
 }
 
@@ -1785,6 +1912,7 @@ ObjectTag::Equippable* ObjectTag::Equippable::clone()
 	return result;
 }
 
+
 void ObjectTag::Equippable::apply_effect(GameObject* unit, Object_interaction* object) 
 {
 	switch (object->m_interaction_message_type)
@@ -1813,7 +1941,7 @@ void ObjectTag::Equippable::apply_effect(GameObject* unit, Object_interaction* o
 			if (!i->m_result) { return; };
 			if (p[2].m_owner->m_kind == entity_e::body_part)
 			{
-				Object_part* part =static_cast<Object_part*>( p[2].m_owner);
+				Object_part* part = static_cast<Object_part*>(p[2].m_owner);
 				Object_tag* t = part->m_object_state.get_tag(object_tag_e::requirements_to_object);
 				if (t)
 				{
@@ -1845,7 +1973,7 @@ void ObjectTag::Equippable::apply_effect(GameObject* unit, Object_interaction* o
 			Object_part* part = static_cast<Object_part*>(p[1].m_object->m_owner);
 			part->m_item = nullptr;
 			part = nullptr;
-			parameter->m_mode = Instruction_slot_parameter::mode_t::unequip;
+			parameter->m_mode = mode_t::unequip;
 			m_value->apply_effect(unit, object);
 			break;
 		}
@@ -1872,7 +2000,7 @@ void ObjectTag::Equippable::apply_effect(GameObject* unit, Object_interaction* o
 			Object_part* part = static_cast<Object_part*>((*p)[2].m_owner);
 			part->m_item = (*p)[1].m_object;
 			(*p)[1].m_object->m_owner = part;
-			parameter->m_mode = Instruction_slot_parameter::mode_t::equip;
+			parameter->m_mode = mode_t::equip;
 			m_value->apply_effect(unit, object);
 			break;
 		}

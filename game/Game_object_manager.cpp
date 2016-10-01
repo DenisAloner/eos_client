@@ -398,31 +398,26 @@ void GameObjectManager::parser(const std::string& command)
 		case object_tag_e::poison_resist:
 		{
 			tag = new ObjectTag::Poison_resist();
-			m_stack_list.front()->add(tag);
 			break;
 		}
 		case object_tag_e::mortal:
 		{
 			tag = new ObjectTag::Mortal();
-			m_stack_list.front()->add(tag);
 			break;
 		}
 		case object_tag_e::purification_from_poison:
 		{
 			tag = new ObjectTag::Purification_from_poison();
-			m_stack_list.front()->add(tag);
 			break;
 		}
 		case object_tag_e::activator:
 		{
 			tag = new ObjectTag::Activator();
-			m_stack_list.front()->add(tag);
 			break;
 		}
 		case object_tag_e::fast_move:
 		{
 			tag = new ObjectTag::Fast_move();
-			m_stack_list.front()->add(tag);
 			break;
 		}
 		case object_tag_e::equippable:
@@ -430,25 +425,34 @@ void GameObjectManager::parser(const std::string& command)
 			tag = new ObjectTag::Equippable();
 			static_cast<ObjectTag::Equippable*>(tag)->m_value = m_slot;
 			static_cast<ObjectTag::Equippable*>(tag)->m_condition = Effect_functions::create_feature_list(feature_list_type_e::generic, interaction_e::action);
-			m_stack_list.front()->add(tag);
-			m_stack_list.push_front(static_cast<ObjectTag::Equippable*>(tag)->m_condition);
 			break;
 		}
 		case object_tag_e::requirements_to_object:
 		{
 			tag = new ObjectTag::Requirements_to_object();
 			static_cast<ObjectTag::Requirements_to_object*>(tag)->m_value = m_slot;
-			m_stack_list.front()->add(tag);
 			break;
 		}
 		default:
 		{
 			tag = new ObjectTag::Label(get_object_tag_e(arg[1]));
-			m_stack_list.front()->add(tag);
+			
 			break;
 		}
 		}
 		if (arg[0][0] == 'y')
+		{
+			m_stack_list.front()->add(tag);
+		}
+		switch (get_object_tag_e(arg[1]))
+		{
+		case object_tag_e::equippable:
+		{
+			m_stack_list.push_front(static_cast<ObjectTag::Equippable*>(tag)->m_condition);
+			break;
+		}
+		}
+		if (arg[0][1] == 'y')
 		{
 			m_slot = tag;
 		}
@@ -614,6 +618,7 @@ void GameObjectManager::init()
 	m_to_object_tag_e["equippable"] = object_tag_e::equippable;
 	m_to_object_tag_e["ring"] = object_tag_e::ring;
 	m_to_object_tag_e["requirements_to_object"] = object_tag_e::requirements_to_object;
+	m_to_object_tag_e["cursed"] = object_tag_e::cursed;
 
 	m_object_tag_string[object_tag_e::poison_resist] = "сопротивление к €ду";
 	m_object_tag_string[object_tag_e::purification_from_poison] = "очищение от €да";
@@ -626,6 +631,7 @@ void GameObjectManager::init()
 	m_object_tag_string[object_tag_e::equippable] = "можно одеть";
 	m_object_tag_string[object_tag_e::ring] = "кольцо";
 	m_object_tag_string[object_tag_e::requirements_to_object] = "требовани€ к предмету";
+	m_object_tag_string[object_tag_e::cursed] = "наложено прокл€тье";
 
 	m_to_action_e["equip"] = action_e::equip;
 	m_to_action_e["hit"] = action_e::hit;

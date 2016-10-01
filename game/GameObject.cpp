@@ -69,7 +69,7 @@ Interaction_list* Attribute_map::get_list(interaction_e key)
 	auto value = m_item.find(key);
 	if (value != m_item.end())
 	{
-		return static_cast<Parts_list*>(value->second);
+		return value->second;
 	}
 	return nullptr;
 }
@@ -123,32 +123,46 @@ void Attribute_map::load()
 	}
 }
 
+void Attribute_map::get_tag_predicat(Object_interaction* object)
+{
+	if (!m_tag)
+	{
+		if (object->m_interaction_message_type == interaction_message_type_e::tag)
+		{
+			if (static_cast<Object_tag*>(object)->m_type == m_key) { m_tag=static_cast<Object_tag*>(object); }
+		}
+	}
+}
+
+
 bool Attribute_map::get_stat(object_tag_e key)
 {
-		auto list = m_item.find(interaction_e::tag);
-		if (list != m_item.end())
-		{
-			Tag_list* taglist = static_cast<Tag_list*>(list->second);
-			for (auto item = taglist->m_effect.begin(); item != taglist->m_effect.end(); ++item)
-			{
-				if (static_cast<Object_tag*>(*item)->m_type == key) { return true; }
-			}
-		}
-	return false;
+	m_tag = nullptr;
+	m_key = key;
+	auto list = m_item.find(interaction_e::tag);
+	if (list != m_item.end())
+	{
+		Tag_list* taglist = static_cast<Tag_list*>(list->second);
+		taglist->do_predicat(std::bind(&Attribute_map::get_tag_predicat, this, std::placeholders::_1));
+	}
+	return m_tag;
 }
 
 Object_tag* Attribute_map::get_tag(object_tag_e key)
 {
-		auto list = m_item.find(interaction_e::tag);
-		if (list != m_item.end())
+	m_tag = nullptr;
+	m_key = key;
+	auto list = m_item.find(interaction_e::tag);
+	if (list != m_item.end())
+	{
+		Tag_list* taglist = static_cast<Tag_list*>(list->second);
+		taglist->do_predicat(std::bind(&Attribute_map::get_tag_predicat, this, std::placeholders::_1));
+		/*for (auto item = taglist->m_effect.begin(); item != taglist->m_effect.end(); ++item)
 		{
-			Tag_list* taglist = static_cast<Tag_list*>(list->second);
-			for (auto item = taglist->m_effect.begin(); item != taglist->m_effect.end(); ++item)
-			{
-				if (static_cast<Object_tag*>(*item)->m_type == key) { return static_cast<Object_tag*>(*item); }
-			}
-		}
-	return nullptr;
+			if (static_cast<Object_tag*>(*item)->m_type == key) { return static_cast<Object_tag*>(*item); }
+		}*/
+	}
+	return m_tag;
 }
 
 Object_state::Object_state()
@@ -524,15 +538,7 @@ bool GameObject::get_stat(object_tag_e key)
 {
 	if (m_active_state)
 	{
-		auto list = m_active_state->m_item.find(interaction_e::tag);
-		if (list != m_active_state->m_item.end())
-		{
-			Tag_list* taglist = static_cast<Tag_list*>(list->second);
-			for (auto item = taglist->m_effect.begin(); item != taglist->m_effect.end(); ++item)
-			{
-				if (static_cast<Object_tag*>(*item)->m_type == key){ return true; }
-			}
-		}
+		return m_active_state->get_stat(key);
 	}
 	return false;
 }
@@ -541,15 +547,7 @@ Object_tag* GameObject::get_tag(object_tag_e key)
 {
 	if (m_active_state)
 	{
-		auto list = m_active_state->m_item.find(interaction_e::tag);
-		if (list != m_active_state->m_item.end())
-		{
-			Tag_list* taglist = static_cast<Tag_list*>(list->second);
-			for (auto item = taglist->m_effect.begin(); item != taglist->m_effect.end(); ++item)
-			{
-				if (static_cast<Object_tag*>(*item)->m_type == key){ return static_cast<Object_tag*>(*item); }
-			}
-		}
+		return m_active_state->get_tag(key);
 	}
 	return nullptr;
 }

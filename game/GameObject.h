@@ -91,6 +91,11 @@ public:
 	Interaction_list* get_list(interaction_e key);
 	bool get_stat(object_tag_e key);
 	Object_tag* get_tag(object_tag_e key);
+
+private:
+	object_tag_e m_key;
+	Object_tag* m_tag;
+	void get_tag_predicat(Object_interaction* object);
 };
 
 class Object_state : public Attribute_map
