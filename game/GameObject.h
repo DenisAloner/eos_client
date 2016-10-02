@@ -34,8 +34,8 @@ public:
 	entity_e m_kind;
 	Game_object_owner* m_owner;
 	
+	Game_object_owner* get_owner();
 	Game_object_owner* get_owner(entity_e kind);
-
 };
 
 class MapCell : public Game_object_owner

@@ -729,39 +729,45 @@ void Parts_list::update_list(Object_interaction* list)
 	}
 	case interaction_message_type_e::part:
 	{
-		Object_part* item = static_cast<Object_part*>(list);
-		if (item->m_item)
+		Object_part* part = static_cast<Object_part*>(list);
+		if (part->m_item)
 		{
-			ObjectTag::Equippable* tag_equippable = static_cast<ObjectTag::Equippable*>(item->m_item->get_tag(object_tag_e::equippable));
+			ObjectTag::Equippable* tag_equippable = static_cast<ObjectTag::Equippable*>(part->m_item->get_tag(object_tag_e::equippable));
 			if (tag_equippable)
 			{
 				Instruction_game_owner* i = new Instruction_game_owner();
-				i->m_value = item;
+				i->m_value = part;
 				tag_equippable->m_condition->apply_effect(nullptr, i);
 				if (!i->m_result)
 				{
-					item->m_item = nullptr;
-					item->m_owner = nullptr;
+					GameObject* obj = part->m_item;
+					MapCell* cell = static_cast<MapCell*>(part->get_owner(entity_e::cell));
+					part->m_item = nullptr;
+					i->m_value = part;
 					i->m_mode = mode_t::unequip;
 					tag_equippable->m_value->apply_effect(nullptr, i);
+					cell->m_map->add_object(obj, cell);
+					obj->m_owner = cell;
 					return;
 				};
-				Object_tag* tag_requirements = item->m_object_state.get_tag(object_tag_e::requirements_to_object);
+				Object_tag* tag_requirements = part->m_object_state.get_tag(object_tag_e::requirements_to_object);
 				if (tag_requirements)
 				{
 					i->m_result = false;
-					i->m_value = item->m_item;
+					i->m_value = part->m_item;
 					tag_requirements->apply_effect(nullptr, i);
 					if (!i->m_result) 
 					{ 
-						item->m_item = nullptr;
-						item->m_owner = nullptr;
-						i->m_value = item;
+						GameObject* obj = part->m_item;
+						MapCell* cell = static_cast<MapCell*>(part->get_owner(entity_e::cell));
+						part->m_item = nullptr;
+						i->m_value = part;
 						i->m_mode = mode_t::unequip;
 						tag_equippable->m_value->apply_effect(nullptr, i);
+						cell->m_map->add_object(obj, cell);
+						obj->m_owner = cell;
 						return; 
 					};
-					LOG(INFO) << "yeah";
 				}
 			}
 		}

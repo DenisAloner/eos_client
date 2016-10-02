@@ -19,6 +19,15 @@ Game_object_owner* Game_object_owner::get_owner(entity_e kind)
 	return nullptr;
 }
 
+Game_object_owner* Game_object_owner::get_owner()
+{
+	if (m_owner)
+	{
+		return m_owner->get_owner();
+	}
+	else return this;
+}
+
 MapCell::MapCell(int x, int y, GameMap* map) :x(x), y(y), m_map(map)
 {
 	m_kind = entity_e::cell;
