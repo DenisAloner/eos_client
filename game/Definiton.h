@@ -389,6 +389,14 @@ enum class ai_type_e
 	non_humanoid
 };
 
+class Object_interaction;
+
+class Bypass_helper
+{
+public:
+	virtual void handle(Object_interaction& value) = 0;
+};
+
 
 class Object_interaction: public virtual iSerializable
 {
@@ -404,7 +412,7 @@ public:
 	virtual std::string get_description() = 0;
 	virtual Object_interaction* clone() = 0;
 	virtual void description(std::list<std::string>* info, int level) = 0;
-	virtual void do_predicat(predicat func) { func(this); };
+	virtual void do_predicat(Bypass_helper& helper) { helper.handle(*this); };
 	virtual void do_predicat_ex(predicat_ex func) { func(this,true); func(this, false);};
 };
 

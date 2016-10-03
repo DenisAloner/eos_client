@@ -132,13 +132,15 @@ void Attribute_map::load()
 	}
 }
 
-void Attribute_map::get_tag_predicat(Object_interaction* object)
+Tag_getter::Tag_getter(object_tag_e key) :m_key(key), m_result(nullptr) {};
+
+void Tag_getter::handle(Object_interaction& value)
 {
-	if (!m_tag)
+	if (!m_result)
 	{
-		if (object->m_interaction_message_type == interaction_message_type_e::tag)
+		if (value.m_interaction_message_type == interaction_message_type_e::tag)
 		{
-			if (static_cast<Object_tag*>(object)->m_type == m_key) { m_tag=static_cast<Object_tag*>(object); }
+			if (static_cast<Object_tag&>(value).m_type == m_key) { m_result = static_cast<Object_tag*>(&value); }
 		}
 	}
 }
@@ -146,32 +148,28 @@ void Attribute_map::get_tag_predicat(Object_interaction* object)
 
 bool Attribute_map::get_stat(object_tag_e key)
 {
-	m_tag = nullptr;
-	m_key = key;
 	auto list = m_item.find(interaction_e::tag);
 	if (list != m_item.end())
 	{
 		Tag_list* taglist = static_cast<Tag_list*>(list->second);
-		taglist->do_predicat(std::bind(&Attribute_map::get_tag_predicat, this, std::placeholders::_1));
+		Tag_getter tg(key);
+		taglist->do_predicat(tg);
+		return tg.m_result;
 	}
-	return m_tag;
+	return false;
 }
 
 Object_tag* Attribute_map::get_tag(object_tag_e key)
 {
-	m_tag = nullptr;
-	m_key = key;
 	auto list = m_item.find(interaction_e::tag);
 	if (list != m_item.end())
 	{
 		Tag_list* taglist = static_cast<Tag_list*>(list->second);
-		taglist->do_predicat(std::bind(&Attribute_map::get_tag_predicat, this, std::placeholders::_1));
-		/*for (auto item = taglist->m_effect.begin(); item != taglist->m_effect.end(); ++item)
-		{
-			if (static_cast<Object_tag*>(*item)->m_type == key) { return static_cast<Object_tag*>(*item); }
-		}*/
+		Tag_getter tg(key);
+		taglist->do_predicat(tg);
+		return tg.m_result;
 	}
-	return m_tag;
+	return nullptr;
 }
 
 Object_state::Object_state()
@@ -626,21 +624,21 @@ void GameObject::update_interaction()
 	}
 }
 
+Action_getter::Action_getter(GameObject* object, std::list<Action_helper_t>& list) : m_object(object), m_list(list) {}
 
-void GameObject::get_action_predicat(Object_interaction* object)
+void Action_getter::handle(Object_interaction& value)
 {
-	if (object->m_interaction_message_type == interaction_message_type_e::action)
+	switch (value.m_interaction_message_type)
 	{
-		m_actions_list->push_back(Action_helper_t(static_cast<Action*>(object)));
+	case interaction_message_type_e::action:
+	{
+		m_list.push_back(Action_helper_t(static_cast<Action*>(&value)));
+		break;
 	}
-}
-
-void GameObject::add_action_from_part(Object_interaction* object)
-{
-	if (object->m_interaction_message_type == interaction_message_type_e::part)
+	case interaction_message_type_e::part:
 	{
-		Object_part* op = static_cast<Object_part*>(object);
-		Action_list* al = static_cast<Action_list*>(op->m_object_state.get_list(interaction_e::action));
+		Object_part& op = static_cast<Object_part&>(value);
+		Action_list* al = static_cast<Action_list*>(op.m_object_state.get_list(interaction_e::action));
 		Action* a;
 		if (al)
 		{
@@ -652,40 +650,40 @@ void GameObject::add_action_from_part(Object_interaction* object)
 				case action_e::pick:
 				{
 					Parameter* p = new Parameter(parameter_type_e::destination);
-					(*p)[0].set(this);
-					(*p)[2].set(op);
-					m_common_actions.pick = true;
-					m_actions_list->push_back(Action_helper_t(a,p));
+					(*p)[0].set(m_object);
+					(*p)[2].set(&op);
+					//m_common_actions.pick = true;
+					m_list.push_back(Action_helper_t(a, p));
 					break;
 				}
 				case action_e::move_step:
 				{
 					Parameter* p = new Parameter(parameter_type_e::position);
-					(*p)[0].set(this);
-					m_actions_list->push_back(Action_helper_t(a, p));
+					(*p)[0].set(m_object);
+					m_list.push_back(Action_helper_t(a, p));
 					break;
 				}
 				case action_e::turn:
 				{
 					Parameter* p = new Parameter(parameter_type_e::direction);
-					(*p)[0].m_object = this;
-					m_actions_list->push_back(Action_helper_t(a, p));
+					(*p)[0].set(m_object);
+					m_list.push_back(Action_helper_t(a, p));
 					break;
 				}
 				case action_e::hit_melee:
 				{
 					Parameter* p = new Parameter(parameter_type_e::interaction_cell);
-					(*p)[0].set(this);
-					(*p)[2].set(op);
-					m_actions_list->push_back(Action_helper_t(a, p));
+					(*p)[0].set(m_object);
+					(*p)[2].set(&op);
+					m_list.push_back(Action_helper_t(a, p));
 					break;
 				}
 				}
 			}
 		}
-		if (op->m_item)
+		if (op.m_item)
 		{
-			al = static_cast<Action_list*>(op->m_item->get_effect(interaction_e::action));
+			al = static_cast<Action_list*>(op.m_item->get_effect(interaction_e::action));
 			if (al)
 			{
 				for (auto action = al->m_effect.begin(); action != al->m_effect.end(); ++action)
@@ -696,53 +694,55 @@ void GameObject::add_action_from_part(Object_interaction* object)
 					case action_e::hit_melee:
 					{
 						Parameter* p = new Parameter(parameter_type_e::interaction_cell);
-						(*p)[0].set(this);
-						(*p)[2].set(op);
-						m_actions_list->push_back(Action_helper_t(a, p));
+						(*p)[0].set(m_object);
+						(*p)[2].set(&op);
+						m_list.push_back(Action_helper_t(a, p));
 						break;
 					}
 					case action_e::shoot:
 					{
 						Parameter* p = new Parameter(parameter_type_e::bow_shoot);
-						(*p)[0].set(this);
-						(*p)[2].set(op);
-						m_actions_list->push_back(Action_helper_t(a, p));
+						(*p)[0].set(m_object);
+						(*p)[2].set(&op);
+						m_list.push_back(Action_helper_t(a, p));
 						break;
 					}
 					}
 				}
 			}
 		}
+		break;
+	}
 	}
 }
 
-std::list<Action_helper_t>* GameObject::m_actions_list = nullptr;
-common_action_t GameObject::m_common_actions;
-
 void GameObject::get_actions_list(std::list<Action_helper_t>& value)
 {
-	m_actions_list = &value;
-	m_common_actions.pick = false;
-	Parts_list* parts = get_parts_list(interaction_e::body);
-	Action_list* al;
+	Action_getter ag(this, value);
+	
+	Action_list* al= static_cast<Action_list*>(get_effect(interaction_e::action));
+	al->do_predicat(ag);
 
-	al = static_cast<Action_list*>(get_effect(interaction_e::action));
-	if (al)
+	/*if (al)
 	{
 		for (auto action = al->m_effect.begin(); action != al->m_effect.end(); ++action)
 		{
 			(*action)->do_predicat(std::bind(&GameObject::get_action_predicat, this, std::placeholders::_1));
 		}
-	}
-	m_common_actions.pick = false;
-	for (auto item = parts->m_effect.begin(); item != parts->m_effect.end(); ++item)
-	{
-		(*item)->do_predicat(std::bind(&GameObject::add_action_from_part, this, std::placeholders::_1));
-	}
-	if (m_common_actions.pick)
-	{
-		m_actions_list->push_back(Action_helper_t(Application::instance().m_actions[action_e::pick]));
-	}
+	}*/
+	//m_common_actions.pick = false;
+
+	Parts_list* parts = get_parts_list(interaction_e::body);
+	parts->do_predicat(ag);
+
+	//for (auto item = parts->m_effect.begin(); item != parts->m_effect.end(); ++item)
+	//{
+	//	(*item)->do_predicat(std::bind(&GameObject::add_action_from_part, this, std::placeholders::_1));
+	//}
+	//if (m_common_actions.pick)
+	//{
+	//	m_actions_list->push_back(Action_helper_t(Application::instance().m_actions[action_e::pick]));
+	//}
 }
 
 void GameObject::reset_serialization_index()
@@ -945,12 +945,12 @@ void Object_part::description(std::list<std::string>* info, int level)
 	}
 }
 
-void Object_part::do_predicat(predicat func)
+void Object_part::do_predicat(Bypass_helper& helper)
 { 
-	func(this);
+	helper.handle(*this);
 	for (auto item = m_object_state.m_item.begin(); item != m_object_state.m_item.end(); item++)
 	{
-		item->second->do_predicat(func);
+		item->second->do_predicat(helper);
 	}
 }
 

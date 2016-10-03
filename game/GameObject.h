@@ -73,6 +73,18 @@ public:
 	virtual void load();
 };
 
+class Tag_getter : public Bypass_helper
+{
+public:
+
+	object_tag_e m_key;
+	Object_tag* m_result;
+
+	Tag_getter(object_tag_e key);
+	virtual void handle(Object_interaction& value);
+
+};
+
 class Attribute_map: public iSerializable
 {
 public:
@@ -92,10 +104,6 @@ public:
 	bool get_stat(object_tag_e key);
 	Object_tag* get_tag(object_tag_e key);
 
-private:
-	object_tag_e m_key;
-	Object_tag* m_tag;
-	void get_tag_predicat(Object_interaction* object);
 };
 
 class Object_state : public Attribute_map
@@ -135,6 +143,18 @@ public:
 	Attribute_map m_equip;
 	Object_state_equip();
 	virtual Object_state* clone();
+
+};
+
+class Action_getter : public Bypass_helper
+{
+public:
+
+	std::list<Action_helper_t>& m_list;
+	GameObject* m_object;
+
+	Action_getter(GameObject* object,std::list<Action_helper_t>& list);
+	virtual void handle(Object_interaction& value);
 
 };
 
@@ -183,11 +203,6 @@ public:
 
 	virtual void get_actions_list(std::list<Action_helper_t>& value);
 
-private:
-	static std::list<Action_helper_t>* m_actions_list;
-	static common_action_t m_common_actions;
-	void add_action_from_part(Object_interaction* object);
-	void get_action_predicat(Object_interaction* object);
 };
 
 class Player: public GUI_connectable_i
@@ -229,7 +244,7 @@ public:
 	virtual std::string get_description();
 	virtual Object_part* clone();
 	virtual void description(std::list<std::string>* info, int level);
-	virtual void do_predicat(predicat func);
+	virtual void do_predicat(Bypass_helper& helper);
 	virtual void do_predicat_ex(predicat_ex func);
 
 	virtual void reset_serialization_index();

@@ -25,7 +25,7 @@ public:
 	virtual void equip(Object_interaction* item) { m_effect.push_back(item); };
 	virtual void unequip(Object_interaction* item) { m_effect.remove(item); };
 
-	virtual void do_predicat(predicat func);
+	virtual void do_predicat(Bypass_helper& helper);
 	virtual void do_predicat_ex(predicat_ex func);
 
 	virtual void reset_serialization_index();
@@ -217,7 +217,7 @@ public:
 	Object_interaction* m_value;
 	Interaction_slot();
 	virtual bool on_turn();
-	virtual void do_predicat(predicat func);
+	virtual void do_predicat(Bypass_helper& helper);
 	virtual void do_predicat_ex(predicat_ex func);
 	virtual void reset_serialization_index();
 };

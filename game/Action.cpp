@@ -1247,9 +1247,19 @@ void action_hit_melee::description(std::list<std::string>* info, int level)
 
 std::string Action_hit::get_description(Parameter* parameter)
 {
-	Parameter& p(*parameter);
-	std::string s("Атаковать ");
-	/*s += p->m_object->m_name + ".";*/
+	std::string s("Ударить");
+	if (parameter)
+	{
+		Parameter& p(*parameter);
+		if (p[1])
+		{
+			s += " " + p[1].m_object->m_name;
+		}
+		if (p[2])
+		{
+			s += " " + p[2].m_part->m_name;
+		}
+	}
 	return s;
 }
 

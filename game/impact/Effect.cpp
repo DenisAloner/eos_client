@@ -95,12 +95,12 @@ void Interaction_list::apply_effect(GameObject* unit, Object_interaction* object
 	}
 }
 
-void Interaction_list::do_predicat(predicat func)
+void Interaction_list::do_predicat(Bypass_helper& helper)
 {
-	func(this);
+	helper.handle(*this);
 	for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
 	{
-		(*item)->do_predicat(func);
+		(*item)->do_predicat(helper);
 	}
 }
 
@@ -1036,10 +1036,10 @@ bool Interaction_slot::on_turn()
 	return m_value->on_turn();
 }
 
-void Interaction_slot::do_predicat(predicat func)
+void Interaction_slot::do_predicat(Bypass_helper& helper)
 {
-	func(this);
-	m_value->do_predicat(func);
+	helper.handle(*this);
+	m_value->do_predicat(helper);
 }
 
 void Interaction_slot::do_predicat_ex(predicat_ex func)
