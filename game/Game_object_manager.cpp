@@ -619,6 +619,7 @@ void GameObjectManager::init()
 	m_to_object_tag_e["ring"] = object_tag_e::ring;
 	m_to_object_tag_e["requirements_to_object"] = object_tag_e::requirements_to_object;
 	m_to_object_tag_e["cursed"] = object_tag_e::cursed;
+	m_to_object_tag_e["can_equip"] = object_tag_e::can_equip;
 
 	m_object_tag_string[object_tag_e::poison_resist] = "сопротивление к яду";
 	m_object_tag_string[object_tag_e::purification_from_poison] = "очищение от яда";
@@ -632,6 +633,7 @@ void GameObjectManager::init()
 	m_object_tag_string[object_tag_e::ring] = "кольцо";
 	m_object_tag_string[object_tag_e::requirements_to_object] = "требования к предмету";
 	m_object_tag_string[object_tag_e::cursed] = "наложено проклятье";
+	m_object_tag_string[object_tag_e::can_equip] = "может перепещать предметы";
 
 	m_to_action_e["equip"] = action_e::equip;
 	m_to_action_e["hit"] = action_e::hit;

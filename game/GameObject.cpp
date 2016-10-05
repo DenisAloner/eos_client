@@ -630,14 +630,45 @@ void Action_getter::handle(Object_interaction& value)
 {
 	switch (value.m_interaction_message_type)
 	{
-	case interaction_message_type_e::action:
+	/*case interaction_message_type_e::action:
 	{
 		m_list.push_back(Action_helper_t(static_cast<Action*>(&value)));
 		break;
-	}
+	}*/
 	case interaction_message_type_e::part:
 	{
 		Object_part& op = static_cast<Object_part&>(value);
+		Tag_list* tl = static_cast<Tag_list*>(op.m_object_state.get_list(interaction_e::tag));
+		Object_tag* t;
+		if (tl)
+		{
+			for (auto tag = tl->m_effect.begin(); tag != tl->m_effect.end(); ++tag)
+			{
+				t = static_cast<Object_tag*>(*tag);
+				switch (t->m_type)
+				{
+				case object_tag_e::can_equip:
+				{
+					if (op.m_item)
+					{
+						Parameter* p = new Parameter(parameter_type_e::destination);
+						(*p)[0].set(m_object);
+						(*p)[1].set(op.m_item);
+						m_list.push_back(Action_helper_t(Application::instance().m_actions[action_e::move_out], p));
+					}
+					else
+					{
+						Parameter* p = new Parameter(parameter_type_e::destination);
+						(*p)[0].set(m_object);
+						(*p)[2].set(&op);
+						m_list.push_back(Action_helper_t(Application::instance().m_actions[action_e::pick], p));
+					}
+					break;
+				}
+				}
+			}
+		}
+
 		Action_list* al = static_cast<Action_list*>(op.m_object_state.get_list(interaction_e::action));
 		Action* a;
 		if (al)
@@ -855,6 +886,7 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 	m_actions.push_front(Application::instance().m_actions[action_e::set_motion_path]);
 	//m_actions.push_front(Application::instance().m_actions[action_e::open_inventory]);
 	m_actions.push_front(Application::instance().m_actions[action_e::cell_info]);
+	m_actions.push_front(Application::instance().m_actions[action_e::equip]);
 	m_actions.push_front(Application::instance().m_actions[action_e::show_parameters]);
 	m_actions.push_front(Application::instance().m_actions[action_e::save]);
 	m_actions.push_front(Application::instance().m_actions[action_e::load]);

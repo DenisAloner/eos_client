@@ -12,5 +12,8 @@
 *.la
 *.a
 
+# Temporary files
+~$*.docx
+
 # Build directory
 build/

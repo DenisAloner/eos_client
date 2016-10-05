@@ -1,3 +1,10 @@
+new_template_part finger,палец,humanoid_finger
+list yy,tag,tag
+instruction_check_tag ring
+tag yn,requirements_to_object
+pop_list
+pop_map
+
 new_template_part hand,рука,humanoid_hand
 list yy,action,action
 action hit_melee
@@ -5,17 +12,19 @@ pop_list
 list yy,parts,body
 part yy,wrist,кисть
 list yy,tag,tag
-tag yy,pick_able
-pop_list
-list yy,action,action
-action pick
+tag yy,can_equip
 pop_list
 list yy,parts,body
-part nyn,finger,палец
-part nyn,finger,палец
-part nyn,finger,палец
-part nyn,finger,палец
-part nyn,finger,палец
+template_part humanoid_finger
+pop_map
+template_part humanoid_finger
+pop_map
+template_part humanoid_finger
+pop_map
+template_part humanoid_finger
+pop_map
+template_part humanoid_finger
+pop_map
 pop_list
 pop_list
 pop_map
@@ -24,19 +33,6 @@ pop_map
 new_template_part container,сумка,cell_for_ring
 list yy,tag,tag
 instruction_check_tag ring
-tag yn,requirements_to_object
-pop_list
-pop_map
-
-new_template_part finger,тест,humanoid_finger
-list yy,tag,tag
-list ny,generic,tag
-instruction_check_tag cursed
-slot_to_list
-instruction_check_tag ring
-slot_to_list
-list_to_slot
-pop_list
 tag yn,requirements_to_object
 pop_list
 pop_map
@@ -100,7 +96,6 @@ pop_list
 slot_to_list
 pop_list
 list yy,action,action
-action equip
 action open
 action push
 action use
@@ -117,11 +112,11 @@ list yn,parameter,skill_unarmed_combat,50000,100000
 list yn,generic,buff
 list yn,generic,damage
 list yy,parts,body
-template_part humanoid_finger
-pop_map
-part nyn,waist,талия
 template_part humanoid_hand
 pop_map
+template_part humanoid_hand
+pop_map
+part nyn,waist,талия
 state dead
 size 2,2,2
 tile_manager 10
@@ -142,7 +137,7 @@ slot_to_list
 mem_effect value,6
 mem_instruction_slot_link health
 tag yn,equippable
-instruction_check_part_type finger
+instruction_check_part_type wrist
 slot_to_list
 pop_list
 pop_list

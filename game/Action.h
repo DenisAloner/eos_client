@@ -187,6 +187,17 @@ public:
 
 };
 
+class Action_move_out :
+	public Action_pick
+{
+public:
+
+	Action_move_out();
+
+	virtual std::string get_description(Parameter* parameter);
+
+};
+
 class Action_open :
 	public Action
 {

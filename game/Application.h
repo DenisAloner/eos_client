@@ -82,7 +82,7 @@ class Application
 {
 public:
 
-	static const std::size_t c_action_size = 18;
+	static const std::size_t c_action_size = 19;
 
 	int m_game_turn;
 	bool m_ready;

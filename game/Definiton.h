@@ -148,7 +148,8 @@ enum action_e
 	save,
 	autoexplore,
 	shoot,
-	load
+	load,
+	move_out
 };
 
 enum class object_state_e
@@ -369,7 +370,8 @@ enum class object_tag_e
 	equippable,
 	ring,
 	requirements_to_object,
-	cursed
+	cursed,
+	can_equip
 };
 
 enum class feature_list_type_e

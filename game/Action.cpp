@@ -887,6 +887,73 @@ void Action_pick::description(std::list<std::string>* info, int level)
 	info->push_back(std::string(level, '.') + "<взять>");
 }
 
+Action_move_out::Action_move_out()
+{
+	m_kind = action_e::move_out;
+	m_icon = Application::instance().m_graph->m_actions[6];
+	m_decay = 1;
+	m_name = "Переместить";
+	m_parameter_kind = parameter_type_e::destination;
+}
+
+std::string Action_move_out::get_description(Parameter* parameter)
+{
+
+	std::string s("Переместить");
+	if (parameter)
+	{
+		Parameter& p(*parameter);
+		if (p[1])
+		{
+			s += " " + p[1].m_object->m_name;
+			switch (p[1].m_object->m_owner->m_kind)
+			{
+			case entity_e::cell:
+			{
+				////static_cast<MapCell*>(p->m_owner)->m_items.push_back(p->m_object);
+				//static_cast<MapCell*>(p[2].m_owner)->m_map->add_object(p[1].m_object, static_cast<MapCell*>(p[2].m_owner));
+				//p[1].m_object->m_owner = p[2].m_owner;
+				break;
+			}
+			case entity_e::inventory_cell:
+			{
+				/*static_cast<Inventory_cell*>(p[2].m_owner)->m_item = p[1].m_object;
+				p[1].m_object->m_owner = p[2].m_owner;*/
+				break;
+			}
+			case entity_e::body_part:
+			{
+				s += " из " + static_cast<Object_part*>(p[1].m_object->m_owner)->m_name;
+				break;
+			}
+			}
+		}
+		if (p[2])
+		{
+			switch (p[2].m_owner->m_kind)
+			{
+			case entity_e::cell:
+			{
+				s += " на пол ";
+				break;
+			}
+			case entity_e::inventory_cell:
+			{
+				/*static_cast<Inventory_cell*>(p[2].m_owner)->m_item = p[1].m_object;
+				p[1].m_object->m_owner = p[2].m_owner;*/
+				break;
+			}
+			case entity_e::body_part:
+			{
+				s += " в " + static_cast<Object_part*>(p[2].m_owner)->m_name;
+				break;
+			}
+			}
+		}
+	}
+	return s;
+}
+
 Action_open::Action_open()
 {
 	m_kind = action_e::open;
