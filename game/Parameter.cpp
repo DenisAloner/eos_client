@@ -70,27 +70,22 @@ Parameter_argument_t::operator bool()
 	case::type_e::object_owner:
 	{
 		return m_owner;
-		break;
 	}
 	case::type_e::mapcell:
 	{
 		return m_cell;
-		break;
 	}
 	case::type_e::inventory_cell:
 	{
 		return m_owner;
-		break;
 	}
 	case::type_e::object_part:
 	{
 		return m_part;
-		break;
 	}
 	case::type_e::gameobject:
 	{
 		return m_object;
-		break;
 	}
 	//case::type_e::object_part_group:
 	//{
@@ -100,7 +95,6 @@ Parameter_argument_t::operator bool()
 	case::type_e::direction:
 	{
 		return m_direction != object_direction_e::none;
-		break;
 	}
 	default:
 	{
@@ -397,11 +391,12 @@ Parameter::Parameter(parameter_type_e kind) :m_kind(kind)
 	}
 	case::parameter_type_e::destination:
 	{
-		m_size = 3;
+		m_size = 4;
 		m_args = new Parameter_argument_t[m_size];
 		m_args[0].kind = type_e::gameobject;
 		m_args[1].kind = type_e::gameobject;
 		m_args[2].kind = type_e::object_owner;
+		m_args[3].kind = type_e::object_part;
 		break;
 	}
 	case::parameter_type_e::interaction_cell:
@@ -524,3 +519,11 @@ Parameter* Parameter::clone()
 //}
 //
 //
+
+// Instruction_result
+
+Instruction_result::Instruction_result()
+{
+	m_interaction_message_type = interaction_message_type_e::instruction_result;
+	m_result = false;
+};

@@ -342,7 +342,8 @@ void Object_state::load()
 
 GameObject::GameObject()
 {
-	m_kind = entity_e::game_object;
+	m_interaction_message_type = interaction_message_type_e::game_object;
+	m_kind = entity_e::game_object;;
 	m_owner = nullptr;
 	m_direction = object_direction_e::down;
 	m_selected = false;
@@ -647,13 +648,14 @@ void Action_getter::handle(Object_interaction& value)
 				t = static_cast<Object_tag*>(*tag);
 				switch (t->m_type)
 				{
-				case object_tag_e::can_equip:
+				case object_tag_e::can_transfer_object:
 				{
 					if (op.m_item)
 					{
 						Parameter* p = new Parameter(parameter_type_e::destination);
 						(*p)[0].set(m_object);
 						(*p)[1].set(op.m_item);
+						(*p)[3].set(&op);
 						m_list.push_back(Action_helper_t(Application::instance().m_actions[action_e::move_out], p));
 					}
 					else
@@ -661,6 +663,7 @@ void Action_getter::handle(Object_interaction& value)
 						Parameter* p = new Parameter(parameter_type_e::destination);
 						(*p)[0].set(m_object);
 						(*p)[2].set(&op);
+						(*p)[3].set(&op);
 						m_list.push_back(Action_helper_t(Application::instance().m_actions[action_e::pick], p));
 					}
 					break;

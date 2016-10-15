@@ -12,7 +12,7 @@ pop_list
 list yy,parts,body
 part yy,wrist,кисть
 list yy,tag,tag
-tag yy,can_equip
+tag yy,can_transfer_object
 pop_list
 list yy,parts,body
 template_part humanoid_finger
@@ -28,6 +28,17 @@ pop_map
 pop_list
 pop_list
 pop_map
+pop_map
+
+new_template_part foot,нога,humanoid_foot
+list yy,tag,tag
+instruction_check_tag footwear
+tag yn,requirements_to_object
+instruction_check_owner_type cell
+instruction_get_owner
+instruction_arg_extract 1
+tag yn,can_transfer_object
+pop_list
 pop_map
 
 new_template_part container,сумка,cell_for_ring
@@ -117,6 +128,10 @@ pop_map
 template_part humanoid_hand
 pop_map
 part nyn,waist,талия
+template_part humanoid_foot
+pop_map
+template_part humanoid_foot
+pop_map
 state dead
 size 2,2,2
 tile_manager 10
@@ -181,6 +196,21 @@ mem_instruction_slot_link body
 tag yn,equippable
 instruction_check_part_type container
 slot_to_list
+pop_list
+pop_list
+pop_map
+
+object boot
+state equip,finger
+size 1,1,1
+icon 8
+tile_manager 30
+list yy,tag,tag
+tag yn,pick_able
+tag yn,pass_able
+tag yn,footwear
+tag yn,seethrough_able
+tag yn,equippable
 pop_list
 pop_list
 pop_map

@@ -58,7 +58,11 @@ public:
 		instruction_check_part_type,
 		instruction_check_tag,
 		slot_to_list,
-		list_to_slot
+		list_to_slot,
+		instruction_arg_extract,
+		instruction_get_owner,
+		instruction_check_owner_type
+
 	};
 
 	enum class parameter_e
@@ -80,6 +84,7 @@ public:
 	std::map<std::string, body_part_e> m_to_body_part_e;
 	std::map<std::string, feature_list_type_e> m_to_feature_list_type_e;
 	std::map<std::string, ai_type_e> m_to_ai_type_e;
+	std::map<std::string, entity_e> m_to_entity_e;
 
 	std::map<interaction_e, std::string> m_effect_string;
 	std::map<effect_e, std::string> m_effect_subtype_string;
@@ -115,6 +120,7 @@ public:
 	body_part_e get_body_part_e(const std::string& key);
 	feature_list_type_e get_feature_list_type_e(const std::string& key);
 	ai_type_e get_ai_type_e(const std::string& key);
+	entity_e get_entity_e(const std::string& key);
 
 	void parser(const std::string& command);
 	void init();

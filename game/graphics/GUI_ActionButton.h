@@ -2,7 +2,6 @@
 #define	GUI_ACTIONBUTTON_H
 
 #include "GUI_Object.h"
-#include "Action.h"
 #include "Application.h"
 
 class Application;

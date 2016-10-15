@@ -2,7 +2,6 @@
 #define	EVENT_H
 
 #include "Definiton.h"
-#include <iostream>
 #include <functional>
 #include <map>
 

@@ -1,6 +1,5 @@
 #include "Renderer.h"
 #include "game/Application.h"
-#include "game/ApplicationGUI.h"
 #include "game/graphics/gl.hpp"
 #include "game/utils/log.h"
 #include <chrono>

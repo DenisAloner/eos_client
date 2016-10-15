@@ -290,7 +290,9 @@ enum class interaction_message_type_e
 	slot_time,
 	tag,
 	instruction_slot_parameter,
-	instruction_game_owner
+	instruction_game_owner,
+	game_object,
+	instruction_result
 };
 
 enum class interaction_e
@@ -371,7 +373,8 @@ enum class object_tag_e
 	ring,
 	requirements_to_object,
 	cursed,
-	can_equip
+	can_transfer_object,
+	footwear
 };
 
 enum class feature_list_type_e

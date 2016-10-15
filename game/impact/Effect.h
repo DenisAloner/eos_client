@@ -429,6 +429,21 @@ namespace ObjectTag
 		virtual void save();
 		virtual void load();
 	};
+
+	class Can_transfer_object : public Object_tag
+	{
+	public:
+
+		Object_interaction* m_value;
+		bool m_result;
+
+		Can_transfer_object();
+		virtual Can_transfer_object* clone();
+		virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+		virtual void save();
+		virtual void load();
+	};
 }
 
 namespace Effect_functions
@@ -456,7 +471,6 @@ class Instruction_slot_parameter :public Interaction_slot
 {
 public:
 
-	
 	Parameter* m_parameter;
 	mode_t m_mode;
 	bool m_result;
@@ -520,6 +534,63 @@ public:
 	virtual std::string get_description() { return nullptr; };
 	virtual bool on_turn() { return false; };
 	virtual Instruction_check_part_type* clone();
+	virtual void description(std::list<std::string>* info, int level) {};
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+	virtual void save() {};
+	virtual void load() {};
+
+};
+
+class Instruction_arg_extract : public Object_interaction
+{
+public:
+
+	Object_interaction* m_value;
+	std::size_t m_index;
+	bool m_result;
+
+	Instruction_arg_extract();
+	virtual Instruction_arg_extract* clone();
+	virtual std::string get_description() { return nullptr; };
+	virtual bool on_turn() { return false; };
+	virtual void description(std::list<std::string>* info, int level) {};
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+	virtual void save();
+	virtual void load();
+};
+
+
+
+class Instruction_get_owner : public Object_interaction
+{
+public:
+
+	Object_interaction* m_value;
+	bool m_result;
+
+	Instruction_get_owner();
+	virtual Instruction_get_owner* clone();
+	virtual std::string get_description() { return nullptr; };
+	virtual bool on_turn() { return false; };
+	virtual void description(std::list<std::string>* info, int level) {};
+	virtual void apply_effect(GameObject* unit, Object_interaction* object) ;
+
+	virtual void save() {};
+	virtual void load() {};
+};
+
+class Instruction_check_owner_type :public Object_interaction
+{
+public:
+
+	entity_e m_value;
+
+	Instruction_check_owner_type();
+	virtual std::string get_description() { return nullptr; };
+	virtual bool on_turn() { return false; };
+	virtual Instruction_check_owner_type* clone();
 	virtual void description(std::list<std::string>* info, int level) {};
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 

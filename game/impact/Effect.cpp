@@ -1,7 +1,5 @@
 #include "Effect.h"
 #include "Application.h"
-#include "game\graphics\GUI_TextBox.h"
-
 
 // Interaction_list
 
@@ -2031,7 +2029,7 @@ void ObjectTag::Equippable::load()
 }
 
 
-// ObjectTag::Equippable
+// ObjectTag::Requirements_to_object
 
 ObjectTag::Requirements_to_object::Requirements_to_object() : Object_tag(object_tag_e::requirements_to_object) 
 {
@@ -2080,6 +2078,54 @@ void ObjectTag::Requirements_to_object::load()
 	fread(&m_type, sizeof(object_tag_e), 1, file);*/
 }
 
+// ObjectTag::Can_transfer_object
+
+ObjectTag::Can_transfer_object::Can_transfer_object() : Object_tag(object_tag_e::can_transfer_object)
+{
+	m_value = nullptr;
+	m_result = false;
+};
+
+ObjectTag::Can_transfer_object* ObjectTag::Can_transfer_object::clone()
+{
+	ObjectTag::Can_transfer_object* result = new ObjectTag::Can_transfer_object;
+	result->m_interaction_message_type = m_interaction_message_type;
+	result->m_value = m_value->clone();
+	result->m_result = m_result;
+	return result;
+}
+
+void ObjectTag::Can_transfer_object::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	switch (object->m_interaction_message_type)
+	{
+	case interaction_message_type_e::instruction_slot_parameter:
+	{
+		m_value->apply_effect(unit, object);
+		/*Instruction_game_owner* i = static_cast<Instruction_game_owner*>(object);
+		m_result = i->m_result;*/
+		break;
+	}
+	default:
+	{
+		break;
+	}
+	}
+};
+
+void ObjectTag::Can_transfer_object::save()
+{
+	/*FILE* file = Serialization_manager::instance().m_file;
+	type_e t = type_e::tag_label;
+	fwrite(&t, sizeof(type_e), 1, file);
+	fwrite(&m_type, sizeof(object_tag_e), 1, file);*/
+}
+
+void ObjectTag::Can_transfer_object::load()
+{
+	/*FILE* file = Serialization_manager::instance().m_file;
+	fread(&m_type, sizeof(object_tag_e), 1, file);*/
+}
 
 // Instruction_game_owner
 
@@ -2152,6 +2198,151 @@ void Instruction_check_part_type::apply_effect(GameObject* unit, Object_interact
 		Instruction_game_owner* i = static_cast<Instruction_game_owner*>(object);
 		Object_part* op = static_cast<Object_part*>(i->m_value);
 		i->m_result = (op->m_part_kind == m_value);
+		break;
+	}
+	}
+};
+
+// Instruction_arg_extract
+
+Instruction_arg_extract::Instruction_arg_extract()
+{
+	m_value = nullptr;
+	m_index = 0;
+	m_result = false;
+};
+
+Instruction_arg_extract* Instruction_arg_extract::clone()
+{
+	Instruction_arg_extract* result = new Instruction_arg_extract();
+	result->m_interaction_message_type = m_interaction_message_type;
+	result->m_value = m_value->clone();
+	result->m_result = m_result;
+	return result;
+}
+
+void Instruction_arg_extract::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	switch (object->m_interaction_message_type)
+	{
+	case interaction_message_type_e::instruction_slot_parameter:
+	{
+		Instruction_slot_parameter* p = static_cast<Instruction_slot_parameter*>(object);
+		Parameter_argument_t& a = p->m_parameter->operator[](m_index);
+		switch (a.kind)
+		{
+		case type_e::gameobject:
+			{
+			Instruction_result* i = new Instruction_result();
+			i->m_value = Parameter_argument_t(type_e::gameobject);
+			i->m_value.set(a.m_object);
+			m_value->apply_effect(unit, i);
+			p->m_result = i->m_result;
+			break;
+			}
+		}
+		break;
+	}
+	default:
+	{
+		break;
+	}
+	}
+};
+
+void Instruction_arg_extract::save()
+{
+	/*FILE* file = Serialization_manager::instance().m_file;
+	type_e t = type_e::tag_label;
+	fwrite(&t, sizeof(type_e), 1, file);
+	fwrite(&m_type, sizeof(object_tag_e), 1, file);*/
+}
+
+void Instruction_arg_extract::load()
+{
+	/*FILE* file = Serialization_manager::instance().m_file;
+	fread(&m_type, sizeof(object_tag_e), 1, file);*/
+}
+
+// Instruction_get_owner
+
+Instruction_get_owner::Instruction_get_owner()
+{
+	m_value = nullptr;
+	m_result = false;
+};
+
+Instruction_get_owner* Instruction_get_owner::clone()
+{
+	Instruction_get_owner* result = new Instruction_get_owner();
+	result->m_interaction_message_type = m_interaction_message_type;
+	result->m_value = m_value->clone();
+	result->m_result = m_result;
+	return result;
+}
+
+void Instruction_get_owner::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	switch (object->m_interaction_message_type)
+	{
+	case interaction_message_type_e::instruction_result:
+	{
+		Instruction_result* ir = static_cast<Instruction_result*>(object);
+		Parameter_argument_t& a = ir->m_value;
+		switch(a.kind)
+		{
+		case type_e::gameobject:
+		{
+			Instruction_result* i = new Instruction_result();
+			i->m_value = Parameter_argument_t(type_e::object_owner);
+			i->m_value.set(a.m_object->m_owner);
+			m_value->apply_effect(unit, i);
+			ir->m_result = i->m_result;
+			break;
+		}
+		}
+		break;
+	}
+	default:
+	{
+		break;
+	}
+	}
+};
+
+// Instruction_check_owner_type
+
+Instruction_check_owner_type::Instruction_check_owner_type()
+{
+};
+
+Instruction_check_owner_type* Instruction_check_owner_type::clone()
+{
+	Instruction_check_owner_type* result = new Instruction_check_owner_type();
+	result->m_interaction_message_type = m_interaction_message_type;
+	result->m_value = m_value;
+	return result;
+}
+
+void Instruction_check_owner_type::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	switch (object->m_interaction_message_type)
+	{
+	case interaction_message_type_e::instruction_result:
+	{
+		Parameter_argument_t& a = static_cast<Instruction_result*>(object)->m_value;
+		switch (a.kind)
+		{
+		case type_e::object_owner:
+		{
+			static_cast<Instruction_result*>(object)->m_result = (a.m_owner->m_kind == m_value);
+			break;
+		}
+		}
+		break;
+	}
+	default:
+	{
 		break;
 	}
 	}

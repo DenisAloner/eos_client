@@ -1,8 +1,6 @@
 #ifndef TPARAMETER_H
 #define	TPARAMETER_H
 
-#include <vector>
-#include <list>
 #include "Definiton.h"
 #include "GameObject.h"
 
@@ -24,6 +22,10 @@ struct Parameter_argument_t
 		Object_part* m_part;
 		object_direction_e m_direction;
 	};
+
+	Parameter_argument_t(){};
+
+	Parameter_argument_t(type_e kind) :kind(kind) {};
 
 	void set(GameObject* value);
 	void set(Game_object_owner* value);
@@ -103,5 +105,22 @@ private:
 //	virtual void load();
 //};
 
+class Instruction_result : public Object_interaction
+{
+public:
+
+	Parameter_argument_t m_value;
+	bool m_result;
+
+	Instruction_result();
+	virtual Instruction_result* clone() { return nullptr; };
+	virtual std::string get_description() { return nullptr; };
+	virtual bool on_turn() { return false; };
+	virtual void description(std::list<std::string>* info, int level) {};
+	virtual void apply_effect(GameObject* unit, Object_interaction* object) {};
+
+	virtual void save() {};
+	virtual void load() {};
+};
 
 #endif //TPARAMETER_H

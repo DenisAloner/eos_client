@@ -5,9 +5,8 @@
 #include "game/GameObject.h"
 #include "game/Parameter.h"
 #include "game/graphics/GUI_MapViewer.h"
-#include "game/graphics/GUI_TextBox.h"
 #include "log.h"
-#include  "impact\Effect.h"
+#include  "impact/Effect.h"
 
 Action::Action(void)
 {
@@ -837,6 +836,11 @@ char Action_pick::perfom(Parameter* parameter)
 	{
 		Instruction_slot_parameter* np = new Instruction_slot_parameter();
 		np->m_parameter = parameter;
+		np->m_result = false;
+		ObjectTag::Can_transfer_object* t=static_cast<ObjectTag::Can_transfer_object*>(p[3].m_part->m_object_state.get_tag(object_tag_e::can_transfer_object));
+		t->apply_effect(nullptr, np);
+		if (!np->m_result) { return 1; };
+		np->m_result = false;
 		Application::instance().command_change_owner(np);
 	}
 	else return 1;

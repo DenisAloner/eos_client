@@ -351,7 +351,6 @@ iSerializable* Serialization_manager::deserialize()
 		fread(&map_index, sizeof(std::size_t), 1, m_file);
 		LOG(INFO) << "Координаты " << std::to_string(x)<<" " << std::to_string(y)<<" "<< std::to_string(map_index);
 		return m_maps[map_index]->m_items[y][x];
-		break;
 	}
 	default:
 	{
@@ -529,7 +528,7 @@ iSerializable* Serialization_manager::deserialize()
 			break;
 		}
 		}
-		LOG(INFO) << "Тип обьекта: " << std::to_string((int)type);
+		LOG(INFO) << "Тип обьекта: " << std::to_string(static_cast<int>(type));
 		m_index += 1;
 		(*m_items)[m_index] = value;
 		LOG(INFO) << "индекс: " << std::to_string(m_index);

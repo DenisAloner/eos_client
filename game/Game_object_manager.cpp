@@ -433,6 +433,12 @@ void GameObjectManager::parser(const std::string& command)
 			static_cast<ObjectTag::Requirements_to_object*>(tag)->m_value = m_slot;
 			break;
 		}
+		case object_tag_e::can_transfer_object:
+		{
+			tag = new ObjectTag::Can_transfer_object();
+			static_cast<ObjectTag::Can_transfer_object*>(tag)->m_value = m_slot;
+			break;
+		}
 		default:
 		{
 			tag = new ObjectTag::Label(get_object_tag_e(arg[1]));
@@ -484,6 +490,31 @@ void GameObjectManager::parser(const std::string& command)
 		m_slot = m_stack_list.front();
 		break;
 	}
+	case command_e::instruction_arg_extract:
+	{
+		Instruction_arg_extract* item = new Instruction_arg_extract();
+		//item->m_interaction_message_type = interaction_message_type_e::single;
+		item->m_value = m_slot;
+		item->m_index = std::stoi(arg[0]);
+		m_slot = item;
+		break;
+	}
+	case command_e::instruction_get_owner:
+	{
+		Instruction_get_owner* item = new Instruction_get_owner();
+		//item->m_interaction_message_type = interaction_message_type_e::single;
+		item->m_value = m_slot;
+		m_slot = item;
+		break;
+	}
+	case command_e::instruction_check_owner_type:
+	{
+		Instruction_check_owner_type* item = new Instruction_check_owner_type();
+		//item->m_interaction_message_type = interaction_message_type_e::single;
+		item->m_value = get_entity_e(arg[0]);
+		m_slot = item;
+		break;
+	}
 	}
 }
 
@@ -526,6 +557,9 @@ void GameObjectManager::init()
 	m_commands["instruction_check_tag"] = command_e::instruction_check_tag;
 	m_commands["slot_to_list"] = command_e::slot_to_list;
 	m_commands["list_to_slot"] = command_e::list_to_slot;
+	m_commands["instruction_arg_extract"] = command_e::instruction_arg_extract;
+	m_commands["instruction_get_owner"] = command_e::instruction_get_owner;
+	m_commands["instruction_check_owner_type"] = command_e::instruction_check_owner_type;
 
 	m_to_object_state_e["alive"] = object_state_e::alive;
 	m_to_object_state_e["dead"] = object_state_e::dead;
@@ -619,7 +653,8 @@ void GameObjectManager::init()
 	m_to_object_tag_e["ring"] = object_tag_e::ring;
 	m_to_object_tag_e["requirements_to_object"] = object_tag_e::requirements_to_object;
 	m_to_object_tag_e["cursed"] = object_tag_e::cursed;
-	m_to_object_tag_e["can_equip"] = object_tag_e::can_equip;
+	m_to_object_tag_e["can_transfer_object"] = object_tag_e::can_transfer_object;
+	m_to_object_tag_e["footwear"] = object_tag_e::footwear;
 
 	m_object_tag_string[object_tag_e::poison_resist] = "сопротивление к яду";
 	m_object_tag_string[object_tag_e::purification_from_poison] = "очищение от яда";
@@ -633,7 +668,8 @@ void GameObjectManager::init()
 	m_object_tag_string[object_tag_e::ring] = "кольцо";
 	m_object_tag_string[object_tag_e::requirements_to_object] = "требования к предмету";
 	m_object_tag_string[object_tag_e::cursed] = "наложено проклятье";
-	m_object_tag_string[object_tag_e::can_equip] = "может перепещать предметы";
+	m_object_tag_string[object_tag_e::can_transfer_object] = "может перекладывать предметы";
+	m_object_tag_string[object_tag_e::footwear] = "обувь";
 
 	m_to_action_e["equip"] = action_e::equip;
 	m_to_action_e["hit"] = action_e::hit;
@@ -666,6 +702,10 @@ void GameObjectManager::init()
 
 	m_to_ai_type_e["non_humanoid"] = ai_type_e::non_humanoid;
 	m_to_ai_type_e["trap"] = ai_type_e::trap;
+
+	m_to_entity_e["gameobject"] = entity_e::game_object;
+	m_to_entity_e["object_part"] = entity_e::body_part;
+	m_to_entity_e["cell"] = entity_e::cell;
 
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);
@@ -810,6 +850,16 @@ feature_list_type_e GameObjectManager::get_feature_list_type_e(const std::string
 {
 	auto value = m_to_feature_list_type_e.find(key);
 	if (value == m_to_feature_list_type_e.end())
+	{
+		LOG(FATAL) << "Элемент `" << key << "` отсутствует в m_items";
+	}
+	return value->second;
+}
+
+entity_e GameObjectManager::get_entity_e(const std::string& key)
+{
+	auto value = m_to_entity_e.find(key);
+	if (value == m_to_entity_e.end())
 	{
 		LOG(FATAL) << "Элемент `" << key << "` отсутствует в m_items";
 	}

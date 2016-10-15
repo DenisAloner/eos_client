@@ -6,6 +6,7 @@ icon bow_icon
 icon arrow_icon
 icon belt_icon
 icon bag_icon
+icon boot_icon
 single snake
 single dagger
 single iso_wall
@@ -36,3 +37,4 @@ single iso_wall_2
 single iso_wall_3
 single belt
 single bag
+single boot
