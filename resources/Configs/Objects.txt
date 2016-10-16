@@ -214,3 +214,12 @@ tag yn,equippable
 pop_list
 pop_list
 pop_map
+
+object fountain
+state alive
+size 4,4,4
+optical 0.4,0.4,0.4
+tile_manager 31
+list yy,tag,tag
+tag yy,seethrough_able
+pop_list

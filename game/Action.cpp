@@ -692,61 +692,53 @@ action_set_motion_path::action_set_motion_path()
 	m_name = "Идти в указанную позицию";
 }
 
-void action_set_motion_path::interaction_handler(Parameter* arg)
+void action_set_motion_path::interaction_handler(Parameter* parameter)
 {
-	//Action::interaction_handler(nullptr);
-	//Application::instance().m_message_queue.m_busy = true;
-	//Parameter* result;
-	//Parameter_Position* p = new Parameter_Position();
-	//p->m_object = Application::instance().m_GUI->MapViewer->m_player->m_object;
-	//p->m_map = Application::instance().m_GUI->MapViewer->m_map;
-	////Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_line(Application::instance().m_GUI->MapViewer, p->m_object->cell()));
-	//result = Application::instance().command_select_location(p->m_object);
-	//if (result)
-	//{
-	//	p->m_place = static_cast<MapCell*>(static_cast<P_object_owner*>(result)->m_cell);
-	//	Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, "Выбрана клетка {" + std::to_string(p->m_place->x) + "," + std::to_string(p->m_place->y) + "}"));
-	//}
-	//else
-	//{
-	//	Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Не выбрана клетка карты")));
-	//	Application::instance().m_message_queue.m_busy = false;
-	//	//Application::instance().m_GUI->MapViewer->m_hints.pop_front();
-	//	return;
-	//}
-	////p->m_map->bresenham_line(p->m_object->cell(), p->m_place, [p](MapCell* a) { Application::instance().m_action_manager->add(new GameTask(Application::instance().m_actions[action_e::move_step], new Parameter_Position(p->m_object, a, p->m_map))); });
-	//
-	//Path::instance().map_costing(p->m_map, p->m_object, p->m_place, 40);
-	//std::vector<MapCell*>* path;
-	//path = Path::instance().get_path_to_cell();
-	//if (path)
-	//{
-	//	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_path(Application::instance().m_GUI->MapViewer, path));
-	//	Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Следовать под данному пути? [Y/N]")));
-	//	if(Application::instance().command_agreement())
-	//	{
-	//		for (int i = 0; i < path->size(); i++)
-	//		{
-	//			Parameter_Position* P;
-	//			P = new Parameter_Position();
-	//			P->m_object = p->m_object;
-	//			P->m_place = (*path)[(path->size() - 1) - i];
-	//			P->m_map = p->m_map;
-	//			Application::instance().m_action_manager->add(new GameTask(Application::instance().m_actions[action_e::move_step], P));
-	//		}
-	//	}
-	//	else
-	//	{
-	//		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Игрок отменил действие")));
-	//	}
-	//	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
-	//	Path::instance().m_heap.m_items.clear();
-	//}
-	//else
-	//{
-	//	Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Нет пути в указанную клетку")));
-	//}
-	//Application::instance().m_message_queue.m_busy = false;
+	Action::interaction_handler(nullptr);
+	Application::instance().m_message_queue.m_busy = true;
+	GameObject* object = Application::instance().m_GUI->MapViewer->m_player->m_object;
+	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_line(Application::instance().m_GUI->MapViewer, object->cell(), object));
+	MapCell* cell = Application::instance().command_select_location(object);
+	if (cell)
+	{
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, "Выбрана клетка {" + std::to_string(cell->x) + "," + std::to_string(cell->y) + "}"));
+	}
+	else
+	{
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Не выбрана клетка карты")));
+		Application::instance().m_message_queue.m_busy = false;
+		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+		return;
+	}
+	//p->m_map->bresenham_line(p->m_object->cell(), p->m_place, [p](MapCell* a) { Application::instance().m_action_manager->add(new GameTask(Application::instance().m_actions[action_e::move_step], new Parameter_Position(p->m_object, a, p->m_map))); });
+	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+	Path::instance().map_costing(cell->m_map, object, cell, 40);
+	std::vector<MapCell*>* path;
+	path = Path::instance().get_path_to_cell();
+	if (path)
+	{
+		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_path(Application::instance().m_GUI->MapViewer, path,object));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Следовать под данному пути? [Y/N]")));
+		if(Application::instance().command_agreement())
+		{
+			for (int i=0; i < path->size(); ++i)
+			{
+				Parameter* p = new Parameter(parameter_type_e::position, object, (*path)[(path->size() - 1) - i]);
+				Application::instance().m_action_manager->add(new GameTask(Application::instance().m_actions[action_e::move_step], p));
+			}
+		}
+		else
+		{
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Игрок отменил действие")));
+		}
+		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+		Path::instance().m_heap.m_items.clear();
+	}
+	else
+	{
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Нет пути в указанную клетку")));
+	}
+	Application::instance().m_message_queue.m_busy = false;
 }
 
 char action_set_motion_path::perfom(Parameter* parameter)

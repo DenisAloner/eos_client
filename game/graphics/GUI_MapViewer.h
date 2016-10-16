@@ -97,8 +97,9 @@ class mapviewer_hint_path : public gui_mapviewer_hint
 {
 public:
 
+	GameObject* m_object;
 	std::vector<MapCell*>* m_path;
-	mapviewer_hint_path(GUI_MapViewer* owner, std::vector<MapCell*>* path);
+	mapviewer_hint_path(GUI_MapViewer* owner, std::vector<MapCell*>* path, GameObject* object);
 	virtual void render();
 };
 
@@ -129,7 +130,8 @@ public:
 	int m_step_count;
 
 	MapCell* m_cell;
-	mapviewer_hint_line(GUI_MapViewer* owner, MapCell* cell);
+	GameObject* m_object;
+	mapviewer_hint_line(GUI_MapViewer* owner, MapCell* cell,GameObject* object);
 	virtual void render();
 	void draw_cell(MapCell* a);
 };

@@ -6,10 +6,10 @@
 #include <algorithm>
 
 gui_mapviewer_hint::gui_mapviewer_hint(GUI_MapViewer* owner) :m_owner(owner) { m_top = false; }
-mapviewer_hint_path::mapviewer_hint_path(GUI_MapViewer* owner, std::vector<MapCell*>* path) : gui_mapviewer_hint(owner), m_path(path) {};
+mapviewer_hint_path::mapviewer_hint_path(GUI_MapViewer* owner, std::vector<MapCell*>* path,GameObject* object) : gui_mapviewer_hint(owner), m_path(path),m_object(object) {};
 mapviewer_hint_area::mapviewer_hint_area(GUI_MapViewer* owner, GameObject* object, bool consider_object_size) : gui_mapviewer_hint(owner), m_object(object), m_consider_object_size(consider_object_size) {}
 mapviewer_hint_object_area::mapviewer_hint_object_area(GUI_MapViewer* owner, GameObject* object) : gui_mapviewer_hint(owner), m_object(object) {}
-mapviewer_hint_line::mapviewer_hint_line(GUI_MapViewer* owner, MapCell* cell) : gui_mapviewer_hint(owner), m_cell(cell) {}
+mapviewer_hint_line::mapviewer_hint_line(GUI_MapViewer* owner, MapCell* cell, GameObject* object) : gui_mapviewer_hint(owner), m_cell(cell),m_object(object) {}
 
 void gui_mapviewer_hint::draw_cell(MapCell* cell, int index)
 {
@@ -155,7 +155,31 @@ void mapviewer_hint_line::render()
 	if (m_owner->m_cursored != nullptr)
 	{
 		m_step_count = 0;
-		m_owner->m_map->bresenham_line(m_cell, m_owner->m_cursored, std::bind(&mapviewer_hint_line::draw_cell, this, std::placeholders::_1));
+		/*m_owner->m_map->bresenham_line(m_cell, m_owner->m_cursored, std::bind(&mapviewer_hint_line::draw_cell, this, std::placeholders::_1));*/
+		Path::instance().map_costing(m_cell->m_map,m_object, m_owner->m_cursored, 40);
+		std::vector<MapCell*>* path;
+		path = Path::instance().get_path_to_cell();
+		if (path)
+		{
+			int i = 0;
+			/*MapCell* c;
+			MapCell& oc(*m_object->cell());
+			game_object_size_t& os(m_object->m_active_state->m_size)
+			for (i; i < path->size(); ++i)
+			{
+				c = (*path)[(path->size() - 1) - i];
+				
+				if((c->x<oc.x)|| (c->x>oc.x+os.x-1)|| (c->y>oc.y) || (c->x<oc.y - os.y-1))
+				{
+					break;
+				}
+			}*/
+			for (i; i < path->size(); ++i)
+			{
+				draw_cell((*path)[(path->size() - 1) - i]);
+			}
+			Path::instance().m_heap.m_items.clear();
+		}
 	}
 }
 

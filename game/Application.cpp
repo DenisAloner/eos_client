@@ -228,7 +228,7 @@ void Application::initialize(dimension_t work_area_size)
 void Application::new_game()
 {
 	m_world = new Game_world();
-	GameMap* map = new GameMap(dimension_t(25, 25));
+	GameMap* map = new GameMap(dimension_t(40, 40));
 	map->generate_room();
 	m_world->m_maps.push_back(map);
 	int rx = 10;
@@ -288,6 +288,10 @@ void Application::new_game()
 			obj = m_game_object_manager->new_object("boot");
 			obj->set_direction(object_direction_e::top);
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx + 2]);
+
+			obj = m_game_object_manager->new_object("fountain");
+			obj->set_direction(object_direction_e::top);
+			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry + 10][rx + 2]);
 
 			/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
 			fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), obj);
