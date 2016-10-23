@@ -219,7 +219,6 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::mem_effect:
 	{
 		Effect* item = new Effect();
-		item->m_interaction_message_type = interaction_message_type_e::single;
 		item->m_subtype = get_effect_e(arg[0]);
 		item->m_value = std::stoi(arg[1]);
 		m_slot = item;
@@ -384,7 +383,6 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::mem_instruction_slot_link:
 	{
 		Instruction_slot_link* item = new Instruction_slot_link();
-		item->m_interaction_message_type = interaction_message_type_e::single;
 		item->m_subtype = get_interaction_e(arg[0]);
 		item->m_value = m_slot;
 		m_slot = item;
@@ -501,8 +499,16 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	case command_e::instruction_get_owner:
 	{
-		Instruction_get_owner* item = new Instruction_get_owner();
-		//item->m_interaction_message_type = interaction_message_type_e::single;
+		Instruction_get_owner* item;
+		if(arg[0]=="top")
+		{
+			item = new Instruction_get_owner_top();
+		}
+		else
+		{
+			item = new Instruction_get_owner();
+			
+		}
 		item->m_value = m_slot;
 		m_slot = item;
 		break;

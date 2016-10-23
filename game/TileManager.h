@@ -69,7 +69,10 @@ class TileManager_Single_animate :
 {
 public:
 
-	TileManager_Single_animate();
+	int m_frame;
+
+	TileManager_Single_animate(int frame);
+	bool load_from_file(const std::string& filename, object_direction_e direction, int frame) override;
 	virtual int get_tile_index(const object_direction_e& direction, const int& frame);
 
 };

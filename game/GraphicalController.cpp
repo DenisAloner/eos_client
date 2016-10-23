@@ -602,11 +602,12 @@ void GraphicalController::parser(const std::string& command)
 	}
 	case command_e::single_animate:
 	{
-		TileManager_Single_animate* m_tile_manager = new TileManager_Single_animate();
-		m_tile_manager->load_from_file(arg[0], object_direction_e::down, 0);
-		m_tile_manager->load_from_file(arg[1], object_direction_e::down, 1);
-		m_tile_manager->load_from_file(arg[2], object_direction_e::down, 2);
-		m_tile_manager->load_from_file(arg[3], object_direction_e::down, 3);
+		int count =std::stoi(arg[0]);
+		TileManager_Single_animate* m_tile_manager = new TileManager_Single_animate(count);
+		for(int i=0;i<count;++i)
+		{
+			m_tile_manager->load_from_file(arg[i + 1], object_direction_e::down, i);
+		}
 		m_tile_manager->m_index = m_tile_managers.size();
 		m_tile_managers.push_back(m_tile_manager);
 		break;

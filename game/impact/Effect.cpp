@@ -35,8 +35,9 @@ std::string Interaction_list::get_description()
 	return result;
 }
 
-void Interaction_list::update()
+bool Interaction_list::update()
 {
+	return false;
 }
 
 Interaction_list* Interaction_list::clone()
@@ -93,9 +94,9 @@ void Interaction_list::apply_effect(GameObject* unit, Object_interaction* object
 	}
 }
 
-void Interaction_list::do_predicat(Bypass_helper& helper)
+void Interaction_list::do_predicat(Visitor& helper)
 {
-	helper.handle(*this);
+	helper.visit(*this);
 	for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
 	{
 		(*item)->do_predicat(helper);
@@ -171,55 +172,93 @@ Parameter_list::Parameter_list()
 	m_list_type = feature_list_type_e::parameter;
 };
 
-void Parameter_list::update_list(Object_interaction* list)
-{
+//void Parameter_list::update_list(Object_interaction* list)
+//{
+//
+//	switch (list->m_interaction_message_type)
+//	{
+//	case interaction_message_type_e::list:
+//	{
+//		Interaction_list* list_item = static_cast<Interaction_list*>(list);
+//		for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); ++current)
+//		{
+//			update_list((*current));
+//		}
+//		break;
+//	}
+//	case interaction_message_type_e::slot_time:
+//	{
+//		LOG(INFO) << "buff in parameter";
+//		Interaction_time* item = static_cast<Interaction_time*>(list);
+//		update_list(item->m_value);
+//		break;
+//	}
+//	default:
+//	{
+//		Effect* item;
+//		item = static_cast<Effect*>(list);
+//		switch (item->m_subtype)
+//		{
+//		case effect_e::value:
+//		{
+//			m_value = m_value + item->m_value;
+//			break;
+//		}
+//		case effect_e::limit:
+//		{
+//			m_limit = m_limit + item->m_value;
+//			break;
+//		}
+//		}
+//	}
+//	}
+//
+//}
 
-	switch (list->m_interaction_message_type)
+Parameter_list::Update_visitor::Update_visitor(Parameter_list& owner): m_owner(owner) {}
+
+void Parameter_list::Update_visitor::visit(Object_interaction& value)
+{
+	switch (value.m_interaction_message_type)
 	{
-	case interaction_message_type_e::list:
-	{
-		Interaction_list* list_item = static_cast<Interaction_list*>(list);
-		for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); ++current)
+	case interaction_message_type_e::effect:
 		{
-			update_list((*current));
-		}
-		break;
-	}
-	case interaction_message_type_e::slot_time:
-	{
-		LOG(INFO) << "buff in parameter";
-		Interaction_time* item = static_cast<Interaction_time*>(list);
-		update_list(item->m_value);
-		break;
-	}
-	default:
-	{
-		Effect* item;
-		item = static_cast<Effect*>(list);
-		switch (item->m_subtype)
+		Effect& item= static_cast<Effect&>(value);
+		switch (item.m_subtype)
 		{
 		case effect_e::value:
 		{
-			m_value = m_value + item->m_value;
+			m_owner.m_value += item.m_value;
 			break;
 		}
 		case effect_e::limit:
 		{
-			m_limit = m_limit + item->m_value;
+			m_owner.m_limit += item.m_value;
 			break;
 		}
+		default:
+			{
+			break;
+			}
 		}
+		break;
+		}
+	default:
+	{
+		break;
 	}
 	}
 
 }
 
-void Parameter_list::update()
+bool Parameter_list::update()
 {
-	//LOG(INFO) << "ÒÈÏ ÏÀÐÀÌÅÒÐÀ " << std::to_string((int)m_subtype);
+	////LOG(INFO) << "ÒÈÏ ÏÀÐÀÌÅÒÐÀ " << std::to_string((int)m_subtype);
 	m_value = m_basic_value;
 	m_limit = m_basic_limit;
-	update_list(this);
+	Update_visitor uh(*this);
+	do_predicat(uh);
+	return false;
 }
 
 std::string Parameter_list::get_description()
@@ -331,11 +370,12 @@ void Vision_list::update_list(Object_interaction* list)
 	}
 }
 
-void Vision_list::update()
+bool Vision_list::update()
 {
 	//LOG(INFO) << "ÒÈÏ ÏÀÐÀÌÅÒÐÀ " << std::to_string((int)m_subtype);
 	m_max_radius = 0;
 	update_list(this);
+	return false;
 }
 
 std::string Vision_list::get_description()
@@ -525,11 +565,12 @@ void Vision_component::update_list(Object_interaction* list)
 	}
 }
 
-void Vision_component::update()
+bool Vision_component::update()
 {
 	//LOG(INFO) << "ÒÈÏ ÏÀÐÀÌÅÒÐÀ " << std::to_string((int)m_subtype);
 	m_value = m_basic_value;
 	update_list(this);
+	return false;
 }
 
 std::string Vision_component::get_description()
@@ -613,49 +654,20 @@ Tag_list* Tag_list::clone()
 	return result;
 }
 
-void Tag_list::update_list(Object_interaction* list)
+Tag_list::Update_visitor::Update_visitor():was_changed(false)
 {
-
-	switch (list->m_interaction_message_type)
-	{
-	case interaction_message_type_e::list:
-	{
-		Interaction_list* list_item = static_cast<Interaction_list*>(list);
-		for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); ++current)
-		{
-			update_list((*current));
-		}
-		break;
-	}
-	case interaction_message_type_e::slot_time:
-	{
-		LOG(INFO) << "buff in parameter";
-		Interaction_time* item = static_cast<Interaction_time*>(list);
-		update_list(item->m_value);
-		break;
-	}
-	default:
-	{
-		Object_tag* item = static_cast<Object_tag*>(list);
-		switch (item->m_type)
-		{
-		case object_tag_e::equippable:
-		{
-			ObjectTag::Equippable* t = static_cast<ObjectTag::Equippable*>(item);
-			//m_value = m_value + item->m_value;
-			break;
-		}
-
-		}
-	}
-	}
-
 }
 
-void Tag_list::update()
+void Tag_list::Update_visitor::visit(Object_interaction& value)
 {
-	//LOG(INFO) << "ÒÈÏ ÏÀÐÀÌÅÒÐÀ " << std::to_string((int)m_subtype);
-	update_list(this);
+	if (was_changed) { return; }
+}
+
+bool Tag_list::update()
+{
+	Update_visitor uh;
+	do_predicat(uh);
+	return uh.was_changed;
 }
 
 void Tag_list::save()
@@ -704,79 +716,152 @@ Parts_list* Parts_list::clone()
 	return result;
 }
 
-void Parts_list::update_list(Object_interaction* list)
-{
+//void Parts_list::update_list(Object_interaction* list)
+//{
+//
+//	switch (list->m_interaction_message_type)
+//	{
+//	case interaction_message_type_e::list:
+//	{
+//		Interaction_list* list_item = static_cast<Interaction_list*>(list);
+//		for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); ++current)
+//		{
+//			update_list((*current));
+//		}
+//		break;
+//	}
+//	case interaction_message_type_e::slot_time:
+//	{
+//		LOG(INFO) << "buff in parameter";
+//		Interaction_time* item = static_cast<Interaction_time*>(list);
+//		update_list(item->m_value);
+//		break;
+//	}
+//	case interaction_message_type_e::part:
+//	{
+//		Object_part* part = static_cast<Object_part*>(list);
+//		LOG(INFO) << part->m_name;
+//		if (part->m_item)
+//		{
+//			LOG(INFO) << part->m_item->m_name;
+//			ObjectTag::Equippable* tag_equippable = static_cast<ObjectTag::Equippable*>(part->m_item->get_tag(object_tag_e::equippable));
+//			if (tag_equippable)
+//			{
+//				Instruction_game_owner* i = new Instruction_game_owner();
+//				i->m_value = part;
+//				tag_equippable->m_condition->apply_effect(nullptr, i);
+//				if (!i->m_result)
+//				{
+//					GameObject* obj = part->m_item;
+//					MapCell* cell = static_cast<MapCell*>(part->get_owner(entity_e::cell));
+//					part->m_item = nullptr;
+//					i->m_value = part;
+//					tag_equippable->m_value->apply_effect(nullptr, i);
+//					cell->m_map->add_object(obj, cell);
+//					obj->m_owner = cell;
+//					return;
+//				};
+//				
+//				Object_tag* tag_requirements = part->m_object_state.get_tag(object_tag_e::requirements_to_object);
+//				if (tag_requirements)
+//				{
+//					i->m_result = false;
+//					i->m_value = part->m_item;
+//					tag_requirements->apply_effect(nullptr, i);
+//					if (!i->m_result) 
+//					{ 
+//						GameObject* obj = part->m_item;
+//						MapCell* cell = static_cast<MapCell*>(part->get_owner(entity_e::cell));
+//						part->m_item = nullptr;
+//						i->m_value = part;
+//						tag_equippable->m_value->apply_effect(nullptr, i);
+//						cell->m_map->add_object(obj, cell);
+//						obj->m_owner = cell;
+//						return; 
+//					};
+//				}
+//			}
+//		}
+//	}
+//	}
+//}
 
-	switch (list->m_interaction_message_type)
+Parts_list::Update_visitor::Update_visitor(Parts_list& owner) : m_owner(owner),was_changed(false) {}
+
+void Parts_list::Update_visitor::visit(Object_interaction& value)
+{
+	if (was_changed) { return; }
+	switch (value.m_interaction_message_type)
 	{
-	case interaction_message_type_e::list:
-	{
-		Interaction_list* list_item = static_cast<Interaction_list*>(list);
-		for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); ++current)
-		{
-			update_list((*current));
-		}
-		break;
-	}
-	case interaction_message_type_e::slot_time:
-	{
-		LOG(INFO) << "buff in parameter";
-		Interaction_time* item = static_cast<Interaction_time*>(list);
-		update_list(item->m_value);
-		break;
-	}
 	case interaction_message_type_e::part:
-	{
-		Object_part* part = static_cast<Object_part*>(list);
-		if (part->m_item)
 		{
-			ObjectTag::Equippable* tag_equippable = static_cast<ObjectTag::Equippable*>(part->m_item->get_tag(object_tag_e::equippable));
-			if (tag_equippable)
+			Object_part& part = static_cast<Object_part&>(value);
+			if (part.m_item)
 			{
-				Instruction_game_owner* i = new Instruction_game_owner();
-				i->m_value = part;
-				tag_equippable->m_condition->apply_effect(nullptr, i);
-				if (!i->m_result)
+				ObjectTag::Equippable* tag_equippable = static_cast<ObjectTag::Equippable*>(part.m_item->get_tag(object_tag_e::equippable));
+				if (tag_equippable)
 				{
-					GameObject* obj = part->m_item;
-					MapCell* cell = static_cast<MapCell*>(part->get_owner(entity_e::cell));
-					part->m_item = nullptr;
-					i->m_value = part;
-					i->m_mode = mode_t::unequip;
-					tag_equippable->m_value->apply_effect(nullptr, i);
-					cell->m_map->add_object(obj, cell);
-					obj->m_owner = cell;
-					return;
-				};
-				Object_tag* tag_requirements = part->m_object_state.get_tag(object_tag_e::requirements_to_object);
-				if (tag_requirements)
-				{
-					i->m_result = false;
-					i->m_value = part->m_item;
-					tag_requirements->apply_effect(nullptr, i);
-					if (!i->m_result) 
-					{ 
-						GameObject* obj = part->m_item;
-						MapCell* cell = static_cast<MapCell*>(part->get_owner(entity_e::cell));
-						part->m_item = nullptr;
-						i->m_value = part;
-						i->m_mode = mode_t::unequip;
+					Instruction_game_owner* i = new Instruction_game_owner();
+					i->m_value = &part;
+					tag_equippable->m_condition->apply_effect(nullptr, i);
+					if (!i->m_result)
+					{
+						GameObject* obj = part.m_item;
+						MapCell* cell = static_cast<MapCell*>(part.get_owner(entity_e::cell));
+						part.m_item = nullptr;
+						i->m_value = &part;
 						tag_equippable->m_value->apply_effect(nullptr, i);
 						cell->m_map->add_object(obj, cell);
 						obj->m_owner = cell;
-						return; 
+						was_changed = true;
+						return;
 					};
+
+					Object_tag* tag_requirements = part.m_object_state.get_tag(object_tag_e::requirements_to_object);
+					if (tag_requirements)
+					{
+						i->m_result = false;
+						i->m_value = part.m_item;
+						tag_requirements->apply_effect(nullptr, i);
+						if (!i->m_result)
+						{
+							GameObject* obj = part.m_item;
+							MapCell* cell = static_cast<MapCell*>(part.get_owner(entity_e::cell));
+							part.m_item = nullptr;
+							i->m_value = &part;
+							Parameter* p = new Parameter(parameter_type_e::destination, obj, obj, cell, &part);
+							Instruction_slot_parameter* ip = new Instruction_slot_parameter();
+							ip->m_parameter = p;
+							tag_equippable->m_value->apply_effect(nullptr, ip);
+							cell->m_map->add_object(obj, cell);
+							obj->m_owner = cell;
+							was_changed = true;
+							return;
+						};
+					}
 				}
 			}
+			break;
 		}
+	default:
+	{
+		break;
 	}
 	}
 
 }
 
-void Parts_list::update()
+bool Parts_list::update()
 {
-	update_list(this);
+	Update_visitor uh(*this);
+	do_predicat(uh);
+	//do
+	//{
+	//	uh.was_changed = false;
+	//	do_predicat(uh);
+	//} while (uh.was_changed);
+
+	return uh.was_changed;
 }
 
 void Parts_list::equip(Object_interaction* item)
@@ -1034,9 +1119,9 @@ bool Interaction_slot::on_turn()
 	return m_value->on_turn();
 }
 
-void Interaction_slot::do_predicat(Bypass_helper& helper)
+void Interaction_slot::do_predicat(Visitor& helper)
 {
-	helper.handle(*this);
+	helper.visit(*this);
 	m_value->do_predicat(helper);
 }
 
@@ -1344,7 +1429,7 @@ void Interaction_timer::load()
 
 Effect::Effect()
 {
-	m_interaction_message_type = interaction_message_type_e::single;
+	m_interaction_message_type = interaction_message_type_e::effect;
 }
 
 bool Effect::on_turn()
@@ -1355,7 +1440,6 @@ bool Effect::on_turn()
 Object_interaction* Effect::clone()
 {
 	Effect* effect = new Effect();
-	effect->m_interaction_message_type = m_interaction_message_type;
 	effect->m_subtype = m_subtype;
 	effect->m_value = m_value;
 	return effect;
@@ -1762,7 +1846,7 @@ std::string Instruction_slot_link::get_description()
 }
 
 
-Object_interaction* Instruction_slot_link::clone()
+Instruction_slot_link* Instruction_slot_link::clone()
 {
 	Instruction_slot_link* effect = new Instruction_slot_link();
 	effect->m_interaction_message_type = m_interaction_message_type;
@@ -1786,20 +1870,79 @@ void Instruction_slot_link::apply_effect(GameObject* unit, Object_interaction* o
 	{
 		Instruction_game_owner* parameter = static_cast<Instruction_game_owner*>(object);
 		Object_part* part = static_cast<Object_part*>(parameter->m_value);
-		LOG(INFO) << std::to_string((int)parameter->m_value->m_kind);
 		auto i = part->m_object_state.get_list(m_subtype);
 		if (i)
 		{
-			if (parameter->m_mode == mode_t::equip)
+			if (m_enable)
 			{
-				i->add(m_value);
+				i->remove(m_value);
+				m_enable = false;
 			}
 			else
 			{
-				i->remove(m_value);
+				i->add(m_value);
+				m_enable = true;
 			}
 		}
 		break;
+	}
+	case interaction_message_type_e::instruction_result:
+	{
+			Instruction_result* ir = static_cast<Instruction_result*>(object);
+			Parameter_argument_t& a = ir->m_value;
+			switch (a.kind)
+			{
+			case type_e::gameobject:
+			{
+				auto i = a.m_object->m_active_state->get_list(m_subtype);
+				if (i)
+				{
+					if (m_enable)
+					{
+						i->remove(m_value);
+						m_enable = false;
+					}
+					else
+					{
+						i->add(m_value);
+						m_enable = true;
+					}
+				}
+				break;
+			}
+			case type_e::object_owner:
+			{
+				Interaction_list* i = nullptr;
+				switch(a.m_owner->m_kind)
+				{
+				case entity_e::body_part:
+					{
+					i = static_cast<Object_part*>(a.m_owner)->m_object_state.get_list(m_subtype);
+					break;
+					}
+				case entity_e::game_object:
+				{
+					i = static_cast<GameObject*>(a.m_owner)->m_active_state->get_list(m_subtype);
+					break;
+				}
+				}
+				if (i)
+				{
+					if (m_enable)
+					{
+						i->remove(m_value);
+						m_enable = false;
+					}
+					else
+					{
+						i->add(m_value);
+						m_enable = true;
+					}
+				}
+				break;
+			}
+			}
+			break;
 	}
 	default:
 	{
@@ -1810,13 +1953,15 @@ void Instruction_slot_link::apply_effect(GameObject* unit, Object_interaction* o
 		if (i)
 		{
 			Instruction_slot_parameter* p = static_cast<Instruction_slot_parameter*>(object);
-			if (p->m_mode == mode_t::equip)
+			if (m_enable)
 			{
-				i->add(m_value);
+				i->remove(m_value);
+				m_enable = false;
 			}
 			else
 			{
-				i->remove(m_value);
+				i->add(m_value);
+				m_enable = true;
 			}
 		}
 		break;
@@ -1977,7 +2122,6 @@ void ObjectTag::Equippable::apply_effect(GameObject* unit, Object_interaction* o
 			Object_part* part = static_cast<Object_part*>(p[1].m_object->m_owner);
 			part->m_item = nullptr;
 			part = nullptr;
-			parameter->m_mode = mode_t::unequip;
 			m_value->apply_effect(unit, object);
 			break;
 		}
@@ -2004,7 +2148,6 @@ void ObjectTag::Equippable::apply_effect(GameObject* unit, Object_interaction* o
 			Object_part* part = static_cast<Object_part*>((*p)[2].m_owner);
 			part->m_item = (*p)[1].m_object;
 			(*p)[1].m_object->m_owner = part;
-			parameter->m_mode = mode_t::equip;
 			m_value->apply_effect(unit, object);
 			break;
 		}
@@ -2154,6 +2297,7 @@ void Instruction_check_tag::apply_effect(GameObject* unit, Object_interaction* o
 {
 	switch (object->m_interaction_message_type)
 	{
+		
 	case interaction_message_type_e::instruction_game_owner:
 	{
 		Instruction_game_owner* i = static_cast<Instruction_game_owner*>(object);
@@ -2216,6 +2360,7 @@ Instruction_arg_extract* Instruction_arg_extract::clone()
 {
 	Instruction_arg_extract* result = new Instruction_arg_extract();
 	result->m_interaction_message_type = m_interaction_message_type;
+	result->m_index = m_index;
 	result->m_value = m_value->clone();
 	result->m_result = m_result;
 	return result;
@@ -2240,6 +2385,15 @@ void Instruction_arg_extract::apply_effect(GameObject* unit, Object_interaction*
 			p->m_result = i->m_result;
 			break;
 			}
+		case type_e::object_part:
+		{
+			Instruction_result* i = new Instruction_result();
+			i->m_value = Parameter_argument_t(type_e::object_part);
+			i->m_value.set(a.m_part);
+			m_value->apply_effect(unit, i);
+			p->m_result = i->m_result;
+			break;
+		}
 		}
 		break;
 	}
@@ -2275,7 +2429,6 @@ Instruction_get_owner::Instruction_get_owner()
 Instruction_get_owner* Instruction_get_owner::clone()
 {
 	Instruction_get_owner* result = new Instruction_get_owner();
-	result->m_interaction_message_type = m_interaction_message_type;
 	result->m_value = m_value->clone();
 	result->m_result = m_result;
 	return result;
@@ -2296,6 +2449,79 @@ void Instruction_get_owner::apply_effect(GameObject* unit, Object_interaction* o
 			Instruction_result* i = new Instruction_result();
 			i->m_value = Parameter_argument_t(type_e::object_owner);
 			i->m_value.set(a.m_object->m_owner);
+			m_value->apply_effect(unit, i);
+			ir->m_result = i->m_result;
+			break;
+		}
+		case type_e::object_part:
+		{
+			Instruction_result* i = new Instruction_result();
+			i->m_value = Parameter_argument_t(type_e::object_owner);
+			i->m_value.set(a.m_part->m_owner);
+			m_value->apply_effect(unit, i);
+			ir->m_result = i->m_result;
+			break;
+		}
+		}
+		break;
+	}
+	default:
+	{
+		break;
+	}
+	}
+};
+
+
+// Instruction_get_owner_top
+
+Instruction_get_owner_top::Instruction_get_owner_top()
+{
+	m_value = nullptr;
+	m_result = false;
+};
+
+Instruction_get_owner_top* Instruction_get_owner_top::clone()
+{
+	Instruction_get_owner_top* result = new Instruction_get_owner_top();
+	result->m_value = m_value->clone();
+	result->m_result = m_result;
+	return result;
+}
+
+void Instruction_get_owner_top::apply_effect(GameObject* unit, Object_interaction* object)
+{
+	switch (object->m_interaction_message_type)
+	{
+	case interaction_message_type_e::instruction_result:
+	{
+		Instruction_result* ir = static_cast<Instruction_result*>(object);
+		Parameter_argument_t& a = ir->m_value;
+		switch (a.kind)
+		{
+		case type_e::gameobject:
+		{
+			Instruction_result* i = new Instruction_result();
+			i->m_value = Parameter_argument_t(type_e::object_owner);
+			i->m_value.set(a.m_object->get_owner(entity_e::game_object));
+			m_value->apply_effect(unit, i);
+			ir->m_result = i->m_result;
+			break;
+		}
+		case type_e::object_part:
+		{
+			Instruction_result* i = new Instruction_result();
+			i->m_value = Parameter_argument_t(type_e::object_owner);
+			i->m_value.set(a.m_part->get_owner(entity_e::game_object));
+			m_value->apply_effect(unit, i);
+			ir->m_result = i->m_result;
+			break;
+		}
+		case type_e::object_owner:
+		{
+			Instruction_result* i = new Instruction_result();
+			i->m_value = Parameter_argument_t(type_e::object_owner);
+			i->m_value.set(a.m_part->get_owner(entity_e::game_object));
 			m_value->apply_effect(unit, i);
 			ir->m_result = i->m_result;
 			break;

@@ -87,7 +87,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	{
 		if (bRet == -1)
 		{
-			// handle the error and possibly exit
+			// visit the error and possibly exit
 		}
 		else
 		{

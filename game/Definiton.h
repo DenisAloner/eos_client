@@ -292,7 +292,8 @@ enum class interaction_message_type_e
 	instruction_slot_parameter,
 	instruction_game_owner,
 	game_object,
-	instruction_result
+	instruction_result,
+		effect
 };
 
 enum class interaction_e
@@ -396,10 +397,10 @@ enum class ai_type_e
 
 class Object_interaction;
 
-class Bypass_helper
+class Visitor
 {
 public:
-	virtual void handle(Object_interaction& value) = 0;
+	virtual void visit(Object_interaction& value) = 0;
 };
 
 
@@ -417,7 +418,7 @@ public:
 	virtual std::string get_description() = 0;
 	virtual Object_interaction* clone() = 0;
 	virtual void description(std::list<std::string>* info, int level) = 0;
-	virtual void do_predicat(Bypass_helper& helper) { helper.handle(*this); };
+	virtual void do_predicat(Visitor& helper) { helper.visit(*this); };
 	virtual void do_predicat_ex(predicat_ex func) { func(this,true); func(this, false);};
 };
 

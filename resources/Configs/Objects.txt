@@ -12,7 +12,9 @@ pop_list
 list yy,parts,body
 part yy,wrist,кисть
 list yy,tag,tag
-tag yy,can_transfer_object
+tag yn,can_transfer_object
+instruction_check_tag cursed
+tag yn,requirements_to_object
 pop_list
 list yy,parts,body
 template_part humanoid_finger
@@ -35,7 +37,7 @@ list yy,tag,tag
 instruction_check_tag footwear
 tag yn,requirements_to_object
 instruction_check_owner_type cell
-instruction_get_owner
+instruction_get_owner near
 instruction_arg_extract 1
 tag yn,can_transfer_object
 pop_list
@@ -151,6 +153,8 @@ mem_slot_time 5
 slot_to_list
 mem_effect value,6
 mem_instruction_slot_link health
+instruction_get_owner top
+instruction_arg_extract 3
 tag yn,equippable
 instruction_check_part_type wrist
 slot_to_list
@@ -220,6 +224,15 @@ state alive
 size 4,4,4
 optical 0.4,0.4,0.4
 tile_manager 31
+list yy,tag,tag
+tag yy,seethrough_able
+pop_list
+
+object campfire
+state alive
+size 2,2,2
+tile_manager 32
+light 40,40,30
 list yy,tag,tag
 tag yy,seethrough_able
 pop_list

@@ -32,6 +32,7 @@ MapCell::MapCell(int x, int y, GameMap* map) :x(x), y(y), m_map(map)
 {
 	m_kind = entity_e::cell;
 	m_notable = false;
+	m_owner = nullptr;
 }
 
 void MapCell::add_object(GameObject* Object)
@@ -134,7 +135,7 @@ void Attribute_map::load()
 
 Tag_getter::Tag_getter(object_tag_e key) :m_key(key), m_result(nullptr) {};
 
-void Tag_getter::handle(Object_interaction& value)
+void Tag_getter::visit(Object_interaction& value)
 {
 	if (!m_result)
 	{
@@ -343,11 +344,12 @@ void Object_state::load()
 GameObject::GameObject()
 {
 	m_interaction_message_type = interaction_message_type_e::game_object;
-	m_kind = entity_e::game_object;;
+	m_kind = entity_e::game_object;
 	m_owner = nullptr;
 	m_direction = object_direction_e::down;
 	m_selected = false;
 	m_active_state = nullptr;
+	m_owner = nullptr;
 	//rendering_necessary = false;
 }
 
@@ -618,16 +620,24 @@ void GameObject::update_interaction()
 {
 	if (m_active_state)
 	{
-		for (auto item = m_active_state->m_item.begin(); item != m_active_state->m_item.end(); item++)
+		bool was_changed;
+		int i = 0;
+		do
 		{
-			item->second->update();
-		}
+			was_changed = false;
+			for (auto item = m_active_state->m_item.begin(); item != m_active_state->m_item.end(); ++item)
+			{
+				was_changed = item->second->update();
+				if (was_changed) break;
+			}
+			i += 1;
+		} while (was_changed);
 	}
 }
 
 Action_getter::Action_getter(GameObject* object, std::list<Action_helper_t>& list) : m_object(object), m_list(list) {}
 
-void Action_getter::handle(Object_interaction& value)
+void Action_getter::visit(Object_interaction& value)
 {
 	switch (value.m_interaction_message_type)
 	{
@@ -980,9 +990,9 @@ void Object_part::description(std::list<std::string>* info, int level)
 	}
 }
 
-void Object_part::do_predicat(Bypass_helper& helper)
+void Object_part::do_predicat(Visitor& helper)
 { 
-	helper.handle(*this);
+	helper.visit(*this);
 	for (auto item = m_object_state.m_item.begin(); item != m_object_state.m_item.end(); item++)
 	{
 		item->second->do_predicat(helper);

@@ -50,14 +50,20 @@ int TileManager_Single::get_tile_index(const object_direction_e& direction, cons
 }
 
 
-TileManager_Single_animate::TileManager_Single_animate()
+TileManager_Single_animate::TileManager_Single_animate(int frame):m_frame(frame)
 {
-	m_tiles = new GLuint[4];
+	m_tiles = new GLuint[frame];
+}
+
+bool TileManager_Single_animate::load_from_file(const std::string& filename, object_direction_e direction, int frame)
+{
+	m_tiles[frame] = Application::instance().m_graph->load_texture(FileSystem::instance().m_resource_path + "Tiles\\" + filename + ".bmp");
+	return true;
 }
 
 int TileManager_Single_animate::get_tile_index(const object_direction_e& direction, const int& frame)
 {
-	return frame;
+	return frame / 8.0*(m_frame - 1);
 }
 
 
@@ -68,7 +74,7 @@ TileManager_Map::TileManager_Map()
 
 int TileManager_Map::get_tile_index(const object_direction_e& direction, const int& frame)
 {
-	return static_cast<int>(direction) * 4 + frame;
+	return static_cast<int>(direction) * 4 + frame / 7.0*3.0;
 }
 
 

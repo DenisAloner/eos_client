@@ -15,7 +15,7 @@ public:
 	Interaction_list();
 	virtual bool on_turn();
 	virtual std::string get_description();
-	virtual void update();
+	virtual bool update();
 	virtual Interaction_list* clone();
 	virtual void description(std::list<std::string>* info, int level);
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
@@ -25,7 +25,7 @@ public:
 	virtual void equip(Object_interaction* item) { m_effect.push_back(item); };
 	virtual void unequip(Object_interaction* item) { m_effect.remove(item); };
 
-	virtual void do_predicat(Bypass_helper& helper);
+	virtual void do_predicat(Visitor& helper);
 	virtual void do_predicat_ex(predicat_ex func);
 
 	virtual void reset_serialization_index();
@@ -48,7 +48,7 @@ public:
 	Parameter_list(interaction_e subtype);
 	Parameter_list();
 	virtual std::string get_description();
-	virtual void update();
+	virtual bool update();
 	virtual Parameter_list* clone();
 	virtual void description(std::list<std::string>* info, int level);
 
@@ -56,7 +56,17 @@ public:
 	virtual void load();
 
 private:
-	void update_list(Object_interaction* list);
+
+	class Update_visitor: public Visitor
+	{
+	public :
+
+		Parameter_list& m_owner;
+
+		Update_visitor(Parameter_list& owner);
+		void visit(Object_interaction& value) override;
+
+	};
 };
 
 class Vision_list :public Interaction_list
@@ -67,7 +77,7 @@ public:
 
 	Vision_list();
 	virtual std::string get_description();
-	virtual void update();
+	virtual bool update();
 	virtual Vision_list* clone();
 	virtual void description(std::list<std::string>* info, int level);
 
@@ -89,7 +99,7 @@ public:
 	AI_FOV m_value;
 	Vision_component();
 	virtual std::string get_description();
-	virtual void update();
+	virtual bool update();
 	virtual Vision_component* clone();
 	virtual void description(std::list<std::string>* info, int level);
 
@@ -107,11 +117,23 @@ public:
 	Tag_list();
 	virtual Tag_list* clone();
 
-	virtual void update();
+	virtual bool update();
 	virtual void save();
 	virtual void load();
+
 private:
-	void update_list(Object_interaction* list);
+	
+	class Update_visitor : public Visitor
+	{
+	public:
+		
+		bool was_changed;
+
+		Update_visitor();
+		void visit(Object_interaction& value);
+
+	};
+
 };
 
 class Parts_list :public  Interaction_list
@@ -120,7 +142,7 @@ public:
 
 	Parts_list();
 	virtual Parts_list* clone();
-	virtual void update();
+	virtual bool update();
 	virtual void save();
 	virtual void load();
 
@@ -128,7 +150,18 @@ public:
 
 
 private:
-	void update_list(Object_interaction* list);
+
+	class Update_visitor : public Visitor
+	{
+	public:
+
+		Parts_list& m_owner;
+		bool was_changed;
+
+		Update_visitor(Parts_list& owner);
+		void visit(Object_interaction& value) override;
+
+	};
 };
 
 class Action_list :public Interaction_list
@@ -217,7 +250,7 @@ public:
 	Object_interaction* m_value;
 	Interaction_slot();
 	virtual bool on_turn();
-	virtual void do_predicat(Bypass_helper& helper);
+	virtual void do_predicat(Visitor& helper);
 	virtual void do_predicat_ex(predicat_ex func);
 	virtual void reset_serialization_index();
 };
@@ -459,7 +492,7 @@ public:
 	bool m_enable;
 	Instruction_slot_link();
 	virtual std::string get_description();
-	virtual Object_interaction* clone();
+	virtual Instruction_slot_link* clone();
 	virtual void description(std::list<std::string>* info, int level);
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
@@ -472,7 +505,6 @@ class Instruction_slot_parameter :public Interaction_slot
 public:
 
 	Parameter* m_parameter;
-	mode_t m_mode;
 	bool m_result;
 
 	Instruction_slot_parameter();
@@ -491,7 +523,6 @@ class Instruction_game_owner :public Object_interaction
 public:
 
 	Game_object_owner* m_value;
-	mode_t m_mode;
 	bool m_result;
 
 	Instruction_game_owner();
@@ -562,7 +593,6 @@ public:
 };
 
 
-
 class Instruction_get_owner : public Object_interaction
 {
 public:
@@ -579,6 +609,15 @@ public:
 
 	virtual void save() {};
 	virtual void load() {};
+};
+
+class Instruction_get_owner_top : public Instruction_get_owner
+{
+public:
+
+	Instruction_get_owner_top();
+	virtual Instruction_get_owner_top* clone();
+	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 };
 
 class Instruction_check_owner_type :public Object_interaction
