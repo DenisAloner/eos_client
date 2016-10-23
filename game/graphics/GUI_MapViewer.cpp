@@ -853,7 +853,7 @@ void mapviewer_object_move::render_on_cell(MapCell* c)
 			x3 = x2;
 			y3 = y0;
 			tile_t tile;
-			m_object->m_active_state->m_tile_manager->set_tile(tile, m_object, Application::instance().m_timer->m_tick, Game_algorithm::turn_to_cell(m_object, m_owner->m_cursored));
+			m_object->m_active_state->m_tile_manager->set_tile(tile, m_object, Application::instance().m_timer->get_tick(), Game_algorithm::turn_to_cell(m_object, m_owner->m_cursored));
 			GLuint Sprite = tile.unit;
 			glUseProgramObjectARB(0);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1016,7 +1016,7 @@ void mapviewer_object_rotate::render_on_cell(MapCell* c)
 			x3 = x2;
 			y3 = y0;
 			tile_t tile;
-			m_object->m_active_state->m_tile_manager->set_tile(tile, m_object, Application::instance().m_timer->m_tick, m_direction);
+			m_object->m_active_state->m_tile_manager->set_tile(tile, m_object, Application::instance().m_timer->get_tick(), m_direction);
 			GLuint Sprite = tile.unit;
 			glUseProgramObjectARB(0);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1319,7 +1319,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 								}
 							}
 							
-							(*Current)->m_active_state->m_tile_manager->set_tile(tile, (*Current), Application::instance().m_timer->m_tick, dx);
+							(*Current)->m_active_state->m_tile_manager->set_tile(tile, (*Current), Application::instance().m_timer->get_tick(), dx);
 							GLuint Sprite = tile.unit;
 							glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 							glActiveTexture(GL_TEXTURE0);

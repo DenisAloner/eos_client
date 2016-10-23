@@ -19,6 +19,7 @@ public:
 	~TileManager();
 
 	virtual bool load_from_file(const std::string& filename, object_direction_e direction, int frame);
+	virtual bool load_from_file(const std::string& filename, object_direction_e direction, int frame,std::string& ext);
 	virtual void set_tile(tile_t& tile, GameObject* obj, int frame, int shift);
 	virtual void set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction);
 	virtual int get_tile_index(const object_direction_e& direction, const int& frame) = 0;
@@ -73,6 +74,7 @@ public:
 
 	TileManager_Single_animate(int frame);
 	bool load_from_file(const std::string& filename, object_direction_e direction, int frame) override;
+	bool load_from_file(const std::string& filename, object_direction_e direction, int frame, std::string& ext) override;
 	virtual int get_tile_index(const object_direction_e& direction, const int& frame);
 
 };

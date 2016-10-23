@@ -635,9 +635,9 @@ void GameObject::update_interaction()
 	}
 }
 
-Action_getter::Action_getter(GameObject* object, std::list<Action_helper_t>& list) : m_object(object), m_list(list) {}
+GameObject::Action_getter::Action_getter(GameObject* object, std::list<Action_helper_t>& list) : m_object(object), m_list(list) {}
 
-void Action_getter::visit(Object_interaction& value)
+void GameObject::Action_getter::visit(Object_interaction& value)
 {
 	switch (value.m_interaction_message_type)
 	{
@@ -767,26 +767,8 @@ void GameObject::get_actions_list(std::list<Action_helper_t>& value)
 	Action_list* al= static_cast<Action_list*>(get_effect(interaction_e::action));
 	al->do_predicat(ag);
 
-	/*if (al)
-	{
-		for (auto action = al->m_effect.begin(); action != al->m_effect.end(); ++action)
-		{
-			(*action)->do_predicat(std::bind(&GameObject::get_action_predicat, this, std::placeholders::_1));
-		}
-	}*/
-	//m_common_actions.pick = false;
-
 	Parts_list* parts = get_parts_list(interaction_e::body);
 	parts->do_predicat(ag);
-
-	//for (auto item = parts->m_effect.begin(); item != parts->m_effect.end(); ++item)
-	//{
-	//	(*item)->do_predicat(std::bind(&GameObject::add_action_from_part, this, std::placeholders::_1));
-	//}
-	//if (m_common_actions.pick)
-	//{
-	//	m_actions_list->push_back(Action_helper_t(Application::instance().m_actions[action_e::pick]));
-	//}
 }
 
 void GameObject::reset_serialization_index()

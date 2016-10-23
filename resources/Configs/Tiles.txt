@@ -14,7 +14,7 @@ single Mud
 rotating no_tile,no_tile,door_down_close,door_left_close
 rotating no_tile,no_tile,door_down_open,door_left_open
 single iso_floor
-single_animate 4,torch_01,torch_02,torch_01,torch_03
+single_animate 4,bmp,torch_01,torch_02,torch_01,torch_03
 rotating8 knight
 single corpse2x2
 single big_corpse
@@ -38,5 +38,5 @@ single iso_wall_3
 single belt
 single bag
 single boot
-single_animate 8,fountain_01,fountain_02,fountain_03,fountain_04,fountain_05,fountain_06,fountain_07,fountain_08
-single_animate 4,campfire_01,campfire_02,campfire_03,campfire_04
+single_animate 8,png,fountain
+single_animate 4,bmp,campfire_01,campfire_02,campfire_03,campfire_04

@@ -91,7 +91,7 @@ object torch
 state alive
 size 1,1,3
 tile_manager 7
-light 80,80,80
+light 100,100,100
 list yy,tag,tag
 tag yy,seethrough_able
 pop_list

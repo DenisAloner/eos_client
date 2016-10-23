@@ -146,18 +146,6 @@ public:
 
 };
 
-class Action_getter : public Visitor
-{
-public:
-
-	std::list<Action_helper_t>& m_list;
-	GameObject* m_object;
-
-	Action_getter(GameObject* object,std::list<Action_helper_t>& list);
-	virtual void visit(Object_interaction& value);
-
-};
-
 class GameObject : public  Object_interaction, public GUI_connectable_i,public Game_object_owner
 {
 public:
@@ -202,6 +190,20 @@ public:
 	virtual void load();
 
 	virtual void get_actions_list(std::list<Action_helper_t>& value);
+
+private:
+
+	class Action_getter : public Visitor
+	{
+	public:
+
+		std::list<Action_helper_t>& m_list;
+		GameObject* m_object;
+
+		Action_getter(GameObject* object, std::list<Action_helper_t>& list);
+		void visit(Object_interaction& value) override;
+
+	};
 
 };
 

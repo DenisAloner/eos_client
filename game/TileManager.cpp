@@ -19,6 +19,12 @@ bool TileManager::load_from_file(const std::string& filename, object_direction_e
 }
 
 
+bool TileManager::load_from_file(const std::string& filename, object_direction_e direction, int frame, std::string& ext)
+{
+	LOG(FATAL) << "Метод не описан";
+	return false;
+}
+
 void TileManager::set_tile(tile_t& tile, GameObject* obj, int frame, int shift)
 {
 	tile.unit = m_tiles[get_tile_index(obj->m_direction, frame)];
@@ -61,9 +67,15 @@ bool TileManager_Single_animate::load_from_file(const std::string& filename, obj
 	return true;
 }
 
+bool TileManager_Single_animate::load_from_file(const std::string& filename, object_direction_e direction, int frame, std::string& ext)
+{
+	m_tiles[frame] = Application::instance().m_graph->png_texture_load(FileSystem::instance().m_resource_path + "Tiles\\" + filename + ".png");
+	return true;
+}
+
 int TileManager_Single_animate::get_tile_index(const object_direction_e& direction, const int& frame)
 {
-	return frame / 8.0*(m_frame - 1);
+	return frame * (m_frame/8.0);
 }
 
 

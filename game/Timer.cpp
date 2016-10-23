@@ -17,14 +17,7 @@ Timer::~Timer()
 
 void Timer::next()
 {
-	if (m_tick > m_tick_limit-1)
-	{
-		m_tick = 0;
-	}
-	else
-	{
-		m_tick += 1;
-	}
+	set_tick(m_tick + 1);
 }
 
 
@@ -36,4 +29,22 @@ void Timer::cycle()
 		std::this_thread::sleep_for(Duration);
 		next();
 	}
+}
+
+void Timer::set_tick(unsigned int value)
+{
+	if (value > m_tick_limit-1)
+	{
+		m_tick = 0;
+	}
+	else
+	{
+		m_tick = value;
+	}
+}
+
+
+unsigned int Timer::get_tick()
+{
+	return m_tick;
 }

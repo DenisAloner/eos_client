@@ -16,6 +16,7 @@
 #include <freetype/ftglyph.h>
 #include <freetype/ftoutln.h>
 #include <freetype/fttrigon.h>
+#include <png.h>
 
 class TileManager;
 
@@ -101,6 +102,9 @@ public:
 	void parser(const std::string& command);
 	void Load_font(std::string font_filename);
 	int get_width(std::string text);
+
+	GLuint png_texture_load(const std::string& path);
+
 	std::size_t measure_text_width(std::string& Text);
 
 	position_t center_aling_to_point(int x, int y,std::string text);

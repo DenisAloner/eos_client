@@ -5,7 +5,7 @@
 class Timer
 {
 public:
-	unsigned int m_tick;
+	
 	int m_tick_limit;
 	int m_tick_size;
 
@@ -14,6 +14,11 @@ public:
 
 	void next();
 	void cycle();
+	void set_tick(unsigned int value);
+	unsigned int get_tick();
+
+private:
+	unsigned int m_tick;
 };
 
 #endif //TIMER_H
