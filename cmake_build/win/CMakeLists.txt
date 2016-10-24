@@ -56,19 +56,22 @@ find_library(GLOG_LIB libglog
 	DOC "Logging library"
 )
 
-find_library(FREETYPE_LIB FreeType
-	PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}
+find_library(FREETYPE_LIB FreeType27
+       $<$<CONFIG:Debug>: PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/debug>
+       $<$<CONFIG:Release>: PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/release>
 	DOC "FreeType libraries"
 )
 
 find_library(LIBPNG_LIB libpng16
-	PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}
-	DOC "libpng libraries"
+       $<$<CONFIG:Debug>: PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/debug>
+       $<$<CONFIG:Release>: PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/release>
+       DOC "libpng libraries"
 )
 
 find_library(ZLIB_LIB zlib
-	PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}
-	DOC "zlib libraries"
+       $<$<CONFIG:Debug>: PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/debug>
+       $<$<CONFIG:Release>: PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/release>
+       DOC "zlib libraries"
 )
 
 include_directories(
@@ -103,7 +106,8 @@ target_link_libraries(${PROJECT_NAME} ${EXT_LIBRARIES})
 # Copy assets and resources into the project directory
 string(REPLACE "/" "\\" PROJECT_DIR_WIN ${PROJECT_DIR})
 # Copy libraries into the Output Directory
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND xcopy ${PROJECT_DIR_WIN}\\lib\\win\\${LIB_PLATFORM}\\*.dll $(OutDir) /e/q/r/y)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND xcopy ${PROJECT_DIR_WIN}\\lib\\win\\${LIB_PLATFORM}\\*.dll $(OutDir) /q/r/y)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND xcopy ${PROJECT_DIR_WIN}\\lib\\win\\${LIB_PLATFORM}\\$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release>\\*.dll $(OutDir) /q/r/y)
 
 set_target_properties(${PROJECT_NAME}
 	PROPERTIES
