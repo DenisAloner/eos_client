@@ -56,21 +56,33 @@ find_library(GLOG_LIB libglog
 	DOC "Logging library"
 )
 
-find_library(FREETYPE_LIB FreeType27
-       $<$<CONFIG:Debug>: PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/debug>
-       $<$<CONFIG:Release>: PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/release>
-	DOC "FreeType libraries"
+find_library(FREETYPE_LIB_DEBUG freetype27d
+       PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/debug
+       DOC "freetype libraries"
 )
 
-find_library(LIBPNG_LIB libpng16
-       $<$<CONFIG:Debug>: PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/debug>
-       $<$<CONFIG:Release>: PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/release>
+find_library(FREETYPE_LIB_RELEASE freetype27
+       $PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/release
+       DOC "freetype libraries"
+)
+
+find_library(LIBPNG_LIB_DEBUG libpng16
+       PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/debug
        DOC "libpng libraries"
 )
 
-find_library(ZLIB_LIB zlib
-       $<$<CONFIG:Debug>: PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/debug>
-       $<$<CONFIG:Release>: PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/release>
+find_library(LIBPNG_LIB_RELEASE libpng16
+       PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/release
+       DOC "libpng libraries"
+)
+
+find_library(ZLIB_LIB_DEBUG zlibd
+       PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/debug
+       DOC "zlib libraries"
+)
+
+find_library(ZLIB_LIB_RELEASE zlib
+       PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/release
        DOC "zlib libraries"
 )
 
@@ -90,9 +102,9 @@ set(EXT_LIBRARIES
 	${SDL_LIB}
 	${SDLMIXER_LIB}
 	${GLOG_LIB}
-	${FREETYPE_LIB}
-	${LIBPNG_LIB}
-	${ZLIB_LIB}
+	$<$<CONFIG:Debug>:${FREETYPE_LIB_DEBUG}>$<$<CONFIG:Release>:${FREETYPE_LIB_RELEASE}>
+        $<$<CONFIG:Debug>:${LIBPNG_LIB_DEBUG}>$<$<CONFIG:Release>:${LIBPNG_LIB_RELEASE}>
+        $<$<CONFIG:Debug>:${ZLIB_LIB_DEBUG}>$<$<CONFIG:Release>:${ZLIB_LIB_RELEASE}>
 )
 
 include(${PROJECT_DIR}/cmake_build/common/game.cmake)
