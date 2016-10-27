@@ -14,7 +14,7 @@ single Mud
 rotating no_tile,no_tile,door_down_close,door_left_close
 rotating no_tile,no_tile,door_down_open,door_left_open
 single iso_floor
-single_animate 4,bmp,torch_01,torch_02,torch_01,torch_03
+single_animate 4,png,flame
 rotating8 knight
 single corpse2x2
 single big_corpse
