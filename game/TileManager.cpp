@@ -75,7 +75,7 @@ bool TileManager_Single_animate::load_from_file(const std::string& filename, obj
 
 int TileManager_Single_animate::get_tile_index(const object_direction_e& direction, const int& frame)
 {
-	return frame * (m_frame/8.0);
+	return frame * (m_frame/24.0);
 }
 
 

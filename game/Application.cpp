@@ -48,7 +48,7 @@ void gui_MessageQueue::push(Parameter* p)
 game_clipboard::game_clipboard():m_item(nullptr){}
 
 Application::Application()
-: m_timer(new Timer(8, 300))
+: m_timer(new Timer(24, 100))
 {
 	m_turn = false;
 	m_GUI = nullptr;

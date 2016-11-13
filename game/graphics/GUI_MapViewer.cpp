@@ -1194,7 +1194,6 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 						}
 					}
 
-					
 					for (std::list<GameObject*>::iterator Current = m_map->m_items[y][x]->m_items.begin(); Current != m_map->m_items[y][x]->m_items.end(); ++Current)
 					{
 						light[0] = (m_map->m_items[y][x]->m_light.R / 100.0F);

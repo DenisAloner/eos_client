@@ -221,7 +221,7 @@ pop_map
 
 object fountain
 state alive
-size 4,4,4
+size 6,6,4
 optical 0.4,0.4,0.4
 tile_manager 31
 list yy,tag,tag
