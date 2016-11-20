@@ -166,7 +166,7 @@ object belt
 state equip,finger
 size 1,1,1
 icon 6
-tile_manager 28
+tile_manager 26
 list yy,tag,tag
 tag yn,pick_able
 tag yn,pass_able
@@ -184,7 +184,7 @@ object bag
 state equip,finger
 size 1,1,1
 icon 7
-tile_manager 29
+tile_manager 27
 list yy,tag,tag
 tag yn,pick_able
 tag yn,pass_able
@@ -208,7 +208,7 @@ object boot
 state equip,finger
 size 1,1,1
 icon 8
-tile_manager 30
+tile_manager 28
 list yy,tag,tag
 tag yn,pick_able
 tag yn,pass_able
@@ -223,7 +223,7 @@ object fountain
 state alive
 size 6,6,4
 optical 0.4,0.4,0.4
-tile_manager 31
+tile_manager 29
 list yy,tag,tag
 tag yy,seethrough_able
 pop_list
@@ -231,7 +231,7 @@ pop_list
 object campfire
 state alive
 size 2,2,2
-tile_manager 32
+tile_manager 30
 light 40,40,30
 list yy,tag,tag
 tag yy,seethrough_able

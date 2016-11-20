@@ -46,7 +46,6 @@ GraphicalController::GraphicalController(dimension_t size)
 		m_mask_shader2 = load_shader("EoS_mask", "EoS_mask2");
 		m_tile_shader = load_shader("EoS_tile", "EoS_tile");
 		m_tile_shader_hide = load_shader("EoS_tile", "EoS_tile_hide");
-		m_tile_shader_alpha = load_shader("EoS_tile", "EoS_tile_alpha");
 		m_empty_01 = create_empty_texture(m_size);
 		m_empty_02 = create_empty_texture(m_size);
 		m_empty_03 = create_empty_texture(m_size);
@@ -116,25 +115,6 @@ void GraphicalController::Load_font(std::string font_filename)
 	m_font_symbols[32].bearing.h = m_font_symbols[97].bearing.h;
 }
 
-void GraphicalController::draw_sprite(double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3)
-{
-	glBegin(GL_QUADS);
-	glTexCoord2d(0,1); glVertex2d(x0, y0);
-	glTexCoord2d(0,0); glVertex2d(x1, y1);
-	glTexCoord2d(1,0); glVertex2d(x2, y2);
-	glTexCoord2d(1,1); glVertex2d(x3, y3);
-	glEnd();
-}
-
-void GraphicalController::draw_tile(tile_t& tile,double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3)
-{
-	glBegin(GL_QUADS);
-	glTexCoord2d(tile.coordinat[0], tile.coordinat[1]); glVertex2d(x0, y0);
-	glTexCoord2d(tile.coordinat[0], tile.coordinat[3]); glVertex2d(x1, y1);
-	glTexCoord2d(tile.coordinat[2], tile.coordinat[3]); glVertex2d(x2, y2);
-	glTexCoord2d(tile.coordinat[2], tile.coordinat[1]); glVertex2d(x3, y3);
-	glEnd();
-}
 
 bool GraphicalController::CompileSuccessful(int obj)
 {
@@ -155,38 +135,6 @@ bool GraphicalController::ValidateSuccessful(int obj)
 	int status;
 	glGetProgramiv(obj, GL_VALIDATE_STATUS, &status);
 	return status == GL_TRUE;
-}
-
-void GraphicalController::draw_sprite_FBO(double TexWidth, double TexHeight, double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3)
-{
-	glBegin(GL_QUADS);
-	glTexCoord2d(0, TexHeight); glVertex2d(x0, y0);
-	glTexCoord2d(0, 0); glVertex2d(x1, y1);
-	glTexCoord2d(TexWidth, 0); glVertex2d(x2, y2);
-	glTexCoord2d(TexWidth, TexHeight); glVertex2d(x3, y3);
-	glEnd();
-}
-
-void GraphicalController::draw_tile_FBO(double tx1, double ty1, double tx2, double ty2, double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3)
-{
-	glBegin(GL_QUADS);
-	glMultiTexCoord2f(GL_TEXTURE0, tx1, ty2);
-	glMultiTexCoord2f(GL_TEXTURE1, 0.0f, 1.0f);
-	glVertex2d(x0, y0);
-	glMultiTexCoord2f(GL_TEXTURE0, tx1, ty1);
-	glMultiTexCoord2f(GL_TEXTURE1, 0.0f, 0.0f);
-	glVertex2d(x1, y1);
-	glMultiTexCoord2f(GL_TEXTURE0, tx2, ty1);
-	glMultiTexCoord2f(GL_TEXTURE1, 1.0f, 0.0f);
-	glVertex2d(x2, y2);
-	glMultiTexCoord2f(GL_TEXTURE0, tx2, ty2);
-	glMultiTexCoord2f(GL_TEXTURE1, 1.0f, 1.0f);
-	glVertex2d(x3, y3);
-	//glTexCoord2d(tx1, ty2); glVertex2d(x0, y0);
-	//glTexCoord2d(tx1, ty1); glVertex2d(x1, y1);
-	//glTexCoord2d(tx2, ty1); glVertex2d(x2, y2);
-	//glTexCoord2d(tx2, ty2); glVertex2d(x3, y3);
-	glEnd();
 }
 
 void GraphicalController::set_VSync(bool sync)
@@ -360,17 +308,17 @@ void GraphicalController::blur_rect(int x, int y, int width, int height)
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_empty_02, 0);
 	glUseProgram(m_horizontal_shader);
 	set_uniform_sampler(m_horizontal_shader, "Map",0);
-	draw_sprite_FBO(Tx, Ty, 0, m_size.h - height, 0, m_size.h, width, m_size.h, width, m_size.h - height);
+	draw_sprite_FBO(Tx, Ty, rectangle_t(0, m_size.h, width, -height));
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_empty_01, 0);
 	glUseProgram(m_vertical_shader);
 	set_uniform_sampler(m_vertical_shader, "Map",0);
 	glBindTexture(GL_TEXTURE_2D, m_empty_02);
-	draw_sprite_FBO(Tx, Ty, 0, m_size.h - height, 0, m_size.h, width, m_size.h, width, m_size.h - height);
+	draw_sprite_FBO(Tx, Ty, rectangle_t(0, m_size.h, width, -height));
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(0);
 	glEnable(GL_SCISSOR_TEST);
 	glBindTexture(GL_TEXTURE_2D, m_empty_01);
-	draw_sprite_FBO(Tx, Ty, x, y, x, y + height, x + width, y + height, x + width, y);
+	draw_sprite_FBO(Tx, Ty, rectangle_t(x,y+height, width, -height));
 	glColor4f(1.0, 1.0, 1.0, 1.0);
 }
 
@@ -645,8 +593,8 @@ GLuint GraphicalController::png_texture_load(const std::string& path)
 	GLuint texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	/*glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);*/
@@ -774,6 +722,23 @@ void GraphicalController::parser(const std::string& command)
 		m_tile_managers.push_back(m_tile_manager);
 		break;
 	}
+	case command_e::single_png:
+	{
+		TileManager_Single_png* m_tile_manager = new TileManager_Single_png();
+		m_tile_manager->load_from_file(arg[0], object_direction_e::down, 0);
+		m_tile_manager->m_index = m_tile_managers.size();
+		m_tile_managers.push_back(m_tile_manager);
+		break;
+	}
+	case command_e::rotate8_animate:
+	{
+		int count = std::stoi(arg[0]);
+		TileManager_rotate8_animate* m_tile_manager = new TileManager_rotate8_animate(count);
+		m_tile_manager->load_from_file(arg[1], object_direction_e::down, 0);
+		m_tile_manager->m_index = m_tile_managers.size();
+		m_tile_managers.push_back(m_tile_manager);
+		break;
+	}
 	case command_e::single_animate:
 	{
 		int count = std::stoi(arg[0]);
@@ -833,9 +798,11 @@ void GraphicalController::parser(const std::string& command)
 void GraphicalController::load_configuration()
 {
 	m_commands["single"] = command_e::single;
+	m_commands["single_png"] = command_e::single_png;
 	m_commands["single_animate"] = command_e::single_animate;
 	m_commands["rotating"] = command_e::rotating;
 	m_commands["rotating8"] = command_e::rotating8;
+	m_commands["rotate8_animate"] = command_e::rotate8_animate;
 	m_commands["icon"] = command_e::icon;
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Tiles.txt", buffer);
@@ -859,4 +826,93 @@ void GraphicalController::load_configuration()
 			pos = std::string::npos;
 		}
 	}
+}
+
+void GraphicalController::draw_sprite(rectangle_t rect)
+{
+	glBegin(GL_QUADS);
+	glTexCoord2d(0, 0); glVertex2d(rect.a.x, rect.b.y);
+	glTexCoord2d(0, 1); glVertex2d(rect.a.x, rect.a.y);
+	glTexCoord2d(1, 1); glVertex2d(rect.b.x, rect.a.y);
+	glTexCoord2d(1, 0); glVertex2d(rect.b.x, rect.b.y);
+	glEnd();
+}
+
+void GraphicalController::draw_rectangle(rectangle_t rect)
+{
+	//glBegin(GL_LINE_LOOP);
+	//glVertex2d(px, py);
+	//glVertex2d(px + m_size.w, py);
+	//glVertex2d(px + m_size.w, py + m_size.h);
+	//glVertex2d(px, py + m_size.h);
+	//glEnd();
+	glBegin(GL_LINES);
+	glVertex2d(rect.a.x, rect.b.y);
+	glVertex2d(rect.a.x, rect.a.y);
+	glVertex2d(rect.a.x, rect.a.y);
+	glVertex2d(rect.b.x, rect.a.y);
+	glVertex2d(rect.b.x, rect.a.y);
+	glVertex2d(rect.b.x, rect.b.y);
+	glVertex2d(rect.b.x, rect.b.y);
+	glVertex2d(rect.a.x, rect.b.y);
+	glEnd();
+}
+
+void GraphicalController::stroke_cell(int x,int y, int xs, int ys)
+{
+	int x0, y0;
+	x0 = (x - y) * tile_size_x_half + xs;
+	y0 = (x + y) * tile_size_y_half + ys;
+	glBegin(GL_LINES);
+	glVertex2d(x0, y0 - tile_size_y_half);
+	glVertex2d(x0 + tile_size_x_half, y0 - tile_size_y);
+	glVertex2d(x0 + tile_size_x_half, y0 - tile_size_y);
+	glVertex2d(x0 + tile_size_x, y0 - tile_size_y_half);
+	glVertex2d(x0 + tile_size_x, y0 - tile_size_y_half);
+	glVertex2d(x0 + tile_size_x_half, y0);
+	glVertex2d(x0 + tile_size_x_half, y0);
+	glVertex2d(x0, y0 - tile_size_y_half);
+	glEnd();
+}
+
+void GraphicalController::draw_tile(tile_t& tile, rectangle_t rect)
+{
+	glBegin(GL_QUADS);
+	glTexCoord2d(tile.coordinat[0], tile.coordinat[1]); glVertex2d(rect.a.x, rect.b.y);
+	glTexCoord2d(tile.coordinat[0], tile.coordinat[3]); glVertex2d(rect.a.x, rect.a.y);
+	glTexCoord2d(tile.coordinat[2], tile.coordinat[3]); glVertex2d(rect.b.x, rect.a.y);
+	glTexCoord2d(tile.coordinat[2], tile.coordinat[1]); glVertex2d(rect.b.x, rect.b.y);
+	glEnd();
+}
+
+void GraphicalController::draw_sprite_FBO(double TexWidth, double TexHeight, rectangle_t rect)
+{
+	glBegin(GL_QUADS);
+	glTexCoord2d(0, TexHeight); 
+	glVertex2d(rect.a.x, rect.b.y);
+	glTexCoord2d(0, 0); 
+	glVertex2d(rect.a.x, rect.a.y);
+	glTexCoord2d(TexWidth, 0); 
+	glVertex2d(rect.b.x, rect.a.y);
+	glTexCoord2d(TexWidth, TexHeight); 
+	glVertex2d(rect.b.x, rect.b.y);
+	glEnd();
+}
+
+void GraphicalController::draw_tile_FBO(double tx1, double ty1, double tx2, double ty2, rectangle_t rect)
+{
+	glBegin(GL_QUADS);
+	glMultiTexCoord2f(GL_TEXTURE0, tx1, ty2);
+	glMultiTexCoord2f(GL_TEXTURE1, 0.0f, 1.0f);
+	glVertex2d(rect.a.x, rect.b.y);
+	glMultiTexCoord2f(GL_TEXTURE0, tx1, ty1);
+	glMultiTexCoord2f(GL_TEXTURE1, 0.0f, 0.0f);
+	glVertex2d(rect.a.x, rect.a.y);
+	glMultiTexCoord2f(GL_TEXTURE0, tx2, ty1);
+	glMultiTexCoord2f(GL_TEXTURE1, 1.0f, 0.0f);
+	glVertex2d(rect.b.x, rect.a.y);
+	glMultiTexCoord2f(GL_TEXTURE0, tx2, ty2);
+	glMultiTexCoord2f(GL_TEXTURE1, 1.0f, 1.0f);
+	glVertex2d(rect.b.x, rect.b.y);
+	glEnd();
 }

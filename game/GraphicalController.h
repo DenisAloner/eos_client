@@ -26,13 +26,27 @@ class GraphicalController
 {
 public:
 
+	struct rectangle_t
+	{
+		position_t a;
+		position_t b;
+		rectangle_t() : a(0, 0), b(0, 0) {};
+		rectangle_t(int x, int y, int w, int h) : a(x, y), b(x + w, y + h) {};
+		void set(int x, int y, int w, int h)
+		{
+			a.x = x;
+			a.y = y;
+			b.x = x + w;
+			b.y = y + h;
+		};
+	};
+
 	GLuint m_actions[16];
 
 	GLuint m_horizontal_shader;
 	GLuint m_vertical_shader;
 	GLuint m_tile_shader;
 	GLuint m_tile_shader_hide;
-	GLuint m_tile_shader_alpha;
 	GLuint m_mask_shader;
 	GLuint m_mask_shader2;
 
@@ -62,10 +76,12 @@ public:
 	enum class command_e
 	{
 		single,
+		single_png,
 		single_animate,
 		rotating,
 		rotating8,
-		icon
+		icon,
+		rotate8_animate
 
 	};
 
@@ -86,17 +102,13 @@ public:
 	position_t get_OpenGL_position(float x, float y);
 	GLuint load_texture(const std::string& path);
 	void output_text(int x, int y, std::string& Text, int sizex, int sizey);
-	void draw_sprite(double x0,double y0,double x1,double y1,double x2,double y2,double x3,double y3);
 	void center_text(int x, int y, std::string Text, int sizex, int sizey);
 	void render_text(double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
 	bool add_scissor(const frectangle_t& rect);
 	void remove_scissor();
-	void draw_sprite_FBO(double TexWidth, double TexHeight, double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
 	void blur_rect(int x, int y, int width, int height);
 	void set_VSync(bool sync);
 	bool set_uniform_float(GLuint program, const char * name, const float value);
-	void draw_tile(tile_t& tile, double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
-	void draw_tile_FBO(double tx1, double ty1, double tx2, double ty2, double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
 	GLint create_empty_texture(dimension_t size);
 	void load_configuration();
 	void parser(const std::string& command);
@@ -108,6 +120,14 @@ public:
 	std::size_t measure_text_width(std::string& Text);
 
 	position_t center_aling_to_point(int x, int y,std::string text);
+
+	void draw_sprite(rectangle_t rect);
+	void draw_rectangle(rectangle_t rect);
+	void stroke_cell(int x, int y, int xs, int ys);
+	void draw_tile(tile_t& tile, rectangle_t rect);
+	void draw_sprite_FBO(double TexWidth, double TexHeight, rectangle_t rect);
+	void draw_tile_FBO(double tx1, double ty1, double tx2, double ty2, rectangle_t rect);
+	
 
 private:
 	bool CompileSuccessful(int obj);

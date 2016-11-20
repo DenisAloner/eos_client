@@ -97,5 +97,6 @@ void GUI_Image::render(GraphicalController* Graph, int px, int py)
 	//glGenerateMipmap(GL_TEXTURE_2D);
 	glColor4d(1.0, 1.0, 1.0, 1.0);
 	glBindTexture(GL_TEXTURE_2D, m_texture);
-	Graph->draw_sprite(px, py, px, py + m_size.h, px + m_size.w, py + m_size.h, px + m_size.w, py);
+	GraphicalController::rectangle_t rect(px, py, m_size.w, m_size.h);
+	Graph->draw_sprite(rect);
 }

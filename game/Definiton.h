@@ -15,10 +15,10 @@ class GUI_Object;
 class Action;
 class Parameter;
 
-const int tile_size_x = 32;
-const int tile_size_y = 18;
-const int tile_size_x_half = 16;
-const int tile_size_y_half = 9;
+const int tile_size_x = 38;
+const int tile_size_y = 22;
+const int tile_size_x_half = 19;
+const int tile_size_y_half = 11;
 
 struct position_t
 {

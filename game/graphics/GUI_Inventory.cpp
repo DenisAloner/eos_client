@@ -17,7 +17,8 @@ void GUI_Part_slot::render(GraphicalController* Graph, int px, int py)
 	if (focused)
 	{
 		glColor4d(1.0, 1.0, 1.0, 0.75);
-		Graph->draw_sprite(px, py, px, py + m_size.h, px + m_size.w, py + m_size.h, px + m_size.w, py);
+		GraphicalController::rectangle_t rect(px, py, m_size.w, m_size.h);
+		Graph->draw_sprite(rect);
 		glColor4d(0, 0, 0, 1);
 	}
 	else
@@ -31,26 +32,16 @@ void GUI_Part_slot::render(GraphicalController* Graph, int px, int py)
 	glDisable(GL_BLEND);
 	glColor4f(1.0, 1.0, 1.0, 1.0);
 
-	glBegin(GL_LINE_LOOP);
-	glVertex2d(px, py);
-	glVertex2d(px + m_size.w, py);
-	glVertex2d(px + m_size.w, py + m_size.h);
-	glVertex2d(px, py + m_size.h);
-	glEnd();
-
-	glBegin(GL_LINE_LOOP);
-	glVertex2d(px, py);
-	glVertex2d(px + 64, py);
-	glVertex2d(px + 64, py + m_size.h);
-	glVertex2d(px, py + m_size.h);
-	glEnd();
+	Graph->draw_rectangle(GraphicalController::rectangle_t(px, py, m_size.w, m_size.h));
+	Graph->draw_rectangle(GraphicalController::rectangle_t(px, py, 64, m_size.h));
 
 	if (m_item->m_item)
 	{
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_BLEND);
 		glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_icons[m_item->m_item->m_active_state->m_icon]);
-		Graph->draw_sprite(px, py, px, py + m_size.h, px + 64, py + m_size.h, px + 64, py);
+		GraphicalController::rectangle_t rect(px, py, 64, m_size.h);
+		Graph->draw_sprite(rect);
 	}
 }
 

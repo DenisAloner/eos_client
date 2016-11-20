@@ -47,7 +47,8 @@ public:
 			if (focused)
 			{
 				glColor4d(1.0, 1.0, 1.0, 0.75);
-				Graph->draw_sprite(px, py, px, py + m_size.h, px + m_size.w, py + m_size.h, px + m_size.w, py);
+				GraphicalController::rectangle_t rect(px,py, m_size.w,m_size.h);
+				Graph->draw_sprite(rect);
 				glColor4d(0, 0, 0, 1);
 				glEnable(GL_TEXTURE_2D);
 				Graph->output_text(px + 4, py, m_text, 8, 17);

@@ -19,11 +19,11 @@ void GUI_ActionButton::render(GraphicalController* Graph, int px, int py)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	int y_shift = (m_size.h - ((Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender) >> 6)) / 2;
-
+	GraphicalController::rectangle_t rect(px, py, m_size.w, m_size.h);
 	if (focused)
 	{
 		glColor4d(1.0, 1.0, 1.0, 0.75);
-		Graph->draw_sprite(px, py, px, py + m_size.h, px + m_size.w, py + m_size.h, px + m_size.w, py);
+		Graph->draw_sprite(rect);
 		glColor4d(0, 0, 0, 1);
 	}
 	else 
@@ -36,22 +36,14 @@ void GUI_ActionButton::render(GraphicalController* Graph, int px, int py)
 	glColor4d(1, 1, 1, 1);
 	glActiveTextureARB(GL_TEXTURE0_ARB);
 	glBindTexture(GL_TEXTURE_2D, m_value.action->m_icon);
-	Graph->draw_sprite(px, py, px, py + m_size.h, px + m_size.h, py + m_size.h, px + m_size.h, py);
+	rect.set(px, py, m_size.h, m_size.h);
+	Graph->draw_sprite(rect);
 
 	if (focused)
 	{
 		glDisable(GL_TEXTURE_2D);
 		glColor4d(0.75, 0.75, 0.75, 1.0);
-		glBegin(GL_LINES);
-		glVertex2d(px, py);
-		glVertex2d(px, py + m_size.h);
-		glVertex2d(px, py + m_size.h);
-		glVertex2d(px + m_size.w, py + m_size.h);
-		glVertex2d(px + m_size.w, py + m_size.h);
-		glVertex2d(px + m_size.w, py);
-		glVertex2d(px + m_size.w, py);
-		glVertex2d(px, py);
-		glEnd();
+		Graph->draw_rectangle(GraphicalController::rectangle_t(px, py, m_size.w, m_size.h));
 	}
 }
 

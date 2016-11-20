@@ -13,26 +13,19 @@ mapviewer_hint_line::mapviewer_hint_line(GUI_MapViewer* owner, MapCell* cell, Ga
 
 void gui_mapviewer_hint::draw_cell(MapCell* cell, int index)
 {
-	double x0, y0, x1, y1, x2, y2, x3, y3;
 	int px = 0;
 	int py = 0;
 	int x = px + cell->x - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
 	int y = py + cell->y - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
 	int yp = m_owner->m_tile_count_x - x;
 	int xp = m_owner->m_tile_count_y - y;
-	x0 = (xp - yp) * 16 + m_owner->m_shift.x;
-	y0 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
-	x1 = x0;
-	y1 = (xp + yp) * 9 + m_owner->m_shift.y;
-	x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
-	y2 = y1;
-	x3 = x2;
-	y3 = y0;
+
+	GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + m_owner->m_shift.x, (xp + yp) * tile_size_y_half + m_owner->m_shift.y, tile_size_x,-tile_size_y);
 	glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_select);
 	glColor4f(1.0F, 0.9F, 0.0F, 0.5F);
-	Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+	Application::instance().m_graph->draw_sprite(r);
 	glColor4f(1.0F, 0.9F, 0.0F, 1.0F);
-	Application::instance().m_graph->center_text((x0 + x2)*0.5, (y0 + y1) *0.5, std::to_string(index), 8, 17);
+	Application::instance().m_graph->center_text((r.a.x + r.b.x)*0.5, (r.a.y + r.b.y) *0.5, std::to_string(index), 8, 17);
 }
 
 void mapviewer_hint_path::render()
@@ -67,7 +60,6 @@ void mapviewer_hint_object_area::render()
 	glEnable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_select);
-	double x0, y0, x1, y1, x2, y2, x3, y3;
 	MapCell* Item = m_object->cell();
 	int bx;
 	int by;
@@ -81,37 +73,13 @@ void mapviewer_hint_object_area::render()
 			int y = py + (Item->y - i) - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
 			int yp = m_owner->m_tile_count_x - x;
 			int xp = m_owner->m_tile_count_y - y;
-			x0 = (xp - yp) * 16 + m_owner->m_shift.x;
-			y0 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
-			x1 = x0;
-			y1 = (xp + yp) * 9 + m_owner->m_shift.y;
-			x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
-			y2 = y1;
-			x3 = x2;
-			y3 = y0;
+			GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + m_owner->m_shift.x, (xp + yp) * tile_size_y_half + m_owner->m_shift.y, tile_size_x, -tile_size_y);
 			glColor4f(1.0F, 0.9F, 0.0F, 0.25F);
-			Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
-			x0 = (xp - yp) * 16 + m_owner->m_shift.x;
-			y0 = (xp + yp) * 9 - 9 + m_owner->m_shift.y;
-			x1 = (xp - yp) * 16 + 16 + m_owner->m_shift.x;
-			y1 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
-			x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
-			y2 = y0;
-			x3 = x1;
-			y3 = (xp + yp) * 9 + m_owner->m_shift.y;
+			Application::instance().m_graph->draw_sprite(r);
 			glDisable(GL_BLEND);
 			glDisable(GL_TEXTURE_2D);
-			glBegin(GL_LINES);
 			glColor4f(1.0, 1.0, 0.0, 1.0);
-			glVertex2d(x0, y0);
-			glVertex2d(x1, y1);
-			glVertex2d(x1, y1);
-			glVertex2d(x2, y2);
-			glVertex2d(x2, y2);
-			glVertex2d(x3, y3);
-			glVertex2d(x3, y3);
-			glVertex2d(x0, y0);
-			glEnd();
+			Application::instance().m_graph->stroke_cell(xp, yp, m_owner->m_shift.x, m_owner->m_shift.y);
 			glEnable(GL_BLEND);
 			glEnable(GL_TEXTURE_2D);
 		}
@@ -120,26 +88,18 @@ void mapviewer_hint_object_area::render()
 
 void mapviewer_hint_line::draw_cell(MapCell* a)
 {
-	double x0, y0, x1, y1, x2, y2, x3, y3;
 	int px = 0;
 	int py = 0;
 	int x = px + a->x - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
 	int y = py + a->y - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
 	int yp = m_owner->m_tile_count_x - x;
 	int xp = m_owner->m_tile_count_y - y;
-	x0 = (xp - yp) * 16 + m_owner->m_shift.x;
-	y0 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
-	x1 = x0;
-	y1 = (xp + yp) * 9 + m_owner->m_shift.y;
-	x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
-	y2 = y1;
-	x3 = x2;
-	y3 = y0;
+	GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + m_owner->m_shift.x, (xp + yp) * tile_size_y_half + m_owner->m_shift.y, tile_size_x, -tile_size_y);
 	glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_select);
 	glColor4f(1.0F, 0.9F, 0.0F, 0.5F);
-	Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+	Application::instance().m_graph->draw_sprite(r);
 	glColor4f(1.0F, 0.9F, 0.0F, 1.0F);
-	Application::instance().m_graph->center_text((x0 + x2)*0.5, (y0 + y1) *0.5, std::to_string(m_step_count), 8, 17);
+	Application::instance().m_graph->center_text((r.a.x + r.b.x)*0.5, (r.a.y + r.b.y) *0.5, std::to_string(m_step_count), 8, 17);
 	m_step_count += 1;
 }
 
@@ -194,7 +154,6 @@ void mapviewer_hint_area::render()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_select);
-	double x0, y0, x1, y1, x2, y2, x3, y3;
 	MapCell* Item = m_object->cell();
 	int bx;
 	int by;
@@ -208,6 +167,7 @@ void mapviewer_hint_area::render()
 		bx = 1;
 		by = 1;
 	}
+	GraphicalController::rectangle_t rect;
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
 	for (int i = -1; i < by + 1; i++)
 	{
@@ -219,37 +179,13 @@ void mapviewer_hint_area::render()
 				int y = py + (Item->y - i) - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
 				int yp = m_owner->m_tile_count_x - x;
 				int xp = m_owner->m_tile_count_y - y;
-				x0 = (xp - yp) * 16 + m_owner->m_shift.x;
-				y0 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
-				x1 = x0;
-				y1 = (xp + yp) * 9 + m_owner->m_shift.y;
-				x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
-				y2 = y1;
-				x3 = x2;
-				y3 = y0;
+				rect.set((xp - yp) * tile_size_x_half + m_owner->m_shift.x, (xp + yp) * tile_size_y_half + m_owner->m_shift.y, tile_size_x, -tile_size_y);
 				glColor4f(1.0F, 0.9F, 0.0F, 0.25F);
-				Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
-				x0 = (xp - yp) * 16 + m_owner->m_shift.x;
-				y0 = (xp + yp) * 9 - 9 + m_owner->m_shift.y;
-				x1 = (xp - yp) * 16 + 16 + m_owner->m_shift.x;
-				y1 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
-				x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
-				y2 = y0;
-				x3 = x1;
-				y3 = (xp + yp) * 9 + m_owner->m_shift.y;
+				Application::instance().m_graph->draw_sprite(rect);
 				glDisable(GL_BLEND);
 				glDisable(GL_TEXTURE_2D);
-				glBegin(GL_LINES);
 				glColor4f(1.0, 1.0, 0.0, 1.0);
-				glVertex2d(x0, y0);
-				glVertex2d(x1, y1);
-				glVertex2d(x1, y1);
-				glVertex2d(x2, y2);
-				glVertex2d(x2, y2);
-				glVertex2d(x3, y3);
-				glVertex2d(x3, y3);
-				glVertex2d(x0, y0);
-				glEnd();
+				Application::instance().m_graph->stroke_cell(xp, yp, m_owner->m_shift.x, m_owner->m_shift.y);
 				glEnable(GL_BLEND);
 				glEnable(GL_TEXTURE_2D);
 			}
@@ -266,37 +202,13 @@ void mapviewer_hint_area::render()
 				int y = py + (Item->y - i) - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
 				int yp = m_owner->m_tile_count_x - x;
 				int xp = m_owner->m_tile_count_y - y;
-				x0 = (xp - yp) * 16 + m_owner->m_shift.x;
-				y0 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
-				x1 = x0;
-				y1 = (xp + yp) * 9 + m_owner->m_shift.y;
-				x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
-				y2 = y1;
-				x3 = x2;
-				y3 = y0;
+				rect.set((xp - yp) * tile_size_x_half + m_owner->m_shift.x, (xp + yp) * tile_size_y_half + m_owner->m_shift.y, tile_size_x, -tile_size_y);
 				glColor4f(1.0F, 0.9F, 0.0F, 0.25F);
-				Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
-				x0 = (xp - yp) * 16 + m_owner->m_shift.x;
-				y0 = (xp + yp) * 9 - 9 + m_owner->m_shift.y;
-				x1 = (xp - yp) * 16 + 16 + m_owner->m_shift.x;
-				y1 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
-				x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
-				y2 = y0;
-				x3 = x1;
-				y3 = (xp + yp) * 9 + m_owner->m_shift.y;
+				Application::instance().m_graph->draw_sprite(rect);
 				glDisable(GL_BLEND);
 				glDisable(GL_TEXTURE_2D);
-				glBegin(GL_LINES);
 				glColor4f(1.0, 1.0, 0.0, 1.0);
-				glVertex2d(x0, y0);
-				glVertex2d(x1, y1);
-				glVertex2d(x1, y1);
-				glVertex2d(x2, y2);
-				glVertex2d(x2, y2);
-				glVertex2d(x3, y3);
-				glVertex2d(x3, y3);
-				glVertex2d(x0, y0);
-				glEnd();
+				Application::instance().m_graph->stroke_cell(xp, yp, m_owner->m_shift.x, m_owner->m_shift.y);
 				glEnable(GL_BLEND);
 				glEnable(GL_TEXTURE_2D);
 			}
@@ -326,6 +238,7 @@ void mapviewer_hint_weapon_range::render()
 	float xrf = ax / 2.0F - 0.5F;
 	float yrf = ay / 2.0F - 0.5F;
 	float rf = m_range + m_object->m_active_state->m_size.x / 2.0F;
+	GraphicalController::rectangle_t r;
 	for (int i = 0; i < ay; i++)
 	{
 		for (int j = 0; j < ax; j++)
@@ -348,52 +261,19 @@ void mapviewer_hint_weapon_range::render()
 				y3 = y0;*/
 				int yp = m_owner->m_tile_count_x - x;
 				int xp = m_owner->m_tile_count_y - y;
-				x0 = (xp - yp) * 16 + m_owner->m_shift.x;
-				y0 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
-				x1 = x0;
-				y1 = (xp + yp) * 9 + m_owner->m_shift.y;
-				x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
-				y2 = y1;
-				x3 = x2;
-				y3 = y0;
+				r.set((xp - yp) * tile_size_x_half + m_owner->m_shift.x, (xp + yp) * tile_size_y_half + m_owner->m_shift.y, tile_size_x, -tile_size_y);
 				glColor4f(1.0F, 0.9F, 0.0F, 0.25F);
 				glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
-				Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+				Application::instance().m_graph->draw_sprite(r);
 				glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_03, 0);
-				Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+				Application::instance().m_graph->draw_sprite(r);
 				glColor4f(1.0F, 0.9F, 0.0F, 0.5F);
-				x0 = (xp - yp) * 16 + m_owner->m_shift.x;
-				y0 = (xp + yp) * 9 - 9 + m_owner->m_shift.y;
-				x1 = (xp - yp) * 16 + 16 + m_owner->m_shift.x;
-				y1 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
-				x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
-				y2 = y0;
-				x3 = x1;
-				y3 = (xp + yp) * 9 + m_owner->m_shift.y;
 				//glDisable(GL_BLEND);
 				glDisable(GL_TEXTURE_2D);
 				glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
-				glBegin(GL_LINES);
-				glVertex2d(x0, y0);
-				glVertex2d(x1, y1);
-				glVertex2d(x1, y1);
-				glVertex2d(x2, y2);
-				glVertex2d(x2, y2);
-				glVertex2d(x3, y3);
-				glVertex2d(x3, y3);
-				glVertex2d(x0, y0);
-				glEnd();
+				Application::instance().m_graph->stroke_cell(xp, yp, m_owner->m_shift.x, m_owner->m_shift.y);
 				glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_03, 0);
-				glBegin(GL_LINES);
-				glVertex2d(x0, y0);
-				glVertex2d(x1, y1);
-				glVertex2d(x1, y1);
-				glVertex2d(x2, y2);
-				glVertex2d(x2, y2);
-				glVertex2d(x3, y3);
-				glVertex2d(x3, y3);
-				glVertex2d(x0, y0);
-				glEnd();
+				Application::instance().m_graph->stroke_cell(xp, yp, m_owner->m_shift.x, m_owner->m_shift.y);
 				glEnable(GL_BLEND);
 				glEnable(GL_TEXTURE_2D);
 			}
@@ -414,14 +294,7 @@ void mapviewer_hint_shoot::draw_cell(MapCell* a)
 		int y = py + a->y - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
 		int yp = m_owner->m_tile_count_x - x;
 		int xp = m_owner->m_tile_count_y - y;
-		x0 = (xp - yp) * 16 + m_owner->m_shift.x;
-		y0 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
-		x1 = x0;
-		y1 = (xp + yp) * 9 + m_owner->m_shift.y;
-		x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
-		y2 = y1;
-		x3 = x2;
-		y3 = y0;
+		GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + m_owner->m_shift.x, (xp + yp) * tile_size_y_half + m_owner->m_shift.y, tile_size_x, -tile_size_y);
 		bool pass_able = true;
 		float xrf = a->x - m_object->cell()->x - m_object->m_active_state->m_size.x / 2.0F + 0.5F;
 		float yrf = a->y - m_object->cell()->y + m_object->m_active_state->m_size.y / 2.0F - 0.5F;
@@ -450,9 +323,9 @@ void mapviewer_hint_shoot::draw_cell(MapCell* a)
 		{
 			glColor4f(1.0F, 0.0F, 0.0F, 0.5F);
 		}
-		Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+		Application::instance().m_graph->draw_sprite(r);
 		glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		Application::instance().m_graph->center_text((x0 + x2)*0.5, (y0 + y1) *0.5, std::to_string(m_step_count), 8, 17);
+		Application::instance().m_graph->center_text((r.a.x + r.b.x)*0.5, (r.a.y + r.b.y) *0.5, std::to_string(m_step_count), 8, 17);
 		if (pass_able)
 		{
 			glColor4f(0.0F, 1.0F, 0.0F, 1.0F);
@@ -461,25 +334,8 @@ void mapviewer_hint_shoot::draw_cell(MapCell* a)
 		{
 			glColor4f(1.0F, 0.0F, 0.0F, 1.0F);
 		}
-		x0 = (xp - yp) * 16 + m_owner->m_shift.x;
-		y0 = (xp + yp) * 9 - 9 + m_owner->m_shift.y;
-		x1 = (xp - yp) * 16 + 16 + m_owner->m_shift.x;
-		y1 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
-		x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
-		y2 = y0;
-		x3 = x1;
-		y3 = (xp + yp) * 9 + m_owner->m_shift.y;
 		glDisable(GL_TEXTURE_2D);
-		glBegin(GL_LINES);
-		glVertex2d(x0, y0);
-		glVertex2d(x1, y1);
-		glVertex2d(x1, y1);
-		glVertex2d(x2, y2);
-		glVertex2d(x2, y2);
-		glVertex2d(x3, y3);
-		glVertex2d(x3, y3);
-		glVertex2d(x0, y0);
-		glEnd();
+		Application::instance().m_graph->stroke_cell(xp, yp, m_owner->m_shift.x, m_owner->m_shift.y);
 		glEnable(GL_TEXTURE_2D);
 		m_step_count += 1;
 	}
@@ -546,21 +402,21 @@ void mapviewer_object_move::render()
 				int y = py + (Item->y - i) - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
 				int yp = m_owner->m_tile_count_x - x;
 				int xp = m_owner->m_tile_count_y - y;
-				x0 = (xp - yp) * 16 + m_owner->m_shift.x;
+				x0 = (xp - yp) * tile_size_x_half + m_owner->m_shift.x;
 				y0 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
 				x1 = x0;
 				y1 = (xp + yp) * 9 + m_owner->m_shift.y;
-				x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
+				x2 = (xp - yp) * tile_size_x_half + 32 + m_owner->m_shift.x;
 				y2 = y1;
 				x3 = x2;
 				y3 = y0;
 				glColor4f(1.0F, 0.9F, 0.0F, 0.25F);
 				Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
-				x0 = (xp - yp) * 16 + m_owner->m_shift.x;
+				x0 = (xp - yp) * tile_size_x_half + m_owner->m_shift.x;
 				y0 = (xp + yp) * 9 - 9 + m_owner->m_shift.y;
-				x1 = (xp - yp) * 16 + 16 + m_owner->m_shift.x;
+				x1 = (xp - yp) * tile_size_x_half + tile_size_x_half + m_owner->m_shift.x;
 				y1 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
-				x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
+				x2 = (xp - yp) * tile_size_x_half + 32 + m_owner->m_shift.x;
 				y2 = y0;
 				x3 = x1;
 				y3 = (xp + yp) * 9 + m_owner->m_shift.y;
@@ -593,21 +449,21 @@ void mapviewer_object_move::render()
 				int y = py + (Item->y - i) - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
 				int yp = m_owner->m_tile_count_x - x;
 				int xp = m_owner->m_tile_count_y - y;
-				x0 = (xp - yp) * 16 + m_owner->m_shift.x;
+				x0 = (xp - yp) * tile_size_x_half + m_owner->m_shift.x;
 				y0 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
 				x1 = x0;
 				y1 = (xp + yp) * 9 + m_owner->m_shift.y;
-				x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
+				x2 = (xp - yp) * tile_size_x_half + 32 + m_owner->m_shift.x;
 				y2 = y1;
 				x3 = x2;
 				y3 = y0;
 				glColor4f(1.0F, 0.9F, 0.0F, 0.25F);
 				Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
-				x0 = (xp - yp) * 16 + m_owner->m_shift.x;
+				x0 = (xp - yp) * tile_size_x_half + m_owner->m_shift.x;
 				y0 = (xp + yp) * 9 - 9 + m_owner->m_shift.y;
-				x1 = (xp - yp) * 16 + 16 + m_owner->m_shift.x;
+				x1 = (xp - yp) * tile_size_x_half + tile_size_x_half + m_owner->m_shift.x;
 				y1 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
-				x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
+				x2 = (xp - yp) * tile_size_x_half + 32 + m_owner->m_shift.x;
 				y2 = y0;
 				x3 = x1;
 				y3 = (xp + yp) * 9 + m_owner->m_shift.y;
@@ -645,6 +501,7 @@ void mapviewer_object_move::render()
 		by = m_object->m_active_state->m_size.y;
 		bool valid = true;//((abs(m_object->cell()->x - m_owner->m_cursored->x) < 2) && (abs(m_object->cell()->y - m_owner->m_cursored->y) < 2));
 		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
+		GraphicalController::rectangle_t r;
 		for (int i = 0; i < by; i++)
 		{
 			for (int j = 0; j < bx; j++)
@@ -653,14 +510,7 @@ void mapviewer_object_move::render()
 				int y = py + (m_cell->y - i) - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
 				int yp = m_owner->m_tile_count_x - x;
 				int xp = m_owner->m_tile_count_y - y;
-				x0 = (xp - yp) * 16 + m_owner->m_shift.x;
-				y0 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
-				x1 = x0;
-				y1 = (xp + yp) * 9 + m_owner->m_shift.y;
-				x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
-				y2 = y1;
-				x3 = x2;
-				y3 = y0;
+				r.set((xp - yp) * tile_size_x_half + m_owner->m_shift.x, (xp + yp) * tile_size_y_half + m_owner->m_shift.y, tile_size_x, -tile_size_y);
 				if (valid)
 				{
 					glColor4f(0.0F, 1.0F, 0.0F, 0.25F);
@@ -669,15 +519,7 @@ void mapviewer_object_move::render()
 				{
 					glColor4f(1.0F, 0.0F, 0.0F, 0.25F);
 				}
-				Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
-				x0 = (xp - yp) * 16 + m_owner->m_shift.x;
-				y0 = (xp + yp) * 9 - 9 + m_owner->m_shift.y;
-				x1 = (xp - yp) * 16 + 16 + m_owner->m_shift.x;
-				y1 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
-				x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
-				y2 = y0;
-				x3 = x1;
-				y3 = (xp + yp) * 9 + m_owner->m_shift.y;
+				Application::instance().m_graph->draw_sprite(r);
 				glDisable(GL_BLEND);
 				glDisable(GL_TEXTURE_2D);
 				if (valid)
@@ -688,16 +530,7 @@ void mapviewer_object_move::render()
 				{
 					glColor4f(1.0, 0.0, 0.0, 1.0);
 				}
-				glBegin(GL_LINES);
-				glVertex2d(x0, y0);
-				glVertex2d(x1, y1);
-				glVertex2d(x1, y1);
-				glVertex2d(x2, y2);
-				glVertex2d(x2, y2);
-				glVertex2d(x3, y3);
-				glVertex2d(x3, y3);
-				glVertex2d(x0, y0);
-				glEnd();
+				Application::instance().m_graph->stroke_cell(xp, yp, m_owner->m_shift.x, m_owner->m_shift.y);
 				glEnable(GL_BLEND);
 				glEnable(GL_TEXTURE_2D);
 			}
@@ -711,14 +544,7 @@ void mapviewer_object_move::render()
 				int y = py + (m_cell->y - i) - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
 				int yp = m_owner->m_tile_count_x - x;
 				int xp = m_owner->m_tile_count_y - y;
-				x0 = (xp - yp) * 16 + m_owner->m_shift.x;
-				y0 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
-				x1 = x0;
-				y1 = (xp + yp) * 9 + m_owner->m_shift.y;
-				x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
-				y2 = y1;
-				x3 = x2;
-				y3 = y0;
+				r.set((xp - yp) * tile_size_x_half + m_owner->m_shift.x, (xp + yp) * tile_size_y_half + m_owner->m_shift.y, tile_size_x, -tile_size_y);
 				if (valid)
 				{
 					glColor4f(0.0F, 1.0F, 0.0F, 0.25F);
@@ -727,15 +553,7 @@ void mapviewer_object_move::render()
 				{
 					glColor4f(1.0F, 0.0F, 0.0F, 0.25F);
 				}
-				Application::instance().m_graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
-				x0 = (xp - yp) * 16 + m_owner->m_shift.x;
-				y0 = (xp + yp) * 9 - 9 + m_owner->m_shift.y;
-				x1 = (xp - yp) * 16 + 16 + m_owner->m_shift.x;
-				y1 = (xp + yp) * 9 - 18 + m_owner->m_shift.y;
-				x2 = (xp - yp) * 16 + 32 + m_owner->m_shift.x;
-				y2 = y0;
-				x3 = x1;
-				y3 = (xp + yp) * 9 + m_owner->m_shift.y;
+				Application::instance().m_graph->draw_sprite(r);
 				glDisable(GL_BLEND);
 				glDisable(GL_TEXTURE_2D);
 				if (valid)
@@ -746,16 +564,7 @@ void mapviewer_object_move::render()
 				{
 					glColor4f(1.0, 0.0, 0.0, 1.0);
 				}
-				glBegin(GL_LINES);
-				glVertex2d(x0, y0);
-				glVertex2d(x1, y1);
-				glVertex2d(x1, y1);
-				glVertex2d(x2, y2);
-				glVertex2d(x2, y2);
-				glVertex2d(x3, y3);
-				glVertex2d(x3, y3);
-				glVertex2d(x0, y0);
-				glEnd();
+				Application::instance().m_graph->stroke_cell(xp, yp, m_owner->m_shift.x, m_owner->m_shift.y);
 				glEnable(GL_BLEND);
 				glEnable(GL_TEXTURE_2D);
 			}
@@ -769,11 +578,11 @@ void mapviewer_object_move::render()
 			int y = py + (m_object->cell()->y+1) - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
 			int yp = m_owner->m_tile_count_x - x;
 			int xp = m_owner->m_tile_count_y - y;
-			x0 = (xp - yp) * 16 + m_owner->m_shift.x;
+			x0 = (xp - yp) * tile_size_x_half + m_owner->m_shift.x;
 			y0 = (xp + yp) * 9 - (54) + m_owner->m_shift.y + (2) * 9;
 			x1 = x0;
 			y1 = (xp + yp) * 9 + m_owner->m_shift.y + (2) * 9;
-			x2 = (xp - yp) * 16 + 96 + m_owner->m_shift.x;
+			x2 = (xp - yp) * tile_size_x_half + 96 + m_owner->m_shift.x;
 			y2 = y1;
 			x3 = x2;
 			y3 = y0;
@@ -806,11 +615,11 @@ void mapviewer_object_move::render()
 	//int y = py + Item->y - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
 	//int yp = m_owner->m_tile_count_x - x;
 	//int xp = m_owner->m_tile_count_y - y;
-	//x0 = (xp - yp) * 16 + m_owner->m_shift.x;
+	//x0 = (xp - yp) * tile_size_x_half + m_owner->m_shift.x;
 	//y0 = (xp + yp) * 9 - (object_size.h) + m_owner->m_shift.y + (size3d.x - 1) * 9;
 	//x1 = x0;
 	//y1 = (xp + yp) * 9 + m_owner->m_shift.y + (size3d.x - 1) * 9;
-	//x2 = (xp - yp) * 16 + object_size.w + m_owner->m_shift.x;
+	//x2 = (xp - yp) * tile_size_x_half + object_size.w + m_owner->m_shift.x;
 	//y2 = y1;
 	//x3 = x2;
 	//y3 = y0;
@@ -844,14 +653,7 @@ void mapviewer_object_move::render_on_cell(MapCell* c)
 			int y = c->y - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
 			int yp = m_owner->m_tile_count_x - x;
 			int xp = m_owner->m_tile_count_y - y;
-			x0 = (xp - yp) * 16 + m_owner->m_shift.x;
-			y0 = (xp + yp) * 9 - (object_size.h) + m_owner->m_shift.y + (size3d.x - 1) * 9;
-			x1 = x0;
-			y1 = (xp + yp) * 9 + m_owner->m_shift.y + (size3d.x - 1) * 9;
-			x2 = (xp - yp) * 16 + object_size.w + m_owner->m_shift.x;
-			y2 = y1;
-			x3 = x2;
-			y3 = y0;
+			GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + m_owner->m_shift.x, (xp + yp+ size3d.x - 1) * tile_size_y_half + m_owner->m_shift.y, object_size.w, -object_size.h);
 			tile_t tile;
 			m_object->m_active_state->m_tile_manager->set_tile(tile, m_object, Application::instance().m_timer->get_tick(), Game_algorithm::turn_to_cell(m_object, m_owner->m_cursored));
 			GLuint Sprite = tile.unit;
@@ -860,9 +662,9 @@ void mapviewer_object_move::render_on_cell(MapCell* c)
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, Sprite);
 			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
-			Application::instance().m_graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
+			Application::instance().m_graph->draw_tile(tile, r);
 			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_03, 0);
-			Application::instance().m_graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
+			Application::instance().m_graph->draw_tile(tile, r);
 		}
 	}
 }
@@ -915,9 +717,10 @@ void mapviewer_object_rotate::render()
 					c = m_owner->m_map->m_items[y][x];
 					yp = m_owner->m_tile_count_x / 2 - c->x + m_owner->m_center.x;
 					xp = m_owner->m_tile_count_y / 2 - c->y + m_owner->m_center.y;
-					xt = (xp - yp) * 16 + m_owner->m_shift.x;
-					yt = (xp + yp) * 9 + m_owner->m_shift.y;
-					Application::instance().m_graph->draw_sprite(xt, yt - 18, xt, yt, xt + 32, yt, xt + 32, yt - 18);
+					xt = (xp - yp) * tile_size_x_half + m_owner->m_shift.x;
+					yt = (xp + yp) * tile_size_y_half + m_owner->m_shift.y;
+					GraphicalController::rectangle_t rect(xt, yt, tile_size_x, -tile_size_y);
+					Application::instance().m_graph->draw_sprite(rect);
 					glDisable(GL_BLEND);
 					glDisable(GL_TEXTURE_2D);
 					top_bound = false;
@@ -962,23 +765,23 @@ void mapviewer_object_rotate::render()
 					glBegin(GL_LINES);
 					if (top_bound)
 					{
-						glVertex2d(xt, yt - 9);
-						glVertex2d(xt + 16, yt - 18);
+						glVertex2d(xt, yt - tile_size_y_half);
+						glVertex2d(xt + tile_size_x_half, yt - tile_size_y);
 					}
 					if (right_bound)
 					{
-						glVertex2d(xt + 16, yt - 18);
-						glVertex2d(xt + 32, yt-9);
+						glVertex2d(xt + tile_size_x_half, yt - tile_size_y);
+						glVertex2d(xt + tile_size_x, yt-tile_size_y_half);
 					}
 					if (down_bound)
 					{
-						glVertex2d(xt + 32, yt-9);
-						glVertex2d(xt + 16, yt);
+						glVertex2d(xt + tile_size_x, yt-tile_size_y_half);
+						glVertex2d(xt + tile_size_x_half, yt);
 					}
 					if (left_bound)
 					{
-						glVertex2d(xt + 16, yt);
-						glVertex2d(xt, yt - 9);
+						glVertex2d(xt + tile_size_x_half, yt);
+						glVertex2d(xt, yt - tile_size_y_half);
 					}
 					glEnd();
 
@@ -1007,14 +810,7 @@ void mapviewer_object_rotate::render_on_cell(MapCell* c)
 			int y = c->y - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
 			int yp = m_owner->m_tile_count_x - x;
 			int xp = m_owner->m_tile_count_y - y;
-			x0 = (xp - yp) * 16 + m_owner->m_shift.x;
-			y0 = (xp + yp) * 9 - (object_size.h) + m_owner->m_shift.y + (size3d.x - 1) * 9;
-			x1 = x0;
-			y1 = (xp + yp) * 9 + m_owner->m_shift.y + (size3d.x - 1) * 9;
-			x2 = (xp - yp) * 16 + object_size.w + m_owner->m_shift.x;
-			y2 = y1;
-			x3 = x2;
-			y3 = y0;
+			GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + m_owner->m_shift.x, (xp + yp + size3d.x - 1) * tile_size_y_half + m_owner->m_shift.y, object_size.w, -object_size.h);
 			tile_t tile;
 			m_object->m_active_state->m_tile_manager->set_tile(tile, m_object, Application::instance().m_timer->get_tick(), m_direction);
 			GLuint Sprite = tile.unit;
@@ -1023,9 +819,9 @@ void mapviewer_object_rotate::render_on_cell(MapCell* c)
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, Sprite);
 			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
-			Application::instance().m_graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
+			Application::instance().m_graph->draw_tile(tile, r);
 			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_03, 0);
-			Application::instance().m_graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
+			Application::instance().m_graph->draw_tile(tile, r);
 		}
 	}
 }
@@ -1044,8 +840,8 @@ GUI_MapViewer::GUI_MapViewer(Application* app)
 	move += std::bind(&GUI_MapViewer::on_move, this, std::placeholders::_1);
 	end_moving += std::bind(&GUI_MapViewer::on_end_moving, this, std::placeholders::_1);
 	m_size = app->m_size;
-	m_shift.x = (m_size.w / 2) - 16;// (m_tile_count_x)* 32 * 0.5;
-	m_shift.y = (m_size.h / 2) - (m_tile_count_y)* 9 - 9;// 1024 * 0.5 - (m_tile_count_y + 6) * 18 * 0.5;
+	m_shift.x = (m_size.w / 2) - tile_size_x_half;// (m_tile_count_x)* 32 * 0.5;
+	m_shift.y = (m_size.h / 2) - (m_tile_count_y)* tile_size_y_half - tile_size_y_half;// 1024 * 0.5 - (m_tile_count_y + 6) * 18 * 0.5;
 }
 
 GUI_MapViewer::~GUI_MapViewer(void)
@@ -1054,8 +850,8 @@ GUI_MapViewer::~GUI_MapViewer(void)
 
 void GUI_MapViewer::calculate()
 {
-	m_tile_size_x = 16;
-	m_tile_size_y = 9;
+	m_tile_size_x = tile_size_x_half;
+	m_tile_size_y = tile_size_y_half;
 }
 
 void GUI_MapViewer::update()
@@ -1111,7 +907,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_03, 0);
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
-	int x0, y0, x1, y1, x2, y2, x3, y3;
+
 	bool IsDraw;
 	tile_t tile;
 	int x;
@@ -1152,6 +948,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 		fov = ai->m_fov->m_view;
 		posc=position_t((m_player->m_object->m_active_state->m_size.x - 1) >> 1, (m_player->m_object->m_active_state->m_size.y - 1) >> 1);
 	}
+	GraphicalController::rectangle_t rect;
 	for (int r = 0; r < 2; r++)
 	{
 		for (int i = 0; i < (m_tile_count_x + m_tile_count_y) - 1; i++)
@@ -1194,7 +991,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 						}
 					}
 
-					for (std::list<GameObject*>::iterator Current = m_map->m_items[y][x]->m_items.begin(); Current != m_map->m_items[y][x]->m_items.end(); ++Current)
+					for (auto Current = m_map->m_items[y][x]->m_items.begin(); Current != m_map->m_items[y][x]->m_items.end(); ++Current)
 					{
 						light[0] = (m_map->m_items[y][x]->m_light.R / 100.0F);
 						light[1] = (m_map->m_items[y][x]->m_light.G / 100.0F);
@@ -1249,7 +1046,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 									}
 									else if (m_map->m_items[y][x]->m_notable)
 									{
-										if (((*Current)->m_name == "floor") || ((*Current)->m_name == "wall") || ((*Current)->m_name == "wall2") || ((*Current)->m_name == "wall3"))
+										if (((*Current)->m_name == "floor") || ((*Current)->m_name == "wall"))
 										{
 											IsDraw = true;
 											is_hide = true;
@@ -1264,14 +1061,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 							int yp = m_tile_count_x - px - gx;
 							int xp = m_tile_count_y - py - gy;
 							dx = object_size.w + m_map->m_items[y][x]->x - (*Current)->cell()->x;
-							x0 = (xp - yp) * 16 + m_shift.x;
-							y0 = (xp + yp) * 9 - (object_size.h) + m_shift.y + (size3d.x - 1) * 9;
-							x1 = x0;
-							y1 = (xp + yp) * 9 + m_shift.y + (size3d.x - 1) * 9;
-							x2 = (xp - yp) * 16 + object_size.w + m_shift.x;
-							y2 = y1;
-							x3 = x2;
-							y3 = y0;
+							rect.set((xp - yp) * tile_size_x_half + m_shift.x, (xp + yp + size3d.x - 1) * tile_size_y_half + m_shift.y, object_size.w, -object_size.h);
 							// считаем среднюю освещенность для многотайловых объектов
 							if (size3d.x > 1 || size3d.y > 1)
 							{
@@ -1296,26 +1086,13 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 										light[3] = 0.0;*/
 							}
 
-							// Подсветка тайлов юнитов
-							if ((*Current)->m_name == "bat" || (*Current)->m_name == "skeleton" || (*Current)->m_name == "bear" || (*Current)->m_name == "rat" || (*Current)->m_name == "human")
-							{
-								auto a = new mapviewer_hint_object_area(this, (*Current));
-								a->render();
-							}
 							if (is_hide)
 							{
 								glUseProgram(Graph->m_tile_shader_hide);
 							}
 							else
 							{
-								if ((*Current)->m_active_state->m_layer == 2)
-								{
-									glUseProgram(Graph->m_tile_shader_alpha);
-								}
-								else
-								{
-									glUseProgram(Graph->m_tile_shader);
-								}
+								glUseProgram(Graph->m_tile_shader);
 							}
 							
 							(*Current)->m_active_state->m_tile_manager->set_tile(tile, (*Current), Application::instance().m_timer->get_tick(), dx);
@@ -1326,7 +1103,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 							Graph->set_uniform_sampler(Graph->m_tile_shader, "Map", 0);
 							Graph->set_uniform_vector(Graph->m_tile_shader, "light", light);
 							glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
-							Graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
+							Graph->draw_tile(tile, rect);
 
 							if ((*Current)->cell()->x == m_map->m_items[y][x]->x)
 							{
@@ -1365,58 +1142,58 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 								}*/
 							}
 
-							//if ((*Current)->m_active_state->m_layer == 1)
-							//{
-							//	if (is_hide)
-							//	{
-							//		glUseProgram(Graph->m_tile_shader_hide);
-							//	}
-							//	else
-							//	{
-							//		glUseProgram(Graph->m_tile_shader);
-							//	}
-							//	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_02, 0);
-							//	Graph->draw_tile(tile, x0, y0, x1, y1, x2, y2, x3, y3);
+							if ((*Current)->m_active_state->m_layer == 1)
+							{
+								/*if (is_hide)
+								{
+									glUseProgram(Graph->m_tile_shader_hide);
+								}
+								else
+								{*/
+									glUseProgram(Graph->m_tile_shader);
+								/*}*/
+								glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_02, 0);
+								Graph->draw_tile(tile, rect);
 
-							//	/*glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
-							//	glUseProgram(Graph->m_mask_shader2);
-							//	glActiveTexture(GL_TEXTURE0);
-							//	glBindTexture(GL_TEXTURE_2D, Graph->m_empty_03);
-							//	Graph->set_uniform_sampler(Graph->m_mask_shader2, "Map", 0);
-							//	glActiveTexture(GL_TEXTURE1);
-							//	glBindTexture(GL_TEXTURE_2D, Sprite);
-							//	Graph->set_uniform_sampler(Graph->m_mask_shader2, "Unit", 1);
-							//	glActiveTexture(GL_TEXTURE0);
-							//	Graph->draw_tile_FBO(x1 / 1024.0, (1024 - y1) / 1024.0, x3 / 1024.0, (1024 - y3) / 1024.0, x0, y0, x1, y1, x2, y2, x3, y3);*/
-							//}
+								/*glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
+								glUseProgram(Graph->m_mask_shader2);
+								glActiveTexture(GL_TEXTURE0);
+								glBindTexture(GL_TEXTURE_2D, Graph->m_empty_03);
+								Graph->set_uniform_sampler(Graph->m_mask_shader2, "Map", 0);
+								glActiveTexture(GL_TEXTURE1);
+								glBindTexture(GL_TEXTURE_2D, Sprite);
+								Graph->set_uniform_sampler(Graph->m_mask_shader2, "Unit", 1);
+								glActiveTexture(GL_TEXTURE0);
+								Graph->draw_tile_FBO(x1 / 1024.0, (1024 - y1) / 1024.0, x3 / 1024.0, (1024 - y3) / 1024.0, x0, y0, x1, y1, x2, y2, x3, y3);*/
+							}
 
-							//if ((*Current)->m_active_state->m_layer == 2)
-							//{
-							//	/*glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
-							//	glUseProgram(Graph->m_mask_shader2);
-							//	glActiveTexture(GL_TEXTURE0);
-							//	glBindTexture(GL_TEXTURE_2D, Graph->m_empty_03);
-							//	Graph->set_uniform_sampler(Graph->m_mask_shader2, "Map1", 0);
-							//	glActiveTexture(GL_TEXTURE1);
-							//	glBindTexture(GL_TEXTURE_2D, Sprite);
-							//	Graph->set_uniform_sampler(Graph->m_mask_shader2, "Unit", 1);
-							//	glActiveTexture(GL_TEXTURE2);
-							//	glBindTexture(GL_TEXTURE_2D, Graph->m_empty_02);
-							//	Graph->set_uniform_sampler(Graph->m_mask_shader2, "Map2", 2);
-							//	glActiveTexture(GL_TEXTURE0);
-							//	Graph->draw_tile_FBO(x1 /(float)m_size.w, (m_size.h - y1) / (float)m_size.h, x3 / (float)m_size.w, (m_size.h - y3) /(float) m_size.h, x0, y0, x1, y1, x2, y2, x3, y3);
+							if ((*Current)->m_active_state->m_layer == 2)
+							{
+								/*glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
+								glUseProgram(Graph->m_mask_shader2);
+								glActiveTexture(GL_TEXTURE0);
+								glBindTexture(GL_TEXTURE_2D, Graph->m_empty_03);
+								Graph->set_uniform_sampler(Graph->m_mask_shader2, "Map1", 0);
+								glActiveTexture(GL_TEXTURE1);
+								glBindTexture(GL_TEXTURE_2D, Sprite);
+								Graph->set_uniform_sampler(Graph->m_mask_shader2, "Unit", 1);
+								glActiveTexture(GL_TEXTURE2);
+								glBindTexture(GL_TEXTURE_2D, Graph->m_empty_02);
+								Graph->set_uniform_sampler(Graph->m_mask_shader2, "Map2", 2);
+								glActiveTexture(GL_TEXTURE0);
+								Graph->draw_tile_FBO(x1 /(float)m_size.w, (m_size.h - y1) / (float)m_size.h, x3 / (float)m_size.w, (m_size.h - y3) /(float) m_size.h, x0, y0, x1, y1, x2, y2, x3, y3);*/
 
-							//	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
-							//	glUseProgram(Graph->m_mask_shader);
-							//	glActiveTexture(GL_TEXTURE0);
-							//	glBindTexture(GL_TEXTURE_2D, Graph->m_empty_02);
-							//	Graph->set_uniform_sampler(Graph->m_mask_shader, "Map", 0);
-							//	glActiveTexture(GL_TEXTURE1);
-							//	glBindTexture(GL_TEXTURE_2D, Sprite);
-							//	Graph->set_uniform_sampler(Graph->m_mask_shader, "Unit", 1);
-							//	glActiveTexture(GL_TEXTURE0);
-							//	Graph->draw_tile_FBO(x1 / (float)m_size.w, (m_size.h - y1) / (float)m_size.h, x3 / (float)m_size.w, (m_size.h - y3) / (float)m_size.h, x0, y0, x1, y1, x2, y2, x3, y3);*/
-							//}
+								glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
+								glUseProgram(Graph->m_mask_shader);
+								glActiveTexture(GL_TEXTURE0);
+								glBindTexture(GL_TEXTURE_2D, Graph->m_empty_02);
+								Graph->set_uniform_sampler(Graph->m_mask_shader, "Map", 0);
+								glActiveTexture(GL_TEXTURE1);
+								glBindTexture(GL_TEXTURE_2D, Sprite);
+								Graph->set_uniform_sampler(Graph->m_mask_shader, "Unit", 1);
+								glActiveTexture(GL_TEXTURE0);
+								Graph->draw_tile_FBO(rect.a.x / static_cast<float>(m_size.w), (m_size.h - rect.a.y) / (float)m_size.h, rect.b.x / (float)m_size.w, (m_size.h - rect.b.y) / (float)m_size.h, rect);
+							}
 
 						}
 					}
@@ -1463,14 +1240,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 		//y3 = (m_tile_count_y - y - m_cursor_y) * m_tile_size_y;
 		int yp = m_tile_count_x - x;
 		int xp = m_tile_count_y - y;
-		x0 = (xp - yp) * 16 + m_shift.x;
-		y0 = (xp + yp) * 9 - 18 + m_shift.y;
-		x1 = x0;
-		y1 = (xp + yp) * 9 + m_shift.y;
-		x2 = (xp - yp) * 16 + 32 + m_shift.x;
-		y2 = y1;
-		x3 = x2;
-		y3 = y0;
+		rect.set((xp - yp) * tile_size_x_half + m_shift.x, (xp + yp) * tile_size_y_half + m_shift.y, tile_size_x, -tile_size_y);
 		glUseProgram(0);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
 		glEnable(GL_BLEND);
@@ -1479,28 +1249,11 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, Graph->m_select);
 		glColor4f(0.0, 1.0, 0.0, 0.25);
-		Graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
-		x0 = (xp - yp) * 16 + m_shift.x;
-		y0 = (xp + yp) * 9 - 9 + m_shift.y;
-		x1 = (xp - yp) * 16 + 16 + m_shift.x;
-		y1 = (xp + yp) * 9 - 18 + m_shift.y;
-		x2 = (xp - yp) * 16 + 32 + m_shift.x;
-		y2 = y0;
-		x3 = x1;
-		y3 = (xp + yp) * 9 + m_shift.y;
+		Graph->draw_sprite(rect);
 		glDisable(GL_BLEND);
 		glDisable(GL_TEXTURE_2D);
-		glBegin(GL_LINES);
 		glColor4f(0.0, 1.0, 0.0, 1.0);
-		glVertex2d(x0, y0);
-		glVertex2d(x1, y1);
-		glVertex2d(x1, y1);
-		glVertex2d(x2, y2);
-		glVertex2d(x2, y2);
-		glVertex2d(x3, y3);
-		glVertex2d(x3, y3);
-		glVertex2d(x0, y0);
-		glEnd();
+		Application::instance().m_graph->stroke_cell(xp,yp,m_shift.x, m_shift.y);
 		glEnable(GL_BLEND);
 		glEnable(GL_TEXTURE_2D);
 		/*	glDisable(GL_BLEND);
@@ -1530,7 +1283,8 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	//Graph->blur_rect(0, 0, 1024 / 4, 1024 / 4);
 	//glBindTexture(GL_TEXTURE_2D, Graph->m_blur);
 	//glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 1024 - 1024 / 4, 1024 /4, 1024 /4);
-	Graph->draw_sprite(0, 0, 0, m_size.h, m_size.w, m_size.h, m_size.w, 0);
+	rect.set(0, 0, m_size.w, m_size.h);
+	Application::instance().m_graph->draw_sprite(rect);
 	glDisable(GL_TEXTURE_2D);
 }
 
@@ -1630,6 +1384,7 @@ void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
 		position_t p = local_xy(position_t(e.position.x, e.position.y));
 		int x;
 		int y;
+
 		x = m_center.x + p.x - m_tile_count_x / 2;
 		y = m_center.y + p.y - m_tile_count_y / 2;
 		if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
@@ -1682,7 +1437,7 @@ void GUI_MapViewer::on_mouse_wheel(MouseEventArgs const& e)
 	{
 		m_tile_count_x -= 2;
 		m_tile_count_y -= 4;
-		if (m_tile_count_x < 16) m_tile_count_x = 16;
+		if (m_tile_count_x < tile_size_x_half) m_tile_count_x = tile_size_x_half;
 		if (m_tile_count_y < 32) m_tile_count_y = 32;
 	}
 	calculate();
@@ -1739,7 +1494,10 @@ void GUI_MapViewer::on_lose_focus(GUI_Object* sender)
 
 position_t GUI_MapViewer::local_xy(position_t p)
 {
-	position_t Result = position_t(m_tile_count_x - (m_tile_count_y - (p.x - m_shift.x) / 32 - m_tile_count_x + (p.y - m_shift.y) / 18 + 1), m_tile_count_y - ((p.x - m_shift.x) / 32 + (p.y - m_shift.y) / 18));
+	float x = (p.x - m_shift.x) / tile_size_x;
+	float y = (p.y - m_shift.y)/ tile_size_y;
+	position_t Result = position_t(m_tile_count_x - (m_tile_count_y - x - m_tile_count_x + y + 1), m_tile_count_y - (x + y));
+	
 	if (Result.x > m_tile_count_x - 1) { Result.x = m_tile_count_x - 1; }
 	if (Result.x < 0) { Result.x = 0; }
 	if (Result.y > m_tile_count_y - 1) { Result.y = m_tile_count_y - 1; }
@@ -1749,8 +1507,9 @@ position_t GUI_MapViewer::local_xy(position_t p)
 void GUI_MapViewer::on_mouse_move(MouseEventArgs const& e)
 {
 	position_t p = local_xy(e.position);
-	const int x = m_center.x + p.x - m_tile_count_x / 2;
-	const int y = m_center.y + p.y - m_tile_count_y / 2;
+	int x = m_center.x + p.x - m_tile_count_x / 2;
+	int y = m_center.y + p.y - m_tile_count_y / 2;
+	
 	if (!(x < 0 || x > m_map->m_size.w - 1 || y < 0 || y > m_map->m_size.h - 1))
 	{
 		m_cursored = m_map->m_items[y][x];
@@ -1777,7 +1536,6 @@ void GUI_MapViewer::on_start_moving(MouseEventArgs const& e)
 	position_t p = local_xy(position_t(e.position.x, e.position.y));
 	m_initial_position.x = m_center.x - p.x;
 	m_initial_position.y = m_center.y - p.y;
-	//MessageBox(NULL, "Start", "", MB_OK);
 }
 
 void GUI_MapViewer::on_move(MouseEventArgs const& e)
@@ -1790,8 +1548,6 @@ void GUI_MapViewer::on_move(MouseEventArgs const& e)
 void GUI_MapViewer::on_end_moving(MouseEventArgs const& e)
 {
 	m_is_moving = false;
-	//MessageBox(NULL, "End", "", MB_OK);
-
 }
 
 MouseEventArgs GUI_MapViewer::set_local_mouse_control(MouseEventArgs const& source)

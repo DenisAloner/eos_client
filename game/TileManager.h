@@ -79,4 +79,31 @@ public:
 
 };
 
+class TileManager_Single_png :
+	public TileManager
+{
+public:
+
+	int m_frame;
+
+	TileManager_Single_png();
+	bool load_from_file(const std::string& filename, object_direction_e direction, int frame) override;
+	virtual int get_tile_index(const object_direction_e& direction, const int& frame);
+
+};
+
+class TileManager_rotate8_animate :
+	public TileManager
+{
+public:
+
+	int m_frame;
+
+	TileManager_rotate8_animate(int frame);
+	bool load_from_file(const std::string& filename, object_direction_e direction, int frame) override;
+	virtual int get_tile_index(const object_direction_e& direction, const int& frame);
+	void set_tile(tile_t& tile, GameObject* obj, int frame, int shift) override;
+
+};
+
 #endif //TILEMANAGER_H

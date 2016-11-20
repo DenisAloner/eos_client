@@ -120,7 +120,8 @@ void GUI_MiniMap::render(GraphicalController* Graph, int px, int py)
 		//glGenerateMipmap(GL_TEXTURE_2D);
 		glColor4d(1.0, 1.0, 1.0, 1.0);
 		glBindTexture(GL_TEXTURE_2D, m_canvas);
-		Graph->draw_sprite(px, py, px, py + m_size.h, px + m_size.w, py + m_size.h, px + m_size.w, py);
+		GraphicalController::rectangle_t rect(px, py, m_size.w, m_size.h);
+		Graph->draw_sprite(rect);
 		glDisable(GL_TEXTURE_2D);
 		double x0, y0, x1, y1;
 		x0 = px + (m_map_viewer->m_center.x - m_map_viewer->m_tile_count_x / 2)*m_size.w / static_cast<float>(m_map_viewer->m_map->m_size.w);
@@ -136,7 +137,7 @@ void GUI_MiniMap::render(GraphicalController* Graph, int px, int py)
 		if (y1 < py) { y1 = py; }
 		if (y1 > py + m_size.h) { y1 = py + m_size.h; }
 		glColor4d(0.0, 1.0, 0.5, 0.3);
-		Graph->draw_sprite(x0, y0, x0, y1, x1, y1, x1, y0);
+		Graph->draw_sprite(rect);
 	}
 }
 
@@ -173,7 +174,8 @@ void GUI_FOV::render(GraphicalController* Graph, int px, int py)
 		//glGenerateMipmap(GL_TEXTURE_2D);
 		glColor4d(1.0, 1.0, 1.0, 1.0);
 		glBindTexture(GL_TEXTURE_2D, m_canvas);
-		Graph->draw_sprite(px, py, px, py + m_size.h, px + m_size.w, py + m_size.h, px + m_size.w, py);
+		GraphicalController::rectangle_t rect(px, py, m_size.w, m_size.h);
+		Graph->draw_sprite(rect);
 	}
 }
 

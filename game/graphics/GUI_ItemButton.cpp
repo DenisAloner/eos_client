@@ -29,7 +29,8 @@ void GUI_ItemButton::render(GraphicalController* Graph, int px, int py)
 	glEnable(GL_TEXTURE_2D);
 	glActiveTextureARB(GL_TEXTURE0_ARB);
 	glBindTexture(GL_TEXTURE_2D, Graph->m_close);
-	Graph->draw_sprite(px, py, px, py + m_size.h, px + m_size.w, py + m_size.h, px + m_size.w, py);
+	GraphicalController::rectangle_t rect(px, py, m_size.w, m_size.h);
+	Graph->draw_sprite(rect);
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_BLEND);
 	/*glBegin(GL_LINES);

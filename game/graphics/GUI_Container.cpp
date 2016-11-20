@@ -66,7 +66,8 @@ void GUI_Container::render(GraphicalController* Graph, int px, int py)
 		glEnable(GL_BLEND);
 		glDisable(GL_TEXTURE_2D);
 		glColor4d(0.0, 0.0, 0.0, 0.5);
-		Graph->draw_sprite(px, py, px, py + m_size.h, px + m_size.w, py + m_size.h, px + m_size.w, py);
+		GraphicalController::rectangle_t rect(px, py, m_size.w, m_size.h);
+		Graph->draw_sprite(rect);
 		glEnable(GL_TEXTURE_2D);
 		glColor4d(1.0, 1.0, 1.0, 1.0);
 		for (auto current : m_items)
@@ -78,17 +79,8 @@ void GUI_Container::render(GraphicalController* Graph, int px, int py)
 		{
 			glDisable(GL_BLEND);
 			glDisable(GL_TEXTURE_2D);
-			glBegin(GL_LINES);
 			glColor4f(1.0, 1.0, 1.0, 1.0);
-			glVertex2d(px, py);
-			glVertex2d(px, py + m_size.h);
-			glVertex2d(px, py + m_size.h);
-			glVertex2d(px + m_size.w, py + m_size.h);
-			glVertex2d(px + m_size.w, py + m_size.h);
-			glVertex2d(px + m_size.w, py);
-			glVertex2d(px + m_size.w, py);
-			glVertex2d(px, py);
-			glEnd();
+			Graph->draw_rectangle(GraphicalController::rectangle_t(px, py, m_size.w, m_size.h));
 		}
 	}
 }

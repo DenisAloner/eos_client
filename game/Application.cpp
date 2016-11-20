@@ -124,7 +124,9 @@ void Application::render()
 		{
 			glColor4d(1.0, 1.0, 1.0, 1.0);
 			glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_icons[m_clipboard.m_item->m_active_state->m_icon]);
-			m_graph->draw_sprite(mouse.x - 32, mouse.y - 32, mouse.x - 32, mouse.y + 32, mouse.x + 32, mouse.y + 32, mouse.x + 32, mouse.y - 32);
+			//m_graph->draw_sprite(mouse.x - 32, mouse.y - 32, mouse.x - 32, mouse.y + 32, mouse.x + 32, mouse.y + 32, mouse.x + 32, mouse.y - 32);
+			GraphicalController::rectangle_t rect(mouse.x - 32, mouse.y - 32, 64, 64);
+			m_graph->draw_sprite(rect);
 			glDisable(GL_TEXTURE_2D);
 			glDisable(GL_BLEND);
 			glColor4f(1.0, 0.9, 0.0, 0.75);
@@ -144,7 +146,10 @@ void Application::render()
 		glColor4d(1.0, 1.0, 1.0, 1.0);
 		glBindTexture(GL_TEXTURE_2D, m_mouse->m_cursor);
 //#warning TODO Избавиться от магических чисел!
-		m_graph->draw_sprite(mouse.x, mouse.y, mouse.x, mouse.y + 48, mouse.x + 48, mouse.y + 48, mouse.x + 48, mouse.y);
+		
+		GraphicalController::rectangle_t rect(mouse.x, mouse.y, 48, 48);
+		m_graph->draw_sprite(rect);
+		//m_graph->draw_sprite(mouse.x, mouse.y, mouse.x, mouse.y + 48, mouse.x + 48, mouse.y + 48, mouse.x + 48, mouse.y);
 		
 	}
 	m_update_mutex.unlock();

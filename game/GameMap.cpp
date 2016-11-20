@@ -157,12 +157,12 @@ void GameMap::generate_room(void)
 			{
 				if ((j == 0)|| (j == m_size.w - 1))
 				{
-					GameObject* obj = Application::instance().m_game_object_manager->new_object("wall2");
+					GameObject* obj = Application::instance().m_game_object_manager->new_object("wall");
 					add_object(obj, m_items[i][j]);
 				}
 				if ((i == 0)||(i == m_size.h - 1))
 				{
-					GameObject* obj = Application::instance().m_game_object_manager->new_object("wall3");
+					GameObject* obj = Application::instance().m_game_object_manager->new_object("wall");
 					add_object(obj, m_items[i][j]);
 				}
 			}
