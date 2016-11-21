@@ -48,7 +48,7 @@ void gui_MessageQueue::push(Parameter* p)
 game_clipboard::game_clipboard():m_item(nullptr){}
 
 Application::Application()
-: m_timer(new Timer(24, 100))
+: m_timer(new Timer(24, 100)), m_action_animation_timer(new Timer(24, 100))
 {
 	m_turn = false;
 	m_GUI = nullptr;
@@ -460,6 +460,7 @@ void Application::update()
 		if (A)
 		{
 			m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->set(m_GUI->MapViewer->m_player->m_object, A->m_action, A->m_parameter);
+			m_GUI->MapViewer->m_player->m_object->m_active_state->m_tile_manager->m_animation = A->m_action->m_animation;
 		}
 		do
 		{
@@ -546,6 +547,7 @@ void Application::update()
 		if (m_action_manager->m_items.empty())
 		{
 			m_update_mutex.unlock();
+			m_GUI->MapViewer->m_player->m_object->m_active_state->m_tile_manager->m_animation = animation_e::idle;
 			return;
 		}
 		m_update_mutex.unlock();

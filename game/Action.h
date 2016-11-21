@@ -29,6 +29,7 @@ public:
 	std::string m_error;
 	int m_decay;
 	parameter_type_e m_parameter_kind;
+	animation_e m_animation;
 
 	Action(void);
 	~Action(void);

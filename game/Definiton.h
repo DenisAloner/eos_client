@@ -578,6 +578,11 @@ enum class mode_t
 	check
 };
 
+enum class animation_e
+{
+	idle,
+	move
+};
 //struct Game_log_message_EventArgs
 //{
 //	game_log_message_t value;

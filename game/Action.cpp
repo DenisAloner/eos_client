@@ -15,6 +15,7 @@ Action::Action(void)
 	m_name = "Нет";
 	m_error = "";
 	m_decay = 10;
+	m_animation = animation_e::idle;
 }
 
 Action::~Action(void)
@@ -234,6 +235,7 @@ action_move_step::action_move_step()
 	m_name = "Идти на шаг";
 	m_decay = 10;
 	m_parameter_kind = parameter_type_e::position;
+	m_animation = animation_e::move;
 }
 
 bool action_move_step::check(Parameter* parameter)

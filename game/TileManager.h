@@ -14,6 +14,7 @@ public:
 
 	GLuint* m_tiles;
 	size_t m_index;
+	animation_e m_animation;
 
 	TileManager();
 	~TileManager();
@@ -101,7 +102,7 @@ public:
 
 	TileManager_rotate8_animate(int frame);
 	bool load_from_file(const std::string& filename, object_direction_e direction, int frame) override;
-	virtual int get_tile_index(const object_direction_e& direction, const int& frame);
+	int get_tile_index(const object_direction_e& direction, const int& frame) override;
 	void set_tile(tile_t& tile, GameObject* obj, int frame, int shift) override;
 
 };

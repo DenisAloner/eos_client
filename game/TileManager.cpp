@@ -2,7 +2,7 @@
 #include "game/GameObject.h"
 
 
-TileManager::TileManager()
+TileManager::TileManager():m_animation(animation_e::idle)
 {
 }
 
@@ -129,7 +129,7 @@ bool TileManager_Single_png::load_from_file(const std::string& filename, object_
 
 TileManager_rotate8_animate::TileManager_rotate8_animate(int frame) :m_frame(frame)
 {
-	m_tiles = new GLuint[8];
+	m_tiles = new GLuint[2];
 }
 
 int TileManager_rotate8_animate::get_tile_index(const object_direction_e& direction, const int& frame)
@@ -140,13 +140,16 @@ int TileManager_rotate8_animate::get_tile_index(const object_direction_e& direct
 
 bool TileManager_rotate8_animate::load_from_file(const std::string& filename, object_direction_e direction, int frame)
 {
-	m_tiles[frame] = Application::instance().m_graph->png_texture_load(FileSystem::instance().m_resource_path + "Tiles\\" + filename + ".png");
+	for(int i=0;i<2;++i)
+	{
+		m_tiles[i] = Application::instance().m_graph->png_texture_load(FileSystem::instance().m_resource_path + "Tiles\\" + filename + std::to_string(i + 1) + ".png");
+	}
 	return true;
 }
 
 void TileManager_rotate8_animate::set_tile(tile_t& tile, GameObject* obj, int frame, int shift)
 {
-	tile.unit = m_tiles[get_tile_index(obj->m_direction, frame)];
+	tile.unit = m_tiles[static_cast<int>(m_animation)];
 	int ix = frame * (m_frame / 24.0);
 	int iy = int(obj->m_direction);
 	double dx = 1.0 / m_frame;

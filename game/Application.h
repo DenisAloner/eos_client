@@ -91,6 +91,7 @@ public:
 	dimension_t m_size;
 
 	Timer* m_timer;
+	Timer* m_action_animation_timer;
 	MouseController* m_mouse;
 	gui_MessageQueue m_message_queue;
 
