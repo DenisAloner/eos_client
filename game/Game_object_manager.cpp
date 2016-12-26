@@ -690,6 +690,7 @@ void GameObjectManager::init()
 	m_to_action_e["use"] = action_e::use;
 	m_to_action_e["shoot"] = action_e::shoot;
 
+	m_to_body_part_e["mouth"] = body_part_e::mouth;
 	m_to_body_part_e["wrist"] = body_part_e::wrist;
 	m_to_body_part_e["finger"] = body_part_e::finger;
 	m_to_body_part_e["head"] = body_part_e::head;

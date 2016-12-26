@@ -739,6 +739,15 @@ void GraphicalController::parser(const std::string& command)
 		m_tile_managers.push_back(m_tile_manager);
 		break;
 	}
+	case command_e::equilateral_animate:
+	{
+		int count = std::stoi(arg[0]);
+		TileManager_equilateral_animate* m_tile_manager = new TileManager_equilateral_animate(count);
+		m_tile_manager->load_from_file(arg[1], object_direction_e::down, 0);
+		m_tile_manager->m_index = m_tile_managers.size();
+		m_tile_managers.push_back(m_tile_manager);
+		break;
+	}
 	case command_e::single_animate:
 	{
 		int count = std::stoi(arg[0]);
@@ -803,6 +812,7 @@ void GraphicalController::load_configuration()
 	m_commands["rotating"] = command_e::rotating;
 	m_commands["rotating8"] = command_e::rotating8;
 	m_commands["rotate8_animate"] = command_e::rotate8_animate;
+	m_commands["equilateral_animate"] = command_e::equilateral_animate;
 	m_commands["icon"] = command_e::icon;
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Tiles.txt", buffer);

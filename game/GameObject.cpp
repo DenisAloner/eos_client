@@ -765,7 +765,10 @@ void GameObject::get_actions_list(std::list<Action_helper_t>& value)
 	Action_getter ag(this, value);
 	
 	Action_list* al= static_cast<Action_list*>(get_effect(interaction_e::action));
-	al->do_predicat(ag);
+	if(al)
+	{
+		al->do_predicat(ag);
+	}
 
 	Parts_list* parts = get_parts_list(interaction_e::body);
 	parts->do_predicat(ag);

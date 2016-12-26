@@ -159,3 +159,31 @@ void TileManager_rotate8_animate::set_tile(tile_t& tile, GameObject* obj, int fr
 	tile.coordinat[2] = (ix+1)*dx;
 	tile.coordinat[3] = 1.0 - ((iy + 1)*dy);
 }
+
+TileManager_equilateral_animate::TileManager_equilateral_animate(int frame) :m_frame(frame)
+{
+	m_tiles = new GLuint[1];
+}
+
+int TileManager_equilateral_animate::get_tile_index(const object_direction_e& direction, const int& frame)
+{
+	return 0;
+
+}
+
+bool TileManager_equilateral_animate::load_from_file(const std::string& filename, object_direction_e direction, int frame)
+{
+	m_tiles[0] = Application::instance().m_graph->png_texture_load(FileSystem::instance().m_resource_path + "Tiles\\" + filename + ".png");
+	return true;
+}
+
+void TileManager_equilateral_animate::set_tile(tile_t& tile, GameObject* obj, int frame, int shift)
+{
+	tile.unit = m_tiles[static_cast<int>(m_animation)];
+	int ix = frame * (m_frame / 24.0);
+	double dx = 1.0 / m_frame;
+	tile.coordinat[0] = ix*dx;
+	tile.coordinat[1] = 1.0;
+	tile.coordinat[2] = (ix + 1)*dx;
+	tile.coordinat[3] = 0.0;
+}

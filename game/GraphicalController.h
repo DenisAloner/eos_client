@@ -81,7 +81,8 @@ public:
 		rotating,
 		rotating8,
 		icon,
-		rotate8_animate
+		rotate8_animate,
+		equilateral_animate
 
 	};
 
