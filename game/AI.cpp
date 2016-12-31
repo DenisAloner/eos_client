@@ -105,7 +105,6 @@ void Path::calculate(GameMap* map, GameObject* object, MapCell* gc,GameObject* g
 			c->m_closed = false;
 		}
 	}
-	MapCell* pc;
 	m_game_map = map;
 	m_unit = object;
 	m_start_cell = object->cell();
@@ -148,7 +147,6 @@ void Path::map_costing(GameMap* map, GameObject* object, MapCell* gc, int radius
 			c->m_closed = false;
 		}
 	}
-	MapCell* pc;
 	m_game_map = map;
 	m_unit = object;
 	m_start_cell = object->cell();
@@ -213,7 +211,7 @@ int Path::manhattan(MapCell* a, MapCell* b, MapCell* c)
 
 int Path::is_in_open(MapCell* c)
 {
-	for (int i = 0; i < m_heap.m_items.size();i++)
+	for (int i = 0; i < m_heap.m_items.size();++i)
 	{
 		if (m_heap.m_items[i]->cell == c)
 		{
@@ -511,7 +509,6 @@ AI* AI_enemy::clone()
 GameObject* AI_enemy::find_goal()
 {
 	FOV::cell* fc;
-	MapCell* mc;
 	Vision_list* vl = static_cast<Vision_list*>(m_object->m_active_state->get_list(interaction_e::vision));
 	int radius = vl->m_max_radius;
 
@@ -559,7 +556,6 @@ GameObject* AI_enemy::find_goal()
 bool AI_enemy::check_goal()
 {
 	FOV::cell* fc;
-	MapCell* mc;
 	Vision_list* vl = static_cast<Vision_list*>(m_object->m_active_state->get_list(interaction_e::vision));
 	int radius = vl->m_max_radius;
 

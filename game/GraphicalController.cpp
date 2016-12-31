@@ -142,17 +142,17 @@ void GraphicalController::set_VSync(bool sync)
 	// Function pointer for the wgl extention function we need to enable/disable
 	// vsync
 	typedef BOOL(APIENTRY *PFNWGLSWAPINTERVALPROC)(int);
-	PFNWGLSWAPINTERVALPROC wglSwapIntervalEXT = 0;
+	PFNWGLSWAPINTERVALPROC wglSwapIntervalEXT = nullptr;
 
-	const char *extensions = (char*)glGetString(GL_EXTENSIONS);
+	const char *extensions = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
 
-	if (strstr(extensions, "WGL_EXT_swap_control") == 0)
+	if (strstr(extensions, "WGL_EXT_swap_control") == nullptr)
 	{
 		return;
 	}
 	else
 	{
-		wglSwapIntervalEXT = (PFNWGLSWAPINTERVALPROC)wglGetProcAddress("wglSwapIntervalEXT");
+		wglSwapIntervalEXT = reinterpret_cast<PFNWGLSWAPINTERVALPROC>(wglGetProcAddress("wglSwapIntervalEXT"));
 
 		if (wglSwapIntervalEXT)
 			wglSwapIntervalEXT(sync);

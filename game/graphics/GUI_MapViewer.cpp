@@ -225,7 +225,6 @@ void mapviewer_hint_weapon_range::render()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_select);
-	double x0, y0, x1, y1, x2, y2, x3, y3;
 	MapCell* item = m_object->cell();
 	int xc;
 	int yc;
@@ -287,7 +286,6 @@ void mapviewer_hint_shoot::draw_cell(MapCell* a)
 {
 	if (!m_object->is_own(a))
 	{
-		double x0, y0, x1, y1, x2, y2, x3, y3;
 		int px = 0;
 		int py = 0;
 		int x = px + a->x - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
@@ -385,7 +383,6 @@ void mapviewer_object_move::render()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_select);
-	double x0, y0, x1, y1, x2, y2, x3, y3;
 	MapCell* Item = m_object->cell();
 	int bx;
 	int by;
@@ -493,7 +490,6 @@ void mapviewer_object_move::render()
 		glEnable(GL_TEXTURE_2D);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_select);
-		double x0, y0, x1, y1, x2, y2, x3, y3;
 		
 		int bx;
 		int by;
@@ -643,7 +639,6 @@ void mapviewer_object_move::render_on_cell(MapCell* c)
 	{
 		if (m_cell == c)
 		{
-			double x0, y0, x1, y1, x2, y2, x3, y3;
 			glColor4f(0.0F, 1.0F, 0.0F, 0.75F);
 			dimension_t object_size;
 			game_object_size_t size3d;
@@ -800,7 +795,6 @@ void mapviewer_object_rotate::render_on_cell(MapCell* c)
 	{
 		if (c == m_object->cell())
 		{
-			double x0, y0, x1, y1, x2, y2, x3, y3;
 			glColor4f(0.0F, 1.0F, 0.0F, 0.75F);
 			dimension_t object_size;
 			game_object_size_t size3d;
@@ -814,14 +808,15 @@ void mapviewer_object_rotate::render_on_cell(MapCell* c)
 			tile_t tile;
 			m_object->m_active_state->m_tile_manager->set_tile(tile, m_object, Application::instance().m_timer->get_tick(), m_direction);
 			GLuint Sprite = tile.unit;
+			LOG(INFO) << std::to_string(tile.coordinat[0])<<"  "<<std::to_string(tile.coordinat[1]) << "  " << std::to_string(tile.coordinat[2]) << "  " << std::to_string(tile.coordinat[3]);
 			glUseProgramObjectARB(0);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, Sprite);
 			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
 			Application::instance().m_graph->draw_tile(tile, r);
-			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_03, 0);
-			Application::instance().m_graph->draw_tile(tile, r);
+			//glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_03, 0);
+			//Application::instance().m_graph->draw_tile(tile, r);
 		}
 	}
 }
@@ -914,9 +909,6 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	int y;
 	int xf;
 	int yf;
-
-	int xv;
-	int yv;
 
 	int dx;
 	glColor4d(1.0, 1.0, 1.0, 1.0);
@@ -1095,7 +1087,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 								glUseProgram(Graph->m_tile_shader);
 							}
 							
-							(*Current)->m_active_state->m_tile_manager->set_tile(tile, (*Current), Application::instance().m_timer->get_tick(), dx);
+							(*Current)->m_active_state->m_tile_manager->set_tile(tile, (*Current), Application::instance().m_timer->get_tick(), (*Current)->m_direction);
 							GLuint Sprite = tile.unit;
 							glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 							glActiveTexture(GL_TEXTURE0);

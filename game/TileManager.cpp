@@ -25,16 +25,6 @@ bool TileManager::load_from_file(const std::string& filename, object_direction_e
 	return false;
 }
 
-void TileManager::set_tile(tile_t& tile, GameObject* obj, int frame, int shift)
-{
-	tile.unit = m_tiles[get_tile_index(obj->m_direction, frame)];
-	double sx = 1.0 / obj->m_active_state->m_tile_size.w;
-	tile.coordinat[0] = 0.0;
-	tile.coordinat[1] = 1.0;
-	tile.coordinat[2] = 1.0;
-	tile.coordinat[3] = 0.0;
-}
-
 void TileManager::set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction)
 {
 	tile.unit = m_tiles[get_tile_index(direction, frame)];
@@ -147,16 +137,16 @@ bool TileManager_rotate8_animate::load_from_file(const std::string& filename, ob
 	return true;
 }
 
-void TileManager_rotate8_animate::set_tile(tile_t& tile, GameObject* obj, int frame, int shift)
+void TileManager_rotate8_animate::set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction)
 {
 	tile.unit = m_tiles[static_cast<int>(m_animation)];
 	int ix = frame * (m_frame / 24.0);
-	int iy = int(obj->m_direction);
+	int iy = int(direction);
 	double dx = 1.0 / m_frame;
 	double dy = 1.0 / 8.0;
 	tile.coordinat[0] = ix*dx;
 	tile.coordinat[1] = 1.0 - ((iy)*dy);
-	tile.coordinat[2] = (ix+1)*dx;
+	tile.coordinat[2] = (ix + 1)*dx;
 	tile.coordinat[3] = 1.0 - ((iy + 1)*dy);
 }
 
@@ -177,7 +167,7 @@ bool TileManager_equilateral_animate::load_from_file(const std::string& filename
 	return true;
 }
 
-void TileManager_equilateral_animate::set_tile(tile_t& tile, GameObject* obj, int frame, int shift)
+void TileManager_equilateral_animate::set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction)
 {
 	tile.unit = m_tiles[static_cast<int>(m_animation)];
 	int ix = frame * (m_frame / 24.0);
