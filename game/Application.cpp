@@ -244,6 +244,9 @@ void Application::new_game()
 	m_world->m_player = new Player(obj, map);
 	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
 
+	std::string json = Parser::to_utf8(Parser::serialize_object(obj));
+	LOG(INFO) << json;
+
 	m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player, map, m_action_manager, m_game_log);
 
 	GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");

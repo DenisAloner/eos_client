@@ -2,16 +2,6 @@
 #include "game\impact\Impact_random_value.h"
 #include "game\impact\Impact_copy_chance.h"
 
-interaction_e GameObjectManager::get_interaction_e(const std::string& key)
-{
-	auto value = m_to_interaction_e.find(key);
-	if (value == m_to_interaction_e.end())
-	{
-		LOG(FATAL) << "Элемент `" << key << "` отсутствует в m_items";
-	}
-	return value->second;
-}
-
 ai_type_e GameObjectManager::get_ai_type_e(const std::string& key)
 {
 	auto value = m_to_ai_type_e.find(key);
@@ -266,7 +256,7 @@ void GameObjectManager::parser(const std::string& command)
 	{
 		Interaction_copyist* item = new Interaction_copyist();
 		item->m_interaction_message_type = interaction_message_type_e::single;
-		item->m_subtype = get_interaction_e(arg[0]);
+		item->m_subtype = m_dictonary_interaction_e.get_enum(arg[0]);
 		item->m_value = m_slot;
 		m_slot = item;
 		break;
@@ -275,7 +265,7 @@ void GameObjectManager::parser(const std::string& command)
 	{
 		Interaction_addon* item = new Interaction_addon();
 		item->m_interaction_message_type = interaction_message_type_e::single;
-		item->m_subtype = get_interaction_e(arg[0]);
+		item->m_subtype = m_dictonary_interaction_e.get_enum(arg[0]);
 		item->m_value = m_slot;
 		m_slot = item;
 		break;
@@ -296,11 +286,11 @@ void GameObjectManager::parser(const std::string& command)
 
 		if (arg[0][0] == 'y')
 		{
-			list = m_stack_attribute_map.front()->create_feature_list(list_type, get_interaction_e(arg[2]));
+			list = m_stack_attribute_map.front()->create_feature_list(list_type, m_dictonary_interaction_e.get_enum(arg[2]));
 		}
 		else
 		{
-			list = Effect_functions::create_feature_list(list_type, get_interaction_e(arg[2]));
+			list = Effect_functions::create_feature_list(list_type, m_dictonary_interaction_e.get_enum(arg[2]));
 		}
 	
 		list->m_list_type = list_type;
@@ -383,7 +373,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::mem_instruction_slot_link:
 	{
 		Instruction_slot_link* item = new Instruction_slot_link();
-		item->m_subtype = get_interaction_e(arg[0]);
+		item->m_subtype = m_dictonary_interaction_e.get_enum(arg[0]);
 		item->m_value = m_slot;
 		m_slot = item;
 		break;
@@ -579,56 +569,32 @@ void GameObjectManager::init()
 	m_to_object_state_e["growth_05"] = object_state_e::growth_05;
 	m_to_object_state_e["growth_06"] = object_state_e::growth_06;
 
-	m_to_interaction_e["total_damage"] = interaction_e::total_damage;
-	m_to_interaction_e["damage"] = interaction_e::damage;
-	m_to_interaction_e["buff"] = interaction_e::buff;
-	m_to_interaction_e["use"] = interaction_e::use;
-	m_to_interaction_e["health"] = interaction_e::health;
-	m_to_interaction_e["strength"] = interaction_e::strength;
-	m_to_interaction_e["intelligence"] = interaction_e::intelligence;
-	m_to_interaction_e["dexterity"] = interaction_e::dexterity;
-	m_to_interaction_e["hunger"] = interaction_e::hunger;
-	m_to_interaction_e["thirst"] = interaction_e::thirst;
-	m_to_interaction_e["poison"] = interaction_e::poison;
-	m_to_interaction_e["action"] = interaction_e::action;
-	m_to_interaction_e["tag"] = interaction_e::tag;
-	m_to_interaction_e["body"] = interaction_e::body;
-	m_to_interaction_e["weapon_damage"] = interaction_e::weapon_damage;
-	m_to_interaction_e["skill_sword"] = interaction_e::skill_sword;
-	m_to_interaction_e["skill_bow"] = interaction_e::skill_bow;
-	m_to_interaction_e["strength_bonus"] = interaction_e::strength_bonus;
-	m_to_interaction_e["demand_weapon_skill"] = interaction_e::demand_weapon_skill;
-	m_to_interaction_e["evasion_skill"] = interaction_e::evasion_skill;
-	m_to_interaction_e["weapon_range"] = interaction_e::weapon_range;
-	m_to_interaction_e["vision"] = interaction_e::vision;
-	m_to_interaction_e["vision_component"] = interaction_e::vision_component;
-	m_to_interaction_e["skill_unarmed_combat"] = interaction_e::skill_unarmed_combat;
-	m_to_interaction_e["equip"] = interaction_e::equip;
+	m_dictonary_interaction_e.add(interaction_e::total_damage, "total_damage", "общий дополнительный урон");
+	m_dictonary_interaction_e.add(interaction_e::damage, "damage", "урон");
+	m_dictonary_interaction_e.add(interaction_e::buff, "buff", "баффы");
+	m_dictonary_interaction_e.add(interaction_e::use, "use", "применение");
+	m_dictonary_interaction_e.add(interaction_e::health, "health", "здоровье");
+	m_dictonary_interaction_e.add(interaction_e::strength, "strength", "сила");
+	m_dictonary_interaction_e.add(interaction_e::intelligence, "intelligence", "интеллект");
+	m_dictonary_interaction_e.add(interaction_e::dexterity, "dexterity", "ловкость");
+	m_dictonary_interaction_e.add(interaction_e::hunger, "hunger", "голод");
+	m_dictonary_interaction_e.add(interaction_e::thirst, "thirst", "жажда");
+	m_dictonary_interaction_e.add(interaction_e::poison, "poison", "яд");
+	m_dictonary_interaction_e.add(interaction_e::action, "action", "действия");
+	m_dictonary_interaction_e.add(interaction_e::tag, "tag", "метки");
+	m_dictonary_interaction_e.add(interaction_e::body, "body", "тело");
+	m_dictonary_interaction_e.add(interaction_e::weapon_damage, "weapon_damage", "урон оружия");
+	m_dictonary_interaction_e.add(interaction_e::skill_sword, "skill_sword", "владение мечом");
+	m_dictonary_interaction_e.add(interaction_e::skill_bow, "skill_bow", "владение луком");
+	m_dictonary_interaction_e.add(interaction_e::strength_bonus, "strength_bonus", "бонус силы");
+	m_dictonary_interaction_e.add(interaction_e::demand_weapon_skill, "demand_weapon_skill", "требование к владению оружием");
+	m_dictonary_interaction_e.add(interaction_e::evasion_skill, "evasion_skill", "навык уклонения");
+	m_dictonary_interaction_e.add(interaction_e::weapon_range, "weapon_range", "дальность");
+	m_dictonary_interaction_e.add(interaction_e::vision, "vision", "зрение");
+	m_dictonary_interaction_e.add(interaction_e::vision_component, "vision_component", "поле зрения");
+	m_dictonary_interaction_e.add(interaction_e::skill_unarmed_combat, "skill_unarmed_combat", "владение безоружным боем");
+	m_dictonary_interaction_e.add(interaction_e::equip, "equip", "экипировка");
 
-	m_effect_string[interaction_e::total_damage] = "общий дополнительный урон";
-	m_effect_string[interaction_e::damage] = "урон";
-	m_effect_string[interaction_e::buff] = "баффы";
-	m_effect_string[interaction_e::use] = "применение";
-	m_effect_string[interaction_e::health] = "здоровье";
-	m_effect_string[interaction_e::strength] = "сила";
-	m_effect_string[interaction_e::intelligence] = "интеллект";
-	m_effect_string[interaction_e::dexterity] = "ловкость";
-	m_effect_string[interaction_e::hunger] = "голод";
-	m_effect_string[interaction_e::thirst] = "жажда";
-	m_effect_string[interaction_e::tag] = "метки";
-	m_effect_string[interaction_e::poison] = "яд";
-	m_effect_string[interaction_e::action] = "действия";
-	m_effect_string[interaction_e::body] = "тело";
-	m_effect_string[interaction_e::weapon_damage] = "урон оружия";
-	m_effect_string[interaction_e::skill_sword] = "владение мечом";
-	m_effect_string[interaction_e::skill_bow] = "владение луком";
-	m_effect_string[interaction_e::strength_bonus] = "бонус силы";
-	m_effect_string[interaction_e::demand_weapon_skill] = "требование к владению оружием";
-	m_effect_string[interaction_e::evasion_skill] = "навык уклонения";
-	m_effect_string[interaction_e::weapon_range] = "дальность";
-	m_effect_string[interaction_e::vision] = "зрение";
-	m_effect_string[interaction_e::vision_component] = "компонент зрения";
-	m_effect_string[interaction_e::skill_unarmed_combat] = "владение безоружным боем";
 
 	m_to_effect_e["value"] = effect_e::value;
 	m_to_effect_e["limit"] = effect_e::limit;
@@ -714,6 +680,16 @@ void GameObjectManager::init()
 	m_to_entity_e["object_part"] = entity_e::body_part;
 	m_to_entity_e["cell"] = entity_e::cell;
 
+	Parser::register_class<GameObject>(u"game_object");
+	Parser::register_class<Object_state>(u"object_state");
+
+	bytearray json;
+	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.json", json);
+	std::u16string json_config(json);
+
+	/*GameObject* test = dynamic_cast<GameObject*>(Parser::deserialize_object(json_config));
+	LOG(INFO) << test->m_name;*/
+
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);
 	std::string config(buffer);
@@ -773,15 +749,6 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 //	}
 //}
 
-std::string GameObjectManager::get_effect_string(interaction_e key)
-{
-	auto value = m_effect_string.find(key);
-	if (value != m_effect_string.end())
-	{
-		return value->second;
-	}
-	return "неизвестный тип";
-}
 
 std::string GameObjectManager::get_effect_subtype_string(effect_e key)
 {
@@ -918,7 +885,7 @@ void GameObjectManager::bind_body(GameObject* object)
 		{
 			m_game_object_owner_stack.clear();
 			m_game_object_owner_stack.push_front(object);
-			for (auto item = list->m_effect.begin(); item != list->m_effect.end(); ++item)
+			for (auto item = list->m_items.begin(); item != list->m_items.end(); ++item)
 			{
 				(*item)->do_predicat_ex(std::bind(&GameObjectManager::bind_body_predicat, this, std::placeholders::_1, std::placeholders::_2));
 			}

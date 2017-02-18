@@ -10,7 +10,7 @@ class Interaction_list :public Object_interaction
 public:
 
 	feature_list_type_e m_list_type;
-	std::list<Object_interaction*> m_effect;
+	std::list<Object_interaction*> m_items;
 
 	Interaction_list();
 	virtual bool on_turn();
@@ -20,10 +20,10 @@ public:
 	virtual void description(std::list<std::string>* info, int level);
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
-	virtual void add(Object_interaction* item) { m_effect.push_back(item); };
-	virtual void remove(Object_interaction* item) { m_effect.remove(item); };
-	virtual void equip(Object_interaction* item) { m_effect.push_back(item); };
-	virtual void unequip(Object_interaction* item) { m_effect.remove(item); };
+	virtual void add(Object_interaction* item) { m_items.push_back(item); };
+	virtual void remove(Object_interaction* item) { m_items.remove(item); };
+	virtual void equip(Object_interaction* item) { m_items.push_back(item); };
+	virtual void unequip(Object_interaction* item) { m_items.remove(item); };
 
 	virtual void do_predicat(Visitor& helper);
 	virtual void do_predicat_ex(predicat_ex func);
@@ -31,6 +31,14 @@ public:
 	virtual void reset_serialization_index();
 	virtual void save();
 	virtual void load();
+
+	// Для поддержки iJSONSerializable
+	Packer_generic& get_packer() override
+	{
+		return Packer<Interaction_list>::Instance();
+	}
+
+	constexpr static auto properties() { return std::make_tuple(makeProperty(&Interaction_list::m_items, u"m_item")); }
 
 };
 

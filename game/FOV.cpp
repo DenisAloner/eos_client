@@ -321,7 +321,7 @@ void FOV::calculate_FOV(GameObject* object, GameMap* map, object_direction_e dir
 	}
 
 	AI_FOV current;
-	for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); ++item)
+	for (auto item = vl->m_items.begin(); item != vl->m_items.end(); ++item)
 	{
 		current = static_cast<Vision_component*>(*item)->m_value;
 		calculate(object, map, current);

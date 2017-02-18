@@ -730,7 +730,7 @@ void AI_enemy::create()
 			int radius = 0;
 			Vision_list* vl = static_cast<Vision_list*>(m_object->m_active_state->get_list(interaction_e::vision));
 			AI_FOV current;
-			for (auto item = vl->m_effect.begin(); item != vl->m_effect.end(); ++item)
+			for (auto item = vl->m_items.begin(); item != vl->m_items.end(); ++item)
 			{
 				current = static_cast<Vision_component*>(*item)->m_value;
 				radius = max(radius, current.radius);

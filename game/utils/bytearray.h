@@ -50,6 +50,8 @@ struct bytearray
 
 	inline operator std::string() const { return std::string((const char*)get(), size()); }
 
+	inline operator std::u16string() const { return std::u16string((const char16_t*)get(), size()); }
+
 private:
 	std::shared_ptr<value_type> m_ptr;
 	size_t m_size;

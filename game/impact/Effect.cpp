@@ -12,12 +12,12 @@ Interaction_list::Interaction_list()
 bool Interaction_list::on_turn()
 {
 	bool result = false;
-	for (auto item = m_effect.begin(); item != m_effect.end();)
+	for (auto item = m_items.begin(); item != m_items.end();)
 	{
 		if ((*item)->on_turn())
 		{
 			LOG(INFO) << "удалить!!";
-			item = m_effect.erase(item);
+			item = m_items.erase(item);
 		}
 		else
 			++item;
@@ -28,7 +28,7 @@ bool Interaction_list::on_turn()
 std::string Interaction_list::get_description()
 {
 	std::string result = "";
-	for (auto current = m_effect.begin(); current != m_effect.end(); ++current)
+	for (auto current = m_items.begin(); current != m_items.end(); ++current)
 	{
 		result += (*current)->get_description() + ",";
 	}
@@ -45,10 +45,10 @@ Interaction_list* Interaction_list::clone()
 	Interaction_list* result = new Interaction_list();
 	result->m_list_type = m_list_type;
 	Object_interaction* c;
-	for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
 		c = (*item)->clone();
-		if (c) { result->m_effect.push_back(c); }
+		if (c) { result->m_items.push_back(c); }
 
 	}
 	return result;
@@ -63,7 +63,7 @@ void Interaction_list::apply_effect(GameObject* unit, Object_interaction* object
 		case interaction_message_type_e::instruction_game_owner:
 		{
 			Instruction_game_owner* i = static_cast<Instruction_game_owner*>(object);
-			for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+			for (auto item = m_items.begin(); item != m_items.end(); ++item)
 			{
 				i->m_result = false;
 				(*item)->apply_effect(unit, object);
@@ -77,7 +77,7 @@ void Interaction_list::apply_effect(GameObject* unit, Object_interaction* object
 		}
 		default:
 		{
-			for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+			for (auto item = m_items.begin(); item != m_items.end(); ++item)
 			{
 				(*item)->apply_effect(unit, object);
 			}
@@ -87,7 +87,7 @@ void Interaction_list::apply_effect(GameObject* unit, Object_interaction* object
 	}
 	else
 	{
-		for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+		for (auto item = m_items.begin(); item != m_items.end(); ++item)
 		{
 			(*item)->apply_effect(unit, object);
 		}
@@ -97,7 +97,7 @@ void Interaction_list::apply_effect(GameObject* unit, Object_interaction* object
 void Interaction_list::do_predicat(Visitor& helper)
 {
 	helper.visit(*this);
-	for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
 		(*item)->do_predicat(helper);
 	}
@@ -106,7 +106,7 @@ void Interaction_list::do_predicat(Visitor& helper)
 void Interaction_list::do_predicat_ex(predicat_ex func)
 {
 	func(this,true);
-	for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
 		(*item)->do_predicat_ex(func);
 	}
@@ -115,7 +115,7 @@ void Interaction_list::do_predicat_ex(predicat_ex func)
 
 void Interaction_list::description(std::list<std::string>* info, int level)
 {
-	for (auto current = m_effect.begin(); current != m_effect.end(); ++current)
+	for (auto current = m_items.begin(); current != m_items.end(); ++current)
 	{
 		(*current)->description(info, level);
 	}
@@ -126,7 +126,7 @@ void Interaction_list::reset_serialization_index()
 	LOG(INFO) << "шаг 4";
 	m_serialization_index = 0;
 	LOG(INFO) << "шаг 5";
-	for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
 		LOG(INFO) << "шаг 6";
 		(*item)->reset_serialization_index();
@@ -139,9 +139,9 @@ void Interaction_list::save()
 	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::interaction_list;
 	fwrite(&t, sizeof(type_e), 1, file);
-	size_t s = m_effect.size();
+	size_t s = m_items.size();
 	fwrite(&s, sizeof(size_t), 1, file);
-	for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
 		Serialization_manager::instance().serialize(*item);
 	}
@@ -153,10 +153,10 @@ void Interaction_list::load()
 	FILE* file = Serialization_manager::instance().m_file;
 	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
-	m_effect.clear();
+	m_items.clear();
 	for (size_t i = 0; i < s; i++)
 	{
-		m_effect.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
+		m_items.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
 	}
 }
 
@@ -180,7 +180,7 @@ Parameter_list::Parameter_list()
 //	case interaction_message_type_e::list:
 //	{
 //		Interaction_list* list_item = static_cast<Interaction_list*>(list);
-//		for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); ++current)
+//		for (auto current = list_item->m_items.begin(); current != list_item->m_items.end(); ++current)
 //		{
 //			update_list((*current));
 //		}
@@ -264,7 +264,7 @@ bool Parameter_list::update()
 std::string Parameter_list::get_description()
 {
 	std::string result = std::to_string(m_value) + "/" + std::to_string(m_limit) + ",";
-	for (auto current = m_effect.begin(); current != m_effect.end(); ++current)
+	for (auto current = m_items.begin(); current != m_items.end(); ++current)
 	{
 		result += (*current)->get_description() + ",";
 	}
@@ -279,7 +279,7 @@ Parameter_list* Parameter_list::clone()
 	result->m_basic_value = m_basic_value;
 	result->m_value = m_value;
 	result->m_limit = m_limit;
-	for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
 		result->add((*item)->clone());
 	}
@@ -289,7 +289,7 @@ Parameter_list* Parameter_list::clone()
 void Parameter_list::description(std::list<std::string>* info, int level)
 {
 	info->push_back(std::string(level, '.') + std::to_string(m_value) + "(" + std::to_string(m_basic_value) + ")/" + std::to_string(m_limit) + "(" + std::to_string(m_basic_limit) + "):");
-	for (auto current = m_effect.begin(); current != m_effect.end(); ++current)
+	for (auto current = m_items.begin(); current != m_items.end(); ++current)
 	{
 		(*current)->description(info, level);
 	}
@@ -306,9 +306,9 @@ void Parameter_list::save()
 	fwrite(&m_basic_value, sizeof(int), 1, file);
 	fwrite(&m_basic_limit, sizeof(int), 1, file);
 
-	size_t s = m_effect.size();
+	size_t s = m_items.size();
 	fwrite(&s, sizeof(size_t), 1, file);
-	for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
 		Serialization_manager::instance().serialize(*item);
 	}
@@ -325,10 +325,10 @@ void Parameter_list::load()
 	fread(&m_basic_limit, sizeof(int), 1, file);
 	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
-	m_effect.clear();
+	m_items.clear();
 	for (size_t i = 0; i < s; i++)
 	{
-		m_effect.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
+		m_items.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
 	}
 	LOG(INFO) << "Конец листа параметров";
 }
@@ -358,7 +358,7 @@ void Vision_list::update_list(Object_interaction* list)
 		default:
 		{
 			Interaction_list* list_item = static_cast<Interaction_list*>(list);
-			for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); ++current)
+			for (auto current = list_item->m_items.begin(); current != list_item->m_items.end(); ++current)
 			{
 				update_list((*current));
 			}
@@ -381,7 +381,7 @@ bool Vision_list::update()
 std::string Vision_list::get_description()
 {
 	/*std::string result = std::to_string(m_value) + "/" + std::to_string(m_limit) + ",";
-	for (auto current = m_effect.begin(); current != m_effect.end(); current++)
+	for (auto current = m_items.begin(); current != m_items.end(); current++)
 	{
 		result += (*current)->get_description() + ",";
 	}
@@ -393,7 +393,7 @@ Vision_list* Vision_list::clone()
 {
 	Vision_list* result = new Vision_list;
 	result->m_list_type = m_list_type;
-	for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
 		result->add((*item)->clone());
 	}
@@ -403,7 +403,7 @@ Vision_list* Vision_list::clone()
 void Vision_list::description(std::list<std::string>* info, int level)
 {
 	//info->push_back(std::string(level, '.') + std::to_string(m_value) + "(" + std::to_string(m_basic_value) + ")/" + std::to_string(m_limit) + "(" + std::to_string(m_basic_limit) + "):");
-	for (auto current = m_effect.begin(); current != m_effect.end(); ++current)
+	for (auto current = m_items.begin(); current != m_items.end(); ++current)
 	{
 		(*current)->description(info, level);
 	}
@@ -419,13 +419,13 @@ void Vision_list::equip(Object_interaction* item)
 		{
 		case feature_list_type_e::vision_component:
 		{
-			m_effect.push_back(item);
+			m_items.push_back(item);
 			break;
 		}
 		default:
 		{
 			Interaction_list* list_item = static_cast<Interaction_list*>(item);
-			for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); ++current)
+			for (auto current = list_item->m_items.begin(); current != list_item->m_items.end(); ++current)
 			{
 				equip(*current);
 			}
@@ -436,7 +436,7 @@ void Vision_list::equip(Object_interaction* item)
 	}
 	default:
 	{
-		for (auto current = m_effect.begin(); current != m_effect.end(); ++current)
+		for (auto current = m_items.begin(); current != m_items.end(); ++current)
 		{
 			static_cast<Vision_component*>(*current)->equip(item);
 		}
@@ -455,13 +455,13 @@ void Vision_list::unequip(Object_interaction* item)
 		{
 		case feature_list_type_e::vision_component:
 		{
-			m_effect.remove(item);
+			m_items.remove(item);
 			break;
 		}
 		default:
 		{
 			Interaction_list* list_item = static_cast<Interaction_list*>(item);
-			for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); ++current)
+			for (auto current = list_item->m_items.begin(); current != list_item->m_items.end(); ++current)
 			{
 				unequip(*current);
 			}
@@ -472,7 +472,7 @@ void Vision_list::unequip(Object_interaction* item)
 	}
 	default:
 	{
-		for (auto current = m_effect.begin(); current != m_effect.end(); ++current)
+		for (auto current = m_items.begin(); current != m_items.end(); ++current)
 		{
 			static_cast<Vision_component*>(*current)->unequip(item);
 		}
@@ -487,9 +487,9 @@ void Vision_list::save()
 	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::vision_list;
 	fwrite(&t, sizeof(type_e), 1, file);
-	size_t s = m_effect.size();
+	size_t s = m_items.size();
 	fwrite(&s, sizeof(size_t), 1, file);
-	for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
 		Serialization_manager::instance().serialize(*item);
 	}
@@ -502,10 +502,10 @@ void Vision_list::load()
 	FILE* file = Serialization_manager::instance().m_file;
 	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
-	m_effect.clear();
+	m_items.clear();
 	for (size_t i = 0; i < s; i++)
 	{
-		m_effect.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
+		m_items.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
 	}
 	LOG(INFO) << "Конец листа зрения";
 }
@@ -526,7 +526,7 @@ void Vision_component::update_list(Object_interaction* list)
 	case interaction_message_type_e::list:
 	{
 		Interaction_list* list_item = static_cast<Interaction_list*>(list);
-		for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); ++current)
+		for (auto current = list_item->m_items.begin(); current != list_item->m_items.end(); ++current)
 		{
 			update_list((*current));
 		}
@@ -576,7 +576,7 @@ bool Vision_component::update()
 std::string Vision_component::get_description()
 {
 	//std::string result = std::to_string(m_value) + "/" + std::to_string(m_limit) + ",";
-	//for (auto current = m_effect.begin(); current != m_effect.end(); current++)
+	//for (auto current = m_items.begin(); current != m_items.end(); current++)
 	//{
 	//	result += (*current)->get_description() + ",";
 	//}
@@ -589,7 +589,7 @@ Vision_component* Vision_component::clone()
 	Vision_component* result = new Vision_component();
 	result->m_basic_value = AI_FOV(m_basic_value.radius, m_basic_value.qualifier, m_basic_value.start_angle, m_basic_value.end_angle);
 	result->m_value = AI_FOV(m_value.radius, m_value.qualifier, m_value.start_angle, m_value.end_angle);
-	for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
 		result->add((*item)->clone());
 	}
@@ -599,7 +599,7 @@ Vision_component* Vision_component::clone()
 void Vision_component::description(std::list<std::string>* info, int level)
 {
 	info->push_back(std::string(level, '.') + std::to_string(m_value.radius)+","+ std::to_string(m_value.start_angle) + "," + std::to_string(m_value.end_angle)+"/" + std::to_string(m_basic_value.radius) + "," + std::to_string(m_basic_value.start_angle) + "," + std::to_string(m_basic_value.end_angle));
-	for (auto current = m_effect.begin(); current != m_effect.end(); ++current)
+	for (auto current = m_items.begin(); current != m_items.end(); ++current)
 	{
 		(*current)->description(info, level+1);
 	}
@@ -612,9 +612,9 @@ void Vision_component::save()
 	type_e t = type_e::vision_component;
 	fwrite(&t, sizeof(type_e), 1, file);
 	FileSystem::instance().serialize_AI_FOV(m_basic_value, file);
-	size_t s = m_effect.size();
+	size_t s = m_items.size();
 	fwrite(&s, sizeof(size_t), 1, file);
-	for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
 		Serialization_manager::instance().serialize(*item);
 	}
@@ -628,10 +628,10 @@ void Vision_component::load()
 	FileSystem::instance().deserialize_AI_FOV(m_basic_value, file);
 	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
-	m_effect.clear();
+	m_items.clear();
 	for (size_t i = 0; i < s; i++)
 	{
-		m_effect.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
+		m_items.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
 	}
 	LOG(INFO) << "Конец компонента зрения";
 }
@@ -647,9 +647,9 @@ Tag_list::Tag_list()
 Tag_list* Tag_list::clone()
 {
 	Tag_list* result = new Tag_list();
-	for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
-		result->m_effect.push_back((*item)->clone());
+		result->m_items.push_back((*item)->clone());
 	}
 	return result;
 }
@@ -676,10 +676,10 @@ void Tag_list::save()
 	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::tag_list;
 	fwrite(&t, sizeof(type_e), 1, file);
-	size_t s = m_effect.size();
+	size_t s = m_items.size();
 	fwrite(&s, sizeof(size_t), 1, file);
 
-	for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
 		Serialization_manager::instance().serialize(*item);
 	}
@@ -691,10 +691,10 @@ void Tag_list::load()
 	FILE* file = Serialization_manager::instance().m_file;
 	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
-	m_effect.clear();
+	m_items.clear();
 	for (size_t i = 0; i < s; i++)
 	{
-		m_effect.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
+		m_items.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
 	}
 }
 
@@ -709,9 +709,9 @@ Parts_list::Parts_list()
 Parts_list* Parts_list::clone()
 {
 	Parts_list* result = new Parts_list();
-	for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
-		result->m_effect.push_back((*item)->clone());
+		result->m_items.push_back((*item)->clone());
 	}
 	return result;
 }
@@ -724,7 +724,7 @@ Parts_list* Parts_list::clone()
 //	case interaction_message_type_e::list:
 //	{
 //		Interaction_list* list_item = static_cast<Interaction_list*>(list);
-//		for (auto current = list_item->m_effect.begin(); current != list_item->m_effect.end(); ++current)
+//		for (auto current = list_item->m_items.begin(); current != list_item->m_items.end(); ++current)
 //		{
 //			update_list((*current));
 //		}
@@ -866,9 +866,9 @@ bool Parts_list::update()
 
 void Parts_list::equip(Object_interaction* item)
 {
-	LOG(INFO) << std::to_string((int)m_list_type); m_effect.push_back(item); LOG(INFO) << std::to_string(m_effect.size());
+	LOG(INFO) << std::to_string((int)m_list_type); m_items.push_back(item); LOG(INFO) << std::to_string(m_items.size());
 
-	for (auto current = m_effect.begin(); current != m_effect.end(); ++current)
+	for (auto current = m_items.begin(); current != m_items.end(); ++current)
 	{
 		//Object_part* a = dynamic_cast<Object_part*>(*current);
 		LOG(INFO) <<std::to_string((int)((*current)->m_interaction_message_type));
@@ -882,9 +882,9 @@ void Parts_list::save()
 	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::parts_list;
 	fwrite(&t, sizeof(type_e), 1, file);
-	size_t s = m_effect.size();
+	size_t s = m_items.size();
 	fwrite(&s, sizeof(size_t), 1, file);
-	for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
 		Serialization_manager::instance().serialize(*item);
 	}
@@ -896,10 +896,10 @@ void Parts_list::load()
 	FILE* file = Serialization_manager::instance().m_file;
 	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
-	m_effect.clear();
+	m_items.clear();
 	for (size_t i = 0; i < s; i++)
 	{
-		m_effect.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
+		m_items.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
 	}
 }
 
@@ -914,9 +914,9 @@ Action_list::Action_list()
 Interaction_list* Action_list::clone()
 {
 	Action_list* result = new Action_list();
-	for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
-		result->m_effect.push_back((*item)->clone());
+		result->m_items.push_back((*item)->clone());
 	}
 	return result;
 }
@@ -927,9 +927,9 @@ void Action_list::save()
 	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::action_list;
 	fwrite(&t, sizeof(type_e), 1, file);
-	size_t s = m_effect.size();
+	size_t s = m_items.size();
 	fwrite(&s, sizeof(size_t), 1, file);
-	for (auto item = m_effect.begin(); item != m_effect.end(); ++item)
+	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
 		Serialization_manager::instance().serialize(*item);
 	}
@@ -941,10 +941,10 @@ void Action_list::load()
 	FILE* file = Serialization_manager::instance().m_file;
 	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
-	m_effect.clear();
+	m_items.clear();
 	for (size_t i = 0; i < s; i++)
 	{
-		m_effect.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
+		m_items.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
 	}
 }
 
@@ -1175,7 +1175,7 @@ Object_interaction* Interaction_copyist::clone()
 
 void Interaction_copyist::description(std::list<std::string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + "<тип параметра:" + Application::instance().m_game_object_manager->get_effect_string(m_subtype) + ">:");
+	info->push_back(std::string(level, '.') + "<тип параметра:" + Application::instance().m_game_object_manager->m_dictonary_interaction_e.get_string(m_subtype) + ">:");
 	m_value->description(info, level + 1);
 }
 
@@ -1227,7 +1227,7 @@ void Interaction_prefix::apply_effect(GameObject* unit, Object_interaction* obje
 	Tag_list* i = static_cast<Tag_list*>(unit->get_effect(interaction_e::tag));
 	if (i)
 	{
-		for (auto item = i->m_effect.begin(); item != i->m_effect.end(); ++item)
+		for (auto item = i->m_items.begin(); item != i->m_items.end(); ++item)
 		{
 			(*item)->apply_effect(unit, this);
 		}
@@ -1276,7 +1276,7 @@ Object_interaction* Interaction_addon::clone()
 
 void Interaction_addon::description(std::list<std::string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + "<наложение эффекта:" + Application::instance().m_game_object_manager->get_effect_string(m_subtype) + ">:");
+	info->push_back(std::string(level, '.') + "<наложение эффекта:" + Application::instance().m_game_object_manager->m_dictonary_interaction_e.get_string(m_subtype) + ">:");
 	m_value->description(info, level + 1);
 }
 
@@ -1858,7 +1858,7 @@ Instruction_slot_link* Instruction_slot_link::clone()
 
 void Instruction_slot_link::description(std::list<std::string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + "<тип параметра:" + Application::instance().m_game_object_manager->get_effect_string(m_subtype) + ">:");
+	info->push_back(std::string(level, '.') + "<тип параметра:" + Application::instance().m_game_object_manager->m_dictonary_interaction_e.get_string(m_subtype) + ">:");
 	m_value->description(info, level + 1);
 }
 

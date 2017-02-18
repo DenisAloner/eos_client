@@ -104,6 +104,8 @@ public:
 	Interaction_list* m_mem_list;
 	Object_part* m_part;
 
+	Dictonary<interaction_e> m_dictonary_interaction_e;
+
 	std::list<Interaction_list*> m_stack_list;
 	std::list<Attribute_map*> m_stack_attribute_map;
 
@@ -111,7 +113,6 @@ public:
 
 	//std::list<GameObject*> m_object_templates;
 
-	interaction_e get_interaction_e(const std::string& key);
 	effect_e get_effect_e(const std::string& key);
 	object_state_e get_object_state_e(const std::string& key);
 	object_tag_e get_object_tag_e(const std::string& key);
@@ -127,7 +128,6 @@ public:
 	GameObject* new_object(std::string unit_name);
 	//void register_object(GameObject*& object);
 
-	std::string get_effect_string(interaction_e key);
 	std::string get_effect_subtype_string(effect_e key);
 	std::string get_object_tag_string(object_tag_e key);
 	std::string get_effect_prefix_string(effect_prefix_e key);

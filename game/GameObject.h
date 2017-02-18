@@ -104,6 +104,13 @@ public:
 	bool get_stat(object_tag_e key);
 	Object_tag* get_tag(object_tag_e key);
 
+	//// Для поддержки iSerializable
+	//void init_by_scheme(scheme_map_t* value)override
+	//{
+	//	fromJson<Attribute_map>(this, *value);
+	//}
+	//constexpr static auto properties() { return std::make_tuple(makeProperty(&Attribute_map::m_item, u"m_item")); }
+
 };
 
 class Object_state : public Attribute_map
@@ -133,6 +140,13 @@ public:
 	virtual void reset_serialization_index();
 	virtual void save();
 	virtual void load();
+
+	Packer_generic& get_packer() override
+	{
+		return Packer<Object_state>::Instance();
+	}
+
+	constexpr static auto properties() { return std::make_tuple(makeProperty(&Object_state::m_layer, u"layer"), makeProperty(&Object_state::m_size, u"size")); }
 };
 
 class Object_state_equip :public Object_state
@@ -146,11 +160,12 @@ public:
 
 };
 
-class GameObject : public  Object_interaction, public GUI_connectable_i,public Game_object_owner
+class GameObject : public Object_interaction, public GUI_connectable_i,public Game_object_owner
 {
 public:
 
 	std::string m_name;
+
 	object_direction_e m_direction;
 	bool m_selected;
 
@@ -190,6 +205,14 @@ public:
 	virtual void load();
 
 	virtual void get_actions_list(std::list<Action_helper_t>& value);
+
+	// Для поддержки iJSONSerializable
+	Packer_generic& get_packer() override
+	{
+		return Packer<GameObject>::Instance();
+	}
+
+	constexpr static auto properties() { return std::make_tuple(makeProperty(&GameObject::m_name, u"name"), makeProperty(&GameObject::m_state, u"state")); }
 
 private:
 

@@ -653,7 +653,7 @@ void GameObject::Action_getter::visit(Object_interaction& value)
 		Object_tag* t;
 		if (tl)
 		{
-			for (auto tag = tl->m_effect.begin(); tag != tl->m_effect.end(); ++tag)
+			for (auto tag = tl->m_items.begin(); tag != tl->m_items.end(); ++tag)
 			{
 				t = static_cast<Object_tag*>(*tag);
 				switch (t->m_type)
@@ -686,7 +686,7 @@ void GameObject::Action_getter::visit(Object_interaction& value)
 		Action* a;
 		if (al)
 		{
-			for (auto action = al->m_effect.begin(); action != al->m_effect.end(); ++action)
+			for (auto action = al->m_items.begin(); action != al->m_items.end(); ++action)
 			{
 				a = static_cast<Action*>(*action);
 				switch (a->m_kind)
@@ -730,7 +730,7 @@ void GameObject::Action_getter::visit(Object_interaction& value)
 			al = static_cast<Action_list*>(op.m_item->get_effect(interaction_e::action));
 			if (al)
 			{
-				for (auto action = al->m_effect.begin(); action != al->m_effect.end(); ++action)
+				for (auto action = al->m_items.begin(); action != al->m_items.end(); ++action)
 				{
 					a = static_cast<Action*>(*action);
 					switch (a->m_kind)
@@ -970,7 +970,7 @@ void Object_part::description(std::list<std::string>* info, int level)
 	info->push_back(std::string(level, '.') + "<эффекты>:");
 	for (auto current = m_object_state.m_item.begin(); current != m_object_state.m_item.end(); current++)
 	{
-		info->push_back(std::string(level + 1, '.') + Application::instance().m_game_object_manager->get_effect_string(current->first) + ":");
+		info->push_back(std::string(level + 1, '.') + Application::instance().m_game_object_manager->m_dictonary_interaction_e.get_string(current->first) + ":");
 		current->second->description(info, level + 2);
 	}
 }
