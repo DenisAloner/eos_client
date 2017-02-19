@@ -278,17 +278,17 @@ void Application::new_game()
 			obj->set_direction(object_direction_e::top);
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-2][rx]);*/
 
-			//obj = m_game_object_manager->new_object("bat");
-			//obj->set_direction(object_direction_e::top);
-			//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx-2]);
+			obj = m_game_object_manager->new_object("bat");
+			obj->set_direction(object_direction_e::top);
+			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx-2]);
 
-			///*obj = m_game_object_manager->new_object("bag");
-			//obj->set_direction(object_direction_e::top);
-			//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx-1]);*/
+			/*obj = m_game_object_manager->new_object("bag");
+			obj->set_direction(object_direction_e::top);
+			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx-1]);*/
 
-			//obj = m_game_object_manager->new_object("ring");
-			//obj->set_direction(object_direction_e::top);
-			//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx + 1]);
+			obj = m_game_object_manager->new_object("ring");
+			obj->set_direction(object_direction_e::top);
+			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx + 1]);
 
 			obj = m_game_object_manager->new_object("boot");
 			obj->set_direction(object_direction_e::top);
@@ -300,6 +300,9 @@ void Application::new_game()
 			obj = m_game_object_manager->new_object("fountain");
 			obj->set_direction(object_direction_e::top);
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry + 10][rx + 2]);
+
+			json = Parser::to_utf8(Parser::serialize_object(obj));
+			LOG(INFO) << json;
 
 	
 

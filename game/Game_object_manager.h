@@ -75,7 +75,6 @@ public:
 	typedef std::map<std::string, command_e> commands_t;
 	typedef std::map<std::string, parameter_e> parameters_t;
 	 
-	std::map<std::string, interaction_e> m_to_interaction_e;
 	std::map<std::string, effect_e> m_to_effect_e;
 	std::map<std::string, object_state_e> m_to_object_state_e;
 	std::map<std::string, effect_prefix_e> m_to_effect_prefix_e;
@@ -85,7 +84,6 @@ public:
 	std::map<std::string, entity_e> m_to_entity_e;
 
 	std::map<effect_e, std::string> m_effect_subtype_string;
-	std::map<object_tag_e, std::string> m_object_tag_string;
 	std::map<effect_prefix_e, std::string> m_effect_prefix_string;
 
 	std::map<std::string, GameObject*> m_items;
@@ -122,7 +120,6 @@ public:
 	//void register_object(GameObject*& object);
 
 	std::string get_effect_subtype_string(effect_e key);
-	std::string get_object_tag_string(object_tag_e key);
 	std::string get_effect_prefix_string(effect_prefix_e key);
 
 	void GameObjectManager::bind_body_predicat(Object_interaction* object, bool add_mode);

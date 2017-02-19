@@ -534,6 +534,11 @@ std::u16string Parser::to_u16string(int const &value) {
 	return result;
 }
 
+std::u16string Parser::float_to_u16string(float const& i)
+{
+	return to_u16string(std::to_string(i));
+}
+
 std::u16string Parser::to_u16string(const std::string& value)
 {
 	std::wstring_convert<std::codecvt_utf8<int16_t>, int16_t> convert;
@@ -577,14 +582,99 @@ int Parser::to_int(const std::u16string& value) {
 	return 0;
 }
 
-template<> TileManager* Parser::from_json<TileManager*>(const std::u16string value)
-{
-	int result = to_int(value);
-	return Application::instance().m_graph->m_tile_managers[result];
+float Parser::to_float(const std::u16string& value) {
+	const char16_t* opening_symbol = nullptr;
+	for (std::size_t i = 0; i < value.size(); ++i)
+	{
+		switch (value[i])
+		{
+		case u'0':case u'1':case u'2':case u'3':case u'4':case u'5':case u'6':case u'7':case u'8':case u'9':case u'.':
+		{
+			if (opening_symbol == nullptr)
+			{
+				opening_symbol = &value[i];
+			}
+			break;
+		}
+		default:
+		{
+			if (opening_symbol != nullptr)
+			{
+				break;
+			}
+			break;
+		}
+		}
+	}
+	if (opening_symbol != nullptr)
+	{
+		static std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> convert;
+		std::u16string value(opening_symbol, &value[value.size() - 1] - opening_symbol + 1);
+		std::wstring ws = convert.from_bytes(
+			reinterpret_cast<const char*> (value.data()),
+			reinterpret_cast<const char*> (value.data() + value.size()));
+		return std::stof(ws);
+	}
+	return 0.0;
 }
 
-template <> std::u16string Parser::to_json<TileManager*>(TileManager* value)
+template<> TileManager& Parser::from_json<TileManager&>(const std::u16string value)
 {
-	std::u16string out = to_u16string(value->m_index);
+	int result = to_int(value);
+	return *Application::instance().m_graph->m_tile_managers[result];
+}
+
+template <> std::u16string Parser::to_json<TileManager&>(TileManager& value)
+{
+	std::u16string out = to_u16string(value.m_index);
 	return out;
 }
+
+template<> std::size_t Parser::from_json<std::size_t>(const std::u16string value)
+{
+	std::size_t result = to_int(value);
+	return result;
+}
+
+template <> std::u16string Parser::to_json<std::size_t>(std::size_t value)
+{
+	std::u16string out = to_u16string(value);
+	return out;
+}
+
+template<> light_t& Parser::from_json<light_t&>(const std::u16string value) {
+	std::u16string temp = value;
+	scheme_vector_t* s = read_pair(temp);
+	return light_t(from_json<int>((*s)[0]), from_json<int>((*s)[1]), from_json<int>((*s)[2]));
+}
+
+template<> std::u16string Parser::to_json<light_t&>(light_t& value)
+{
+	std::u16string result = u"[" + to_json<int>(value.R) + u"," + to_json<int>(value.G) + u"," + to_json<int>(value.B) + u"]";
+	return result;
+}
+
+template<> float Parser::from_json<float>(const std::u16string value)
+{
+	float result = to_float(value);
+	return result;
+}
+
+template <> std::u16string Parser::to_json<float>(float value)
+{
+	std::u16string out = float_to_u16string(value);
+	return out;
+}
+
+template<> optical_properties_t& Parser::from_json<optical_properties_t&>(const std::u16string value) {
+	std::u16string temp = value;
+	scheme_vector_t* s = read_pair(temp);
+	return optical_properties_t(RGB_t(from_json<float>((*s)[0]), from_json<float>((*s)[1]), from_json<float>((*s)[2])));
+}
+
+template<> std::u16string Parser::to_json<optical_properties_t&>(optical_properties_t& value)
+{
+	std::u16string result = u"[" + to_json<float>(value.attenuation.R) + u"," + to_json<float>(value.attenuation.G) + u"," + to_json<float>(value.attenuation.B) + u"]";
+	return result;
+}
+

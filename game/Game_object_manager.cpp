@@ -587,21 +587,6 @@ void GameObjectManager::init()
 	m_to_effect_prefix_e["physical_damage"] = effect_prefix_e::physical_damage;
 	m_to_effect_prefix_e["poison_damage"] = effect_prefix_e::poison_damage;
 
-	m_object_tag_string[object_tag_e::poison_resist] = "сопротивление к яду";
-	m_object_tag_string[object_tag_e::purification_from_poison] = "очищение от яда";
-	m_object_tag_string[object_tag_e::mortal] = "смертное существо";
-	m_object_tag_string[object_tag_e::pass_able] = "не является преградой";
-	m_object_tag_string[object_tag_e::pick_able] = "можно взять";
-	m_object_tag_string[object_tag_e::seethrough_able] = "не загораживает обзор";
-	m_object_tag_string[object_tag_e::activator] = "активирует/деактивирует механизмы";
-	m_object_tag_string[object_tag_e::fast_move] = "быстрое передвижение";
-	m_object_tag_string[object_tag_e::equippable] = "можно одеть";
-	m_object_tag_string[object_tag_e::ring] = "кольцо";
-	m_object_tag_string[object_tag_e::requirements_to_object] = "требования к предмету";
-	m_object_tag_string[object_tag_e::cursed] = "наложено проклятье";
-	m_object_tag_string[object_tag_e::can_transfer_object] = "может перекладывать предметы";
-	m_object_tag_string[object_tag_e::footwear] = "обувь";
-
 	m_to_action_e["equip"] = action_e::equip;
 	m_to_action_e["hit"] = action_e::hit;
 	m_to_action_e["hit_melee"] = action_e::hit_melee;
@@ -715,15 +700,6 @@ std::string GameObjectManager::get_effect_subtype_string(effect_e key)
 	return "неизвестный тип";
 }
 
-std::string GameObjectManager::get_object_tag_string(object_tag_e key)
-{
-	auto value = m_object_tag_string.find(key);
-	if (value != m_object_tag_string.end())
-	{
-		return value->second;
-	}
-	return "неизвестный тип";
-}
 
 std::string GameObjectManager::get_effect_prefix_string(effect_prefix_e key)
 {

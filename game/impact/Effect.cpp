@@ -1511,7 +1511,7 @@ Object_tag::Object_tag(object_tag_e key) :m_type(key)
 
 void Object_tag::description(std::list<std::string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + "<" + Application::instance().m_game_object_manager->get_object_tag_string(m_type) + ">");
+	info->push_back(std::string(level, '.') + "<" + Parser::m_string_object_tag_e[m_type] + ">");
 }
 
 std::string Object_tag::get_description()

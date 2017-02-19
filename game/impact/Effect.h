@@ -38,7 +38,7 @@ public:
 		return Packer<Interaction_list>::Instance();
 	}
 
-	constexpr static auto properties() { return std::make_tuple(makeProperty(&Interaction_list::m_items, u"items")); }
+	constexpr static auto properties() { return std::make_tuple(make_property(&Interaction_list::m_items, u"items")); }
 
 };
 
@@ -134,7 +134,7 @@ public:
 		return Packer<Tag_list>::Instance();
 	}
 
-	constexpr static auto properties() { return std::make_tuple(makeProperty(&Tag_list::m_items, u"items")); }
+	constexpr static auto properties() { return std::make_tuple(make_property(&Tag_list::m_items, u"items")); }
 
 private:
 	
@@ -454,7 +454,7 @@ namespace ObjectTag
 			return Packer<Label>::Instance();
 		}
 
-		constexpr static auto properties() { return std::make_tuple(makeProperty(&Label::m_type, u"type")); }
+		constexpr static auto properties() { return std::make_tuple(make_property(&Label::m_type, u"type")); }
 	};
 
 	class Equippable : public Object_tag
@@ -478,8 +478,8 @@ namespace ObjectTag
 		}
 
 		constexpr static auto properties() { return std::make_tuple(
-			makeProperty(&Equippable::m_value, u"value"),
-			makeProperty(&Equippable::m_condition, u"condition")
+			make_property(&Equippable::m_value, u"value"),
+			make_property(&Equippable::m_condition, u"condition")
 		); }
 
 	};

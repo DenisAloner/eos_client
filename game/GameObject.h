@@ -112,7 +112,7 @@ public:
 
 	constexpr static auto properties() {
 		return std::make_tuple(
-			makeProperty(&Attribute_map::m_items, u"item")
+			make_property(&Attribute_map::m_items, u"item")
 		);
 	}
 
@@ -125,7 +125,7 @@ public:
 	object_state_e m_state;
 	int m_layer;
 	game_object_size_t m_size;
-	unsigned int m_icon;
+	std::size_t m_icon;
 	float m_weight;
 	light_t* m_light;
 	optical_properties_t* m_optical;
@@ -151,12 +151,17 @@ public:
 		return Packer<Object_state>::Instance();
 	}
 
-	constexpr static auto properties() { return std::make_tuple(
-		makeProperty(&Object_state::m_layer, u"layer"), 
-		makeProperty(&Object_state::m_size, u"size"), 
-		makeProperty(&Object_state::m_tile_manager, u"tile_manager"),
-		makeProperty(&Object_state::m_items, u"item")
-	); }
+	constexpr static auto properties() {
+		return make_union(std::make_tuple(
+			make_property(&Object_state::m_layer, u"layer"),
+			make_property(&Object_state::m_size, u"size"),
+			make_property(&Object_state::m_tile_manager, u"tile_manager"),
+			make_property(&Object_state::m_icon, u"icon"),
+			make_property(&Object_state::m_light, u"light"),
+			make_property(&Object_state::m_optical, u"optical")
+		), Attribute_map::properties());
+	}
+
 };
 
 class Object_state_equip :public Object_state
@@ -174,12 +179,10 @@ public:
 	}
 
 	constexpr static auto properties() {
-		return std::make_tuple(
-			makeProperty(&Object_state_equip::m_body_part, u"body_part"),
-			makeProperty(&Object_state_equip::m_equip, u"equip"),
-			makeProperty(&Object_state::m_tile_manager, u"tile_manager"),
-			makeProperty(&Object_state_equip::m_items, u"items")
-		);
+		return make_union(std::make_tuple(
+			make_property(&Object_state_equip::m_body_part, u"body_part"),
+			make_property(&Object_state_equip::m_equip, u"equip")
+		), Object_state::properties());
 	}
 
 };
@@ -237,8 +240,8 @@ public:
 	}
 
 	constexpr static auto properties() { return std::make_tuple(
-		makeProperty(&GameObject::m_name, u"name"), 
-		makeProperty(&GameObject::m_state, u"state")
+		make_property(&GameObject::m_name, u"name"), 
+		make_property(&GameObject::m_state, u"state")
 	); }
 
 private:

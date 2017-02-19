@@ -651,8 +651,13 @@ struct Property {
 };
 
 template<typename Class, typename T>
-constexpr auto makeProperty(T Class::*member, const char16_t* name) {
+constexpr auto make_property(T Class::*member, const char16_t* name) {
 	return Property<Class, T>{member, name};
+}
+
+template<typename A, typename B>
+constexpr auto make_union(A a, B b) {
+	return std::tuple_cat(a,b);
 }
 
 template<std::size_t iteration, typename T>
@@ -790,7 +795,7 @@ public:
 		return Packer<Object_interaction>::Instance();
 	}
 
-	constexpr static auto properties() { return std::make_tuple(makeProperty(&Object_interaction::m_namename, u"m_value")); }
+	constexpr static auto properties() { return std::make_tuple(make_property(&Object_interaction::m_namename, u"m_value")); }
 
 };
 
@@ -842,8 +847,10 @@ public:
 	static std::u16string get_value(const std::u16string& value);
 	static std::string to_utf8(const std::u16string& value);
 	static std::u16string to_u16string(int const& i);
+	static std::u16string float_to_u16string(float const& i);
 	static std::u16string to_u16string(const std::string& value);
 	static int to_int(const std::u16string& value);
+	static float to_float(const std::u16string& value);
 
 	template<typename T>
 	static void register_class(std::u16string class_name)
@@ -925,8 +932,21 @@ public:
 		return map;
 	};
 
-	template<typename T> static typename std::enable_if<!is_pair<T>::value && !is_list<T>::value && !is_map<T>::value && (!std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value), T >::type from_json(const std::u16string value);
+	template<typename T> static typename std::enable_if< !std::is_pointer<T>::value && !is_pair<T>::value && !is_list<T>::value && !is_map<T>::value && (!std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value), T >::type from_json(const std::u16string value);
 
+	template<typename T> static typename std::enable_if< std::is_pointer<T>::value && !is_pair<T>::value && !is_list<T>::value && !is_map<T>::value && (!std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value), T >::type from_json(const std::u16string value)
+	{
+		if (get_value(value)==u"null")
+		{
+			return nullptr;
+		}
+		else
+		{
+			using Type = typename std::remove_pointer_t<T>&;
+			return &Parser::from_json<Type>(value);
+		}
+	}
+	
 	template<typename T> static typename std::enable_if<std::is_pointer<T>::value&&std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T>::type from_json(const std::u16string value)
 	{
 		std::u16string temp(value);
@@ -1021,7 +1041,7 @@ public:
 		return result;
 	};
 
-	template<typename T> static std::u16string to_json(typename std::enable_if< !is_list<T>::value && !is_map<T>::value && !is_pair<T>::value && !std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T >::type value);
+	template<typename T> static std::u16string to_json(typename std::enable_if< !std::is_pointer<T>::value && !is_list<T>::value && !is_map<T>::value && !is_pair<T>::value && !std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T >::type value);
 
 	template<typename T> static std::u16string to_json(typename std::enable_if<std::is_pointer<T>::value&&std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, iSerializable*>::type value)
 	{
@@ -1031,6 +1051,19 @@ public:
 	template<typename T> static std::u16string to_json(typename std::enable_if<!std::is_pointer<T>::value&&std::is_base_of<iSerializable, T>::value, T>::type value)
 	{
 		return serialize_object(&value);
+	}
+
+	template<typename T> static std::u16string to_json(typename std::enable_if< std::is_pointer<T>::value && !is_list<T>::value && !is_map<T>::value && !is_pair<T>::value && !std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T >::type value)
+	{
+		if (value == nullptr)
+		{
+			return u"null";
+		}
+		else
+		{
+			using Type = typename std::remove_pointer_t<T>&;
+			return Parser::to_json<Type>(*value);
+		}
 	}
 
 	template<> static inline std::u16string to_json<int>(int value)
@@ -1116,8 +1149,7 @@ public:
 		return out;
 	}
 
-	template<>
-	static inline body_part_e from_json<body_part_e>(const std::u16string value) {
+	template<> static inline body_part_e from_json<body_part_e>(const std::u16string value) {
 		std::size_t start_pos = value.find(u'"');
 		if (start_pos != std::string::npos)
 		{
@@ -1137,10 +1169,6 @@ public:
 		return out;
 	}
 
-	/*template <> static TileManager* from_json<TileManager*>(const std::u16string value);
-
-	template <> static std::u16string to_json<TileManager*>(TileManager* value);
-*/
 };
 
 #endif //DEFINITION_H
