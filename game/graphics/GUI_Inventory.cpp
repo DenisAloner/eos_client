@@ -83,11 +83,11 @@ void GUI_Part_slot::on_mouse_down(MouseEventArgs const& e)
 //	resize(m_size.w, LastElement->m_position.y + LastElement->m_size.h+1);
 //}
 //
-//GUI_body_cell::GUI_body_cell(int width, int height, Object_part* item, GUI_Body* owner) : GUI_Container(0, 0, width, 0,false),m_item(item), m_owner(owner)
+//GUI_body_cell::GUI_body_cell(int width, int height, Object_part* item, GUI_Body* owner) : GUI_Container(0, 0, width, 0,false),m_items(item), m_owner(owner)
 //{
 //	m_size.w = width;
 //	m_size.h = height;
-//	//Object_part* part = m_item;
+//	//Object_part* part = m_items;
 //	//for (auto slot = part->m_items.begin(); slot != part->m_items.end(); ++slot)
 //	//{
 //	//	GUI_Part_slot* gui_slot = new GUI_Part_slot(width - 4, 64, (*slot), this);
@@ -103,7 +103,7 @@ void GUI_Part_slot::on_mouse_down(MouseEventArgs const& e)
 //	glEnable(GL_TEXTURE_2D);
 //	glEnable(GL_BLEND);
 //	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//	Graph->center_text(px + m_size.w/2, py + 12, m_item->m_name, 8, 17);
+//	Graph->center_text(px + m_size.w/2, py + 12, m_items->m_name, 8, 17);
 //}
 
 //void GUI_body_cell::on_mouse_down(MouseEventArgs const& e)
@@ -167,7 +167,7 @@ void GUI_Body::update(Attribute_map* feature)
 		remove(*m_items.begin());
 	}
 	m_max_item_name = 0;
-	for (auto item = feature->m_item.begin(); item != feature->m_item.end(); ++item)
+	for (auto item = feature->m_items.begin(); item != feature->m_items.end(); ++item)
 	{
 		if (item->first == interaction_e::body) 
 		{

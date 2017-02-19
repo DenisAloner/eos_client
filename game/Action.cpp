@@ -865,7 +865,7 @@ std::string Action_pick::get_description(Parameter* parameter)
 			}
 			case entity_e::inventory_cell:
 			{
-				/*static_cast<Inventory_cell*>(p[2].m_owner)->m_item = p[1].m_object;
+				/*static_cast<Inventory_cell*>(p[2].m_owner)->m_items = p[1].m_object;
 				p[1].m_object->m_owner = p[2].m_owner;*/
 				break;
 			}
@@ -915,7 +915,7 @@ std::string Action_move_out::get_description(Parameter* parameter)
 			}
 			case entity_e::inventory_cell:
 			{
-				/*static_cast<Inventory_cell*>(p[2].m_owner)->m_item = p[1].m_object;
+				/*static_cast<Inventory_cell*>(p[2].m_owner)->m_items = p[1].m_object;
 				p[1].m_object->m_owner = p[2].m_owner;*/
 				break;
 			}
@@ -937,7 +937,7 @@ std::string Action_move_out::get_description(Parameter* parameter)
 			}
 			case entity_e::inventory_cell:
 			{
-				/*static_cast<Inventory_cell*>(p[2].m_owner)->m_item = p[1].m_object;
+				/*static_cast<Inventory_cell*>(p[2].m_owner)->m_items = p[1].m_object;
 				p[1].m_object->m_owner = p[2].m_owner;*/
 				break;
 			}
@@ -1050,7 +1050,7 @@ void Action_hit::interaction_handler(Parameter* arg)
 	{
 		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 		Application::instance().m_message_queue.m_busy = false;
-		Application::instance().m_clipboard.m_item = nullptr;
+		Application::instance().m_clipboard.m_items = nullptr;
 		return;
 	}
 	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p->m_unit, true));
@@ -1102,7 +1102,7 @@ char Action_hit::perfom(Parameter* parameter)
 		}
 		if (p->m_unit_body_part)
 		{
-			reaction = p->m_unit_body_part->m_item->get_effect(interaction_e::damage);
+			reaction = p->m_unit_body_part->m_items->get_effect(interaction_e::damage);
 			if (reaction)
 			{
 				Object_interaction* msg = reaction->clone();
@@ -1545,7 +1545,7 @@ char Action_use::perfom(Parameter* parameter)
 	//	}
 	//	case entity_e::inventory_cell:
 	//	{
-	//		static_cast<Inventory_cell*>(p[1].m_object->m_owner)->m_item = nullptr;
+	//		static_cast<Inventory_cell*>(p[1].m_object->m_owner)->m_items = nullptr;
 	//		break;
 	//	}
 	//	case entity_e::body_part:
@@ -1764,7 +1764,7 @@ void Action_shoot::interaction_handler(Parameter* parameter)
 		{
 			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Действие отменено")));
 			Application::instance().m_message_queue.m_busy = false;
-			Application::instance().m_clipboard.m_item = nullptr;
+			Application::instance().m_clipboard.m_items = nullptr;
 			return;
 		}
 		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Выбрать еще заряд? [Y/N]")));
@@ -1834,7 +1834,7 @@ bool Action_shoot::check(Parameter* parameter)
 {
 	//m_error = "";
 	//P_bow_shoot* p = static_cast<P_bow_shoot*>(parameter);
-	//if (!p->m_ammo_owner.front()->m_item)
+	//if (!p->m_ammo_owner.front()->m_items)
 	//{
 	//	m_error = "Нет снарядов.";
 	//	return false;
@@ -1872,7 +1872,7 @@ char Action_shoot::perfom(Parameter* parameter)
 	{
 	/*	MapCell* center= p[0].m_object->get_center(p[4].m_cell);
 		MapCell* c= p[4].m_cell->m_map->bresenham_line2(center, p[4].m_cell,parameter, std::bind(&Action_shoot::process_cell, this, std::placeholders::_1, std::placeholders::_2));
-		GameObject* temp = p[3].m_part->m_item;
+		GameObject* temp = p[3].m_part->m_items;
 		Application::instance().command_unequip(p[0].m_object, p[3].m_part, temp);
 		c->m_map->add_object(temp, c);
 		temp->m_owner = c;*/
@@ -1888,7 +1888,7 @@ char Action_shoot::perfom(Parameter* parameter)
 		//}
 		//case entity_e::inventory_cell:
 		//{
-		//	static_cast<Inventory_cell*>(p->m_owner)->m_item = p->m_object;
+		//	static_cast<Inventory_cell*>(p->m_owner)->m_items = p->m_object;
 		//	p->m_object->m_owner = p->m_owner;
 		//	break;
 		//}

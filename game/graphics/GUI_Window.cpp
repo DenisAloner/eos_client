@@ -172,7 +172,7 @@ GUI_description_window::GUI_description_window(int x, int y, int width, int heig
 	m_textbox = new GUI_TextBox();
 	m_textbox->m_position.x = 2;
 	m_textbox->m_position.y = 2;
-	//m_item->resize(m_size.w - 4, m_size.h - 25 - 2);
+	//m_items->resize(m_size.w - 4, m_size.h - 25 - 2);
 	add(m_textbox);
 	m_textbox->resize(m_size.w - 4, m_size.h - m_textbox->m_position.y - 2);
 	GUI_Layer::add(m_textbox);
@@ -190,17 +190,17 @@ void GUI_description_window::update_info()
 	if (m_object->m_active_state)
 	{
 		m_text.push_back("эффекты:");
-		for (auto current = m_object->m_active_state->m_item.begin(); current != m_object->m_active_state->m_item.end(); current++)
+		for (auto current = m_object->m_active_state->m_items.begin(); current != m_object->m_active_state->m_items.end(); current++)
 		{
-			m_text.push_back("." + Application::instance().m_game_object_manager->m_dictonary_interaction_e.get_string(current->first) + ":");
+			m_text.push_back("." + Parser::m_string_interaction_e[current->first] + ":");
 			current->second->description(&m_text,2);
 		}
 		if (m_object->m_active_state->m_state == object_state_e::equip)
 		{
 			Object_state_equip* obj = static_cast<Object_state_equip*>(m_object->m_active_state);
-			for (auto current = obj->m_equip.m_item.begin(); current != obj->m_equip.m_item.end(); current++)
+			for (auto current = obj->m_equip.m_items.begin(); current != obj->m_equip.m_items.end(); current++)
 			{
-				m_text.push_back("." + Application::instance().m_game_object_manager->m_dictonary_interaction_e.get_string(current->first) + ":");
+				m_text.push_back("." + Parser::m_string_interaction_e[current->first] + ":");
 				current->second->description(&m_text, 2);
 			}
 		}
@@ -216,7 +216,7 @@ GUI_body_window::GUI_body_window(int x, int y, int width, int height, std::strin
 	m_item = new GUI_Body(m_object->m_active_state);
 	m_item->m_position.x = 1;
 	m_item->m_position.y = 1;
-	//m_item->resize(m_size.w - 4, m_size.h - 25 - 2);
+	//m_items->resize(m_size.w - 4, m_size.h - 25 - 2);
 	add(m_item);
 	update_info();
 	object->event_update += std::bind(&GUI_body_window::update_info, this);

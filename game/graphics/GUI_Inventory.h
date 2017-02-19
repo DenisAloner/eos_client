@@ -36,7 +36,7 @@ public:
 //{
 //public:
 //
-//	Object_part* m_item;
+//	Object_part* m_items;
 //	GUI_Body* m_owner;
 //
 //	GUI_body_cell(int width, int height, Object_part* item, GUI_Body* owner);

@@ -78,15 +78,12 @@ public:
 	std::map<std::string, interaction_e> m_to_interaction_e;
 	std::map<std::string, effect_e> m_to_effect_e;
 	std::map<std::string, object_state_e> m_to_object_state_e;
-	std::map<std::string, object_tag_e> m_to_object_tag_e;
 	std::map<std::string, effect_prefix_e> m_to_effect_prefix_e;
 	std::map<std::string, action_e> m_to_action_e;
-	std::map<std::string, body_part_e> m_to_body_part_e;
 	std::map<std::string, feature_list_type_e> m_to_feature_list_type_e;
 	std::map<std::string, ai_type_e> m_to_ai_type_e;
 	std::map<std::string, entity_e> m_to_entity_e;
 
-	std::map<interaction_e, std::string> m_effect_string;
 	std::map<effect_e, std::string> m_effect_subtype_string;
 	std::map<object_tag_e, std::string> m_object_tag_string;
 	std::map<effect_prefix_e, std::string> m_effect_prefix_string;
@@ -104,8 +101,6 @@ public:
 	Interaction_list* m_mem_list;
 	Object_part* m_part;
 
-	Dictonary<interaction_e> m_dictonary_interaction_e;
-
 	std::list<Interaction_list*> m_stack_list;
 	std::list<Attribute_map*> m_stack_attribute_map;
 
@@ -115,10 +110,8 @@ public:
 
 	effect_e get_effect_e(const std::string& key);
 	object_state_e get_object_state_e(const std::string& key);
-	object_tag_e get_object_tag_e(const std::string& key);
 	effect_prefix_e get_effect_prefix_e(const std::string& key);
 	action_e get_action_e(const std::string& key);
-	body_part_e get_body_part_e(const std::string& key);
 	feature_list_type_e get_feature_list_type_e(const std::string& key);
 	ai_type_e get_ai_type_e(const std::string& key);
 	entity_e get_entity_e(const std::string& key);

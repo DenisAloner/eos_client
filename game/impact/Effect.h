@@ -38,7 +38,7 @@ public:
 		return Packer<Interaction_list>::Instance();
 	}
 
-	constexpr static auto properties() { return std::make_tuple(makeProperty(&Interaction_list::m_items, u"m_item")); }
+	constexpr static auto properties() { return std::make_tuple(makeProperty(&Interaction_list::m_items, u"items")); }
 
 };
 
@@ -128,6 +128,13 @@ public:
 	virtual bool update();
 	virtual void save();
 	virtual void load();
+
+	Packer_generic& get_packer() override
+	{
+		return Packer<Tag_list>::Instance();
+	}
+
+	constexpr static auto properties() { return std::make_tuple(makeProperty(&Tag_list::m_items, u"items")); }
 
 private:
 	
@@ -433,12 +440,21 @@ namespace ObjectTag
 	class Label : public Object_tag
 	{
 	public:
+		Label():Object_tag(object_tag_e::none){};
 		Label(object_tag_e type);
 		virtual Label* clone();
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
 		virtual void save();
 		virtual void load();
+
+		// Для поддержки iSerializable
+		Packer_generic& get_packer() override
+		{
+			return Packer<Label>::Instance();
+		}
+
+		constexpr static auto properties() { return std::make_tuple(makeProperty(&Label::m_type, u"type")); }
 	};
 
 	class Equippable : public Object_tag
@@ -454,6 +470,18 @@ namespace ObjectTag
 
 		virtual void save();
 		virtual void load();
+
+		// Для поддержки iSerializable
+		Packer_generic& get_packer() override
+		{
+			return Packer<Equippable>::Instance();
+		}
+
+		constexpr static auto properties() { return std::make_tuple(
+			makeProperty(&Equippable::m_value, u"value"),
+			makeProperty(&Equippable::m_condition, u"condition")
+		); }
+
 	};
 
 	class Requirements_to_object : public Object_tag

@@ -59,6 +59,21 @@ action hit_melee
 pop_list
 pop_map
 
+object boot
+state equip,finger
+size 1,1,1
+icon 8
+tile_manager 28
+list yy,tag,tag
+tag yn,pick_able
+tag yn,pass_able
+tag yn,footwear
+tag yn,seethrough_able
+tag yn,equippable
+pop_list
+pop_list
+pop_map
+
 object wall
 state alive
 size 1,1,5
@@ -232,21 +247,6 @@ mem_instruction_slot_link body
 tag yn,equippable
 instruction_check_part_type container
 slot_to_list
-pop_list
-pop_list
-pop_map
-
-object boot
-state equip,finger
-size 1,1,1
-icon 8
-tile_manager 28
-list yy,tag,tag
-tag yn,pick_able
-tag yn,pass_able
-tag yn,footwear
-tag yn,seethrough_able
-tag yn,equippable
 pop_list
 pop_list
 pop_map

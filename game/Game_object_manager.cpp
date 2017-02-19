@@ -77,6 +77,7 @@ void GameObjectManager::parser(const std::string& command)
 		m_object = new GameObject();
 		m_object->m_name = arg[0];
 		m_items.insert(std::pair<std::string, GameObject*>(arg[0], m_object));
+		m_slot = nullptr;
 		break;
 	}
 	case command_e::state:
@@ -87,7 +88,7 @@ void GameObjectManager::parser(const std::string& command)
 		case object_state_e::equip:
 		{
 			Object_state_equip* obj_state = new Object_state_equip();
-			obj_state->m_body_part = get_body_part_e(arg[1]);
+			obj_state->m_body_part = Parser::m_json_body_part_e.get_enum(arg[1]);
 			m_stack_attribute_map.push_front(&obj_state->m_equip);
 			m_object->m_active_state = obj_state;
 			break;
@@ -256,7 +257,7 @@ void GameObjectManager::parser(const std::string& command)
 	{
 		Interaction_copyist* item = new Interaction_copyist();
 		item->m_interaction_message_type = interaction_message_type_e::single;
-		item->m_subtype = m_dictonary_interaction_e.get_enum(arg[0]);
+		item->m_subtype = Parser::m_json_interaction_e.get_enum(arg[0]);
 		item->m_value = m_slot;
 		m_slot = item;
 		break;
@@ -265,7 +266,7 @@ void GameObjectManager::parser(const std::string& command)
 	{
 		Interaction_addon* item = new Interaction_addon();
 		item->m_interaction_message_type = interaction_message_type_e::single;
-		item->m_subtype = m_dictonary_interaction_e.get_enum(arg[0]);
+		item->m_subtype = Parser::m_json_interaction_e.get_enum(arg[0]);
 		item->m_value = m_slot;
 		m_slot = item;
 		break;
@@ -286,11 +287,11 @@ void GameObjectManager::parser(const std::string& command)
 
 		if (arg[0][0] == 'y')
 		{
-			list = m_stack_attribute_map.front()->create_feature_list(list_type, m_dictonary_interaction_e.get_enum(arg[2]));
+			list = m_stack_attribute_map.front()->create_feature_list(list_type, Parser::m_json_interaction_e.get_enum(arg[2]));
 		}
 		else
 		{
-			list = Effect_functions::create_feature_list(list_type, m_dictonary_interaction_e.get_enum(arg[2]));
+			list = Effect_functions::create_feature_list(list_type, Parser::m_json_interaction_e.get_enum(arg[2]));
 		}
 	
 		list->m_list_type = list_type;
@@ -330,7 +331,7 @@ void GameObjectManager::parser(const std::string& command)
 	{
 		Object_part* item = new Object_part();
 		item->m_interaction_message_type = interaction_message_type_e::part;
-		item->m_part_kind = get_body_part_e(arg[0]);
+		item->m_part_kind = Parser::m_json_body_part_e.get_enum(arg[0]);
 		item->m_name = arg[1];
 		m_stack_attribute_map.push_front(&item->m_object_state);
 		m_template_part[arg[2]] = item;
@@ -347,7 +348,7 @@ void GameObjectManager::parser(const std::string& command)
 	{
 		Object_part* item = new Object_part();
 		item->m_interaction_message_type = interaction_message_type_e::part;
-		item->m_part_kind = get_body_part_e(arg[1]);
+		item->m_part_kind = Parser::m_json_body_part_e.get_enum(arg[1]);
 		item->m_name = arg[2];
 		if (arg[0][0] == 'y')
 		{
@@ -373,7 +374,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::mem_instruction_slot_link:
 	{
 		Instruction_slot_link* item = new Instruction_slot_link();
-		item->m_subtype = m_dictonary_interaction_e.get_enum(arg[0]);
+		item->m_subtype = Parser::m_json_interaction_e.get_enum(arg[0]);
 		item->m_value = m_slot;
 		m_slot = item;
 		break;
@@ -381,7 +382,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::tag:
 	{
 		Object_tag* tag;
-		switch (get_object_tag_e(arg[1]))
+		switch (Parser::m_json_object_tag.get_enum(arg[1]))
 		{
 		case object_tag_e::poison_resist:
 		{
@@ -429,7 +430,7 @@ void GameObjectManager::parser(const std::string& command)
 		}
 		default:
 		{
-			tag = new ObjectTag::Label(get_object_tag_e(arg[1]));
+			tag = new ObjectTag::Label(Parser::m_json_object_tag.get_enum(arg[1]));
 			
 			break;
 		}
@@ -438,7 +439,7 @@ void GameObjectManager::parser(const std::string& command)
 		{
 			m_stack_list.front()->add(tag);
 		}
-		switch (get_object_tag_e(arg[1]))
+		switch (Parser::m_json_object_tag.get_enum(arg[1]))
 		{
 		case object_tag_e::equippable:
 		{
@@ -456,7 +457,7 @@ void GameObjectManager::parser(const std::string& command)
 	{
 		Instruction_check_part_type* item = new Instruction_check_part_type();
 		item->m_interaction_message_type = interaction_message_type_e::single;
-		item->m_value = get_body_part_e(arg[0]);
+		item->m_value = Parser::m_json_body_part_e.get_enum(arg[0]);
 		m_slot = item;
 		break;
 	}
@@ -464,7 +465,7 @@ void GameObjectManager::parser(const std::string& command)
 	{
 		Instruction_check_tag* item = new Instruction_check_tag();
 		item->m_interaction_message_type = interaction_message_type_e::single;
-		item->m_value = get_object_tag_e(arg[0]);
+		item->m_value = Parser::m_json_object_tag.get_enum(arg[0]);
 		m_slot = item;
 		break;
 	}
@@ -569,33 +570,6 @@ void GameObjectManager::init()
 	m_to_object_state_e["growth_05"] = object_state_e::growth_05;
 	m_to_object_state_e["growth_06"] = object_state_e::growth_06;
 
-	m_dictonary_interaction_e.add(interaction_e::total_damage, "total_damage", "общий дополнительный урон");
-	m_dictonary_interaction_e.add(interaction_e::damage, "damage", "урон");
-	m_dictonary_interaction_e.add(interaction_e::buff, "buff", "баффы");
-	m_dictonary_interaction_e.add(interaction_e::use, "use", "применение");
-	m_dictonary_interaction_e.add(interaction_e::health, "health", "здоровье");
-	m_dictonary_interaction_e.add(interaction_e::strength, "strength", "сила");
-	m_dictonary_interaction_e.add(interaction_e::intelligence, "intelligence", "интеллект");
-	m_dictonary_interaction_e.add(interaction_e::dexterity, "dexterity", "ловкость");
-	m_dictonary_interaction_e.add(interaction_e::hunger, "hunger", "голод");
-	m_dictonary_interaction_e.add(interaction_e::thirst, "thirst", "жажда");
-	m_dictonary_interaction_e.add(interaction_e::poison, "poison", "яд");
-	m_dictonary_interaction_e.add(interaction_e::action, "action", "действия");
-	m_dictonary_interaction_e.add(interaction_e::tag, "tag", "метки");
-	m_dictonary_interaction_e.add(interaction_e::body, "body", "тело");
-	m_dictonary_interaction_e.add(interaction_e::weapon_damage, "weapon_damage", "урон оружия");
-	m_dictonary_interaction_e.add(interaction_e::skill_sword, "skill_sword", "владение мечом");
-	m_dictonary_interaction_e.add(interaction_e::skill_bow, "skill_bow", "владение луком");
-	m_dictonary_interaction_e.add(interaction_e::strength_bonus, "strength_bonus", "бонус силы");
-	m_dictonary_interaction_e.add(interaction_e::demand_weapon_skill, "demand_weapon_skill", "требование к владению оружием");
-	m_dictonary_interaction_e.add(interaction_e::evasion_skill, "evasion_skill", "навык уклонения");
-	m_dictonary_interaction_e.add(interaction_e::weapon_range, "weapon_range", "дальность");
-	m_dictonary_interaction_e.add(interaction_e::vision, "vision", "зрение");
-	m_dictonary_interaction_e.add(interaction_e::vision_component, "vision_component", "поле зрения");
-	m_dictonary_interaction_e.add(interaction_e::skill_unarmed_combat, "skill_unarmed_combat", "владение безоружным боем");
-	m_dictonary_interaction_e.add(interaction_e::equip, "equip", "экипировка");
-
-
 	m_to_effect_e["value"] = effect_e::value;
 	m_to_effect_e["limit"] = effect_e::limit;
 	m_to_effect_e["start_angle"] = effect_e::start_angle;
@@ -612,21 +586,6 @@ void GameObjectManager::init()
 
 	m_to_effect_prefix_e["physical_damage"] = effect_prefix_e::physical_damage;
 	m_to_effect_prefix_e["poison_damage"] = effect_prefix_e::poison_damage;
-
-	m_to_object_tag_e["poison_resist"] = object_tag_e::poison_resist;
-	m_to_object_tag_e["purification_from_poison"] = object_tag_e::purification_from_poison;
-	m_to_object_tag_e["mortal"] = object_tag_e::mortal;
-	m_to_object_tag_e["pick_able"] = object_tag_e::pick_able;
-	m_to_object_tag_e["pass_able"] = object_tag_e::pass_able;
-	m_to_object_tag_e["seethrough_able"] = object_tag_e::seethrough_able;
-	m_to_object_tag_e["activator"] = object_tag_e::activator;
-	m_to_object_tag_e["fast_move"] = object_tag_e::fast_move;
-	m_to_object_tag_e["equippable"] = object_tag_e::equippable;
-	m_to_object_tag_e["ring"] = object_tag_e::ring;
-	m_to_object_tag_e["requirements_to_object"] = object_tag_e::requirements_to_object;
-	m_to_object_tag_e["cursed"] = object_tag_e::cursed;
-	m_to_object_tag_e["can_transfer_object"] = object_tag_e::can_transfer_object;
-	m_to_object_tag_e["footwear"] = object_tag_e::footwear;
 
 	m_object_tag_string[object_tag_e::poison_resist] = "сопротивление к яду";
 	m_object_tag_string[object_tag_e::purification_from_poison] = "очищение от яда";
@@ -656,15 +615,6 @@ void GameObjectManager::init()
 	m_to_action_e["use"] = action_e::use;
 	m_to_action_e["shoot"] = action_e::shoot;
 
-	m_to_body_part_e["mouth"] = body_part_e::mouth;
-	m_to_body_part_e["wrist"] = body_part_e::wrist;
-	m_to_body_part_e["finger"] = body_part_e::finger;
-	m_to_body_part_e["head"] = body_part_e::head;
-	m_to_body_part_e["hand"] = body_part_e::hand;
-	m_to_body_part_e["foot"] = body_part_e::foot;
-	m_to_body_part_e["waist"] = body_part_e::waist;
-	m_to_body_part_e["container"] = body_part_e::container;
-
 	m_to_feature_list_type_e["action"] = feature_list_type_e::action;
 	m_to_feature_list_type_e["tag"] = feature_list_type_e::tag;
 	m_to_feature_list_type_e["generic"] = feature_list_type_e::generic;
@@ -682,6 +632,11 @@ void GameObjectManager::init()
 
 	Parser::register_class<GameObject>(u"game_object");
 	Parser::register_class<Object_state>(u"object_state");
+	Parser::register_class<Tag_list>(u"tag_list");
+	Parser::register_class<ObjectTag::Label>(u"label");
+	Parser::register_class<ObjectTag::Equippable>(u"equippable");
+	Parser::register_class<Attribute_map>(u"attribute_map");
+	Parser::register_class<Object_state_equip>(u"object_state_equip");
 
 	bytearray json;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.json", json);
@@ -780,15 +735,6 @@ std::string GameObjectManager::get_effect_prefix_string(effect_prefix_e key)
 	return "неизвестный тип";
 }
 
-object_tag_e GameObjectManager::get_object_tag_e(const std::string& key)
-{
-	auto value = m_to_object_tag_e.find(key);
-	if (value == m_to_object_tag_e.end())
-	{
-		LOG(FATAL) << "Элемент `" << key << "` отсутствует в m_items";
-	}
-	return value->second;
-}
 
 effect_prefix_e GameObjectManager::get_effect_prefix_e(const std::string& key)
 {
@@ -804,16 +750,6 @@ action_e GameObjectManager::get_action_e(const std::string& key)
 {
 	auto value = m_to_action_e.find(key);
 	if (value == m_to_action_e.end())
-	{
-		LOG(FATAL) << "Элемент `" << key << "` отсутствует в m_items";
-	}
-	return value->second;
-}
-
-body_part_e GameObjectManager::get_body_part_e(const std::string& key)
-{
-	auto value = m_to_body_part_e.find(key);
-	if (value == m_to_body_part_e.end())
 	{
 		LOG(FATAL) << "Элемент `" << key << "` отсутствует в m_items";
 	}

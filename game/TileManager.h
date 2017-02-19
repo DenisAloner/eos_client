@@ -5,26 +5,6 @@
 #include "graphics/gl.hpp"
 #include "Application.h"
 
-
-class GameObject;
-
-class TileManager
-{
-public:
-
-	GLuint* m_tiles;
-	size_t m_index;
-	animation_e m_animation;
-
-	TileManager();
-	~TileManager();
-
-	virtual bool load_from_file(const std::string& filename, object_direction_e direction, int frame);
-	virtual bool load_from_file(const std::string& filename, object_direction_e direction, int frame,std::string& ext);
-	virtual void set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction);
-	virtual int get_tile_index(const object_direction_e& direction, const int& frame) = 0;
-};
-
 class TileManager_Single :
 	public TileManager
 {

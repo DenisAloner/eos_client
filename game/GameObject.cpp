@@ -62,22 +62,22 @@ Attribute_map::Attribute_map(){};
 Interaction_list*  Attribute_map::create_feature_list(feature_list_type_e key, interaction_e name)
 {
 	Interaction_list* result = Effect_functions::create_feature_list(key, name);
-	m_item[name] = result;	
+	m_items[name] = result;	
 	return result;
 }
 
 void Attribute_map::add_effect(interaction_e key, Object_interaction* item)
 {
-	if (m_item.find(key) != m_item.end())
+	if (m_items.find(key) != m_items.end())
 	{
-		m_item[key]->add(item);
+		m_items[key]->add(item);
 	}
 }
 
 Interaction_list* Attribute_map::get_list(interaction_e key)
 {
-	auto value = m_item.find(key);
-	if (value != m_item.end())
+	auto value = m_items.find(key);
+	if (value != m_items.end())
 	{
 		return value->second;
 	}
@@ -87,9 +87,9 @@ Interaction_list* Attribute_map::get_list(interaction_e key)
 Attribute_map* Attribute_map::clone()
 {
 	Attribute_map* result = new Attribute_map();
-	for (auto item = m_item.begin(); item != m_item.end(); item++)
+	for (auto item = m_items.begin(); item != m_items.end(); item++)
 	{
-		result->m_item[item->first] = item->second->clone();
+		result->m_items[item->first] = item->second->clone();
 	}
 	return result;
 }
@@ -97,7 +97,7 @@ Attribute_map* Attribute_map::clone()
 void  Attribute_map::reset_serialization_index()
 {
 	m_serialization_index = 0;
-	for (auto item = m_item.begin(); item != m_item.end(); item++)
+	for (auto item = m_items.begin(); item != m_items.end(); item++)
 	{
 		(*item).second->reset_serialization_index();
 	}
@@ -106,10 +106,10 @@ void  Attribute_map::reset_serialization_index()
 void Attribute_map::save()
 {
 	FILE* file = Serialization_manager::instance().m_file;
-	size_t s = m_item.size();
+	size_t s = m_items.size();
 	fwrite(&s, sizeof(size_t), 1, file);
 	LOG(INFO) << "ëèñòîâ " << std::to_string(s);
-	for (auto item = m_item.begin(); item != m_item.end(); item++)
+	for (auto item = m_items.begin(); item != m_items.end(); item++)
 	{
 		LOG(INFO) << "ÌÀÐÊÅÐ ÀÒÐÈÁÓÒÀ  - " << std::to_string((int)(*item).first);
 		fwrite(&((*item).first), sizeof(interaction_e), 1, file);
@@ -122,14 +122,14 @@ void Attribute_map::load()
 	FILE* file = Serialization_manager::instance().m_file;
 	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
-	m_item.clear();
+	m_items.clear();
 	interaction_e ie;
 	LOG(INFO) << "ëèñòîâ " << std::to_string(s);
 	for (size_t i = 0; i < s; i++)
 	{
 		fread(&ie, sizeof(interaction_e), 1, file);
 		LOG(INFO) << "ÌÀÐÊÅÐ ÀÒÐÈÁÓÒÀ  - " << std::to_string((int)ie);
-		m_item[ie] = dynamic_cast<Interaction_list*>(Serialization_manager::instance().deserialize());
+		m_items[ie] = dynamic_cast<Interaction_list*>(Serialization_manager::instance().deserialize());
 	}
 }
 
@@ -149,8 +149,8 @@ void Tag_getter::visit(Object_interaction& value)
 
 bool Attribute_map::get_stat(object_tag_e key)
 {
-	auto list = m_item.find(interaction_e::tag);
-	if (list != m_item.end())
+	auto list = m_items.find(interaction_e::tag);
+	if (list != m_items.end())
 	{
 		Tag_list* taglist = static_cast<Tag_list*>(list->second);
 		Tag_getter tg(key);
@@ -162,8 +162,8 @@ bool Attribute_map::get_stat(object_tag_e key)
 
 Object_tag* Attribute_map::get_tag(object_tag_e key)
 {
-	auto list = m_item.find(interaction_e::tag);
-	if (list != m_item.end())
+	auto list = m_items.find(interaction_e::tag);
+	if (list != m_items.end())
 	{
 		Tag_list* taglist = static_cast<Tag_list*>(list->second);
 		Tag_getter tg(key);
@@ -213,9 +213,9 @@ Object_state* Object_state::clone()
 		state->m_visibility = new float;
 		*state->m_visibility = *m_visibility;
 	}
-	for (auto item = m_item.begin(); item != m_item.end(); item++)
+	for (auto item = m_items.begin(); item != m_items.end(); item++)
 	{
-		state->m_item[item->first] = item->second->clone();
+		state->m_items[item->first] = item->second->clone();
 	}
 	return state;
 }
@@ -242,14 +242,14 @@ Object_state* Object_state_equip::clone()
 	}
 	else state->m_ai = nullptr;
 	
-	for (auto item = m_item.begin(); item != m_item.end(); item++)
+	for (auto item = m_items.begin(); item != m_items.end(); item++)
 	{
-		state->m_item[item->first] = item->second->clone();
+		state->m_items[item->first] = item->second->clone();
 	}
 
-	for (auto item = m_equip.m_item.begin(); item != m_equip.m_item.end(); item++)
+	for (auto item = m_equip.m_items.begin(); item != m_equip.m_items.end(); item++)
 	{
-		state->m_equip.m_item[item->first] = item->second->clone();
+		state->m_equip.m_items[item->first] = item->second->clone();
 	}
 	return state;
 }
@@ -446,9 +446,9 @@ Object_state* GameObject::get_state(object_state_e state)
 
 void GameObject::add_effect(interaction_e key, Object_interaction* item)
 {
-	if (m_active_state->m_item.find(key) != m_active_state->m_item.end())
+	if (m_active_state->m_items.find(key) != m_active_state->m_items.end())
 	{
-		m_active_state->m_item[key]->add(item);
+		m_active_state->m_items[key]->add(item);
 	}
 }
 
@@ -456,18 +456,18 @@ void GameObject::remove_effect(interaction_e key, Object_interaction* item)
 {
 	if (m_active_state)
 	{
-		if (m_active_state->m_item.find(key) != m_active_state->m_item.end())
+		if (m_active_state->m_items.find(key) != m_active_state->m_items.end())
 		{
-			m_active_state->m_item[key]->remove(item);
+			m_active_state->m_items[key]->remove(item);
 		}
 	}
 }
 
 void GameObject::add_from(interaction_e key, Object_interaction* item)
 {
-	if (m_active_state->m_item.find(key) != m_active_state->m_item.end())
+	if (m_active_state->m_items.find(key) != m_active_state->m_items.end())
 	{
-		m_active_state->m_item[key]->equip(item);
+		m_active_state->m_items[key]->equip(item);
 	}
 }
 
@@ -475,13 +475,13 @@ void GameObject::add_from(interaction_e key, Interaction_list* feature)
 {
 	if (m_active_state)
 	{
-		if (m_active_state->m_item.find(key) == m_active_state->m_item.end())
+		if (m_active_state->m_items.find(key) == m_active_state->m_items.end())
 		{
-			m_active_state->m_item[key] = feature;
+			m_active_state->m_items[key] = feature;
 		}
 		else
 		{
-			m_active_state->m_item[key]->equip(feature);
+			m_active_state->m_items[key]->equip(feature);
 		}
 	}
 }
@@ -490,16 +490,16 @@ void GameObject::remove_from(interaction_e key, Interaction_list* feature)
 {
 	if (m_active_state)
 	{
-		auto item = m_active_state->m_item.find(key);
-		if (item != m_active_state->m_item.end())
+		auto item = m_active_state->m_items.find(key);
+		if (item != m_active_state->m_items.end())
 		{
 			if (item->second == feature)
 			{
-				m_active_state->m_item.erase(key);
+				m_active_state->m_items.erase(key);
 			}
 			else
 			{
-				m_active_state->m_item[key]->unequip(feature);
+				m_active_state->m_items[key]->unequip(feature);
 			}
 		}
 	}
@@ -509,8 +509,8 @@ Interaction_list* GameObject::get_effect(interaction_e key)
 {
 	if (m_active_state)
 	{
-		auto value = m_active_state->m_item.find(key);
-		if (value != m_active_state->m_item.end())
+		auto value = m_active_state->m_items.find(key);
+		if (value != m_active_state->m_items.end())
 		{
 			return value->second;
 		}
@@ -522,8 +522,8 @@ Parameter_list* GameObject::get_parameter(interaction_e key)
 {
 	if (m_active_state)
 	{
-		auto value = m_active_state->m_item.find(key);
-		if (value != m_active_state->m_item.end())
+		auto value = m_active_state->m_items.find(key);
+		if (value != m_active_state->m_items.end())
 		{
 			return static_cast<Parameter_list*>(value->second);
 		}
@@ -535,8 +535,8 @@ Parts_list* GameObject::get_parts_list(interaction_e key)
 {
 	if (m_active_state)
 	{
-		auto value = m_active_state->m_item.find(key);
-		if (value != m_active_state->m_item.end())
+		auto value = m_active_state->m_items.find(key);
+		if (value != m_active_state->m_items.end())
 		{
 			return static_cast<Parts_list*>(value->second);
 		}
@@ -625,7 +625,7 @@ void GameObject::update_interaction()
 		do
 		{
 			was_changed = false;
-			for (auto item = m_active_state->m_item.begin(); item != m_active_state->m_item.end(); ++item)
+			for (auto item = m_active_state->m_items.begin(); item != m_active_state->m_items.end(); ++item)
 			{
 				was_changed = item->second->update();
 				if (was_changed) break;
@@ -968,9 +968,9 @@ void Object_part::description(std::list<std::string>* info, int level)
 {
 	info->push_back(std::string(level, '.') + "<" + m_name + ">:");
 	info->push_back(std::string(level, '.') + "<ýôôåêòû>:");
-	for (auto current = m_object_state.m_item.begin(); current != m_object_state.m_item.end(); current++)
+	for (auto current = m_object_state.m_items.begin(); current != m_object_state.m_items.end(); current++)
 	{
-		info->push_back(std::string(level + 1, '.') + Application::instance().m_game_object_manager->m_dictonary_interaction_e.get_string(current->first) + ":");
+		info->push_back(std::string(level + 1, '.') + Parser::m_string_interaction_e[current->first] + ":");
 		current->second->description(info, level + 2);
 	}
 }
@@ -978,7 +978,7 @@ void Object_part::description(std::list<std::string>* info, int level)
 void Object_part::do_predicat(Visitor& helper)
 { 
 	helper.visit(*this);
-	for (auto item = m_object_state.m_item.begin(); item != m_object_state.m_item.end(); item++)
+	for (auto item = m_object_state.m_items.begin(); item != m_object_state.m_items.end(); item++)
 	{
 		item->second->do_predicat(helper);
 	}
@@ -987,7 +987,7 @@ void Object_part::do_predicat(Visitor& helper)
 void Object_part::do_predicat_ex(predicat_ex func)
 {
 	func(this,true);
-	for (auto item = m_object_state.m_item.begin(); item != m_object_state.m_item.end(); item++)
+	for (auto item = m_object_state.m_items.begin(); item != m_object_state.m_items.end(); item++)
 	{
 		item->second->do_predicat_ex(func);
 	}

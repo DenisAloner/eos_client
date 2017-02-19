@@ -595,10 +595,25 @@ class Dictonary
 	std::unordered_map<std::string, T> m_by_string;
 	std::unordered_map<T, std::string> m_by_enum;
 
+	
+	Dictonary(std::initializer_list<std::tuple<T, std::string>> l)
+	{
+		for (auto element : l)
+		{
+			add(std::get<0>(element), std::get<1>(element));
+		}
+	}
+
+	void add(T enm, std::string json_string)
+	{
+		m_by_string[json_string] = enm;
+		m_by_enum[enm] = json_string;
+	}
+
 	void add(T enm,std::string json_string,std::string description_string)
 	{
 		m_by_string[json_string]=enm;
-		m_by_enum[enm] = description_string;
+		m_by_enum[enm] = json_string;
 	}
 
 	std::string get_string(T key)
@@ -781,6 +796,22 @@ public:
 
 typedef iSerializable* (*instance_function_t)();
 
+class TileManager
+{
+public:
+
+	GLuint* m_tiles;
+	size_t m_index;
+	animation_e m_animation;
+
+	TileManager();
+	~TileManager();
+
+	virtual bool load_from_file(const std::string& filename, object_direction_e direction, int frame);
+	virtual bool load_from_file(const std::string& filename, object_direction_e direction, int frame, std::string& ext);
+	virtual void set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction);
+	virtual int get_tile_index(const object_direction_e& direction, const int& frame) = 0;
+};
 
 class Parser
 {
@@ -788,6 +819,13 @@ public:
 
 	static std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> m_convert;
 	static std::map<std::u16string, instance_function_t> m_classes;
+
+	static Dictonary<interaction_e> m_json_interaction_e;
+	static Dictonary<object_tag_e> m_json_object_tag;
+	static Dictonary<body_part_e> m_json_body_part_e;
+
+	static std::unordered_map<interaction_e, std::string> m_string_interaction_e;
+	static std::unordered_map<object_tag_e, std::string> m_string_object_tag_e;
 
 	Parser();
 	~Parser();
@@ -805,6 +843,7 @@ public:
 	static std::string to_utf8(const std::u16string& value);
 	static std::u16string to_u16string(int const& i);
 	static std::u16string to_u16string(const std::string& value);
+	static int to_int(const std::u16string& value);
 
 	template<typename T>
 	static void register_class(std::u16string class_name)
@@ -888,10 +927,20 @@ public:
 
 	template<typename T> static typename std::enable_if<!is_pair<T>::value && !is_list<T>::value && !is_map<T>::value && (!std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value), T >::type from_json(const std::u16string value);
 
-	template<typename T> static typename std::enable_if<std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T>::type from_json(const std::u16string value)
+	template<typename T> static typename std::enable_if<std::is_pointer<T>::value&&std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T>::type from_json(const std::u16string value)
 	{
 		std::u16string temp(value);
 		return dynamic_cast<T>(deserialize_object(temp));
+	};
+
+	template<typename T> static typename std::enable_if<!std::is_pointer<T>::value&&std::is_base_of<iSerializable, T>::value, T>::type from_json(const std::u16string value)
+	{
+		std::u16string temp(value);
+		scheme_map_t* s = read_object(temp);
+		T* result = new T();
+		result->get_packer().from_json(result, s);
+		delete s;
+		return *result;
 	};
 
 	template<>
@@ -974,9 +1023,14 @@ public:
 
 	template<typename T> static std::u16string to_json(typename std::enable_if< !is_list<T>::value && !is_map<T>::value && !is_pair<T>::value && !std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T >::type value);
 
-	template<typename T> static std::u16string to_json(typename std::enable_if<std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, iSerializable*>::type value)
+	template<typename T> static std::u16string to_json(typename std::enable_if<std::is_pointer<T>::value&&std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, iSerializable*>::type value)
 	{
 		return serialize_object(value);
+	}
+
+	template<typename T> static std::u16string to_json(typename std::enable_if<!std::is_pointer<T>::value&&std::is_base_of<iSerializable, T>::value, T>::type value)
+	{
+		return serialize_object(&value);
 	}
 
 	template<> static inline std::u16string to_json<int>(int value)
@@ -1020,6 +1074,73 @@ public:
 		std::u16string result = u"[" + to_json<int>(value.x) + u"," + to_json<int>(value.y) + u"," + to_json<int>(value.z) + u"]";
 		return result;
 	};
+
+	template<>
+	static inline object_tag_e from_json<object_tag_e>(const std::u16string value) {
+		std::size_t start_pos = value.find(u'"');
+		if (start_pos != std::string::npos)
+		{
+			std::size_t end_pos = value.find(u'"', start_pos + 1);
+			if (end_pos != std::string::npos)
+			{
+				std::u16string* result = new std::u16string(value.substr(start_pos + 1, end_pos - start_pos - 1));
+				return m_json_object_tag.get_enum(to_utf8(*result));
+			}
+		}
+		return object_tag_e::none;
+	}
+
+	template<> static inline std::u16string to_json<object_tag_e>(object_tag_e value)
+	{
+		return u"\"" + to_u16string(m_json_object_tag.get_string(value)) + u"\"";
+	}
+
+	template<>
+	static inline interaction_e from_json<interaction_e>(const std::u16string value) {
+		std::size_t start_pos = value.find(u'"');
+		if (start_pos != std::string::npos)
+		{
+			std::size_t end_pos = value.find(u'"', start_pos + 1);
+			if (end_pos != std::string::npos)
+			{
+				std::u16string* result = new std::u16string(value.substr(start_pos + 1, end_pos - start_pos - 1));
+				return m_json_interaction_e.get_enum(to_utf8(*result));
+			}
+		}
+		return interaction_e::action;
+	}
+
+	template<> static inline std::u16string to_json<interaction_e>(interaction_e value)
+	{
+		std::u16string out = u"\"" + to_u16string(m_json_interaction_e.get_string(value)) + u"\"";
+		return out;
+	}
+
+	template<>
+	static inline body_part_e from_json<body_part_e>(const std::u16string value) {
+		std::size_t start_pos = value.find(u'"');
+		if (start_pos != std::string::npos)
+		{
+			std::size_t end_pos = value.find(u'"', start_pos + 1);
+			if (end_pos != std::string::npos)
+			{
+				std::u16string* result = new std::u16string(value.substr(start_pos + 1, end_pos - start_pos - 1));
+				return m_json_body_part_e.get_enum(to_utf8(*result));
+			}
+		}
+		return body_part_e::container;
+	}
+
+	template<> static inline std::u16string to_json<body_part_e>(body_part_e value)
+	{
+		std::u16string out = u"\"" + to_u16string(m_json_body_part_e.get_string(value)) + u"\"";
+		return out;
+	}
+
+	/*template <> static TileManager* from_json<TileManager*>(const std::u16string value);
+
+	template <> static std::u16string to_json<TileManager*>(TileManager* value);
+*/
 };
 
 #endif //DEFINITION_H

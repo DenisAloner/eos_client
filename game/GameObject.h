@@ -28,12 +28,12 @@ struct object_parameter_t;
 class Action;
 class AI;
 
-class Game_object_owner: public virtual iSerializable
+class Game_object_owner : public virtual iSerializable
 {
 public:
 	entity_e m_kind;
 	Game_object_owner* m_owner;
-	
+
 	Game_object_owner* get_owner();
 	Game_object_owner* get_owner(entity_e kind);
 };
@@ -85,11 +85,11 @@ public:
 
 };
 
-class Attribute_map: public iSerializable
+class Attribute_map : public iSerializable
 {
 public:
 
-	std::map<interaction_e, Interaction_list* > m_item;
+	std::map<interaction_e, Interaction_list* > m_items;
 
 	Attribute_map();
 	void add_effect(interaction_e key, Object_interaction* item);
@@ -104,12 +104,17 @@ public:
 	bool get_stat(object_tag_e key);
 	Object_tag* get_tag(object_tag_e key);
 
-	//// Для поддержки iSerializable
-	//void init_by_scheme(scheme_map_t* value)override
-	//{
-	//	fromJson<Attribute_map>(this, *value);
-	//}
-	//constexpr static auto properties() { return std::make_tuple(makeProperty(&Attribute_map::m_item, u"m_item")); }
+	// Для поддержки iSerializable
+	Packer_generic& get_packer() override
+	{
+		return Packer<Attribute_map>::Instance();
+	}
+
+	constexpr static auto properties() {
+		return std::make_tuple(
+			makeProperty(&Attribute_map::m_items, u"item")
+		);
+	}
 
 };
 
@@ -124,7 +129,7 @@ public:
 	float m_weight;
 	light_t* m_light;
 	optical_properties_t* m_optical;
-	
+
 	float* m_visibility;
 
 	TileManager* m_tile_manager;
@@ -146,7 +151,12 @@ public:
 		return Packer<Object_state>::Instance();
 	}
 
-	constexpr static auto properties() { return std::make_tuple(makeProperty(&Object_state::m_layer, u"layer"), makeProperty(&Object_state::m_size, u"size")); }
+	constexpr static auto properties() { return std::make_tuple(
+		makeProperty(&Object_state::m_layer, u"layer"), 
+		makeProperty(&Object_state::m_size, u"size"), 
+		makeProperty(&Object_state::m_tile_manager, u"tile_manager"),
+		makeProperty(&Object_state::m_items, u"item")
+	); }
 };
 
 class Object_state_equip :public Object_state
@@ -158,9 +168,23 @@ public:
 	Object_state_equip();
 	virtual Object_state* clone();
 
+	Packer_generic& get_packer() override
+	{
+		return Packer<Object_state_equip>::Instance();
+	}
+
+	constexpr static auto properties() {
+		return std::make_tuple(
+			makeProperty(&Object_state_equip::m_body_part, u"body_part"),
+			makeProperty(&Object_state_equip::m_equip, u"equip"),
+			makeProperty(&Object_state::m_tile_manager, u"tile_manager"),
+			makeProperty(&Object_state_equip::m_items, u"items")
+		);
+	}
+
 };
 
-class GameObject : public Object_interaction, public GUI_connectable_i,public Game_object_owner
+class GameObject : public Object_interaction, public GUI_connectable_i, public Game_object_owner
 {
 public:
 
@@ -212,7 +236,10 @@ public:
 		return Packer<GameObject>::Instance();
 	}
 
-	constexpr static auto properties() { return std::make_tuple(makeProperty(&GameObject::m_name, u"name"), makeProperty(&GameObject::m_state, u"state")); }
+	constexpr static auto properties() { return std::make_tuple(
+		makeProperty(&GameObject::m_name, u"name"), 
+		makeProperty(&GameObject::m_state, u"state")
+	); }
 
 private:
 
@@ -230,7 +257,7 @@ private:
 
 };
 
-class Player: public GUI_connectable_i
+class Player : public GUI_connectable_i
 {
 public:
 
@@ -244,7 +271,7 @@ public:
 
 
 
-class Inventory_cell: public Game_object_owner
+class Inventory_cell : public Game_object_owner
 {
 public:
 

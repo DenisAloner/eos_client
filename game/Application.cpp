@@ -244,9 +244,6 @@ void Application::new_game()
 	m_world->m_player = new Player(obj, map);
 	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
 
-	std::string json = Parser::to_utf8(Parser::serialize_object(obj));
-	LOG(INFO) << json;
-
 	m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player, map, m_action_manager, m_game_log);
 
 	GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
@@ -281,25 +278,30 @@ void Application::new_game()
 			obj->set_direction(object_direction_e::top);
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-2][rx]);*/
 
-			obj = m_game_object_manager->new_object("bat");
-			obj->set_direction(object_direction_e::top);
-			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx-2]);
+			//obj = m_game_object_manager->new_object("bat");
+			//obj->set_direction(object_direction_e::top);
+			//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx-2]);
 
-			/*obj = m_game_object_manager->new_object("bag");
-			obj->set_direction(object_direction_e::top);
-			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx-1]);*/
+			///*obj = m_game_object_manager->new_object("bag");
+			//obj->set_direction(object_direction_e::top);
+			//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx-1]);*/
 
-			obj = m_game_object_manager->new_object("ring");
-			obj->set_direction(object_direction_e::top);
-			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx + 1]);
+			//obj = m_game_object_manager->new_object("ring");
+			//obj->set_direction(object_direction_e::top);
+			//m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx + 1]);
 
 			obj = m_game_object_manager->new_object("boot");
 			obj->set_direction(object_direction_e::top);
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx + 2]);
 
+			std::string json = Parser::to_utf8(Parser::serialize_object(obj));
+			LOG(INFO) << json;
+
 			obj = m_game_object_manager->new_object("fountain");
 			obj->set_direction(object_direction_e::top);
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry + 10][rx + 2]);
+
+	
 
 			/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
 			fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), obj);
@@ -898,10 +900,10 @@ Game_object_owner* Application::command_select_transfer(Parameter_destination* p
 //			{
 //			case entity_e::inventory_cell:
 //				{
-//					if (static_cast<Inventory_cell*>(temp->m_cell)->m_item)
+//					if (static_cast<Inventory_cell*>(temp->m_cell)->m_items)
 //					{
 //						Result = new P_object();
-//						Result->m_object = static_cast<Inventory_cell*>(temp->m_cell)->m_item;
+//						Result->m_object = static_cast<Inventory_cell*>(temp->m_cell)->m_items;
 //						Exit = true;
 //					}
 //					else Result = nullptr;
@@ -909,10 +911,10 @@ Game_object_owner* Application::command_select_transfer(Parameter_destination* p
 //				}
 //			case entity_e::body_part:
 //			{
-//				if (static_cast<Object_part*>(temp->m_cell)->m_item)
+//				if (static_cast<Object_part*>(temp->m_cell)->m_items)
 //				{
 //					Result = new P_object();
-//					Result->m_object = static_cast<Object_part*>(temp->m_cell)->m_item;
+//					Result->m_object = static_cast<Object_part*>(temp->m_cell)->m_items;
 //					Exit = true;
 //				}
 //				else Result = nullptr;
@@ -1006,7 +1008,7 @@ void Application::command_change_owner(Instruction_slot_parameter* parameter)
 	//{
 	//	if (object->m_active_state)
 	//	{
-	//		for (auto kind = object->m_active_state->m_item.begin(); kind != object->m_active_state->m_item.end(); kind++)
+	//		for (auto kind = object->m_active_state->m_items.begin(); kind != object->m_active_state->m_items.end(); kind++)
 	//		{
 	//			if (kind->first != interaction_e::damage&&kind->first != interaction_e::action)
 	//			{
@@ -1021,12 +1023,12 @@ void Application::command_change_owner(Instruction_slot_parameter* parameter)
 		Object_tag* list = obj_state->get_tag(object_tag_e::equippable);
 		if (list)
 		{
-			LOG(INFO) << "step 0  "<<std::to_string((int)static_cast<ObjectTag::Equippable*>(list)->m_value->m_interaction_message_type);
+			//LOG(INFO) << "step 0  "<<std::to_string((int)static_cast<ObjectTag::Equippable*>(list)->m_value->m_interaction_message_type);
 			list->apply_effect((*p)[0].m_object, parameter);
 		}
 		//if (object->m_active_state)
 		//{
-		//	for (auto kind = object->m_active_state->m_item.begin(); kind != object->m_active_state->m_item.end(); kind++)
+		//	for (auto kind = object->m_active_state->m_items.begin(); kind != object->m_active_state->m_items.end(); kind++)
 		//	{
 		//		if (kind->first != interaction_e::damage&&kind->first != interaction_e::action)
 		//		{

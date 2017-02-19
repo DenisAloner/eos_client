@@ -741,10 +741,10 @@ Parts_list* Parts_list::clone()
 //	{
 //		Object_part* part = static_cast<Object_part*>(list);
 //		LOG(INFO) << part->m_name;
-//		if (part->m_item)
+//		if (part->m_items)
 //		{
-//			LOG(INFO) << part->m_item->m_name;
-//			ObjectTag::Equippable* tag_equippable = static_cast<ObjectTag::Equippable*>(part->m_item->get_tag(object_tag_e::equippable));
+//			LOG(INFO) << part->m_items->m_name;
+//			ObjectTag::Equippable* tag_equippable = static_cast<ObjectTag::Equippable*>(part->m_items->get_tag(object_tag_e::equippable));
 //			if (tag_equippable)
 //			{
 //				Instruction_game_owner* i = new Instruction_game_owner();
@@ -752,9 +752,9 @@ Parts_list* Parts_list::clone()
 //				tag_equippable->m_condition->apply_effect(nullptr, i);
 //				if (!i->m_result)
 //				{
-//					GameObject* obj = part->m_item;
+//					GameObject* obj = part->m_items;
 //					MapCell* cell = static_cast<MapCell*>(part->get_owner(entity_e::cell));
-//					part->m_item = nullptr;
+//					part->m_items = nullptr;
 //					i->m_value = part;
 //					tag_equippable->m_value->apply_effect(nullptr, i);
 //					cell->m_map->add_object(obj, cell);
@@ -766,13 +766,13 @@ Parts_list* Parts_list::clone()
 //				if (tag_requirements)
 //				{
 //					i->m_result = false;
-//					i->m_value = part->m_item;
+//					i->m_value = part->m_items;
 //					tag_requirements->apply_effect(nullptr, i);
 //					if (!i->m_result) 
 //					{ 
-//						GameObject* obj = part->m_item;
+//						GameObject* obj = part->m_items;
 //						MapCell* cell = static_cast<MapCell*>(part->get_owner(entity_e::cell));
-//						part->m_item = nullptr;
+//						part->m_items = nullptr;
 //						i->m_value = part;
 //						tag_equippable->m_value->apply_effect(nullptr, i);
 //						cell->m_map->add_object(obj, cell);
@@ -1175,7 +1175,7 @@ Object_interaction* Interaction_copyist::clone()
 
 void Interaction_copyist::description(std::list<std::string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + "<тип параметра:" + Application::instance().m_game_object_manager->m_dictonary_interaction_e.get_string(m_subtype) + ">:");
+	info->push_back(std::string(level, '.') + "<тип параметра:" + Parser::m_string_interaction_e[m_subtype] + ">:");
 	m_value->description(info, level + 1);
 }
 
@@ -1276,7 +1276,7 @@ Object_interaction* Interaction_addon::clone()
 
 void Interaction_addon::description(std::list<std::string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + "<наложение эффекта:" + Application::instance().m_game_object_manager->m_dictonary_interaction_e.get_string(m_subtype) + ">:");
+	info->push_back(std::string(level, '.') + "<наложение эффекта:" + Parser::m_string_interaction_e[m_subtype] + ">:");
 	m_value->description(info, level + 1);
 }
 
@@ -1858,7 +1858,7 @@ Instruction_slot_link* Instruction_slot_link::clone()
 
 void Instruction_slot_link::description(std::list<std::string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + "<тип параметра:" + Application::instance().m_game_object_manager->m_dictonary_interaction_e.get_string(m_subtype) + ">:");
+	info->push_back(std::string(level, '.') + "<тип параметра:" + Parser::m_string_interaction_e[m_subtype] + ">:");
 	m_value->description(info, level + 1);
 }
 
@@ -2050,13 +2050,17 @@ void Instruction_slot_parameter::load()
 
 // ObjectTag::Equippable
 
-ObjectTag::Equippable::Equippable(): Object_tag(object_tag_e::equippable){};
+ObjectTag::Equippable::Equippable() : Object_tag(object_tag_e::equippable)
+{
+	m_value = nullptr;
+	m_condition = nullptr;
+};
 
 ObjectTag::Equippable* ObjectTag::Equippable::clone()
 {
 	ObjectTag::Equippable* result = new ObjectTag::Equippable;
 	result->m_interaction_message_type = m_interaction_message_type;
-	result->m_value = m_value->clone();
+	if(m_value){ result->m_value = m_value->clone(); }
 	result->m_condition = m_condition->clone();
 	return result;
 }
@@ -2148,7 +2152,7 @@ void ObjectTag::Equippable::apply_effect(GameObject* unit, Object_interaction* o
 			Object_part* part = static_cast<Object_part*>((*p)[2].m_owner);
 			part->m_item = (*p)[1].m_object;
 			(*p)[1].m_object->m_owner = part;
-			m_value->apply_effect(unit, object);
+			if (m_value) { m_value->apply_effect(unit, object); }
 			break;
 		}
 		}
