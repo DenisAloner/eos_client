@@ -333,14 +333,14 @@ void GameObjectManager::parser(const std::string& command)
 		item->m_interaction_message_type = interaction_message_type_e::part;
 		item->m_part_kind = Parser::m_json_body_part_e.get_enum(arg[0]);
 		item->m_name = arg[1];
-		m_stack_attribute_map.push_front(&item->m_object_state);
+		m_stack_attribute_map.push_front(&item->m_attributes);
 		m_template_part[arg[2]] = item;
 		break;
 	}
 	case command_e::template_part:
 	{
 		Object_part* item = m_template_part[arg[0]]->clone();
-		m_stack_attribute_map.push_front(&item->m_object_state);
+		m_stack_attribute_map.push_front(&item->m_attributes);
 		m_stack_list.front()->add(item);
 		break;
 	}
@@ -352,7 +352,7 @@ void GameObjectManager::parser(const std::string& command)
 		item->m_name = arg[2];
 		if (arg[0][0] == 'y')
 		{
-			m_stack_attribute_map.push_front(&item->m_object_state);
+			m_stack_attribute_map.push_front(&item->m_attributes);
 		}
 		if (arg[0][1] == 'y')
 		{
@@ -508,7 +508,7 @@ void GameObjectManager::parser(const std::string& command)
 	{
 		Instruction_check_owner_type* item = new Instruction_check_owner_type();
 		//item->m_interaction_message_type = interaction_message_type_e::single;
-		item->m_value = get_entity_e(arg[0]);
+		item->m_value = Parser::m_json_entity_e.get_enum(arg[0]);
 		m_slot = item;
 		break;
 	}
@@ -611,17 +611,21 @@ void GameObjectManager::init()
 	m_to_ai_type_e["non_humanoid"] = ai_type_e::non_humanoid;
 	m_to_ai_type_e["trap"] = ai_type_e::trap;
 
-	m_to_entity_e["gameobject"] = entity_e::game_object;
-	m_to_entity_e["object_part"] = entity_e::body_part;
-	m_to_entity_e["cell"] = entity_e::cell;
-
 	Parser::register_class<GameObject>(u"game_object");
+	Parser::register_class<Inventory_cell>(u"inventory_cell");
+	Parser::register_class<Object_part>(u"object_part");
+	Parser::register_class<Attribute_map>(u"attribute_map");
 	Parser::register_class<Object_state>(u"object_state");
+	Parser::register_class<Object_state_equip>(u"object_state_equip");
+	Parser::register_class<Interaction_list>(u"interaction_list");
 	Parser::register_class<Tag_list>(u"tag_list");
+	Parser::register_class<Parts_list>(u"parts_list");
+	Parser::register_class<Instruction_slot_link>(u"interaction_slot_link");
 	Parser::register_class<ObjectTag::Label>(u"label");
 	Parser::register_class<ObjectTag::Equippable>(u"equippable");
-	Parser::register_class<Attribute_map>(u"attribute_map");
-	Parser::register_class<Object_state_equip>(u"object_state_equip");
+	Parser::register_class<ObjectTag::Requirements_to_object>(u"requirements_to_object");
+	Parser::register_class<Instruction_check_part_type>(u"instruction_check_part_type");
+	
 
 	bytearray json;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.json", json);
@@ -736,16 +740,6 @@ feature_list_type_e GameObjectManager::get_feature_list_type_e(const std::string
 {
 	auto value = m_to_feature_list_type_e.find(key);
 	if (value == m_to_feature_list_type_e.end())
-	{
-		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
-	}
-	return value->second;
-}
-
-entity_e GameObjectManager::get_entity_e(const std::string& key)
-{
-	auto value = m_to_entity_e.find(key);
-	if (value == m_to_entity_e.end())
 	{
 		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
 	}

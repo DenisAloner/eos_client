@@ -817,7 +817,7 @@ void Parts_list::Update_visitor::visit(Object_interaction& value)
 						return;
 					};
 
-					Object_tag* tag_requirements = part.m_object_state.get_tag(object_tag_e::requirements_to_object);
+					Object_tag* tag_requirements = part.m_attributes.get_tag(object_tag_e::requirements_to_object);
 					if (tag_requirements)
 					{
 						i->m_result = false;
@@ -1870,7 +1870,7 @@ void Instruction_slot_link::apply_effect(GameObject* unit, Object_interaction* o
 	{
 		Instruction_game_owner* parameter = static_cast<Instruction_game_owner*>(object);
 		Object_part* part = static_cast<Object_part*>(parameter->m_value);
-		auto i = part->m_object_state.get_list(m_subtype);
+		auto i = part->m_attributes.get_list(m_subtype);
 		if (i)
 		{
 			if (m_enable)
@@ -1917,7 +1917,7 @@ void Instruction_slot_link::apply_effect(GameObject* unit, Object_interaction* o
 				{
 				case entity_e::body_part:
 					{
-					i = static_cast<Object_part*>(a.m_owner)->m_object_state.get_list(m_subtype);
+					i = static_cast<Object_part*>(a.m_owner)->m_attributes.get_list(m_subtype);
 					break;
 					}
 				case entity_e::game_object:
@@ -1949,7 +1949,7 @@ void Instruction_slot_link::apply_effect(GameObject* unit, Object_interaction* o
 		Instruction_slot_parameter* parameter = static_cast<Instruction_slot_parameter*>(object);
 		Parameter& p(*(parameter->m_parameter));
 		Object_part* part = static_cast<Object_part*>(p[1].m_object->m_owner);
-		auto i = part->m_object_state.get_list(m_subtype);
+		auto i = part->m_attributes.get_list(m_subtype);
 		if (i)
 		{
 			Instruction_slot_parameter* p = static_cast<Instruction_slot_parameter*>(object);
@@ -2095,7 +2095,7 @@ void ObjectTag::Equippable::apply_effect(GameObject* unit, Object_interaction* o
 			if (p[2].m_owner->m_kind == entity_e::body_part)
 			{
 				Object_part* part = static_cast<Object_part*>(p[2].m_owner);
-				Object_tag* t = part->m_object_state.get_tag(object_tag_e::requirements_to_object);
+				Object_tag* t = part->m_attributes.get_tag(object_tag_e::requirements_to_object);
 				if (t)
 				{
 					i->m_result = false;

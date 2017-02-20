@@ -75,6 +75,22 @@ Dictonary<interaction_e> Parser::m_json_interaction_e = {
 	{ interaction_e::equip, "equip" }
 };
 
+Dictonary<feature_list_type_e> Parser::m_json_feature_list_type_e = {
+	{ feature_list_type_e::generic,"generic" },
+	{ feature_list_type_e::parameter,"parameter" },
+	{ feature_list_type_e::tag,"tag" },
+	{ feature_list_type_e::action,"action", },
+	{ feature_list_type_e::parts,"parts" },
+	{ feature_list_type_e::vision,"vision" },
+	{ feature_list_type_e::vision_component,"vision_component" }
+};
+
+Dictonary<entity_e> Parser::m_json_entity_e = {
+	{ entity_e::game_object,"gameobject" },
+	{ entity_e::body_part,"object_part" },
+	{ entity_e::cell,"cell" }
+};
+
 std::unordered_map<interaction_e, std::string>  Parser::m_string_interaction_e = {
 	{ interaction_e::total_damage, "общий дополнительный урон" },
 	{ interaction_e::damage, "урон" },
@@ -156,6 +172,7 @@ std::u16string Parser::serialize_object(iSerializable* value)
 {
 	if (value)
 	{
+		LOG(INFO) << to_utf8(value->get_packer().get_type());
 		std::u16string result = value->get_packer().to_json(value);
 		if (result.empty())
 		{

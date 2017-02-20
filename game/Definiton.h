@@ -828,9 +828,30 @@ public:
 	static Dictonary<interaction_e> m_json_interaction_e;
 	static Dictonary<object_tag_e> m_json_object_tag;
 	static Dictonary<body_part_e> m_json_body_part_e;
+	static Dictonary<feature_list_type_e> m_json_feature_list_type_e;
+	static Dictonary<entity_e> m_json_entity_e;
 
 	static std::unordered_map<interaction_e, std::string> m_string_interaction_e;
 	static std::unordered_map<object_tag_e, std::string> m_string_object_tag_e;
+
+	class Templates: public iSerializable
+	{
+	public:
+
+		std::unordered_map< std::string, Object_interaction*> m_items;
+		
+		Packer_generic& get_packer() override
+		{
+			return Packer<Templates>::Instance();
+		}
+
+		constexpr static auto properties() {
+			return std::make_tuple(
+				make_property(&Templates::m_items, u"item")
+			);
+		}
+	};
+	
 
 	Parser();
 	~Parser();
@@ -932,7 +953,7 @@ public:
 		return map;
 	};
 
-	template<typename T> static typename std::enable_if< !std::is_pointer<T>::value && !is_pair<T>::value && !is_list<T>::value && !is_map<T>::value && (!std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value), T >::type from_json(const std::u16string value);
+	template<typename T> static typename std::enable_if<!std::is_enum<T>::value && !std::is_pointer<T>::value && !is_pair<T>::value && !is_list<T>::value && !is_map<T>::value && (!std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value), T >::type from_json(const std::u16string value);
 
 	template<typename T> static typename std::enable_if< std::is_pointer<T>::value && !is_pair<T>::value && !is_list<T>::value && !is_map<T>::value && (!std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value), T >::type from_json(const std::u16string value)
 	{
@@ -1041,7 +1062,7 @@ public:
 		return result;
 	};
 
-	template<typename T> static std::u16string to_json(typename std::enable_if< !std::is_pointer<T>::value && !is_list<T>::value && !is_map<T>::value && !is_pair<T>::value && !std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T >::type value);
+	template<typename T> static std::u16string to_json(typename std::enable_if< !std::is_enum<T>::value && !std::is_pointer<T>::value && !is_list<T>::value && !is_map<T>::value && !is_pair<T>::value && !std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T >::type value);
 
 	template<typename T> static std::u16string to_json(typename std::enable_if<std::is_pointer<T>::value&&std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, iSerializable*>::type value)
 	{
@@ -1108,8 +1129,34 @@ public:
 		return result;
 	};
 
-	template<>
-	static inline object_tag_e from_json<object_tag_e>(const std::u16string value) {
+	template<typename T> static Dictonary<T>& get_dictonary();
+    
+	template<> static Dictonary<object_tag_e>& get_dictonary<object_tag_e>()
+	{
+		return m_json_object_tag;
+	}
+
+	template<> static Dictonary<interaction_e>& get_dictonary<interaction_e>()
+	{
+		return m_json_interaction_e;
+	}
+
+	template<> static Dictonary<body_part_e>& get_dictonary<body_part_e>()
+	{
+		return m_json_body_part_e;
+	}
+
+	template<> static Dictonary<feature_list_type_e>& get_dictonary<feature_list_type_e>()
+	{
+		return m_json_feature_list_type_e;
+	}
+
+	template<> static Dictonary<entity_e>& get_dictonary<entity_e>()
+	{
+		return m_json_entity_e;
+	}
+
+	template<typename T> static inline typename std::enable_if<std::is_enum<T>::value, T>::type from_json(const std::u16string value) {
 		std::size_t start_pos = value.find(u'"');
 		if (start_pos != std::string::npos)
 		{
@@ -1117,55 +1164,15 @@ public:
 			if (end_pos != std::string::npos)
 			{
 				std::u16string* result = new std::u16string(value.substr(start_pos + 1, end_pos - start_pos - 1));
-				return m_json_object_tag.get_enum(to_utf8(*result));
+				return get_dictonary<T>().get_enum(to_utf8(*result));
 			}
 		}
-		return object_tag_e::none;
+		return static_cast<T>(0);
 	}
 
-	template<> static inline std::u16string to_json<object_tag_e>(object_tag_e value)
+	template<typename T> static inline std::u16string to_json(typename std::enable_if<std::is_enum<T>::value, T>::type value)
 	{
-		return u"\"" + to_u16string(m_json_object_tag.get_string(value)) + u"\"";
-	}
-
-	template<>
-	static inline interaction_e from_json<interaction_e>(const std::u16string value) {
-		std::size_t start_pos = value.find(u'"');
-		if (start_pos != std::string::npos)
-		{
-			std::size_t end_pos = value.find(u'"', start_pos + 1);
-			if (end_pos != std::string::npos)
-			{
-				std::u16string* result = new std::u16string(value.substr(start_pos + 1, end_pos - start_pos - 1));
-				return m_json_interaction_e.get_enum(to_utf8(*result));
-			}
-		}
-		return interaction_e::action;
-	}
-
-	template<> static inline std::u16string to_json<interaction_e>(interaction_e value)
-	{
-		std::u16string out = u"\"" + to_u16string(m_json_interaction_e.get_string(value)) + u"\"";
-		return out;
-	}
-
-	template<> static inline body_part_e from_json<body_part_e>(const std::u16string value) {
-		std::size_t start_pos = value.find(u'"');
-		if (start_pos != std::string::npos)
-		{
-			std::size_t end_pos = value.find(u'"', start_pos + 1);
-			if (end_pos != std::string::npos)
-			{
-				std::u16string* result = new std::u16string(value.substr(start_pos + 1, end_pos - start_pos - 1));
-				return m_json_body_part_e.get_enum(to_utf8(*result));
-			}
-		}
-		return body_part_e::container;
-	}
-
-	template<> static inline std::u16string to_json<body_part_e>(body_part_e value)
-	{
-		std::u16string out = u"\"" + to_u16string(m_json_body_part_e.get_string(value)) + u"\"";
+		std::u16string out = u"\"" + to_u16string(get_dictonary<T>().get_string(value)) + u"\"";
 		return out;
 	}
 

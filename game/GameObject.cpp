@@ -649,7 +649,7 @@ void GameObject::Action_getter::visit(Object_interaction& value)
 	case interaction_message_type_e::part:
 	{
 		Object_part& op = static_cast<Object_part&>(value);
-		Tag_list* tl = static_cast<Tag_list*>(op.m_object_state.get_list(interaction_e::tag));
+		Tag_list* tl = static_cast<Tag_list*>(op.m_attributes.get_list(interaction_e::tag));
 		Object_tag* t;
 		if (tl)
 		{
@@ -682,7 +682,7 @@ void GameObject::Action_getter::visit(Object_interaction& value)
 			}
 		}
 
-		Action_list* al = static_cast<Action_list*>(op.m_object_state.get_list(interaction_e::action));
+		Action_list* al = static_cast<Action_list*>(op.m_attributes.get_list(interaction_e::action));
 		Action* a;
 		if (al)
 		{
@@ -938,8 +938,9 @@ Object_part::Object_part(GameObject* item) :Inventory_cell(item)
 {
 	m_interaction_message_type = interaction_message_type_e::part;
 	m_kind = entity_e::body_part;
+	m_part_kind = body_part_e::container;
 	m_owner = nullptr;
-	m_object_state.create_feature_list(feature_list_type_e::parts, interaction_e::body);
+	m_attributes.create_feature_list(feature_list_type_e::parts, interaction_e::body);
 };
 
 Object_part* Object_part::clone()
@@ -949,7 +950,7 @@ Object_part* Object_part::clone()
 	result->m_name = m_name;
 	result->m_part_kind = m_part_kind;
 	result->m_item = nullptr;
-	result->m_object_state = *m_object_state.clone();
+	result->m_attributes = *m_attributes.clone();
 	return result;
 }
 
@@ -968,7 +969,7 @@ void Object_part::description(std::list<std::string>* info, int level)
 {
 	info->push_back(std::string(level, '.') + "<" + m_name + ">:");
 	info->push_back(std::string(level, '.') + "<эффекты>:");
-	for (auto current = m_object_state.m_items.begin(); current != m_object_state.m_items.end(); current++)
+	for (auto current = m_attributes.m_items.begin(); current != m_attributes.m_items.end(); current++)
 	{
 		info->push_back(std::string(level + 1, '.') + Parser::m_string_interaction_e[current->first] + ":");
 		current->second->description(info, level + 2);
@@ -978,7 +979,7 @@ void Object_part::description(std::list<std::string>* info, int level)
 void Object_part::do_predicat(Visitor& helper)
 { 
 	helper.visit(*this);
-	for (auto item = m_object_state.m_items.begin(); item != m_object_state.m_items.end(); item++)
+	for (auto item = m_attributes.m_items.begin(); item != m_attributes.m_items.end(); item++)
 	{
 		item->second->do_predicat(helper);
 	}
@@ -987,7 +988,7 @@ void Object_part::do_predicat(Visitor& helper)
 void Object_part::do_predicat_ex(predicat_ex func)
 {
 	func(this,true);
-	for (auto item = m_object_state.m_items.begin(); item != m_object_state.m_items.end(); item++)
+	for (auto item = m_attributes.m_items.begin(); item != m_attributes.m_items.end(); item++)
 	{
 		item->second->do_predicat_ex(func);
 	}
@@ -997,7 +998,7 @@ void Object_part::do_predicat_ex(predicat_ex func)
 void Object_part::reset_serialization_index()
 {
 	m_serialization_index = 0;
-	m_object_state.reset_serialization_index();
+	m_attributes.reset_serialization_index();
 	if (m_item)
 	{
 		// ??? исправить, временная заглушка, необходимо добавить свойство, которое показывает был ли сброшен объект для сохранения уже
@@ -1015,7 +1016,7 @@ void Object_part::save()
 	type_e t = type_e::object_part;
 	fwrite(&t, sizeof(type_e), 1, file);
 	LOG(INFO) << "Состояние";
-	m_object_state.save();
+	m_attributes.save();
 	LOG(INFO) << "Конец состояния";
 	fwrite(&m_part_kind, sizeof(body_part_e), 1, file);
 	FileSystem::instance().serialize_string(m_name, file);
@@ -1029,7 +1030,7 @@ void Object_part::load()
 {
 	LOG(INFO) << "Часть";
 	FILE* file = Serialization_manager::instance().m_file;
-	m_object_state.load();
+	m_attributes.load();
 	fread(&m_part_kind, sizeof(body_part_e), 1, file);
 	FileSystem::instance().deserialize_string(m_name, file);
 	LOG(INFO) << "Объект в части";

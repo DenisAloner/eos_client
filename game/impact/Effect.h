@@ -38,7 +38,12 @@ public:
 		return Packer<Interaction_list>::Instance();
 	}
 
-	constexpr static auto properties() { return std::make_tuple(make_property(&Interaction_list::m_items, u"items")); }
+	constexpr static auto properties() {
+		return std::make_tuple(
+			make_property(&Interaction_list::m_list_type, u"list_type"),
+			make_property(&Interaction_list::m_items, u"items")
+		);
+	}
 
 };
 
@@ -163,6 +168,14 @@ public:
 
 	virtual void equip(Object_interaction* item);
 
+	Packer_generic& get_packer() override
+	{
+		return Packer<Parts_list>::Instance();
+	}
+
+	constexpr static auto properties() {
+		return std::make_tuple(make_property(&Parts_list::m_items, u"items"));;
+	}
 
 private:
 
@@ -268,6 +281,18 @@ public:
 	virtual void do_predicat(Visitor& helper);
 	virtual void do_predicat_ex(predicat_ex func);
 	virtual void reset_serialization_index();
+
+	Packer_generic& get_packer() override
+	{
+		return Packer<Interaction_slot>::Instance();
+	}
+
+	constexpr static auto properties() {
+		return std::make_tuple(
+			make_property(&Interaction_slot::m_value, u"value")
+		);
+	}
+
 };
 
 class Interaction_copyist :public Interaction_slot
@@ -477,10 +502,12 @@ namespace ObjectTag
 			return Packer<Equippable>::Instance();
 		}
 
-		constexpr static auto properties() { return std::make_tuple(
-			make_property(&Equippable::m_value, u"value"),
-			make_property(&Equippable::m_condition, u"condition")
-		); }
+		constexpr static auto properties() {
+			return make_union(std::make_tuple(
+				make_property(&Equippable::m_value, u"value"),
+				make_property(&Equippable::m_condition, u"condition")
+			), Object_tag::properties());
+		}
 
 	};
 
@@ -497,6 +524,18 @@ namespace ObjectTag
 
 		virtual void save();
 		virtual void load();
+
+		Packer_generic& get_packer() override
+		{
+			return Packer<Requirements_to_object>::Instance();
+		}
+
+		constexpr static auto properties() {
+			return make_union(std::make_tuple(
+				make_property(&Requirements_to_object::m_value, u"value")
+			), Object_tag::properties());
+		}
+
 	};
 
 	class Can_transfer_object : public Object_tag
@@ -534,6 +573,17 @@ public:
 
 	virtual void save();
 	virtual void load();
+
+	Packer_generic& get_packer() override
+	{
+		return Packer<Instruction_slot_link>::Instance();
+	}
+
+	constexpr static auto properties() {
+		return make_union(std::make_tuple(
+			make_property(&Instruction_slot_link::m_subtype, u"subtype")
+		), Interaction_slot::properties());
+	}
 };
 
 class Instruction_slot_parameter :public Interaction_slot
@@ -606,6 +656,17 @@ public:
 
 	virtual void save() {};
 	virtual void load() {};
+
+	Packer_generic& get_packer() override
+	{
+		return Packer<Instruction_check_part_type>::Instance();
+	}
+
+	constexpr static auto properties() {
+		return std::make_tuple(
+			make_property(&Instruction_check_part_type::m_value, u"value")
+		);
+	}
 
 };
 

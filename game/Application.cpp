@@ -282,9 +282,12 @@ void Application::new_game()
 			obj->set_direction(object_direction_e::top);
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx-2]);
 
-			/*obj = m_game_object_manager->new_object("bag");
+			obj = m_game_object_manager->new_object("bag");
 			obj->set_direction(object_direction_e::top);
-			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx-1]);*/
+			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx-1]);
+
+			std::string json = Parser::to_utf8(Parser::serialize_object(obj));
+			LOG(INFO) << json;
 
 			obj = m_game_object_manager->new_object("ring");
 			obj->set_direction(object_direction_e::top);
@@ -294,17 +297,11 @@ void Application::new_game()
 			obj->set_direction(object_direction_e::top);
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx + 2]);
 
-			std::string json = Parser::to_utf8(Parser::serialize_object(obj));
-			LOG(INFO) << json;
-
+			
 			obj = m_game_object_manager->new_object("fountain");
 			obj->set_direction(object_direction_e::top);
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry + 10][rx + 2]);
 
-			json = Parser::to_utf8(Parser::serialize_object(obj));
-			LOG(INFO) << json;
-
-	
 
 			/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
 			fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), obj);

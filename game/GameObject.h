@@ -36,6 +36,18 @@ public:
 
 	Game_object_owner* get_owner();
 	Game_object_owner* get_owner(entity_e kind);
+
+	Packer_generic& get_packer() override
+	{
+		return Packer<Game_object_owner>::Instance();
+	}
+
+	constexpr static auto properties() {
+		return std::make_tuple(
+			make_property(&Game_object_owner::m_kind, u"kind"),
+			make_property(&Game_object_owner::m_owner, u"owner")
+		);
+	}
 };
 
 class MapCell : public Game_object_owner
@@ -279,18 +291,30 @@ class Inventory_cell : public Game_object_owner
 public:
 
 	GameObject* m_item;
+	Inventory_cell():m_item(nullptr){}
 	Inventory_cell(GameObject* item);
 
 	virtual void reset_serialization_index();
 	virtual void save();
 	virtual void load();
+
+	Packer_generic& get_packer() override
+	{
+		return Packer<Inventory_cell>::Instance();
+	}
+
+	constexpr static auto properties() {
+		return make_union(std::make_tuple(
+			make_property(&Inventory_cell::m_item, u"item")
+		), Game_object_owner::properties());
+	}
 };
 
 class Object_part : public Inventory_cell, public Object_interaction
 {
 public:
 
-	Attribute_map m_object_state;
+	Attribute_map m_attributes;
 	body_part_e m_part_kind;
 	std::string m_name;
 
@@ -305,6 +329,20 @@ public:
 	virtual void reset_serialization_index();
 	virtual void save();
 	virtual void load();
+
+	Packer_generic& get_packer() override
+	{
+		return Packer<Object_part>::Instance();
+	}
+
+	constexpr static auto properties() {
+		return make_union(std::make_tuple(
+			make_property(&Object_part::m_part_kind, u"part_kind"),
+			make_property(&Object_part::m_name, u"name"),
+			make_property(&Object_part::m_attributes, u"attributes")
+		, Inventory_cell::properties()));
+	}
+
 };
 
 #endif //GAMEOBJECT_H
