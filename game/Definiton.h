@@ -866,12 +866,12 @@ public:
 	static scheme_list_t* parse_array(std::u16string& value);
 	static scheme_vector_t* parse_pair(std::u16string& value);
 	static std::u16string get_value(const std::u16string& value);
-	static std::string to_utf8(const std::u16string& value);
 	static std::u16string to_u16string(int const& i);
 	static std::u16string float_to_u16string(float const& i);
-	static std::u16string to_u16string(const std::string& value);
 	static int to_int(const std::u16string& value);
 	static float to_float(const std::u16string& value);
+	static std::string UTF16_to_CP866(std::u16string const& value);
+	static std::u16string CP866_to_UTF16(std::string const& value);
 
 	template<typename T>
 	static void register_class(std::u16string class_name)
@@ -1045,10 +1045,10 @@ public:
 			if (end_pos != std::string::npos)
 			{
 				std::u16string* result = new std::u16string(value.substr(start_pos + 1, end_pos - start_pos - 1));
-				return to_utf8(*result);
+				return UTF16_to_CP866(*result);
 			}
 		}
-		return to_utf8(value);
+		return UTF16_to_CP866(value);
 	}
 
 	template<>
@@ -1099,7 +1099,7 @@ public:
 
 	template<> static inline std::u16string to_json<std::string>(std::string value)
 	{
-		return u"\"" + to_u16string(value) + u"\"";
+		return u"\"" + CP866_to_UTF16(value) + u"\"";
 	}
 
 	template<typename T> static std::u16string to_json(typename std::enable_if< is_list<T>::value || is_map<T>::value, T >::type value)
@@ -1164,7 +1164,7 @@ public:
 			if (end_pos != std::string::npos)
 			{
 				std::u16string* result = new std::u16string(value.substr(start_pos + 1, end_pos - start_pos - 1));
-				return get_dictonary<T>().get_enum(to_utf8(*result));
+				return get_dictonary<T>().get_enum(UTF16_to_CP866(*result));
 			}
 		}
 		return static_cast<T>(0);
@@ -1172,7 +1172,7 @@ public:
 
 	template<typename T> static inline std::u16string to_json(typename std::enable_if<std::is_enum<T>::value, T>::type value)
 	{
-		std::u16string out = u"\"" + to_u16string(get_dictonary<T>().get_string(value)) + u"\"";
+		std::u16string out = u"\"" + CP866_to_UTF16(get_dictonary<T>().get_string(value)) + u"\"";
 		return out;
 	}
 

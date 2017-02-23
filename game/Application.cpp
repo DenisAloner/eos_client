@@ -286,7 +286,7 @@ void Application::new_game()
 			obj->set_direction(object_direction_e::top);
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx-1]);
 
-			std::string json = Parser::to_utf8(Parser::serialize_object(obj));
+			std::string json = Parser::UTF16_to_CP866(Parser::serialize_object(obj));
 			LOG(INFO) << json;
 
 			obj = m_game_object_manager->new_object("ring");

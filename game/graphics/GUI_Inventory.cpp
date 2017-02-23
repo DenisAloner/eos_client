@@ -129,7 +129,7 @@ void GUI_Body::get_part_predicat(Object_interaction* object,bool add_mode)
 		if (object->m_interaction_message_type == interaction_message_type_e::part)
 		{
 			
-			Object_part* part = static_cast<Object_part*>(object);
+			Object_part* part = dynamic_cast<Object_part*>(object);
 			LOG(INFO) << "parts: " << part->m_name;
 			m_owner_name.push_front(&part->m_name);
 			std::string name = "";

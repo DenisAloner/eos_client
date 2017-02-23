@@ -310,7 +310,7 @@ public:
 	}
 };
 
-class Object_part : public Inventory_cell, public Object_interaction
+class Object_part : public Inventory_cell, virtual public Object_interaction
 {
 public:
 
@@ -340,7 +340,7 @@ public:
 			make_property(&Object_part::m_part_kind, u"part_kind"),
 			make_property(&Object_part::m_name, u"name"),
 			make_property(&Object_part::m_attributes, u"attributes")
-		, Inventory_cell::properties()));
+		), Inventory_cell::properties());
 	}
 
 };

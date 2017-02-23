@@ -648,7 +648,7 @@ void GameObject::Action_getter::visit(Object_interaction& value)
 	}*/
 	case interaction_message_type_e::part:
 	{
-		Object_part& op = static_cast<Object_part&>(value);
+		Object_part& op = dynamic_cast<Object_part&>(value);
 		Tag_list* tl = static_cast<Tag_list*>(op.m_attributes.get_list(interaction_e::tag));
 		Object_tag* t;
 		if (tl)

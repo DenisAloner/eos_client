@@ -766,7 +766,7 @@ void GameObjectManager::bind_body_predicat(Object_interaction* object, bool add_
 		if (object->m_interaction_message_type == interaction_message_type_e::part)
 		{
 
-			Object_part* part = static_cast<Object_part*>(object);
+			Object_part* part = dynamic_cast<Object_part*>(object);
 			LOG(INFO) << "parts: " << part->m_name;
 			part->m_owner= m_game_object_owner_stack.front();
 			m_game_object_owner_stack.push_front(part);

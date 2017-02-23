@@ -172,7 +172,7 @@ std::u16string Parser::serialize_object(iSerializable* value)
 {
 	if (value)
 	{
-		LOG(INFO) << to_utf8(value->get_packer().get_type());
+		LOG(INFO) << UTF16_to_CP866(value->get_packer().get_type());
 		std::u16string result = value->get_packer().to_json(value);
 		if (result.empty())
 		{
@@ -533,13 +533,6 @@ void Parser::print_u16string(std::u16string value)
 }
 
 
-std::string Parser::to_utf8(const std::u16string& value)
-{
-	std::wstring_convert<std::codecvt_utf8<int16_t>, int16_t> convert;
-	auto p = reinterpret_cast<const int16_t *>(value.data());
-	return convert.to_bytes(p, p + value.size());
-}
-
 
 std::u16string Parser::to_u16string(int const &value) {
 	std::string temp = std::to_string(value);
@@ -553,14 +546,7 @@ std::u16string Parser::to_u16string(int const &value) {
 
 std::u16string Parser::float_to_u16string(float const& i)
 {
-	return to_u16string(std::to_string(i));
-}
-
-std::u16string Parser::to_u16string(const std::string& value)
-{
-	std::wstring_convert<std::codecvt_utf8<int16_t>, int16_t> convert;
-	auto asInt = convert.from_bytes(value);
-	return std::u16string(reinterpret_cast<char16_t const *>(asInt.data()), asInt.length());
+	return CP866_to_UTF16(std::to_string(i));
 }
 
 int Parser::to_int(const std::u16string& value) {
@@ -633,6 +619,56 @@ float Parser::to_float(const std::u16string& value) {
 		return std::stof(ws);
 	}
 	return 0.0;
+}
+
+std::string Parser::UTF16_to_CP866(std::u16string const& value)
+{
+	std::string out(value.length(), '0');
+	for (int i = 0; i<value.length(); ++i)
+	{
+		if (value[i]>0x409 && value[i]<0x44f)
+		{
+			if (value[i]<0x440)
+			{
+				out[i] = value[i] - 0x410 + 0x80;
+			}
+			else
+			{
+				out[i] = value[i] - 0x440 + 0xE0;
+			}
+
+		}
+		else
+		{
+			out[i] = value[i];
+		}
+	}
+	return out;
+}
+
+std::u16string Parser::CP866_to_UTF16(std::string const& value)
+{
+	std::u16string out(value.length(), '0');
+	for (int i = 0; i<value.length(); ++i)
+	{
+		if (value[i]>0x7F && value[i]<0xB0)
+		{
+			if (value[i]<0x440)
+			{
+				out[i] = value[i] - 0x80 + 0x410;
+			}
+			else
+			{
+				out[i] = value[i] - 0xE0 + 0x440;
+			}
+
+		}
+		else
+		{
+			out[i] = value[i];
+		}
+	}
+	return out;
 }
 
 template<> TileManager& Parser::from_json<TileManager&>(const std::u16string value)

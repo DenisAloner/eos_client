@@ -795,7 +795,7 @@ void Parts_list::Update_visitor::visit(Object_interaction& value)
 	{
 	case interaction_message_type_e::part:
 		{
-			Object_part& part = static_cast<Object_part&>(value);
+			Object_part& part = dynamic_cast<Object_part&>(value);
 			if (part.m_item)
 			{
 				ObjectTag::Equippable* tag_equippable = static_cast<ObjectTag::Equippable*>(part.m_item->get_tag(object_tag_e::equippable));
