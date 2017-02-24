@@ -68,6 +68,19 @@ public:
 	virtual void save();
 	virtual void load();
 
+	Packer_generic& get_packer() override
+	{
+		return Packer<Parameter_list>::Instance();
+	}
+
+	constexpr static auto properties() {
+		return make_union(std::make_tuple(
+			make_property(&Parameter_list::m_subtype, u"subtype"),
+			make_property(&Parameter_list::m_basic_value, u"basic_value"),
+			make_property(&Parameter_list::m_basic_limit, u"basic_limit")
+		), Interaction_list::properties());
+	}
+
 private:
 
 	class Update_visitor: public Visitor
@@ -119,6 +132,17 @@ public:
 	virtual void save();
 	virtual void load();
 
+	Packer_generic& get_packer() override
+	{
+		return Packer<Vision_component>::Instance();
+	}
+
+	constexpr static auto properties() {
+		return make_union(std::make_tuple(
+			make_property(&Vision_component::m_basic_value, u"basic_value")
+		), Interaction_list::properties());
+	}
+
 private:
 	void update_list(Object_interaction* list);
 };
@@ -156,7 +180,7 @@ private:
 
 };
 
-class Parts_list :public  Interaction_list
+class Parts_list: public Interaction_list
 {
 public:
 
@@ -524,6 +548,7 @@ namespace ObjectTag
 
 		virtual void save();
 		virtual void load();
+		void reset_serialization_index() override;
 
 		Packer_generic& get_packer() override
 		{

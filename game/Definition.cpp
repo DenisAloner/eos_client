@@ -138,6 +138,8 @@ std::unordered_map<object_tag_e, std::string>  Parser::m_string_object_tag_e = {
 
 std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> Parser::m_convert;
 
+std::size_t Parser::m_object_index = 0;
+
 Parser::Parser()
 {
 	/*m_classes[u"A_class"] = A::create_instance;
@@ -683,6 +685,20 @@ template <> std::u16string Parser::to_json<TileManager&>(TileManager& value)
 	return out;
 }
 
+//template<> predicat_t& Parser::from_json<predicat_t&>(const std::u16string value)
+//{
+//	int result = to_int(value);
+//	return *Application::instance().m_ai_manager->m_fov_qualifiers[result];
+//}
+//
+//template <> std::u16string Parser::to_json<predicat_t&>(predicat_t& value)
+//{
+//	std::u16string out = to_u16string(value.index);
+//	return out;
+//}
+
+
+
 template<> std::size_t Parser::from_json<std::size_t>(const std::u16string value)
 {
 	std::size_t result = to_int(value);
@@ -731,3 +747,19 @@ template<> std::u16string Parser::to_json<optical_properties_t&>(optical_propert
 	return result;
 }
 
+template<> AI_FOV Parser::from_json<AI_FOV>(const std::u16string value) {
+	std::u16string temp = value;
+	scheme_vector_t* s = read_pair(temp);
+	AI_FOV out;
+	out.radius = from_json<int>((*s)[0]);
+	out.qualifier= Application::instance().m_ai_manager->m_fov_qualifiers[from_json<int>((*s)[1])];
+	out.start_angle = from_json<int>((*s)[2]);
+	out.end_angle = from_json<int>((*s)[3]);
+	return out;
+};
+
+template<> std::u16string Parser::to_json<AI_FOV>(AI_FOV value)
+{
+	std::u16string result = u"[" + to_json<int>(value.radius) + u"," + to_json<int>(value.qualifier->index) + u"," + to_json<int>(value.start_angle) + u"," + to_json<int>(value.end_angle) + u"]";
+	return result;
+}

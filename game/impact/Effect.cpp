@@ -2225,6 +2225,15 @@ void ObjectTag::Requirements_to_object::load()
 	fread(&m_type, sizeof(object_tag_e), 1, file);*/
 }
 
+void ObjectTag::Requirements_to_object::reset_serialization_index()
+{
+	m_serialization_index = 0;
+	if (m_value)
+	{
+		m_value->reset_serialization_index();
+	}
+}
+
 // ObjectTag::Can_transfer_object
 
 ObjectTag::Can_transfer_object::Can_transfer_object() : Object_tag(object_tag_e::can_transfer_object)

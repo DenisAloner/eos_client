@@ -244,6 +244,11 @@ void Application::new_game()
 	m_world->m_player = new Player(obj, map);
 	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
 
+	
+	obj->reset_serialization_index();
+	std::string json = Parser::UTF16_to_CP866(Parser::to_json<GameObject*>(obj));
+	LOG(INFO) << json;
+
 	m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player, map, m_action_manager, m_game_log);
 
 	GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
@@ -282,16 +287,18 @@ void Application::new_game()
 			obj->set_direction(object_direction_e::top);
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx-2]);
 
+			
+			
 			obj = m_game_object_manager->new_object("bag");
 			obj->set_direction(object_direction_e::top);
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx-1]);
 
-			std::string json = Parser::UTF16_to_CP866(Parser::serialize_object(obj));
-			LOG(INFO) << json;
-
+		
 			obj = m_game_object_manager->new_object("ring");
 			obj->set_direction(object_direction_e::top);
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx + 1]);
+
+		
 
 			obj = m_game_object_manager->new_object("boot");
 			obj->set_direction(object_direction_e::top);

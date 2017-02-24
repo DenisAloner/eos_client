@@ -820,6 +820,9 @@ public:
 
 class Parser
 {
+private:
+	static std::size_t m_object_index;
+
 public:
 
 	static std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> m_convert;
@@ -1066,7 +1069,42 @@ public:
 
 	template<typename T> static std::u16string to_json(typename std::enable_if<std::is_pointer<T>::value&&std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, iSerializable*>::type value)
 	{
-		return serialize_object(value);
+		if (value)
+		{
+			switch (value->m_serialization_index)
+			{
+			case 0:
+			{
+				m_object_index += 1;
+				value->m_serialization_index = m_object_index;
+				LOG(INFO) << UTF16_to_CP866(value->get_packer().get_type());
+				std::u16string result = value->get_packer().to_json(value);
+				if (result.empty())
+				{
+					std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type() + u"\",\"$link\":" + to_u16string(value->m_serialization_index) + u"}";
+					return out;
+				}
+				else
+				{
+					std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type() + u"\",\"$link\":" + to_u16string(value->m_serialization_index)+u"," + result + u"}";
+					return out;
+				}
+				break;
+			}
+			default:
+			{
+				std::u16string out = u"{\"$link\":" + to_u16string(value->m_serialization_index) + u"}";
+				return out;
+
+				break;
+			}
+			}
+		}
+		else
+		{
+			return u"null";
+		}
+		
 	}
 
 	template<typename T> static std::u16string to_json(typename std::enable_if<!std::is_pointer<T>::value&&std::is_base_of<iSerializable, T>::value, T>::type value)
