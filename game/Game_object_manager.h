@@ -76,11 +76,8 @@ public:
 	typedef std::map<std::string, parameter_e> parameters_t;
 	 
 	std::map<std::string, effect_e> m_to_effect_e;
-	std::map<std::string, object_state_e> m_to_object_state_e;
 	std::map<std::string, effect_prefix_e> m_to_effect_prefix_e;
-	std::map<std::string, action_e> m_to_action_e;
 	std::map<std::string, feature_list_type_e> m_to_feature_list_type_e;
-	std::map<std::string, ai_type_e> m_to_ai_type_e;
 
 	std::map<effect_e, std::string> m_effect_subtype_string;
 	std::map<effect_prefix_e, std::string> m_effect_prefix_string;
@@ -106,11 +103,7 @@ public:
 	//std::list<GameObject*> m_object_templates;
 
 	effect_e get_effect_e(const std::string& key);
-	object_state_e get_object_state_e(const std::string& key);
 	effect_prefix_e get_effect_prefix_e(const std::string& key);
-	action_e get_action_e(const std::string& key);
-	feature_list_type_e get_feature_list_type_e(const std::string& key);
-	ai_type_e get_ai_type_e(const std::string& key);
 
 	void parser(const std::string& command);
 	void init();

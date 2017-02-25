@@ -24,7 +24,7 @@ public:
 	size_t m_index;
 
 	GLuint m_icon;
-	action_e m_kind;
+	action_e::type m_kind;
 	std::string m_name;
 	std::string m_error;
 	int m_decay;
@@ -43,11 +43,23 @@ public:
 	virtual Object_interaction* clone();
 	virtual void description(std::list<std::string>* info, int level) {};
 
-	virtual void reset_serialization_index() { m_serialization_index = 1; };
+	virtual void reset_serialization_index() { m_serialization_index = 0; };
 	virtual void save();
 	virtual void load();
 
 	virtual bool get_child(GameTask*& task) { return false; };
+
+	Packer_generic& get_packer() final
+	{
+		return Packer<Action>::Instance();
+	}
+
+	constexpr static auto properties() {
+		return std::make_tuple(
+			make_property(&Action::m_kind, u"type")
+		);
+	}
+
 };
 
 class Action_wrapper : public Object_interaction

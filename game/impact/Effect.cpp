@@ -1687,7 +1687,7 @@ void ObjectTag::Activator::reset_serialization_index()
 	m_serialization_index = 0;
 	for (auto item = m_link.begin(); item != m_link.end(); ++item)
 	{
-		if ((*item)->m_serialization_index > 1)
+		if ((*item)->m_serialization_index > 0)
 		{
 			(*item)->reset_serialization_index();
 		}

@@ -136,28 +136,35 @@ enum class entity_e
 	game_object
 };
 
-enum action_e
+class action_e
 {
-	move,
-	move_step,
-	push,
-	turn,
-	open_inventory,
-	cell_info,
-	set_motion_path,
-	pick,
-	open,
-	hit,
-	hit_melee,
-	equip,
-	show_parameters,
-	use,
-	save,
-	autoexplore,
-	shoot,
-	load,
-	move_out
+public:
+	enum type
+	{
+		none,
+		move,
+		move_step,
+		push,
+		turn,
+		open_inventory,
+		cell_info,
+		set_motion_path,
+		pick,
+		open,
+		hit,
+		hit_melee,
+		equip,
+		show_parameters,
+		use,
+		save,
+		autoexplore,
+		shoot,
+		load,
+		move_out,
+		max
+	};
 };
+
 
 enum class object_state_e
 { 
@@ -165,13 +172,7 @@ enum class object_state_e
 	dead,
 	on,
 	off,
-	equip,
-	growth_01,
-	growth_02,
-	growth_03,
-	growth_04,
-	growth_05,
-	growth_06
+	equip
 };
 
 enum class parameter_type_e
@@ -712,6 +713,10 @@ public:
 	virtual void from_json(iSerializable* object, scheme_map_t* value) = 0;
 	virtual std::u16string to_json(iSerializable* object) = 0;
 	virtual std::u16string get_type() = 0;
+	virtual bool is_singleton()
+	{
+		return false;
+	}
 
 };
 
@@ -729,7 +734,7 @@ public:
 	virtual Packer_generic& get_packer();
 };
 
-template<typename T> iSerializable* create_instance() { return new T; }
+template<typename T> iSerializable* create_instance(scheme_map_t* value) { return new T; }
 
 template<typename T>
 class Packer :public Packer_generic
@@ -772,6 +777,47 @@ public:
 
 };
 
+template<>
+class Packer<Action> :public Packer_generic
+{
+public:
+
+	static Packer& Instance()
+	{
+		static Packer self;
+		return self;
+	}
+
+	// delete copy and move constructors and assign operators
+	Packer(Packer const&) = delete;             // Copy construct
+	Packer(Packer &&) = delete;                  // Move construct
+	Packer& operator=(Packer const&) = delete;  // Copy assign
+	Packer& operator=(Packer &&) = delete;      // Move assign
+
+	std::u16string m_class_name;
+
+	std::u16string get_type() override
+	{
+		return m_class_name;
+	}
+
+	void from_json(iSerializable* object, scheme_map_t* value) override
+	{
+	}
+
+	std::u16string to_json(iSerializable* object) override;
+
+	bool is_singleton() override
+	{
+		return true;
+	}
+
+	Packer()
+	{
+	}
+
+};
+
 class Object_interaction : public virtual iSerializable
 {
 public:
@@ -799,7 +845,7 @@ public:
 
 };
 
-typedef iSerializable* (*instance_function_t)();
+typedef iSerializable* (*instance_function_t)(scheme_map_t*);
 
 class TileManager
 {
@@ -831,8 +877,11 @@ public:
 	static Dictonary<interaction_e> m_json_interaction_e;
 	static Dictonary<object_tag_e> m_json_object_tag;
 	static Dictonary<body_part_e> m_json_body_part_e;
+	static Dictonary<ai_type_e> m_json_ai_type_e;
 	static Dictonary<feature_list_type_e> m_json_feature_list_type_e;
 	static Dictonary<entity_e> m_json_entity_e;
+	static Dictonary<action_e::type> m_json_action_e;
+	static Dictonary<object_state_e> m_json_object_state_e;
 
 	static std::unordered_map<interaction_e, std::string> m_string_interaction_e;
 	static std::unordered_map<object_tag_e, std::string> m_string_object_tag_e;
@@ -880,6 +929,13 @@ public:
 	static void register_class(std::u16string class_name)
 	{
 		m_classes[class_name] = create_instance<T>;
+		Packer<T>::Instance().m_class_name = class_name;
+	}
+
+	template<typename T>
+	static void register_class(std::u16string class_name,instance_function_t function)
+	{
+		m_classes[class_name] = function;
 		Packer<T>::Instance().m_class_name = class_name;
 	}
 
@@ -1067,44 +1123,61 @@ public:
 
 	template<typename T> static std::u16string to_json(typename std::enable_if< !std::is_enum<T>::value && !std::is_pointer<T>::value && !is_list<T>::value && !is_map<T>::value && !is_pair<T>::value && !std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T >::type value);
 
-	template<typename T> static std::u16string to_json(typename std::enable_if<std::is_pointer<T>::value&&std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, iSerializable*>::type value)
+	template<typename T> static std::u16string to_json(typename std::enable_if<std::is_pointer<T>::value&&std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T>::type value)
 	{
 		if (value)
 		{
-			switch (value->m_serialization_index)
+			if (value->get_packer().is_singleton())
 			{
-			case 0:
-			{
-				m_object_index += 1;
-				value->m_serialization_index = m_object_index;
 				LOG(INFO) << UTF16_to_CP866(value->get_packer().get_type());
 				std::u16string result = value->get_packer().to_json(value);
 				if (result.empty())
 				{
-					std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type() + u"\",\"$link\":" + to_u16string(value->m_serialization_index) + u"}";
+					std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type() + u"\"}";
 					return out;
 				}
 				else
 				{
-					std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type() + u"\",\"$link\":" + to_u16string(value->m_serialization_index)+u"," + result + u"}";
+					std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type() + u"\"," + result + u"}";
 					return out;
 				}
-				break;
 			}
-			default:
+			else
 			{
-				std::u16string out = u"{\"$link\":" + to_u16string(value->m_serialization_index) + u"}";
-				return out;
+				switch (value->m_serialization_index)
+				{
+				case 0:
+				{
+					m_object_index += 1;
+					value->m_serialization_index = m_object_index;
+					LOG(INFO) << UTF16_to_CP866(value->get_packer().get_type());
+					std::u16string result = value->get_packer().to_json(value);
+					if (result.empty())
+					{
+						std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type() + u"\",\"$link_id\":" + to_u16string(value->m_serialization_index) + u"}";
+						return out;
+					}
+					else
+					{
+						std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type() + u"\",\"$link_id\":" + to_u16string(value->m_serialization_index) + u"," + result + u"}";
+						return out;
+					}
+					break;
+				}
+				default:
+				{
+					std::u16string out = u"{\"$link\":" + to_u16string(value->m_serialization_index) + u"}";
+					return out;
 
-				break;
-			}
+					break;
+				}
+				}
 			}
 		}
 		else
 		{
 			return u"null";
 		}
-		
 	}
 
 	template<typename T> static std::u16string to_json(typename std::enable_if<!std::is_pointer<T>::value&&std::is_base_of<iSerializable, T>::value, T>::type value)
@@ -1192,6 +1265,21 @@ public:
 	template<> static Dictonary<entity_e>& get_dictonary<entity_e>()
 	{
 		return m_json_entity_e;
+	}
+
+	template<> static Dictonary<ai_type_e>& get_dictonary<ai_type_e>()
+	{
+		return m_json_ai_type_e;
+	}
+
+	template<> static Dictonary<action_e::type>& get_dictonary<action_e::type>()
+	{
+		return m_json_action_e;
+	}
+
+	template<> static Dictonary<object_state_e>& get_dictonary<object_state_e>()
+	{
+		return m_json_object_state_e;
 	}
 
 	template<typename T> static inline typename std::enable_if<std::is_enum<T>::value, T>::type from_json(const std::u16string value) {

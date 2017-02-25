@@ -94,14 +94,14 @@ void Action_wrapper::reset_serialization_index()
 	m_serialization_index = 0;
 	if (m_action)
 	{
-		if (m_action->m_serialization_index > 1)
+		if (m_action->m_serialization_index > 0)
 		{
 			m_action->reset_serialization_index();
 		}
 	}
 	if (m_parameter)
 	{
-		if (m_parameter->m_serialization_index > 1)
+		if (m_parameter->m_serialization_index > 0)
 		{
 			m_parameter->reset_serialization_index();
 		}

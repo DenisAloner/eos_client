@@ -113,6 +113,15 @@ public:
 	virtual void save();
 	virtual void load();
 
+	Packer_generic& get_packer() override
+	{
+		return Packer<Vision_list>::Instance();
+	}
+
+	constexpr static auto properties() {
+		return Interaction_list::properties();
+	}
+
 private:
 	void update_list(Object_interaction* list);
 };
@@ -163,7 +172,9 @@ public:
 		return Packer<Tag_list>::Instance();
 	}
 
-	constexpr static auto properties() { return std::make_tuple(make_property(&Tag_list::m_items, u"items")); }
+	constexpr static auto properties() {
+		return Interaction_list::properties();
+	}
 
 private:
 	
@@ -198,7 +209,7 @@ public:
 	}
 
 	constexpr static auto properties() {
-		return std::make_tuple(make_property(&Parts_list::m_items, u"items"));;
+		return Interaction_list::properties();
 	}
 
 private:
@@ -225,6 +236,15 @@ public:
 
 	virtual void save();
 	virtual void load();
+
+	Packer_generic& get_packer() override
+	{
+		return Packer<Action_list>::Instance();
+	}
+
+	constexpr static auto properties() {
+		return Interaction_list::properties();
+	}
 };
 
 class Slot_set_state: public Object_interaction
@@ -425,6 +445,11 @@ public:
 	virtual std::string get_description();
 	virtual Object_tag* clone() = 0;
 	virtual bool on_turn();
+
+	constexpr static auto properties()
+	{
+		return std::make_tuple(make_property(&Object_tag::m_type, u"type"));
+	}
 };
 
 namespace ObjectTag
@@ -503,7 +528,7 @@ namespace ObjectTag
 			return Packer<Label>::Instance();
 		}
 
-		constexpr static auto properties() { return std::make_tuple(make_property(&Label::m_type, u"type")); }
+		constexpr static auto properties() { return Object_tag::properties(); }
 	};
 
 	class Equippable : public Object_tag

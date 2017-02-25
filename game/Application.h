@@ -105,7 +105,7 @@ public:
 	GraphicalController* m_graph;
 	ActionManager* m_action_manager;
 
-	Action* m_actions[c_action_size];
+	Action* m_actions[action_e::max-1];
 
 	AI_manager* m_ai_manager;
 	

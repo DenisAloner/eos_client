@@ -154,7 +154,7 @@ void Parameter_argument_t::reset_serialization_index()
 	{
 		if (m_object)
 		{
-			if (m_object->m_serialization_index > 1)
+			if (m_object->m_serialization_index > 0)
 			{
 				m_object->reset_serialization_index();
 			}
@@ -165,7 +165,7 @@ void Parameter_argument_t::reset_serialization_index()
 	{
 		if (m_owner)
 		{
-			if (m_owner->m_serialization_index > 1)
+			if (m_owner->m_serialization_index > 0)
 			{
 				m_owner->reset_serialization_index();
 			}
@@ -176,7 +176,7 @@ void Parameter_argument_t::reset_serialization_index()
 	{
 		if (m_cell)
 		{
-			if (m_cell->m_serialization_index > 1)
+			if (m_cell->m_serialization_index > 0)
 			{
 				m_cell->reset_serialization_index();
 			}
@@ -187,7 +187,7 @@ void Parameter_argument_t::reset_serialization_index()
 	{
 		if (m_owner)
 		{
-			if (m_owner->m_serialization_index > 1)
+			if (m_owner->m_serialization_index > 0)
 			{
 				m_owner->reset_serialization_index();
 			}
@@ -198,7 +198,7 @@ void Parameter_argument_t::reset_serialization_index()
 	{
 		if (m_part)
 		{
-			if (m_part->m_serialization_index > 1)
+			if (m_part->m_serialization_index > 0)
 			{
 				m_part->reset_serialization_index();
 			}

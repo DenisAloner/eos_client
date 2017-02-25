@@ -80,7 +80,7 @@ public:
 	void add_object(GameObject* Object);
 	//virtual Object_feature* find_property(property_e kind, GameObject* excluded);
 
-	virtual void reset_serialization_index() { m_serialization_index = 1; };
+	virtual void reset_serialization_index() { m_serialization_index = 0; };
 	virtual void save();
 	virtual void load();
 };
@@ -165,8 +165,10 @@ public:
 
 	constexpr static auto properties() {
 		return make_union(std::make_tuple(
-			make_property(&Object_state::m_layer, u"layer"),
+			make_property(&Object_state::m_state, u"state"),
 			make_property(&Object_state::m_size, u"size"),
+			make_property(&Object_state::m_layer, u"layer"),
+			make_property(&Object_state::m_ai, u"AI"),
 			make_property(&Object_state::m_tile_manager, u"tile_manager"),
 			make_property(&Object_state::m_icon, u"icon"),
 			make_property(&Object_state::m_light, u"light"),

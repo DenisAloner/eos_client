@@ -193,7 +193,7 @@ void Application::initialize(dimension_t work_area_size)
 	m_actions[action_e::load] = new Action_load();
 	m_actions[action_e::move_out] = new Action_move_out();
 
-	for (size_t i = 0; i < c_action_size; i++)
+	for (size_t i = 1; i < action_e::max; i++)
 	{
 		m_actions[i]->m_index = i;
 	}

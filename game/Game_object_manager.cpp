@@ -2,31 +2,11 @@
 #include "game\impact\Impact_random_value.h"
 #include "game\impact\Impact_copy_chance.h"
 
-ai_type_e GameObjectManager::get_ai_type_e(const std::string& key)
-{
-	auto value = m_to_ai_type_e.find(key);
-	if (value == m_to_ai_type_e.end())
-	{
-		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
-	}
-	return value->second;
-}
-
 effect_e GameObjectManager::get_effect_e(const std::string& key)
 {
 	auto value = m_to_effect_e.find(key);
 	if (value == m_to_effect_e.end())
 	{ 
-		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
-	}
-	return value->second;
-}
-
-object_state_e GameObjectManager::get_object_state_e(const std::string& key)
-{
-	auto value = m_to_object_state_e.find(key);
-	if (value == m_to_object_state_e.end())
-	{
 		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
 	}
 	return value->second;
@@ -82,7 +62,7 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	case command_e::state:
 	{  
-		object_state_e state = get_object_state_e(arg[0]);
+		object_state_e state = Parser::m_json_object_state_e.get_enum(arg[0]);
 		switch (state)
 		{
 		case object_state_e::equip:
@@ -108,7 +88,7 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	case command_e::ai:
 	{
-		ai_type_e type = get_ai_type_e(arg[0]);
+		ai_type_e type = Parser::m_json_ai_type_e.get_enum(arg[0]);
 		switch (type)
 		{
 		case ai_type_e::trap:
@@ -183,7 +163,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::mem_slot_set_state:
 	{
 		Slot_set_state* item = new Slot_set_state();
-		item->m_value = get_object_state_e(arg[0]);
+		item->m_value = Parser::m_json_object_state_e.get_enum(arg[0]);
 		m_slot = item;
 		break;
 	}
@@ -282,7 +262,7 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	case command_e::list:
 	{
-		feature_list_type_e list_type = get_feature_list_type_e(arg[1]);
+		feature_list_type_e list_type = Parser::m_json_feature_list_type_e.get_enum(arg[1]);
 		Interaction_list* list;
 
 		if (arg[0][0] == 'y')
@@ -366,7 +346,7 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	case command_e::action:
 	{
-		action_e action = get_action_e(arg[0]);
+		action_e::type action = Parser::m_json_action_e.get_enum(arg[0]);
 		Action* item = Application::instance().m_actions[action];
 		m_stack_list.front()->add(item);
 		break;
@@ -515,6 +495,11 @@ void GameObjectManager::parser(const std::string& command)
 	}
 }
 
+iSerializable* get_serializable(scheme_map_t* value)
+{
+	return Application::instance().m_actions[Parser::m_json_action_e.get_enum(Parser::UTF16_to_CP866((*value)[u"type"]))];
+}
+
 void GameObjectManager::init()
 {
 	m_commands["object"] = command_e::obj;
@@ -558,18 +543,6 @@ void GameObjectManager::init()
 	m_commands["instruction_get_owner"] = command_e::instruction_get_owner;
 	m_commands["instruction_check_owner_type"] = command_e::instruction_check_owner_type;
 
-	m_to_object_state_e["alive"] = object_state_e::alive;
-	m_to_object_state_e["dead"] = object_state_e::dead;
-	m_to_object_state_e["on"] = object_state_e::on;
-	m_to_object_state_e["off"] = object_state_e::off;
-	m_to_object_state_e["equip"] = object_state_e::equip;
-	m_to_object_state_e["growth_01"] = object_state_e::growth_01;
-	m_to_object_state_e["growth_02"] = object_state_e::growth_02;
-	m_to_object_state_e["growth_03"] = object_state_e::growth_03;
-	m_to_object_state_e["growth_04"] = object_state_e::growth_04;
-	m_to_object_state_e["growth_05"] = object_state_e::growth_05;
-	m_to_object_state_e["growth_06"] = object_state_e::growth_06;
-
 	m_to_effect_e["value"] = effect_e::value;
 	m_to_effect_e["limit"] = effect_e::limit;
 	m_to_effect_e["start_angle"] = effect_e::start_angle;
@@ -587,30 +560,6 @@ void GameObjectManager::init()
 	m_to_effect_prefix_e["physical_damage"] = effect_prefix_e::physical_damage;
 	m_to_effect_prefix_e["poison_damage"] = effect_prefix_e::poison_damage;
 
-	m_to_action_e["equip"] = action_e::equip;
-	m_to_action_e["hit"] = action_e::hit;
-	m_to_action_e["hit_melee"] = action_e::hit_melee;
-	m_to_action_e["move"] = action_e::move;
-	m_to_action_e["move_step"] = action_e::move_step;
-	m_to_action_e["open"] = action_e::open;
-	m_to_action_e["pick"] = action_e::pick;
-	m_to_action_e["push"] = action_e::push;
-	m_to_action_e["set_motion_path"] = action_e::set_motion_path;
-	m_to_action_e["turn"] = action_e::turn;
-	m_to_action_e["use"] = action_e::use;
-	m_to_action_e["shoot"] = action_e::shoot;
-
-	m_to_feature_list_type_e["action"] = feature_list_type_e::action;
-	m_to_feature_list_type_e["tag"] = feature_list_type_e::tag;
-	m_to_feature_list_type_e["generic"] = feature_list_type_e::generic;
-	m_to_feature_list_type_e["parameter"] = feature_list_type_e::parameter;
-	m_to_feature_list_type_e["parts"] = feature_list_type_e::parts;
-	m_to_feature_list_type_e["vision"] = feature_list_type_e::vision;
-	m_to_feature_list_type_e["vision_component"] = feature_list_type_e::vision_component;
-
-	m_to_ai_type_e["non_humanoid"] = ai_type_e::non_humanoid;
-	m_to_ai_type_e["trap"] = ai_type_e::trap;
-
 	Parser::register_class<GameObject>(u"game_object");
 	Parser::register_class<Inventory_cell>(u"inventory_cell");
 	Parser::register_class<Object_part>(u"object_part");
@@ -618,13 +567,19 @@ void GameObjectManager::init()
 	Parser::register_class<Object_state>(u"object_state");
 	Parser::register_class<Object_state_equip>(u"object_state_equip");
 	Parser::register_class<Interaction_list>(u"interaction_list");
+	Parser::register_class<Parameter_list>(u"parameter_list");
+	Parser::register_class<Vision_list>(u"vision_list");
+	Parser::register_class<Vision_component>(u"vision_component");
 	Parser::register_class<Tag_list>(u"tag_list");
 	Parser::register_class<Parts_list>(u"parts_list");
+	Parser::register_class<Action_list>(u"action_list");
 	Parser::register_class<Instruction_slot_link>(u"interaction_slot_link");
 	Parser::register_class<ObjectTag::Label>(u"label");
 	Parser::register_class<ObjectTag::Equippable>(u"equippable");
 	Parser::register_class<ObjectTag::Requirements_to_object>(u"requirements_to_object");
 	Parser::register_class<Instruction_check_part_type>(u"instruction_check_part_type");
+	Parser::register_class<AI_enemy>(u"ai_enemy");
+	Parser::register_class<Action>(u"action", &get_serializable);
 	
 
 	bytearray json;
@@ -720,26 +675,6 @@ effect_prefix_e GameObjectManager::get_effect_prefix_e(const std::string& key)
 {
 	auto value = m_to_effect_prefix_e.find(key);
 	if (value == m_to_effect_prefix_e.end())
-	{
-		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
-	}
-	return value->second;
-}
-
-action_e GameObjectManager::get_action_e(const std::string& key)
-{
-	auto value = m_to_action_e.find(key);
-	if (value == m_to_action_e.end())
-	{
-		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
-	}
-	return value->second;
-}
-
-feature_list_type_e GameObjectManager::get_feature_list_type_e(const std::string& key)
-{
-	auto value = m_to_feature_list_type_e.find(key);
-	if (value == m_to_feature_list_type_e.end())
 	{
 		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
 	}

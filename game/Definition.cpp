@@ -15,6 +15,11 @@ object_direction_e operator+(object_direction_e lhs, const rotate_direction_e& r
 Packer_generic& iSerializable::get_packer()
 {
 	return Packer<Object_interaction>::Instance();
+}
+
+std::u16string Packer<Action>::to_json(iSerializable* object)
+{
+	return object_to_json<Action>(dynamic_cast<Action*>(object));
 };
 
 std::map<std::u16string, instance_function_t> Parser::m_classes = {};
@@ -45,6 +50,11 @@ Dictonary<body_part_e> Parser::m_json_body_part_e = {
 	{ body_part_e::foot,"foot" },
 	{ body_part_e::waist,"waist" },
 	{ body_part_e::container,"container" }
+};
+
+Dictonary<ai_type_e> Parser::m_json_ai_type_e = {
+	{ ai_type_e::non_humanoid,"non_humanoid" },
+	{ ai_type_e::trap,"trap" }
 };
 
 Dictonary<interaction_e> Parser::m_json_interaction_e = {
@@ -89,6 +99,36 @@ Dictonary<entity_e> Parser::m_json_entity_e = {
 	{ entity_e::game_object,"gameobject" },
 	{ entity_e::body_part,"object_part" },
 	{ entity_e::cell,"cell" }
+};
+
+Dictonary<action_e::type> Parser::m_json_action_e = {
+	{action_e::move,"move"},
+	{action_e::move_step,"move_step"},
+	{action_e::push,"push"},
+	{action_e::turn,"turn"},
+	{action_e::open_inventory,"open_inventory"},
+	{action_e::cell_info,"cell_info"},
+	{action_e::set_motion_path,"set_motion_path"},
+	{action_e::pick,"pick"},
+	{action_e::open,"open"},
+	{action_e::hit,"hit"},
+	{action_e::hit_melee,"hit_melee"},
+	{action_e::equip,"equip"},
+	{action_e::show_parameters,"how_parameters"},
+	{action_e::use,"use"},
+	{action_e::save,"save"},
+	{action_e::autoexplore,"autoexplore"},
+	{action_e::shoot,"shoot"},
+	{action_e::load,"load"},
+	{action_e::move_out,"move_out" }
+};
+
+Dictonary<object_state_e> Parser::m_json_object_state_e = {
+	{ object_state_e::alive,"alive" },
+	{ object_state_e::dead, "dead" },
+	{ object_state_e::on, "on" },
+	{ object_state_e::off, "off" },
+	{ object_state_e::equip, "equip" }
 };
 
 std::unordered_map<interaction_e, std::string>  Parser::m_string_interaction_e = {
@@ -162,7 +202,7 @@ iSerializable* Parser::deserialize_object(std::u16string& value)
 		print_u16string(u"Значение");
 		print_u16string(element.second);
 		}*/
-		iSerializable* result = m_classes[get_value((*s)[u"$type"])]();
+		iSerializable* result = m_classes[get_value((*s)[u"$type"])](s);
 		result->get_packer().from_json(result, s);
 		delete s;
 		return result;
@@ -685,19 +725,17 @@ template <> std::u16string Parser::to_json<TileManager&>(TileManager& value)
 	return out;
 }
 
-//template<> predicat_t& Parser::from_json<predicat_t&>(const std::u16string value)
-//{
-//	int result = to_int(value);
-//	return *Application::instance().m_ai_manager->m_fov_qualifiers[result];
-//}
-//
-//template <> std::u16string Parser::to_json<predicat_t&>(predicat_t& value)
-//{
-//	std::u16string out = to_u16string(value.index);
-//	return out;
-//}
+template<> predicat_t& Parser::from_json<predicat_t&>(const std::u16string value)
+{
+	int result = to_int(value);
+	return *Application::instance().m_ai_manager->m_fov_qualifiers[result];
+}
 
-
+template <> std::u16string Parser::to_json<predicat_t&>(predicat_t& value)
+{
+	std::u16string out = to_u16string(value.index);
+	return out;
+}
 
 template<> std::size_t Parser::from_json<std::size_t>(const std::u16string value)
 {
@@ -763,3 +801,16 @@ template<> std::u16string Parser::to_json<AI_FOV>(AI_FOV value)
 	std::u16string result = u"[" + to_json<int>(value.radius) + u"," + to_json<int>(value.qualifier->index) + u"," + to_json<int>(value.start_angle) + u"," + to_json<int>(value.end_angle) + u"]";
 	return result;
 }
+
+//template<> Action* Parser::from_json<Action*>(const std::u16string value)
+//{
+//	int result = to_int(value);
+//	return Application::instance().m_actions[result];
+//}
+//
+//template <> std::u16string Parser::to_json<Action*>(Action* value)
+//{
+//	LOG(INFO) << "ACTION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+//	std::u16string out = to_u16string(value->m_index);
+//	return out;
+//}

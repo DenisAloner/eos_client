@@ -766,7 +766,7 @@ void AI_enemy::reset_serialization_index()
 	m_serialization_index = 0;
 	if (m_action_controller)
 	{
-		if (m_action_controller->m_serialization_index > 1)
+		if (m_action_controller->m_serialization_index > 0)
 		{
 			m_action_controller->reset_serialization_index();
 		}
