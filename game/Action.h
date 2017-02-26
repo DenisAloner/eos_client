@@ -56,7 +56,7 @@ public:
 
 	constexpr static auto properties() {
 		return std::make_tuple(
-			make_property(&Action::m_kind, u"type")
+			make_property(&Action::m_kind, u"value")
 		);
 	}
 

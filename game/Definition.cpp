@@ -190,26 +190,6 @@ Parser::~Parser()
 {
 }
 
-iSerializable* Parser::deserialize_object(std::u16string& value)
-{
-	scheme_map_t* s = read_object(value);
-	if (s)
-	{
-		/*for (auto element : (*s))
-		{
-		print_u16string(u"Ёлемент");
-		print_u16string(element.first);
-		print_u16string(u"«начение");
-		print_u16string(element.second);
-		}*/
-		iSerializable* result = m_classes[get_value((*s)[u"$type"])](s);
-		result->get_packer().from_json(result, s);
-		delete s;
-		return result;
-	}
-	return nullptr;
-}
-
 std::u16string Parser::serialize_object(iSerializable* value)
 {
 	if (value)
@@ -543,6 +523,11 @@ scheme_vector_t* Parser::parse_pair(std::u16string& value)
 	return result;
 }
 
+bool isalpha(char16_t symbol)
+{
+	return (symbol > 0x3F && symbol < 0x5B) || (symbol > 0x61 && symbol < 0x7B);
+}
+
 std::u16string Parser::get_value(const std::u16string& value)
 {
 	std::size_t start_pos = value.find(u'"');
@@ -551,8 +536,34 @@ std::u16string Parser::get_value(const std::u16string& value)
 		std::size_t end_pos = value.find(u'"', start_pos + 1);
 		if (end_pos != std::string::npos)
 		{
-			return value.substr(start_pos + 1, end_pos - start_pos - 1);
+			std::u16string* result = new std::u16string(value.substr(start_pos + 1, end_pos - start_pos - 1));
+			return *result;
 		}
+	}
+	const char16_t* opening_symbol = nullptr;
+	for (std::size_t i = 0; i < value.size(); ++i)
+	{
+		LOG(INFO) <<std::to_string(isalpha(value[i]));
+		if (isalpha(value[i]))
+		{
+			if (opening_symbol == nullptr)
+			{
+				opening_symbol = &value[i];
+			}
+		}
+		else
+		{
+			if (opening_symbol != nullptr)
+			{
+				break;
+			}
+		}
+
+	}
+	if (opening_symbol != nullptr)
+	{
+		std::u16string out(opening_symbol, &value[value.size() - 1] - opening_symbol + 1);
+		return out;
 	}
 	return u"";
 }
@@ -752,7 +763,8 @@ template <> std::u16string Parser::to_json<std::size_t>(std::size_t value)
 template<> light_t& Parser::from_json<light_t&>(const std::u16string value) {
 	std::u16string temp = value;
 	scheme_vector_t* s = read_pair(temp);
-	return light_t(from_json<int>((*s)[0]), from_json<int>((*s)[1]), from_json<int>((*s)[2]));
+	light_t* out = new light_t(from_json<int>((*s)[0]), from_json<int>((*s)[1]), from_json<int>((*s)[2]));
+	return *out;
 }
 
 template<> std::u16string Parser::to_json<light_t&>(light_t& value)
@@ -763,7 +775,9 @@ template<> std::u16string Parser::to_json<light_t&>(light_t& value)
 
 template<> float Parser::from_json<float>(const std::u16string value)
 {
+	LOG(INFO) << UTF16_to_CP866(value);
 	float result = to_float(value);
+	LOG(INFO) << std::to_string(result);
 	return result;
 }
 
@@ -776,7 +790,8 @@ template <> std::u16string Parser::to_json<float>(float value)
 template<> optical_properties_t& Parser::from_json<optical_properties_t&>(const std::u16string value) {
 	std::u16string temp = value;
 	scheme_vector_t* s = read_pair(temp);
-	return optical_properties_t(RGB_t(from_json<float>((*s)[0]), from_json<float>((*s)[1]), from_json<float>((*s)[2])));
+	optical_properties_t* out=new optical_properties_t(RGB_t(from_json<float>((*s)[0]), from_json<float>((*s)[1]), from_json<float>((*s)[2])));
+	return *out;
 }
 
 template<> std::u16string Parser::to_json<optical_properties_t&>(optical_properties_t& value)

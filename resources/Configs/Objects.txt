@@ -74,28 +74,11 @@ pop_list
 pop_list
 pop_map
 
-object wall
-state alive
-size 1,1,5
-optical 0.0,0.0,0.0
-tile_manager 2
-layer 2
-
 object dirt
 state alive
 size 1,1,0
 tile_manager 3
 layer 2
-
-object floor
-state alive
-size 1,1,0
-tile_manager 6
-list yy,tag,tag
-tag yy,pass_able
-tag yy,seethrough_able
-pop_list
-layer 0
 
 object torch
 state alive
@@ -236,12 +219,3 @@ slot_to_list
 pop_list
 pop_list
 pop_map
-
-object fountain
-state alive
-size 6,6,4
-optical 0.4,0.4,0.4
-tile_manager 29
-list yy,tag,tag
-tag yy,seethrough_able
-pop_list

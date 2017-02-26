@@ -119,6 +119,21 @@ public:
 	virtual void save();
 	virtual void load();
 
+	std::map<std::string, Object_interaction*> m_templates;
+	std::map<std::string, GameObject*> m_json_items;
+
+	Packer_generic& get_packer() override
+	{
+		return Packer<GameObjectManager>::Instance();
+	}
+
+	constexpr static auto properties() {
+		return std::make_tuple(
+			make_property(&GameObjectManager::m_templates, u"templates"),
+			make_property(&GameObjectManager::m_json_items, u"json_items")
+		);
+	}
+
 private:
 	std::list<Game_object_owner*> m_game_object_owner_stack;
 };

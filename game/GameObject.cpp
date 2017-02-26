@@ -206,7 +206,7 @@ Object_state* Object_state::clone()
 	else state->m_ai = nullptr;
 	if (m_optical)
 	{
-		state->m_optical = new optical_properties_t(*m_optical);
+		state->m_optical = new optical_properties_t{ *m_optical };
 	}
 	if (m_visibility)
 	{

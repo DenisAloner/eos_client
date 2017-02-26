@@ -497,7 +497,7 @@ void GameObjectManager::parser(const std::string& command)
 
 iSerializable* get_serializable(scheme_map_t* value)
 {
-	return Application::instance().m_actions[Parser::m_json_action_e.get_enum(Parser::UTF16_to_CP866((*value)[u"type"]))];
+	return Application::instance().m_actions[Parser::m_json_action_e.get_enum(Parser::UTF16_to_CP866((*value)[u"value"]))];
 }
 
 void GameObjectManager::init()
@@ -578,6 +578,7 @@ void GameObjectManager::init()
 	Parser::register_class<ObjectTag::Equippable>(u"equippable");
 	Parser::register_class<ObjectTag::Requirements_to_object>(u"requirements_to_object");
 	Parser::register_class<Instruction_check_part_type>(u"instruction_check_part_type");
+	Parser::register_class<GameObjectManager>(u"game_object_manager");
 	Parser::register_class<AI_enemy>(u"ai_enemy");
 	Parser::register_class<Action>(u"action", &get_serializable);
 	
@@ -586,8 +587,13 @@ void GameObjectManager::init()
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.json", json);
 	std::u16string json_config(json);
 
-	/*GameObject* test = dynamic_cast<GameObject*>(Parser::deserialize_object(json_config));
-	LOG(INFO) << test->m_name;*/
+
+	std::u16string temp(json_config);
+	scheme_map_t* s = Parser::read_object(temp);
+	object_from_json<GameObjectManager>(this, s);
+	delete s;
+
+	m_items.insert(m_json_items.begin(), m_json_items.end());
 
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);
@@ -633,6 +639,7 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 	}
 	obj->m_active_state = obj->m_state.front();
 	//register_object(obj);
+	obj->set_direction(obj->m_direction);
 	bind_body(obj);
 	obj->update_interaction();
 	Application::instance().m_world->m_object_manager.m_items.push_back(obj);

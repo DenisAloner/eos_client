@@ -245,10 +245,6 @@ void Application::new_game()
 	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
 
 	
-	obj->reset_serialization_index();
-	std::string json = Parser::UTF16_to_CP866(Parser::to_json<GameObject*>(obj));
-	LOG(INFO) << json;
-
 	m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player, map, m_action_manager, m_game_log);
 
 	GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
@@ -309,6 +305,9 @@ void Application::new_game()
 			obj->set_direction(object_direction_e::top);
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry + 10][rx + 2]);
 
+			/*obj->reset_serialization_index();
+			std::string json = Parser::UTF16_to_CP866(Parser::to_json<GameObject*>(obj));
+			LOG(INFO) << json;*/
 
 			/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
 			fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), obj);

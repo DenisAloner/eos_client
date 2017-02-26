@@ -665,6 +665,7 @@ template<std::size_t iteration, typename T>
 void property_from_json(T* object, scheme_map_t& data) {
 	constexpr auto property = std::get<iteration>(T::properties());
 	using Type = typename decltype(property)::Type;
+	LOG(INFO) << Parser::UTF16_to_CP866(property.name);
 	*object.*(property.member) = Parser::from_json<Type>(data[property.name]);
 }
 
@@ -734,7 +735,12 @@ public:
 	virtual Packer_generic& get_packer();
 };
 
-template<typename T> iSerializable* create_instance(scheme_map_t* value) { return new T; }
+template<typename T> iSerializable* create_instance(scheme_map_t* value)
+{
+	T* out = new T;
+	out->get_packer().from_json(out, value);
+	return out;
+}
 
 template<typename T>
 class Packer :public Packer_generic
@@ -908,7 +914,6 @@ public:
 	Parser();
 	~Parser();
 
-	static iSerializable* deserialize_object(std::u16string& value);
 	static std::u16string serialize_object(iSerializable* value);
 	static scheme_map_t* read_object(std::u16string& value);
 	static scheme_list_t* read_array(std::u16string& value);
@@ -1003,19 +1008,22 @@ public:
 		T map;
 		std::u16string temp = value;
 		scheme_list_t* s = read_array(temp);
-
-		for (auto element : (*s))
+		if(s)
 		{
-			Value v = from_json<Value>(element);
-			map.insert(v);
+			for (auto element : (*s))
+			{
+				Value v = from_json<Value>(element);
+				map.insert(v);
+			}
 		}
 		return map;
 	};
 
-	template<typename T> static typename std::enable_if<!std::is_enum<T>::value && !std::is_pointer<T>::value && !is_pair<T>::value && !is_list<T>::value && !is_map<T>::value && (!std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value), T >::type from_json(const std::u16string value);
+	template<typename T> static typename std::enable_if<!std::is_enum<T>::value && !std::is_pointer<T>::value && !is_pair<T>::value && !is_list<T>::value && !is_map<T>::value && !std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T >::type from_json(const std::u16string value);
 
-	template<typename T> static typename std::enable_if< std::is_pointer<T>::value && !is_pair<T>::value && !is_list<T>::value && !is_map<T>::value && (!std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value), T >::type from_json(const std::u16string value)
+	template<typename T> static typename std::enable_if< std::is_pointer<T>::value && !is_pair<T>::value && !is_list<T>::value && !is_map<T>::value && !std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T >::type from_json(const std::u16string value)
 	{
+		LOG(INFO) << Parser::UTF16_to_CP866(get_value(value));
 		if (get_value(value)==u"null")
 		{
 			return nullptr;
@@ -1030,7 +1038,15 @@ public:
 	template<typename T> static typename std::enable_if<std::is_pointer<T>::value&&std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T>::type from_json(const std::u16string value)
 	{
 		std::u16string temp(value);
-		return dynamic_cast<T>(deserialize_object(temp));
+		scheme_map_t* s = read_object(temp);
+		if (s)
+		{
+			iSerializable* result = m_classes[get_value((*s)[u"$type"])](s);
+			LOG(INFO) << UTF16_to_CP866(result->get_packer().get_type());
+			delete s;
+			return dynamic_cast<T>(result);
+		}
+		return nullptr;
 	};
 
 	template<typename T> static typename std::enable_if<!std::is_pointer<T>::value&&std::is_base_of<iSerializable, T>::value, T>::type from_json(const std::u16string value)
@@ -1166,7 +1182,7 @@ public:
 				}
 				default:
 				{
-					std::u16string out = u"{\"$link\":" + to_u16string(value->m_serialization_index) + u"}";
+					std::u16string out = u"{\"$type\":\"link\",\"value\":" + to_u16string(value->m_serialization_index) + u"}";
 					return out;
 
 					break;
