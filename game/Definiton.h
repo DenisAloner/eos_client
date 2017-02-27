@@ -141,7 +141,7 @@ class action_e
 public:
 	enum type
 	{
-		none,
+		none=-1,
 		move,
 		move_step,
 		push,
@@ -892,25 +892,6 @@ public:
 	static std::unordered_map<interaction_e, std::string> m_string_interaction_e;
 	static std::unordered_map<object_tag_e, std::string> m_string_object_tag_e;
 
-	class Templates: public iSerializable
-	{
-	public:
-
-		std::unordered_map< std::string, Object_interaction*> m_items;
-		
-		Packer_generic& get_packer() override
-		{
-			return Packer<Templates>::Instance();
-		}
-
-		constexpr static auto properties() {
-			return std::make_tuple(
-				make_property(&Templates::m_items, u"item")
-			);
-		}
-	};
-	
-
 	Parser();
 	~Parser();
 
@@ -929,6 +910,8 @@ public:
 	static float to_float(const std::u16string& value);
 	static std::string UTF16_to_CP866(std::u16string const& value);
 	static std::u16string CP866_to_UTF16(std::string const& value);
+	static void register_class(std::u16string class_name, instance_function_t function);
+
 
 	template<typename T>
 	static void register_class(std::u16string class_name)
@@ -979,12 +962,16 @@ public:
 		using Value = typename T::value_type;
 		T list;
 		std::u16string temp = value;
+		LOG(INFO) << UTF16_to_CP866(temp);
 		scheme_list_t* s = read_array(temp);
-
-		for (auto element : (*s))
+		LOG(INFO) << std::to_string(s==nullptr);
+		if (s)
 		{
-			Value v = from_json<Value>(element);
-			list.push_back(v);
+			for (auto element : (*s))
+			{
+				Value v = from_json<Value>(element);
+				list.push_back(v);
+			}
 		}
 		return list;
 	};

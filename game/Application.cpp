@@ -193,7 +193,7 @@ void Application::initialize(dimension_t work_area_size)
 	m_actions[action_e::load] = new Action_load();
 	m_actions[action_e::move_out] = new Action_move_out();
 
-	for (size_t i = 1; i < action_e::max; i++)
+	for (size_t i = 0; i < action_e::max; i++)
 	{
 		m_actions[i]->m_index = i;
 	}
@@ -301,14 +301,13 @@ void Application::new_game()
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx + 2]);
 
 			
-			obj = m_game_object_manager->new_object("fountain");
+			obj = m_game_object_manager->new_object("bag");
 			obj->set_direction(object_direction_e::top);
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry + 10][rx + 2]);
 
-			/*obj->reset_serialization_index();
+			obj->reset_serialization_index();
 			std::string json = Parser::UTF16_to_CP866(Parser::to_json<GameObject*>(obj));
-			LOG(INFO) << json;*/
-
+	
 			/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
 			fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), obj);
 			MiniMap->add(fov);*/

@@ -74,21 +74,6 @@ pop_list
 pop_list
 pop_map
 
-object dirt
-state alive
-size 1,1,0
-tile_manager 3
-layer 2
-
-object torch
-state alive
-size 1,1,4
-tile_manager 7
-light 100,100,100
-list yy,tag,tag
-tag yy,seethrough_able
-pop_list
-
 object human
 state alive
 ai non_humanoid,0
@@ -191,30 +176,6 @@ part nny,container,пояс
 mem_instruction_slot_link body
 tag yn,equippable
 instruction_check_part_type waist
-slot_to_list
-pop_list
-pop_list
-pop_map
-
-object bag
-state equip,finger
-size 1,1,1
-icon 7
-tile_manager 27
-list yy,tag,tag
-tag yn,pick_able
-tag yn,pass_able
-tag yn,seethrough_able
-list ny,generic,body
-template_part cell_for_ring
-pop_map
-template_part cell_for_ring
-pop_map
-list_to_slot
-pop_list
-mem_instruction_slot_link body
-tag yn,equippable
-instruction_check_part_type container
 slot_to_list
 pop_list
 pop_list

@@ -61,6 +61,34 @@ void GUI_Part_slot::on_mouse_down(MouseEventArgs const& e)
 	}
 }
 
+//void GUI_Container_visitor::visit(Object_interaction& value)
+//{
+//	if (value.m_interaction_message_type == interaction_message_type_e::part)
+//	{
+//
+//		Object_part& part = dynamic_cast<Object_part&>(value);
+//		LOG(INFO) << "parts: " << part.m_name;
+//		m_owner_name.push_front(&part.m_name);
+//		std::string name = "";
+//		for (auto i = m_owner_name.begin(); i != m_owner_name.end(); i++)
+//		{
+//			if (name == "")
+//			{
+//				name += *(*i);
+//			}
+//			else
+//			{
+//				name += " < " + *(*i);
+//			}
+//		}
+//		std::size_t s = Application::instance().m_graph->measure_text_width(name);
+//		if (s > m_owner->m_max_item_name) { m_owner->m_max_item_name = s; }
+//		GUI_Part_slot* gui_item = new GUI_Part_slot(0, 64, &part, m_owner);
+//		gui_item->m_name = name;
+//		m_owner->add_item_control(gui_item);
+//	}
+//}
+
 //void GUI_body_cell::add_item_control(GUI_Object* object)
 //{
 //	if (!m_items.empty())
@@ -129,9 +157,9 @@ void GUI_Body::get_part_predicat(Object_interaction* object,bool add_mode)
 		if (object->m_interaction_message_type == interaction_message_type_e::part)
 		{
 			
-			Object_part* part = dynamic_cast<Object_part*>(object);
-			LOG(INFO) << "parts: " << part->m_name;
-			m_owner_name.push_front(&part->m_name);
+			Object_part& part = *dynamic_cast<Object_part*>(object);
+			LOG(INFO) << "parts: " << part.m_name;
+			m_owner_name.push_front(&part.m_name);
 			std::string name = "";
 			for (auto i = m_owner_name.begin(); i != m_owner_name.end(); i++)
 			{
@@ -146,7 +174,7 @@ void GUI_Body::get_part_predicat(Object_interaction* object,bool add_mode)
 			}
 			std::size_t s = Application::instance().m_graph->measure_text_width(name);
 			if (s > m_max_item_name) { m_max_item_name = s; }
-			GUI_Part_slot* gui_item = new GUI_Part_slot(0, 64, part, this);
+			GUI_Part_slot* gui_item = new GUI_Part_slot(0, 64, &part, this);
 			gui_item->m_name = name;
 			add_item_control(gui_item);
 		}

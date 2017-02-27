@@ -500,6 +500,14 @@ iSerializable* get_serializable(scheme_map_t* value)
 	return Application::instance().m_actions[Parser::m_json_action_e.get_enum(Parser::UTF16_to_CP866((*value)[u"value"]))];
 }
 
+iSerializable* get_template(scheme_map_t* value)
+{
+	LOG(INFO) << std::to_string(GameObjectManager::m_config.m_templates.size());
+	return GameObjectManager::m_config.m_templates[Parser::UTF16_to_CP866(Parser::get_value((*value)[u"value"]))]->clone();
+}
+
+Config GameObjectManager::m_config = {};
+
 void GameObjectManager::init()
 {
 	m_commands["object"] = command_e::obj;
@@ -578,9 +586,11 @@ void GameObjectManager::init()
 	Parser::register_class<ObjectTag::Equippable>(u"equippable");
 	Parser::register_class<ObjectTag::Requirements_to_object>(u"requirements_to_object");
 	Parser::register_class<Instruction_check_part_type>(u"instruction_check_part_type");
-	Parser::register_class<GameObjectManager>(u"game_object_manager");
+	Parser::register_class<Instruction_check_tag>(u"instruction_check_tag");
+	Parser::register_class<Config>(u"config");
 	Parser::register_class<AI_enemy>(u"ai_enemy");
 	Parser::register_class<Action>(u"action", &get_serializable);
+	Parser::register_class(u"template", &get_template);
 	
 
 	bytearray json;
@@ -590,10 +600,11 @@ void GameObjectManager::init()
 
 	std::u16string temp(json_config);
 	scheme_map_t* s = Parser::read_object(temp);
-	object_from_json<GameObjectManager>(this, s);
+	//Config* tempcfg = new Config;
+	object_from_json<Config>(&m_config, s);
 	delete s;
 
-	m_items.insert(m_json_items.begin(), m_json_items.end());
+	m_items.insert(m_config.m_items.begin(),m_config.m_items.end());
 
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);

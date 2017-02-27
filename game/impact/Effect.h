@@ -541,6 +541,7 @@ namespace ObjectTag
 		Equippable();
 		virtual Equippable* clone();
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
+		void reset_serialization_index() override;
 
 		virtual void save();
 		virtual void load();
@@ -688,6 +689,17 @@ public:
 
 	virtual void save() {};
 	virtual void load() {};
+
+	Packer_generic& get_packer() override
+	{
+		return Packer<Instruction_check_tag>::Instance();
+	}
+
+	constexpr static auto properties() {
+		return std::make_tuple(
+			make_property(&Instruction_check_tag::m_value, u"value")
+		);
+	}
 
 };
 

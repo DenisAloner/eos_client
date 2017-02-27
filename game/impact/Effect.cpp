@@ -2088,6 +2088,7 @@ void ObjectTag::Equippable::apply_effect(GameObject* unit, Object_interaction* o
 		}
 		case entity_e::body_part:
 		{
+			
 			Instruction_game_owner* i = new Instruction_game_owner();
 			i->m_value = p[2].m_owner;
 			m_condition->apply_effect(unit, i);
@@ -2160,6 +2161,20 @@ void ObjectTag::Equippable::apply_effect(GameObject* unit, Object_interaction* o
 	}
 	}
 };
+
+void ObjectTag::Equippable::reset_serialization_index()
+{
+
+	m_serialization_index = 0;
+	if(m_value&&m_value->m_serialization_index!=0)
+	{
+		m_value->reset_serialization_index();
+	}
+	if (m_condition&&m_condition->m_serialization_index != 0)
+	{
+		m_condition->reset_serialization_index();
+	}
+}
 
 void ObjectTag::Equippable::save()
 {

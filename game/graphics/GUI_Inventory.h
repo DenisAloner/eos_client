@@ -49,6 +49,7 @@ public:
 //
 //};
 
+
 class GUI_Body :
 	public GUI_Container
 {
@@ -70,5 +71,16 @@ public:
 	void update(Attribute_map* feature);
 
 };
+
+//class GUI_Container_visitor :public Visitor
+//{
+//public:
+//
+//	GUI_Body* m_owner;
+//
+//	std::list<std::string*> m_owner_name;
+//	void visit(Object_interaction& value) override;
+//};
+
 
 #endif //GUI_INVENTORY_H

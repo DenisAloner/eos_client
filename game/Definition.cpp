@@ -724,6 +724,11 @@ std::u16string Parser::CP866_to_UTF16(std::string const& value)
 	return out;
 }
 
+void Parser::register_class(std::u16string class_name, instance_function_t function)
+{
+	m_classes[class_name] = function;
+}
+
 template<> TileManager& Parser::from_json<TileManager&>(const std::u16string value)
 {
 	int result = to_int(value);
