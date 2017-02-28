@@ -100,11 +100,9 @@ public:
 	typedef std::map<std::string, command_e> commands_t;
 	typedef std::map<std::string, parameter_e> parameters_t;
 	 
-	std::map<std::string, effect_e> m_to_effect_e;
 	std::map<std::string, effect_prefix_e> m_to_effect_prefix_e;
 	std::map<std::string, feature_list_type_e> m_to_feature_list_type_e;
 
-	std::map<effect_e, std::string> m_effect_subtype_string;
 	std::map<effect_prefix_e, std::string> m_effect_prefix_string;
 
 	std::map<std::string, GameObject*> m_items;
@@ -127,7 +125,6 @@ public:
 
 	//std::list<GameObject*> m_object_templates;
 
-	effect_e get_effect_e(const std::string& key);
 	effect_prefix_e get_effect_prefix_e(const std::string& key);
 
 	void parser(const std::string& command);
@@ -135,7 +132,6 @@ public:
 	GameObject* new_object(std::string unit_name);
 	//void register_object(GameObject*& object);
 
-	std::string get_effect_subtype_string(effect_e key);
 	std::string get_effect_prefix_string(effect_prefix_e key);
 
 	void GameObjectManager::bind_body_predicat(Object_interaction* object, bool add_mode);

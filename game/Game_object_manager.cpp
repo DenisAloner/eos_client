@@ -2,25 +2,6 @@
 #include "game\impact\Impact_random_value.h"
 #include "game\impact\Impact_copy_chance.h"
 
-effect_e GameObjectManager::get_effect_e(const std::string& key)
-{
-	auto value = m_to_effect_e.find(key);
-	if (value == m_to_effect_e.end())
-	{ 
-		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
-	}
-	return value->second;
-}
-
-//object_parameter_e GameObjectManager::get_object_parameter_e(const std::string& key)
-//{
-//	auto value = m_to_object_parameter_e.find(key);
-//	if (value == m_to_object_parameter_e.end())
-//	{
-//		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
-//	}
-//	return value->second;
-//}
 
 void GameObjectManager::parser(const std::string& command)
 {
@@ -190,7 +171,7 @@ void GameObjectManager::parser(const std::string& command)
 	case command_e::mem_effect:
 	{
 		Effect* item = new Effect();
-		item->m_subtype = get_effect_e(arg[0]);
+		item->m_subtype = Parser::m_json_effect_e.get_enum(arg[0]);
 		item->m_value = std::stoi(arg[1]);
 		m_slot = item;
 		break;
@@ -199,7 +180,7 @@ void GameObjectManager::parser(const std::string& command)
 	{
 		Impact_random_value* item = new Impact_random_value();
 		item->m_interaction_message_type = interaction_message_type_e::single;
-		item->m_subtype = get_effect_e(arg[0]);
+		item->m_subtype = Parser::m_json_effect_e.get_enum(arg[0]);
 		item->m_value = std::stoi(arg[1]);
 		item->m_min_value = std::stoi(arg[2]);
 		m_slot = item;
@@ -497,7 +478,7 @@ void GameObjectManager::parser(const std::string& command)
 
 iSerializable* get_serializable(scheme_map_t* value)
 {
-	return Application::instance().m_actions[Parser::m_json_action_e.get_enum(Parser::UTF16_to_CP866((*value)[u"value"]))];
+	return Application::instance().m_actions[Parser::m_json_action_e.get_enum(Parser::UTF16_to_CP866(Parser::get_value((*value)[u"value"])))];
 }
 
 iSerializable* get_template(scheme_map_t* value)
@@ -551,15 +532,6 @@ void GameObjectManager::init()
 	m_commands["instruction_get_owner"] = command_e::instruction_get_owner;
 	m_commands["instruction_check_owner_type"] = command_e::instruction_check_owner_type;
 
-	m_to_effect_e["value"] = effect_e::value;
-	m_to_effect_e["limit"] = effect_e::limit;
-	m_to_effect_e["start_angle"] = effect_e::start_angle;
-	m_to_effect_e["end_angle"] = effect_e::end_angle;
-
-	m_effect_subtype_string[effect_e::value] = "модификатор значени€";
-	m_effect_subtype_string[effect_e::limit] = "модификатор лимита";
-	m_effect_subtype_string[effect_e::start_angle] = "модификатор начального угла обзора";
-	m_effect_subtype_string[effect_e::end_angle] = "модификатор конечного угла обзора";
 
 	m_effect_prefix_string[effect_prefix_e::physical_damage] = "физический урон";
 	m_effect_prefix_string[effect_prefix_e::poison_damage] = "урон от €да";
@@ -568,6 +540,11 @@ void GameObjectManager::init()
 	m_to_effect_prefix_e["physical_damage"] = effect_prefix_e::physical_damage;
 	m_to_effect_prefix_e["poison_damage"] = effect_prefix_e::poison_damage;
 
+	Parser::register_class<Instruction_arg_extract>(u"instruction_arg_extract");
+	Parser::register_class<Instruction_get_owner>(u"instruction_get_owner");
+	Parser::register_class<Instruction_get_owner_top>(u"instruction_get_owner_top");
+	Parser::register_class<Effect>(u"effect");
+	Parser::register_class<Interaction_time>(u"interaction_time");
 	Parser::register_class<GameObject>(u"game_object");
 	Parser::register_class<Inventory_cell>(u"inventory_cell");
 	Parser::register_class<Object_part>(u"object_part");
@@ -665,18 +642,6 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 //		m_update_buff.push_front(object);
 //	}
 //}
-
-
-std::string GameObjectManager::get_effect_subtype_string(effect_e key)
-{
-	auto value = m_effect_subtype_string.find(key);
-	if (value != m_effect_subtype_string.end())
-	{
-		return value->second;
-	}
-	return "неизвестный тип";
-}
-
 
 std::string GameObjectManager::get_effect_prefix_string(effect_prefix_e key)
 {

@@ -324,7 +324,7 @@ public:
 	virtual bool on_turn();
 	virtual void do_predicat(Visitor& helper);
 	virtual void do_predicat_ex(predicat_ex func);
-	virtual void reset_serialization_index();
+	void reset_serialization_index() override;
 
 	Packer_generic& get_packer() override
 	{
@@ -399,6 +399,18 @@ public:
 
 	virtual void save();
 	virtual void load();
+
+	Packer_generic& get_packer() override
+	{
+		return Packer<Interaction_time>::Instance();
+	}
+
+	constexpr static auto properties() {
+		return make_union(std::make_tuple(
+			make_property(&Interaction_time::m_turn, u"m_turn")
+		), Interaction_slot::properties());
+	}
+
 };
 
 class Interaction_timer :public Interaction_slot
@@ -433,6 +445,19 @@ public:
 
 	virtual void save();
 	virtual void load();
+
+	Packer_generic& get_packer() override
+	{
+		return Packer<Effect>::Instance();
+	}
+
+	constexpr static auto properties() {
+		return std::make_tuple(
+			make_property(&Effect::m_value, u"value"),
+			make_property(&Effect::m_subtype, u"subtype")
+		);
+	}
+
 };
 
 class Object_tag :public Object_interaction
@@ -746,9 +771,22 @@ public:
 	virtual bool on_turn() { return false; };
 	virtual void description(std::list<std::string>* info, int level) {};
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	void reset_serialization_index() override;
 
 	virtual void save();
 	virtual void load();
+
+	Packer_generic& get_packer() override
+	{
+		return Packer<Instruction_arg_extract>::Instance();
+	}
+
+	constexpr static auto properties() {
+		return std::make_tuple(
+			make_property(&Instruction_arg_extract::m_value, u"value"),
+			make_property(&Instruction_arg_extract::m_index, u"index")
+		);
+	}
 };
 
 
@@ -765,9 +803,21 @@ public:
 	virtual bool on_turn() { return false; };
 	virtual void description(std::list<std::string>* info, int level) {};
 	virtual void apply_effect(GameObject* unit, Object_interaction* object) ;
+	void reset_serialization_index() override;
 
 	virtual void save() {};
 	virtual void load() {};
+
+	Packer_generic& get_packer() override
+	{
+		return Packer<Instruction_get_owner>::Instance();
+	}
+
+	constexpr static auto properties() {
+		return std::make_tuple(
+			make_property(&Instruction_get_owner::m_value, u"value")
+		);
+	}
 };
 
 class Instruction_get_owner_top : public Instruction_get_owner
@@ -775,8 +825,17 @@ class Instruction_get_owner_top : public Instruction_get_owner
 public:
 
 	Instruction_get_owner_top();
-	virtual Instruction_get_owner_top* clone();
-	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	Instruction_get_owner_top* clone() override;
+	void apply_effect(GameObject* unit, Object_interaction* object) override;
+
+	Packer_generic& get_packer() override
+	{
+		return Packer<Instruction_get_owner_top>::Instance();
+	}
+
+	constexpr static auto properties() {
+		return Instruction_get_owner::properties();
+	}
 };
 
 class Instruction_check_owner_type :public Object_interaction

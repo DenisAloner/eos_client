@@ -131,6 +131,21 @@ Dictonary<object_state_e> Parser::m_json_object_state_e = {
 	{ object_state_e::equip, "equip" }
 };
 
+Dictonary<effect_e> Parser::m_json_effect_e = {
+	{ effect_e::value,"value" },
+	{ effect_e::limit,"limit" },
+	{ effect_e::start_angle,"start_angle" },
+	{ effect_e::end_angle,"end_angle" }
+};
+
+std::unordered_map<effect_e, std::string>  Parser::m_string_effect_e = {
+	{ effect_e::value,"модификатор значения" },
+	{ effect_e::limit,"модификатор лимита" },
+	{ effect_e::start_angle, "модификатор начального угла обзора" },
+	{ effect_e::end_angle, "модификатор конечного угла обзора" }
+};
+
+
 std::unordered_map<interaction_e, std::string>  Parser::m_string_interaction_e = {
 	{ interaction_e::total_damage, "общий дополнительный урон" },
 	{ interaction_e::damage, "урон" },

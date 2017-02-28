@@ -1135,7 +1135,7 @@ void Interaction_slot::do_predicat_ex(predicat_ex func)
 void Interaction_slot::reset_serialization_index()
 {
 	m_serialization_index = 0;
-	if (m_value)
+	if (m_value&&m_value->m_serialization_index != 0)
 	{
 		m_value->reset_serialization_index();
 	}
@@ -1447,7 +1447,7 @@ Object_interaction* Effect::clone()
 
 std::string Effect::get_description()
 {
-	return Application::instance().m_game_object_manager->get_effect_subtype_string(m_subtype) + ":" + std::to_string(m_value);
+	return Parser::m_string_effect_e[m_subtype] + ":" + std::to_string(m_value);
 }
 
 void Effect::apply_effect(GameObject* unit, Object_interaction* object)
@@ -1483,7 +1483,7 @@ void Effect::apply_effect(GameObject* unit, Object_interaction* object)
 
 void Effect::description(std::list<std::string>* info, int level)
 {
-	info->push_back(std::string(level,'.')+Application::instance().m_game_object_manager->get_effect_subtype_string(m_subtype) + ":" + std::to_string(m_value));
+	info->push_back(std::string(level,'.')+ Parser::m_string_effect_e[m_subtype] + ":" + std::to_string(m_value));
 }
 
 void Effect::save()
@@ -2432,6 +2432,15 @@ void Instruction_arg_extract::apply_effect(GameObject* unit, Object_interaction*
 	}
 };
 
+void Instruction_arg_extract::reset_serialization_index()
+{
+	m_serialization_index = 0;
+	if (m_value&&m_value->m_serialization_index != 0)
+	{
+		m_value->reset_serialization_index();
+	}
+}
+
 void Instruction_arg_extract::save()
 {
 	/*FILE* file = Serialization_manager::instance().m_file;
@@ -2500,6 +2509,14 @@ void Instruction_get_owner::apply_effect(GameObject* unit, Object_interaction* o
 	}
 };
 
+void Instruction_get_owner::reset_serialization_index()
+{
+	m_serialization_index = 0;
+	if (m_value&&m_value->m_serialization_index != 0)
+	{
+		m_value->reset_serialization_index();
+	}
+}
 
 // Instruction_get_owner_top
 

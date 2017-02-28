@@ -888,7 +888,9 @@ public:
 	static Dictonary<entity_e> m_json_entity_e;
 	static Dictonary<action_e::type> m_json_action_e;
 	static Dictonary<object_state_e> m_json_object_state_e;
+	static Dictonary<effect_e> m_json_effect_e;
 
+	static std::unordered_map<effect_e, std::string> m_string_effect_e;
 	static std::unordered_map<interaction_e, std::string> m_string_interaction_e;
 	static std::unordered_map<object_tag_e, std::string> m_string_object_tag_e;
 
@@ -1283,6 +1285,11 @@ public:
 	template<> static Dictonary<object_state_e>& get_dictonary<object_state_e>()
 	{
 		return m_json_object_state_e;
+	}
+
+	template<> static Dictonary<effect_e>& get_dictonary<effect_e>()
+	{
+		return m_json_effect_e;
 	}
 
 	template<typename T> static inline typename std::enable_if<std::is_enum<T>::value, T>::type from_json(const std::u16string value) {
