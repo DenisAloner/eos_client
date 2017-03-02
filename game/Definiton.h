@@ -502,6 +502,7 @@ struct predicat_t
 	std::function<bool(GameObject*)> predicat;
 	size_t index;
 
+	predicat_t() :predicat(), index(0) {};
 	predicat_t(std::function<bool(GameObject*)> predicat, size_t index) :predicat(predicat), index(index) {};
 };
 
@@ -661,23 +662,23 @@ constexpr auto make_union(A a, B b) {
 	return std::tuple_cat(a,b);
 }
 
-template<std::size_t iteration, typename T>
-void property_from_json(T* object, scheme_map_t& data) {
+template<std::size_t iteration,typename T>
+void property_from_json(T* object, scheme_map_t& data)
+{
 	constexpr auto property = std::get<iteration>(T::properties());
 	using Type = typename decltype(property)::Type;
-	LOG(INFO) << Parser::UTF16_to_CP866(property.name);
-	*object.*(property.member) = Parser::from_json<Type>(data[property.name]);
+	Parser::from_json<Type>(data[property.name], (*object.*(property.member)));
 }
 
 template<std::size_t iteration, typename T>
 std::enable_if_t<(iteration > 0)> set_property(T* object, scheme_map_t& data) {
-	property_from_json<iteration, T>(object, data);
+	property_from_json<iteration,T>(object, data);
 	set_property<iteration - 1, T>(object, data);
 }
 
 template<std::size_t iteration, typename T>
 std::enable_if_t<(iteration == 0)> set_property(T* object, scheme_map_t& data) {
-	property_from_json<iteration, T>(object, data);
+	property_from_json<iteration,T>(object, data);
 }
 
 template<typename T>
@@ -959,97 +960,87 @@ public:
 		static constexpr bool value = true;
 	};
 
-	template<typename T> static typename std::enable_if< is_list<T>::value, T >::type from_json(const std::u16string value)
+	template<typename T> static void from_json(const std::u16string value, typename std::enable_if<is_list<T>::value, T& >::type prop)
 	{
 		using Value = typename T::value_type;
-		T list;
 		std::u16string temp = value;
-		LOG(INFO) << UTF16_to_CP866(temp);
 		scheme_list_t* s = read_array(temp);
-		LOG(INFO) << std::to_string(s==nullptr);
 		if (s)
 		{
 			for (auto element : (*s))
 			{
-				Value v = from_json<Value>(element);
-				list.push_back(v);
+				Value v;
+				from_json<Value>(element,v);
+				prop.push_back(v);
 			}
 		}
-		return list;
+		delete s;
 	};
 
-	template<typename T> static typename std::enable_if< is_pair<T>::value, T >::type from_json(const std::u16string value)
+	/*template<typename T> static void from_json(const std::u16string value, typename std::enable_if<is_pair<T>::value, T& >::type prop)
 	{
+		LOG(INFO) << "ÏÀÐÀ";
 		using Key = typename T::first_type;
 		using Value = typename T::second_type;
-
 		std::u16string temp = value;
 		scheme_vector_t* s = read_pair(temp);
-		Key k = from_json<std::remove_const_t<Key>>((*s)[0]);
-		Value v = from_json<Value>((*s)[1]);
-		T pair(k, v);
-		return pair;
-	};
+		std::remove_const_t<Key> key;
+		from_json<std::remove_const_t<Key>>((*s)[0], key);
+		prop.first=key;
+		from_json<Value>((*s)[1], prop.second);
+	};*/
 
-	template<typename T> static typename std::enable_if< is_map<T>::value, T >::type from_json(const std::u16string value)
+	template<typename T> static void from_json(const std::u16string value, typename std::enable_if<is_map<T>::value, T& >::type prop)
 	{
-		using Value = typename T::value_type;
-		T map;
+		using Key = typename T::key_type;
+		using Value = typename T::mapped_type;
 		std::u16string temp = value;
 		scheme_list_t* s = read_array(temp);
+		Key k;
+		Value v;
 		if(s)
 		{
 			for (auto element : (*s))
 			{
-				Value v = from_json<Value>(element);
-				map.insert(v);
+				scheme_vector_t* p = read_pair(element);
+				from_json<Key>((*p)[0],k);
+				from_json<Value>((*p)[1], v);
+				prop[k]=v;
+				delete p;
 			}
+			delete s;
 		}
-		return map;
 	};
 
-	template<typename T> static typename std::enable_if<!std::is_enum<T>::value && !std::is_pointer<T>::value && !is_pair<T>::value && !is_list<T>::value && !is_map<T>::value && !std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T >::type from_json(const std::u16string value);
 
-	template<typename T> static typename std::enable_if< std::is_pointer<T>::value && !is_pair<T>::value && !is_list<T>::value && !is_map<T>::value && !std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T >::type from_json(const std::u16string value)
-	{
-		LOG(INFO) << Parser::UTF16_to_CP866(get_value(value));
-		if (get_value(value)==u"null")
-		{
-			return nullptr;
-		}
-		else
-		{
-			using Type = typename std::remove_pointer_t<T>&;
-			return &Parser::from_json<Type>(value);
-		}
-	}
-	
-	template<typename T> static typename std::enable_if<std::is_pointer<T>::value&&std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T>::type from_json(const std::u16string value)
+	template<typename T> static void from_json(const std::u16string value, typename std::enable_if<std::is_pointer<T>::value&&std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T& >::type prop)
 	{
 		std::u16string temp(value);
 		scheme_map_t* s = read_object(temp);
 		if (s)
 		{
-			iSerializable* result = m_classes[get_value((*s)[u"$type"])](s);
-			LOG(INFO) << UTF16_to_CP866(result->get_packer().get_type());
+			prop = dynamic_cast<T>(m_classes[get_value((*s)[u"$type"])](s));
+			LOG(INFO) << UTF16_to_CP866(prop->get_packer().get_type());
 			delete s;
-			return dynamic_cast<T>(result);
+			return;
 		}
-		return nullptr;
-	};
+		prop = nullptr;
+	}
 
-	template<typename T> static typename std::enable_if<!std::is_pointer<T>::value&&std::is_base_of<iSerializable, T>::value, T>::type from_json(const std::u16string value)
+	template<typename T> static void from_json(const std::u16string value, typename std::enable_if<std::is_pointer<T>::value && !std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T& >::type prop);
+
+	template<typename T> static void from_json(const std::u16string value, typename std::enable_if<!std::is_pointer<T>::value&&!std::is_enum<T>::value && !is_pair<T>::value && !is_list<T>::value && !is_map<T>::value && !std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T& >::type prop);
+
+
+	template<typename T> static void from_json(const std::u16string value, typename std::enable_if<!std::is_pointer<T>::value&&std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T&>::type prop)
 	{
 		std::u16string temp(value);
 		scheme_map_t* s = read_object(temp);
-		T* result = new T();
-		result->get_packer().from_json(result, s);
+		prop.get_packer().from_json(&prop, s);
 		delete s;
-		return *result;
 	};
 
-	template<>
-	static inline int from_json<int>(const std::u16string value) {
+	template<> static void from_json<int>(const std::u16string value,int& prop) {
 		const char16_t* opening_symbol = nullptr;
 		for (std::size_t i = 0; i < value.size(); ++i)
 		{
@@ -1080,51 +1071,46 @@ public:
 			std::wstring ws = convert.from_bytes(
 				reinterpret_cast<const char*> (value.data()),
 				reinterpret_cast<const char*> (value.data() + value.size()));
-			return std::stoi(ws);
+			prop=std::stoi(ws);
 		}
-		return 0;
+		else
+		{
+			prop = 0;
+		}
+
 	}
 
 	template<>
-	static inline std::u16string from_json<std::u16string>(const std::u16string value) {
+	static inline void from_json<std::u16string>(const std::u16string value, std::u16string& prop ) 
+	{
 		std::size_t start_pos = value.find(u'"');
 		if (start_pos != std::string::npos)
 		{
 			std::size_t end_pos = value.find(u'"', start_pos + 1);
 			if (end_pos != std::string::npos)
 			{
-				std::u16string* result = new std::u16string(value.substr(start_pos + 1, end_pos - start_pos - 1));
-				return *result;
+				prop = value.substr(start_pos + 1, end_pos - start_pos - 1);
+				return;
 			}
 		}
-		return value;
+		prop = value;
 	}
 
 	template<>
-	static inline std::string from_json<std::string>(const std::u16string value) {
+	static inline void from_json<std::string>(const std::u16string value, std::string& prop) {
 		std::size_t start_pos = value.find(u'"');
 		if (start_pos != std::string::npos)
 		{
 			std::size_t end_pos = value.find(u'"', start_pos + 1);
 			if (end_pos != std::string::npos)
 			{
-				std::u16string* result = new std::u16string(value.substr(start_pos + 1, end_pos - start_pos - 1));
-				return UTF16_to_CP866(*result);
+				LOG(INFO) <<"!!!!!!!!!!!!!string:: "<< UTF16_to_CP866(value.substr(start_pos + 1, end_pos - start_pos - 1));
+				prop = UTF16_to_CP866(value.substr(start_pos + 1, end_pos - start_pos - 1));
+				return;
 			}
 		}
-		return UTF16_to_CP866(value);
+		prop = UTF16_to_CP866(value);
 	}
-
-	template<>
-	static inline game_object_size_t from_json<game_object_size_t>(const std::u16string value) {
-		std::u16string temp = value;
-		scheme_vector_t* s = read_pair(temp);
-		game_object_size_t result;
-		result.x = from_json<int>((*s)[0]);
-		result.y = from_json<int>((*s)[1]);
-		result.z = from_json<int>((*s)[2]);
-		return result;
-	};
 
 	template<typename T> static std::u16string to_json(typename std::enable_if< !std::is_enum<T>::value && !std::is_pointer<T>::value && !is_list<T>::value && !is_map<T>::value && !is_pair<T>::value && !std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T >::type value);
 
@@ -1292,18 +1278,19 @@ public:
 		return m_json_effect_e;
 	}
 
-	template<typename T> static inline typename std::enable_if<std::is_enum<T>::value, T>::type from_json(const std::u16string value) {
+	template<typename T> static inline void from_json(const std::u16string value, typename std::enable_if<std::is_enum<T>::value, T&>::type prop) 
+	{
 		std::size_t start_pos = value.find(u'"');
 		if (start_pos != std::string::npos)
 		{
 			std::size_t end_pos = value.find(u'"', start_pos + 1);
 			if (end_pos != std::string::npos)
 			{
-				std::u16string* result = new std::u16string(value.substr(start_pos + 1, end_pos - start_pos - 1));
-				return get_dictonary<T>().get_enum(UTF16_to_CP866(*result));
+				prop=get_dictonary<T>().get_enum(UTF16_to_CP866(value.substr(start_pos + 1, end_pos - start_pos - 1)));
+				return;
 			}
 		}
-		return static_cast<T>(0);
+		prop=static_cast<T>(0);
 	}
 
 	template<typename T> static inline std::u16string to_json(typename std::enable_if<std::is_enum<T>::value, T>::type value)

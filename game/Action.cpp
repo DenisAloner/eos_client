@@ -486,7 +486,7 @@ std::string ActionClass_Turn::get_description(Parameter* parameter)
 		Parameter& p(*parameter);
 		if (p[0])
 		{
-			s += " " + p[0].m_object->m_name + ".";
+			s += " " + p[0].m_object->m_name;
 		}
 	}
 	return s;

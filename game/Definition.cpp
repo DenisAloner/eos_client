@@ -1,3 +1,6 @@
+#ifndef DEFINITION_CPP
+#define	DEFINITION_CPP
+
 #include "Definiton.h"
 #include "Application.h"
 
@@ -694,17 +697,17 @@ std::string Parser::UTF16_to_CP866(std::u16string const& value)
 	std::string out(value.length(), '0');
 	for (int i = 0; i<value.length(); ++i)
 	{
-		if (value[i]>0x409 && value[i]<0x44f)
-		{
+		if (value[i]>0x409 && value[i]<0x450)
+		{/*
 			if (value[i]<0x440)
-			{
-				out[i] = value[i] - 0x410 + 0x80;
-			}
+			{*/
+				out[i] = value[i] - 0x410 + 0xC0;
+		/*	}
 			else
 			{
 				out[i] = value[i] - 0x440 + 0xE0;
 			}
-
+*/
 		}
 		else
 		{
@@ -744,10 +747,21 @@ void Parser::register_class(std::u16string class_name, instance_function_t funct
 	m_classes[class_name] = function;
 }
 
-template<> TileManager& Parser::from_json<TileManager&>(const std::u16string value)
+template<> void Parser::from_json<TileManager*>(const std::u16string value, TileManager*& prop)
 {
-	int result = to_int(value);
-	return *Application::instance().m_graph->m_tile_managers[result];
+	{
+		LOG(INFO) << Parser::UTF16_to_CP866(get_value(value)) << Parser::UTF16_to_CP866(value);
+		if (get_value(value) == u"null")
+		{
+			prop = nullptr;
+		}
+		else
+		{
+			int result = to_int(value);
+			prop = Application::instance().m_graph->m_tile_managers[result];
+		}
+	}
+
 }
 
 template <> std::u16string Parser::to_json<TileManager&>(TileManager& value)
@@ -756,10 +770,19 @@ template <> std::u16string Parser::to_json<TileManager&>(TileManager& value)
 	return out;
 }
 
-template<> predicat_t& Parser::from_json<predicat_t&>(const std::u16string value)
+template<> void Parser::from_json<predicat_t*>(const std::u16string value, predicat_t*& prop)
 {
-	int result = to_int(value);
-	return *Application::instance().m_ai_manager->m_fov_qualifiers[result];
+	LOG(INFO) << Parser::UTF16_to_CP866(get_value(value)) << Parser::UTF16_to_CP866(value);
+	if (get_value(value) == u"null")
+	{
+		prop = nullptr;
+	}
+	else
+	{
+		int result = to_int(value);
+		prop = Application::instance().m_ai_manager->m_fov_qualifiers[result];
+	}
+
 }
 
 template <> std::u16string Parser::to_json<predicat_t&>(predicat_t& value)
@@ -768,10 +791,10 @@ template <> std::u16string Parser::to_json<predicat_t&>(predicat_t& value)
 	return out;
 }
 
-template<> std::size_t Parser::from_json<std::size_t>(const std::u16string value)
+template<> void Parser::from_json<std::size_t>(const std::u16string value, std::size_t& prop)
 {
 	std::size_t result = to_int(value);
-	return result;
+	prop=result;
 }
 
 template <> std::u16string Parser::to_json<std::size_t>(std::size_t value)
@@ -780,11 +803,22 @@ template <> std::u16string Parser::to_json<std::size_t>(std::size_t value)
 	return out;
 }
 
-template<> light_t& Parser::from_json<light_t&>(const std::u16string value) {
-	std::u16string temp = value;
-	scheme_vector_t* s = read_pair(temp);
-	light_t* out = new light_t(from_json<int>((*s)[0]), from_json<int>((*s)[1]), from_json<int>((*s)[2]));
-	return *out;
+template<> void Parser::from_json<light_t*>(const std::u16string value, light_t*& prop)
+{
+	LOG(INFO) << Parser::UTF16_to_CP866(get_value(value)) << Parser::UTF16_to_CP866(value);
+	if (get_value(value) == u"null")
+	{
+		prop = nullptr;
+	}
+	else
+	{
+		prop = new light_t();
+		std::u16string temp = value;
+		scheme_vector_t* s = read_pair(temp);
+		from_json<int>((*s)[0], prop->R);
+		from_json<int>((*s)[1], prop->G);
+		from_json<int>((*s)[2], prop->B);
+	}
 }
 
 template<> std::u16string Parser::to_json<light_t&>(light_t& value)
@@ -793,12 +827,10 @@ template<> std::u16string Parser::to_json<light_t&>(light_t& value)
 	return result;
 }
 
-template<> float Parser::from_json<float>(const std::u16string value)
+template<> void Parser::from_json<float>(const std::u16string value,float& prop)
 {
-	LOG(INFO) << UTF16_to_CP866(value);
 	float result = to_float(value);
-	LOG(INFO) << std::to_string(result);
-	return result;
+	prop = result;
 }
 
 template <> std::u16string Parser::to_json<float>(float value)
@@ -807,11 +839,23 @@ template <> std::u16string Parser::to_json<float>(float value)
 	return out;
 }
 
-template<> optical_properties_t& Parser::from_json<optical_properties_t&>(const std::u16string value) {
-	std::u16string temp = value;
-	scheme_vector_t* s = read_pair(temp);
-	optical_properties_t* out=new optical_properties_t(RGB_t(from_json<float>((*s)[0]), from_json<float>((*s)[1]), from_json<float>((*s)[2])));
-	return *out;
+template<> void Parser::from_json<optical_properties_t*>(const std::u16string value, optical_properties_t*& prop) 
+{
+	LOG(INFO) << Parser::UTF16_to_CP866(get_value(value)) << Parser::UTF16_to_CP866(value);
+	if (get_value(value) == u"null")
+	{
+		prop = nullptr;
+	}
+	else
+	{
+		prop = new optical_properties_t();
+		std::u16string temp = value;
+		scheme_vector_t* s = read_pair(temp);
+		from_json<float>((*s)[0], prop->attenuation.R);
+		from_json<float>((*s)[1], prop->attenuation.G);
+		from_json<float>((*s)[2], prop->attenuation.B);
+	}
+
 }
 
 template<> std::u16string Parser::to_json<optical_properties_t&>(optical_properties_t& value)
@@ -820,15 +864,15 @@ template<> std::u16string Parser::to_json<optical_properties_t&>(optical_propert
 	return result;
 }
 
-template<> AI_FOV Parser::from_json<AI_FOV>(const std::u16string value) {
+template<> void Parser::from_json<AI_FOV>(const std::u16string value, AI_FOV& prop) {
 	std::u16string temp = value;
 	scheme_vector_t* s = read_pair(temp);
-	AI_FOV out;
-	out.radius = from_json<int>((*s)[0]);
-	out.qualifier= Application::instance().m_ai_manager->m_fov_qualifiers[from_json<int>((*s)[1])];
-	out.start_angle = from_json<int>((*s)[2]);
-	out.end_angle = from_json<int>((*s)[3]);
-	return out;
+	from_json<int>((*s)[0],prop.radius);
+	int x;
+	from_json<int>((*s)[1], x);
+	prop.qualifier= Application::instance().m_ai_manager->m_fov_qualifiers[x];
+	from_json<int>((*s)[2],prop.start_angle);
+	from_json<int>((*s)[3],prop.end_angle);
 };
 
 template<> std::u16string Parser::to_json<AI_FOV>(AI_FOV value)
@@ -837,15 +881,12 @@ template<> std::u16string Parser::to_json<AI_FOV>(AI_FOV value)
 	return result;
 }
 
-//template<> Action* Parser::from_json<Action*>(const std::u16string value)
-//{
-//	int result = to_int(value);
-//	return Application::instance().m_actions[result];
-//}
-//
-//template <> std::u16string Parser::to_json<Action*>(Action* value)
-//{
-//	LOG(INFO) << "ACTION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
-//	std::u16string out = to_u16string(value->m_index);
-//	return out;
-//}
+template<> void Parser::from_json<game_object_size_t>(const std::u16string value, game_object_size_t& prop) {
+	std::u16string temp = value;
+	scheme_vector_t* s = read_pair(temp);
+	from_json<int>((*s)[0], prop.x);
+	from_json<int>((*s)[1], prop.y);
+	from_json<int>((*s)[2], prop.z);
+};
+
+#endif //DEFINITION_CPP

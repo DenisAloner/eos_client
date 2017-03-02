@@ -36,7 +36,6 @@ public:
 		return std::make_tuple(
 			make_property(&Config::m_items, u"items"),
 			make_property(&Config::m_templates, u"templates")
-			
 		);
 	}
 };

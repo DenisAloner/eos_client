@@ -2282,6 +2282,15 @@ void ObjectTag::Can_transfer_object::apply_effect(GameObject* unit, Object_inter
 		break;
 	}
 	}
+}
+
+void ObjectTag::Can_transfer_object::reset_serialization_index()
+{
+	m_serialization_index = 0;
+	if (m_value&&m_value->m_serialization_index != 0)
+	{
+		m_value->reset_serialization_index();
+	}
 };
 
 void ObjectTag::Can_transfer_object::save()

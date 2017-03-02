@@ -483,7 +483,7 @@ iSerializable* get_serializable(scheme_map_t* value)
 
 iSerializable* get_template(scheme_map_t* value)
 {
-	LOG(INFO) << std::to_string(GameObjectManager::m_config.m_templates.size());
+	LOG(INFO) << Parser::UTF16_to_CP866(Parser::get_value((*value)[u"value"]))<<"::"<<std::to_string(GameObjectManager::m_config.m_templates.size());
 	return GameObjectManager::m_config.m_templates[Parser::UTF16_to_CP866(Parser::get_value((*value)[u"value"]))]->clone();
 }
 
@@ -545,6 +545,8 @@ void GameObjectManager::init()
 	Parser::register_class<Instruction_get_owner_top>(u"instruction_get_owner_top");
 	Parser::register_class<Effect>(u"effect");
 	Parser::register_class<Interaction_time>(u"interaction_time");
+	Parser::register_class<ObjectTag::Can_transfer_object>(u"can_transfer_object");
+	Parser::register_class<Instruction_check_owner_type>(u"instruction_check_owner_type");
 	Parser::register_class<GameObject>(u"game_object");
 	Parser::register_class<Inventory_cell>(u"inventory_cell");
 	Parser::register_class<Object_part>(u"object_part");
@@ -569,7 +571,6 @@ void GameObjectManager::init()
 	Parser::register_class<Action>(u"action", &get_serializable);
 	Parser::register_class(u"template", &get_template);
 	
-
 	bytearray json;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.json", json);
 	std::u16string json_config(json);
@@ -583,7 +584,7 @@ void GameObjectManager::init()
 
 	m_items.insert(m_config.m_items.begin(),m_config.m_items.end());
 
-	bytearray buffer;
+	/*bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.txt", buffer);
 	std::string config(buffer);
 	std::size_t pos = 0;
@@ -604,7 +605,7 @@ void GameObjectManager::init()
 			parser(config.substr(pos));
 			pos = std::string::npos;
 		}
-	}
+	}*/
 
 };
 

@@ -624,9 +624,21 @@ namespace ObjectTag
 		Can_transfer_object();
 		virtual Can_transfer_object* clone();
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
+		void reset_serialization_index() override;
 
 		virtual void save();
 		virtual void load();
+
+		Packer_generic& get_packer() override
+		{
+			return Packer<Can_transfer_object>::Instance();
+		}
+
+		constexpr static auto properties() {
+			return make_union(std::make_tuple(
+				make_property(&Can_transfer_object::m_value, u"value")
+			), Object_tag::properties());
+		}
 	};
 }
 
@@ -853,5 +865,16 @@ public:
 
 	virtual void save() {};
 	virtual void load() {};
+
+	Packer_generic& get_packer() override
+	{
+		return Packer<Instruction_check_owner_type>::Instance();
+	}
+
+	constexpr static auto properties() {
+		return std::make_tuple(
+			make_property(&Instruction_check_owner_type::m_value, u"value")
+		);
+	}
 
 };
