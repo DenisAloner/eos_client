@@ -642,11 +642,12 @@ class Dictonary
 
 class iSerializable;
 
-template<typename Class, typename T>
+template<typename Class, typename T, typename P>
 struct Property {
 	constexpr Property(T Class::*aMember, const char16_t* aName) : member{ aMember }, name{ aName } {}
 
 	using Type = T;
+	using PropType = P;
 
 	T Class::*member;
 	const char16_t* name;
@@ -654,7 +655,12 @@ struct Property {
 
 template<typename Class, typename T>
 constexpr auto make_property(T Class::*member, const char16_t* name) {
-	return Property<Class, T>{member, name};
+	return Property<Class, T, T>{member, name};
+}
+
+template<typename P, typename Class, typename T>
+constexpr auto make_property(T Class::*member, const char16_t* name) {
+	return Property<Class, T, P>{member, name};
 }
 
 template<typename A, typename B>
@@ -662,23 +668,33 @@ constexpr auto make_union(A a, B b) {
 	return std::tuple_cat(a,b);
 }
 
-template<std::size_t iteration,typename T>
-void property_from_json(T* object, scheme_map_t& data)
+template<typename T, typename P>
+void property_from_json(T* object, scheme_map_t& data, typename std::enable_if<std::is_same<typename P::Type, typename P::PropType>::value, P&>::type property)
 {
-	constexpr auto property = std::get<iteration>(T::properties());
-	using Type = typename decltype(property)::Type;
-	Parser::from_json<Type>(data[property.name], (*object.*(property.member)));
+	
+	Parser::from_json<typename P::Type>(data[property.name], (*object.*(property.member)));
+}
+
+template<typename T, typename P>
+void property_from_json(T* object, scheme_map_t& data, typename std::enable_if<!std::is_same<typename P::Type, typename P::PropType>::value, P&>::type property)
+{
+
+	Parser::from_json<typename P::Type, P::PropType>(data[property.name], (*object.*(property.member)));
 }
 
 template<std::size_t iteration, typename T>
 std::enable_if_t<(iteration > 0)> set_property(T* object, scheme_map_t& data) {
-	property_from_json<iteration,T>(object, data);
+	constexpr auto property = std::get<iteration>(T::properties());
+	using Type = typename decltype(property);
+	property_from_json<T,Type>(object, data, property);
 	set_property<iteration - 1, T>(object, data);
 }
 
 template<std::size_t iteration, typename T>
 std::enable_if_t<(iteration == 0)> set_property(T* object, scheme_map_t& data) {
-	property_from_json<iteration,T>(object, data);
+	constexpr auto property = std::get<iteration>(T::properties());
+	using Type = typename decltype(property);
+	property_from_json<T,Type>(object, data,property);
 }
 
 template<typename T>
@@ -686,21 +702,29 @@ void object_from_json(T* object, scheme_map_t* value) {
 	set_property<std::tuple_size<decltype(T::properties())>::value - 1, T>(object, *value);
 }
 
-template<std::size_t iteration, typename T>
-std::u16string property_to_json(T* object) {
-	constexpr auto property = std::get<iteration>(T::properties());
-	using Type = typename decltype(property)::Type;
-	return u"\"" + std::u16string(property.name) + u"\":" + Parser::to_json<Type>(*object.*(property.member));
+template<typename T,typename P>
+std::u16string property_to_json(T* object,typename std::enable_if<std::is_same<typename P::Type,typename P::PropType>::value,P&>::type property) {
+	
+	return u"\"" + std::u16string(property.name) + u"\":" + Parser::to_json<typename P::Type>(*object.*(property.member));
+}
+
+template<typename T, typename P>
+std::u16string property_to_json(T* object, typename std::enable_if<!std::is_same<typename P::Type, typename P::PropType>::value, P&>::type property) {
+	return u"";
 }
 
 template<std::size_t iteration, typename T>
 std::enable_if_t<(iteration > 0), std::u16string> get_property(T* object) {
-	return property_to_json<iteration, T>(object) + u"," + get_property<iteration - 1, T>(object);
+	constexpr auto property = std::get<iteration>(T::properties());
+	using Type = typename decltype(property);
+	return property_to_json<T,Type>(object,property) + u"," + get_property<iteration - 1, T>(object);
 }
 
 template<std::size_t iteration, typename T>
 std::enable_if_t<(iteration == 0), std::u16string> get_property(T* object) {
-	return property_to_json<iteration, T>(object);
+	constexpr auto property = std::get<iteration>(T::properties());
+	using Type = typename decltype(property);
+	return property_to_json<T, Type>(object, property);
 }
 
 template<typename T>
@@ -877,6 +901,9 @@ private:
 	static std::size_t m_object_index;
 
 public:
+
+	struct icon_t {};
+	struct icon_map_t {};
 
 	static std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> m_convert;
 	static std::map<std::u16string, instance_function_t> m_classes;
@@ -1298,6 +1325,9 @@ public:
 		std::u16string out = u"\"" + CP866_to_UTF16(get_dictonary<T>().get_string(value)) + u"\"";
 		return out;
 	}
+
+	template<typename T,typename P> static void from_json(const std::u16string value, typename std::enable_if<!std::is_same<T,P>::value, T&>::type prop);
+	template<typename T, typename P> static std::u16string to_json(typename std::enable_if<!std::is_same<T, P>::value, T&>::type value);
 
 };
 

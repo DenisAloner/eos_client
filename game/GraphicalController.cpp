@@ -796,11 +796,6 @@ void GraphicalController::parser(const std::string& command)
 		m_tile_managers.push_back(m_tile_manager);
 		break;
 	}
-	case command_e::icon:
-	{
-		m_icons.push_back(load_texture(FileSystem::instance().m_resource_path + "Tiles\\" + arg[0] + ".bmp"));
-		break;
-	}
 	}
 }
 

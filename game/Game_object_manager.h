@@ -23,6 +23,7 @@ public:
 
 	std::map<std::string, Object_interaction*> m_templates;
 	std::map<std::string, GameObject*> m_items;
+	std::map<std::string, GLuint> m_icons;
 
 	void save() override {}
 	void load() override {}
@@ -35,7 +36,8 @@ public:
 	constexpr static auto properties() {
 		return std::make_tuple(
 			make_property(&Config::m_items, u"items"),
-			make_property(&Config::m_templates, u"templates")
+			make_property(&Config::m_templates, u"templates"),
+			make_property<Parser::icon_map_t>(&Config::m_icons, u"icons")
 		);
 	}
 };

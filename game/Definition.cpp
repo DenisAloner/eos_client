@@ -889,4 +889,36 @@ template<> void Parser::from_json<game_object_size_t>(const std::u16string value
 	from_json<int>((*s)[2], prop.z);
 };
 
+template<> void Parser::from_json<GLuint, Parser::icon_t>(const std::u16string value, GLuint& prop)
+{
+	std::string&& name = UTF16_to_CP866(get_value(value));
+	prop = GameObjectManager::m_config.m_icons[name];
+}
+
+template <> std::u16string Parser::to_json<GLuint, Parser::icon_t>(GLuint& value)
+{
+	return u"";
+}
+
+template<> void Parser::from_json< std::map<std::string, GLuint>, Parser::icon_map_t>(const std::u16string value, std::map<std::string, GLuint>& prop)
+{
+	std::u16string temp = value;
+	scheme_list_t* s = read_array(temp);
+	if (s)
+	{
+		for (auto element : (*s))
+		{
+			
+			std::string&& name = UTF16_to_CP866(get_value(element));
+			prop[name] = Application::instance().m_graph->load_texture(FileSystem::instance().m_resource_path + "Tiles\\" + name + ".bmp");
+		}
+		delete s;
+	}
+}
+
+template <> std::u16string Parser::to_json<std::map<std::string, GLuint>, Parser::icon_map_t>(std::map<std::string, GLuint>& value)
+{
+	return u"";
+}
+
 #endif //DEFINITION_CPP
