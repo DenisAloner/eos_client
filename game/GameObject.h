@@ -169,7 +169,7 @@ public:
 			make_property(&Object_state::m_size, u"size"),
 			make_property(&Object_state::m_layer, u"layer"),
 			make_property(&Object_state::m_ai, u"AI"),
-			make_property(&Object_state::m_tile_manager, u"tile_manager"),
+			make_property<Parser::tilemanager_ref_t>(&Object_state::m_tile_manager, u"tile_manager"),
 			make_property<Parser::icon_t>(&Object_state::m_icon, u"icon"),
 			make_property(&Object_state::m_light, u"light"),
 			make_property(&Object_state::m_optical, u"optical")

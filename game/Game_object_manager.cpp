@@ -541,6 +541,10 @@ void GameObjectManager::init()
 	m_to_effect_prefix_e["poison_damage"] = effect_prefix_e::poison_damage;
 
 	Parser::register_class<Instruction_arg_extract>(u"instruction_arg_extract");
+	Parser::register_class<TileManager_Single>(u"tilemanager_single");
+	Parser::register_class<TileManager_Single_png>(u"tilemanager_single_png");
+	Parser::register_class<TileManager_rotate8_animate>(u"tilemanager_rotate8_animate");
+	Parser::register_class<TileManager_equilateral_animate>(u"tilemanager_equilateral_animate");
 	Parser::register_class<Instruction_get_owner>(u"instruction_get_owner");
 	Parser::register_class<Instruction_get_owner_top>(u"instruction_get_owner_top");
 	Parser::register_class<Effect>(u"effect");

@@ -78,9 +78,6 @@ public:
 		single,
 		single_png,
 		single_animate,
-		rotating,
-		rotating8,
-		icon,
 		rotate8_animate,
 		equilateral_animate
 

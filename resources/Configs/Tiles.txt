@@ -2,20 +2,12 @@ single snake
 single dagger
 single_png wall
 single Mud
-rotating no_tile,no_tile,door_down_close,door_left_close
-rotating no_tile,no_tile,door_down_open,door_left_open
 single_png floor
 equilateral_animate 24,fireplace
 rotate8_animate 24,human
 single corpse2x2
 single big_corpse
-rotating8 rat
 rotate8_animate 24,bat
-rotating8 skeleton
-rotating8 wolf
-rotating8 bear
-rotating no_tile,no_tile,lever_on_down,lever_on_left
-rotating no_tile,no_tile,lever_off_down,lever_off_left
 single trap_off
 single trap_on
 single red_potion
@@ -27,4 +19,4 @@ single ring
 single belt
 single bag
 single boot
-single_animate 24,png,fountain_
+equilateral_animate 24,fountain

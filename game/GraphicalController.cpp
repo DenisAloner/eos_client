@@ -717,7 +717,7 @@ void GraphicalController::parser(const std::string& command)
 	case command_e::single:
 	{
 		TileManager_Single* m_tile_manager = new TileManager_Single();
-		m_tile_manager->load_from_file(arg[0], object_direction_e::down, 0);
+		m_tile_manager->init(arg[0], object_direction_e::down, 1);
 		m_tile_manager->m_index = m_tile_managers.size();
 		m_tile_managers.push_back(m_tile_manager);
 		break;
@@ -725,7 +725,7 @@ void GraphicalController::parser(const std::string& command)
 	case command_e::single_png:
 	{
 		TileManager_Single_png* m_tile_manager = new TileManager_Single_png();
-		m_tile_manager->load_from_file(arg[0], object_direction_e::down, 0);
+		m_tile_manager->init(arg[0], object_direction_e::down, 1);
 		m_tile_manager->m_index = m_tile_managers.size();
 		m_tile_managers.push_back(m_tile_manager);
 		break;
@@ -733,8 +733,8 @@ void GraphicalController::parser(const std::string& command)
 	case command_e::rotate8_animate:
 	{
 		int count = std::stoi(arg[0]);
-		TileManager_rotate8_animate* m_tile_manager = new TileManager_rotate8_animate(count);
-		m_tile_manager->load_from_file(arg[1], object_direction_e::down, 0);
+		TileManager_rotate8_animate* m_tile_manager = new TileManager_rotate8_animate;
+		m_tile_manager->init(arg[1], object_direction_e::down, count);
 		m_tile_manager->m_index = m_tile_managers.size();
 		m_tile_managers.push_back(m_tile_manager);
 		break;
@@ -742,8 +742,8 @@ void GraphicalController::parser(const std::string& command)
 	case command_e::equilateral_animate:
 	{
 		int count = std::stoi(arg[0]);
-		TileManager_equilateral_animate* m_tile_manager = new TileManager_equilateral_animate(count);
-		m_tile_manager->load_from_file(arg[1], object_direction_e::down, 0);
+		TileManager_equilateral_animate* m_tile_manager = new TileManager_equilateral_animate;
+		m_tile_manager->init(arg[1], object_direction_e::down, count);
 		m_tile_manager->m_index = m_tile_managers.size();
 		m_tile_managers.push_back(m_tile_manager);
 		break;
@@ -751,47 +751,11 @@ void GraphicalController::parser(const std::string& command)
 	case command_e::single_animate:
 	{
 		int count = std::stoi(arg[0]);
-		TileManager_Single_animate* m_tile_manager = new TileManager_Single_animate(count);
-		if (arg[1] == "png")
-		{
+		TileManager_Single_animate* m_tile_manager = new TileManager_Single_animate;
 			for (int i = 0; i < count; ++i)
 			{
-				m_tile_manager->load_from_file(arg[2] + std::to_string(i+1), object_direction_e::down, i,arg[1]);
+				m_tile_manager->init(arg[1] + std::to_string(i+1), object_direction_e::down, i);
 			}
-		}
-		else
-		{
-			for (int i = 0; i < count; ++i)
-			{
-				m_tile_manager->load_from_file(arg[i + 2], object_direction_e::down, i);
-			}
-		}
-		m_tile_manager->m_index = m_tile_managers.size();
-		m_tile_managers.push_back(m_tile_manager);
-		break;
-	}
-	case command_e::rotating:
-	{
-		TileManager_rotating* m_tile_manager = new TileManager_rotating();
-		m_tile_manager->load_from_file(arg[0], object_direction_e::top, 0);
-		m_tile_manager->load_from_file(arg[1], object_direction_e::right, 2);
-		m_tile_manager->load_from_file(arg[2], object_direction_e::down, 4);
-		m_tile_manager->load_from_file(arg[3], object_direction_e::left, 6);
-		m_tile_manager->m_index = m_tile_managers.size();
-		m_tile_managers.push_back(m_tile_manager);
-		break;
-	}
-	case command_e::rotating8:
-	{
-		TileManager_rotating8* m_tile_manager = new TileManager_rotating8();
-		m_tile_manager->load_from_file(arg[0] + "_top", object_direction_e::top, 0);
-		m_tile_manager->load_from_file(arg[0] + "_topright", object_direction_e::topright, 1);
-		m_tile_manager->load_from_file(arg[0] + "_right", object_direction_e::right, 2);
-		m_tile_manager->load_from_file(arg[0] + "_downright", object_direction_e::downright, 3);
-		m_tile_manager->load_from_file(arg[0] + "_down", object_direction_e::down, 4);
-		m_tile_manager->load_from_file(arg[0] + "_downleft", object_direction_e::downleft, 5);
-		m_tile_manager->load_from_file(arg[0] + "_left", object_direction_e::left, 6);
-		m_tile_manager->load_from_file(arg[0] + "_topleft", object_direction_e::topleft, 7);
 		m_tile_manager->m_index = m_tile_managers.size();
 		m_tile_managers.push_back(m_tile_manager);
 		break;
@@ -804,11 +768,8 @@ void GraphicalController::load_configuration()
 	m_commands["single"] = command_e::single;
 	m_commands["single_png"] = command_e::single_png;
 	m_commands["single_animate"] = command_e::single_animate;
-	m_commands["rotating"] = command_e::rotating;
-	m_commands["rotating8"] = command_e::rotating8;
 	m_commands["rotate8_animate"] = command_e::rotate8_animate;
 	m_commands["equilateral_animate"] = command_e::equilateral_animate;
-	m_commands["icon"] = command_e::icon;
 	bytearray buffer;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Tiles.txt", buffer);
 	std::string config(buffer);

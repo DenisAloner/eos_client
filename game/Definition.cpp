@@ -561,7 +561,6 @@ std::u16string Parser::get_value(const std::u16string& value)
 	const char16_t* opening_symbol = nullptr;
 	for (std::size_t i = 0; i < value.size(); ++i)
 	{
-		LOG(INFO) <<std::to_string(isalpha(value[i]));
 		if (isalpha(value[i]))
 		{
 			if (opening_symbol == nullptr)
@@ -747,28 +746,96 @@ void Parser::register_class(std::u16string class_name, instance_function_t funct
 	m_classes[class_name] = function;
 }
 
-template<> void Parser::from_json<TileManager*>(const std::u16string value, TileManager*& prop)
-{
+template<> void Parser::from_json<int>(const std::u16string value, int& prop) {
+	const char16_t* opening_symbol = nullptr;
+	for (std::size_t i = 0; i < value.size(); ++i)
 	{
-		LOG(INFO) << Parser::UTF16_to_CP866(get_value(value)) << Parser::UTF16_to_CP866(value);
-		if (get_value(value) == u"null")
+		switch (value[i])
 		{
-			prop = nullptr;
-		}
-		else
+		case u'0':case u'1':case u'2':case u'3':case u'4':case u'5':case u'6':case u'7':case u'8':case u'9':
 		{
-			int result = to_int(value);
-			prop = Application::instance().m_graph->m_tile_managers[result];
+			if (opening_symbol == nullptr)
+			{
+				opening_symbol = &value[i];
+			}
+			break;
 		}
+		default:
+		{
+			if (opening_symbol != nullptr)
+			{
+				break;
+			}
+			break;
+		}
+		}
+	}
+	if (opening_symbol != nullptr)
+	{
+		static std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> convert;
+		std::u16string value(opening_symbol, &value[value.size() - 1] - opening_symbol + 1);
+		std::wstring ws = convert.from_bytes(
+			reinterpret_cast<const char*> (value.data()),
+			reinterpret_cast<const char*> (value.data() + value.size()));
+		prop = std::stoi(ws);
+	}
+	else
+	{
+		prop = 0;
 	}
 
 }
 
-template <> std::u16string Parser::to_json<TileManager&>(TileManager& value)
+template<> void Parser::from_json<std::u16string>(const std::u16string value, std::u16string& prop)
 {
-	std::u16string out = to_u16string(value.m_index);
-	return out;
+	std::size_t start_pos = value.find(u'"');
+	if (start_pos != std::string::npos)
+	{
+		std::size_t end_pos = value.find(u'"', start_pos + 1);
+		if (end_pos != std::string::npos)
+		{
+			prop = value.substr(start_pos + 1, end_pos - start_pos - 1);
+			return;
+		}
+	}
+	prop = value;
 }
+
+template<> void Parser::from_json<std::string>(const std::u16string value, std::string& prop) {
+	std::size_t start_pos = value.find(u'"');
+	if (start_pos != std::string::npos)
+	{
+		std::size_t end_pos = value.find(u'"', start_pos + 1);
+		if (end_pos != std::string::npos)
+		{
+			prop = UTF16_to_CP866(value.substr(start_pos + 1, end_pos - start_pos - 1));
+			return;
+		}
+	}
+	prop = UTF16_to_CP866(value);
+}
+
+template<> std::u16string Parser::to_json<int>(int value)
+{
+	return to_u16string(value);
+}
+
+template<> std::u16string Parser::to_json<std::u16string>(std::u16string value)
+{
+	return u"\"" + value + u"\"";
+}
+
+template<> std::u16string Parser::to_json<std::string>(std::string value)
+{
+	return u"\"" + CP866_to_UTF16(value) + u"\"";
+}
+
+template<> std::u16string Parser::to_json<game_object_size_t>(game_object_size_t value)
+{
+	std::u16string result = u"[" + to_json<int>(value.x) + u"," + to_json<int>(value.y) + u"," + to_json<int>(value.z) + u"]";
+	return result;
+};
+
 
 template<> void Parser::from_json<predicat_t*>(const std::u16string value, predicat_t*& prop)
 {
@@ -917,6 +984,52 @@ template<> void Parser::from_json< std::map<std::string, GLuint>, Parser::icon_m
 }
 
 template <> std::u16string Parser::to_json<std::map<std::string, GLuint>, Parser::icon_map_t>(std::map<std::string, GLuint>& value)
+{
+	return u"";
+}
+
+template<> void Parser::from_json<TileManager*,Parser::tilemanager_ref_t>(const std::u16string value, TileManager*& prop)
+{
+	{
+		LOG(INFO) << Parser::UTF16_to_CP866(get_value(value)) << Parser::UTF16_to_CP866(value);
+		if (get_value(value) == u"null")
+		{
+			prop = nullptr;
+		}
+		else
+		{
+			int result = to_int(value);
+			prop = Application::instance().m_graph->m_tile_managers[result];
+		}
+	}
+
+}
+
+template <> std::u16string Parser::to_json<TileManager*,Parser::tilemanager_ref_t>(TileManager*& value)
+{
+	std::u16string out = to_u16string(value->m_index);
+	return out;
+}
+
+template<> void Parser::from_json< std::vector<GLuint>, Parser::icon_t>(const std::u16string value, std::vector<GLuint>& prop)
+{
+	std::u16string temp = value;
+	scheme_list_t* s = read_array(temp);
+	if (s)
+	{
+		prop.resize(s->size());
+		int i = 0;
+		for (auto element : (*s))
+		{
+			std::string&& name = UTF16_to_CP866(get_value(element));
+			prop[i] = Application::instance().m_graph->png_texture_load(FileSystem::instance().m_resource_path + "Tiles\\" + name + ".png");
+			i += 1;
+		}
+		delete s;
+	}
+}
+
+template <> std::u16string Parser::to_json<std::vector<GLuint>, Parser::icon_t>(std::vector<GLuint>& value)
 {
 	return u"";
 }

@@ -878,23 +878,6 @@ public:
 
 typedef iSerializable* (*instance_function_t)(scheme_map_t*);
 
-class TileManager
-{
-public:
-
-	GLuint* m_tiles;
-	size_t m_index;
-	animation_e m_animation;
-
-	TileManager();
-	~TileManager();
-
-	virtual bool load_from_file(const std::string& filename, object_direction_e direction, int frame);
-	virtual bool load_from_file(const std::string& filename, object_direction_e direction, int frame, std::string& ext);
-	virtual void set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction);
-	virtual int get_tile_index(const object_direction_e& direction, const int& frame) = 0;
-};
-
 class Parser
 {
 private:
@@ -904,6 +887,7 @@ public:
 
 	struct icon_t {};
 	struct icon_map_t {};
+	struct tilemanager_ref_t {};
 
 	static std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> m_convert;
 	static std::map<std::u16string, instance_function_t> m_classes;
@@ -1067,78 +1051,6 @@ public:
 		delete s;
 	};
 
-	template<> static void from_json<int>(const std::u16string value,int& prop) {
-		const char16_t* opening_symbol = nullptr;
-		for (std::size_t i = 0; i < value.size(); ++i)
-		{
-			switch (value[i])
-			{
-			case u'0':case u'1':case u'2':case u'3':case u'4':case u'5':case u'6':case u'7':case u'8':case u'9':
-			{
-				if (opening_symbol == nullptr)
-				{
-					opening_symbol = &value[i];
-				}
-				break;
-			}
-			default:
-			{
-				if (opening_symbol != nullptr)
-				{
-					break;
-				}
-				break;
-			}
-			}
-		}
-		if (opening_symbol != nullptr)
-		{
-			static std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> convert;
-			std::u16string value(opening_symbol, &value[value.size() - 1] - opening_symbol + 1);
-			std::wstring ws = convert.from_bytes(
-				reinterpret_cast<const char*> (value.data()),
-				reinterpret_cast<const char*> (value.data() + value.size()));
-			prop=std::stoi(ws);
-		}
-		else
-		{
-			prop = 0;
-		}
-
-	}
-
-	template<>
-	static inline void from_json<std::u16string>(const std::u16string value, std::u16string& prop ) 
-	{
-		std::size_t start_pos = value.find(u'"');
-		if (start_pos != std::string::npos)
-		{
-			std::size_t end_pos = value.find(u'"', start_pos + 1);
-			if (end_pos != std::string::npos)
-			{
-				prop = value.substr(start_pos + 1, end_pos - start_pos - 1);
-				return;
-			}
-		}
-		prop = value;
-	}
-
-	template<>
-	static inline void from_json<std::string>(const std::u16string value, std::string& prop) {
-		std::size_t start_pos = value.find(u'"');
-		if (start_pos != std::string::npos)
-		{
-			std::size_t end_pos = value.find(u'"', start_pos + 1);
-			if (end_pos != std::string::npos)
-			{
-				LOG(INFO) <<"!!!!!!!!!!!!!string:: "<< UTF16_to_CP866(value.substr(start_pos + 1, end_pos - start_pos - 1));
-				prop = UTF16_to_CP866(value.substr(start_pos + 1, end_pos - start_pos - 1));
-				return;
-			}
-		}
-		prop = UTF16_to_CP866(value);
-	}
-
 	template<typename T> static std::u16string to_json(typename std::enable_if< !std::is_enum<T>::value && !std::is_pointer<T>::value && !is_list<T>::value && !is_map<T>::value && !is_pair<T>::value && !std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T >::type value);
 
 	template<typename T> static std::u16string to_json(typename std::enable_if<std::is_pointer<T>::value&&std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T>::type value)
@@ -1216,21 +1128,6 @@ public:
 		}
 	}
 
-	template<> static inline std::u16string to_json<int>(int value)
-	{
-		return to_u16string(value);
-	}
-
-	template<> static inline std::u16string to_json<std::u16string>(std::u16string value)
-	{
-		return u"\"" + value + u"\"";
-	}
-
-	template<> static inline std::u16string to_json<std::string>(std::string value)
-	{
-		return u"\"" + CP866_to_UTF16(value) + u"\"";
-	}
-
 	template<typename T> static std::u16string to_json(typename std::enable_if< is_list<T>::value || is_map<T>::value, T >::type value)
 	{
 		using Value = typename T::value_type;
@@ -1249,12 +1146,6 @@ public:
 		using Key = typename T::first_type;
 		using Value = typename T::second_type;
 		std::u16string result = u"[" + Parser::to_json<std::remove_const_t<Key>>(value.first) + u"," + Parser::to_json<Value>(value.second) + u"]";
-		return result;
-	};
-
-	template<> static inline std::u16string to_json<game_object_size_t>(game_object_size_t value)
-	{
-		std::u16string result = u"[" + to_json<int>(value.x) + u"," + to_json<int>(value.y) + u"," + to_json<int>(value.z) + u"]";
 		return result;
 	};
 
