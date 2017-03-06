@@ -282,10 +282,10 @@ void Application::new_game()
 			obj->set_direction(object_direction_e::top);
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-2][rx]);*/
 
-			/*obj = m_game_object_manager->new_object("bat");
+			obj = m_game_object_manager->new_object("bat");
 			obj->set_direction(object_direction_e::top);
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx-2]);
-*/
+
 		
 			obj = m_game_object_manager->new_object("bag");
 			obj->set_direction(object_direction_e::top);

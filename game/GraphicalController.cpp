@@ -59,7 +59,6 @@ GraphicalController::GraphicalController(dimension_t size)
 		m_visible = load_texture(FileSystem::instance().m_resource_path + "Tiles\\visible.bmp");
 		m_dir = load_texture(FileSystem::instance().m_resource_path + "Tiles\\directions.bmp");
 		m_logo = load_texture(FileSystem::instance().m_resource_path + "Tiles\\logo.bmp");
-		load_configuration();
 	}
 	catch(std::logic_error e)
 	{
@@ -682,116 +681,6 @@ GLint GraphicalController::create_empty_texture(dimension_t size)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.w, size.h, 0, GL_BGRA, GL_UNSIGNED_BYTE, nullptr);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	return texture;
-}
-
-void GraphicalController::parser(const std::string& command)
-{
-	LOG(INFO) << command;
-	std::size_t found = 0;
-	std::string args;
-	command_e key;
-	std::vector<std::string> arg;
-	found = command.find(" ");
-	if (found != std::string::npos)
-	{
-		key = m_commands.find(command.substr(0, found))->second;
-		args = command.substr(found + 1);
-		std::size_t pos = 0;
-		do
-		{
-			found = args.find(",", pos);
-			if (found != -1)
-			{
-				arg.push_back(args.substr(pos, found - pos));
-				pos = found + 1;
-			}
-			else break;
-		} while (true);
-		arg.push_back(args.substr(pos));
-	}
-	else {
-		key = m_commands.find(command)->second;
-	}
-	switch (key)
-	{
-	case command_e::single:
-	{
-		TileManager_Single* m_tile_manager = new TileManager_Single();
-		m_tile_manager->init(arg[0], object_direction_e::down, 1);
-		m_tile_manager->m_index = m_tile_managers.size();
-		m_tile_managers.push_back(m_tile_manager);
-		break;
-	}
-	case command_e::single_png:
-	{
-		TileManager_Single_png* m_tile_manager = new TileManager_Single_png();
-		m_tile_manager->init(arg[0], object_direction_e::down, 1);
-		m_tile_manager->m_index = m_tile_managers.size();
-		m_tile_managers.push_back(m_tile_manager);
-		break;
-	}
-	case command_e::rotate8_animate:
-	{
-		int count = std::stoi(arg[0]);
-		TileManager_rotate8_animate* m_tile_manager = new TileManager_rotate8_animate;
-		m_tile_manager->init(arg[1], object_direction_e::down, count);
-		m_tile_manager->m_index = m_tile_managers.size();
-		m_tile_managers.push_back(m_tile_manager);
-		break;
-	}
-	case command_e::equilateral_animate:
-	{
-		int count = std::stoi(arg[0]);
-		TileManager_equilateral_animate* m_tile_manager = new TileManager_equilateral_animate;
-		m_tile_manager->init(arg[1], object_direction_e::down, count);
-		m_tile_manager->m_index = m_tile_managers.size();
-		m_tile_managers.push_back(m_tile_manager);
-		break;
-	}
-	case command_e::single_animate:
-	{
-		int count = std::stoi(arg[0]);
-		TileManager_Single_animate* m_tile_manager = new TileManager_Single_animate;
-			for (int i = 0; i < count; ++i)
-			{
-				m_tile_manager->init(arg[1] + std::to_string(i+1), object_direction_e::down, i);
-			}
-		m_tile_manager->m_index = m_tile_managers.size();
-		m_tile_managers.push_back(m_tile_manager);
-		break;
-	}
-	}
-}
-
-void GraphicalController::load_configuration()
-{
-	m_commands["single"] = command_e::single;
-	m_commands["single_png"] = command_e::single_png;
-	m_commands["single_animate"] = command_e::single_animate;
-	m_commands["rotate8_animate"] = command_e::rotate8_animate;
-	m_commands["equilateral_animate"] = command_e::equilateral_animate;
-	bytearray buffer;
-	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Tiles.txt", buffer);
-	std::string config(buffer);
-	std::size_t pos = 0;
-	std::size_t found = 0;
-	while (pos != std::string::npos)
-	{
-		found = config.find("\r\n", pos);
-		if (found != std::string::npos)
-		{
-			if (found - pos > 0)
-			{
-				parser(config.substr(pos, found - pos));
-
-			}
-			pos = found + 2;
-		}
-		else {
-			parser(config.substr(pos));
-			pos = std::string::npos;
-		}
-	}
 }
 
 void GraphicalController::draw_sprite(rectangle_t rect)

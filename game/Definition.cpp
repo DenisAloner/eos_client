@@ -998,8 +998,8 @@ template<> void Parser::from_json<TileManager*,Parser::tilemanager_ref_t>(const 
 		}
 		else
 		{
-			int result = to_int(value);
-			prop = Application::instance().m_graph->m_tile_managers[result];
+			std::string&& result = UTF16_to_CP866(get_value(value));
+			prop = Application::instance().m_game_object_manager->m_config.m_tile_managers[result];
 		}
 	}
 

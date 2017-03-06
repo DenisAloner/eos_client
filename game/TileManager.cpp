@@ -15,7 +15,7 @@ TileManager::~TileManager()
 bool TileManager::init(const std::string& filename, object_direction_e direction, int frame)
 {
 	m_tiles.resize(1);
-	m_tiles[0] = Application::instance().m_graph->load_texture(FileSystem::instance().m_resource_path + "Tiles\\" + filename + ".bmp");
+	m_tiles[0] = Application::instance().m_graph->png_texture_load(FileSystem::instance().m_resource_path + "Tiles\\" + filename + ".png");
 	return true;
 }
 

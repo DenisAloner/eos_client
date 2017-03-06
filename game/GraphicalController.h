@@ -73,19 +73,8 @@ public:
 
 	dimension_t m_size;
 
-	enum class command_e
-	{
-		single,
-		single_png,
-		single_animate,
-		rotate8_animate,
-		equilateral_animate
-
-	};
-
+	
 	std::list<frectangle_t> m_scissors;
-	std::vector<TileManager*> m_tile_managers;
-	std::map<std::string, command_e> m_commands;
 
 	GLuint m_FBO;
 
@@ -107,8 +96,6 @@ public:
 	void set_VSync(bool sync);
 	bool set_uniform_float(GLuint program, const char * name, const float value);
 	GLint create_empty_texture(dimension_t size);
-	void load_configuration();
-	void parser(const std::string& command);
 	void Load_font(std::string font_filename);
 	int get_width(std::string text);
 

@@ -320,7 +320,7 @@ void Object_state::load()
 	size_t s;
 	fread(&s, sizeof(size_t), 1, file);
 	LOG(INFO) << "тайл "<<std::to_string(s);
-	m_tile_manager = Application::instance().m_graph->m_tile_managers[s];
+	//m_tile_manager = Application::instance().m_graph->m_tile_managers[s];
 	m_ai = static_cast<AI*>(Serialization_manager::instance().deserialize());
 }
 

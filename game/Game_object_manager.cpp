@@ -129,7 +129,7 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	case command_e::tile_manager:
 	{
-		m_object->m_active_state->m_tile_manager = Application::instance().m_graph->m_tile_managers[std::stoi(arg[0])];
+		//m_object->m_active_state->m_tile_manager = Application::instance().m_graph->m_tile_managers[std::stoi(arg[0])];
 		break;
 	}
 	case command_e::light:
