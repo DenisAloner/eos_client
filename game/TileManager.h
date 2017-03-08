@@ -43,46 +43,12 @@ class TileManager_Single :
 public:
 
 	TileManager_Single();
-
+	bool init(const std::string& filename, object_direction_e direction, int frame) override;
 	int get_tile_index(const object_direction_e& direction, const int& frame) override;
 
 	Packer_generic& get_packer() override
 	{
 		return Packer<TileManager_Single>::Instance();
-	}
-
-	constexpr static auto properties() {
-		return TileManager::properties();
-	}
-
-};
-
-
-class TileManager_Single_animate :
-	public TileManager
-{
-public:
-
-	int m_frame;
-
-	TileManager_Single_animate();
-	bool init(const std::string& filename, object_direction_e direction, int frame) override;
-	int get_tile_index(const object_direction_e& direction, const int& frame) override;
-
-};
-
-class TileManager_Single_png :
-	public TileManager
-{
-public:
-
-	TileManager_Single_png();
-	bool init(const std::string& filename, object_direction_e direction, int frame) override;
-	int get_tile_index(const object_direction_e& direction, const int& frame) override;
-
-	Packer_generic& get_packer() override
-	{
-		return Packer<TileManager_Single_png>::Instance();
 	}
 
 	constexpr static auto properties() {

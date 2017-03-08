@@ -31,42 +31,15 @@ void TileManager::set_tile(tile_t& tile, GameObject* obj, int frame, const objec
 
 TileManager_Single::TileManager_Single()
 {
-	
 }
 
 int TileManager_Single::get_tile_index(const object_direction_e& direction, const int& frame)
 {
 	return 0;
-}
-
-
-TileManager_Single_animate::TileManager_Single_animate()
-{
-}
-
-bool TileManager_Single_animate::init(const std::string& filename, object_direction_e direction, int frame)
-{
-	m_tiles.resize(frame);
-	m_tiles[frame] = Application::instance().m_graph->load_texture(FileSystem::instance().m_resource_path + "Tiles\\" + filename + ".png");
-	return true;
-}
-
-int TileManager_Single_animate::get_tile_index(const object_direction_e& direction, const int& frame)
-{
-	return frame * (m_frame/24.0);
-}
-
-TileManager_Single_png::TileManager_Single_png()
-{
-}
-
-int TileManager_Single_png::get_tile_index(const object_direction_e& direction, const int& frame)
-{
-	return 0;
 
 }
 
-bool TileManager_Single_png::init(const std::string& filename, object_direction_e direction, int frame)
+bool TileManager_Single::init(const std::string& filename, object_direction_e direction, int frame)
 {
 	m_tiles.resize(1);
 	m_tiles[0] = Application::instance().m_graph->png_texture_load(FileSystem::instance().m_resource_path + "Tiles\\" + filename + ".png");

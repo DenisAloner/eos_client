@@ -847,7 +847,7 @@ template<> void Parser::from_json<predicat_t*>(const std::u16string value, predi
 	else
 	{
 		int result = to_int(value);
-		prop = Application::instance().m_ai_manager->m_fov_qualifiers[result];
+		prop = Application::instance().m_ai_manager->m_path_qualifiers[result];
 	}
 
 }
