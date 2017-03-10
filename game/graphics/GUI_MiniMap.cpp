@@ -19,7 +19,7 @@ GUI_MiniMap::~GUI_MiniMap()
 
 void GUI_MiniMap::on_update()
 {
-	Application::instance().m_update_canvas.push_back(this);
+	execute_in_render_thread(std::bind(&GUI_MiniMap::render_on_canvas, this));
 }
 
 void GUI_MiniMap::render_on_canvas()
@@ -68,27 +68,27 @@ void GUI_MiniMap::render_on_canvas()
 			for (std::list<GameObject*>::iterator obj = m_map_viewer->m_map->m_items[y][x]->m_items.begin(); obj != m_map_viewer->m_map->m_items[y][x]->m_items.end(); ++obj)
 			{
 				glColor4d(0.0, 0.0, 0.0, 0.0);
-				if ((*obj)->m_name == "floor")
+				if ((*obj)->m_name == u"floor")
 				{
 					glColor4d(0.3, 0.3, 0.3, 1.0);
 				}
-				if ((*obj)->m_name == "wall")
+				if ((*obj)->m_name == u"wall")
 				{
 					glColor4d(0.0, 0.3, 0.5, 1.0);
 				}
-				if ((*obj)->m_name == "elf")
+				if ((*obj)->m_name == u"elf")
 				{
 					glColor4d(0.0, 0.7, 0.0, 1.0);
 				}
-				if ((*obj)->m_name == "door")
+				if ((*obj)->m_name == u"door")
 				{
 					glColor4d(0.3, 0.1, 0.0, 1.0);
 				}
-				if ((*obj)->m_name == "torch")
+				if ((*obj)->m_name == u"torch")
 				{
 					glColor4d(0.9, 0.8, 0.0, 1.0);
 				}
-				if ((*obj)->m_name == "snake")
+				if ((*obj)->m_name == u"snake")
 				{
 					glColor4d(0.7, 0.0, 0.0, 1.0);
 				}
@@ -157,7 +157,7 @@ GUI_FOV::GUI_FOV(position_t position, dimension_t size, GameObject* object)
 
 void GUI_FOV::on_update()
 {
-	Application::instance().m_update_canvas.push_back(this);
+	execute_in_render_thread(std::bind(&GUI_FOV::render_on_canvas, this));
 }
 
 
@@ -184,7 +184,6 @@ void GUI_FOV::render_on_canvas()
 	dimension_t cr = Application::instance().m_size;
 	if (!m_canvas_create)
 	{
-		
 		m_canvas = Application::instance().m_graph->create_empty_texture(dimension_t(cr.w, cr.h));
 		m_canvas_create = true;
 	};

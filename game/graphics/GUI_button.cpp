@@ -1,7 +1,7 @@
 #include "GUI_button.h"
 
 
-GUI_button::GUI_button(int x, int y, int width, int height, std::string text)
+GUI_button::GUI_button(int x, int y, int width, int height, std::u16string text)
 {
 	m_position = position_t(x, y);
 	m_size = dimension_t(width, height);
@@ -36,7 +36,7 @@ void GUI_button::render(GraphicalController* Graph, int px, int py)
 	}
 }
 
-GUI_Mainmenu_button::GUI_Mainmenu_button(int x, int y, int width, int height, std::string text, parameter_type_e kind) :GUI_button(x, y, width, height, text), m_parameter(new Parameter(kind))
+GUI_Mainmenu_button::GUI_Mainmenu_button(int x, int y, int width, int height, std::u16string text, parameter_type_e kind) :GUI_button(x, y, width, height, text), m_parameter(new Parameter(kind))
 {
 }
 

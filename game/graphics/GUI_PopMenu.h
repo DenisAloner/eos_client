@@ -21,7 +21,7 @@ public:
 	{
 	public:
 
-		std::string m_text;
+		std::u16string m_text;
 		_val m_object;
 
 		GUI_PopMenu* m_owner;
@@ -66,7 +66,7 @@ public:
 	GUI_PopMenu(void) :GUI_Container(0, 0, 0, 0){ item_click += std::bind(&GUI_PopMenu::on_item_click, this, std::placeholders::_1); }
 	~GUI_PopMenu(void);
 
-	virtual void add(std::string Text, _val Object)
+	virtual void add(std::u16string Text, _val Object)
 	{
 		GUI_PopMenu::Item* object;
 		object = new GUI_PopMenu::Item();
@@ -90,7 +90,7 @@ public:
 		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); ++Current)
 		{
 			object = (GUI_PopMenu::Item*)(*Current);
-			maxlen = max(Application::instance().m_graph->get_width(object->m_text), maxlen);
+			maxlen = max(Application::instance().m_graph->measure_text_width(object->m_text), maxlen);
 		}
 		resize(maxlen + 8, m_items.size() * ((Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender) >> 6));
 		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); ++Current)

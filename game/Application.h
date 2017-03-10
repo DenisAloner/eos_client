@@ -115,7 +115,11 @@ public:
 
 	GUI_Window_manager* m_window_manager;
 
-	std::list<GUI_Object*> m_update_canvas;
+	std::list<std::function<void()>> m_update_in_render_thread;
+
+	HDC m_hDC;
+	HGLRC m_hRC;
+	HGLRC subhRC;
 
 	Game_log m_game_log;
 
@@ -129,7 +133,7 @@ public:
 		return Singleton;
 	}
 
-	void initialize(dimension_t work_area_size);
+	void initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC);
 	void start();
 	void stop();
 

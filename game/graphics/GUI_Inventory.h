@@ -21,7 +21,7 @@ public:
 
 	Object_part* m_item;
 	GUI_Body* m_owner;
-	std::string m_name;
+	std::u16string m_name;
 
 	GUI_Part_slot(int width, int height, Object_part* item, GUI_Body* owner);
 
@@ -58,7 +58,7 @@ public:
 	bool m_already_active;
 	GUI_Body(Attribute_map* feature);
 	
-	std::list<std::string*> m_owner_name;
+	std::list<std::u16string*> m_owner_name;
 	std::size_t m_max_item_name;
 
 	//virtual void Render(GraphicalController* Graph);

@@ -25,7 +25,7 @@ void gui_mapviewer_hint::draw_cell(MapCell* cell, int index)
 	glColor4f(1.0F, 0.9F, 0.0F, 0.5F);
 	Application::instance().m_graph->draw_sprite(r);
 	glColor4f(1.0F, 0.9F, 0.0F, 1.0F);
-	Application::instance().m_graph->center_text((r.a.x + r.b.x)*0.5, (r.a.y + r.b.y) *0.5, std::to_string(index), 8, 17);
+	Application::instance().m_graph->center_text((r.a.x + r.b.x)*0.5, (r.a.y + r.b.y) *0.5, Parser::CP866_to_UTF16(std::to_string(index)), 8, 17);
 }
 
 void mapviewer_hint_path::render()
@@ -99,7 +99,7 @@ void mapviewer_hint_line::draw_cell(MapCell* a)
 	glColor4f(1.0F, 0.9F, 0.0F, 0.5F);
 	Application::instance().m_graph->draw_sprite(r);
 	glColor4f(1.0F, 0.9F, 0.0F, 1.0F);
-	Application::instance().m_graph->center_text((r.a.x + r.b.x)*0.5, (r.a.y + r.b.y) *0.5, std::to_string(m_step_count), 8, 17);
+	Application::instance().m_graph->center_text((r.a.x + r.b.x)*0.5, (r.a.y + r.b.y) *0.5, Parser::CP866_to_UTF16(std::to_string(m_step_count)), 8, 17);
 	m_step_count += 1;
 }
 
@@ -323,7 +323,7 @@ void mapviewer_hint_shoot::draw_cell(MapCell* a)
 		}
 		Application::instance().m_graph->draw_sprite(r);
 		glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		Application::instance().m_graph->center_text((r.a.x + r.b.x)*0.5, (r.a.y + r.b.y) *0.5, std::to_string(m_step_count), 8, 17);
+		Application::instance().m_graph->center_text((r.a.x + r.b.x)*0.5, (r.a.y + r.b.y) *0.5, Parser::CP866_to_UTF16(std::to_string(m_step_count)), 8, 17);
 		if (pass_able)
 		{
 			glColor4f(0.0F, 1.0F, 0.0F, 1.0F);
@@ -1038,7 +1038,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 									}
 									else if (m_map->m_items[y][x]->m_notable)
 									{
-										if (((*Current)->m_name == "floor") || ((*Current)->m_name == "wall"))
+										if (((*Current)->m_name == u"floor") || ((*Current)->m_name == u"wall"))
 										{
 											IsDraw = true;
 											is_hide = true;
@@ -1389,7 +1389,7 @@ void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
 		}
 		if (PopMenu->m_items.size() == 0)
 		{
-			PopMenu->add("Нет действий", nullptr);
+			PopMenu->add(u"Нет действий", nullptr);
 		}
 		PopMenu->destroy += std::bind(&GUI_Layer::remove, m_GUI, std::placeholders::_1);
 		m_GUI->add_front(PopMenu);

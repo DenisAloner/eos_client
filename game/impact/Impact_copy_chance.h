@@ -14,7 +14,7 @@ public:
 	~Impact_copy_chance();
 
 	virtual Object_interaction* clone();
-	virtual std::string get_description();
+	std::u16string get_description() override;
 	virtual void description(std::list<std::string>* info, int level);
 
 	virtual void save();

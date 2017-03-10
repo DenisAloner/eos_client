@@ -806,7 +806,7 @@ void AI_trap::create()
 	m_object->set_state(object_state_e::off);
 	for (auto item = m_object->cell()->m_items.begin(); item != m_object->cell()->m_items.end(); ++item)
 	{
-		if (m_object != (*item) && (*item)->m_name != "floor")
+		if (m_object != (*item) && (*item)->m_name != u"floor")
 		{
 			m_object->set_state(object_state_e::on);
 		}
@@ -815,7 +815,7 @@ void AI_trap::create()
 	{
 		for (auto item = m_object->cell()->m_items.begin(); item != m_object->cell()->m_items.end(); ++item)
 		{
-			if (m_object != (*item) && (*item)->m_name != "floor")
+			if (m_object != (*item) && (*item)->m_name != u"floor")
 			{
 				/*?1? P_unit_interaction* p = new P_unit_interaction();
 				p->m_unit = m_object;
@@ -841,5 +841,5 @@ AI_manager::AI_manager()
 	m_fov_qualifiers.push_back(new predicat_t([](GameObject* object)->bool{return false; },1));
 
 	m_path_qualifiers.push_back(new predicat_t([](GameObject* object)->bool {return !object->get_stat(object_tag_e::pass_able); }, 0));
-	m_path_qualifiers.push_back(new predicat_t([](GameObject* object)->bool{return !object->get_stat(object_tag_e::pass_able) && object->m_name != "wall"; },1));
+	m_path_qualifiers.push_back(new predicat_t([](GameObject* object)->bool{return !object->get_stat(object_tag_e::pass_able) && object->m_name != u"wall"; },1));
 }
