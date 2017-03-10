@@ -16,7 +16,7 @@ public:
 
 	virtual bool check_region(MouseEventArgs const& e);
 	virtual void on_mouse_click(MouseEventArgs const& e);
-	virtual void render(GraphicalController* Graph, int px, int py);
+	void render(GraphicalController* Graph, int px, int py) override;
 	virtual void on_mouse_wheel(MouseEventArgs const& e);
 	virtual void on_mouse_down(MouseEventArgs const& e);
 	virtual void on_mouse_move(MouseEventArgs const& e);

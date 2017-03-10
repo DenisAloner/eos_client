@@ -99,11 +99,25 @@ void Application::render()
 	m_update_mutex.lock();
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	std::thread::id this_id = std::this_thread::get_id();
+	std::hash<std::thread::id> hasher;
+	
+	//OutputDebugString((std::to_string(hasher(this_id)) + " render\n").c_str());
+		
+
 	for (auto current = m_update_canvas.begin(); current != m_update_canvas.end(); ++current)
 	{
 		(*current)->render_on_canvas();
 	}
 	m_update_canvas.clear();
+
+	for (auto current = m_update_in_render_thread.begin(); current != m_update_in_render_thread.end(); ++current)
+	{
+		(*current)();
+	}
+	m_update_in_render_thread.clear();
+
 	//if (Application::instance().m_GUI->MapViewer->m_map->m_update)
 	//{
 	//	Application::instance().m_GUI->MapViewer->m_map->update(VoidEventArgs());
@@ -208,17 +222,17 @@ void Application::initialize(dimension_t work_area_size)
 	m_GUI->add(m_window_manager);
 	m_GUI->add(new GUI_Image((m_size.w - 1024) / 2, (m_size.h - 1024) / 2, 1024, 1024, m_graph->m_logo));
 
-	GUI_Window* MainMenu = new GUI_Window(0, 0, 400, 400, "Главное меню");
+	GUI_Window* MainMenu = new GUI_Window(0, 0, 400, 400, u"Главное меню");
 	MainMenu->m_position = position_t((m_size.w - MainMenu->m_size.w)/2, (m_size.h - MainMenu->m_size.h) / 2);
 	GUI_Button_list* menu = new GUI_Button_list(0, 0, 400, 400);
 	GUI_Mainmenu_button* button;
-	button = new GUI_Mainmenu_button(0, 0, 396, 47, "Новая игра", parameter_type_e::new_game);
+	button = new GUI_Mainmenu_button(0, 0, 396, 47, u"Новая игра", parameter_type_e::new_game);
 	button->mouse_click += std::bind(&GUI_Window::on_close, MainMenu, MainMenu);
 	menu->add_item_control(button);
-	button = new GUI_Mainmenu_button(0, 0, 396, 47, "Загрузка игры", parameter_type_e::load_game);
+	button = new GUI_Mainmenu_button(0, 0, 396, 47, u"Загрузка игры", parameter_type_e::load_game);
 	button->mouse_click += std::bind(&GUI_Window::on_close, MainMenu, MainMenu);
 	menu->add_item_control(button);
-	button = new GUI_Mainmenu_button(0, 0, 396, 47, "Выход", parameter_type_e::game_quit);
+	button = new GUI_Mainmenu_button(0, 0, 396, 47, u"Выход", parameter_type_e::game_quit);
 	button->mouse_click += std::bind(&GUI_Window::on_close, MainMenu, MainMenu);
 	menu->add_item_control(button);
 	MainMenu->add(menu);
@@ -250,12 +264,12 @@ void Application::new_game()
 
 	m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player, map, m_action_manager, m_game_log);
 
-	GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
+	GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, u"Мини-карта");
 	rectangle_t cr = MiniMap->client_rect();
 	GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(0, 0), dimension_t(cr.w, cr.h), m_GUI->MapViewer);
 	MiniMap->add(mini_map);
 
-	MiniMap = new GUI_Window(300, 0, 400, 400, "Поле зрения player");
+	MiniMap = new GUI_Window(300, 0, 400, 400, u"Поле зрения player");
 	cr = MiniMap->client_rect();
 	GUI_FOV* fov = new GUI_FOV(position_t(0, 0), dimension_t(cr.w, cr.h), m_GUI->MapViewer->m_player->m_object);
 	MiniMap->add(fov);
@@ -542,7 +556,8 @@ void Application::update()
 				(*m)->update(VoidEventArgs());
 			}
 			m_update_mutex.unlock();
-			m_game_log.add(game_log_message_t(game_log_message_type_e::message_time,"Ход - " + std::to_string(m_game_turn)));
+			std::u16string temp= u"Ход - " + Parser::CP866_to_UTF16(std::to_string(m_game_turn));
+			m_game_log.add(game_log_message_t(game_log_message_type_e::message_time,temp));
 			m_game_turn += 1;
 			std::chrono::milliseconds Duration(1);
 			std::this_thread::sleep_for(Duration);
@@ -612,7 +627,7 @@ MapCell* Application::command_select_location(GameObject* object)
 		m_GUI->MapViewer->m_cursor_x = 1;
 		m_GUI->MapViewer->m_cursor_y = 1;
 	}
-	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Выберите клетку")));
+	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Выберите клетку")));
 	bool Exit = false;
 	while (Exit == false)
 	{
@@ -651,7 +666,7 @@ GameObject* Application::command_select_object_on_map()
 	GameObject* Result = nullptr;
 	m_GUI->MapViewer->m_cursor_x = 1;
 	m_GUI->MapViewer->m_cursor_y = 1;
-	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Выберите обьект")));
+	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Выберите обьект")));
 	bool Exit = false;
 	while (Exit == false)
 	{
@@ -688,7 +703,7 @@ GameObject* Application::command_select_object()
 	GameObject* Result = nullptr;
 	m_GUI->MapViewer->m_cursor_x = 1;
 	m_GUI->MapViewer->m_cursor_y = 1;
-	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Выберите обьект")));
+	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Выберите обьект")));
 	bool Exit = false;
 	while (Exit == false)
 	{
@@ -753,7 +768,7 @@ bool Application::command_open_body(GameObject*& Object)
 	Parts_list* Property = static_cast<Parts_list*>(Object->get_effect(interaction_e::body));
 	if (Property != nullptr)
 	{
-		GUI_body_window* Window = new GUI_body_window(m_size.w / 2 - (192 + 2) / 2, m_size.h / 2 - (4 * 64 + 2) / 2, 192 + 4, 4 * 64 + 27, Object->m_name + "::body",Object);
+		GUI_body_window* Window = new GUI_body_window(m_size.w / 2 - (192 + 2) / 2, m_size.h / 2 - (4 * 64 + 2) / 2, 192 + 4, 4 * 64 + 27, Object->m_name + u"::body",Object);
 		/*GUI_Body* Inv = new GUI_Body(static_cast<Interaction_feature*>(Object->get_feature(object_feature_e::interaction_feature)));
 		Inv->m_position.x = 2;
 		Inv->m_position.y = Window->m_size.h - Inv->m_size.h - 2;
@@ -766,7 +781,7 @@ bool Application::command_open_body(GameObject*& Object)
 
 void Application::command_gui_show_characterization(GameObject*& object)
 {
-	GUI_description_window* Window = new GUI_description_window(m_size.w / 2 - (192 + 2) / 2, m_size.h / 2 - (4 * 64 + 2) / 2, 800 + 4, 8 * 64 + 27, object->m_name + "::Характеристика",object);
+	GUI_description_window* Window = new GUI_description_window(m_size.w / 2 - (192 + 2) / 2, m_size.h / 2 - (4 * 64 + 2) / 2, 800 + 4, 8 * 64 + 27, object->m_name + u"::Характеристика",object);
 	//m_GUI->add_front(Window);
 }
 
@@ -851,7 +866,7 @@ void my_audio_callback(void *userdata, uint8_t *stream, uint32_t len) {
 
 Game_object_owner* Application::command_select_transfer(Parameter_destination* parameter){
 	Game_object_owner* Result = nullptr;
-	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Выберите назначение")));
+	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Выберите назначение")));
 	bool Exit = false;
 	while (Exit == false)
 	{
@@ -941,7 +956,7 @@ Game_object_owner* Application::command_select_transfer(Parameter_destination* p
 Object_part* Application::command_select_body_part()
 {
 	Object_part* Result = nullptr;
-	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Выберите слот")));
+	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Выберите слот")));
 	bool Exit = false;
 	while (Exit == false)
 	{

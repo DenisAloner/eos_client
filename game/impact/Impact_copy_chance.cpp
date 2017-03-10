@@ -25,9 +25,9 @@ void Impact_copy_chance::description(std::list<std::string>* info, int level)
 	m_value->description(info, level + 1);*/
 }
 
-std::string Impact_copy_chance::get_description()
+std::u16string Impact_copy_chance::get_description()
 {
-	return "Impact_copy_chance";
+	return u"Impact_copy_chance";
 }
 
 void Impact_copy_chance::save()

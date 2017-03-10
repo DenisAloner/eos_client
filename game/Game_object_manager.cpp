@@ -33,14 +33,6 @@ void GameObjectManager::parser(const std::string& command)
 	}
 	switch (key)
 	{
-	case command_e::obj:
-	{
-		m_object = new GameObject();
-		m_object->m_name = arg[0];
-		m_items.insert(std::pair<std::string, GameObject*>(arg[0], m_object));
-		m_slot = nullptr;
-		break;
-	}
 	case command_e::state:
 	{  
 		object_state_e state = Parser::m_json_object_state_e.get_enum(arg[0]);
@@ -288,41 +280,11 @@ void GameObjectManager::parser(const std::string& command)
 		m_stack_attribute_map.pop_front();
 		break;
 	}
-	case command_e::new_template_part:
-	{
-		Object_part* item = new Object_part();
-		item->m_interaction_message_type = interaction_message_type_e::part;
-		item->m_part_kind = Parser::m_json_body_part_e.get_enum(arg[0]);
-		item->m_name = arg[1];
-		m_stack_attribute_map.push_front(&item->m_attributes);
-		m_template_part[arg[2]] = item;
-		break;
-	}
 	case command_e::template_part:
 	{
 		Object_part* item = m_template_part[arg[0]]->clone();
 		m_stack_attribute_map.push_front(&item->m_attributes);
 		m_stack_list.front()->add(item);
-		break;
-	}
-	case command_e::part:
-	{
-		Object_part* item = new Object_part();
-		item->m_interaction_message_type = interaction_message_type_e::part;
-		item->m_part_kind = Parser::m_json_body_part_e.get_enum(arg[1]);
-		item->m_name = arg[2];
-		if (arg[0][0] == 'y')
-		{
-			m_stack_attribute_map.push_front(&item->m_attributes);
-		}
-		if (arg[0][1] == 'y')
-		{
-			m_stack_list.front()->add(item);
-		}
-		if (arg[0][2] == 'y')
-		{
-			m_slot = item;
-		}
 		break;
 	}
 	case command_e::action:
@@ -689,7 +651,7 @@ void GameObjectManager::bind_body_predicat(Object_interaction* object, bool add_
 		{
 
 			Object_part* part = dynamic_cast<Object_part*>(object);
-			LOG(INFO) << "parts: " << part->m_name;
+			//LOG(INFO) << "parts: " << part->m_name;
 			part->m_owner= m_game_object_owner_stack.front();
 			m_game_object_owner_stack.push_front(part);
 		}

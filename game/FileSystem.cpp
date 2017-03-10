@@ -338,7 +338,7 @@ iSerializable* Serialization_manager::deserialize()
 		size_t s;
 		fread(&s, sizeof(size_t), 1, m_file);
 		value = Application::instance().m_actions[s];
-		LOG(INFO) << "Загружено действие "<< Application::instance().m_actions[s]->m_name;
+		//LOG(INFO) << "Загружено действие "<< Application::instance().m_actions[s]->m_name;
 		return value;
 	}
 	case type_e::mapcell:

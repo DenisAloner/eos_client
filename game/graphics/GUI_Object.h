@@ -42,6 +42,7 @@ public:
 	virtual bool check_region(MouseEventArgs const& e);
 	virtual void set_focus(bool state);
 	virtual void resize(int width, int height);
+	void execute_in_render_thread(std::function<void()>&& func);
 
 };
 

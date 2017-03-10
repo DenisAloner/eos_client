@@ -19,7 +19,7 @@ public:
 
 	tag_t m_tag;
 
-	GUI_Item(int _x, int _y, int _width, int _height, std::string text, tag_t tag);
+	GUI_Item(int _x, int _y, int _width, int _height, std::u16string text, tag_t tag);
 	~GUI_Item();
 
 	void on_close_button_click();

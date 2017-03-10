@@ -12,7 +12,7 @@ class GUI_Header :
 public:
 
 	Event<GUI_Object*> close;
-	GUI_Header(int x, int y, int width, int height, std::string text);
+	GUI_Header(int x, int y, int width, int height, std::u16string text);
 	~GUI_Header();
 
 	void on_close_button_click();
@@ -30,7 +30,7 @@ public:
 	Event<MouseEventArgs> end_moving;
 	Event<GUI_Object*> close;
 
-	GUI_Window(int _x, int _y, int _width, int _height, std::string _Name);
+	GUI_Window(int _x, int _y, int _width, int _height, std::u16string _Name);
 	~GUI_Window();
 
 	bool m_is_moving;
@@ -60,8 +60,8 @@ public:
 
 	GameObject* m_object;
 	GUI_TextBox* m_textbox;
-	GUI_description_window(int x, int y, int width, int height, std::string Name, GameObject*& object);
-	std::list<std::string> m_text;
+	GUI_description_window(int x, int y, int width, int height, std::u16string Name, GameObject*& object);
+	std::list<std::u16string> m_text;
 	void update_info();
 
 };
@@ -75,8 +75,8 @@ public:
 
 	GameObject* m_object;
 	GUI_Body* m_item;
-	GUI_body_window(int x, int y, int width, int height, std::string Name, GameObject*& object);
-	std::list<std::string> m_text;
+	GUI_body_window(int x, int y, int width, int height, std::u16string Name, GameObject*& object);
+	std::list<std::u16string> m_text;
 	void update_info();
 
 };

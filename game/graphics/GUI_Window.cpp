@@ -1,7 +1,7 @@
 #include "GUI_Window.h"
 #include "Application.h"
 
-GUI_Header::GUI_Header(int x, int y, int width, int height, std::string text) :GUI_Container(x, y, width, height)
+GUI_Header::GUI_Header(int x, int y, int width, int height, std::u16string text) :GUI_Container(x, y, width, height)
 {
 	GUI_Text* m_text = new GUI_Text(text);
 	m_text->m_position.x = 2;
@@ -36,7 +36,7 @@ void GUI_Header::resize(int width, int height)
 	m_items.front()->m_size.h = m_size.h - 8;
 }
 
-GUI_Window::GUI_Window(int _x, int _y, int _width, int _height, std::string _Name) :GUI_Container(_x, _y, _width, _height)
+GUI_Window::GUI_Window(int _x, int _y, int _width, int _height, std::u16string _Name) :GUI_Container(_x, _y, _width, _height)
 {
 	m_is_moving = false;
 	m_header = new GUI_Header(2, 2, m_size.w - 4, 0, _Name);
@@ -167,7 +167,7 @@ void GUI_Window::on_mouse_wheel(MouseEventArgs const& e)
 	}
 }
 
-GUI_description_window::GUI_description_window(int x, int y, int width, int height, std::string Name, GameObject*& object) :GUI_Window(x, y, width, height, Name), m_object(object)
+GUI_description_window::GUI_description_window(int x, int y, int width, int height, std::u16string Name, GameObject*& object) :GUI_Window(x, y, width, height, Name), m_object(object)
 {
 	m_textbox = new GUI_TextBox();
 	m_textbox->m_position.x = 2;
@@ -189,10 +189,10 @@ void GUI_description_window::update_info()
 	}
 	if (m_object->m_active_state)
 	{
-		m_text.push_back("эффекты:");
+		m_text.push_back(u"эффекты:");
 		for (auto current = m_object->m_active_state->m_items.begin(); current != m_object->m_active_state->m_items.end(); current++)
 		{
-			m_text.push_back("." + Parser::m_string_interaction_e[current->first] + ":");
+			m_text.push_back(u"." + Parser::m_string_interaction_e[current->first] + u":");
 			current->second->description(&m_text,2);
 		}
 		if (m_object->m_active_state->m_state == object_state_e::equip)
@@ -200,7 +200,7 @@ void GUI_description_window::update_info()
 			Object_state_equip* obj = static_cast<Object_state_equip*>(m_object->m_active_state);
 			for (auto current = obj->m_equip.m_items.begin(); current != obj->m_equip.m_items.end(); current++)
 			{
-				m_text.push_back("." + Parser::m_string_interaction_e[current->first] + ":");
+				m_text.push_back(u"." + Parser::m_string_interaction_e[current->first] + u":");
 				current->second->description(&m_text, 2);
 			}
 		}
@@ -211,7 +211,7 @@ void GUI_description_window::update_info()
 	}
 }
 
-GUI_body_window::GUI_body_window(int x, int y, int width, int height, std::string Name, GameObject*& object) :GUI_Window(x, y, width, height, Name), m_object(object)
+GUI_body_window::GUI_body_window(int x, int y, int width, int height, std::u16string Name, GameObject*& object) :GUI_Window(x, y, width, height, Name), m_object(object)
 {
 	m_item = new GUI_Body(m_object->m_active_state);
 	m_item->m_position.x = 1;

@@ -31,7 +31,7 @@ void GUI_ActionButton::render(GraphicalController* Graph, int px, int py)
 		glColor4d(1, 1, 1, 1);
 	}
 	glEnable(GL_TEXTURE_2D);
-	std::string desc = m_value.action->get_description(m_value.parameter);
+	std::u16string desc = m_value.action->get_description(m_value.parameter);
 	Graph->output_text(px + m_size.h + 4, py + y_shift, desc, 8, 17);
 	glDisable(GL_BLEND);
 	glColor4d(1, 1, 1, 1);

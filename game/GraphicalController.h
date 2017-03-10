@@ -68,13 +68,12 @@ public:
 	FT_Face       m_face;
 	FT_GlyphSlot  m_slot;
 
-	font_symbol_t m_font_symbols[256];
-	FT_ULong Unicode_to_ASCII[256];
 
 	dimension_t m_size;
 
 	
 	std::list<frectangle_t> m_scissors;
+	std::unordered_map<char16_t, font_symbol_t> m_unicode_symbols;
 
 	GLuint m_FBO;
 
@@ -87,8 +86,8 @@ public:
 	bool set_uniform_ptr(GLuint program, const char * name, const int value);
 	position_t get_OpenGL_position(float x, float y);
 	GLuint load_texture(const std::string& path);
-	void output_text(int x, int y, std::string& Text, int sizex, int sizey);
-	void center_text(int x, int y, std::string Text, int sizex, int sizey);
+	void output_text(int x, int y, std::u16string& Text, int sizex, int sizey);
+	void center_text(int x, int y, std::u16string Text, int sizex, int sizey);
 	void render_text(double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
 	bool add_scissor(const frectangle_t& rect);
 	void remove_scissor();
@@ -97,13 +96,13 @@ public:
 	bool set_uniform_float(GLuint program, const char * name, const float value);
 	GLint create_empty_texture(dimension_t size);
 	void Load_font(std::string font_filename);
-	int get_width(std::string text);
+	font_symbol_t& get_symbol(char16_t value);
 
 	GLuint png_texture_load(const std::string& path);
 
-	std::size_t measure_text_width(std::string& Text);
+	std::size_t measure_text_width(std::u16string& Text);
 
-	position_t center_aling_to_point(int x, int y,std::string text);
+	position_t center_aling_to_point(int x, int y, std::u16string text);
 
 	void draw_sprite(rectangle_t rect);
 	void draw_rectangle(rectangle_t rect);

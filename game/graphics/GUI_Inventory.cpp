@@ -5,7 +5,7 @@ GUI_Part_slot::GUI_Part_slot(int width, int height, Object_part* item, GUI_Body*
 {
 	m_size.w = width;
 	m_size.h = height;
-	m_name = "";
+	m_name = u"";
 }
 
 void GUI_Part_slot::render(GraphicalController* Graph, int px, int py)
@@ -158,18 +158,18 @@ void GUI_Body::get_part_predicat(Object_interaction* object,bool add_mode)
 		{
 			
 			Object_part& part = *dynamic_cast<Object_part*>(object);
-			LOG(INFO) << "parts: " << part.m_name;
+			//LOG(INFO) << "parts: " << part.m_name;
 			m_owner_name.push_front(&part.m_name);
-			std::string name = "";
-			for (auto i = m_owner_name.begin(); i != m_owner_name.end(); i++)
+			std::u16string name = u"";
+			for (auto i = m_owner_name.begin(); i != m_owner_name.end(); ++i)
 			{
-				if(name == "")
+				if(name == u"")
 				{
 					name += *(*i); 
 				}
 				else
 				{
-					name += " < " + *(*i);
+					name += u" < " + *(*i);
 				}
 			}
 			std::size_t s = Application::instance().m_graph->measure_text_width(name);

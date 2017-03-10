@@ -405,7 +405,7 @@ void  GameMap::add_wall()
 					{
 						if (!m_items[y+i][x +j]->m_items.empty()&&(!(i==0&&j==0)))
 						{
-							if (m_items[y + i][x + j]->m_items.front()->m_name == "floor")
+							if (m_items[y + i][x + j]->m_items.front()->m_name == u"floor")
 								empty = false;
 						}
 					}
@@ -476,7 +476,7 @@ void  GameMap::add_doors()
 		b = false;
 		for (int i = rect.x; i < rect.x + rect.w+1; i++)
 		{
-			if (m_items[rect.y][i]->m_items.front()->m_name == "floor") 
+			if (m_items[rect.y][i]->m_items.front()->m_name == u"floor") 
 			{ 
 				if (!b)
 				{
@@ -484,7 +484,7 @@ void  GameMap::add_doors()
 					s = i;
 				}
 			}
-			if (m_items[rect.y][i]->m_items.front()->m_name == "wall") 
+			if (m_items[rect.y][i]->m_items.front()->m_name == u"wall") 
 			{
 				if (b)
 				{
@@ -541,7 +541,7 @@ void  GameMap::add_doors()
 		b = false;
 		for (int i = rect.x; i < rect.x + rect.w + 1; i++)
 		{
-			if (m_items[rect.y+rect.h][i]->m_items.front()->m_name == "floor")
+			if (m_items[rect.y+rect.h][i]->m_items.front()->m_name == u"floor")
 			{
 				if (!b)
 				{
@@ -549,7 +549,7 @@ void  GameMap::add_doors()
 					s = i;
 				}
 			}
-			if (m_items[rect.y + rect.h][i]->m_items.front()->m_name == "wall")
+			if (m_items[rect.y + rect.h][i]->m_items.front()->m_name == u"wall")
 			{
 				if (b)
 				{
@@ -603,7 +603,7 @@ void  GameMap::add_doors()
 		b = false;
 		for (int i = rect.y; i < rect.y + rect.h + 1; i++)
 		{
-			if (m_items[i][rect.x]->m_items.front()->m_name == "floor")
+			if (m_items[i][rect.x]->m_items.front()->m_name == u"floor")
 			{
 				if (!b)
 				{
@@ -611,7 +611,7 @@ void  GameMap::add_doors()
 					s = i;
 				}
 			}
-			if (m_items[i][rect.x]->m_items.front()->m_name == "wall")
+			if (m_items[i][rect.x]->m_items.front()->m_name == u"wall")
 			{
 				if (b)
 				{
@@ -673,7 +673,7 @@ void  GameMap::add_doors()
 		b = false;
 		for (int i = rect.y; i < rect.y + rect.h + 1; i++)
 		{
-			if (m_items[i][rect.x + rect.w]->m_items.front()->m_name == "floor")
+			if (m_items[i][rect.x + rect.w]->m_items.front()->m_name == u"floor")
 			{
 				if (!b)
 				{
@@ -681,7 +681,7 @@ void  GameMap::add_doors()
 					s = i;
 				}
 			}
-			if (m_items[i][rect.x + rect.w]->m_items.front()->m_name == "wall")
+			if (m_items[i][rect.x + rect.w]->m_items.front()->m_name == u"wall")
 			{
 				if (b)
 				{

@@ -560,9 +560,8 @@ enum game_log_message_type_e
 struct game_log_message_t
 {
 	game_log_message_type_e type;
-	std::string value;
-
-	game_log_message_t(game_log_message_type_e type, std::string& value) :type(type), value(value) {};
+	std::u16string value;
+	game_log_message_t(game_log_message_type_e type, std::u16string& value) :type(type), value(value) {};
 };
 
 class GUI_TextFormat
@@ -861,9 +860,9 @@ public:
 	Object_interaction() {};
 	virtual void apply_effect(GameObject* unit, Object_interaction* object) {};
 	virtual bool on_turn() { return false; };
-	virtual std::string get_description() { return ""; };
+	virtual std::u16string get_description() { return u""; };
 	virtual Object_interaction* clone() { return nullptr; };
-	virtual void description(std::list<std::string>* info, int level) {};
+	virtual void description(std::list<std::u16string>* info, int level) {};
 	virtual void do_predicat(Visitor& helper) { helper.visit(*this); };
 	virtual void do_predicat_ex(predicat_ex func) { func(this, true); func(this, false); };
 
@@ -902,9 +901,9 @@ public:
 	static Dictonary<object_state_e> m_json_object_state_e;
 	static Dictonary<effect_e> m_json_effect_e;
 
-	static std::unordered_map<effect_e, std::string> m_string_effect_e;
-	static std::unordered_map<interaction_e, std::string> m_string_interaction_e;
-	static std::unordered_map<object_tag_e, std::string> m_string_object_tag_e;
+	static std::unordered_map<effect_e, std::u16string> m_string_effect_e;
+	static std::unordered_map<interaction_e, std::u16string> m_string_interaction_e;
+	static std::unordered_map<object_tag_e, std::u16string> m_string_object_tag_e;
 
 	Parser();
 	~Parser();

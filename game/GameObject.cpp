@@ -359,10 +359,10 @@ bool GameObject::on_turn()
 	return false;
 }
 
-std::string GameObject::get_description()
+std::u16string GameObject::get_description()
 {
 	LOG(FATAL) << "Метод не описан.";
-	return "";
+	return u"";
 }
 
 Object_interaction* GameObject::clone()
@@ -371,9 +371,9 @@ Object_interaction* GameObject::clone()
 	return nullptr;
 }
 
-void GameObject::description(std::list<std::string>* info, int level)
+void GameObject::description(std::list<std::u16string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + "<" + m_name + ">");
+	info->push_back(std::u16string(level, u'.') + u"<" + m_name + u">");
 }
 
 void GameObject::do_predicat(predicat func)
@@ -789,7 +789,7 @@ void GameObject::reset_serialization_index()
 
 void GameObject::save()
 {
-	LOG(INFO) << m_name;
+	/*LOG(INFO) << m_name;
 	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::gameobject;
 	fwrite(&t, sizeof(type_e), 1, file);
@@ -804,12 +804,12 @@ void GameObject::save()
 	{
 		Serialization_manager::instance().serialize(*item);
 	}
-	Serialization_manager::instance().serialize(m_active_state);
+	Serialization_manager::instance().serialize(m_active_state);*/
 }
 
 void GameObject::load()
 {
-	FILE* file = Serialization_manager::instance().m_file;
+	/*FILE* file = Serialization_manager::instance().m_file;
 	FileSystem::instance().deserialize_string(m_name, file);
 	LOG(INFO) << m_name;
 	fread(&m_direction, sizeof(object_direction_e), 1, file);
@@ -835,7 +835,7 @@ void GameObject::load()
 	m_active_state = static_cast<Object_state*>(Serialization_manager::instance().deserialize());
 	set_direction(m_direction);
 	update_interaction();
-	LOG(INFO) << "конец загрузки объекта";
+	LOG(INFO) << "конец загрузки объекта";*/
 }
 
 Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
@@ -956,22 +956,21 @@ Object_part* Object_part::clone()
 
 bool Object_part::on_turn()
 {
-	LOG(INFO) <<"не удалять "<< m_name;
 	return false;
 }
 
-std::string Object_part::get_description()
+std::u16string Object_part::get_description()
 {
-	return "slot";
+	return u"slot";
 }
 
-void Object_part::description(std::list<std::string>* info, int level)
+void Object_part::description(std::list<std::u16string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + "<" + m_name + ">:");
-	info->push_back(std::string(level, '.') + "<эффекты>:");
+	info->push_back(std::u16string(level, '.') + u"<" + m_name + u">:");
+	info->push_back(std::u16string(level, '.') + u"<эффекты>:");
 	for (auto current = m_attributes.m_items.begin(); current != m_attributes.m_items.end(); current++)
 	{
-		info->push_back(std::string(level + 1, '.') + Parser::m_string_interaction_e[current->first] + ":");
+		info->push_back(std::u16string(level + 1, '.') + Parser::m_string_interaction_e[current->first] + u":");
 		current->second->description(info, level + 2);
 	}
 }
@@ -1011,7 +1010,7 @@ void Object_part::reset_serialization_index()
 
 void Object_part::save()
 {
-	LOG(INFO) << "Часть";
+	/*LOG(INFO) << "Часть";
 	FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::object_part;
 	fwrite(&t, sizeof(type_e), 1, file);
@@ -1023,12 +1022,12 @@ void Object_part::save()
 	LOG(INFO) << "--- Запись объекта ---";
 	Serialization_manager::instance().serialize(m_item);
 	LOG(INFO) << "--- Конец записи объекта ---";
-	LOG(INFO) << "Конец листа частей";
+	LOG(INFO) << "Конец листа частей";*/
 }
 
 void Object_part::load()
 {
-	LOG(INFO) << "Часть";
+	/*LOG(INFO) << "Часть";
 	FILE* file = Serialization_manager::instance().m_file;
 	m_attributes.load();
 	fread(&m_part_kind, sizeof(body_part_e), 1, file);
@@ -1046,5 +1045,5 @@ void Object_part::load()
 			LOG(INFO) << "Объект не имеет владельца";
 		}
 	}
-	LOG(INFO) << "Конец части";
+	LOG(INFO) << "Конец части";*/
 }

@@ -205,7 +205,7 @@ class GameObject : public Object_interaction, public GUI_connectable_i, public G
 {
 public:
 
-	std::string m_name;
+	std::u16string m_name;
 
 	object_direction_e m_direction;
 	bool m_selected;
@@ -236,9 +236,9 @@ public:
 	MapCell* get_center(MapCell* c);
 
 	virtual bool on_turn();
-	virtual std::string get_description();
+	std::u16string get_description() override;
 	virtual Object_interaction* clone();
-	virtual void description(std::list<std::string>* info, int level);
+	void description(std::list<std::u16string>* info, int level) override;
 	virtual void do_predicat(predicat func);
 
 	virtual void reset_serialization_index();
@@ -318,13 +318,13 @@ public:
 
 	Attribute_map m_attributes;
 	body_part_e m_part_kind;
-	std::string m_name;
+	std::u16string m_name;
 
 	Object_part(GameObject* item = nullptr);
 	virtual bool on_turn();
-	virtual std::string get_description();
+	std::u16string get_description() override;
 	virtual Object_part* clone();
-	virtual void description(std::list<std::string>* info, int level);
+	void description(std::list<std::u16string>* info, int level) override;
 	virtual void do_predicat(Visitor& helper);
 	virtual void do_predicat_ex(predicat_ex func);
 

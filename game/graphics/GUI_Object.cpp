@@ -1,4 +1,5 @@
 #include "GUI_Object.h"
+#include "Application.h"
 
 
 GUI_Object::GUI_Object(void)
@@ -26,6 +27,11 @@ void GUI_Object::resize(int width, int height)
 {
 	m_size.w = width;
 	m_size.h = height;
+}
+
+void GUI_Object::execute_in_render_thread(std::function<void()>&& func)
+{
+	Application::instance().m_update_in_render_thread.push_back(func);
 }
 
 

@@ -1,6 +1,6 @@
 #include "GUI_Item.h"
 
-GUI_Item::GUI_Item(int _x, int _y, int _width, int _height, std::string text, tag_t tag) :GUI_Container(_x, _y, _width, _height)
+GUI_Item::GUI_Item(int _x, int _y, int _width, int _height, std::u16string text, tag_t tag) :GUI_Container(_x, _y, _width, _height)
 {
 
 	m_tag = tag;

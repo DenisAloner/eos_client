@@ -68,27 +68,27 @@ void GUI_MiniMap::render_on_canvas()
 			for (std::list<GameObject*>::iterator obj = m_map_viewer->m_map->m_items[y][x]->m_items.begin(); obj != m_map_viewer->m_map->m_items[y][x]->m_items.end(); ++obj)
 			{
 				glColor4d(0.0, 0.0, 0.0, 0.0);
-				if ((*obj)->m_name == "floor")
+				if ((*obj)->m_name == u"floor")
 				{
 					glColor4d(0.3, 0.3, 0.3, 1.0);
 				}
-				if ((*obj)->m_name == "wall")
+				if ((*obj)->m_name == u"wall")
 				{
 					glColor4d(0.0, 0.3, 0.5, 1.0);
 				}
-				if ((*obj)->m_name == "elf")
+				if ((*obj)->m_name == u"elf")
 				{
 					glColor4d(0.0, 0.7, 0.0, 1.0);
 				}
-				if ((*obj)->m_name == "door")
+				if ((*obj)->m_name == u"door")
 				{
 					glColor4d(0.3, 0.1, 0.0, 1.0);
 				}
-				if ((*obj)->m_name == "torch")
+				if ((*obj)->m_name == u"torch")
 				{
 					glColor4d(0.9, 0.8, 0.0, 1.0);
 				}
-				if ((*obj)->m_name == "snake")
+				if ((*obj)->m_name == u"snake")
 				{
 					glColor4d(0.7, 0.0, 0.0, 1.0);
 				}

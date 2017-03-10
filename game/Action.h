@@ -25,8 +25,8 @@ public:
 
 	GLuint m_icon;
 	action_e::type m_kind;
-	std::string m_name;
-	std::string m_error;
+	std::u16string m_name;
+	std::u16string m_error;
 	int m_decay;
 	parameter_type_e m_parameter_kind;
 	animation_e m_animation;
@@ -36,10 +36,10 @@ public:
 
 	virtual bool check(Parameter* parameter);
 	virtual char perfom(Parameter* parameter);
-	virtual std::string get_description(Parameter* parameter) = 0;
+	virtual std::u16string get_description(Parameter* parameter) = 0;
 	virtual void interaction_handler(Parameter* arg);
 	virtual bool on_turn(){ return false; };
-	virtual std::string get_description() { return "действие"; };
+	virtual std::u16string get_description() { return u"действие"; };
 	virtual Object_interaction* clone();
 	virtual void description(std::list<std::string>* info, int level) {};
 
@@ -74,7 +74,7 @@ public:
 	Action_wrapper();
 
 	virtual bool on_turn() { return false; };
-	virtual std::string get_description() { return "действие"; };
+	virtual std::u16string get_description() { return u"действие"; };
 	virtual void description(std::list<std::string>* info, int level) {};
 	virtual Action_wrapper* clone();
 	//virtual void perfom(Parameter* parameter);
@@ -100,7 +100,7 @@ public:
 
 	virtual bool check(Parameter* parameter);
 	virtual char perfom(Parameter* parameter);
-	virtual std::string get_description(Parameter* parameter);
+	virtual std::u16string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 };
 
@@ -124,7 +124,7 @@ public:
 
 	virtual bool check(Parameter* parameter);
 	virtual char perfom(Parameter* parameter);
-	virtual std::string get_description(Parameter* parameter);
+	virtual std::u16string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 
 };
@@ -139,7 +139,7 @@ public:
 
 	virtual bool check(Parameter* parameter);
 	virtual char perfom(Parameter* parameter);
-	virtual std::string get_description(Parameter* parameter);
+	virtual std::u16string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 
 };
@@ -154,7 +154,7 @@ public:
 
 	virtual bool check(Parameter* parameter);
 	virtual char perfom(Parameter* parameter);
-	virtual std::string get_description(Parameter* parameter);
+	virtual std::u16string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 
 };
@@ -168,7 +168,7 @@ public:
 
 	virtual bool check(Parameter* parameter);
 	virtual char perfom(Parameter* parameter);
-	virtual std::string get_description(Parameter* parameter);
+	virtual std::u16string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 
 };
@@ -181,7 +181,7 @@ public:
 	action_set_motion_path();
 
 	virtual char perfom(Parameter* parameter);
-	virtual std::string get_description(Parameter* parameter);
+	virtual std::u16string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 };
 
@@ -194,7 +194,7 @@ public:
 	Action_pick();
 
 	virtual char perfom(Parameter* parameter);
-	virtual std::string get_description(Parameter* parameter);
+	virtual std::u16string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 	virtual void description(std::list<std::string>* info, int level);
 
@@ -207,7 +207,7 @@ public:
 
 	Action_move_out();
 
-	virtual std::string get_description(Parameter* parameter);
+	virtual std::u16string get_description(Parameter* parameter);
 
 };
 
@@ -219,7 +219,7 @@ public:
 	Action_open();
 
 	virtual char perfom(Parameter* parameter);
-	virtual std::string get_description(Parameter* parameter);
+	virtual std::u16string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 
 };
@@ -232,7 +232,7 @@ public:
 	Action_hit();
 	virtual bool check(Parameter* parameter);
 	virtual char perfom(Parameter* parameter);
-	virtual std::string get_description(Parameter* parameter);
+	virtual std::u16string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 
 };
@@ -257,7 +257,7 @@ public:
 
 	virtual bool check(Parameter* parameter);
 	virtual char perfom(Parameter* parameter);
-	virtual std::string get_description(Parameter* parameter);
+	virtual std::u16string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 
 };
@@ -269,7 +269,7 @@ public:
 
 	Action_show_parameters();
 
-	virtual std::string get_description(Parameter* parameter);
+	virtual std::u16string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 
 };
@@ -284,7 +284,7 @@ public:
 
 	virtual bool check(Parameter* parameter);
 	virtual char perfom(Parameter* parameter);
-	virtual std::string get_description(Parameter* parameter);
+	std::u16string get_description(Parameter* parameter) override;
 	virtual void interaction_handler(Parameter* arg);
 };
 
@@ -295,7 +295,7 @@ public:
 
 	Action_save();
 
-	virtual std::string get_description(Parameter* parameter);
+	virtual std::u16string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 
 };
@@ -307,7 +307,7 @@ public:
 
 	Action_load();
 
-	virtual std::string get_description(Parameter* parameter);
+	virtual std::u16string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 
 };
@@ -319,7 +319,7 @@ public:
 
 	Action_autoexplore();
 
-	virtual std::string get_description(Parameter* parameter);
+	virtual std::u16string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 	virtual bool get_child(GameTask*& task);
 
@@ -333,7 +333,7 @@ public:
 	Action_shoot();
 	virtual bool check(Parameter* parameter);
 	virtual char perfom(Parameter* parameter);
-	virtual std::string get_description(Parameter* parameter);
+	virtual std::u16string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 	bool process_cell(Parameter* parameter,MapCell* cell);
 private:

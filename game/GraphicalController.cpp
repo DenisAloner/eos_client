@@ -6,19 +6,7 @@
 GraphicalController::GraphicalController(dimension_t size)
 {
 	m_size = size;
-	for (int i = 0; i < 192; ++i)
-	{
-		Unicode_to_ASCII[i] = i;
-	}
-	for (int i = 192; i < 224; ++i)
-	{
-		Unicode_to_ASCII[i] = i - 192 + 1040;
-	}
-	for (int i = 224; i < 256; ++i)
-	{
-		Unicode_to_ASCII[i] = i - 224 + 1072;
-	}
-
+	
 	Load_font(FileSystem::instance().m_resource_path + "Fonts\\9746.ttf");
 
 	try
@@ -85,35 +73,53 @@ void GraphicalController::Load_font(std::string font_filename)
 
 	m_error = FT_Set_Pixel_Sizes(m_face, font_size_c, 0);
 	m_slot = m_face->glyph;
-	for (int i = 0; i < 256; ++i)
+	get_symbol(u'?');
+	get_symbol(u' ');
+	m_unicode_symbols[u' '] = m_unicode_symbols[u'?'];
+}
+
+font_symbol_t& GraphicalController::get_symbol(char16_t value)
+{
+	std::u16string temp{ value };
+	auto symbol = m_unicode_symbols.find(value);
+	if(symbol == m_unicode_symbols.end())
 	{
-		m_error = FT_Load_Char(m_face, Unicode_to_ASCII[i], FT_LOAD_RENDER);
+		
+		m_error = FT_Load_Char(m_face, value, FT_LOAD_RENDER);
 
 		if (m_error != 0)
 		{
 			LOG(INFO) << "Ошибка загрузки символа";
+			return m_unicode_symbols[u'?'];
 		}
 
 		GLuint texture;
 		glGenTextures(1, &texture);
+		GLenum err;
+		if ((err = glGetError()) != GL_NO_ERROR) {
+			LOG(INFO)<<" ----------------------------------------------------------------------------------------------------" << Parser::UTF16_to_CP866({ value })<<"   "<<std::to_string((int)value) << "   Ошибка: " << gluErrorString(err); 
+		}
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, m_slot->bitmap.width, m_slot->bitmap.rows, 0, GL_ALPHA, GL_UNSIGNED_BYTE, m_slot->bitmap.buffer);
-		m_font_symbols[i].id = texture;
-		m_font_symbols[i].size.w = m_slot->bitmap.width;
-		m_font_symbols[i].size.h = m_slot->bitmap.rows;
-		m_font_symbols[i].bearing.w = m_slot->bitmap_left;
-		m_font_symbols[i].bearing.h = m_font_symbols[i].size.h - m_slot->bitmap_top;
+		LOG(INFO) << std::to_string(texture) <<"    "<< Parser::UTF16_to_CP866({ value });
+		font_symbol_t s;
+		s.id = texture;
+		s.size.w = m_slot->bitmap.width;
+		s.size.h = m_slot->bitmap.rows;
+		s.bearing.w = m_slot->bitmap_left;
+		s.bearing.h = s.size.h - m_slot->bitmap_top;
+		m_unicode_symbols[value] = s;
+		return m_unicode_symbols[value];
 	}
-	m_font_symbols[32].size.w = m_font_symbols[97].size.w;
-	m_font_symbols[32].size.h = m_font_symbols[97].size.h;
-	m_font_symbols[32].bearing.w = m_font_symbols[97].bearing.w;
-	m_font_symbols[32].bearing.h = m_font_symbols[97].bearing.h;
+	else
+	{
+		return symbol->second;
+	}
 }
-
 
 bool GraphicalController::CompileSuccessful(int obj)
 {
@@ -199,7 +205,7 @@ void GraphicalController::set_VSync(bool sync)
 //	}
 //}
 
-void GraphicalController::output_text(int x, int y, std::string& Text, int sizex, int sizey)
+void GraphicalController::output_text(int x, int y, std::u16string& Text, int sizex, int sizey)
 {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glUseProgram(0);
@@ -208,9 +214,9 @@ void GraphicalController::output_text(int x, int y, std::string& Text, int sizex
 	int x0, y0, x1, y1, x2, y2, x3, y3;
 	int shift_x = 0;
 	for (int k = 0; k<Text.length(); k++)
-	{ 
-		font_symbol_t& fs = m_font_symbols[(unsigned char)Text[k]];
-		if ((unsigned char)Text[k] != 32)
+	{
+		font_symbol_t& fs = get_symbol(Text[k]);
+		if (Text[k] != 32)
 		{
 			glBindTexture(GL_TEXTURE_2D, fs.id);
 			x0 = x + shift_x;
@@ -232,44 +238,35 @@ void GraphicalController::output_text(int x, int y, std::string& Text, int sizex
 	}
 }
 
-std::size_t GraphicalController::measure_text_width(std::string& Text)
+
+std::size_t GraphicalController::measure_text_width(std::u16string& Text)
 {
 	int result = 0;
 	for (int k = 0; k<Text.length(); k++)
 	{
-		font_symbol_t& fs = m_font_symbols[(unsigned char)Text[k]];
+		font_symbol_t& fs = get_symbol(Text[k]);
 		result += fs.size.w;
 	}
 	return result;
 }
 
-void GraphicalController::center_text(int x, int y, std::string Text, int sizex, int sizey)
+void GraphicalController::center_text(int x, int y, std::u16string Text, int sizex, int sizey)
 {
 	int width = 0;
 	for (int k = 0; k<Text.length(); k++)
 	{
-		font_symbol_t& fs = m_font_symbols[(unsigned char)Text[k]];
+		font_symbol_t& fs = get_symbol(Text[k]);
 		width += fs.size.w;
 	}
 	int cx = x - (width / 2);
-	int cy = y-((m_face->size->metrics.ascender- m_face->size->metrics.descender) >> 7);
+	int cy = y - ((m_face->size->metrics.ascender - m_face->size->metrics.descender) >> 7);
 	output_text(cx, cy, Text, sizex, sizey);
 }
 
-int GraphicalController::get_width(std::string text)
-{
-	int width = 0;
-	for (int k = 0; k<text.length(); k++)
-	{
-		font_symbol_t& fs = m_font_symbols[(unsigned char)text[k]];
-		width += fs.size.w;
-	}
-	return width;
-}
 
-position_t GraphicalController::center_aling_to_point(int x, int y, std::string text)
+position_t GraphicalController::center_aling_to_point(int x, int y, std::u16string text)
 {
-	return position_t(x - (get_width(text) / 2), y);
+	return position_t(x - (measure_text_width(text) / 2), y);
 }
 
 bool GraphicalController::add_scissor(const frectangle_t& rect)

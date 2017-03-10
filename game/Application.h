@@ -116,6 +116,7 @@ public:
 	GUI_Window_manager* m_window_manager;
 
 	std::list<GUI_Object*> m_update_canvas;
+	std::list<std::function<void()>> m_update_in_render_thread;
 
 	Game_log m_game_log;
 

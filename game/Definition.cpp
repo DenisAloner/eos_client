@@ -141,57 +141,57 @@ Dictonary<effect_e> Parser::m_json_effect_e = {
 	{ effect_e::end_angle,"end_angle" }
 };
 
-std::unordered_map<effect_e, std::string>  Parser::m_string_effect_e = {
-	{ effect_e::value,"модификатор значения" },
-	{ effect_e::limit,"модификатор лимита" },
-	{ effect_e::start_angle, "модификатор начального угла обзора" },
-	{ effect_e::end_angle, "модификатор конечного угла обзора" }
+std::unordered_map<effect_e, std::u16string>  Parser::m_string_effect_e = {
+	{ effect_e::value,u"модификатор значения" },
+	{ effect_e::limit,u"модификатор лимита" },
+	{ effect_e::start_angle, u"модификатор начального угла обзора" },
+	{ effect_e::end_angle, u"модификатор конечного угла обзора" }
 };
 
 
-std::unordered_map<interaction_e, std::string>  Parser::m_string_interaction_e = {
-	{ interaction_e::total_damage, "общий дополнительный урон" },
-	{ interaction_e::damage, "урон" },
-	{ interaction_e::buff, "баффы" },
-	{ interaction_e::use, "применение" },
-	{ interaction_e::health, "здоровье" },
-	{ interaction_e::strength, "сила" },
-	{ interaction_e::intelligence, "интеллект" },
-	{ interaction_e::dexterity, "ловкость" },
-	{ interaction_e::hunger,  "голод" },
-	{ interaction_e::thirst,  "жажда" },
-	{ interaction_e::poison,  "яд" },
-	{ interaction_e::action,  "действия" },
-	{ interaction_e::tag,  "метки" },
-	{ interaction_e::body,  "тело" },
-	{ interaction_e::weapon_damage,  "урон оружия" },
-	{ interaction_e::skill_sword,  "владение мечом" },
-	{ interaction_e::skill_bow,  "владение луком" },
-	{ interaction_e::strength_bonus,  "бонус силы" },
-	{ interaction_e::demand_weapon_skill,  "требование к владению оружием" },
-	{ interaction_e::evasion_skill, "навык уклонения" },
-	{ interaction_e::weapon_range,  "дальность" },
-	{ interaction_e::vision,  "зрение" },
-	{ interaction_e::vision_component,  "поле зрения" },
-	{ interaction_e::skill_unarmed_combat,  "владение безоружным боем" },
-	{ interaction_e::equip,  "экипировка" }
+std::unordered_map<interaction_e, std::u16string>  Parser::m_string_interaction_e = {
+	{ interaction_e::total_damage, u"общий дополнительный урон" },
+	{ interaction_e::damage, u"урон" },
+	{ interaction_e::buff, u"баффы" },
+	{ interaction_e::use, u"применение" },
+	{ interaction_e::health, u"здоровье" },
+	{ interaction_e::strength, u"сила" },
+	{ interaction_e::intelligence, u"интеллект" },
+	{ interaction_e::dexterity, u"ловкость" },
+	{ interaction_e::hunger,  u"голод" },
+	{ interaction_e::thirst,  u"жажда" },
+	{ interaction_e::poison,  u"яд" },
+	{ interaction_e::action,  u"действия" },
+	{ interaction_e::tag,  u"метки" },
+	{ interaction_e::body,  u"тело" },
+	{ interaction_e::weapon_damage,  u"урон оружия" },
+	{ interaction_e::skill_sword,  u"владение мечом" },
+	{ interaction_e::skill_bow,  u"владение луком" },
+	{ interaction_e::strength_bonus,  u"бонус силы" },
+	{ interaction_e::demand_weapon_skill,  u"требование к владению оружием" },
+	{ interaction_e::evasion_skill, u"навык уклонения" },
+	{ interaction_e::weapon_range,  u"дальность" },
+	{ interaction_e::vision,  u"зрение" },
+	{ interaction_e::vision_component,  u"поле зрения" },
+	{ interaction_e::skill_unarmed_combat,  u"владение безоружным боем" },
+	{ interaction_e::equip,  u"экипировка" }
 };
 
-std::unordered_map<object_tag_e, std::string>  Parser::m_string_object_tag_e = {
-	{ object_tag_e::poison_resist , "сопротивление к яду" },
-	{ object_tag_e::purification_from_poison , "очищение от яда" },
-	{ object_tag_e::mortal , "смертное существо" },
-	{ object_tag_e::pass_able , "не является преградой" },
-	{ object_tag_e::pick_able , "можно взять" },
-	{ object_tag_e::seethrough_able , "не загораживает обзор" },
-	{ object_tag_e::activator , "активирует/деактивирует механизмы" },
-	{ object_tag_e::fast_move , "быстрое передвижение" },
-	{ object_tag_e::equippable , "можно одеть" },
-	{ object_tag_e::ring , "кольцо" },
-	{ object_tag_e::requirements_to_object , "требования к предмету" },
-	{ object_tag_e::cursed , "наложено проклятье" },
-	{ object_tag_e::can_transfer_object , "может перекладывать предметы" },
-	{ object_tag_e::footwear , "обувь" }
+std::unordered_map<object_tag_e, std::u16string>  Parser::m_string_object_tag_e = {
+	{ object_tag_e::poison_resist , u"сопротивление к яду" },
+	{ object_tag_e::purification_from_poison , u"очищение от яда" },
+	{ object_tag_e::mortal , u"смертное существо" },
+	{ object_tag_e::pass_able , u"не является преградой" },
+	{ object_tag_e::pick_able , u"можно взять" },
+	{ object_tag_e::seethrough_able , u"не загораживает обзор" },
+	{ object_tag_e::activator , u"активирует/деактивирует механизмы" },
+	{ object_tag_e::fast_move , u"быстрое передвижение" },
+	{ object_tag_e::equippable , u"можно одеть" },
+	{ object_tag_e::ring , u"кольцо" },
+	{ object_tag_e::requirements_to_object , u"требования к предмету" },
+	{ object_tag_e::cursed , u"наложено проклятье" },
+	{ object_tag_e::can_transfer_object , u"может перекладывать предметы" },
+	{ object_tag_e::footwear , u"обувь" }
 };
 
 std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> Parser::m_convert;

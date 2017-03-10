@@ -25,12 +25,12 @@ bool Interaction_list::on_turn()
 	return false;
 }
 
-std::string Interaction_list::get_description()
+std::u16string Interaction_list::get_description()
 {
-	std::string result = "";
+	std::u16string result = u"";
 	for (auto current = m_items.begin(); current != m_items.end(); ++current)
 	{
-		result += (*current)->get_description() + ",";
+		result += (*current)->get_description() + u",";
 	}
 	return result;
 }
@@ -113,7 +113,7 @@ void Interaction_list::do_predicat_ex(predicat_ex func)
 	func(this, false);
 }
 
-void Interaction_list::description(std::list<std::string>* info, int level)
+void Interaction_list::description(std::list<std::u16string>* info, int level)
 {
 	for (auto current = m_items.begin(); current != m_items.end(); ++current)
 	{
@@ -261,12 +261,12 @@ bool Parameter_list::update()
 	return false;
 }
 
-std::string Parameter_list::get_description()
+std::u16string Parameter_list::get_description()
 {
-	std::string result = std::to_string(m_value) + "/" + std::to_string(m_limit) + ",";
+	std::u16string result = Parser::CP866_to_UTF16(std::to_string(m_value)) + u"/" + Parser::CP866_to_UTF16(std::to_string(m_limit)) + u",";
 	for (auto current = m_items.begin(); current != m_items.end(); ++current)
 	{
-		result += (*current)->get_description() + ",";
+		result += (*current)->get_description() + u",";
 	}
 	return result;
 }
@@ -286,9 +286,9 @@ Parameter_list* Parameter_list::clone()
 	return result;
 }
 
-void Parameter_list::description(std::list<std::string>* info, int level)
+void Parameter_list::description(std::list<std::u16string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + std::to_string(m_value) + "(" + std::to_string(m_basic_value) + ")/" + std::to_string(m_limit) + "(" + std::to_string(m_basic_limit) + "):");
+	info->push_back(Parser::CP866_to_UTF16(std::string(level, '.') + std::to_string(m_value) + "(" + std::to_string(m_basic_value) + ")/" + std::to_string(m_limit) + "(" + std::to_string(m_basic_limit) + "):"));
 	for (auto current = m_items.begin(); current != m_items.end(); ++current)
 	{
 		(*current)->description(info, level);
@@ -378,7 +378,7 @@ bool Vision_list::update()
 	return false;
 }
 
-std::string Vision_list::get_description()
+std::u16string Vision_list::get_description()
 {
 	/*std::string result = std::to_string(m_value) + "/" + std::to_string(m_limit) + ",";
 	for (auto current = m_items.begin(); current != m_items.end(); current++)
@@ -386,7 +386,7 @@ std::string Vision_list::get_description()
 		result += (*current)->get_description() + ",";
 	}
 	return result;*/
-	return "";
+	return u"empty";
 }
 
 Vision_list* Vision_list::clone()
@@ -400,7 +400,7 @@ Vision_list* Vision_list::clone()
 	return result;
 }
 
-void Vision_list::description(std::list<std::string>* info, int level)
+void Vision_list::description(std::list<std::u16string>* info, int level)
 {
 	//info->push_back(std::string(level, '.') + std::to_string(m_value) + "(" + std::to_string(m_basic_value) + ")/" + std::to_string(m_limit) + "(" + std::to_string(m_basic_limit) + "):");
 	for (auto current = m_items.begin(); current != m_items.end(); ++current)
@@ -573,7 +573,7 @@ bool Vision_component::update()
 	return false;
 }
 
-std::string Vision_component::get_description()
+std::u16string Vision_component::get_description()
 {
 	//std::string result = std::to_string(m_value) + "/" + std::to_string(m_limit) + ",";
 	//for (auto current = m_items.begin(); current != m_items.end(); current++)
@@ -581,7 +581,7 @@ std::string Vision_component::get_description()
 	//	result += (*current)->get_description() + ",";
 	//}
 	//return result;
-	return "";
+	return u"";
 }
 
 Vision_component* Vision_component::clone()
@@ -596,9 +596,9 @@ Vision_component* Vision_component::clone()
 	return result;
 }
 
-void Vision_component::description(std::list<std::string>* info, int level)
+void Vision_component::description(std::list<std::u16string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + std::to_string(m_value.radius)+","+ std::to_string(m_value.start_angle) + "," + std::to_string(m_value.end_angle)+"/" + std::to_string(m_basic_value.radius) + "," + std::to_string(m_basic_value.start_angle) + "," + std::to_string(m_basic_value.end_angle));
+	info->push_back(Parser::CP866_to_UTF16(std::string(level, '.') + std::to_string(m_value.radius)+","+ std::to_string(m_value.start_angle) + "," + std::to_string(m_value.end_angle)+"/" + std::to_string(m_basic_value.radius) + "," + std::to_string(m_basic_value.start_angle) + "," + std::to_string(m_basic_value.end_angle)));
 	for (auto current = m_items.begin(); current != m_items.end(); ++current)
 	{
 		(*current)->description(info, level+1);
@@ -959,9 +959,9 @@ Slot_set_state* Slot_set_state::clone()
 	return effect;
 }
 
-void Slot_set_state::description(std::list<std::string>* info, int level)
+void Slot_set_state::description(std::list<std::u16string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + "изменить состояние");
+	info->push_back(std::u16string(level, '.') + u"изменить состояние");
 }
 
 void Slot_set_state::apply_effect(GameObject* unit, Object_interaction* object)
@@ -983,9 +983,9 @@ void Slot_set_state::load()
 
 // Slot_select_cell
 
-void Slot_select_cell::description(std::list<std::string>* info, int level)
+void Slot_select_cell::description(std::list<std::u16string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + "выбрать локацию");
+	info->push_back(std::u16string(level, '.') + u"выбрать локацию");
 }
 
 Slot_select_cell* Slot_select_cell::clone()
@@ -1038,9 +1038,9 @@ void Slot_select_cell::load()
 
 // Slot_allocator
 
-void Slot_allocator::description(std::list<std::string>* info, int level)
+void Slot_allocator::description(std::list<std::u16string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + "вперед на одну клетку");
+	info->push_back(std::u16string(level, '.') + u"вперед на одну клетку");
 
 }
 
@@ -1074,9 +1074,9 @@ void Slot_allocator::load()
 
 // Slot_mover
 
-void Slot_mover::description(std::list<std::string>* info, int level)
+void Slot_mover::description(std::list<std::u16string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + "переместить объект:");
+	info->push_back(std::u16string(level, '.') + u"переместить объект:");
 	m_value->description(info, level + 1);
 }
 
@@ -1158,9 +1158,9 @@ Interaction_copyist::Interaction_copyist()
 {
 }
 
-std::string Interaction_copyist::get_description()
+std::u16string Interaction_copyist::get_description()
 {
-	return "slot";
+	return u"slot";
 }
 
 
@@ -1173,9 +1173,9 @@ Object_interaction* Interaction_copyist::clone()
 	return effect;
 }
 
-void Interaction_copyist::description(std::list<std::string>* info, int level)
+void Interaction_copyist::description(std::list<std::u16string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + "<тип параметра:" + Parser::m_string_interaction_e[m_subtype] + ">:");
+	info->push_back(std::u16string(level, '.') + u"<тип параметра:" + Parser::m_string_interaction_e[m_subtype] + u">:");
 	m_value->description(info, level + 1);
 }
 
@@ -1208,9 +1208,9 @@ void Interaction_copyist::load()
 
 Interaction_prefix::Interaction_prefix() {};
 
-void Interaction_prefix::description(std::list<std::string>* info, int level)
+void Interaction_prefix::description(std::list<std::u16string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + "<тип эффекта:" + Application::instance().m_game_object_manager->get_effect_prefix_string(m_subtype) + ">:");
+	info->push_back(std::u16string(level, '.') + u"<тип эффекта:" + Parser::CP866_to_UTF16(Application::instance().m_game_object_manager->get_effect_prefix_string(m_subtype)) + u">:");
 	m_value->description(info, level + 1);
 }
 
@@ -1235,9 +1235,9 @@ void Interaction_prefix::apply_effect(GameObject* unit, Object_interaction* obje
 	if (m_value) { m_value->apply_effect(unit, object); }
 }
 
-std::string Interaction_prefix::get_description()
+std::u16string Interaction_prefix::get_description()
 {
-	return "none";
+	return u"none";
 }
 
 void Interaction_prefix::save()
@@ -1260,9 +1260,9 @@ void Interaction_prefix::load()
 
 Interaction_addon::Interaction_addon() {};
 
-std::string Interaction_addon::get_description()
+std::u16string Interaction_addon::get_description()
 {
-	return "slot";
+	return u"slot";
 }
 
 Object_interaction* Interaction_addon::clone()
@@ -1274,9 +1274,9 @@ Object_interaction* Interaction_addon::clone()
 	return effect;
 }
 
-void Interaction_addon::description(std::list<std::string>* info, int level)
+void Interaction_addon::description(std::list<std::u16string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + "<наложение эффекта:" + Parser::m_string_interaction_e[m_subtype] + ">:");
+	info->push_back(std::u16string(level, '.') + u"<наложение эффекта:" + Parser::m_string_interaction_e[m_subtype] + u">:");
 	m_value->description(info, level + 1);
 }
 
@@ -1319,9 +1319,9 @@ bool Interaction_time::on_turn()
 	else return false;
 }
 
-std::string Interaction_time::get_description()
+std::u16string Interaction_time::get_description()
 {
-	return "slot";
+	return u"slot";
 }
 
 Object_interaction* Interaction_time::clone()
@@ -1333,9 +1333,9 @@ Object_interaction* Interaction_time::clone()
 	return effect;
 }
 
-void Interaction_time::description(std::list<std::string>* info, int level)
+void Interaction_time::description(std::list<std::u16string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + "<длительное наложение эффекта:" + std::to_string(m_turn) + ">:");
+	info->push_back(std::u16string(level, '.') + u"<длительное наложение эффекта:" + Parser::CP866_to_UTF16(std::to_string(m_turn)) + u">:");
 	m_value->description(info, level + 1);
 }
 
@@ -1377,9 +1377,9 @@ bool Interaction_timer::on_turn()
 	return m_value->on_turn();
 }
 
-std::string Interaction_timer::get_description()
+std::u16string Interaction_timer::get_description()
 {
-	return "slot";
+	return u"slot";
 }
 
 Object_interaction* Interaction_timer::clone()
@@ -1392,9 +1392,9 @@ Object_interaction* Interaction_timer::clone()
 	return effect;
 }
 
-void Interaction_timer::description(std::list<std::string>* info, int level)
+void Interaction_timer::description(std::list<std::u16string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + "<цикличное наложение эффекта:" + std::to_string(m_turn) + "(" + std::to_string(m_period) + ")>:");
+	info->push_back(std::u16string(level, '.') + u"<цикличное наложение эффекта:" + Parser::CP866_to_UTF16(std::to_string(m_turn) + "(" + std::to_string(m_period) + ")>:"));
 	m_value->description(info, level + 1);
 }
 
@@ -1445,9 +1445,9 @@ Object_interaction* Effect::clone()
 	return effect;
 }
 
-std::string Effect::get_description()
+std::u16string Effect::get_description()
 {
-	return Parser::m_string_effect_e[m_subtype] + ":" + std::to_string(m_value);
+	return Parser::m_string_effect_e[m_subtype] + u":" + Parser::CP866_to_UTF16(std::to_string(m_value));
 }
 
 void Effect::apply_effect(GameObject* unit, Object_interaction* object)
@@ -1481,9 +1481,9 @@ void Effect::apply_effect(GameObject* unit, Object_interaction* object)
 }
 
 
-void Effect::description(std::list<std::string>* info, int level)
+void Effect::description(std::list<std::u16string>* info, int level)
 {
-	info->push_back(std::string(level,'.')+ Parser::m_string_effect_e[m_subtype] + ":" + std::to_string(m_value));
+	info->push_back(std::u16string(level,'.')+ Parser::m_string_effect_e[m_subtype] + u":" + Parser::CP866_to_UTF16(std::to_string(m_value)));
 }
 
 void Effect::save()
@@ -1509,14 +1509,14 @@ Object_tag::Object_tag(object_tag_e key) :m_type(key)
 	m_interaction_message_type = interaction_message_type_e::tag;
 };
 
-void Object_tag::description(std::list<std::string>* info, int level)
+void Object_tag::description(std::list<std::u16string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + "<" + Parser::m_string_object_tag_e[m_type] + ">");
+	info->push_back(Parser::CP866_to_UTF16(std::string(level, '.')) + u"<" + Parser::m_string_object_tag_e[m_type] + u">");
 }
 
-std::string Object_tag::get_description()
+std::u16string Object_tag::get_description()
 {
-	return "none";
+	return u"none";
 }
 
 bool Object_tag::on_turn()
@@ -1840,9 +1840,9 @@ Instruction_slot_link::Instruction_slot_link()
 	m_enable = false;
 }
 
-std::string Instruction_slot_link::get_description()
+std::u16string Instruction_slot_link::get_description()
 {
-	return "slot";
+	return u"slot";
 }
 
 
@@ -1856,9 +1856,9 @@ Instruction_slot_link* Instruction_slot_link::clone()
 	return effect;
 }
 
-void Instruction_slot_link::description(std::list<std::string>* info, int level)
+void Instruction_slot_link::description(std::list<std::u16string>* info, int level)
 {
-	info->push_back(std::string(level, '.') + "<тип параметра:" + Parser::m_string_interaction_e[m_subtype] + ">:");
+	info->push_back(Parser::CP866_to_UTF16(std::string(level, '.')) + u"<тип параметра:" + Parser::m_string_interaction_e[m_subtype] + u">:");
 	m_value->description(info, level + 1);
 }
 
@@ -1994,9 +1994,9 @@ Instruction_slot_parameter::Instruction_slot_parameter()
 	m_interaction_message_type = interaction_message_type_e::instruction_slot_parameter;
 }
 
-std::string Instruction_slot_parameter::get_description()
+std::u16string Instruction_slot_parameter::get_description()
 {
-	return "slot";
+	return u"slot";
 }
 
 
@@ -2008,7 +2008,7 @@ Object_interaction* Instruction_slot_parameter::clone()
 	return effect;
 }
 
-void Instruction_slot_parameter::description(std::list<std::string>* info, int level)
+void Instruction_slot_parameter::description(std::list<std::u16string>* info, int level)
 {
 	/*info->push_back(std::string(level, '.') + "<тип параметра:" + Application::instance().m_game_object_manager->get_object_tag_string(m_subtype) + ">:");*/
 	m_value->description(info, level + 1);

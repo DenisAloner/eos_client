@@ -1,15 +1,15 @@
 #include "GUI_Text.h"
 
 
-GUI_Text::GUI_Text(std::string _Text)
+GUI_Text::GUI_Text(std::u16string text)
 {
 	m_format = new GUI_TextFormat(8, 17, RGBA_t(1.0, 1.0, 1.0, 1.0));
-	set(_Text);
+	set(text);
 }
 
-GUI_Text::GUI_Text(std::string _Text, GUI_TextFormat* _Format) : m_format(_Format)
+GUI_Text::GUI_Text(std::u16string text, GUI_TextFormat* format) : m_format(format)
 {
-	set(_Text);
+	set(text);
 }
 
 GUI_Text::~GUI_Text()
@@ -24,7 +24,7 @@ void GUI_Text::render(GraphicalController* Graph, int px, int py)
 	Graph->output_text(px, py, m_text, m_format->m_symbol_size.w, m_format->m_symbol_size.h);
 }
 
-void GUI_Text::set(std::string t)
+void GUI_Text::set(std::u16string t)
 {
 	m_text = t;
 	m_size.w = m_text.length() * m_format->m_symbol_size.w;
