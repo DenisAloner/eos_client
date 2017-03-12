@@ -27,6 +27,6 @@ void GUI_Text::render(GraphicalController* Graph, int px, int py)
 void GUI_Text::set(std::u16string t)
 {
 	m_text = t;
-	m_size.w = m_text.length() * m_format->m_symbol_size.w;
+	m_size.w = Application::instance().m_graph->measure_text_width(m_text);
 	m_size.h = (Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender) >> 6;
 }
