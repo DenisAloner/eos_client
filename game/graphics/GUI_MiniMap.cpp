@@ -19,7 +19,7 @@ GUI_MiniMap::~GUI_MiniMap()
 
 void GUI_MiniMap::on_update()
 {
-	Application::instance().m_update_canvas.push_back(this);
+	execute_in_render_thread(std::bind(&GUI_MiniMap::render_on_canvas, this));
 }
 
 void GUI_MiniMap::render_on_canvas()
@@ -157,7 +157,7 @@ GUI_FOV::GUI_FOV(position_t position, dimension_t size, GameObject* object)
 
 void GUI_FOV::on_update()
 {
-	Application::instance().m_update_canvas.push_back(this);
+	execute_in_render_thread(std::bind(&GUI_FOV::render_on_canvas, this));
 }
 
 
@@ -184,7 +184,6 @@ void GUI_FOV::render_on_canvas()
 	dimension_t cr = Application::instance().m_size;
 	if (!m_canvas_create)
 	{
-		
 		m_canvas = Application::instance().m_graph->create_empty_texture(dimension_t(cr.w, cr.h));
 		m_canvas_create = true;
 	};

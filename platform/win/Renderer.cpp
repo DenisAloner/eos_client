@@ -53,7 +53,7 @@ void Renderer::work()
 	glLoadIdentity();
 
 	// Инициализируем приложение
-	Application::instance().initialize(m_size);
+	Application::instance().initialize(m_size,m_hDC, hRC);
 
 
 	//???? Application::instance().m_GUI->MapViewer->m_center.x = Application::instance().m_GUI->MapViewer->m_player->m_object->cell()->x;

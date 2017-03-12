@@ -93,12 +93,12 @@ font_symbol_t& GraphicalController::get_symbol(char16_t value)
 			return m_unicode_symbols[u'?'];
 		}
 
+		bool is_ok = wglMakeCurrent(Application::instance().m_hDC, Application::instance().subhRC);
+		GLenum err;
+		
 		GLuint texture;
 		glGenTextures(1, &texture);
-		GLenum err;
-		if ((err = glGetError()) != GL_NO_ERROR) {
-			LOG(INFO)<<" ----------------------------------------------------------------------------------------------------" << Parser::UTF16_to_CP866({ value })<<"   "<<std::to_string((int)value) << "   Îøèáêà: " << gluErrorString(err); 
-		}
+		
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -113,6 +113,7 @@ font_symbol_t& GraphicalController::get_symbol(char16_t value)
 		s.bearing.w = m_slot->bitmap_left;
 		s.bearing.h = s.size.h - m_slot->bitmap_top;
 		m_unicode_symbols[value] = s;
+		wglMakeCurrent(Application::instance().m_hDC, Application::instance().m_hRC);
 		return m_unicode_symbols[value];
 	}
 	else

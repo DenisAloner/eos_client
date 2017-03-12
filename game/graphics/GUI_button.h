@@ -14,7 +14,6 @@ public:
 	~GUI_button();
 
 	void render(GraphicalController* Graph, int px, int py) override;
-	void update();
 
 };
 

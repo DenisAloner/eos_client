@@ -104,14 +104,7 @@ void Application::render()
 	std::hash<std::thread::id> hasher;
 	
 	//OutputDebugString((std::to_string(hasher(this_id)) + " render\n").c_str());
-		
-
-	for (auto current = m_update_canvas.begin(); current != m_update_canvas.end(); ++current)
-	{
-		(*current)->render_on_canvas();
-	}
-	m_update_canvas.clear();
-
+	
 	for (auto current = m_update_in_render_thread.begin(); current != m_update_in_render_thread.end(); ++current)
 	{
 		(*current)();
@@ -169,8 +162,12 @@ void Application::render()
 	m_update_mutex.unlock();
 }
 
-void Application::initialize(dimension_t work_area_size)
+void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 {
+	this->m_hDC = m_hDC;
+	this->m_hRC = hRC;
+	subhRC = wglCreateContext(m_hDC);
+	wglShareLists(this->m_hRC, subhRC);
 	m_size = work_area_size;
 	music = NULL;
 	m_game_turn = 1;

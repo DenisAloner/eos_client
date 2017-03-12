@@ -85,12 +85,6 @@ public:
 			object->m_position.y = 0;
 		}
 		GUI_Layer::add(object);
-		execute_in_render_thread(std::bind(&GUI_PopMenu::update,this));
-	};
-
-	void update()
-	{
-		GUI_PopMenu::Item* object;
 		std::size_t maxlen = 0;
 		std::size_t height = 0;
 		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); ++Current)
@@ -103,7 +97,7 @@ public:
 		{
 			(*Current)->m_size.w = m_size.w - 1;
 		}
-	}
+	};
 
 	virtual void on_lose_focus(GUI_Object* sender){ destroy(this); }
 	virtual void on_mouse_move(MouseEventArgs const& e)
