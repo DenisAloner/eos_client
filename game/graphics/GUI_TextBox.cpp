@@ -3,6 +3,8 @@
 
 GUI_TextBox::GUI_TextBox() :GUI_Container(0, 0, 0, 0)
 {
+	start_render = m_items.begin();
+	end_render = m_items.end();
 }
 
 
@@ -59,6 +61,7 @@ void GUI_TextBox::add_item_control(GUI_Object* object)
 		m_scroll.y = 0;
 	}
 	GUI_Layer::add(object);
+	update();
 }
 
 void GUI_TextBox::set_scroll(int dy)
@@ -88,6 +91,60 @@ void GUI_TextBox::set_scroll(int dy)
 			}
 		}
 		m_scroll.y += dy;
+		update();
+	}
+
+}
+
+void GUI_TextBox::update()
+{
+	for(auto i=m_items.begin();i!=m_items.end();++i)
+	{
+		if((*i)->m_position.y+ (*i)->m_size.h+ m_scroll.y>0)
+		{
+			start_render = i;
+			for (auto j = i; j != m_items.end(); ++j)
+			{
+				if ((*j)->m_position.y + (*j)->m_size.h + m_scroll.y > m_size.h)
+				{
+					end_render = j;
+					break;
+				}
+			}
+			break;
+		}
+	}
+}
+
+
+void GUI_TextBox::render(GraphicalController* Graph, int px, int py)
+{
+
+	glEnable(GL_SCISSOR_TEST);
+	if (Graph->add_scissor(frectangle_t((float)px, (float)py, (float)m_size.w, (float)m_size.h)))
+	{
+
+		Graph->blur_rect(px, py, m_size.w, m_size.h);
+
+		glEnable(GL_BLEND);
+		glDisable(GL_TEXTURE_2D);
+		glColor4d(0.0, 0.0, 0.0, 0.5);
+		GraphicalController::rectangle_t rect(px, py, m_size.w, m_size.h);
+		Graph->draw_sprite(rect);
+		glEnable(GL_TEXTURE_2D);
+		glColor4d(1.0, 1.0, 1.0, 1.0);
+		for (auto i = start_render; i != end_render; ++i)
+		{
+			(*i)->render(Graph, px + (*i)->m_position.x + m_scroll.x, py + (*i)->m_position.y + m_scroll.y);
+		}
+		Graph->remove_scissor();
+		if (m_border_visible)
+		{
+			glDisable(GL_BLEND);
+			glDisable(GL_TEXTURE_2D);
+			glColor4f(1.0, 1.0, 1.0, 1.0);
+			Graph->draw_rectangle(GraphicalController::rectangle_t(px, py, m_size.w, m_size.h));
+		}
 	}
 }
 

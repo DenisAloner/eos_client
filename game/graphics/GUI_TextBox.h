@@ -12,14 +12,18 @@ class GUI_TextBox :
 {
 public:
 
+	std::list<GUI_Object*>::iterator start_render;
+	std::list<GUI_Object*>::iterator end_render;
+
 	GUI_TextBox();
 	~GUI_TextBox();
 
 	//virtual void Render(GraphicalController* Graph);
 	virtual void add_item_control(GUI_Object* object);
-	virtual void on_mouse_wheel(MouseEventArgs const& e);
-	void set_scroll(int dy);
-
+	void on_mouse_wheel(MouseEventArgs const& e) override;
+	void set_scroll(int dy) override;
+	void update();
+	void render(GraphicalController* Graph, int px, int py) override;
 };
 
 class GUI_game_console :
