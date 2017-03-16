@@ -1189,10 +1189,13 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 
 						}
 					}
+					if(m_hints.size()!=0)
+					{
 						for (auto current = m_hints.begin(); current != m_hints.end(); ++current)
 						{
 							(*current)->render_on_cell(m_map->m_items[y][x]);
 						}
+					}
 				}
 			}
 		}
@@ -1407,7 +1410,7 @@ void GUI_MapViewer::on_mouse_down(MouseEventArgs const& e)
 		x = m_center.x + p.x - m_tile_count_x / 2;
 		y = m_center.y + p.y - m_tile_count_y / 2;
 
-		if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
+		//if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
 		{
 			set_focus(true);
 			//on_mouse_click(e);
@@ -1496,6 +1499,7 @@ position_t GUI_MapViewer::local_xy(position_t p)
 	if (Result.y < 0) { Result.y = 0; }
 	return Result;
 }
+
 void GUI_MapViewer::on_mouse_move(MouseEventArgs const& e)
 {
 	position_t p = local_xy(e.position);
