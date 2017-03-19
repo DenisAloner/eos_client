@@ -7,6 +7,9 @@ GUI_Object::GUI_Object(void)
 	focused=false;
 	key_press += std::bind(&GUI_Object::on_key_press, this, std::placeholders::_1);
 	mouse_click+=std::bind(&GUI_Object::on_mouse_click,this,std::placeholders::_1);
+	mouse_start_drag += std::bind(&GUI_Object::on_mouse_start_drag, this, std::placeholders::_1);
+	mouse_drag += std::bind(&GUI_Object::on_mouse_drag, this, std::placeholders::_1);
+	mouse_end_drag += std::bind(&GUI_Object::on_mouse_end_drag, this, std::placeholders::_1);
 	mouse_down += std::bind(&GUI_Object::on_mouse_down, this, std::placeholders::_1);
 	mouse_wheel += std::bind(&GUI_Object::on_mouse_wheel, this, std::placeholders::_1);
 	mouse_move += std::bind(&GUI_Object::on_mouse_move, this, std::placeholders::_1);
@@ -38,6 +41,18 @@ void GUI_Object::execute_in_render_thread(std::function<void()>&& func)
 void GUI_Object::on_mouse_click(MouseEventArgs const& e)
 {
 	set_focus(true);
+}
+
+void GUI_Object::on_mouse_start_drag(MouseEventArgs const& e)
+{
+}
+
+void GUI_Object::on_mouse_drag(MouseEventArgs const& e)
+{
+}
+
+void GUI_Object::on_mouse_end_drag(MouseEventArgs const& e)
+{
 }
 
 void GUI_Object::on_mouse_down(MouseEventArgs const& e)

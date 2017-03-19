@@ -21,6 +21,9 @@ public:
 	GUI_Object(void);
 	~GUI_Object(void);
 
+	Event<MouseEventArgs> mouse_start_drag;
+	Event<MouseEventArgs> mouse_drag;
+	Event<MouseEventArgs> mouse_end_drag;
 	Event<MouseEventArgs> mouse_click;
 	Event<MouseEventArgs> mouse_down;
 	Event<MouseEventArgs> mouse_wheel;
@@ -33,6 +36,9 @@ public:
 	virtual void render(GraphicalController* Graph,int px,int py);
 	virtual void render_on_canvas() {};
 	virtual void on_mouse_click(MouseEventArgs const& e);
+	virtual void on_mouse_start_drag(MouseEventArgs const& e);
+	virtual void on_mouse_drag(MouseEventArgs const& e);
+	virtual void on_mouse_end_drag(MouseEventArgs const& e);
 	virtual void on_mouse_down(MouseEventArgs const& e);
 	virtual void on_mouse_wheel(MouseEventArgs const& e);
 	virtual void on_mouse_move(MouseEventArgs const& e);

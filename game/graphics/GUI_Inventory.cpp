@@ -209,9 +209,9 @@ void GUI_Body::update(Attribute_map* feature)
 	}
 	GUI_Object* LastElement = m_items.back();
 	int h = LastElement->m_position.y + LastElement->m_size.h + 2;
-	if (h > Application::instance().m_GUI->m_main_layer->m_size.h-50)
+	if (h > Application::instance().m_gui_controller.m_size.h-50)
 	{
-		h = Application::instance().m_GUI->m_main_layer->m_size.h - 50;
+		h = Application::instance().m_gui_controller.m_size.h - 50;
 	}
 	resize(LastElement->m_size.w+4, h);
 }

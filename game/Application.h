@@ -21,6 +21,7 @@
 #include "GUI_button.h"
 #include "GUI_Button_list.h"
 #include "game/Game_log.h"
+#include <graphics/GUI_Controller.h>
 
 class Action;
 class ActionManager;
@@ -100,7 +101,8 @@ public:
 
 	GameObjectManager* m_game_object_manager;
 
-	ApplicationGUI* m_GUI;
+	GUI_Controller m_gui_controller;
+	
 	GraphicalController* m_graph;
 	ActionManager* m_action_manager;
 
@@ -109,7 +111,6 @@ public:
 	AI_manager* m_ai_manager;
 	
 	Event<WPARAM> key_press;
-	Event<MouseEventArgs> mouse_click;
 
 	Mix_Chunk *music;
 

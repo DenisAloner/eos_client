@@ -5,22 +5,22 @@
 #include "log.h"
 #include <algorithm>
 
-gui_mapviewer_hint::gui_mapviewer_hint(GUI_MapViewer* owner) :m_owner(owner) { m_top = false; }
-mapviewer_hint_path::mapviewer_hint_path(GUI_MapViewer* owner, std::vector<MapCell*>* path,GameObject* object) : gui_mapviewer_hint(owner), m_path(path),m_object(object) {};
-mapviewer_hint_area::mapviewer_hint_area(GUI_MapViewer* owner, GameObject* object, bool consider_object_size) : gui_mapviewer_hint(owner), m_object(object), m_consider_object_size(consider_object_size) {}
-mapviewer_hint_object_area::mapviewer_hint_object_area(GUI_MapViewer* owner, GameObject* object) : gui_mapviewer_hint(owner), m_object(object) {}
-mapviewer_hint_line::mapviewer_hint_line(GUI_MapViewer* owner, MapCell* cell, GameObject* object) : gui_mapviewer_hint(owner), m_cell(cell),m_object(object) {}
+gui_mapviewer_hint::gui_mapviewer_hint() { m_top = false; }
+mapviewer_hint_path::mapviewer_hint_path(std::vector<MapCell*>* path,GameObject* object) :  m_path(path),m_object(object) {};
+mapviewer_hint_area::mapviewer_hint_area(GameObject* object, bool consider_object_size) :  m_object(object), m_consider_object_size(consider_object_size) {}
+mapviewer_hint_object_area::mapviewer_hint_object_area(GameObject* object) : m_object(object) {}
+mapviewer_hint_line::mapviewer_hint_line(MapCell* cell, GameObject* object) : m_cell(cell),m_object(object) {}
 
-void gui_mapviewer_hint::draw_cell(MapCell* cell, int index)
+void gui_mapviewer_hint::draw_cell(GUI_MapViewer* owner,MapCell* cell, int index)
 {
 	int px = 0;
 	int py = 0;
-	int x = px + cell->x - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
-	int y = py + cell->y - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
-	int yp = m_owner->m_tile_count_x - x;
-	int xp = m_owner->m_tile_count_y - y;
+	int x = px + cell->x - owner->m_center.x + owner->m_tile_count_x / 2;
+	int y = py + cell->y - owner->m_center.y + owner->m_tile_count_y / 2;
+	int yp = owner->m_tile_count_x - x;
+	int xp = owner->m_tile_count_y - y;
 
-	GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + m_owner->m_shift.x, (xp + yp) * tile_size_y_half + m_owner->m_shift.y, tile_size_x,-tile_size_y);
+	GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + owner->m_shift.x, (xp + yp) * tile_size_y_half + owner->m_shift.y, tile_size_x,-tile_size_y);
 	glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_select);
 	glColor4f(1.0F, 0.9F, 0.0F, 0.5F);
 	Application::instance().m_graph->draw_sprite(r);
@@ -28,7 +28,7 @@ void gui_mapviewer_hint::draw_cell(MapCell* cell, int index)
 	Application::instance().m_graph->center_text((r.a.x + r.b.x)*0.5, (r.a.y + r.b.y) *0.5, Parser::CP866_to_UTF16(std::to_string(index)), 8, 17);
 }
 
-void mapviewer_hint_path::render()
+void mapviewer_hint_path::render(GUI_MapViewer* owner)
 {
 	int px = 0;
 	int py = 0;
@@ -37,19 +37,19 @@ void mapviewer_hint_path::render()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_2D);
-	if (m_owner->m_cursored != nullptr)
+	if (owner->m_cursored != nullptr)
 	{
 		if (m_path)
 		{
 			for (int i = 0; i < m_path->size(); i++)
 			{
-				draw_cell((*m_path)[(m_path->size() - 1) - i], i);
+				draw_cell(owner,(*m_path)[(m_path->size() - 1) - i], i);
 			}
 		}
 	}
 }
 
-void mapviewer_hint_object_area::render()
+void mapviewer_hint_object_area::render(GUI_MapViewer* owner)
 {
 	int px = 0;
 	int py = 0;
@@ -69,32 +69,32 @@ void mapviewer_hint_object_area::render()
 	{
 		for (int j = 0; j < bx; j++)
 		{
-			int x = px + (Item->x + j) - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
-			int y = py + (Item->y - i) - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
-			int yp = m_owner->m_tile_count_x - x;
-			int xp = m_owner->m_tile_count_y - y;
-			GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + m_owner->m_shift.x, (xp + yp) * tile_size_y_half + m_owner->m_shift.y, tile_size_x, -tile_size_y);
+			int x = px + (Item->x + j) - owner->m_center.x + owner->m_tile_count_x / 2;
+			int y = py + (Item->y - i) - owner->m_center.y + owner->m_tile_count_y / 2;
+			int yp = owner->m_tile_count_x - x;
+			int xp = owner->m_tile_count_y - y;
+			GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + owner->m_shift.x, (xp + yp) * tile_size_y_half + owner->m_shift.y, tile_size_x, -tile_size_y);
 			glColor4f(1.0F, 0.9F, 0.0F, 0.25F);
 			Application::instance().m_graph->draw_sprite(r);
 			glDisable(GL_BLEND);
 			glDisable(GL_TEXTURE_2D);
 			glColor4f(1.0, 1.0, 0.0, 1.0);
-			Application::instance().m_graph->stroke_cell(xp, yp, m_owner->m_shift.x, m_owner->m_shift.y);
+			Application::instance().m_graph->stroke_cell(xp, yp, owner->m_shift.x, owner->m_shift.y);
 			glEnable(GL_BLEND);
 			glEnable(GL_TEXTURE_2D);
 		}
 	}
 }
 
-void mapviewer_hint_line::draw_cell(MapCell* a)
+void mapviewer_hint_line::draw_cell(GUI_MapViewer* owner,MapCell* a)
 {
 	int px = 0;
 	int py = 0;
-	int x = px + a->x - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
-	int y = py + a->y - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
-	int yp = m_owner->m_tile_count_x - x;
-	int xp = m_owner->m_tile_count_y - y;
-	GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + m_owner->m_shift.x, (xp + yp) * tile_size_y_half + m_owner->m_shift.y, tile_size_x, -tile_size_y);
+	int x = px + a->x - owner->m_center.x + owner->m_tile_count_x / 2;
+	int y = py + a->y - owner->m_center.y + owner->m_tile_count_y / 2;
+	int yp = owner->m_tile_count_x - x;
+	int xp = owner->m_tile_count_y - y;
+	GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + owner->m_shift.x, (xp + yp) * tile_size_y_half + owner->m_shift.y, tile_size_x, -tile_size_y);
 	glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_select);
 	glColor4f(1.0F, 0.9F, 0.0F, 0.5F);
 	Application::instance().m_graph->draw_sprite(r);
@@ -103,7 +103,7 @@ void mapviewer_hint_line::draw_cell(MapCell* a)
 	m_step_count += 1;
 }
 
-void mapviewer_hint_line::render()
+void mapviewer_hint_line::render(GUI_MapViewer* owner)
 {
 	int px = 0;
 	int py = 0;
@@ -112,11 +112,11 @@ void mapviewer_hint_line::render()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_2D);
-	if (m_owner->m_cursored != nullptr)
+	if (owner->m_cursored != nullptr)
 	{
 		m_step_count = 0;
 		/*m_owner->m_map->bresenham_line(m_cell, m_owner->m_cursored, std::bind(&mapviewer_hint_line::draw_cell, this, std::placeholders::_1));*/
-		Path::instance().map_costing(m_cell->m_map,m_object, m_owner->m_cursored, 40);
+		Path::instance().map_costing(m_cell->m_map,m_object, owner->m_cursored, 40);
 		std::vector<MapCell*>* path;
 		path = Path::instance().get_path_to_cell();
 		if (path)
@@ -136,16 +136,16 @@ void mapviewer_hint_line::render()
 			}*/
 			for (i; i < path->size(); ++i)
 			{
-				draw_cell((*path)[(path->size() - 1) - i]);
+				draw_cell(owner,(*path)[(path->size() - 1) - i]);
 			}
 			Path::instance().m_heap.m_items.clear();
 		}
 	}
 }
 
-mapviewer_hint_weapon_range::mapviewer_hint_weapon_range(GUI_MapViewer* owner, GameObject* object, int range) : gui_mapviewer_hint(owner), m_object(object), m_range(range) {}
+mapviewer_hint_weapon_range::mapviewer_hint_weapon_range( GameObject* object, int range) :m_object(object), m_range(range) {}
 
-void mapviewer_hint_area::render()
+void mapviewer_hint_area::render(GUI_MapViewer* owner)
 {
 	int px = 0;
 	int py = 0;
@@ -175,17 +175,17 @@ void mapviewer_hint_area::render()
 		{
 			if (i == by || j == bx || i == -1 || j == -1)
 			{
-				int x = px + (Item->x + j) - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
-				int y = py + (Item->y - i) - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
-				int yp = m_owner->m_tile_count_x - x;
-				int xp = m_owner->m_tile_count_y - y;
-				rect.set((xp - yp) * tile_size_x_half + m_owner->m_shift.x, (xp + yp) * tile_size_y_half + m_owner->m_shift.y, tile_size_x, -tile_size_y);
+				int x = px + (Item->x + j) - owner->m_center.x + owner->m_tile_count_x / 2;
+				int y = py + (Item->y - i) - owner->m_center.y + owner->m_tile_count_y / 2;
+				int yp = owner->m_tile_count_x - x;
+				int xp = owner->m_tile_count_y - y;
+				rect.set((xp - yp) * tile_size_x_half + owner->m_shift.x, (xp + yp) * tile_size_y_half + owner->m_shift.y, tile_size_x, -tile_size_y);
 				glColor4f(1.0F, 0.9F, 0.0F, 0.25F);
 				Application::instance().m_graph->draw_sprite(rect);
 				glDisable(GL_BLEND);
 				glDisable(GL_TEXTURE_2D);
 				glColor4f(1.0, 1.0, 0.0, 1.0);
-				Application::instance().m_graph->stroke_cell(xp, yp, m_owner->m_shift.x, m_owner->m_shift.y);
+				Application::instance().m_graph->stroke_cell(xp, yp, owner->m_shift.x, owner->m_shift.y);
 				glEnable(GL_BLEND);
 				glEnable(GL_TEXTURE_2D);
 			}
@@ -198,17 +198,17 @@ void mapviewer_hint_area::render()
 		{
 			if (i == by || j == bx || i == -1 || j == -1)
 			{
-				int x = px + (Item->x + j) - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
-				int y = py + (Item->y - i) - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
-				int yp = m_owner->m_tile_count_x - x;
-				int xp = m_owner->m_tile_count_y - y;
-				rect.set((xp - yp) * tile_size_x_half + m_owner->m_shift.x, (xp + yp) * tile_size_y_half + m_owner->m_shift.y, tile_size_x, -tile_size_y);
+				int x = px + (Item->x + j) - owner->m_center.x + owner->m_tile_count_x / 2;
+				int y = py + (Item->y - i) - owner->m_center.y + owner->m_tile_count_y / 2;
+				int yp = owner->m_tile_count_x - x;
+				int xp = owner->m_tile_count_y - y;
+				rect.set((xp - yp) * tile_size_x_half + owner->m_shift.x, (xp + yp) * tile_size_y_half + owner->m_shift.y, tile_size_x, -tile_size_y);
 				glColor4f(1.0F, 0.9F, 0.0F, 0.25F);
 				Application::instance().m_graph->draw_sprite(rect);
 				glDisable(GL_BLEND);
 				glDisable(GL_TEXTURE_2D);
 				glColor4f(1.0, 1.0, 0.0, 1.0);
-				Application::instance().m_graph->stroke_cell(xp, yp, m_owner->m_shift.x, m_owner->m_shift.y);
+				Application::instance().m_graph->stroke_cell(xp, yp, owner->m_shift.x, owner->m_shift.y);
 				glEnable(GL_BLEND);
 				glEnable(GL_TEXTURE_2D);
 			}
@@ -216,7 +216,7 @@ void mapviewer_hint_area::render()
 	}
 }
 
-void mapviewer_hint_weapon_range::render()
+void mapviewer_hint_weapon_range::render(GUI_MapViewer* owner)
 {
 	int px = 0;
 	int py = 0;
@@ -248,8 +248,8 @@ void mapviewer_hint_weapon_range::render()
 			int yp = yc - i + yr;
 			if ((!m_object->is_own(xp,yp))&&(rf*rf >= ((j - xrf)*(j - xrf) + (i - yrf)*(i - yrf))))
 			{
-				int x = px + xp - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
-				int y = py + yp - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
+				int x = px + xp - owner->m_center.x + owner->m_tile_count_x / 2;
+				int y = py + yp - owner->m_center.y + owner->m_tile_count_y / 2;
 				/*x0 = x * m_owner->m_tile_size_x;
 				y0 = (m_owner->m_tile_count_y - y - 1) * m_owner->m_tile_size_y;
 				x1 = x0;
@@ -258,9 +258,9 @@ void mapviewer_hint_weapon_range::render()
 				y2 = y1;
 				x3 = x2;
 				y3 = y0;*/
-				int yp = m_owner->m_tile_count_x - x;
-				int xp = m_owner->m_tile_count_y - y;
-				r.set((xp - yp) * tile_size_x_half + m_owner->m_shift.x, (xp + yp) * tile_size_y_half + m_owner->m_shift.y, tile_size_x, -tile_size_y);
+				int yp = owner->m_tile_count_x - x;
+				int xp = owner->m_tile_count_y - y;
+				r.set((xp - yp) * tile_size_x_half + owner->m_shift.x, (xp + yp) * tile_size_y_half + owner->m_shift.y, tile_size_x, -tile_size_y);
 				glColor4f(1.0F, 0.9F, 0.0F, 0.25F);
 				glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
 				Application::instance().m_graph->draw_sprite(r);
@@ -270,9 +270,9 @@ void mapviewer_hint_weapon_range::render()
 				//glDisable(GL_BLEND);
 				glDisable(GL_TEXTURE_2D);
 				glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
-				Application::instance().m_graph->stroke_cell(xp, yp, m_owner->m_shift.x, m_owner->m_shift.y);
+				Application::instance().m_graph->stroke_cell(xp, yp, owner->m_shift.x, owner->m_shift.y);
 				glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_03, 0);
-				Application::instance().m_graph->stroke_cell(xp, yp, m_owner->m_shift.x, m_owner->m_shift.y);
+				Application::instance().m_graph->stroke_cell(xp, yp, owner->m_shift.x,owner->m_shift.y);
 				glEnable(GL_BLEND);
 				glEnable(GL_TEXTURE_2D);
 			}
@@ -280,19 +280,19 @@ void mapviewer_hint_weapon_range::render()
 	}
 }
 
-mapviewer_hint_shoot::mapviewer_hint_shoot(GUI_MapViewer* owner, GameObject* object, int range) : gui_mapviewer_hint(owner), m_object(object),m_range(range) { m_top = true; }
+mapviewer_hint_shoot::mapviewer_hint_shoot( GameObject* object, int range) :  m_object(object),m_range(range) { m_top = true; }
 
-void mapviewer_hint_shoot::draw_cell(MapCell* a)
+void mapviewer_hint_shoot::draw_cell(GUI_MapViewer* owner,MapCell* a)
 {
 	if (!m_object->is_own(a))
 	{
 		int px = 0;
 		int py = 0;
-		int x = px + a->x - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
-		int y = py + a->y - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
-		int yp = m_owner->m_tile_count_x - x;
-		int xp = m_owner->m_tile_count_y - y;
-		GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + m_owner->m_shift.x, (xp + yp) * tile_size_y_half + m_owner->m_shift.y, tile_size_x, -tile_size_y);
+		int x = px + a->x - owner->m_center.x + owner->m_tile_count_x / 2;
+		int y = py + a->y - owner->m_center.y + owner->m_tile_count_y / 2;
+		int yp = owner->m_tile_count_x - x;
+		int xp = owner->m_tile_count_y - y;
+		GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + owner->m_shift.x, (xp + yp) * tile_size_y_half + owner->m_shift.y, tile_size_x, -tile_size_y);
 		bool pass_able = true;
 		float xrf = a->x - m_object->cell()->x - m_object->m_active_state->m_size.x / 2.0F + 0.5F;
 		float yrf = a->y - m_object->cell()->y + m_object->m_active_state->m_size.y / 2.0F - 0.5F;
@@ -333,13 +333,13 @@ void mapviewer_hint_shoot::draw_cell(MapCell* a)
 			glColor4f(1.0F, 0.0F, 0.0F, 1.0F);
 		}
 		glDisable(GL_TEXTURE_2D);
-		Application::instance().m_graph->stroke_cell(xp, yp, m_owner->m_shift.x, m_owner->m_shift.y);
+		Application::instance().m_graph->stroke_cell(xp, yp, owner->m_shift.x, owner->m_shift.y);
 		glEnable(GL_TEXTURE_2D);
 		m_step_count += 1;
 	}
 }
 
-void mapviewer_hint_shoot::render()
+void mapviewer_hint_shoot::render(GUI_MapViewer* owner)
 {
 	int px = 0;
 	int py = 0;
@@ -348,25 +348,25 @@ void mapviewer_hint_shoot::render()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_2D);
-	if (m_owner->m_cursored != nullptr)
+	if (owner->m_cursored != nullptr)
 	{
 		m_step_count = 1;
-		MapCell* cell = m_object->get_center(m_owner->m_cursored);
+		MapCell* cell = m_object->get_center(owner->m_cursored);
 		//glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
-		m_owner->m_map->bresenham_line(cell, m_owner->m_cursored, std::bind(&mapviewer_hint_shoot::draw_cell, this, std::placeholders::_1));
+		owner->m_map->bresenham_line(cell, owner->m_cursored, std::bind(&mapviewer_hint_shoot::draw_cell, this,owner, std::placeholders::_1));
 		m_step_count = 1;
 	/*	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_03, 0);
 		m_owner->m_map->bresenham_line(cell, m_owner->m_cursored, std::bind(&mapviewer_hint_shoot::draw_cell, this, std::placeholders::_1));*/
 	}
 }
 
-mapviewer_object_move::mapviewer_object_move(GUI_MapViewer* owner, GameObject* object) : gui_mapviewer_hint(owner), m_object(object) { init(); }
+mapviewer_object_move::mapviewer_object_move( GameObject* object) : m_object(object) {}
 
-void mapviewer_object_move::init()
+void mapviewer_object_move::init(GUI_MapViewer* owner)
 {
-	if (m_owner->m_cursored)
+	if (owner->m_cursored)
 	{
-		m_cell = Game_algorithm::step_in_direction(m_object, Game_algorithm::turn_to_cell(m_object, m_owner->m_cursored));
+		m_cell = Game_algorithm::step_in_direction(m_object, Game_algorithm::turn_to_cell(m_object, owner->m_cursored));
 	}
 	else
 	{
@@ -374,7 +374,7 @@ void mapviewer_object_move::init()
 	}
 }
 
-void mapviewer_object_move::render()
+void mapviewer_object_move::render(GUI_MapViewer* owner)
 {
 	int px = 0;
 	int py = 0;
@@ -502,11 +502,11 @@ void mapviewer_object_move::render()
 		{
 			for (int j = 0; j < bx; j++)
 			{
-				int x = px + (m_cell->x + j) - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
-				int y = py + (m_cell->y - i) - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
-				int yp = m_owner->m_tile_count_x - x;
-				int xp = m_owner->m_tile_count_y - y;
-				r.set((xp - yp) * tile_size_x_half + m_owner->m_shift.x, (xp + yp) * tile_size_y_half + m_owner->m_shift.y, tile_size_x, -tile_size_y);
+				int x = px + (m_cell->x + j) - owner->m_center.x + owner->m_tile_count_x / 2;
+				int y = py + (m_cell->y - i) - owner->m_center.y + owner->m_tile_count_y / 2;
+				int yp = owner->m_tile_count_x - x;
+				int xp = owner->m_tile_count_y - y;
+				r.set((xp - yp) * tile_size_x_half + owner->m_shift.x, (xp + yp) * tile_size_y_half + owner->m_shift.y, tile_size_x, -tile_size_y);
 				if (valid)
 				{
 					glColor4f(0.0F, 1.0F, 0.0F, 0.25F);
@@ -526,7 +526,7 @@ void mapviewer_object_move::render()
 				{
 					glColor4f(1.0, 0.0, 0.0, 1.0);
 				}
-				Application::instance().m_graph->stroke_cell(xp, yp, m_owner->m_shift.x, m_owner->m_shift.y);
+				Application::instance().m_graph->stroke_cell(xp, yp, owner->m_shift.x, owner->m_shift.y);
 				glEnable(GL_BLEND);
 				glEnable(GL_TEXTURE_2D);
 			}
@@ -536,11 +536,11 @@ void mapviewer_object_move::render()
 		{
 			for (int j = 0; j < bx; j++)
 			{
-				int x = px + (m_cell->x + j) - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
-				int y = py + (m_cell->y - i) - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
-				int yp = m_owner->m_tile_count_x - x;
-				int xp = m_owner->m_tile_count_y - y;
-				r.set((xp - yp) * tile_size_x_half + m_owner->m_shift.x, (xp + yp) * tile_size_y_half + m_owner->m_shift.y, tile_size_x, -tile_size_y);
+				int x = px + (m_cell->x + j) - owner->m_center.x + owner->m_tile_count_x / 2;
+				int y = py + (m_cell->y - i) - owner->m_center.y + owner->m_tile_count_y / 2;
+				int yp = owner->m_tile_count_x - x;
+				int xp = owner->m_tile_count_y - y;
+				r.set((xp - yp) * tile_size_x_half + owner->m_shift.x, (xp + yp) * tile_size_y_half + owner->m_shift.y, tile_size_x, -tile_size_y);
 				if (valid)
 				{
 					glColor4f(0.0F, 1.0F, 0.0F, 0.25F);
@@ -560,7 +560,7 @@ void mapviewer_object_move::render()
 				{
 					glColor4f(1.0, 0.0, 0.0, 1.0);
 				}
-				Application::instance().m_graph->stroke_cell(xp, yp, m_owner->m_shift.x, m_owner->m_shift.y);
+				Application::instance().m_graph->stroke_cell(xp, yp, owner->m_shift.x, owner->m_shift.y);
 				glEnable(GL_BLEND);
 				glEnable(GL_TEXTURE_2D);
 			}
@@ -633,7 +633,7 @@ void mapviewer_object_move::render()
 	}
 }
 
-void mapviewer_object_move::render_on_cell(MapCell* c)
+void mapviewer_object_move::render_on_cell(GUI_MapViewer* owner,MapCell* c)
 {
 	if (m_cell)
 	{
@@ -644,13 +644,13 @@ void mapviewer_object_move::render_on_cell(MapCell* c)
 			game_object_size_t size3d;
 			object_size = m_object->m_active_state->m_tile_size;
 			size3d = m_object->m_active_state->m_size;
-			int x = c->x - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
-			int y = c->y - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
-			int yp = m_owner->m_tile_count_x - x;
-			int xp = m_owner->m_tile_count_y - y;
-			GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + m_owner->m_shift.x, (xp + yp+ size3d.x - 1) * tile_size_y_half + m_owner->m_shift.y, object_size.w, -object_size.h);
+			int x = c->x - owner->m_center.x + owner->m_tile_count_x / 2;
+			int y = c->y - owner->m_center.y + owner->m_tile_count_y / 2;
+			int yp = owner->m_tile_count_x - x;
+			int xp = owner->m_tile_count_y - y;
+			GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + owner->m_shift.x, (xp + yp+ size3d.x - 1) * tile_size_y_half + owner->m_shift.y, object_size.w, -object_size.h);
 			tile_t tile;
-			m_object->m_active_state->m_tile_manager->set_tile(tile, m_object, Application::instance().m_timer->get_tick(), Game_algorithm::turn_to_cell(m_object, m_owner->m_cursored));
+			m_object->m_active_state->m_tile_manager->set_tile(tile, m_object, Application::instance().m_timer->get_tick(), Game_algorithm::turn_to_cell(m_object, owner->m_cursored));
 			GLuint Sprite = tile.unit;
 			glUseProgramObjectARB(0);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -664,18 +664,16 @@ void mapviewer_object_move::render_on_cell(MapCell* c)
 	}
 }
 
-mapviewer_object_rotate::mapviewer_object_rotate(GUI_MapViewer* owner, GameObject* object) : gui_mapviewer_hint(owner), m_object(object)
+mapviewer_object_rotate::mapviewer_object_rotate(GameObject* object) :  m_object(object)
 { 
 	m_fov = new FOV_help();
-	init();
-	
 }
 
-void mapviewer_object_rotate::init()
+void mapviewer_object_rotate::init(GUI_MapViewer* owner)
 {
-	if (m_owner->m_cursored)
+	if (owner->m_cursored)
 	{
-		m_direction =  Game_algorithm::turn_to_cell(m_object, m_owner->m_cursored);
+		m_direction =  Game_algorithm::turn_to_cell(m_object, owner->m_cursored);
 	}
 	else
 	{
@@ -684,9 +682,9 @@ void mapviewer_object_rotate::init()
 	m_fov->calculate_FOV(m_object, m_object->cell()->m_map, m_direction);
 }
 
-void mapviewer_object_rotate::render()
+void mapviewer_object_rotate::render(GUI_MapViewer* owner)
 {
-	if (m_owner->m_cursored)
+	if (owner->m_cursored)
 	{
 		bool top_bound;
 		bool down_bound;
@@ -709,11 +707,11 @@ void mapviewer_object_rotate::render()
 			{
 				if (m_fov->m_map[yf][xf].visible)
 				{  
-					c = m_owner->m_map->m_items[y][x];
-					yp = m_owner->m_tile_count_x / 2 - c->x + m_owner->m_center.x;
-					xp = m_owner->m_tile_count_y / 2 - c->y + m_owner->m_center.y;
-					xt = (xp - yp) * tile_size_x_half + m_owner->m_shift.x;
-					yt = (xp + yp) * tile_size_y_half + m_owner->m_shift.y;
+					c = owner->m_map->m_items[y][x];
+					yp = owner->m_tile_count_x / 2 - c->x + owner->m_center.x;
+					xp = owner->m_tile_count_y / 2 - c->y + owner->m_center.y;
+					xt = (xp - yp) * tile_size_x_half + owner->m_shift.x;
+					yt = (xp + yp) * tile_size_y_half + owner->m_shift.y;
 					GraphicalController::rectangle_t rect(xt, yt, tile_size_x, -tile_size_y);
 					Application::instance().m_graph->draw_sprite(rect);
 					glDisable(GL_BLEND);
@@ -789,9 +787,9 @@ void mapviewer_object_rotate::render()
 	}
 }
 
-void mapviewer_object_rotate::render_on_cell(MapCell* c)
+void mapviewer_object_rotate::render_on_cell(GUI_MapViewer* owner,MapCell* c)
 {
-	if (m_owner->m_cursored)
+	if (owner->m_cursored)
 	{
 		if (c == m_object->cell())
 		{
@@ -800,11 +798,11 @@ void mapviewer_object_rotate::render_on_cell(MapCell* c)
 			game_object_size_t size3d;
 			object_size = m_object->m_active_state->m_tile_size;
 			size3d = m_object->m_active_state->m_size;
-			int x = c->x - m_owner->m_center.x + m_owner->m_tile_count_x / 2;
-			int y = c->y - m_owner->m_center.y + m_owner->m_tile_count_y / 2;
-			int yp = m_owner->m_tile_count_x - x;
-			int xp = m_owner->m_tile_count_y - y;
-			GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + m_owner->m_shift.x, (xp + yp + size3d.x - 1) * tile_size_y_half + m_owner->m_shift.y, object_size.w, -object_size.h);
+			int x = c->x - owner->m_center.x + owner->m_tile_count_x / 2;
+			int y = c->y - owner->m_center.y + owner->m_tile_count_y / 2;
+			int yp = owner->m_tile_count_x - x;
+			int xp = owner->m_tile_count_y - y;
+			GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + owner->m_shift.x, (xp + yp + size3d.x - 1) * tile_size_y_half + owner->m_shift.y, object_size.w, -object_size.h);
 			tile_t tile;
 			m_object->m_active_state->m_tile_manager->set_tile(tile, m_object, Application::instance().m_timer->get_tick(), m_direction);
 			GLuint Sprite = tile.unit;
@@ -826,14 +824,10 @@ GUI_MapViewer::GUI_MapViewer(Application* app)
 	m_tile_count_x = 90;
 	m_tile_count_y = 90;
 	m_just_focused = false;
-	m_is_moving = false;
 	m_focus = nullptr;
 	m_cursored = nullptr;
 	m_cursor_x = 1;
 	m_cursor_y = 1;
-	start_moving += std::bind(&GUI_MapViewer::on_start_moving, this, std::placeholders::_1);
-	move += std::bind(&GUI_MapViewer::on_move, this, std::placeholders::_1);
-	end_moving += std::bind(&GUI_MapViewer::on_end_moving, this, std::placeholders::_1);
 	m_size = app->m_size;
 	m_shift.x = (m_size.w / 2) - tile_size_x_half;// (m_tile_count_x)* 32 * 0.5;
 	m_shift.y = (m_size.h / 2) - (m_tile_count_y)* tile_size_y_half - tile_size_y_half;// 1024 * 0.5 - (m_tile_count_y + 6) * 18 * 0.5;
@@ -921,9 +915,9 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	bool passable;
 	bool is_hide;
 	bool is_in_fov;
-	for (auto current = m_hints.begin(); current != m_hints.end(); ++current)
+	for (auto current = Application::instance().m_gui_controller.m_hints.begin(); current != Application::instance().m_gui_controller.m_hints.end(); ++current)
 	{
-		(*current)->init();
+		(*current)->init(this);
 	}
 
 	bool m_observer;
@@ -1189,11 +1183,11 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 
 						}
 					}
-					if(m_hints.size()!=0)
+					if(Application::instance().m_gui_controller.m_hints.size()!=0)
 					{
-						for (auto current = m_hints.begin(); current != m_hints.end(); ++current)
+						for (auto current = Application::instance().m_gui_controller.m_hints.begin(); current != Application::instance().m_gui_controller.m_hints.end(); ++current)
 						{
-							(*current)->render_on_cell(m_map->m_items[y][x]);
+							(*current)->render_on_cell(this,m_map->m_items[y][x]);
 						}
 					}
 				}
@@ -1201,21 +1195,21 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 		}
 		if (r == 0)
 		{
-			for (std::list<gui_mapviewer_hint*>::iterator current = m_hints.begin(); current != m_hints.end(); ++current)
+			for (std::list<gui_mapviewer_hint*>::iterator current = Application::instance().m_gui_controller.m_hints.begin(); current != Application::instance().m_gui_controller.m_hints.end(); ++current)
 			{
 				if (!(*current)->m_top)
 				{
-					(*current)->render();
+					(*current)->render(this);
 				}
 			}
 		}
 		else
 		{
-			for (std::list<gui_mapviewer_hint*>::iterator current = m_hints.begin(); current != m_hints.end(); ++current)
+			for (std::list<gui_mapviewer_hint*>::iterator current = Application::instance().m_gui_controller.m_hints.begin(); current != Application::instance().m_gui_controller.m_hints.end(); ++current)
 			{
 				if ((*current)->m_top)
 				{
-					(*current)->render();
+					(*current)->render(this);
 				}
 			}
 		}
@@ -1352,24 +1346,25 @@ void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
 {
 	if (e.key == mk_left)
 	{
-		position_t p = local_xy(position_t(e.position.x, e.position.y));
-		int x;
-		int y;
-		x = m_center.x + p.x - m_tile_count_x / 2;
-		y = m_center.y + p.y - m_tile_count_y / 2;
-		if (!m_just_focused)
-		{
-			if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
+
+			position_t p = local_xy(position_t(e.position.x, e.position.y));
+			int x;
+			int y;
+			x = m_center.x + p.x - m_tile_count_x / 2;
+			y = m_center.y + p.y - m_tile_count_y / 2;
+			if (!m_just_focused)
 			{
-				Parameter* p = new Parameter(parameter_type_e::owner);
-				(*p)[0].set(m_map->m_items[y][x]);
-				if (Application::instance().m_message_queue.m_reader)
+				if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
 				{
-					Application::instance().m_message_queue.push(p);
+					Parameter* p = new Parameter(parameter_type_e::owner);
+					(*p)[0].set(m_map->m_items[y][x]);
+					if (Application::instance().m_message_queue.m_reader)
+					{
+						Application::instance().m_message_queue.push(p);
+					}
 				}
 			}
-		}
-		m_just_focused = false;
+			m_just_focused = false;
 	}
 	else {
 		Select_object_popmenu *PopMenu;
@@ -1510,40 +1505,30 @@ void GUI_MapViewer::on_mouse_move(MouseEventArgs const& e)
 	{
 		m_cursored = m_map->m_items[y][x];
 	}
-	if (e.key == mk_left)
-	{
-		if (!m_is_moving) start_moving(e);
-		move(e);
-	}
-	else
-	{
-		if (m_is_moving) end_moving(e);
+
 		MouseEventArgs LocalMouseEventArgs = set_local_mouse_control(e);
 		if (m_focus)
 		{
 			m_focus->mouse_move(LocalMouseEventArgs);
 		}
-	}
 }
 
-void GUI_MapViewer::on_start_moving(MouseEventArgs const& e)
+void GUI_MapViewer::on_mouse_start_drag(MouseEventArgs const& e)
 {
-	m_is_moving = true;
 	position_t p = local_xy(position_t(e.position.x, e.position.y));
 	m_initial_position.x = m_center.x - p.x;
 	m_initial_position.y = m_center.y - p.y;
 }
 
-void GUI_MapViewer::on_move(MouseEventArgs const& e)
+void GUI_MapViewer::on_mouse_drag(MouseEventArgs const& e)
 {
 	position_t p = local_xy(position_t(e.position.x, e.position.y));
 	m_center.x = m_initial_position.x + p.x;
 	m_center.y = m_initial_position.y + p.y;
 }
 
-void GUI_MapViewer::on_end_moving(MouseEventArgs const& e)
+void GUI_MapViewer::on_mouse_end_drag(MouseEventArgs const& e)
 {
-	m_is_moving = false;
 }
 
 MouseEventArgs GUI_MapViewer::set_local_mouse_control(MouseEventArgs const& source)

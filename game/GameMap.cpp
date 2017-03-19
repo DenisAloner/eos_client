@@ -41,7 +41,7 @@ void Object_manager::calculate_ai()
 	{
 		if ((*object)->m_owner->m_kind == entity_e::cell)
 		{
-			if (((*object)->m_active_state->m_ai) && ((*object) != Application::instance().m_GUI->MapViewer->m_player->m_object))
+			if (((*object)->m_active_state->m_ai) && ((*object) != Application::instance().m_world->m_player->m_object))
 			{
 				switch ((*object)->m_active_state->m_ai->m_ai_type)
 				{

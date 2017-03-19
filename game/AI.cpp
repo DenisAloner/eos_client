@@ -542,9 +542,9 @@ GameObject* AI_enemy::find_goal()
 			{
 				for (auto item = m_map->m_items[y][x]->m_items.begin(); item != m_map->m_items[y][x]->m_items.end(); ++item)
 				{
-					if ((*item) == Application::instance().m_GUI->MapViewer->m_player->m_object)
+					if ((*item) == Application::instance().m_world->m_player->m_object)
 					{
-						return Application::instance().m_GUI->MapViewer->m_player->m_object;
+						return Application::instance().m_world->m_player->m_object;
 					}
 				}
 			}

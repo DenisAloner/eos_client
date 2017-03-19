@@ -56,6 +56,33 @@ void GUI_Layer::on_mouse_move(MouseEventArgs const& e)
 	}
 }
 
+void GUI_Layer::on_mouse_start_drag(MouseEventArgs const& e)
+{
+	MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
+	if (m_focus)
+	{
+		m_focus->mouse_start_drag(LocalMouseEventArgs);
+	}
+}
+
+void GUI_Layer::on_mouse_drag(MouseEventArgs const& e)
+{
+	MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
+	if(m_focus)
+	{
+		m_focus->mouse_drag(LocalMouseEventArgs);
+	}
+}
+
+void GUI_Layer::on_mouse_end_drag(MouseEventArgs const& e)
+{
+	MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
+	if (m_focus)
+	{
+		m_focus->mouse_end_drag(LocalMouseEventArgs);
+	}
+}
+
 void GUI_Layer::on_mouse_wheel(MouseEventArgs const& e)
 {
 	if (m_focus)

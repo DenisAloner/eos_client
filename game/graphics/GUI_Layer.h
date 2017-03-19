@@ -20,19 +20,22 @@ public:
 	GUI_Layer(int x, int y, int width, int height);
 	~GUI_Layer(void);
 
-	virtual void render(GraphicalController* Graph, int px, int py);
-	virtual void on_mouse_click(MouseEventArgs const& e);
-	virtual void on_mouse_down(MouseEventArgs const& e);
-	virtual void on_mouse_wheel(MouseEventArgs const& e);
-	virtual void on_mouse_move(MouseEventArgs const& e);
-	virtual void on_key_press(WPARAM w);
-	virtual void set_focus(bool state);
+	void render(GraphicalController* Graph, int px, int py) override;
+	void on_mouse_click(MouseEventArgs const& e) override;
+	void on_mouse_down(MouseEventArgs const& e) override;
+	void on_mouse_wheel(MouseEventArgs const& e) override;
+	void on_mouse_move(MouseEventArgs const& e) override;
+	void on_mouse_start_drag(MouseEventArgs const& e) override;
+	void on_mouse_drag(MouseEventArgs const& e) override;
+	void on_mouse_end_drag(MouseEventArgs const& e) override;
+	void on_key_press(WPARAM w) override;
+	void set_focus(bool state) override;
 	virtual void add(GUI_Object* object);
 	virtual void add_front(GUI_Object* object);
 	virtual void remove(GUI_Object* object);
-	
-	virtual bool check_region(MouseEventArgs const& e);
-	virtual void on_get_focus(GUI_Object* sender);
+
+	bool check_region(MouseEventArgs const& e) override;
+	void on_get_focus(GUI_Object* sender) override;
 	virtual void on_item_get_focus(GUI_Object* sender);
 	virtual MouseEventArgs set_local_mouse_position(MouseEventArgs const& source);
 };

@@ -3,10 +3,6 @@
 
 GUI_Scrollbar_vertical::GUI_Scrollbar_vertical(GUI_TextBox* owner):m_owner(owner)
 {
-	m_is_moving = false;
-	start_moving += std::bind(&GUI_Scrollbar_vertical::on_start_moving, this, std::placeholders::_1);
-	move += std::bind(&GUI_Scrollbar_vertical::on_move, this, std::placeholders::_1);
-	end_moving += std::bind(&GUI_Scrollbar_vertical::on_end_moving, this, std::placeholders::_1);
 }
 
 void GUI_Scrollbar_vertical::render(GraphicalController* Graph, int px, int py)
@@ -43,37 +39,18 @@ MouseEventArgs GUI_Scrollbar_vertical::set_local_mouse_control(MouseEventArgs co
 	return MouseEventArgs(position_t(source.position.x - m_position.x, source.position.y - m_position.y), source.key, source.value);
 }
 
-void GUI_Scrollbar_vertical::on_mouse_move(MouseEventArgs const& e)
-{
-	if (e.key == mk_left)
-	{
-		if (!m_is_moving) start_moving(e);
-		MouseEventArgs LocalMouseEventArgs = set_local_mouse_control(e);
-		move(LocalMouseEventArgs);
-	}
-	else
-	{
-		if (m_is_moving) end_moving(e);
-	}
-}
 
-void GUI_Scrollbar_vertical::on_start_moving(MouseEventArgs const& e)
+void GUI_Scrollbar_vertical::on_mouse_start_drag(MouseEventArgs const& e)
 {
-	m_is_moving = true;
 	MouseEventArgs LocalMouseEventArgs = set_local_mouse_control(e);
-	LOG(INFO) << "INITIAL  " << std::to_string(LocalMouseEventArgs.position.y)<<"    "<< std::to_string(e.position.y);
 	m_pos = LocalMouseEventArgs.position.y;
 }
 
-void GUI_Scrollbar_vertical::on_move(MouseEventArgs const& e)
+void GUI_Scrollbar_vertical::on_mouse_drag(MouseEventArgs const& e)
 {
-	/*position_t p = local_xy(position_t(e.position.x, e.position.y));
-	
-	m_center.x = m_initial_position.x + p.x;
-	m_center.y = m_initial_position.y + p.y;*/
-	LOG(INFO) << "MOVE  "<<std::to_string(e.position.y);
-	m_bar_top += -m_pos + e.position.y;
-	m_pos = e.position.y;
+	MouseEventArgs LocalMouseEventArgs = set_local_mouse_control(e);
+	m_bar_top += -m_pos + LocalMouseEventArgs.position.y;
+	m_pos = LocalMouseEventArgs.position.y;
 	if (m_bar_top < 0) { m_bar_top = 0; }
 	if (m_bar_top + m_bar_height > m_size.h) { m_bar_top= m_size.h- m_bar_height; }
 	GUI_Object& LastElement = *m_owner->m_items.back();
@@ -82,13 +59,21 @@ void GUI_Scrollbar_vertical::on_move(MouseEventArgs const& e)
 	
 }
 
-void GUI_Scrollbar_vertical::on_end_moving(MouseEventArgs const& e)
+bool GUI_Scrollbar_vertical::check_region(MouseEventArgs const& e)
 {
-	m_is_moving = false;
+	LOG(INFO) << std::to_string(focused);
+	if (this->m_position.x <= e.position.x&&this->m_position.x + m_size.w >= e.position.x&&this->m_position.y <= e.position.y&&this->m_position.y + m_size.h >= e.position.y)
+	{
+		return true;
+	}
+	return false;
 }
+
+
 
 GUI_TextBox::GUI_TextBox() :GUI_Container(0, 0, 0, 0), m_scrollbar(this)
 {
+	m_scrollbar.get_focus += std::bind(&GUI_TextBox::on_item_get_focus, this, std::placeholders::_1);
 	start_render = m_items.begin();
 	end_render = m_items.end();
 }
@@ -249,7 +234,6 @@ void GUI_TextBox::render(GraphicalController* Graph, int px, int py)
 	glEnable(GL_SCISSOR_TEST);
 	if (Graph->add_scissor(frectangle_t((float)px, (float)py, (float)m_size.w, (float)m_size.h)))
 	{
-
 		Graph->blur_rect(px, py, m_size.w, m_size.h);
 		glEnable(GL_BLEND);
 		glDisable(GL_TEXTURE_2D);
@@ -313,12 +297,16 @@ void GUI_TextBox::on_mouse_click(MouseEventArgs const& e)
 
 void GUI_TextBox::on_mouse_down(MouseEventArgs const& e)
 {
-	MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
+	LOG(INFO) << "GUI_TextBox::on_mouse_down";
+	MouseEventArgs LocalMouseEventArgs = MouseEventArgs(position_t(e.position.x - m_position.x, e.position.y - m_position.y), e.key, e.value);
+	
 	if (m_scrollbar.check_region(LocalMouseEventArgs))
 	{
+		LOG(INFO) << "m_scrollbar.mouse_down = ";
 		m_scrollbar.mouse_down(LocalMouseEventArgs);
 		return;
 	}
+	LocalMouseEventArgs = set_local_mouse_position(e);
 	for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); ++Current)
 	{
 		if ((*Current)->check_region(LocalMouseEventArgs))
@@ -333,11 +321,48 @@ void GUI_TextBox::on_mouse_down(MouseEventArgs const& e)
 	}
 }
 
+void GUI_TextBox::on_mouse_start_drag(MouseEventArgs const& e)
+{
+	if (m_focus)
+	{
+		if(m_focus==&m_scrollbar)
+		{
+			MouseEventArgs LocalMouseEventArgs = MouseEventArgs(position_t(e.position.x - m_position.x, e.position.y - m_position.y), e.key, e.value);
+			m_focus->mouse_start_drag(LocalMouseEventArgs);
+		}
+		else
+		{
+			MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
+			m_focus->mouse_start_drag(LocalMouseEventArgs);
+		}
+	}
+}
+
+void GUI_TextBox::on_mouse_drag(MouseEventArgs const& e)
+{
+	if (m_focus)
+	{
+		if (m_focus == &m_scrollbar)
+		{
+			MouseEventArgs LocalMouseEventArgs = MouseEventArgs(position_t(e.position.x - m_position.x, e.position.y - m_position.y), e.key, e.value);
+			m_focus->mouse_drag(LocalMouseEventArgs);
+		}
+		else
+		{
+			MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
+			m_focus->mouse_drag(LocalMouseEventArgs);
+		}
+	}
+}
+
 void GUI_TextBox::on_mouse_move(MouseEventArgs const& e)
 {
 	MouseEventArgs LocalMouseEventArgs = MouseEventArgs(position_t(e.position.x - m_position.x, e.position.y - m_position.y), e.key, e.value);
-	m_scrollbar.mouse_move(LocalMouseEventArgs);
-	LocalMouseEventArgs = set_local_mouse_position(e);
+	if (m_scrollbar.check_region(LocalMouseEventArgs))
+	{
+		m_scrollbar.mouse_move(LocalMouseEventArgs);
+		return;
+	}
 	for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); ++Current)
 	{
 		if ((*Current)->check_region(LocalMouseEventArgs))

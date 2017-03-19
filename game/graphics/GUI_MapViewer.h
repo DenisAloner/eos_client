@@ -27,15 +27,10 @@ class GUI_MapViewer : public GUI_Object
 { 
 public:
 
-	Event<MouseEventArgs> start_moving;
-	Event<MouseEventArgs> move;
-	Event<MouseEventArgs> end_moving;
-
 	GUI_Object* m_focus;
 	MapCell* m_cursored;
 
 	bool m_just_focused;
-	bool m_is_moving;
 
 	GUI_MapViewer(Application* app);
 	~GUI_MapViewer(void);
@@ -58,16 +53,14 @@ public:
 	position_t m_center;
 	position_t m_initial_position;
 
-	std::list<gui_mapviewer_hint*> m_hints;
-
 	virtual void on_key_press(WPARAM w);
-	virtual void on_mouse_click(MouseEventArgs const& e);
-	virtual void on_mouse_down(MouseEventArgs const& e);
-	virtual void on_mouse_wheel(MouseEventArgs const& e);
-	virtual void on_mouse_move(MouseEventArgs const& e);
-	virtual void on_start_moving(MouseEventArgs const& e);
-	virtual void on_move(MouseEventArgs const& e);
-	virtual void on_end_moving(MouseEventArgs const& e);
+	void on_mouse_click(MouseEventArgs const& e) override;
+	void on_mouse_down(MouseEventArgs const& e) override;
+	void on_mouse_wheel(MouseEventArgs const& e) override;
+	void on_mouse_move(MouseEventArgs const& e) override;
+	void on_mouse_start_drag(MouseEventArgs const& e) override;
+	void on_mouse_drag(MouseEventArgs const& e)override;
+	void on_mouse_end_drag(MouseEventArgs const& e)override;
 	virtual void on_item_get_focus(GUI_Object* sender);
 	virtual void on_lose_focus(GUI_Object* sender);
 	position_t local_xy(position_t p);
@@ -83,14 +76,13 @@ class gui_mapviewer_hint
 {
 public:
 
-	GUI_MapViewer* m_owner;
 	bool m_top;
 
-	gui_mapviewer_hint(GUI_MapViewer* owner);
-	virtual void render() = 0;
-	virtual void init() {};
-	virtual void render_on_cell(MapCell* c) {};
-	void draw_cell(MapCell* cell, int index);
+	gui_mapviewer_hint();
+	virtual void render(GUI_MapViewer* owner) = 0;
+	virtual void init(GUI_MapViewer* owner) {};
+	virtual void render_on_cell(GUI_MapViewer* owner,MapCell* c) {};
+	void draw_cell(GUI_MapViewer* owner,MapCell* cell, int index);
 };
 
 class mapviewer_hint_path : public gui_mapviewer_hint
@@ -99,8 +91,8 @@ public:
 
 	GameObject* m_object;
 	std::vector<MapCell*>* m_path;
-	mapviewer_hint_path(GUI_MapViewer* owner, std::vector<MapCell*>* path, GameObject* object);
-	virtual void render();
+	mapviewer_hint_path(std::vector<MapCell*>* path, GameObject* object);
+	void render(GUI_MapViewer* owner) override;
 };
 
 class mapviewer_hint_area : public gui_mapviewer_hint
@@ -110,8 +102,8 @@ public:
 	bool m_consider_object_size;
 
 	GameObject* m_object;
-	mapviewer_hint_area(GUI_MapViewer* owner, GameObject* object, bool consider_object_size);
-	virtual void render();
+	mapviewer_hint_area(GameObject* object, bool consider_object_size);
+	void render(GUI_MapViewer* owner) override;
 };
 
 class mapviewer_hint_object_area : public gui_mapviewer_hint
@@ -119,8 +111,8 @@ class mapviewer_hint_object_area : public gui_mapviewer_hint
 public:
 
 	GameObject* m_object;
-	mapviewer_hint_object_area(GUI_MapViewer* owner, GameObject* object);
-	virtual void render();
+	mapviewer_hint_object_area(GameObject* object);
+	void render(GUI_MapViewer* owner) override;
 };
 
 class mapviewer_hint_line : public gui_mapviewer_hint
@@ -131,9 +123,9 @@ public:
 
 	MapCell* m_cell;
 	GameObject* m_object;
-	mapviewer_hint_line(GUI_MapViewer* owner, MapCell* cell,GameObject* object);
-	virtual void render();
-	void draw_cell(MapCell* a);
+	mapviewer_hint_line( MapCell* cell,GameObject* object);
+	void render(GUI_MapViewer* owner) override;
+	void draw_cell(GUI_MapViewer* owner,MapCell* a);
 };
 
 class mapviewer_hint_shoot : public gui_mapviewer_hint
@@ -144,9 +136,9 @@ public:
 	int m_range;
 
 	GameObject* m_object;
-	mapviewer_hint_shoot(GUI_MapViewer* owner, GameObject* object, int range);
-	virtual void render();
-	void draw_cell(MapCell* a);
+	mapviewer_hint_shoot(GameObject* object, int range);
+	void render(GUI_MapViewer* owner) override;
+	void draw_cell(GUI_MapViewer* owner,MapCell* a);
 };
 
 class mapviewer_hint_weapon_range : public gui_mapviewer_hint
@@ -156,8 +148,8 @@ public:
 	int m_range;
 
 	GameObject* m_object;
-	mapviewer_hint_weapon_range(GUI_MapViewer* owner, GameObject* object, int range);
-	virtual void render();
+	mapviewer_hint_weapon_range( GameObject* object, int range);
+	void render(GUI_MapViewer* owner) override;
 };
 
 class mapviewer_object_move : public gui_mapviewer_hint
@@ -166,10 +158,10 @@ public:
 
 	MapCell* m_cell;
 	GameObject* m_object;
-	mapviewer_object_move(GUI_MapViewer* owner, GameObject* object);
-	virtual void init();
-	virtual void render();
-	virtual void render_on_cell(MapCell* c);
+	mapviewer_object_move(GameObject* object);
+	void init(GUI_MapViewer* owner) override;
+	void render(GUI_MapViewer* owner) override;
+	void render_on_cell(GUI_MapViewer* owner,MapCell* c) override;
 };
 
 class mapviewer_object_rotate : public gui_mapviewer_hint
@@ -180,10 +172,10 @@ public:
 	object_direction_e m_direction;
 
 	GameObject* m_object;
-	mapviewer_object_rotate(GUI_MapViewer* owner, GameObject* object);
-	virtual void init();
-	virtual void render();
-	virtual void render_on_cell(MapCell* c);
+	mapviewer_object_rotate( GameObject* object);
+	void init(GUI_MapViewer* owner) override;
+	void render(GUI_MapViewer* owner) override;
+	void render_on_cell(GUI_MapViewer* owner,MapCell* c) override;
 };
 
 #endif //GUI_MAPVIEWER_H

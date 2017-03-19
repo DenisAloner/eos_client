@@ -1,3 +1,6 @@
+#ifndef EOS_CPP
+#define	EOS_CPP
+
 // Includes
 #include <windows.h>
 #include <string>
@@ -276,3 +279,5 @@ BOOL SetClientRect(HWND hWnd, int x, int y)
 	GetWindowRect(hWnd, &rect2);
 	return MoveWindow(hWnd, rect2.left, rect2.top, rect.right - rect.left, rect.bottom - rect.top, TRUE);
 }
+
+#endif //EOS_CPP

@@ -198,11 +198,11 @@ void ActionClass_Move::interaction_handler(Parameter* parameter)
 	Parameter& p(*out_parameter);
 	if (!p[0])
 	{
-		p[0].set(Application::instance().m_GUI->MapViewer->m_player->m_object);
+		p[0].set(Application::instance().m_world->m_player->m_object);
 	}
 	if (!p[1])
 	{
-		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_object_move(Application::instance().m_GUI->MapViewer, p[0].m_object));
+		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_object_move( p[0].m_object));
 		temp = Application::instance().command_select_location(p[0].m_object);
 		if (temp)
 		{
@@ -213,10 +213,10 @@ void ActionClass_Move::interaction_handler(Parameter* parameter)
 		{
 			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Действие отменено")));
 			Application::instance().m_message_queue.m_busy = false;
-			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+			Application::instance().m_gui_controller.m_hints.pop_front();
 			return;
 		}
-		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+		Application::instance().m_gui_controller.m_hints.pop_front();
 	}
 	Application::instance().m_action_manager->add(new GameTask(this, out_parameter));
 	Application::instance().m_message_queue.m_busy = false;
@@ -544,19 +544,19 @@ void ActionClass_Turn::interaction_handler(Parameter* parameter)
 	}
 	if (!p[1])
 	{
-		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_object_rotate(Application::instance().m_GUI->MapViewer, p[0].m_object));
+		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_object_rotate( p[0].m_object));
 		MapCell* result = Application::instance().command_select_location(p[0].m_object);
 		if (result)
 		{
 			p[1].set(Game_algorithm::turn_to_cell(p[0].m_object, result));
-			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+			Application::instance().m_gui_controller.m_hints.pop_front();
 			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Направление выбрано")));
 		}
 		else
 		{
 			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Действие отменено")));
 			Application::instance().m_message_queue.m_busy = false;
-			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+			Application::instance().m_gui_controller.m_hints.pop_front();
 			return;
 		}
 	}
@@ -698,8 +698,8 @@ void action_set_motion_path::interaction_handler(Parameter* parameter)
 {
 	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
-	GameObject* object = Application::instance().m_GUI->MapViewer->m_player->m_object;
-	Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_line(Application::instance().m_GUI->MapViewer, object->cell(), object));
+	GameObject* object = Application::instance().m_world->m_player->m_object;
+	Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_line( object->cell(), object));
 	MapCell* cell = Application::instance().command_select_location(object);
 	if (cell)
 	{
@@ -709,17 +709,17 @@ void action_set_motion_path::interaction_handler(Parameter* parameter)
 	{
 		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Не выбрана клетка карты")));
 		Application::instance().m_message_queue.m_busy = false;
-		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+		Application::instance().m_gui_controller.m_hints.pop_front();
 		return;
 	}
 	//p->m_map->bresenham_line(p->m_object->cell(), p->m_place, [p](MapCell* a) { Application::instance().m_action_manager->add(new GameTask(Application::instance().m_actions[action_e::move_step], new Parameter_Position(p->m_object, a, p->m_map))); });
-	Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+	Application::instance().m_gui_controller.m_hints.pop_front();
 	Path::instance().map_costing(cell->m_map, object, cell, 40);
 	std::vector<MapCell*>* path;
 	path = Path::instance().get_path_to_cell();
 	if (path)
 	{
-		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_path(Application::instance().m_GUI->MapViewer, path,object));
+		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_path(path,object));
 		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Следовать под данному пути? [Y/N]")));
 		if(Application::instance().command_agreement())
 		{
@@ -733,7 +733,7 @@ void action_set_motion_path::interaction_handler(Parameter* parameter)
 		{
 			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Игрок отменил действие")));
 		}
-		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+		Application::instance().m_gui_controller.m_hints.pop_front();
 		Path::instance().m_heap.m_items.clear();
 	}
 	else
@@ -778,7 +778,7 @@ void Action_pick::interaction_handler(Parameter* parameter)
 	Parameter& p(*out_parameter);
 	if (!p[0])
 	{
-		p[0].set(Application::instance().m_GUI->MapViewer->m_player->m_object);
+		p[0].set(Application::instance().m_world->m_player->m_object);
 	}
 	if (!p[2])
 	{
@@ -798,7 +798,7 @@ void Action_pick::interaction_handler(Parameter* parameter)
 	}
 	if (!p[1])
 	{
-		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p[0].m_object, true));
+		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_area( p[0].m_object, true));
 		GameObject* result = Application::instance().command_select_object();
 		if (result)
 		{
@@ -812,10 +812,10 @@ void Action_pick::interaction_handler(Parameter* parameter)
 		{
 			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Действие отменено")));
 			Application::instance().m_message_queue.m_busy = false;
-			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+			Application::instance().m_gui_controller.m_hints.pop_front();
 			return;
 		}
-		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+		Application::instance().m_gui_controller.m_hints.pop_front();
 		Application::instance().m_clipboard.m_item = p[1].m_object;
 	}
 	Application::instance().m_action_manager->add(new GameTask(this, out_parameter));
@@ -1141,7 +1141,7 @@ void action_hit_melee::interaction_handler(Parameter* parameter)
 	Parameter& p(*out_parameter);
 	if (!p[0])
 	{ 
-		p[0].set(Application::instance().m_GUI->MapViewer->m_player->m_object);
+		p[0].set(Application::instance().m_world->m_player->m_object);
 	}
 	if (!p[2])
 	{
@@ -1160,7 +1160,7 @@ void action_hit_melee::interaction_handler(Parameter* parameter)
 	}
 	if (!p[1])
 	{
-		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p[0].m_object, true));
+		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_area( p[0].m_object, true));
 		GameObject* result = Application::instance().command_select_object_on_map();
 		if (result)
 		{
@@ -1174,14 +1174,14 @@ void action_hit_melee::interaction_handler(Parameter* parameter)
 		{
 			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Действие отменено")));
 			Application::instance().m_message_queue.m_busy = false;
-			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+			Application::instance().m_gui_controller.m_hints.pop_front();
 			return;
 		}
-		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+		Application::instance().m_gui_controller.m_hints.pop_front();
 	}
 	if(!p[3])
 	{
-		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_object_area(Application::instance().m_GUI->MapViewer, p[1].m_object));
+		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_object_area( p[1].m_object));
 		MapCell* result = Application::instance().command_select_location(p[1].m_object);
 		if (result)
 		{
@@ -1192,10 +1192,10 @@ void action_hit_melee::interaction_handler(Parameter* parameter)
 		{
 			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Действие отменено")));
 			Application::instance().m_message_queue.m_busy = false;
-			Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+			Application::instance().m_gui_controller.m_hints.pop_front();
 			return;
 		}
-		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+		Application::instance().m_gui_controller.m_hints.pop_front();
 	}
 	Application::instance().m_action_manager->add(new GameTask(this, out_parameter));
 	Application::instance().m_message_queue.m_busy = false;
@@ -1604,7 +1604,6 @@ void Action_load::interaction_handler(Parameter* arg)
 	Application::instance().m_message_queue.m_busy = true;
 	update_lock.lock();
 	Application::instance().stop();
-	Application::instance().m_GUI = nullptr;
 	//Application::instance().m_GUI->remove(Application::instance().m_GUI->MapViewer);
 	Application::instance().load_game();
 	update_lock.unlock();
@@ -1660,7 +1659,7 @@ std::u16string Action_autoexplore::get_description(Parameter* parameter)
 
 bool Action_autoexplore::get_child(GameTask*& task)
 {
-	GameObject* object = Application::instance().m_GUI->MapViewer->m_player->m_object;
+	GameObject* object = Application::instance().m_world->m_player->m_object;
 	GameMap* map = static_cast<MapCell*>(object->m_owner)->m_map;
 	map->m_dijkstra_map->calculate_cost_autoexplore(map, object);
 	map->m_dijkstra_map->trace();
@@ -1718,7 +1717,7 @@ void Action_shoot::interaction_handler(Parameter* parameter)
 	Parameter& p(*out_parameter);
 	if (!p[0])
 	{
-		p[0].set(Application::instance().m_GUI->MapViewer->m_player->m_object);
+		p[0].set(Application::instance().m_world->m_player->m_object);
 	}
 
 	if (!p[2])
@@ -1795,8 +1794,8 @@ void Action_shoot::interaction_handler(Parameter* parameter)
 	if (!p[4])
 	{
 		Parameter_list* wr = p[2].m_part->m_item->get_parameter(interaction_e::weapon_range);
-		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_shoot(Application::instance().m_GUI->MapViewer, p[0].m_object, wr->m_value));
-		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_weapon_range(Application::instance().m_GUI->MapViewer, p[0].m_object, wr->m_value));
+		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_shoot( p[0].m_object, wr->m_value));
+		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_weapon_range( p[0].m_object, wr->m_value));
 		bool valid = false;
 		while (!valid)
 		{
@@ -1818,13 +1817,13 @@ void Action_shoot::interaction_handler(Parameter* parameter)
 			{
 				Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Действие отменено")));
 				Application::instance().m_message_queue.m_busy = false;
-				Application::instance().m_GUI->MapViewer->m_hints.pop_front();
-				Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+				Application::instance().m_gui_controller.m_hints.pop_front();
+				Application::instance().m_gui_controller.m_hints.pop_front();
 				return;
 			}
 		}
-		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
-		Application::instance().m_GUI->MapViewer->m_hints.pop_front();
+		Application::instance().m_gui_controller.m_hints.pop_front();
+		Application::instance().m_gui_controller.m_hints.pop_front();
 	}
 	Application::instance().m_action_manager->add(new GameTask(this, out_parameter));
 	Application::instance().m_message_queue.m_busy = false;

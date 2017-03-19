@@ -1,5 +1,4 @@
 #include "game/Application.h"
-#include "game/ApplicationGUI.h"
 #include "game/MouseController.h"
 #include "game/ActionManager.h"
 #include "game/GameObject.h"
@@ -51,7 +50,6 @@ Application::Application()
 : m_timer(new Timer(24, 100)), m_action_animation_timer(new Timer(24, 100))
 {
 	m_turn = false;
-	m_GUI = nullptr;
 }
 
 Application::~Application(void)
@@ -62,35 +60,35 @@ Application::~Application(void)
 void Application::on_key_press(WPARAM w)
 {
 	m_update_mutex.lock();
-	if (m_GUI) { m_GUI->key_press(w); }
+	m_gui_controller.key_press(w);
 	m_update_mutex.unlock();
 }
 
 void Application::on_mouse_click(MouseEventArgs const& e)
 {
 	m_update_mutex.lock();
-	if (m_GUI) { m_GUI->mouse_click(e); }
+	m_gui_controller.mouse_click(e);
 	m_update_mutex.unlock();
 }
 
 void Application::on_mouse_down(MouseEventArgs const& e)
 {
 	m_update_mutex.lock();
-	if (m_GUI) { m_GUI->mouse_down(e); }
+	m_gui_controller.mouse_down(e);
 	m_update_mutex.unlock();
 }
 
 void Application::on_mouse_move(MouseEventArgs const& e)
 {
 	m_update_mutex.lock();
-	if (m_GUI) { m_GUI->mouse_move(e); }
+	m_gui_controller.mouse_move(e);
 	m_update_mutex.unlock();
 }
 
 void Application::on_mouse_wheel(MouseEventArgs const& e)
 {
 	m_update_mutex.lock();
-	if (m_GUI) { m_GUI->mouse_wheel(e); }
+	m_gui_controller.mouse_wheel(e);
 	m_update_mutex.unlock();
 }
 
@@ -116,9 +114,9 @@ void Application::render()
 	//	Application::instance().m_GUI->MapViewer->m_map->update(VoidEventArgs());
 	//	Application::instance().m_GUI->MapViewer->m_map->m_update = false;
 	//}
-	if (m_GUI)
+	if (m_gui_controller.m_GUI)
 	{
-		m_GUI->render(m_graph, 0, 0);
+		m_gui_controller.m_GUI->render(m_graph, 0, 0);
 	}
 	const position_t mouse = Application::instance().m_mouse->get_mouse_position();
 	glEnable(GL_BLEND);
@@ -169,6 +167,7 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 	subhRC = wglCreateContext(m_hDC);
 	wglShareLists(this->m_hRC, subhRC);
 	m_size = work_area_size;
+	m_gui_controller.m_size = m_size;
 	music = NULL;
 	m_game_turn = 1;
 	m_ready = false;
@@ -214,10 +213,10 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 	m_game_object_manager->init();
 	LOG(INFO) << "Менеджер игровых объектов успешно инициализирован";
 
-	m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h);
+	m_gui_controller.m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h);
 	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
-	m_GUI->add(m_window_manager);
-	m_GUI->add(new GUI_Image((m_size.w - 1024) / 2, (m_size.h - 1024) / 2, 1024, 1024, m_graph->m_logo));
+	m_gui_controller.m_GUI->add(m_window_manager);
+	m_gui_controller.m_GUI->add(new GUI_Image((m_size.w - 1024) / 2, (m_size.h - 1024) / 2, 1024, 1024, m_graph->m_logo));
 
 	GUI_Window* MainMenu = new GUI_Window(0, 0, 400, 400, u"Главное меню");
 	MainMenu->m_position = position_t((m_size.w - MainMenu->m_size.w)/2, (m_size.h - MainMenu->m_size.h) / 2);
@@ -259,16 +258,16 @@ void Application::new_game()
 	std::string json = Parser::UTF16_to_CP866(Parser::to_json<GameObject*>(obj));
 	LOG(INFO) << json;
 
-	m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player, map, m_action_manager, m_game_log);
+	m_gui_controller.m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player, map, m_action_manager, m_game_log);
 
 	GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, u"Мини-карта");
 	rectangle_t cr = MiniMap->client_rect();
-	GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(0, 0), dimension_t(cr.w, cr.h), m_GUI->MapViewer);
+	GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(0, 0), dimension_t(cr.w, cr.h), m_gui_controller.m_GUI->MapViewer);
 	MiniMap->add(mini_map);
 
 	MiniMap = new GUI_Window(300, 0, 400, 400, u"Поле зрения player");
 	cr = MiniMap->client_rect();
-	GUI_FOV* fov = new GUI_FOV(position_t(0, 0), dimension_t(cr.w, cr.h), m_GUI->MapViewer->m_player->m_object);
+	GUI_FOV* fov = new GUI_FOV(position_t(0, 0), dimension_t(cr.w, cr.h), m_world->m_player->m_object);
 	MiniMap->add(fov);
 
 	/*obj = m_game_object_manager->new_object("bat");
@@ -295,26 +294,26 @@ void Application::new_game()
 
 			obj = m_game_object_manager->new_object("bat");
 			obj->set_direction(object_direction_e::top);
-			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx-2]);
+			map->add_to_map(obj, map->m_items[ry - 2][rx-2]);
 
 		
 			obj = m_game_object_manager->new_object("bag");
 			obj->set_direction(object_direction_e::top);
-			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx-1]);
+			map->add_to_map(obj, map->m_items[ry - 2][rx-1]);
 
 		
 			obj = m_game_object_manager->new_object("ring");
 			obj->set_direction(object_direction_e::top);
-			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx + 1]);
+			map->add_to_map(obj, map->m_items[ry - 2][rx + 1]);
 
 		
 			obj = m_game_object_manager->new_object("boot");
 			obj->set_direction(object_direction_e::top);
-			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 2][rx + 2]);
+			map->add_to_map(obj, map->m_items[ry - 2][rx + 2]);
 
 			obj = m_game_object_manager->new_object("fountain");
 			obj->set_direction(object_direction_e::top);
-			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry + 10][rx + 2]);
+			map->add_to_map(obj, map->m_items[ry + 10][rx + 2]);
 
 			
 	
@@ -333,7 +332,7 @@ void Application::load_game()
 
 	m_world = Serialization_manager::instance().load("save");
 	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
-	m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player, m_world->m_maps.front(), m_action_manager, m_game_log);
+	m_gui_controller.m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player, m_world->m_maps.front(), m_action_manager, m_game_log);
 	
 	//GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
 	//GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(5, 5), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 30), m_GUI->MapViewer);
@@ -376,18 +375,18 @@ void Application::update_after_load()
 {
 	//m_update_mutex.lock();
 	m_world->calculate_lighting();
-	m_GUI->MapViewer->update();
+	m_gui_controller.m_GUI->MapViewer->update();
 	for (auto m = m_world->m_maps.begin(); m != m_world->m_maps.end(); ++m)
 	{
 		(*m)->update(VoidEventArgs());
 	}
 	//m_update_mutex.unlock();
 	//m_update_mutex.lock();
-	if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
+	if (m_world->m_player->m_object->m_active_state->m_ai)
 	{
-		GameObject* object = m_GUI->MapViewer->m_player->m_object;
+		GameObject* object = m_world->m_player->m_object;
 		GameMap* map = static_cast<MapCell*>(object->m_owner)->m_map;
-		static_cast<AI_enemy*>(m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)->calculate_FOV(m_GUI->MapViewer->m_player->m_object, map);
+		static_cast<AI_enemy*>(m_world->m_player->m_object->m_active_state->m_ai)->calculate_FOV(m_world->m_player->m_object, map);
 	}
 	//m_update_mutex.unlock();
 }
@@ -475,24 +474,24 @@ void Application::update()
 		A = m_action_manager->get_task();
 		if (A)
 		{
-			m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->set(m_GUI->MapViewer->m_player->m_object, A->m_action, A->m_parameter);
-			m_GUI->MapViewer->m_player->m_object->m_active_state->m_tile_manager->m_animation = A->m_action->m_animation;
+			m_world->m_player->m_object->m_active_state->m_ai->m_action_controller->set(m_world->m_player->m_object, A->m_action, A->m_parameter);
+			m_world->m_player->m_object->m_active_state->m_tile_manager->m_animation = A->m_action->m_animation;
 		}
 		do
 		{
 			m_update_mutex.lock();
-			if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
+			if (m_world->m_player->m_object->m_active_state->m_ai)
 			{
-				m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai->m_action_controller->update();
+				m_world->m_player->m_object->m_active_state->m_ai->m_action_controller->update();
 			}
 			//start = std::chrono::high_resolution_clock::now();
 			m_world->m_object_manager.calculate_ai();
 			end = std::chrono::high_resolution_clock::now();
 			elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 			//LOG(INFO) << "Просчет ИИ: " << std::to_string(elapsed.count());
-			if (m_GUI->MapViewer->m_player->m_object->m_active_state->m_ai)
+			if (m_world->m_player->m_object->m_active_state->m_ai)
 			{
-				GameObject* object = m_GUI->MapViewer->m_player->m_object;
+				GameObject* object = m_world->m_player->m_object;
 				GameMap* map = static_cast<MapCell*>(object->m_owner)->m_map;
 
 				AI_enemy* ai = static_cast<AI_enemy*>(object->m_active_state->m_ai);
@@ -544,7 +543,7 @@ void Application::update()
 			elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 			//LOG(INFO) << "Просчет освещения: " << std::to_string(elapsed.count());
 			//start = std::chrono::high_resolution_clock::now();
-			Application::instance().m_GUI->MapViewer->update();
+			m_gui_controller.m_GUI->MapViewer->update();
 			end = std::chrono::high_resolution_clock::now();
 			elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 			//LOG(INFO) << "Просчет карты: " << std::to_string(elapsed.count());
@@ -558,13 +557,13 @@ void Application::update()
 			m_game_turn += 1;
 			std::chrono::milliseconds Duration(1);
 			std::this_thread::sleep_for(Duration);
-		} while (!check_action_completion(m_GUI->MapViewer->m_player->m_object));
+		} while (!check_action_completion(m_world->m_player->m_object));
 		m_update_mutex.lock();
 		if (m_action_manager->m_is_remove) { m_action_manager->remove(); }
 		if (m_action_manager->m_items.empty())
 		{
 			m_update_mutex.unlock();
-			m_GUI->MapViewer->m_player->m_object->m_active_state->m_tile_manager->m_animation = animation_e::idle;
+			m_world->m_player->m_object->m_active_state->m_tile_manager->m_animation = animation_e::idle;
 			return;
 		}
 		m_update_mutex.unlock();
@@ -614,7 +613,7 @@ void Application::command_main_menu_select()
 MapCell* Application::command_select_location(GameObject* object)
 {
 	MapCell* Result = nullptr;
-	if (object)
+	/*if (object)
 	{
 		m_GUI->MapViewer->m_cursor_x = object->m_active_state->m_size.x;
 		m_GUI->MapViewer->m_cursor_y = object->m_active_state->m_size.y;
@@ -623,7 +622,7 @@ MapCell* Application::command_select_location(GameObject* object)
 	{
 		m_GUI->MapViewer->m_cursor_x = 1;
 		m_GUI->MapViewer->m_cursor_y = 1;
-	}
+	}*/
 	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Выберите клетку")));
 	bool Exit = false;
 	while (Exit == false)
@@ -653,16 +652,16 @@ MapCell* Application::command_select_location(GameObject* object)
 		m_message_queue.m_condition_variable.notify_one();
 		m_message_queue.m_reader = false;
 	}
-	m_GUI->MapViewer->m_cursor_x = 1;
-	m_GUI->MapViewer->m_cursor_y = 1;
+	/*m_GUI->MapViewer->m_cursor_x = 1;
+	m_GUI->MapViewer->m_cursor_y = 1;*/
 	return Result;
 }
 
 GameObject* Application::command_select_object_on_map()
 {
 	GameObject* Result = nullptr;
-	m_GUI->MapViewer->m_cursor_x = 1;
-	m_GUI->MapViewer->m_cursor_y = 1;
+	/*m_GUI->MapViewer->m_cursor_x = 1;
+	m_GUI->MapViewer->m_cursor_y = 1;*/
 	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Выберите обьект")));
 	bool Exit = false;
 	while (Exit == false)
@@ -698,8 +697,8 @@ GameObject* Application::command_select_object_on_map()
 GameObject* Application::command_select_object()
 {
 	GameObject* Result = nullptr;
-	m_GUI->MapViewer->m_cursor_x = 1;
-	m_GUI->MapViewer->m_cursor_y = 1;
+	/*m_GUI->MapViewer->m_cursor_x = 1;
+	m_GUI->MapViewer->m_cursor_y = 1;*/
 	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Выберите обьект")));
 	bool Exit = false;
 	while (Exit == false)
