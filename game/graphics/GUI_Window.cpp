@@ -38,13 +38,9 @@ void GUI_Header::resize(int width, int height)
 
 GUI_Window::GUI_Window(int _x, int _y, int _width, int _height, std::u16string _Name) :GUI_Container(_x, _y, _width, _height)
 {
-	m_is_moving = false;
 	m_header = new GUI_Header(2, 2, m_size.w - 4, 0, _Name);
 	m_header->close += std::bind(&GUI_Window::on_header_close, this);
 	GUI_Layer::add(m_header);
-	start_moving += std::bind(&GUI_Window::on_start_moving, this, std::placeholders::_1);
-	move += std::bind(&GUI_Window::on_move, this, std::placeholders::_1);
-	end_moving += std::bind(&GUI_Window::on_ending_move, this, std::placeholders::_1);
 	close += std::bind(&GUI_Window::on_close, this, std::placeholders::_1);
 	Application::instance().m_window_manager->add_front(this);
 }
@@ -90,56 +86,71 @@ GUI_Window::~GUI_Window()
 //	}
 //}
 
-void GUI_Window::on_mouse_move(MouseEventArgs const& e)
+//void GUI_Window::on_mouse_move(MouseEventArgs const& e)
+//{
+//	if (m_is_moving)
+//	{
+//		if (e.key == mk_left)
+//		{
+//			move(e);
+//		}
+//		else
+//		{
+//			end_moving(e);
+//		}
+//	}
+//	else {
+//		MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
+//		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); ++Current)
+//		{
+//			if ((*Current)->check_region(LocalMouseEventArgs))
+//			{
+//				(*Current)->mouse_move(LocalMouseEventArgs);
+//				if ((*Current) == m_items.front())
+//				{
+//					if (e.key == mk_left)
+//					{
+//						start_moving(e);
+//						move(e);
+//					}
+//				}
+//				return;
+//			}
+//		}
+//	}
+//}
+
+void GUI_Window::on_mouse_start_drag(MouseEventArgs const& e)
 {
-	if (m_is_moving)
+	if (m_focus&&m_focus!=m_header)
 	{
-		if (e.key == mk_left)
-		{
-			move(e);
-		}
-		else
-		{
-			end_moving(e);
-		}
-	}
-	else {
 		MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
-		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); ++Current)
-		{
-			if ((*Current)->check_region(LocalMouseEventArgs))
-			{
-				(*Current)->mouse_move(LocalMouseEventArgs);
-				if ((*Current) == m_items.front())
-				{
-					if (e.key == mk_left)
-					{
-						start_moving(e);
-						move(e);
-					}
-				}
-				return;
-			}
-		}
+		m_focus->mouse_start_drag(LocalMouseEventArgs);
+	}
+	else
+	{
+		m_initial_position.x = m_position.x - e.position.x;
+		m_initial_position.y = m_position.y - e.position.y;
+	}
+
+}
+
+void GUI_Window::on_mouse_drag(MouseEventArgs const& e)
+{
+	if (m_focus&&m_focus != m_header)
+	{
+		MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
+		m_focus->mouse_drag(LocalMouseEventArgs);
+	}
+	else
+	{
+		m_position.x = m_initial_position.x + e.position.x;
+		m_position.y = m_initial_position.y + e.position.y;
 	}
 }
 
-void GUI_Window::on_start_moving(MouseEventArgs const& e)
+void GUI_Window::on_mouse_end_drag(MouseEventArgs const& e)
 {
-	m_is_moving = true;
-	m_initial_position.x = m_position.x - e.position.x;
-	m_initial_position.y = m_position.y - e.position.y;
-}
-
-void GUI_Window::on_move(MouseEventArgs const& e)
-{
-	m_position.x = m_initial_position.x + e.position.x;
-	m_position.y = m_initial_position.y + e.position.y;
-}
-
-void GUI_Window::on_ending_move(MouseEventArgs const& e)
-{
-	m_is_moving = false;
 }
 
 void GUI_Window::on_close(GUI_Object* e)

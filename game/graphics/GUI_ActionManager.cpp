@@ -2,7 +2,7 @@
 #include "Action.h"
 
 
-GUI_ActionManager::GUI_ActionManager(int x, int y, int width, int height,ActionManager* ActionManager) : GUI_Container(x, y, width, height)
+GUI_ActionManager::GUI_ActionManager(int x, int y, int width, int height,ActionManager* ActionManager) : GUI_Scrollable_container(x, y, width, height)
 {
 	m_item = ActionManager;
 	m_item->add_item_event += std::bind(&GUI_ActionManager::on_item_add, this, std::placeholders::_1);
@@ -46,26 +46,9 @@ GUI_ActionManager::~GUI_ActionManager(void)
 
 void GUI_ActionManager::add_item_control(GUI_Object* object)
 {
-	static_cast<GUI_Item*>(object)->resize(m_size.w - 4, 21);
-	/*object->width = width - 4;
-	object->height = 21;*/
-	if (!m_items.empty())
-	{
-		GUI_Item* LastElement = static_cast<GUI_Item*>(m_items.back());
-		object->m_position.x = 2;
-		object->m_position.y = LastElement->m_position.y + LastElement->m_size.h + 2;
-		if (object->m_position.y + object->m_size.h>m_size.h)
-		{
-			m_scroll.y -= object->m_size.h;
-		}
-	}
-	else
-	{
-		object->m_position.x = 2;
-		object->m_position.y = 2;
-	}
+	static_cast<GUI_Item*>(object)->resize(m_size.w - 4-20, 21);
 	static_cast<GUI_Item*>(object)->close += std::bind(&GUI_ActionManager::remove_item_from_source, this, std::placeholders::_1);
-	GUI_Layer::add(object);
+	GUI_Scrollable_container::add_item_control(object);
 }
 
 void GUI_ActionManager::on_item_add(tag_t const& e)
@@ -99,6 +82,8 @@ void GUI_ActionManager::remove_item_control(GUI_Object* object)
 			break;
 		}
 	}
+	update();
+	m_scrollbar.content_update();
 }
 
 void GUI_ActionManager::on_item_remove(tag_t const& e)

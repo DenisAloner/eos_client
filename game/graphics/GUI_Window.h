@@ -25,27 +25,23 @@ class GUI_Window :
 {
 public:
 
-	Event<MouseEventArgs> start_moving;
-	Event<MouseEventArgs> move;
-	Event<MouseEventArgs> end_moving;
 	Event<GUI_Object*> close;
 
 	GUI_Window(int _x, int _y, int _width, int _height, std::u16string _Name);
 	~GUI_Window();
 
-	bool m_is_moving;
 	position_t m_initial_position;
 
 	//virtual void on_mouse_down(MouseEventArgs const& e);
-	virtual void on_mouse_move(MouseEventArgs const& e);
-	virtual void on_start_moving(MouseEventArgs const& e);
-	virtual void on_move(MouseEventArgs const& e);
-	virtual void on_ending_move(MouseEventArgs const& e);
+	/*virtual void on_mouse_move(MouseEventArgs const& e);*/
+	void on_mouse_start_drag(MouseEventArgs const& e) override;
+	void on_mouse_drag(MouseEventArgs const& e) override;
+	void on_mouse_end_drag(MouseEventArgs const& e) override;
 	virtual void on_close(GUI_Object* e);
 	virtual void on_header_close();
 	virtual void resize(int _width, int _height);
-	virtual void on_mouse_wheel(MouseEventArgs const& e);
-	virtual void add(GUI_Object* object);
+	void on_mouse_wheel(MouseEventArgs const& e) override;
+	void add(GUI_Object* object) override;
 	virtual rectangle_t client_rect();
 
 private:

@@ -12,7 +12,11 @@ GUI_Controller::~GUI_Controller()
 
 void GUI_Controller::key_press(WPARAM w)
 {
-	if (m_GUI) { m_GUI->key_press(w); }
+	if (m_GUI)
+	{
+		LOG(INFO) << "yes";
+		m_GUI->key_press(w);
+	}
 }
 
 void GUI_Controller::mouse_click(MouseEventArgs const& e)
@@ -42,7 +46,6 @@ void GUI_Controller::mouse_move(MouseEventArgs const& e)
 	{
 		if (m_dragged)
 		{
-			LOG(INFO) << "dragged";
 			m_GUI->mouse_drag(e);
 		}
 		else
