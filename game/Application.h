@@ -33,7 +33,6 @@ class Parameter;
 class P_object;
 class Action_OpenInventory;
 class MouseController;
-class GUI_ActionPanel;
 class GUI_ActionButton;
 class GUI_ActionManager;
 class GUI_Layer;

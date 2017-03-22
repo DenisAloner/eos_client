@@ -3,7 +3,6 @@
 #include "game/ActionManager.h"
 #include "game/GameObject.h"
 #include "game/graphics/GUI_ActionManager.h"
-#include "game/graphics/GUI_ActionPanel.h"
 #include "game/graphics/GUI_ActionButton.h"
 #include "game/graphics/GUI_Window.h"
 #include "game/graphics/GUI_MapViewer.h"

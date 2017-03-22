@@ -14,36 +14,6 @@ GUI_ActionManager::~GUI_ActionManager(void)
 {
 }
 
-//void GUI_ActionManager::Render(GraphicalController* Graph)
-//{
-//	glEnable(GL_BLEND);
-//	glDisable(GL_TEXTURE_2D);
-//	glColor4d(1.0, 1.0, 1.0, 0.5);
-//	Graph->draw_sprite(x,y,x,y+height,x+width,y+height,x+width,y);
-//	glEnable(GL_TEXTURE_2D);
-//	int i=0;
-//	glColor4d(0.0, 0.0, 0.0, 1.0);
-//	for(auto current:Item->Actions)
-//	{
-//		Graph->TextXY(x+5,y+i,current->Action->GetDescription(current->Parameter),8,17);
-//		i+=18;
-//	}
-//	//Graph->CenterText(x+width/2,y+height/2,Text,8,17);
-//	glDisable(GL_BLEND);
-//	glDisable(GL_TEXTURE_2D);
-//	glBegin(GL_LINES);
-//	glColor4f(1.0, 1.0, 1.0, 1.0);
-//	glVertex2d(x, y);
-//	glVertex2d(x, y + height);
-//	glVertex2d(x, y + height);
-//	glVertex2d(x + width, y + height);
-//	glVertex2d(x + width, y + height);
-//	glVertex2d(x + width, y);
-//	glVertex2d(x + width, y);
-//	glVertex2d(x, y);
-//	glEnd();
-//}
-
 void GUI_ActionManager::add_item_control(GUI_Object* object)
 {
 	static_cast<GUI_Item*>(object)->resize(m_size.w - 4-20, 21);
@@ -79,6 +49,15 @@ void GUI_ActionManager::remove_item_control(GUI_Object* object)
 				}
 			}
 			GUI_Layer::remove(object);
+			if (!m_items.empty())
+			{
+				GUI_Object* LastElement = m_items.back();
+				if (LastElement->m_position.y + LastElement->m_size.h+ m_scroll.y<m_size.h)
+				{
+					m_scroll.y += LastElement->m_size.h;
+					if (m_scroll.y > 0) { m_scroll.y=0; }
+				}
+			}
 			break;
 		}
 	}
@@ -92,7 +71,7 @@ void GUI_ActionManager::on_item_remove(tag_t const& e)
 	{
 		if (static_cast<GUI_Item*>(*Current)->m_tag.task == e.task)
 		{
-			remove_item_control((*Current));
+			remove_item_control(*Current);
 			break;
 		}
 	}

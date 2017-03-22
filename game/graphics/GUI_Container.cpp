@@ -157,11 +157,10 @@ void GUI_Scrollbar_vertical::content_update()
 	else
 	{
 		GUI_Object& LastElement = *m_owner->m_items.back();
-		int total = LastElement.m_position.y + LastElement.m_size.h;
+		int total = LastElement.m_position.y + LastElement.m_size.h + 2;
 		m_bar_top = std::abs((float)m_owner->m_scroll.y / (float)total*m_size.h);
 		m_bar_height = (float)m_owner->m_size.h / (float)total*m_size.h;
 	}
-
 }
 
 MouseEventArgs GUI_Scrollbar_vertical::set_local_mouse_control(MouseEventArgs const& source)
@@ -184,7 +183,7 @@ void GUI_Scrollbar_vertical::on_mouse_drag(MouseEventArgs const& e)
 	if (m_bar_top < 0) { m_bar_top = 0; }
 	if (m_bar_top + m_bar_height > m_size.h) { m_bar_top = m_size.h - m_bar_height; }
 	GUI_Object& LastElement = *m_owner->m_items.back();
-	int total = LastElement.m_position.y + LastElement.m_size.h;
+	int total = LastElement.m_position.y + LastElement.m_size.h + 2;
 	m_owner->set_scroll2(-(float)m_bar_top / (float)m_size.h*total);
 
 }
@@ -214,16 +213,16 @@ void GUI_Scrollable_container::add_item_control(GUI_Object* object)
 	{
 		GUI_Object* LastElement = m_items.back();
 		object->m_position.x = 2;
-		object->m_position.y = LastElement->m_position.y + LastElement->m_size.h;
-		if (object->m_position.y + object->m_size.h>m_size.h)
+		object->m_position.y = LastElement->m_position.y + LastElement->m_size.h + 2;
+		if (object->m_position.y + object->m_size.h>m_size.h+2)
 		{
-			m_scroll.y -= object->m_size.h;
+			m_scroll.y -= object->m_size.h + 2;
 		}
 	}
 	else
 	{
 		object->m_position.x = 2;
-		object->m_position.y = 0;
+		object->m_position.y = 2;
 		m_scroll.y = 0;
 	}
 	GUI_Layer::add(object);
@@ -239,11 +238,11 @@ void GUI_Scrollable_container::set_scroll(int dy)
 		if (dy < 0)
 		{
 			Item =m_items.back();
-			if (Item->m_position.y + Item->m_size.h + m_scroll.y + dy < m_size.h)
+			if (Item->m_position.y + Item->m_size.h+2 + m_scroll.y + dy < m_size.h)
 			{
 				if (m_scroll.y != 0)
 				{
-					m_scroll.y = m_size.h - (Item->m_position.y + Item->m_size.h);
+					m_scroll.y = m_size.h - (Item->m_position.y + Item->m_size.h+2);
 				}
 				update();
 				m_scrollbar.content_update();
@@ -282,12 +281,12 @@ void GUI_Scrollable_container::update()
 	end_render = m_items.end();
 	for (auto i = m_items.begin(); i != m_items.end(); ++i)
 	{
-		if ((*i)->m_position.y + (*i)->m_size.h + m_scroll.y>0)
+		if ((*i)->m_position.y + (*i)->m_size.h + m_scroll.y+2>0)
 		{
 			start_render = i;
 			for (auto j = i; j != m_items.end(); ++j)
 			{
-				if ((*j)->m_position.y + (*j)->m_size.h + m_scroll.y > m_size.h)
+				if ((*j)->m_position.y + (*j)->m_size.h + m_scroll.y +2> m_size.h)
 				{
 					end_render = ++j;
 					return;

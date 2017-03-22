@@ -3,10 +3,8 @@
 
 #include "Description_GUI.h"
 #include "graphics/GUI_Layer.h"
-#include "graphics/GUI_ActionPanel.h"
 #include "GameObject.h"
 #include "GameMap.h"
-#include "GUI_ActionPanel.h"
 #include "GUI_ActionManager.h"
 #include "ActionManager.h"
 #include "Game_log.h"
@@ -14,7 +12,6 @@
 
 
 class GUI_MapViewer;
-class GUI_ActionPanel;
 class Player;
 class GUI_Action_bar;
 
@@ -28,7 +25,6 @@ public:
 
 	GUI_MapViewer* MapViewer;
 	GUI_Layer* m_main_layer;
-	GUI_ActionPanel* m_action_panel;
 	GUI_Action_bar* m_action_bar;
 };
 
