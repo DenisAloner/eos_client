@@ -42,9 +42,11 @@ public:
 	void render(GraphicalController* Graph, int px, int py) override;
 	void content_update();
 	MouseEventArgs set_local_mouse_control(MouseEventArgs const& source);
+	void on_mouse_click(MouseEventArgs const& e) override;
 	void on_mouse_start_drag(MouseEventArgs const& e) override;
 	void on_mouse_drag(MouseEventArgs const& e) override;
 	bool check_region(MouseEventArgs const& e) override;
+	void set_scroll_top(int value);
 
 };
 

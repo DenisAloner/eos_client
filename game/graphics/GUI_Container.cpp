@@ -168,6 +168,29 @@ MouseEventArgs GUI_Scrollbar_vertical::set_local_mouse_control(MouseEventArgs co
 	return MouseEventArgs(position_t(source.position.x - m_position.x, source.position.y - m_position.y), source.key, source.value);
 }
 
+void GUI_Scrollbar_vertical::set_scroll_top(int value)
+{
+	m_bar_top = value;
+	if (m_bar_top < 0) { m_bar_top = 0; }
+	if (m_bar_top + m_bar_height > m_size.h) { m_bar_top = m_size.h - m_bar_height; }
+	GUI_Object& LastElement = *m_owner->m_items.back();
+	int total = LastElement.m_position.y + LastElement.m_size.h + 2;
+	m_owner->set_scroll2(-(float)m_bar_top / (float)m_size.h*total);
+}
+
+void GUI_Scrollbar_vertical::on_mouse_click(MouseEventArgs const& e)
+{
+	MouseEventArgs LocalMouseEventArgs = set_local_mouse_control(e);
+	if(LocalMouseEventArgs.position.y<m_bar_top)
+	{
+		set_scroll_top(LocalMouseEventArgs.position.y);
+	} else if (LocalMouseEventArgs.position.y>m_bar_top+m_bar_height)
+	{
+		set_scroll_top(LocalMouseEventArgs.position.y - m_bar_height);
+	}
+	set_focus(true);
+}
+
 
 void GUI_Scrollbar_vertical::on_mouse_start_drag(MouseEventArgs const& e)
 {
@@ -178,14 +201,8 @@ void GUI_Scrollbar_vertical::on_mouse_start_drag(MouseEventArgs const& e)
 void GUI_Scrollbar_vertical::on_mouse_drag(MouseEventArgs const& e)
 {
 	MouseEventArgs LocalMouseEventArgs = set_local_mouse_control(e);
-	m_bar_top += -m_pos + LocalMouseEventArgs.position.y;
+	set_scroll_top(m_bar_top -m_pos + LocalMouseEventArgs.position.y);
 	m_pos = LocalMouseEventArgs.position.y;
-	if (m_bar_top < 0) { m_bar_top = 0; }
-	if (m_bar_top + m_bar_height > m_size.h) { m_bar_top = m_size.h - m_bar_height; }
-	GUI_Object& LastElement = *m_owner->m_items.back();
-	int total = LastElement.m_position.y + LastElement.m_size.h + 2;
-	m_owner->set_scroll2(-(float)m_bar_top / (float)m_size.h*total);
-
 }
 
 bool GUI_Scrollbar_vertical::check_region(MouseEventArgs const& e)
@@ -346,12 +363,13 @@ void GUI_Scrollable_container::on_mouse_wheel(MouseEventArgs const& e)
 
 void GUI_Scrollable_container::on_mouse_click(MouseEventArgs const& e)
 {
-	MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
+	MouseEventArgs LocalMouseEventArgs = MouseEventArgs(position_t(e.position.x - m_position.x, e.position.y - m_position.y), e.key, e.value);
 	if (m_scrollbar.check_region(LocalMouseEventArgs))
 	{
 		m_scrollbar.mouse_click(LocalMouseEventArgs);
 		return;
 	}
+	LocalMouseEventArgs = set_local_mouse_position(e);
 	for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); ++Current)
 	{
 		if ((*Current)->check_region(LocalMouseEventArgs))
