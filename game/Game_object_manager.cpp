@@ -640,30 +640,8 @@ void GameObjectManager::save()
 
 void GameObjectManager::load()
 {
-
 }
 
-void GameObjectManager::bind_body_predicat(Object_interaction* object, bool add_mode)
-{
-	if (add_mode)
-	{
-		if (object->m_interaction_message_type == interaction_message_type_e::part)
-		{
-
-			Object_part* part = dynamic_cast<Object_part*>(object);
-			//LOG(INFO) << "parts: " << part->m_name;
-			part->m_owner= m_game_object_owner_stack.front();
-			m_game_object_owner_stack.push_front(part);
-		}
-	}
-	else
-	{
-		if (object->m_interaction_message_type == interaction_message_type_e::part)
-		{
-			m_game_object_owner_stack.pop_front();
-		}
-	}
-}
 
 void GameObjectManager::bind_body(GameObject* object)
 {
@@ -673,13 +651,20 @@ void GameObjectManager::bind_body(GameObject* object)
 		Interaction_list* list = (*item)->get_list(interaction_e::body);
 		if (list)
 		{
-			m_game_object_owner_stack.clear();
-			m_game_object_owner_stack.push_front(object);
-			for (auto item = list->m_items.begin(); item != list->m_items.end(); ++item)
-			{
-				(*item)->do_predicat_ex(std::bind(&GameObjectManager::bind_body_predicat, this, std::placeholders::_1, std::placeholders::_2));
-			}
-			m_game_object_owner_stack.pop_front();
+			Visitor_part_hierarchy_setter setter;
+			setter.m_game_object_owner_stack.push_front(object);
+			list->apply_visitor(setter);
 		}
 	}
+}
+
+void Visitor_part_hierarchy_setter::begin(Object_part& value)
+{
+	value.m_owner = m_game_object_owner_stack.front();
+	m_game_object_owner_stack.push_front(&value);
+}
+
+void Visitor_part_hierarchy_setter::end(Object_part& value)
+{
+	m_game_object_owner_stack.pop_front();
 }

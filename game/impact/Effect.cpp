@@ -103,14 +103,9 @@ void Interaction_list::do_predicat(Visitor& helper)
 	}
 }
 
-void Interaction_list::do_predicat_ex(predicat_ex func)
+void Interaction_list::apply_visitor(Visitor_generic& visitor)
 {
-	func(this,true);
-	for (auto item = m_items.begin(); item != m_items.end(); ++item)
-	{
-		(*item)->do_predicat_ex(func);
-	}
-	func(this, false);
+	visitor.visit(*this);
 }
 
 void Interaction_list::description(std::list<std::u16string>* info, int level)
@@ -295,6 +290,11 @@ void Parameter_list::description(std::list<std::u16string>* info, int level)
 	}
 }
 
+void Parameter_list::apply_visitor(Visitor_generic& visitor)
+{
+	visitor.visit(*this);
+}
+
 void Parameter_list::save()
 {
 	LOG(INFO) << "Лист параметров";
@@ -407,6 +407,11 @@ void Vision_list::description(std::list<std::u16string>* info, int level)
 	{
 		(*current)->description(info, level);
 	}
+}
+
+void Vision_list::apply_visitor(Visitor_generic& visitor)
+{
+	visitor.visit(*this);
 }
 
 void Vision_list::equip(Object_interaction* item)
@@ -605,6 +610,11 @@ void Vision_component::description(std::list<std::u16string>* info, int level)
 	}
 }
 
+void Vision_component::apply_visitor(Visitor_generic& visitor)
+{
+	visitor.visit(*this);
+}
+
 void Vision_component::save()
 {
 	LOG(INFO) << "Компонент зрения";
@@ -642,6 +652,11 @@ Tag_list::Tag_list()
 {
 	m_interaction_message_type = interaction_message_type_e::list;
 	m_list_type = feature_list_type_e::tag;
+}
+
+void Tag_list::apply_visitor(Visitor_generic& visitor)
+{
+	visitor.visit(*this);
 }
 
 Tag_list* Tag_list::clone()
@@ -903,6 +918,11 @@ void Parts_list::load()
 	}
 }
 
+void Parts_list::apply_visitor(Visitor_generic& visitor)
+{
+	visitor.visit(*this);
+}
+
 // Action_list
 
 Action_list::Action_list() 
@@ -1123,13 +1143,6 @@ void Interaction_slot::do_predicat(Visitor& helper)
 {
 	helper.visit(*this);
 	m_value->do_predicat(helper);
-}
-
-void Interaction_slot::do_predicat_ex(predicat_ex func)
-{
-	func(this, true);
-	m_value->do_predicat_ex(func);
-	func(this, false);
 }
 
 void Interaction_slot::reset_serialization_index()
@@ -1773,7 +1786,12 @@ ObjectTag::Label* ObjectTag::Label::clone()
 	return effect;
 }
 
-void ObjectTag::Label::apply_effect(GameObject* unit, Object_interaction* object){};
+void ObjectTag::Label::apply_effect(GameObject* unit, Object_interaction* object){}
+
+void ObjectTag::Label::apply_visitor(Visitor_generic& visitor)
+{
+	visitor.visit(*this);
+};
 
 void ObjectTag::Label::save()
 {

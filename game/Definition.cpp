@@ -23,7 +23,11 @@ Packer_generic& iSerializable::get_packer()
 std::u16string Packer<Action>::to_json(iSerializable* object)
 {
 	return object_to_json<Action>(dynamic_cast<Action*>(object));
-};
+}
+
+void Object_interaction::apply_visitor(Visitor_generic& visitor)
+{
+}
 
 std::map<std::u16string, instance_function_t> Parser::m_classes = {};
 

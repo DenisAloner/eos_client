@@ -12,6 +12,7 @@
 #include <map>
 #include "Effect.h"
 #include "Action.h"
+#include "Visitors.h"
 
 class Object_feature;
 class Application;
@@ -115,6 +116,7 @@ public:
 	Interaction_list* get_list(interaction_e key);
 	bool get_stat(object_tag_e key);
 	Object_tag* get_tag(object_tag_e key);
+	virtual void apply_visitor(Visitor_generic& visitor);
 
 	// Для поддержки iSerializable
 	Packer_generic& get_packer() override
@@ -153,6 +155,7 @@ public:
 	virtual void set_tile_size();
 	Object_state();
 	virtual Object_state* clone();
+	void apply_visitor(Visitor_generic& visitor) override;
 
 	virtual void reset_serialization_index();
 	virtual void save();
@@ -240,6 +243,7 @@ public:
 	virtual Object_interaction* clone();
 	void description(std::list<std::u16string>* info, int level) override;
 	virtual void do_predicat(predicat func);
+	void apply_visitor(Visitor_generic& visitor) override;
 
 	virtual void reset_serialization_index();
 	virtual void save();
@@ -326,7 +330,7 @@ public:
 	virtual Object_part* clone();
 	void description(std::list<std::u16string>* info, int level) override;
 	virtual void do_predicat(Visitor& helper);
-	virtual void do_predicat_ex(predicat_ex func);
+	void apply_visitor(Visitor_generic& visitor) override;
 
 	virtual void reset_serialization_index();
 	virtual void save();

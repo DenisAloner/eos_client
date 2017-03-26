@@ -4,6 +4,7 @@
 #include "GameObject.h"
 #include "Effect.h"
 #include "game\impact\forwards.h"
+#include "Visitors.h"
 
 
 class Effect;
@@ -137,7 +138,6 @@ public:
 
 	std::string get_effect_prefix_string(effect_prefix_e key);
 
-	void GameObjectManager::bind_body_predicat(Object_interaction* object, bool add_mode);
 	void GameObjectManager::bind_body(GameObject* object);
 
 	virtual void save();
@@ -145,6 +145,14 @@ public:
 
 	static Config m_config;
 
-private:
+};
+
+class Visitor_part_hierarchy_setter :public Visitor_doublehandle
+{
+public:
+
 	std::list<Game_object_owner*> m_game_object_owner_stack;
+
+	void begin(Object_part& value) override;
+	void end(Object_part& value) override;
 };

@@ -173,6 +173,11 @@ Object_tag* Attribute_map::get_tag(object_tag_e key)
 	return nullptr;
 }
 
+void Attribute_map::apply_visitor(Visitor_generic& visitor)
+{
+	visitor.visit(*this);
+}
+
 Object_state::Object_state()
 {
 	m_layer = 1;
@@ -218,6 +223,11 @@ Object_state* Object_state::clone()
 		state->m_items[item->first] = item->second->clone();
 	}
 	return state;
+}
+
+void Object_state::apply_visitor(Visitor_generic& visitor)
+{
+	visitor.visit(*this);
 }
 
 Object_state_equip::Object_state_equip()
@@ -380,6 +390,11 @@ void GameObject::do_predicat(predicat func)
 { 
 	func(this); 
 	LOG(FATAL) << "Метод не описан.";
+}
+
+void GameObject::apply_visitor(Visitor_generic& visitor)
+{
+	visitor.visit(*this);
 };
 
 void GameObject::turn()
@@ -984,14 +999,9 @@ void Object_part::do_predicat(Visitor& helper)
 	}
 }
 
-void Object_part::do_predicat_ex(predicat_ex func)
+void Object_part::apply_visitor(Visitor_generic& visitor)
 {
-	func(this,true);
-	for (auto item = m_attributes.m_items.begin(); item != m_attributes.m_items.end(); item++)
-	{
-		item->second->do_predicat_ex(func);
-	}
-	func(this, false);
+	visitor.visit(*this);
 }
 
 void Object_part::reset_serialization_index()

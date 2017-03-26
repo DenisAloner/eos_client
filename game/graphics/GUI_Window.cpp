@@ -50,6 +50,190 @@ rectangle_t GUI_Window::client_rect()
 	return rectangle_t(1, m_header->m_position.y + m_header->m_size.h + 1, m_size.w - 2, m_size.h - (m_header->m_position.y + m_header->m_size.h + 1));
 }
 
+Visitor_object_description_getter::Visitor_object_description_getter() :m_value(nullptr)
+{
+}
+
+void Visitor_object_description_getter::handle_simple(std::u16string& value)
+{
+	if (m_active.empty())
+	{
+		m_value = new Tree<std::u16string>(value);
+	}
+	else
+	{
+		m_active.front()->add_node(value);
+	}
+}
+
+void Visitor_object_description_getter::handle_simple(std::u16string const& value)
+{
+	if (m_active.empty())
+	{
+		m_value = new Tree<std::u16string>(value);
+	}
+	else
+	{
+		m_active.front()->add_node(value);
+	}
+}
+
+void Visitor_object_description_getter::handle_complex(std::u16string& value)
+{
+	if (m_active.empty())
+	{
+		m_active.push_front(new Tree<std::u16string>(value));
+	}
+	else
+	{
+		auto element = m_active.front()->add_node(value);
+		m_active.push_front(element);
+	}
+	if (!m_value)
+	{
+		m_value = m_active.front();
+	}
+}
+
+void Visitor_object_description_getter::handle_complex(std::u16string const& value)
+{
+	if (m_active.empty())
+	{
+		m_active.push_front(new Tree<std::u16string>(value));
+	}
+	else
+	{
+		auto element = m_active.front()->add_node(value);
+		m_active.push_front(element);
+	}
+	if (!m_value)
+	{
+		m_value = m_active.front();
+	}
+}
+
+void Visitor_object_description_getter::visit(Object_state& value)
+{
+	begin(value);
+	Tree<std::u16string>* item = nullptr;
+	for (auto current = value.m_items.begin(); current != value.m_items.end(); ++current)
+	{
+		current->second->apply_visitor(*this);
+		std::list<Tree<std::u16string>>& node = m_active.front()->m_nodes;
+		if (!node.empty() && item != &node.back())
+		{
+			item = &node.back();
+			node.back().m_value = Parser::m_string_interaction_e[current->first] + u": " + node.back().m_value;
+		}
+	}
+	end(value);
+}
+
+void Visitor_object_description_getter::visit(ObjectTag::Label& value)
+{
+	handle_simple(u"<" + Parser::m_string_object_tag_e[value.m_type] + u">");
+}
+
+void Visitor_object_description_getter::begin(GameObject& value)
+{
+	handle_complex(value.m_name);
+}
+	
+void Visitor_object_description_getter::end(GameObject& value)
+{
+	m_active.pop_front();
+}
+
+void Visitor_object_description_getter::begin(Attribute_map& value)
+{
+	handle_complex(u"Характеристики: ");
+}
+
+void Visitor_object_description_getter::end(Attribute_map& value)
+{
+	m_active.pop_front();
+}
+
+void Visitor_object_description_getter::begin(Object_state& value)
+{
+	handle_complex(u"Характеристики: ");
+}
+
+void Visitor_object_description_getter::end(Object_state& value)
+{
+	m_active.pop_front();
+}
+
+void Visitor_object_description_getter::begin(Interaction_list& value)
+{
+	handle_complex(u"");
+}
+
+void Visitor_object_description_getter::end(Interaction_list& value)
+{
+	m_active.pop_front();
+}
+
+void Visitor_object_description_getter::begin(Parameter_list& value)
+{
+	handle_complex(Parser::CP866_to_UTF16(std::to_string(value.m_value) + "(" + std::to_string(value.m_basic_value) + ")/" + std::to_string(value.m_limit) + "(" + std::to_string(value.m_basic_limit) + "):"));
+}
+
+void Visitor_object_description_getter::end(Parameter_list& value)
+{
+	m_active.pop_front();
+}
+
+void Visitor_object_description_getter::begin(Vision_list& value)
+{
+	handle_complex(u"");
+}
+
+void Visitor_object_description_getter::end(Vision_list& value)
+{
+	m_active.pop_front();
+}
+
+void Visitor_object_description_getter::begin(Vision_component& value)
+{
+	handle_complex(Parser::CP866_to_UTF16(std::to_string(value.m_value.radius) + "," + std::to_string(value.m_value.start_angle) + "," + std::to_string(value.m_value.end_angle) + "/" + std::to_string(value.m_basic_value.radius) + "," + std::to_string(value.m_basic_value.start_angle) + "," + std::to_string(value.m_basic_value.end_angle)));
+}
+
+void Visitor_object_description_getter::end(Vision_component& value)
+{
+	m_active.pop_front();
+}
+
+void Visitor_object_description_getter::begin(Parts_list& value)
+{
+	handle_complex(u"");
+}
+
+void Visitor_object_description_getter::end(Parts_list& value)
+{
+	m_active.pop_front();
+}
+
+void Visitor_object_description_getter::begin(Object_part& value)
+{
+	handle_complex(value.m_name+u": ");
+}
+
+void Visitor_object_description_getter::end(Object_part& value)
+{
+	m_active.pop_front();
+}
+
+void Visitor_object_description_getter::begin(Tag_list& value)
+{
+	handle_complex(u"");
+}
+
+void Visitor_object_description_getter::end(Tag_list& value)
+{
+	m_active.pop_front();
+}
+
 void GUI_Window::add(GUI_Object* object)
 {
 	object->m_position = position_t(object->m_position.x + 1, object->m_position.y + m_header->m_position.y + m_header->m_size.h + 1);
@@ -60,65 +244,6 @@ void GUI_Window::add(GUI_Object* object)
 GUI_Window::~GUI_Window()
 {
 }
-
-//void GUI_Window::on_mouse_down(MouseEventArgs const& e)
-//{
-//	MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
-//	if (m_items.front()->check_region(LocalMouseEventArgs))
-//	{
-//		m_focus = nullptr;
-//		set_focus(true);
-//		return;
-//	}
-//	else {
-//		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); Current++)
-//		{
-//			if ((*Current)->check_region(LocalMouseEventArgs))
-//			{
-//				(*Current)->mouse_down(LocalMouseEventArgs);
-//				return;
-//			}
-//		}
-//		if ((m_focus != this) && (m_focus == nullptr))
-//		{
-//			set_focus(true);
-//		}
-//	}
-//}
-
-//void GUI_Window::on_mouse_move(MouseEventArgs const& e)
-//{
-//	if (m_is_moving)
-//	{
-//		if (e.key == mk_left)
-//		{
-//			move(e);
-//		}
-//		else
-//		{
-//			end_moving(e);
-//		}
-//	}
-//	else {
-//		MouseEventArgs LocalMouseEventArgs = set_local_mouse_position(e);
-//		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); ++Current)
-//		{
-//			if ((*Current)->check_region(LocalMouseEventArgs))
-//			{
-//				(*Current)->mouse_move(LocalMouseEventArgs);
-//				if ((*Current) == m_items.front())
-//				{
-//					if (e.key == mk_left)
-//					{
-//						start_moving(e);
-//						move(e);
-//					}
-//				}
-//				return;
-//			}
-//		}
-//	}
-//}
 
 void GUI_Window::on_mouse_start_drag(MouseEventArgs const& e)
 {
@@ -193,12 +318,15 @@ GUI_description_window::GUI_description_window(int x, int y, int width, int heig
 
 void GUI_description_window::update_info()
 {
+	Visitor_object_description_getter info;
+	m_object->apply_visitor(info);
 	m_text.clear();
 	while (m_textbox->m_items.begin()!= m_textbox->m_items.end())
 	{
 		m_textbox->GUI_Layer::remove((*m_textbox->m_items.begin()));
 	}
-	if (m_object->m_active_state)
+	add_tree(*info.m_value, 0);
+	/*if (m_object->m_active_state)
 	{
 		m_text.push_back(u"эффекты:");
 		for (auto current = m_object->m_active_state->m_items.begin(); current != m_object->m_active_state->m_items.end(); current++)
@@ -219,6 +347,16 @@ void GUI_description_window::update_info()
 	for (auto item = m_text.begin(); item != m_text.end(); ++item)
 	{
 		m_textbox->add_item_control(new GUI_Text((*item), new GUI_TextFormat(8, 17, RGBA_t(0.7, 0.9, 1.0, 1.0))));
+	}*/
+
+}
+
+void GUI_description_window::add_tree(Tree<std::u16string>& value, int level)
+{
+	m_textbox->add_item_control(new GUI_Text(std::u16string(level, '.') + value.m_value, new GUI_TextFormat(8, 17, RGBA_t(1.0, 1.0, 1.0, 1.0))));
+	for (auto item = value.m_nodes.begin(); item != value.m_nodes.end(); ++item)
+	{
+		add_tree(*item, level + 1);
 	}
 }
 

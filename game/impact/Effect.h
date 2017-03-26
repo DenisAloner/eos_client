@@ -26,7 +26,7 @@ public:
 	virtual void unequip(Object_interaction* item) { m_items.remove(item); };
 
 	virtual void do_predicat(Visitor& helper);
-	virtual void do_predicat_ex(predicat_ex func);
+	void apply_visitor(Visitor_generic& visitor) override;
 
 	virtual void reset_serialization_index();
 	virtual void save();
@@ -64,6 +64,7 @@ public:
 	virtual bool update();
 	virtual Parameter_list* clone();
 	void description(std::list<std::u16string>* info, int level) override;
+	void apply_visitor(Visitor_generic& visitor) override;
 
 	virtual void save();
 	virtual void load();
@@ -106,6 +107,7 @@ public:
 	virtual bool update();
 	virtual Vision_list* clone();
 	virtual void description(std::list<std::u16string>* info, int level);
+	void apply_visitor(Visitor_generic& visitor) override;
 
 	virtual void equip(Object_interaction* item);
 	virtual void unequip(Object_interaction* item);
@@ -137,6 +139,7 @@ public:
 	virtual bool update();
 	virtual Vision_component* clone();
 	void description(std::list<std::u16string>* info, int level) override;
+	void apply_visitor(Visitor_generic& visitor) override;
 
 	virtual void save();
 	virtual void load();
@@ -161,6 +164,9 @@ class Tag_list :public  Interaction_list
 public:
 
 	Tag_list();
+
+	void apply_visitor(Visitor_generic& visitor) override;
+
 	virtual Tag_list* clone();
 
 	virtual bool update();
@@ -201,6 +207,7 @@ public:
 	virtual void save();
 	virtual void load();
 
+	void apply_visitor(Visitor_generic& visitor) override;
 	virtual void equip(Object_interaction* item);
 
 	Packer_generic& get_packer() override
@@ -323,7 +330,6 @@ public:
 	Interaction_slot();
 	virtual bool on_turn();
 	virtual void do_predicat(Visitor& helper);
-	virtual void do_predicat_ex(predicat_ex func);
 	void reset_serialization_index() override;
 
 	Packer_generic& get_packer() override
@@ -543,6 +549,8 @@ namespace ObjectTag
 		Label(object_tag_e type);
 		virtual Label* clone();
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+		void apply_visitor(Visitor_generic& visitor) override;
 
 		virtual void save();
 		virtual void load();

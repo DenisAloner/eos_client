@@ -403,28 +403,6 @@ public:
 	virtual void visit(Object_interaction& value) = 0;
 };
 
-
-//class Object_interaction: public virtual iSerializable
-//{
-//public:
-//
-//	typedef std::function<void(Object_interaction*)> predicat;
-//	typedef std::function<void(Object_interaction*,bool)> predicat_ex;
-//
-//	interaction_message_type_e m_interaction_message_type;
-//	Object_interaction(){};
-//	virtual void apply_effect(GameObject* unit, Object_interaction* object) {};
-//	virtual bool on_turn() = 0;
-//	virtual std::string get_description() = 0;
-//	virtual Object_interaction* clone() = 0;
-//	virtual void description(std::list<std::string>* info, int level) = 0;
-//	virtual void do_predicat(Visitor& helper) { helper.visit(*this); };
-//	virtual void do_predicat_ex(predicat_ex func) { func(this,true); func(this, false);};
-//};
-
-
-
-
 class GameTask;
 class GameObject;
 
@@ -848,6 +826,37 @@ public:
 
 };
 
+template<typename T>
+class Tree
+{
+public:
+
+	T m_value;
+
+	std::list<Tree> m_nodes;
+
+	Tree(){};
+
+	Tree(T const& value) :m_value(value) {};
+
+	Tree(T& value) :m_value(value) {};
+
+	Tree* add_node(T& value)
+	{
+		m_nodes.push_back(Tree(value));
+		return &m_nodes.back();
+	}
+
+	Tree* add_node(T const& value)
+	{
+		m_nodes.push_back(Tree(value));
+		return &m_nodes.back();
+	}
+
+};
+
+class Visitor_generic;
+
 class Object_interaction : public virtual iSerializable
 {
 public:
@@ -864,7 +873,7 @@ public:
 	virtual Object_interaction* clone() { return nullptr; };
 	virtual void description(std::list<std::u16string>* info, int level) {};
 	virtual void do_predicat(Visitor& helper) { helper.visit(*this); };
-	virtual void do_predicat_ex(predicat_ex func) { func(this, true); func(this, false); };
+	virtual void apply_visitor(Visitor_generic& visitor);
 
 	Packer_generic& get_packer() override
 	{

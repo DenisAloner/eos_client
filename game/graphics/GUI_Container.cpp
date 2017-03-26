@@ -449,6 +449,7 @@ void GUI_Scrollable_container::on_mouse_move(MouseEventArgs const& e)
 		m_scrollbar.mouse_move(LocalMouseEventArgs);
 		return;
 	}
+	LocalMouseEventArgs = set_local_mouse_position(e);
 	for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); ++Current)
 	{
 		if ((*Current)->check_region(LocalMouseEventArgs))

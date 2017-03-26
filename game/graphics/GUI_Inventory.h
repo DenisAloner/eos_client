@@ -4,6 +4,7 @@
 #include "GUI_Container.h"
 #include <list>
 #include "GameObject.h"
+#include "Visitors.h"
 
 class Property_Container;
 class Parts_list;
@@ -25,62 +26,42 @@ public:
 
 	GUI_Part_slot(int width, int height, Object_part* item, GUI_Body* owner);
 
-	virtual void render(GraphicalController* Graph, int px, int py);
-	virtual void on_mouse_move(MouseEventArgs const& e);
-	virtual void on_mouse_down(MouseEventArgs const& e);
+	void render(GraphicalController* Graph, int px, int py) override;
+	void on_mouse_move(MouseEventArgs const& e) override;
+	void on_mouse_down(MouseEventArgs const& e) override;
 
 };
 
-//class GUI_body_cell :
-//	public GUI_Container
-//{
-//public:
-//
-//	Object_part* m_items;
-//	GUI_Body* m_owner;
-//
-//	GUI_body_cell(int width, int height, Object_part* item, GUI_Body* owner);
-//
-//	virtual void add_item_control(GUI_Object* object);
-//	virtual void render(GraphicalController* Graph, int px, int py);
-//	//virtual void on_mouse_move(MouseEventArgs const& e);
-//	//virtual void on_mouse_down(MouseEventArgs const& e);
-//	//virtual void set_focus(bool state);
-//
-//};
-
-
 class GUI_Body :
-	public GUI_Container
+	public GUI_Scrollable_container
 {
 public:
 
 	bool m_already_active;
 	GUI_Body(Attribute_map* feature);
 	
-	std::list<std::u16string*> m_owner_name;
 	std::size_t m_max_item_name;
 
-	//virtual void Render(GraphicalController* Graph);
-	virtual void add_item_control(GUI_Object* object);
-	virtual void on_mouse_wheel(MouseEventArgs const& e);
-	virtual void set_scroll(int dy);
-	virtual void on_mouse_down(MouseEventArgs const& e);
-	virtual void set_focus(bool state);
-	void get_part_predicat(Object_interaction* object, bool add_mode);
+	void on_mouse_down(MouseEventArgs const& e) override;
+	void set_focus(bool state) override;
 	void update(Attribute_map* feature);
 
 };
 
-//class GUI_Container_visitor :public Visitor
-//{
-//public:
-//
-//	GUI_Body* m_owner;
-//
-//	std::list<std::string*> m_owner_name;
-//	void visit(Object_interaction& value) override;
-//};
+class Visitor_container_hierarchy_getter :public Visitor_doublehandle
+{
+public:
+
+	std::list<std::u16string> m_active;
+	std::list<GUI_Part_slot*> m_result;
+
+	GUI_Body* m_owner;
+
+	Visitor_container_hierarchy_getter(GUI_Body* owner);
+
+	void begin(Object_part& value) override;
+	void end(Object_part& value) override;
+};
 
 
 #endif //GUI_INVENTORY_H
