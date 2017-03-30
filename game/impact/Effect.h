@@ -244,6 +244,8 @@ public:
 	virtual void save();
 	virtual void load();
 
+	void apply_visitor(Visitor_generic& visitor) override;
+
 	Packer_generic& get_packer() override
 	{
 		return Packer<Action_list>::Instance();

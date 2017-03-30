@@ -885,6 +885,11 @@ void Action_pick::description(std::list<std::string>* info, int level)
 	info->push_back(std::string(level, '.') + "<взять>");
 }
 
+void Action_pick::apply_visitor(Visitor_generic& visitor)
+{
+	visitor.visit(*this);
+}
+
 Action_move_out::Action_move_out()
 {
 	m_kind = action_e::move_out;

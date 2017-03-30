@@ -114,7 +114,7 @@ void Visitor_object_description_getter::handle_complex(std::u16string const& val
 
 void Visitor_object_description_getter::visit(Object_state& value)
 {
-	begin(value);
+	handle_complex(u"Характеристики: ");
 	Tree<std::u16string>* item = nullptr;
 	for (auto current = value.m_items.begin(); current != value.m_items.end(); ++current)
 	{
@@ -126,7 +126,7 @@ void Visitor_object_description_getter::visit(Object_state& value)
 			node.back().m_value = Parser::m_string_interaction_e[current->first] + u": " + node.back().m_value;
 		}
 	}
-	end(value);
+	m_active.pop_front();
 }
 
 void Visitor_object_description_getter::visit(ObjectTag::Label& value)
@@ -134,103 +134,80 @@ void Visitor_object_description_getter::visit(ObjectTag::Label& value)
 	handle_simple(u"<" + Parser::m_string_object_tag_e[value.m_type] + u">");
 }
 
-void Visitor_object_description_getter::begin(GameObject& value)
+void Visitor_object_description_getter::visit(Action_pick& value)
+{
+	handle_simple(u"<" + value.get_description(nullptr) + u">");
+}
+
+void Visitor_object_description_getter::visit(GameObject& value)
 {
 	handle_complex(value.m_name);
+	Visitor_simple::visit(value);
+	m_active.pop_front();
 }
 	
-void Visitor_object_description_getter::end(GameObject& value)
-{
-	m_active.pop_front();
-}
 
-void Visitor_object_description_getter::begin(Attribute_map& value)
+void Visitor_object_description_getter::visit(Attribute_map& value)
 {
 	handle_complex(u"Характеристики: ");
-}
-
-void Visitor_object_description_getter::end(Attribute_map& value)
-{
+	Visitor_simple::visit(value);
 	m_active.pop_front();
 }
 
-void Visitor_object_description_getter::begin(Object_state& value)
-{
-	handle_complex(u"Характеристики: ");
-}
-
-void Visitor_object_description_getter::end(Object_state& value)
-{
-	m_active.pop_front();
-}
-
-void Visitor_object_description_getter::begin(Interaction_list& value)
+void Visitor_object_description_getter::visit(Interaction_list& value)
 {
 	handle_complex(u"");
-}
-
-void Visitor_object_description_getter::end(Interaction_list& value)
-{
+	Visitor_simple::visit(value);
 	m_active.pop_front();
 }
 
-void Visitor_object_description_getter::begin(Parameter_list& value)
+void Visitor_object_description_getter::visit(Parameter_list& value)
 {
 	handle_complex(Parser::CP866_to_UTF16(std::to_string(value.m_value) + "(" + std::to_string(value.m_basic_value) + ")/" + std::to_string(value.m_limit) + "(" + std::to_string(value.m_basic_limit) + "):"));
-}
-
-void Visitor_object_description_getter::end(Parameter_list& value)
-{
+	Visitor_simple::visit(value);
 	m_active.pop_front();
 }
 
-void Visitor_object_description_getter::begin(Vision_list& value)
+void Visitor_object_description_getter::visit(Vision_list& value)
 {
 	handle_complex(u"");
-}
-
-void Visitor_object_description_getter::end(Vision_list& value)
-{
+	Visitor_simple::visit(value);
 	m_active.pop_front();
 }
 
-void Visitor_object_description_getter::begin(Vision_component& value)
+void Visitor_object_description_getter::visit(Vision_component& value)
 {
 	handle_complex(Parser::CP866_to_UTF16(std::to_string(value.m_value.radius) + "," + std::to_string(value.m_value.start_angle) + "," + std::to_string(value.m_value.end_angle) + "/" + std::to_string(value.m_basic_value.radius) + "," + std::to_string(value.m_basic_value.start_angle) + "," + std::to_string(value.m_basic_value.end_angle)));
-}
-
-void Visitor_object_description_getter::end(Vision_component& value)
-{
+	Visitor_simple::visit(value);
 	m_active.pop_front();
 }
 
-void Visitor_object_description_getter::begin(Parts_list& value)
+void Visitor_object_description_getter::visit(Parts_list& value)
 {
 	handle_complex(u"");
-}
-
-void Visitor_object_description_getter::end(Parts_list& value)
-{
+	Visitor_simple::visit(value);
 	m_active.pop_front();
 }
 
-void Visitor_object_description_getter::begin(Object_part& value)
+void Visitor_object_description_getter::visit(Object_part& value)
 {
 	handle_complex(value.m_name+u": ");
-}
-
-void Visitor_object_description_getter::end(Object_part& value)
-{
+	Visitor_simple::visit(value);
 	m_active.pop_front();
 }
 
-void Visitor_object_description_getter::begin(Tag_list& value)
+void Visitor_object_description_getter::visit(Tag_list& value)
 {
 	handle_complex(u"");
+	Visitor_simple::visit(value);
+	m_active.pop_front();
 }
 
-void Visitor_object_description_getter::end(Tag_list& value)
+
+void Visitor_object_description_getter::visit(Action_list& value)
 {
+	handle_complex(u"");
+	Visitor_simple::visit(value);
 	m_active.pop_front();
 }
 
@@ -303,6 +280,69 @@ void GUI_Window::on_mouse_wheel(MouseEventArgs const& e)
 	}
 }
 
+GUI_TreeNode::GUI_TreeNode(std::u16string text, GUI_TextFormat* format, int level):level(level), m_format(format)
+{
+	m_text = text;
+	m_size.h = (Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender) >> 6;
+	m_size.w = Application::instance().m_graph->measure_text_width(m_text) + 10 + 2;
+}
+
+void GUI_TreeNode::render(GraphicalController* Graph, int px, int py)
+{
+	glEnable(GL_BLEND);
+	glColor4d(m_format->m_color.R, m_format->m_color.G, m_format->m_color.B, m_format->m_color.A);
+	glDisable(GL_TEXTURE_2D);
+	GraphicalController::rectangle_t rect(px+2, py+((m_size.h-10)/2), 10, 10);
+	Graph->draw_rectangle(rect);
+	glBegin(GL_LINES);
+	glVertex2d(px + 7, py);
+	glVertex2d(px + 7, py + ((m_size.h - 10) / 2));
+	glVertex2d(px - 9, py + m_size.h / 2);
+	glVertex2d(px, py + m_size.h / 2);
+	glVertex2d(px + 7, py + ((m_size.h - 10) / 2)+10);
+	glVertex2d(px + 7, py+m_size.h+2);
+	glEnd();
+	for (int i = 0; i<level; ++i)
+	{
+		glBegin(GL_LINES);
+		glVertex2d(px - 9 - i * 16, py);
+		glVertex2d(px - 9 - i * 16, py + m_size.h + 2);
+		glEnd();
+	}
+	glEnable(GL_TEXTURE_2D);
+	Graph->output_text(10+6+px, py, m_text, m_format->m_symbol_size.w, m_format->m_symbol_size.h);
+}
+
+GUI_TreeLeaf::GUI_TreeLeaf(std::u16string text, GUI_TextFormat* format, int level):level(level),m_format(format)
+{
+	m_text = text;
+	m_size.h = (Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender) >> 6;
+	m_size.w = Application::instance().m_graph->measure_text_width(m_text);
+}
+
+void GUI_TreeLeaf::render(GraphicalController* Graph, int px, int py)
+{
+	glLineWidth(1);
+	glEnable(GL_BLEND);
+	glColor4d(m_format->m_color.R, m_format->m_color.G, m_format->m_color.B, m_format->m_color.A);
+	glDisable(GL_TEXTURE_2D);
+	glBegin(GL_LINES);
+	glVertex2d(px - 9, py);
+	glVertex2d(px - 9, py + m_size.h+2);
+	glVertex2d(px - 9, py + m_size.h / 2);
+	glVertex2d(px, py + m_size.h / 2);
+	glEnd();
+	for(int i=1;i<level;++i)
+	{
+		glBegin(GL_LINES);
+		glVertex2d(px - 9-i*16, py);
+		glVertex2d(px - 9-i*16, py + m_size.h + 2);
+		glEnd();
+	}
+	glEnable(GL_TEXTURE_2D);
+	Graph->output_text(px, py, m_text, m_format->m_symbol_size.w, m_format->m_symbol_size.h);
+}
+
 GUI_description_window::GUI_description_window(int x, int y, int width, int height, std::u16string Name, GameObject*& object) :GUI_Window(x, y, width, height, Name), m_object(object)
 {
 	m_textbox = new GUI_TextBox();
@@ -353,7 +393,15 @@ void GUI_description_window::update_info()
 
 void GUI_description_window::add_tree(Tree<std::u16string>& value, int level)
 {
-	m_textbox->add_item_control(new GUI_Text(std::u16string(level, '.') + value.m_value, new GUI_TextFormat(8, 17, RGBA_t(1.0, 1.0, 1.0, 1.0))));
+	if(value.m_nodes.empty())
+	{
+		m_textbox->add_item_control(new GUI_TreeLeaf(value.m_value, new GUI_TextFormat(8, 17, RGBA_t(1.0, 1.0, 1.0, 1.0)),level));
+	}
+	else
+	{
+		m_textbox->add_item_control(new GUI_TreeNode(value.m_value, new GUI_TextFormat(8, 17, RGBA_t(1.0, 1.0, 1.0, 1.0)),level));
+	}
+	m_textbox->m_items.back()->m_position.x += 16 * level;
 	for (auto item = value.m_nodes.begin(); item != value.m_nodes.end(); ++item)
 	{
 		add_tree(*item, level + 1);

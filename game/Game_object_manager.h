@@ -147,12 +147,11 @@ public:
 
 };
 
-class Visitor_part_hierarchy_setter :public Visitor_doublehandle
+class Visitor_part_hierarchy_setter :public Visitor_simple
 {
 public:
 
 	std::list<Game_object_owner*> m_game_object_owner_stack;
 
-	void begin(Object_part& value) override;
-	void end(Object_part& value) override;
+	void visit(Object_part& value) override;
 };

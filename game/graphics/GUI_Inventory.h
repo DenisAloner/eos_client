@@ -48,7 +48,7 @@ public:
 
 };
 
-class Visitor_container_hierarchy_getter :public Visitor_doublehandle
+class Visitor_container_hierarchy_getter :public Visitor_simple
 {
 public:
 
@@ -59,8 +59,7 @@ public:
 
 	Visitor_container_hierarchy_getter(GUI_Body* owner);
 
-	void begin(Object_part& value) override;
-	void end(Object_part& value) override;
+	void visit(Object_part& value) override;
 };
 
 

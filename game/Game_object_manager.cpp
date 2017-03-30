@@ -658,13 +658,10 @@ void GameObjectManager::bind_body(GameObject* object)
 	}
 }
 
-void Visitor_part_hierarchy_setter::begin(Object_part& value)
+void Visitor_part_hierarchy_setter::visit(Object_part& value)
 {
 	value.m_owner = m_game_object_owner_stack.front();
 	m_game_object_owner_stack.push_front(&value);
-}
-
-void Visitor_part_hierarchy_setter::end(Object_part& value)
-{
+	Visitor_simple::visit(value);
 	m_game_object_owner_stack.pop_front();
 }

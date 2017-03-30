@@ -65,7 +65,7 @@ Visitor_container_hierarchy_getter::Visitor_container_hierarchy_getter(GUI_Body*
 {
 }
 
-void Visitor_container_hierarchy_getter::begin(Object_part& value)
+void Visitor_container_hierarchy_getter::visit(Object_part& value)
 {
 	m_active.push_front(value.m_name);
 	std::u16string name = u"";
@@ -84,11 +84,9 @@ void Visitor_container_hierarchy_getter::begin(Object_part& value)
 	GUI_Part_slot* gui_item = new GUI_Part_slot(0, 64, &value, m_owner);
 	gui_item->m_name = name;
 	m_result.push_back(gui_item);
-}
-
-void Visitor_container_hierarchy_getter::end(Object_part& value)
-{
+	Visitor_simple::visit(value);
 	m_active.pop_front();
+
 }
 
 void GUI_Body::update(Attribute_map* feature)

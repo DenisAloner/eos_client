@@ -197,6 +197,7 @@ public:
 	virtual std::u16string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
 	virtual void description(std::list<std::string>* info, int level);
+	void apply_visitor(Visitor_generic& visitor) override;
 
 };
 

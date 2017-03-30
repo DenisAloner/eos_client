@@ -50,7 +50,7 @@ private:
 
 };
 
-class Visitor_object_description_getter :public Visitor_doublehandle
+class Visitor_object_description_getter :public Visitor_simple
 {
 public:
 
@@ -67,28 +67,45 @@ public:
 
 	void visit(Object_state& value) override;
 	void visit(ObjectTag::Label& value) override;
+	void visit(Action_pick& value) override;
 
-	void begin(GameObject& value) override;
-	void end(GameObject& value) override;
-	void begin(Attribute_map& value) override;
-	void end(Attribute_map& value) override;
-	void begin(Object_state& value) override;
-	void end(Object_state& value) override;
-	void begin(Interaction_list& value) override;
-	void end(Interaction_list&value) override;
-	void begin(Parameter_list& value) override;
-	void end(Parameter_list& value) override;
-	void begin(Vision_list& value) override;
-	void end(Vision_list& value) override;
-	void begin(Vision_component& value) override;
-	void end(Vision_component& value) override;
-	void begin(Parts_list& value) override;
-	void end(Parts_list& value) override;
-	void begin(Object_part& value) override;
-	void end(Object_part& value) override;
-	void begin(Tag_list& value) override;
-	void end(Tag_list& value) override;
+	void visit(GameObject& value) override;
+	void visit(Attribute_map& value) override;
+	void visit(Interaction_list& value) override;
+	void visit(Parameter_list& value) override;
+	void visit(Vision_list& value) override;
+	void visit(Vision_component& value) override;
+	void visit(Parts_list& value) override;
+	void visit(Object_part& value) override;
+	void visit(Tag_list& value) override;
+	void visit(Action_list& value) override;
 	
+};
+
+class GUI_TreeNode: public GUI_Object
+{
+public:
+
+	int level;
+	GUI_TextFormat* m_format;
+	std::u16string m_text;
+	
+	GUI_TreeNode(std::u16string text, GUI_TextFormat* format, int level);
+	void render(GraphicalController* Graph, int px, int py) override;
+
+};
+
+class GUI_TreeLeaf : public GUI_Object
+{
+public:
+
+	int level;
+	GUI_TextFormat* m_format;
+	std::u16string m_text;
+
+	GUI_TreeLeaf(std::u16string text, GUI_TextFormat* format,int level);
+	void render(GraphicalController* Graph, int px, int py) override;
+
 };
 
 class GUI_description_window :

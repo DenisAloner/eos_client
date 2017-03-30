@@ -968,6 +968,11 @@ void Action_list::load()
 	}
 }
 
+void Action_list::apply_visitor(Visitor_generic& visitor)
+{
+	visitor.visit(*this);
+}
+
 
 // Slot_set_state
 

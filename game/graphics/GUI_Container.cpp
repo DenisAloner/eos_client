@@ -158,8 +158,8 @@ void GUI_Scrollbar_vertical::content_update()
 	{
 		GUI_Object& LastElement = *m_owner->m_items.back();
 		int total = LastElement.m_position.y + LastElement.m_size.h + 2;
-		m_bar_top = std::abs((float)m_owner->m_scroll.y / (float)total*m_size.h);
-		m_bar_height = (float)m_owner->m_size.h / (float)total*m_size.h;
+		m_bar_top = std::abs(m_owner->m_scroll.y / static_cast<float>(total)*m_size.h);
+		m_bar_height = m_owner->m_size.h / static_cast<float>(total)*m_size.h;
 	}
 }
 
@@ -201,7 +201,7 @@ void GUI_Scrollbar_vertical::on_mouse_start_drag(MouseEventArgs const& e)
 void GUI_Scrollbar_vertical::on_mouse_drag(MouseEventArgs const& e)
 {
 	MouseEventArgs LocalMouseEventArgs = set_local_mouse_control(e);
-	set_scroll_top(m_bar_top -m_pos + LocalMouseEventArgs.position.y);
+	set_scroll_top(m_bar_top - m_pos + LocalMouseEventArgs.position.y);
 	m_pos = LocalMouseEventArgs.position.y;
 }
 
@@ -231,9 +231,9 @@ void GUI_Scrollable_container::add_item_control(GUI_Object* object)
 		GUI_Object* LastElement = m_items.back();
 		object->m_position.x = 2;
 		object->m_position.y = LastElement->m_position.y + LastElement->m_size.h + 2;
-		if (object->m_position.y + object->m_size.h>m_size.h+2)
+		if (object->m_position.y + object->m_size.h + m_scroll.y + 2 > m_size.h)
 		{
-			m_scroll.y -= object->m_size.h + 2;
+			m_scroll.y = (m_size.h - object->m_position.y - object->m_size.h - 2);
 		}
 	}
 	else
@@ -254,12 +254,13 @@ void GUI_Scrollable_container::set_scroll(int dy)
 		GUI_Object* Item;
 		if (dy < 0)
 		{
-			Item =m_items.back();
+			Item = m_items.back();
 			if (Item->m_position.y + Item->m_size.h+2 + m_scroll.y + dy < m_size.h)
 			{
-				if (m_scroll.y != 0)
+				m_scroll.y = m_size.h - (Item->m_position.y + Item->m_size.h + 2);
+				if (m_scroll.y > 0)
 				{
-					m_scroll.y = m_size.h - (Item->m_position.y + Item->m_size.h+2);
+					m_scroll.y = 0;
 				}
 				update();
 				m_scrollbar.content_update();
@@ -287,6 +288,31 @@ void GUI_Scrollable_container::set_scroll2(int dy)
 {
 	if (!m_items.empty())
 	{
+		GUI_Object* Item;
+		if (dy < 0)
+		{
+			Item = m_items.back();
+			if (Item->m_position.y + Item->m_size.h + 2 + dy < m_size.h)
+			{
+				m_scroll.y = m_size.h - (Item->m_position.y + Item->m_size.h + 2);
+				if (m_scroll.y > 0)
+				{
+					m_scroll.y = 0;
+				}
+				update();
+				return;
+			}
+		}
+		else
+		{
+			Item = m_items.front();
+			if (Item->m_position.y + dy > 0)
+			{
+				m_scroll.y = 0;
+				update();
+				return;
+			}
+		}
 		m_scroll.y = dy;
 		update();
 	}
