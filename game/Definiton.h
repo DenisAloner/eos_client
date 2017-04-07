@@ -832,6 +832,7 @@ class Tree
 public:
 
 	T m_value;
+	Tree* m_owner;
 
 	std::list<Tree> m_nodes;
 
@@ -844,12 +845,14 @@ public:
 	Tree* add_node(T& value)
 	{
 		m_nodes.push_back(Tree(value));
+		m_nodes.back().m_owner = this;
 		return &m_nodes.back();
 	}
 
 	Tree* add_node(T const& value)
 	{
 		m_nodes.push_back(Tree(value));
+		m_nodes.back().m_owner = this;
 		return &m_nodes.back();
 	}
 

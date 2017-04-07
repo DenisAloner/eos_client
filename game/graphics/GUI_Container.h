@@ -71,7 +71,7 @@ public:
 	void on_mouse_move(MouseEventArgs const& e) override;
 	void set_scroll(int dy) override;
 	void set_scroll2(int dy);
-	void update();
+	virtual void update();
 	void render(GraphicalController* Graph, int px, int py) override;
 	void resize(int width, int height) override;
 

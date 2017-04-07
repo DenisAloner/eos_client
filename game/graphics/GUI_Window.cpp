@@ -280,14 +280,14 @@ void GUI_Window::on_mouse_wheel(MouseEventArgs const& e)
 	}
 }
 
-GUI_TreeNode::GUI_TreeNode(std::u16string text, GUI_TextFormat* format, int level):level(level), m_format(format)
+GUI_TreeElement::GUI_TreeElement(std::u16string text, GUI_TextFormat* format, int level):level(level), m_format(format),m_hide(false)
 {
 	m_text = text;
 	m_size.h = (Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender) >> 6;
 	m_size.w = Application::instance().m_graph->measure_text_width(m_text) + 10 + 2;
 }
 
-void GUI_TreeNode::render(GraphicalController* Graph, int px, int py)
+void GUI_TreeElement::render(GraphicalController* Graph, int px, int py)
 {
 	glEnable(GL_BLEND);
 	glColor4d(m_format->m_color.R, m_format->m_color.G, m_format->m_color.B, m_format->m_color.A);
@@ -311,41 +311,114 @@ void GUI_TreeNode::render(GraphicalController* Graph, int px, int py)
 	}
 	glEnable(GL_TEXTURE_2D);
 	Graph->output_text(10+6+px, py, m_text, m_format->m_symbol_size.w, m_format->m_symbol_size.h);
+
+	//glLineWidth(1);
+	//glEnable(GL_BLEND);
+	//glColor4d(m_format->m_color.R, m_format->m_color.G, m_format->m_color.B, m_format->m_color.A);
+	//glDisable(GL_TEXTURE_2D);
+	//glBegin(GL_LINES);
+	//glVertex2d(px - 9, py);
+	//glVertex2d(px - 9, py + m_size.h + 2);
+	//glVertex2d(px - 9, py + m_size.h / 2);
+	//glVertex2d(px, py + m_size.h / 2);
+	//glEnd();
+	//for (int i = 1; i<level; ++i)
+	//{
+	//	glBegin(GL_LINES);
+	//	glVertex2d(px - 9 - i * 16, py);
+	//	glVertex2d(px - 9 - i * 16, py + m_size.h + 2);
+	//	glEnd();
+	//}
+	//glEnable(GL_TEXTURE_2D);
+	//Graph->output_text(px, py, m_text, m_format->m_symbol_size.w, m_format->m_symbol_size.h);
 }
 
-GUI_TreeLeaf::GUI_TreeLeaf(std::u16string text, GUI_TextFormat* format, int level):level(level),m_format(format)
+GUI_TreeView::GUI_TreeView(int x, int y, int width, int height):GUI_Scrollable_container(x, y, width, height)
 {
-	m_text = text;
-	m_size.h = (Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender) >> 6;
-	m_size.w = Application::instance().m_graph->measure_text_width(m_text);
 }
 
-void GUI_TreeLeaf::render(GraphicalController* Graph, int px, int py)
+void GUI_TreeView::update()
 {
-	glLineWidth(1);
-	glEnable(GL_BLEND);
-	glColor4d(m_format->m_color.R, m_format->m_color.G, m_format->m_color.B, m_format->m_color.A);
-	glDisable(GL_TEXTURE_2D);
-	glBegin(GL_LINES);
-	glVertex2d(px - 9, py);
-	glVertex2d(px - 9, py + m_size.h+2);
-	glVertex2d(px - 9, py + m_size.h / 2);
-	glVertex2d(px, py + m_size.h / 2);
-	glEnd();
-	for(int i=1;i<level;++i)
+	LOG(INFO) << "Begin GUI_TreeView::update()";
+	start_render = m_items.begin();
+	end_render = m_items.end();
+	GUI_TreeElement* temp;
+	for (auto i = m_items.begin(); i != m_items.end(); ++i)
 	{
-		glBegin(GL_LINES);
-		glVertex2d(px - 9-i*16, py);
-		glVertex2d(px - 9-i*16, py + m_size.h + 2);
-		glEnd();
+		temp = static_cast<GUI_TreeElement*>(*i);
+		LOG(INFO) << "current: " << Parser::UTF16_to_CP866(temp->m_text);
+		if ((*i)->m_position.y + (*i)->m_size.h + m_scroll.y + 2>0)
+		{
+			LOG(INFO) << "SUB FOR";
+			start_render = i;
+			for (auto j = i; j != m_items.end(); ++j)
+			{
+				if ((*j)->m_position.y + (*j)->m_size.h + m_scroll.y + 2> m_size.h)
+				{
+					end_render = ++j;
+					return;
+				}
+				temp = static_cast<GUI_TreeElement*>(*j);
+				if (temp->m_hide)
+				{
+					j = temp->m_next;
+				}
+				if (j == m_items.end()) { break; }
+			}
+			end_render = m_items.end();
+			LOG(INFO) << "EXIT SUB FOR";
+			return;
+		}
+		if (temp->m_hide)
+		{
+			i = temp->m_next;
+		}
+		if (i == m_items.end()) { break; }
+		LOG(INFO) << std::to_string(static_cast<GUI_TreeElement*>(*i)->level);
+		
 	}
-	glEnable(GL_TEXTURE_2D);
-	Graph->output_text(px, py, m_text, m_format->m_symbol_size.w, m_format->m_symbol_size.h);
+	LOG(INFO) << "End GUI_TreeView::update()";
+}
+
+void GUI_TreeView::render(GraphicalController* Graph, int px, int py)
+{
+
+	glEnable(GL_SCISSOR_TEST);
+	if (Graph->add_scissor(frectangle_t((float)px, (float)py, (float)m_size.w, (float)m_size.h)))
+	{
+		Graph->blur_rect(px, py, m_size.w, m_size.h);
+		glEnable(GL_BLEND);
+		glDisable(GL_TEXTURE_2D);
+		glColor4d(0.0, 0.0, 0.0, 0.5);
+		GraphicalController::rectangle_t rect(px, py, m_size.w, m_size.h);
+		Graph->draw_sprite(rect);
+		glEnable(GL_TEXTURE_2D);
+		glColor4d(1.0, 1.0, 1.0, 1.0);
+		for (auto i = start_render; i != end_render; ++i)
+		{
+			(*i)->render(Graph, px + (*i)->m_position.x + m_scroll.x, py + (*i)->m_position.y + m_scroll.y);
+			GUI_TreeElement* temp = static_cast<GUI_TreeElement*>(*i);
+			if (temp->m_hide)
+			{
+				i = temp->m_next;
+			}
+			if (i == m_items.end()) { break; }
+		}
+		m_scrollbar.render(Graph, px + m_scrollbar.m_position.x, py + m_scrollbar.m_position.y);
+		Graph->remove_scissor();
+		if (m_border_visible)
+		{
+			glDisable(GL_BLEND);
+			glDisable(GL_TEXTURE_2D);
+			glColor4f(1.0, 1.0, 1.0, 1.0);
+			Graph->draw_rectangle(GraphicalController::rectangle_t(px, py, m_size.w, m_size.h));
+		}
+	}
 }
 
 GUI_description_window::GUI_description_window(int x, int y, int width, int height, std::u16string Name, GameObject*& object) :GUI_Window(x, y, width, height, Name), m_object(object)
 {
-	m_textbox = new GUI_TextBox();
+	m_textbox = new GUI_TreeView(0,0,0, 0);
 	m_textbox->m_position.x = 2;
 	m_textbox->m_position.y = 2;
 	//m_items->resize(m_size.w - 4, m_size.h - 25 - 2);
@@ -366,6 +439,11 @@ void GUI_description_window::update_info()
 		m_textbox->GUI_Layer::remove((*m_textbox->m_items.begin()));
 	}
 	add_tree(*info.m_value, 0);
+	bind_tree(*info.m_value, m_textbox->m_items.begin());
+	static_cast<GUI_TreeElement*>(*std::next(m_textbox->m_items.begin(), 1))->m_hide=true;
+	change_node();
+	m_textbox->update();
+	m_textbox->m_scrollbar.content_update();
 	/*if (m_object->m_active_state)
 	{
 		m_text.push_back(u"эффекты:");
@@ -391,21 +469,66 @@ void GUI_description_window::update_info()
 
 }
 
+void GUI_description_window::change_node()
+{
+	LOG(INFO) << "Begin GUI_description_window::change_node()";
+	GUI_TreeElement* current = nullptr;
+	GUI_TreeElement* previous = nullptr;
+	int y = 2;
+	for (auto item = m_textbox->m_items.begin(); item != m_textbox->m_items.end(); ++item)
+	{
+		current=static_cast<GUI_TreeElement*>(*item);
+		current->m_position.y = y;
+		y += current->m_size.h + 2;
+		if (current->m_hide)
+		{
+			item = current->m_next;
+		}
+		if(item== m_textbox->m_items.end())
+		{
+			break;
+		}
+	}
+	LOG(INFO) << "End GUI_description_window::change_node()";
+}
+
 void GUI_description_window::add_tree(Tree<std::u16string>& value, int level)
 {
-	if(value.m_nodes.empty())
+	GUI_TreeElement* result = new GUI_TreeElement(value.m_value, new GUI_TextFormat(8, 17, RGBA_t(1.0, 1.0, 1.0, 1.0)), level);
+	m_textbox->add_item_control(result);
+	result->m_position.x += 16 * level;
+	if(!value.m_nodes.empty())
 	{
-		m_textbox->add_item_control(new GUI_TreeLeaf(value.m_value, new GUI_TextFormat(8, 17, RGBA_t(1.0, 1.0, 1.0, 1.0)),level));
+		for (auto item = value.m_nodes.begin(); item != value.m_nodes.end(); ++item)
+		{
+			add_tree(*item, level + 1);
+		}
+	}
+}
+
+void GUI_description_window::bind_tree(Tree<std::u16string>& value, std::list<GUI_Object*>::iterator& pos)
+{
+	GUI_TreeElement* result = static_cast<GUI_TreeElement*>(*pos);
+	LOG(INFO) << "GUI_description_window::bind_tree: " << Parser::UTF16_to_CP866(result->m_text);
+	++pos;
+	if (!value.m_nodes.empty())
+	{
+		for (auto item = value.m_nodes.begin(); item != value.m_nodes.end(); ++item)
+		{
+			bind_tree(*item, pos);
+		}
+	}
+	result->m_next = pos;
+	if (pos != m_textbox->m_items.end())
+	{
+		result = static_cast<GUI_TreeElement*>(*pos);
+		LOG(INFO) << "Next GUI_description_window::bind_tree: " << Parser::UTF16_to_CP866(result->m_text);
 	}
 	else
 	{
-		m_textbox->add_item_control(new GUI_TreeNode(value.m_value, new GUI_TextFormat(8, 17, RGBA_t(1.0, 1.0, 1.0, 1.0)),level));
+		LOG(INFO) << "Next GUI_description_window::bind_tree: END LIST";
 	}
-	m_textbox->m_items.back()->m_position.x += 16 * level;
-	for (auto item = value.m_nodes.begin(); item != value.m_nodes.end(); ++item)
-	{
-		add_tree(*item, level + 1);
-	}
+
 }
 
 GUI_body_window::GUI_body_window(int x, int y, int width, int height, std::u16string Name, GameObject*& object) :GUI_Window(x, y, width, height, Name), m_object(object)
