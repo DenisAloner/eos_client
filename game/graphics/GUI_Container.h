@@ -60,6 +60,8 @@ public:
 	std::list<GUI_Object*>::iterator start_render;
 	std::list<GUI_Object*>::iterator end_render;
 
+	dimension_t m_content_size;
+
 	GUI_Scrollable_container(int x, int y, int width, int height, bool border_visible = true);
 
 	virtual void add_item_control(GUI_Object* object);

@@ -11,7 +11,7 @@ public:
 	GUI_Window_manager(int x, int y, int width, int height);
 	~GUI_Window_manager();
 
-	virtual void on_item_get_focus(GUI_Object* sender);
+	void on_item_get_focus(GUI_Object* sender) override;
 
 };
 

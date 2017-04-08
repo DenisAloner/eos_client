@@ -52,11 +52,16 @@ void GUI_ActionManager::remove_item_control(GUI_Object* object)
 			if (!m_items.empty())
 			{
 				GUI_Object* LastElement = m_items.back();
-				if (LastElement->m_position.y + LastElement->m_size.h+ m_scroll.y<m_size.h)
+				if (LastElement->m_position.y + LastElement->m_size.h+ m_scroll.y+2<m_size.h)
 				{
 					m_scroll.y += LastElement->m_size.h;
 					if (m_scroll.y > 0) { m_scroll.y=0; }
 				}
+				m_content_size.h = LastElement->m_position.y + LastElement->m_size.h + 2;
+			}
+			else
+			{
+				m_content_size.h = 0;
 			}
 			break;
 		}

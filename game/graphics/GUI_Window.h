@@ -85,12 +85,30 @@ public:
 class GUI_TreeElement: public GUI_Object
 {
 public:
+	
+	enum class kind_e
+	{
+		node,
+		element
+	};
+
+	enum class element_position_e
+	{
+		begin,
+		middle,
+		end,
+		single
+	};
+
+	kind_e m_kind;
+	element_position_e m_element_position;
 
 	int level;
 	GUI_TextFormat* m_format;
 	std::u16string m_text;
 
 	std::list<GUI_Object*>::iterator m_next;
+	GUI_TreeElement* m_owner;
 	bool m_hide;
 	
 	GUI_TreeElement(std::u16string text, GUI_TextFormat* format, int level);
@@ -104,9 +122,20 @@ class GUI_TreeView :
 {
 public:
 
-	GUI_TreeView(int x, int y, int width, int height);
+	GameObject* m_object;
+	std::list<std::u16string> m_text;
+
+	GUI_TreeView(int x, int y, int width, int height, GameObject*& object);
+	void on_mouse_click(MouseEventArgs const& e) override;
 	void update() override;
 	void render(GraphicalController* Graph, int px, int py) override;
+
+	void update_info();
+	void change_node();
+
+private:
+	void add_tree(Tree<std::u16string>& value, int level, GUI_TreeElement* owner);
+	void bind_tree(Tree<std::u16string>& value, std::list<GUI_Object*>::iterator& pos);
 };
 
 class GUI_description_window :
@@ -116,13 +145,7 @@ public:
 	GameObject* m_object;
 	GUI_TreeView* m_textbox;
 	GUI_description_window(int x, int y, int width, int height, std::u16string Name, GameObject*& object);
-	std::list<std::u16string> m_text;
 	void update_info();
-	void change_node();
-
-private:
-	void add_tree(Tree<std::u16string>& value,int level);
-	void bind_tree(Tree<std::u16string>& value, std::list<GUI_Object*>::iterator& pos);
 };
 
 class GUI_Body;
