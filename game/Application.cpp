@@ -10,6 +10,7 @@
 #include "game/graphics/GUI_Timer.h"
 #include "utils/log.h"
 #include <chrono>
+#include <graphics/GUI_Description_window.h>
 
 void my_audio_callback(void *userdata, uint8_t *stream, uint32_t len);
 
@@ -776,7 +777,7 @@ bool Application::command_open_body(GameObject*& Object)
 
 void Application::command_gui_show_characterization(GameObject*& object)
 {
-	GUI_description_window* Window = new GUI_description_window(m_size.w / 2 - (192 + 2) / 2, m_size.h / 2 - (4 * 64 + 2) / 2, 800 + 4, 8 * 64 + 27, object->m_name + u"::Характеристика",object);
+	GUI_Description_window* Window = new GUI_Description_window(m_size.w / 2 - (192 + 2) / 2, m_size.h / 2 - (4 * 64 + 2) / 2, 800 + 4, 8 * 64 + 27, object->m_name + u"::Характеристика",object);
 	//m_GUI->add_front(Window);
 }
 

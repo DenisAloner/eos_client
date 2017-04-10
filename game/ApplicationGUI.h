@@ -9,6 +9,7 @@
 #include "ActionManager.h"
 #include "Game_log.h"
 #include "GUI_Action_bar.h"
+#include "GUI_TextBox.h"
 
 
 class GUI_MapViewer;

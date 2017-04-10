@@ -606,6 +606,7 @@ namespace ObjectTag
 		Requirements_to_object();
 		virtual Requirements_to_object* clone();
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
+		void apply_visitor(Visitor_generic& visitor) override;
 
 		virtual void save();
 		virtual void load();
@@ -733,6 +734,9 @@ public:
 	virtual Instruction_check_tag* clone();
 	virtual void description(std::list<std::string>* info, int level) {};
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+
+
+	void apply_visitor(Visitor_generic& visitor) override;
 
 	virtual void save() {};
 	virtual void load() {};

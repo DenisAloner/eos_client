@@ -2247,6 +2247,11 @@ void ObjectTag::Requirements_to_object::apply_effect(GameObject* unit, Object_in
 		break;
 	}
 	}
+}
+
+void ObjectTag::Requirements_to_object::apply_visitor(Visitor_generic& visitor)
+{
+	visitor.visit(*this);
 };
 
 void ObjectTag::Requirements_to_object::save()
@@ -2373,6 +2378,11 @@ void Instruction_check_tag::apply_effect(GameObject* unit, Object_interaction* o
 		break;
 	}
 	}
+}
+
+void Instruction_check_tag::apply_visitor(Visitor_generic& visitor)
+{
+	visitor.visit(*this);
 };
 
 // Instruction_check_part_type

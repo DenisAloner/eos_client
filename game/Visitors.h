@@ -13,11 +13,12 @@ class Object_part;
 class Tag_list;
 class Action_list;
 class Action_pick;
-
+class Instruction_check_tag;
 
 namespace ObjectTag
 {
 	class Label;
+	class Requirements_to_object;
 }
 
 class Visitor_generic
@@ -35,8 +36,10 @@ public:
 	virtual void visit(Parts_list& value) {};
 	virtual void visit(Object_part& value) {};
 	virtual void visit(ObjectTag::Label& value) {};
+	virtual void visit(ObjectTag::Requirements_to_object& value) {};
 	virtual void visit(Action_list& value) {};
 	virtual void visit(Action_pick& value) {};
+	virtual void visit(Instruction_check_tag& value) {};
 
 };
 
@@ -55,6 +58,7 @@ public:
 	void visit(Object_part& value) override;
 	void visit(Tag_list& value) override;
 	void visit(Action_list& value) override;
+	void visit(ObjectTag::Requirements_to_object& value) override;
 
 };
 

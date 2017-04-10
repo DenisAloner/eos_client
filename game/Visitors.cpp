@@ -85,3 +85,11 @@ void Visitor_simple::visit(Action_list& value)
 		(*current)->apply_visitor(*this);
 	}
 }
+
+void Visitor_simple::visit(ObjectTag::Requirements_to_object& value)
+{
+	if (value.m_value)
+	{
+		value.m_value->apply_visitor(*this);
+	}
+}
