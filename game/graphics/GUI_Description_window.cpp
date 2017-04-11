@@ -432,7 +432,11 @@ void GUI_TreeView::update_info()
 
 void GUI_TreeView::update()
 {
-	if (m_content_size.h + m_scroll.y < 0) { m_scroll.y = 0; }
+	if (m_content_size.h + m_scroll.y < m_size.h)
+	{
+		m_scroll.y = m_size.h - m_content_size.h;
+	}
+	if (m_scroll.y > 0) { m_scroll.y = 0; }
 	start_render = m_items.begin();
 	end_render = m_items.end();
 	GUI_TreeElement* temp;
@@ -445,7 +449,7 @@ void GUI_TreeView::update()
 			for (auto j = i; j != m_items.end(); ++j)
 			{
 				temp = static_cast<GUI_TreeElement*>(*j);
-				if (temp->m_position.y + temp->m_size.h + m_scroll.y + 2> m_size.h)
+				if (temp->m_position.y + temp->m_size.h+2 + m_scroll.y > m_size.h)
 				{
 					if (temp->m_hide)
 					{
@@ -461,7 +465,6 @@ void GUI_TreeView::update()
 				}
 				if (j == m_items.end()) { break; }
 			}
-			//end_render = m_items.end();
 			return;
 		}
 		if (temp->m_hide)
@@ -488,10 +491,10 @@ void GUI_TreeView::change_node()
 			i = current->m_next;
 			--i;
 		}
-		if (i == m_items.end())
+		/*if (i == m_items.end())
 		{
 			break;
-		}
+		}*/
 	}
 	m_content_size.h = y;
 }
@@ -499,9 +502,9 @@ void GUI_TreeView::change_node()
 void GUI_TreeView::add_tree(Tree<std::u16string>& value, int level, GUI_TreeElement* owner)
 {
 	GUI_TreeElement* result = new GUI_TreeElement(value.m_value, new GUI_TextFormat(8, 17, RGBA_t(1.0, 1.0, 1.0, 1.0)), level);
+	result->m_owner = owner;
 	add_item_control(result);
 	result->m_position.x += 16 * level;
-	result->m_owner = owner;
 	if (value.m_nodes.empty())
 	{
 		result->m_kind = GUI_TreeElement::kind_e::element;

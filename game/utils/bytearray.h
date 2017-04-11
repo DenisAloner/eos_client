@@ -1,7 +1,6 @@
 #ifndef UTILS_BYTEARRAY_H
 #define	UTILS_BYTEARRAY_H
 
-
 struct bytearray
 {
 	typedef unsigned char value_type;
@@ -48,9 +47,9 @@ struct bytearray
 
 	inline operator bool() const { return !is_empty(); }
 
-	inline operator std::string() const { return std::string((const char*)get(), size()); }
+	inline operator std::string() const { return std::string(reinterpret_cast<const char*>(get()), size()); }
 
-	inline operator std::u16string() const { return std::u16string((const char16_t*)get(), size()); }
+	explicit inline operator std::u16string() const { return std::u16string(reinterpret_cast<const char16_t*>(get()), size()/2); };
 
 private:
 	std::shared_ptr<value_type> m_ptr;
