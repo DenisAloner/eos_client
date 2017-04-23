@@ -191,7 +191,7 @@ private:
 		bool was_changed;
 
 		Update_visitor();
-		void visit(Object_interaction& value);
+		void visit(Object_interaction& value) override;
 
 	};
 
@@ -446,7 +446,7 @@ public:
 	effect_e m_subtype;
 	Effect();
 	virtual bool on_turn();
-	virtual Object_interaction* clone();
+	Effect* clone() override;
 	std::u16string get_description() override;
 	void description(std::list<std::u16string>* info, int level) override;
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
@@ -507,6 +507,16 @@ namespace ObjectTag
 
 		virtual void save();
 		virtual void load();
+
+		void apply_visitor(Visitor_generic& visitor) override;
+
+		// Для поддержки iSerializable
+		Packer_generic& get_packer() override
+		{
+			return Packer<Mortal>::Instance();
+		}
+
+		/*constexpr static auto properties() { return Object_tag::properties(); }*/
 	};
 
 	class Purification_from_poison : public Object_tag

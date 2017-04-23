@@ -1184,6 +1184,7 @@ std::u16string Interaction_copyist::get_description()
 
 Object_interaction* Interaction_copyist::clone()
 {
+	LOG(INFO) << "clone";
 	Interaction_copyist* effect = new Interaction_copyist();
 	effect->m_interaction_message_type = m_interaction_message_type;
 	effect->m_subtype = m_subtype;
@@ -1250,7 +1251,8 @@ void Interaction_prefix::apply_effect(GameObject* unit, Object_interaction* obje
 			(*item)->apply_effect(unit, this);
 		}
 	}
-	if (m_value) { m_value->apply_effect(unit, object); }
+	// TODO сделать версию без применения и с применением модифицированного эффекта
+	/*if (m_value) { m_value->apply_effect(unit, object); }*/
 }
 
 std::u16string Interaction_prefix::get_description()
@@ -1445,7 +1447,7 @@ void Interaction_timer::load()
 
 // Effect
 
-Effect::Effect()
+Effect::Effect(): m_value(0), m_subtype()
 {
 	m_interaction_message_type = interaction_message_type_e::effect;
 }
@@ -1455,7 +1457,7 @@ bool Effect::on_turn()
 	return false;
 }
 
-Object_interaction* Effect::clone()
+Effect* Effect::clone()
 {
 	Effect* effect = new Effect();
 	effect->m_subtype = m_subtype;
@@ -1578,7 +1580,7 @@ void ObjectTag::Poison_resist::load()
 
 // ObjectTag::Mortal
 
-ObjectTag::Mortal::Mortal() :Object_tag(object_tag_e::mortal){};
+ObjectTag::Mortal::Mortal() :Object_tag(object_tag_e::mortal) {};
 
 ObjectTag::Mortal* ObjectTag::Mortal::clone()
 {
@@ -2660,3 +2662,8 @@ void Instruction_check_owner_type::apply_effect(GameObject* unit, Object_interac
 	}
 	}
 };
+
+void ObjectTag::Mortal::apply_visitor(Visitor_generic& visitor)
+{
+	visitor.visit(*this);
+}

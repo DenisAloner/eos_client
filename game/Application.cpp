@@ -824,27 +824,26 @@ bool Application::command_check_position(GameObject*& object, MapCell*& position
 void Application::process_game()
 {
 	command_main_menu_select();
-	//???? update_after_load();
-	std::chrono::time_point<std::chrono::steady_clock> start;
-	std::chrono::time_point<std::chrono::steady_clock> end;
-	std::chrono::milliseconds elapsed;
-	while (true)
+	std::unique_lock<std::mutex> lk(m_turn_mutex);
+	while(true)
 	{
-		if (m_turn)
-		{
-			start = std::chrono::high_resolution_clock::now();
-			update();
-			m_turn = false;
-			end = std::chrono::high_resolution_clock::now();
-			elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-			LOG(INFO) << "Просчет 10 ходов: " << std::to_string(elapsed.count());
-		}
+		m_turn_cv.wait(lk);
+		std::chrono::time_point<std::chrono::steady_clock> start;
+		std::chrono::time_point<std::chrono::steady_clock> end;
+		std::chrono::milliseconds elapsed;
+		start = std::chrono::high_resolution_clock::now();
+		update();
+		m_turn = false;
+		end = std::chrono::high_resolution_clock::now();
+		elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+		LOG(INFO) << "Просчет 10 ходов: " << std::to_string(elapsed.count());
 	}
 }
 
 void Application::on_turn()
 {
-	m_turn = true;
+	std::lock_guard<std::mutex> lk(m_turn_mutex);
+	m_turn_cv.notify_one();
 }
 
 void my_audio_callback(void *userdata, uint8_t *stream, uint32_t len) {

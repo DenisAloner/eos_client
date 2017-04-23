@@ -202,7 +202,9 @@ void ActionClass_Move::interaction_handler(Parameter* parameter)
 	}
 	if (!p[1])
 	{
+		Application::instance().m_UI_mutex.lock();
 		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_object_move( p[0].m_object));
+		Application::instance().m_UI_mutex.unlock();
 		temp = Application::instance().command_select_location(p[0].m_object);
 		if (temp)
 		{
@@ -213,10 +215,14 @@ void ActionClass_Move::interaction_handler(Parameter* parameter)
 		{
 			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Действие отменено")));
 			Application::instance().m_message_queue.m_busy = false;
+			Application::instance().m_UI_mutex.lock();
 			Application::instance().m_gui_controller.m_hints.pop_front();
+			Application::instance().m_UI_mutex.unlock();
 			return;
 		}
+		Application::instance().m_UI_mutex.lock();
 		Application::instance().m_gui_controller.m_hints.pop_front();
+		Application::instance().m_UI_mutex.unlock();
 	}
 	Application::instance().m_action_manager->add(new GameTask(this, out_parameter));
 	Application::instance().m_message_queue.m_busy = false;
@@ -243,7 +249,6 @@ bool action_move_step::check(Parameter* parameter)
 	Parameter& p(*parameter);
 	if (abs(p[0].m_object->cell()->x - p[1].m_cell->x) < 2 && abs(p[0].m_object->cell()->y - p[1].m_cell->y)< 2)
 	{
-		LOG(INFO) << "yes";
 		return Application::instance().command_check_position(p[0].m_object, p[1].m_cell, p[1].m_cell->m_map);
 	}
 	else return false;
@@ -544,19 +549,25 @@ void ActionClass_Turn::interaction_handler(Parameter* parameter)
 	}
 	if (!p[1])
 	{
+		Application::instance().m_UI_mutex.lock();
 		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_object_rotate( p[0].m_object));
+		Application::instance().m_UI_mutex.unlock();
 		MapCell* result = Application::instance().command_select_location(p[0].m_object);
 		if (result)
 		{
 			p[1].set(Game_algorithm::turn_to_cell(p[0].m_object, result));
+			Application::instance().m_UI_mutex.lock();
 			Application::instance().m_gui_controller.m_hints.pop_front();
+			Application::instance().m_UI_mutex.unlock();
 			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Направление выбрано")));
 		}
 		else
 		{
 			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Действие отменено")));
 			Application::instance().m_message_queue.m_busy = false;
+			Application::instance().m_UI_mutex.lock();
 			Application::instance().m_gui_controller.m_hints.pop_front();
+			Application::instance().m_UI_mutex.unlock();
 			return;
 		}
 	}
@@ -699,7 +710,9 @@ void action_set_motion_path::interaction_handler(Parameter* parameter)
 	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
 	GameObject* object = Application::instance().m_world->m_player->m_object;
+	Application::instance().m_UI_mutex.lock();
 	Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_line( object->cell(), object));
+	Application::instance().m_UI_mutex.unlock();
 	MapCell* cell = Application::instance().command_select_location(object);
 	if (cell)
 	{
@@ -709,17 +722,23 @@ void action_set_motion_path::interaction_handler(Parameter* parameter)
 	{
 		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Не выбрана клетка карты")));
 		Application::instance().m_message_queue.m_busy = false;
+		Application::instance().m_UI_mutex.lock();
 		Application::instance().m_gui_controller.m_hints.pop_front();
+		Application::instance().m_UI_mutex.unlock();
 		return;
 	}
 	//p->m_map->bresenham_line(p->m_object->cell(), p->m_place, [p](MapCell* a) { Application::instance().m_action_manager->add(new GameTask(Application::instance().m_actions[action_e::move_step], new Parameter_Position(p->m_object, a, p->m_map))); });
+	Application::instance().m_UI_mutex.lock();
 	Application::instance().m_gui_controller.m_hints.pop_front();
+	Application::instance().m_UI_mutex.unlock();
 	Path::instance().map_costing(cell->m_map, object, cell, 40);
 	std::vector<MapCell*>* path;
 	path = Path::instance().get_path_to_cell();
 	if (path)
 	{
+		Application::instance().m_UI_mutex.lock();
 		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_path(path,object));
+		Application::instance().m_UI_mutex.unlock();
 		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Следовать под данному пути? [Y/N]")));
 		if(Application::instance().command_agreement())
 		{
@@ -733,7 +752,9 @@ void action_set_motion_path::interaction_handler(Parameter* parameter)
 		{
 			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Игрок отменил действие")));
 		}
+		Application::instance().m_UI_mutex.lock();
 		Application::instance().m_gui_controller.m_hints.pop_front();
+		Application::instance().m_UI_mutex.unlock();
 		Path::instance().m_heap.m_items.clear();
 	}
 	else
@@ -798,7 +819,9 @@ void Action_pick::interaction_handler(Parameter* parameter)
 	}
 	if (!p[1])
 	{
+		Application::instance().m_UI_mutex.lock();
 		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_area( p[0].m_object, true));
+		Application::instance().m_UI_mutex.unlock();
 		GameObject* result = Application::instance().command_select_object();
 		if (result)
 		{
@@ -812,10 +835,14 @@ void Action_pick::interaction_handler(Parameter* parameter)
 		{
 			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Действие отменено")));
 			Application::instance().m_message_queue.m_busy = false;
+			Application::instance().m_UI_mutex.lock();
 			Application::instance().m_gui_controller.m_hints.pop_front();
+			Application::instance().m_UI_mutex.unlock();
 			return;
 		}
+		Application::instance().m_UI_mutex.lock();
 		Application::instance().m_gui_controller.m_hints.pop_front();
+		Application::instance().m_UI_mutex.unlock();
 		Application::instance().m_clipboard.m_item = p[1].m_object;
 	}
 	Application::instance().m_action_manager->add(new GameTask(this, out_parameter));
@@ -1165,7 +1192,9 @@ void action_hit_melee::interaction_handler(Parameter* parameter)
 	}
 	if (!p[1])
 	{
+		Application::instance().m_UI_mutex.lock();
 		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_area( p[0].m_object, true));
+		Application::instance().m_UI_mutex.unlock();
 		GameObject* result = Application::instance().command_select_object_on_map();
 		if (result)
 		{
@@ -1179,14 +1208,20 @@ void action_hit_melee::interaction_handler(Parameter* parameter)
 		{
 			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Действие отменено")));
 			Application::instance().m_message_queue.m_busy = false;
+			Application::instance().m_UI_mutex.lock();
 			Application::instance().m_gui_controller.m_hints.pop_front();
+			Application::instance().m_UI_mutex.unlock();
 			return;
 		}
+		Application::instance().m_UI_mutex.lock();
 		Application::instance().m_gui_controller.m_hints.pop_front();
+		Application::instance().m_UI_mutex.unlock();
 	}
 	if(!p[3])
 	{
+		Application::instance().m_UI_mutex.lock();
 		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_object_area( p[1].m_object));
+		Application::instance().m_UI_mutex.unlock();
 		MapCell* result = Application::instance().command_select_location(p[1].m_object);
 		if (result)
 		{
@@ -1197,10 +1232,14 @@ void action_hit_melee::interaction_handler(Parameter* parameter)
 		{
 			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Действие отменено")));
 			Application::instance().m_message_queue.m_busy = false;
+			Application::instance().m_UI_mutex.lock();
 			Application::instance().m_gui_controller.m_hints.pop_front();
+			Application::instance().m_UI_mutex.unlock();
 			return;
 		}
+		Application::instance().m_UI_mutex.lock();
 		Application::instance().m_gui_controller.m_hints.pop_front();
+		Application::instance().m_UI_mutex.unlock();
 	}
 	Application::instance().m_action_manager->add(new GameTask(this, out_parameter));
 	Application::instance().m_message_queue.m_busy = false;
@@ -1303,6 +1342,10 @@ char action_hit_melee::perfom(Parameter* parameter)
 		if (sbj_health->m_value - sbj_health_old_value != 0)
 		{
 			msg += u"Здоровье " + p[1].m_object->m_name + u" изменилось на " + Parser::CP866_to_UTF16(std::to_string(sbj_health->m_value - sbj_health_old_value)) + u".";
+		}
+		if(p[1].m_object->m_active_state->m_state==object_state_e::dead)
+		{
+			msg += p[1].m_object->m_name + u" повержен.";
 		}
 		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_battle, msg));
 	}
@@ -1799,8 +1842,10 @@ void Action_shoot::interaction_handler(Parameter* parameter)
 	if (!p[4])
 	{
 		Parameter_list* wr = p[2].m_part->m_item->get_parameter(interaction_e::weapon_range);
-		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_shoot( p[0].m_object, wr->m_value));
+		Application::instance().m_UI_mutex.lock();
+		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_shoot(p[0].m_object, wr->m_value));
 		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_weapon_range( p[0].m_object, wr->m_value));
+		Application::instance().m_UI_mutex.unlock();
 		bool valid = false;
 		while (!valid)
 		{
@@ -1822,13 +1867,17 @@ void Action_shoot::interaction_handler(Parameter* parameter)
 			{
 				Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Действие отменено")));
 				Application::instance().m_message_queue.m_busy = false;
+				Application::instance().m_UI_mutex.lock();
 				Application::instance().m_gui_controller.m_hints.pop_front();
 				Application::instance().m_gui_controller.m_hints.pop_front();
+				Application::instance().m_UI_mutex.unlock();
 				return;
 			}
 		}
+		Application::instance().m_UI_mutex.lock();
 		Application::instance().m_gui_controller.m_hints.pop_front();
 		Application::instance().m_gui_controller.m_hints.pop_front();
+		Application::instance().m_UI_mutex.unlock();
 	}
 	Application::instance().m_action_manager->add(new GameTask(this, out_parameter));
 	Application::instance().m_message_queue.m_busy = false;

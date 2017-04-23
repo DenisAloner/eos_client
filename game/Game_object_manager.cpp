@@ -527,6 +527,7 @@ void GameObjectManager::init()
 	Parser::register_class<Action_list>(u"action_list");
 	Parser::register_class<Instruction_slot_link>(u"interaction_slot_link");
 	Parser::register_class<ObjectTag::Label>(u"label");
+	Parser::register_class<ObjectTag::Mortal>(u"objecttag_mortal");
 	Parser::register_class<ObjectTag::Equippable>(u"equippable");
 	Parser::register_class<ObjectTag::Requirements_to_object>(u"requirements_to_object");
 	Parser::register_class<Instruction_check_part_type>(u"instruction_check_part_type");

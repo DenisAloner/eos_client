@@ -25,6 +25,7 @@ public:
 	void visit(Object_state& value) override;
 	void visit(ObjectTag::Label& value) override;
 	void visit(ObjectTag::Requirements_to_object& value) override;
+	void visit(ObjectTag::Mortal& value) override;
 	void visit(Action_pick& value) override;
 
 	void visit(GameObject& value) override;

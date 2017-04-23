@@ -19,6 +19,7 @@ namespace ObjectTag
 {
 	class Label;
 	class Requirements_to_object;
+	class Mortal;
 }
 
 class Visitor_generic
@@ -37,6 +38,7 @@ public:
 	virtual void visit(Object_part& value) {};
 	virtual void visit(ObjectTag::Label& value) {};
 	virtual void visit(ObjectTag::Requirements_to_object& value) {};
+	virtual void visit(ObjectTag::Mortal& value) {};
 	virtual void visit(Action_list& value) {};
 	virtual void visit(Action_pick& value) {};
 	virtual void visit(Instruction_check_tag& value) {};

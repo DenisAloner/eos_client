@@ -233,7 +233,7 @@ void GUI_Scrollable_container::add_item_control(GUI_Object* object)
 		{
 			m_scroll.y = (m_size.h - object->m_position.y - object->m_size.h - 2);
 		}
-		m_content_size.h = LastElement->m_position.y + LastElement->m_size.h + 2;
+		m_content_size.h = object->m_position.y + object->m_size.h + 2;
 	}
 	else
 	{
@@ -316,6 +316,11 @@ void GUI_Scrollable_container::set_scroll2(int dy)
 
 void GUI_Scrollable_container::update()
 {
+	if (m_content_size.h + m_scroll.y < m_size.h)
+	{
+		m_scroll.y = m_size.h - m_content_size.h;
+	}
+	if (m_scroll.y > 0) { m_scroll.y = 0; }
 	start_render = m_items.begin();
 	end_render = m_items.end();
 	for (auto i = m_items.begin(); i != m_items.end(); ++i)

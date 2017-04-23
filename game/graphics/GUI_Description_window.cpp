@@ -91,6 +91,11 @@ void Visitor_object_description_getter::visit(ObjectTag::Requirements_to_object&
 	m_active.pop_front();
 }
 
+void Visitor_object_description_getter::visit(ObjectTag::Mortal& value)
+{
+	handle_simple(u"<" + Parser::m_string_object_tag_e[value.m_type] + u">");
+}
+
 void Visitor_object_description_getter::visit(Action_pick& value)
 {
 	handle_simple(u"<" + value.get_description(nullptr) + u">");

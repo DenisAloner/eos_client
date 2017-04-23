@@ -866,7 +866,7 @@ public:
 
 	interaction_message_type_e m_interaction_message_type;
 	std::u16string m_namename;
-	Object_interaction() {};
+	Object_interaction() { m_namename = u"base"; };
 	virtual void apply_effect(GameObject* unit, Object_interaction* object) {};
 	virtual bool on_turn() { return false; };
 	virtual std::u16string get_description() { return u""; };

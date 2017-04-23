@@ -98,6 +98,11 @@ public:
 
 	std::mutex m_update_mutex;
 
+	std::mutex m_turn_mutex;
+	std::condition_variable m_turn_cv;
+
+	std::mutex m_UI_mutex;
+
 	GameObjectManager* m_game_object_manager;
 
 	GUI_Controller m_gui_controller;
