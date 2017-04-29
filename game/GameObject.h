@@ -241,7 +241,6 @@ public:
 	virtual bool on_turn();
 	std::u16string get_description() override;
 	virtual Object_interaction* clone();
-	void description(std::list<std::u16string>* info, int level) override;
 	virtual void do_predicat(predicat func);
 	void apply_visitor(Visitor_generic& visitor) override;
 
@@ -328,7 +327,6 @@ public:
 	virtual bool on_turn();
 	std::u16string get_description() override;
 	virtual Object_part* clone();
-	void description(std::list<std::u16string>* info, int level) override;
 	virtual void do_predicat(Visitor& helper);
 	void apply_visitor(Visitor_generic& visitor) override;
 

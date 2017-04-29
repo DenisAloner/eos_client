@@ -188,6 +188,65 @@ void Visitor_object_description_getter::visit(Instruction_check_tag& value)
 	handle_simple(u"метка <" + Parser::m_string_object_tag_e[value.m_value] + u">");
 }
 
+void Visitor_object_description_getter::visit(Instruction_slot_link& value)
+{
+	handle_complex(u"<тип параметра:" + Parser::m_string_interaction_e[value.m_subtype] + u">:");
+	Visitor_simple::visit(value);
+	m_active.pop_front();
+}
+
+void Visitor_object_description_getter::visit(Slot_set_state& value)
+{
+	handle_simple(u"изменить состояние");
+}
+
+void Visitor_object_description_getter::visit(Interaction_copyist& value)
+{
+	handle_complex(u"<тип параметра:" + Parser::m_string_interaction_e[value.m_subtype] + u">:");
+	Visitor_simple::visit(value);
+	m_active.pop_front();
+}
+
+void Visitor_object_description_getter::visit(Interaction_prefix& value)
+{
+	handle_complex(u"<тип эффекта:" + Parser::CP866_to_UTF16(Application::instance().m_game_object_manager->get_effect_prefix_string(value.m_subtype)) + u">:");
+	Visitor_simple::visit(value);
+	m_active.pop_front();
+}
+
+void Visitor_object_description_getter::visit(Interaction_addon& value)
+{
+	handle_complex(u"<наложение эффекта:" + Parser::m_string_interaction_e[value.m_subtype] + u">:");
+	Visitor_simple::visit(value);
+	m_active.pop_front();
+}
+
+void Visitor_object_description_getter::visit(Interaction_time& value)
+{
+	handle_complex(u"<длительное наложение эффекта:" + Parser::CP866_to_UTF16(std::to_string(value.m_turn)) + u">:");
+	Visitor_simple::visit(value);
+	m_active.pop_front();
+}
+
+void Visitor_object_description_getter::visit(Interaction_timer& value)
+{
+	handle_complex(u"<цикличное наложение эффекта:" + Parser::CP866_to_UTF16(std::to_string(value.m_turn) + "(" + std::to_string(value.m_period) + ")>:"));
+	Visitor_simple::visit(value);
+	m_active.pop_front();
+}
+
+void Visitor_object_description_getter::visit(Effect& value)
+{
+	handle_simple(u":" + Parser::CP866_to_UTF16(std::to_string(value.m_value)));
+}
+
+void Visitor_object_description_getter::visit(Instruction_slot_parameter& value)
+{
+	handle_complex(u"Instruction_slot_parameter:");
+	Visitor_simple::visit(value);
+	m_active.pop_front();
+}
+
 void GUI_Window::add(GUI_Object* object)
 {
 	object->m_position = position_t(object->m_position.x + 1, object->m_position.y + m_header->m_position.y + m_header->m_size.h + 1);

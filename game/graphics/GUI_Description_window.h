@@ -39,6 +39,15 @@ public:
 	void visit(Tag_list& value) override;
 	void visit(Action_list& value) override;
 	void visit(Instruction_check_tag& value) override;
+	void visit(Instruction_slot_link& value) override;
+	void visit(Slot_set_state& value) override;
+	void visit(Interaction_copyist& value) override;
+	void visit(Interaction_prefix& value) override;
+	void visit(Interaction_addon& value) override;
+	void visit(Interaction_time& value) override;
+	void visit(Interaction_timer& value) override;
+	void visit(Effect& value) override;
+	void visit(Instruction_slot_parameter& value) override;
 
 };
 

@@ -17,7 +17,6 @@ public:
 	std::u16string get_description() override;
 	virtual bool update();
 	virtual Interaction_list* clone();
-	void description(std::list<std::u16string>* info, int level) override;
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
 	virtual void add(Object_interaction* item) { m_items.push_back(item); };
@@ -63,7 +62,6 @@ public:
 	std::u16string get_description() override;
 	virtual bool update();
 	virtual Parameter_list* clone();
-	void description(std::list<std::u16string>* info, int level) override;
 	void apply_visitor(Visitor_generic& visitor) override;
 
 	virtual void save();
@@ -106,7 +104,6 @@ public:
 	std::u16string get_description() override;
 	virtual bool update();
 	virtual Vision_list* clone();
-	virtual void description(std::list<std::u16string>* info, int level);
 	void apply_visitor(Visitor_generic& visitor) override;
 
 	virtual void equip(Object_interaction* item);
@@ -138,7 +135,6 @@ public:
 	std::u16string get_description() override;
 	virtual bool update();
 	virtual Vision_component* clone();
-	void description(std::list<std::u16string>* info, int level) override;
 	void apply_visitor(Visitor_generic& visitor) override;
 
 	virtual void save();
@@ -266,58 +262,6 @@ public:
 	virtual bool on_turn() { return false; };
 	std::u16string get_description() override { return u"set_state"; };
 	virtual Slot_set_state* clone();
-	void description(std::list<std::u16string>* info, int level) override;
-	virtual void do_predicat(predicat func) { func(this); };
-
-	virtual void save();
-	virtual void load();
-};
-
-class Slot_select_cell :public Object_interaction
-{
-public:
-
-	std::string m_value;
-	Slot_select_cell() { m_interaction_message_type = interaction_message_type_e::select_location; };
-	virtual void apply_effect(GameObject* unit, Object_interaction* object);
-	virtual bool on_turn() { return false; };
-	std::u16string get_description() override { return u"select_location"; };
-	virtual Slot_select_cell* clone();
-	void description(std::list<std::u16string>* info, int level) override;
-	virtual void do_predicat(predicat func) { func(this); };
-
-	virtual void save();
-	virtual void load();
-};
-
-class Slot_allocator :public Object_interaction
-{
-public:
-
-	MapCell* m_value;
-	Slot_allocator() { m_interaction_message_type = interaction_message_type_e::allocator; };
-	virtual void apply_effect(GameObject* unit, Object_interaction* object);
-	virtual bool on_turn() { return false; };
-	std::u16string get_description() override { return u"select_location"; };
-	virtual Slot_allocator* clone();
-	void description(std::list<std::u16string>* info, int level) override;
-	virtual void do_predicat(predicat func) { func(this); };
-
-	virtual void save();
-	virtual void load();
-};
-
-class Slot_mover :public Object_interaction
-{
-public:
-
-	Slot_allocator* m_value;
-	Slot_mover() { m_interaction_message_type = interaction_message_type_e::mover; };
-	virtual void apply_effect(GameObject* unit, Object_interaction* object);
-	virtual bool on_turn() { return false; };
-	std::u16string get_description() override { return u"select_location"; };
-	virtual Slot_mover* clone();
-	void description(std::list<std::u16string>* info, int level) override;
 	virtual void do_predicat(predicat func) { func(this); };
 
 	virtual void save();
@@ -355,7 +299,6 @@ public:
 	Interaction_copyist();
 	std::u16string get_description() override;
 	virtual Object_interaction* clone();
-	void description(std::list<std::u16string>* info, int level) override;
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
 	virtual void save();
@@ -371,7 +314,6 @@ public:
 	Interaction_prefix();
 	std::u16string get_description() override;
 	virtual Interaction_prefix* clone();
-	void description(std::list<std::u16string>* info, int level) override;
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
 	virtual void save();
@@ -386,7 +328,6 @@ public:
 	Interaction_addon();
 	std::u16string get_description() override;
 	virtual Object_interaction* clone();
-	void description(std::list<std::u16string>* info, int level) override;
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
 	virtual void save();
@@ -402,7 +343,6 @@ public:
 	virtual bool on_turn();
 	std::u16string get_description() override;
 	virtual Object_interaction* clone();
-	void description(std::list<std::u16string>* info, int level) override;
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
 	virtual void save();
@@ -431,7 +371,6 @@ public:
 	virtual bool on_turn();
 	std::u16string get_description() override;
 	virtual Object_interaction* clone();
-	void description(std::list<std::u16string>* info, int level) override;
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
 	virtual void save();
@@ -448,7 +387,6 @@ public:
 	virtual bool on_turn();
 	Effect* clone() override;
 	std::u16string get_description() override;
-	void description(std::list<std::u16string>* info, int level) override;
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
 	virtual void save();
@@ -474,7 +412,6 @@ public:
 
 	object_tag_e m_type;
 	Object_tag(object_tag_e key);
-	void description(std::list<std::u16string>* info, int level) override;
 	std::u16string get_description() override;
 	virtual Object_tag* clone() = 0;
 	virtual bool on_turn();
@@ -677,7 +614,6 @@ public:
 	Instruction_slot_link();
 	std::u16string get_description() override;
 	virtual Instruction_slot_link* clone();
-	void description(std::list<std::u16string>* info, int level) override;
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
 	virtual void save();
@@ -705,7 +641,6 @@ public:
 	Instruction_slot_parameter();
 	std::u16string get_description() override;
 	virtual Object_interaction* clone();
-	void description(std::list<std::u16string>* info, int level) override;
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
 	virtual void save();
@@ -724,7 +659,6 @@ public:
 	std::u16string get_description() override { return nullptr; };
 	virtual bool on_turn() { return false; };
 	virtual Object_interaction* clone() { return nullptr; };
-	virtual void description(std::list<std::string>* info, int level) {};
 	virtual void apply_effect(GameObject* unit, Object_interaction* object) {};
 
 	virtual void save() {};
@@ -742,7 +676,6 @@ public:
 	std::u16string get_description() override { return nullptr; };
 	virtual bool on_turn() { return false; };
 	virtual Instruction_check_tag* clone();
-	virtual void description(std::list<std::string>* info, int level) {};
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
 
@@ -774,7 +707,6 @@ public:
 	std::u16string get_description() override { return nullptr; };
 	virtual bool on_turn() { return false; };
 	virtual Instruction_check_part_type* clone();
-	virtual void description(std::list<std::string>* info, int level) {};
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
 	virtual void save() {};
@@ -805,7 +737,6 @@ public:
 	virtual Instruction_arg_extract* clone();
 	std::u16string get_description() override { return nullptr; };
 	virtual bool on_turn() { return false; };
-	virtual void description(std::list<std::string>* info, int level) {};
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 	void reset_serialization_index() override;
 
@@ -837,7 +768,6 @@ public:
 	virtual Instruction_get_owner* clone();
 	std::u16string get_description() override { return nullptr; };
 	virtual bool on_turn() { return false; };
-	virtual void description(std::list<std::string>* info, int level) {};
 	virtual void apply_effect(GameObject* unit, Object_interaction* object) ;
 	void reset_serialization_index() override;
 
@@ -884,7 +814,6 @@ public:
 	std::u16string get_description() override { return nullptr; };
 	virtual bool on_turn() { return false; };
 	virtual Instruction_check_owner_type* clone();
-	virtual void description(std::list<std::string>* info, int level) {};
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
 	virtual void save() {};

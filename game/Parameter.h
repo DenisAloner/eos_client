@@ -116,7 +116,6 @@ public:
 	virtual Instruction_result* clone() { return nullptr; };
 	std::u16string get_description() override { return nullptr; };
 	virtual bool on_turn() { return false; };
-	virtual void description(std::list<std::string>* info, int level) {};
 	virtual void apply_effect(GameObject* unit, Object_interaction* object) {};
 
 	virtual void save() {};

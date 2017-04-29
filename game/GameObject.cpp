@@ -381,11 +381,6 @@ Object_interaction* GameObject::clone()
 	return nullptr;
 }
 
-void GameObject::description(std::list<std::u16string>* info, int level)
-{
-	info->push_back(std::u16string(level, u'.') + u"<" + m_name + u">");
-}
-
 void GameObject::do_predicat(predicat func)
 { 
 	func(this); 
@@ -977,17 +972,6 @@ bool Object_part::on_turn()
 std::u16string Object_part::get_description()
 {
 	return u"slot";
-}
-
-void Object_part::description(std::list<std::u16string>* info, int level)
-{
-	info->push_back(std::u16string(level, '.') + u"<" + m_name + u">:");
-	info->push_back(std::u16string(level, '.') + u"<эффекты>:");
-	for (auto current = m_attributes.m_items.begin(); current != m_attributes.m_items.end(); current++)
-	{
-		info->push_back(std::u16string(level + 1, '.') + Parser::m_string_interaction_e[current->first] + u":");
-		current->second->description(info, level + 2);
-	}
 }
 
 void Object_part::do_predicat(Visitor& helper)

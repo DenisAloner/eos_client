@@ -140,26 +140,6 @@ void GameObjectManager::parser(const std::string& command)
 		m_slot = item;
 		break;
 	}
-	case command_e::mem_slot_select_location:
-	{
-		Slot_select_cell* item = new Slot_select_cell();
-		item->m_value = arg[0];
-		m_slot = item;
-		break;
-	}
-	case command_e::mem_slot_mover:
-	{
-		Slot_mover* item = new Slot_mover();
-		item->m_value = static_cast<Slot_allocator*>(m_slot);
-		m_slot = item;
-		break;
-	}
-	case command_e::mem_slot_allocator:
-	{
-		Slot_allocator* item = new Slot_allocator();
-		m_slot = item;
-		break;
-	}
 	case command_e::mem_effect:
 	{
 		Effect* item = new Effect();

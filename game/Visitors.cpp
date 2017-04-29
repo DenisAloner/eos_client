@@ -93,3 +93,59 @@ void Visitor_simple::visit(ObjectTag::Requirements_to_object& value)
 		value.m_value->apply_visitor(*this);
 	}
 }
+
+void Visitor_simple::visit(Instruction_slot_link& value)
+{
+	if (value.m_value)
+	{
+		value.m_value->apply_visitor(*this);
+	}
+}
+
+void Visitor_simple::visit(Interaction_copyist& value)
+{
+	if (value.m_value)
+	{
+		value.m_value->apply_visitor(*this);
+	}
+}
+
+void Visitor_simple::visit(Interaction_prefix& value)
+{
+	if (value.m_value)
+	{
+		value.m_value->apply_visitor(*this);
+	}
+}
+
+void Visitor_simple::visit(Interaction_addon& value)
+{
+	if (value.m_value)
+	{
+		value.m_value->apply_visitor(*this);
+	}
+}
+
+void Visitor_simple::visit(Interaction_time& value)
+{
+	if (value.m_value)
+	{
+		value.m_value->apply_visitor(*this);
+	}
+}
+
+void Visitor_simple::visit(Interaction_timer& value)
+{
+	if (value.m_value)
+	{
+		value.m_value->apply_visitor(*this);
+	}
+}
+
+void Visitor_simple::visit(Instruction_slot_parameter& value)
+{
+	if (value.m_value)
+	{
+		value.m_value->apply_visitor(*this);
+	}
+}

@@ -108,14 +108,6 @@ void Interaction_list::apply_visitor(Visitor_generic& visitor)
 	visitor.visit(*this);
 }
 
-void Interaction_list::description(std::list<std::u16string>* info, int level)
-{
-	for (auto current = m_items.begin(); current != m_items.end(); ++current)
-	{
-		(*current)->description(info, level);
-	}
-}
-
 void Interaction_list::reset_serialization_index()
 {
 	LOG(INFO) << "шаг 4";
@@ -281,15 +273,6 @@ Parameter_list* Parameter_list::clone()
 	return result;
 }
 
-void Parameter_list::description(std::list<std::u16string>* info, int level)
-{
-	info->push_back(Parser::CP866_to_UTF16(std::string(level, '.') + std::to_string(m_value) + "(" + std::to_string(m_basic_value) + ")/" + std::to_string(m_limit) + "(" + std::to_string(m_basic_limit) + "):"));
-	for (auto current = m_items.begin(); current != m_items.end(); ++current)
-	{
-		(*current)->description(info, level);
-	}
-}
-
 void Parameter_list::apply_visitor(Visitor_generic& visitor)
 {
 	visitor.visit(*this);
@@ -398,15 +381,6 @@ Vision_list* Vision_list::clone()
 		result->add((*item)->clone());
 	}
 	return result;
-}
-
-void Vision_list::description(std::list<std::u16string>* info, int level)
-{
-	//info->push_back(std::string(level, '.') + std::to_string(m_value) + "(" + std::to_string(m_basic_value) + ")/" + std::to_string(m_limit) + "(" + std::to_string(m_basic_limit) + "):");
-	for (auto current = m_items.begin(); current != m_items.end(); ++current)
-	{
-		(*current)->description(info, level);
-	}
 }
 
 void Vision_list::apply_visitor(Visitor_generic& visitor)
@@ -599,15 +573,6 @@ Vision_component* Vision_component::clone()
 		result->add((*item)->clone());
 	}
 	return result;
-}
-
-void Vision_component::description(std::list<std::u16string>* info, int level)
-{
-	info->push_back(Parser::CP866_to_UTF16(std::string(level, '.') + std::to_string(m_value.radius)+","+ std::to_string(m_value.start_angle) + "," + std::to_string(m_value.end_angle)+"/" + std::to_string(m_basic_value.radius) + "," + std::to_string(m_basic_value.start_angle) + "," + std::to_string(m_basic_value.end_angle)));
-	for (auto current = m_items.begin(); current != m_items.end(); ++current)
-	{
-		(*current)->description(info, level+1);
-	}
 }
 
 void Vision_component::apply_visitor(Visitor_generic& visitor)
@@ -984,11 +949,6 @@ Slot_set_state* Slot_set_state::clone()
 	return effect;
 }
 
-void Slot_set_state::description(std::list<std::u16string>* info, int level)
-{
-	info->push_back(std::u16string(level, '.') + u"изменить состояние");
-}
-
 void Slot_set_state::apply_effect(GameObject* unit, Object_interaction* object)
 {
 	unit->set_state(m_value);
@@ -1003,133 +963,6 @@ void Slot_set_state::save()
 }
 
 void Slot_set_state::load()
-{
-}
-
-// Slot_select_cell
-
-void Slot_select_cell::description(std::list<std::u16string>* info, int level)
-{
-	info->push_back(std::u16string(level, '.') + u"выбрать локацию");
-}
-
-Slot_select_cell* Slot_select_cell::clone()
-{
-	Slot_select_cell* effect = new Slot_select_cell();
-	effect->m_interaction_message_type = m_interaction_message_type;
-	effect->m_value = m_value;
-	return effect;
-}
-
-void Slot_select_cell::apply_effect(GameObject* unit, Object_interaction* object)
-{
-	MapCell* c = unit->cell();
-	MapCell* n = unit->cell();
-	GameMap* map = c->m_map;
-	if (map->check(c->x + 1, c->y))
-	{
-		n = map->m_items[c->y][c->x + 1];
-		if (n->m_items.size() == 1)
-		{
-			GameObject* obj = Application::instance().m_game_object_manager->new_object(m_value);
-			obj->set_direction(object_direction_e::left);
-			map->add_object(obj, n);
-		}
-	};
-	if (map->check(c->x + 1, c->y + 1))
-	{
-		n = map->m_items[c->y + 1][c->x + 1];
-		if (n->m_items.size() == 1)
-		{
-			GameObject* obj = Application::instance().m_game_object_manager->new_object(m_value);
-			obj->set_direction(object_direction_e::left);
-			map->add_object(obj, n);
-		}
-	};
-}
-
-void Slot_select_cell::save()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::slot_select_cell;
-	fwrite(&t, sizeof(type_e), 1, file);
-	FileSystem::instance().serialize_string(m_value, file);
-}
-
-void Slot_select_cell::load()
-{
-}
-
-
-// Slot_allocator
-
-void Slot_allocator::description(std::list<std::u16string>* info, int level)
-{
-	info->push_back(std::u16string(level, '.') + u"вперед на одну клетку");
-
-}
-
-Slot_allocator* Slot_allocator::clone()
-{
-	Slot_allocator* effect = new Slot_allocator();
-	effect->m_interaction_message_type = m_interaction_message_type;
-	return effect;
-}
-
-void Slot_allocator::apply_effect(GameObject* unit, Object_interaction* object)
-{
-	MapCell* c = unit->cell();
-	GameMap* map = c->m_map;
-	if (map->check(c->x + 1, c->y))
-	{
-		m_value = map->m_items[c->y][c->x + 1];
-	};
-}
-
-void Slot_allocator::save()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::slot_allocator;
-	fwrite(&t, sizeof(type_e), 1, file);
-}
-
-void Slot_allocator::load()
-{
-}
-
-// Slot_mover
-
-void Slot_mover::description(std::list<std::u16string>* info, int level)
-{
-	info->push_back(std::u16string(level, '.') + u"переместить объект:");
-	m_value->description(info, level + 1);
-}
-
-Slot_mover* Slot_mover::clone()
-{
-	Slot_mover* effect = new Slot_mover();
-	effect->m_interaction_message_type = m_interaction_message_type;
-	effect->m_value = m_value;
-	return effect;
-}
-
-void Slot_mover::apply_effect(GameObject* unit, Object_interaction* object)
-{
-
-	MapCell* c = unit->cell();
-	GameMap* map = c->m_map;
-	m_value->apply_effect(unit, object);
-	map->move_object(unit, m_value->m_value);
-}
-
-void Slot_mover::save()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::slot_mover;
-	fwrite(&t, sizeof(type_e), 1, file);
-}
-
-void Slot_mover::load()
 {
 }
 
@@ -1192,12 +1025,6 @@ Object_interaction* Interaction_copyist::clone()
 	return effect;
 }
 
-void Interaction_copyist::description(std::list<std::u16string>* info, int level)
-{
-	info->push_back(std::u16string(level, '.') + u"<тип параметра:" + Parser::m_string_interaction_e[m_subtype] + u">:");
-	m_value->description(info, level + 1);
-}
-
 void Interaction_copyist::apply_effect(GameObject* unit, Object_interaction* object)
 {
 	auto i = unit->get_effect(m_subtype);
@@ -1226,12 +1053,6 @@ void Interaction_copyist::load()
 // Interaction_prefix
 
 Interaction_prefix::Interaction_prefix() {};
-
-void Interaction_prefix::description(std::list<std::u16string>* info, int level)
-{
-	info->push_back(std::u16string(level, '.') + u"<тип эффекта:" + Parser::CP866_to_UTF16(Application::instance().m_game_object_manager->get_effect_prefix_string(m_subtype)) + u">:");
-	m_value->description(info, level + 1);
-}
 
 Interaction_prefix* Interaction_prefix::clone()
 {
@@ -1294,12 +1115,6 @@ Object_interaction* Interaction_addon::clone()
 	return effect;
 }
 
-void Interaction_addon::description(std::list<std::u16string>* info, int level)
-{
-	info->push_back(std::u16string(level, '.') + u"<наложение эффекта:" + Parser::m_string_interaction_e[m_subtype] + u">:");
-	m_value->description(info, level + 1);
-}
-
 void Interaction_addon::apply_effect(GameObject* unit, Object_interaction* object)
 {
 	unit->add_from(m_subtype, m_value->clone());
@@ -1353,12 +1168,6 @@ Object_interaction* Interaction_time::clone()
 	return effect;
 }
 
-void Interaction_time::description(std::list<std::u16string>* info, int level)
-{
-	info->push_back(std::u16string(level, '.') + u"<длительное наложение эффекта:" + Parser::CP866_to_UTF16(std::to_string(m_turn)) + u">:");
-	m_value->description(info, level + 1);
-}
-
 void Interaction_time::apply_effect(GameObject* unit, Object_interaction* object)
 {
 	m_value->apply_effect(unit, object);
@@ -1410,12 +1219,6 @@ Object_interaction* Interaction_timer::clone()
 	effect->m_period = m_period;
 	effect->m_value = m_value->clone();
 	return effect;
-}
-
-void Interaction_timer::description(std::list<std::u16string>* info, int level)
-{
-	info->push_back(std::u16string(level, '.') + u"<цикличное наложение эффекта:" + Parser::CP866_to_UTF16(std::to_string(m_turn) + "(" + std::to_string(m_period) + ")>:"));
-	m_value->description(info, level + 1);
 }
 
 void Interaction_timer::apply_effect(GameObject* unit, Object_interaction* object)
@@ -1500,12 +1303,6 @@ void Effect::apply_effect(GameObject* unit, Object_interaction* object)
 	}
 }
 
-
-void Effect::description(std::list<std::u16string>* info, int level)
-{
-	info->push_back(std::u16string(level,'.')+ Parser::m_string_effect_e[m_subtype] + u":" + Parser::CP866_to_UTF16(std::to_string(m_value)));
-}
-
 void Effect::save()
 {
 	FILE* file = Serialization_manager::instance().m_file;
@@ -1528,11 +1325,6 @@ Object_tag::Object_tag(object_tag_e key) :m_type(key)
 {
 	m_interaction_message_type = interaction_message_type_e::tag;
 };
-
-void Object_tag::description(std::list<std::u16string>* info, int level)
-{
-	info->push_back(Parser::CP866_to_UTF16(std::string(level, '.')) + u"<" + Parser::m_string_object_tag_e[m_type] + u">");
-}
 
 std::u16string Object_tag::get_description()
 {
@@ -1881,12 +1673,6 @@ Instruction_slot_link* Instruction_slot_link::clone()
 	return effect;
 }
 
-void Instruction_slot_link::description(std::list<std::u16string>* info, int level)
-{
-	info->push_back(Parser::CP866_to_UTF16(std::string(level, '.')) + u"<тип параметра:" + Parser::m_string_interaction_e[m_subtype] + u">:");
-	m_value->description(info, level + 1);
-}
-
 void Instruction_slot_link::apply_effect(GameObject* unit, Object_interaction* object)
 {
 	switch (object->m_interaction_message_type)
@@ -2031,12 +1817,6 @@ Object_interaction* Instruction_slot_parameter::clone()
 	effect->m_interaction_message_type = m_interaction_message_type;
 	//effect->m_value = m_value->clone();
 	return effect;
-}
-
-void Instruction_slot_parameter::description(std::list<std::u16string>* info, int level)
-{
-	/*info->push_back(std::string(level, '.') + "<тип параметра:" + Application::instance().m_game_object_manager->get_object_tag_string(m_subtype) + ">:");*/
-	m_value->description(info, level + 1);
 }
 
 void Instruction_slot_parameter::apply_effect(GameObject* unit, Object_interaction* object)

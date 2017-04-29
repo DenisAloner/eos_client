@@ -19,12 +19,6 @@ Object_interaction* Impact_copy_chance::clone()
 	return nullptr;
 }
 
-void Impact_copy_chance::description(std::list<std::string>* info, int level)
-{
-	/*info->push_back(std::string(level, '.') + "<тип параметра:" + Application::instance().m_game_object_manager->get_effect_string(m_subtype) + ">:");
-	m_value->description(info, level + 1);*/
-}
-
 std::u16string Impact_copy_chance::get_description()
 {
 	return u"Impact_copy_chance";

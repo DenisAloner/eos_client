@@ -907,11 +907,6 @@ std::u16string Action_pick::get_description(Parameter* parameter)
 	return s;
 }
 
-void Action_pick::description(std::list<std::string>* info, int level)
-{
-	info->push_back(std::string(level, '.') + "<взять>");
-}
-
 void Action_pick::apply_visitor(Visitor_generic& visitor)
 {
 	visitor.visit(*this);
@@ -1351,11 +1346,6 @@ char action_hit_melee::perfom(Parameter* parameter)
 	}
 	else return 1;
 	return 0;
-}
-
-void action_hit_melee::description(std::list<std::string>* info, int level)
-{
-	info->push_back(std::string(level, '.') + "<ударить>");
 }
 
 std::u16string Action_hit::get_description(Parameter* parameter)

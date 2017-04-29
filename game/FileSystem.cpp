@@ -407,21 +407,6 @@ iSerializable* Serialization_manager::deserialize()
 			value = new Slot_set_state();
 			break;
 		}
-		case type_e::slot_select_cell:
-		{
-			value = new Slot_select_cell();
-			break;
-		}
-		case type_e::slot_allocator:
-		{
-			value = new Slot_allocator();
-			break;
-		}
-		case type_e::slot_mover:
-		{
-			value = new Slot_mover();
-			break;
-		}
 		case type_e::interaction_copyist:
 		{
 			value = new Interaction_copyist();

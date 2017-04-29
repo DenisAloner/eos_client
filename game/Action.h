@@ -41,7 +41,6 @@ public:
 	virtual bool on_turn(){ return false; };
 	virtual std::u16string get_description() { return u"действие"; };
 	virtual Object_interaction* clone();
-	virtual void description(std::list<std::string>* info, int level) {};
 
 	virtual void reset_serialization_index() { m_serialization_index = 0; };
 	virtual void save();
@@ -75,7 +74,6 @@ public:
 
 	virtual bool on_turn() { return false; };
 	virtual std::u16string get_description() { return u"действие"; };
-	virtual void description(std::list<std::string>* info, int level) {};
 	virtual Action_wrapper* clone();
 	//virtual void perfom(Parameter* parameter);
 
@@ -196,7 +194,6 @@ public:
 	virtual char perfom(Parameter* parameter);
 	virtual std::u16string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
-	virtual void description(std::list<std::string>* info, int level);
 	void apply_visitor(Visitor_generic& visitor) override;
 
 };
@@ -246,7 +243,6 @@ public:
 	action_hit_melee();
 	virtual void interaction_handler(Parameter* arg);
 	virtual char perfom(Parameter* parameter);
-	virtual void description(std::list<std::string>* info, int level);
 };
 
 class Action_equip :

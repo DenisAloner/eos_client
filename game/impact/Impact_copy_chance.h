@@ -15,7 +15,6 @@ public:
 
 	virtual Object_interaction* clone();
 	std::u16string get_description() override;
-	virtual void description(std::list<std::string>* info, int level);
 
 	virtual void save();
 	virtual void load();
