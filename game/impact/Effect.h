@@ -13,8 +13,7 @@ public:
 	std::list<Object_interaction*> m_items;
 
 	Interaction_list();
-	virtual bool on_turn();
-	std::u16string get_description() override;
+	bool on_turn() override;
 	virtual bool update();
 	virtual Interaction_list* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
@@ -59,7 +58,6 @@ public:
 
 	Parameter_list(interaction_e subtype);
 	Parameter_list();
-	std::u16string get_description() override;
 	virtual bool update();
 	virtual Parameter_list* clone();
 	void apply_visitor(Visitor_generic& visitor) override;
@@ -101,7 +99,6 @@ public:
 	int m_max_radius;
 
 	Vision_list();
-	std::u16string get_description() override;
 	virtual bool update();
 	virtual Vision_list* clone();
 	void apply_visitor(Visitor_generic& visitor) override;
@@ -132,7 +129,6 @@ public:
 	AI_FOV m_basic_value;
 	AI_FOV m_value;
 	Vision_component();
-	std::u16string get_description() override;
 	virtual bool update();
 	virtual Vision_component* clone();
 	void apply_visitor(Visitor_generic& visitor) override;
@@ -260,7 +256,6 @@ public:
 	Slot_set_state() { m_interaction_message_type = interaction_message_type_e::set_attribute_map; };
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 	virtual bool on_turn() { return false; };
-	std::u16string get_description() override { return u"set_state"; };
 	virtual Slot_set_state* clone();
 	virtual void do_predicat(predicat func) { func(this); };
 
@@ -297,7 +292,6 @@ public:
 
 	interaction_e m_subtype;
 	Interaction_copyist();
-	std::u16string get_description() override;
 	virtual Object_interaction* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
@@ -312,7 +306,6 @@ public:
 
 	effect_prefix_e m_subtype;
 	Interaction_prefix();
-	std::u16string get_description() override;
 	virtual Interaction_prefix* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
@@ -326,7 +319,6 @@ public:
 
 	interaction_e m_subtype;
 	Interaction_addon();
-	std::u16string get_description() override;
 	virtual Object_interaction* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
@@ -341,7 +333,6 @@ public:
 	int m_turn;
 	Interaction_time();
 	virtual bool on_turn();
-	std::u16string get_description() override;
 	virtual Object_interaction* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
@@ -369,7 +360,6 @@ public:
 	int m_period;
 	Interaction_timer();
 	virtual bool on_turn();
-	std::u16string get_description() override;
 	virtual Object_interaction* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
@@ -386,7 +376,6 @@ public:
 	Effect();
 	virtual bool on_turn();
 	Effect* clone() override;
-	std::u16string get_description() override;
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
 	virtual void save();
@@ -412,7 +401,6 @@ public:
 
 	object_tag_e m_type;
 	Object_tag(object_tag_e key);
-	std::u16string get_description() override;
 	virtual Object_tag* clone() = 0;
 	virtual bool on_turn();
 
@@ -612,7 +600,6 @@ public:
 	interaction_e m_subtype;
 	bool m_enable;
 	Instruction_slot_link();
-	std::u16string get_description() override;
 	virtual Instruction_slot_link* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
@@ -639,7 +626,6 @@ public:
 	bool m_result;
 
 	Instruction_slot_parameter();
-	std::u16string get_description() override;
 	virtual Object_interaction* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
@@ -656,7 +642,6 @@ public:
 	bool m_result;
 
 	Instruction_game_owner();
-	std::u16string get_description() override { return nullptr; };
 	virtual bool on_turn() { return false; };
 	virtual Object_interaction* clone() { return nullptr; };
 	virtual void apply_effect(GameObject* unit, Object_interaction* object) {};
@@ -673,7 +658,6 @@ public:
 	object_tag_e m_value;
 
 	Instruction_check_tag();
-	std::u16string get_description() override { return nullptr; };
 	virtual bool on_turn() { return false; };
 	virtual Instruction_check_tag* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
@@ -704,7 +688,6 @@ public:
 	body_part_e m_value;
 
 	Instruction_check_part_type();
-	std::u16string get_description() override { return nullptr; };
 	virtual bool on_turn() { return false; };
 	virtual Instruction_check_part_type* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
@@ -735,7 +718,6 @@ public:
 
 	Instruction_arg_extract();
 	virtual Instruction_arg_extract* clone();
-	std::u16string get_description() override { return nullptr; };
 	virtual bool on_turn() { return false; };
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 	void reset_serialization_index() override;
@@ -766,7 +748,6 @@ public:
 
 	Instruction_get_owner();
 	virtual Instruction_get_owner* clone();
-	std::u16string get_description() override { return nullptr; };
 	virtual bool on_turn() { return false; };
 	virtual void apply_effect(GameObject* unit, Object_interaction* object) ;
 	void reset_serialization_index() override;
@@ -811,7 +792,6 @@ public:
 	entity_e m_value;
 
 	Instruction_check_owner_type();
-	std::u16string get_description() override { return nullptr; };
 	virtual bool on_turn() { return false; };
 	virtual Instruction_check_owner_type* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);

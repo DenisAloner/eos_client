@@ -19,7 +19,7 @@ void Object_manager::update_buff()
 			e->apply_effect(*object, nullptr);
 			list->on_turn();
 		}
-		for (auto item = (*object)->m_active_state->m_items.begin(); item != (*object)->m_active_state->m_items.end(); item++)
+		for (auto item = (*object)->m_active_state->m_items.begin(); item != (*object)->m_active_state->m_items.end(); ++item)
 		{
 			if ((*item).second->m_interaction_message_type == interaction_message_type_e::list)
 			{

@@ -238,8 +238,7 @@ public:
 	bool is_own(int x, int y);
 	MapCell* get_center(MapCell* c);
 
-	virtual bool on_turn();
-	std::u16string get_description() override;
+	bool on_turn() override;
 	virtual Object_interaction* clone();
 	virtual void do_predicat(predicat func);
 	void apply_visitor(Visitor_generic& visitor) override;
@@ -325,7 +324,6 @@ public:
 
 	Object_part(GameObject* item = nullptr);
 	virtual bool on_turn();
-	std::u16string get_description() override;
 	virtual Object_part* clone();
 	virtual void do_predicat(Visitor& helper);
 	void apply_visitor(Visitor_generic& visitor) override;

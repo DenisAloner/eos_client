@@ -114,8 +114,7 @@ public:
 
 	Instruction_result();
 	virtual Instruction_result* clone() { return nullptr; };
-	std::u16string get_description() override { return nullptr; };
-	virtual bool on_turn() { return false; };
+	bool on_turn() override { return false; };
 	virtual void apply_effect(GameObject* unit, Object_interaction* object) {};
 
 	virtual void save() {};

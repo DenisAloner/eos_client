@@ -19,11 +19,6 @@ Object_interaction* Impact_copy_chance::clone()
 	return nullptr;
 }
 
-std::u16string Impact_copy_chance::get_description()
-{
-	return u"Impact_copy_chance";
-}
-
 void Impact_copy_chance::save()
 {
 	FILE* file = Serialization_manager::instance().m_file;

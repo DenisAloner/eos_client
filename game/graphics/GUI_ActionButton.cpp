@@ -62,9 +62,6 @@ void GUI_ActionButton::on_mouse_click(MouseEventArgs const& e)
 
 bool GUI_ActionButton::check_region(MouseEventArgs const& e)
 {
-	//char buf2[32];
-	//itoa(e.Position.x, buf2, 10);
-	//MessageBox(NULL, buf2, "eos", MB_OK);
 	if (this->m_position.x <= e.position.x&&this->m_position.x + m_size.w >= e.position.x&&this->m_position.y <= e.position.y&&this->m_position.y + m_size.h >= e.position.y)
 	{
 		return true;

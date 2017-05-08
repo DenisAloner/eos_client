@@ -369,12 +369,6 @@ bool GameObject::on_turn()
 	return false;
 }
 
-std::u16string GameObject::get_description()
-{
-	LOG(FATAL) << "Метод не описан.";
-	return u"";
-}
-
 Object_interaction* GameObject::clone()
 {
 	LOG(FATAL) << "Метод не описан.";
@@ -967,11 +961,6 @@ Object_part* Object_part::clone()
 bool Object_part::on_turn()
 {
 	return false;
-}
-
-std::u16string Object_part::get_description()
-{
-	return u"slot";
 }
 
 void Object_part::do_predicat(Visitor& helper)

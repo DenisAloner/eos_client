@@ -25,16 +25,6 @@ bool Interaction_list::on_turn()
 	return false;
 }
 
-std::u16string Interaction_list::get_description()
-{
-	std::u16string result = u"";
-	for (auto current = m_items.begin(); current != m_items.end(); ++current)
-	{
-		result += (*current)->get_description() + u",";
-	}
-	return result;
-}
-
 bool Interaction_list::update()
 {
 	return false;
@@ -248,16 +238,6 @@ bool Parameter_list::update()
 	return false;
 }
 
-std::u16string Parameter_list::get_description()
-{
-	std::u16string result = Parser::CP866_to_UTF16(std::to_string(m_value)) + u"/" + Parser::CP866_to_UTF16(std::to_string(m_limit)) + u",";
-	for (auto current = m_items.begin(); current != m_items.end(); ++current)
-	{
-		result += (*current)->get_description() + u",";
-	}
-	return result;
-}
-
 Parameter_list* Parameter_list::clone()
 {
 	Parameter_list* result = new Parameter_list(m_subtype);
@@ -359,17 +339,6 @@ bool Vision_list::update()
 	m_max_radius = 0;
 	update_list(this);
 	return false;
-}
-
-std::u16string Vision_list::get_description()
-{
-	/*std::string result = std::to_string(m_value) + "/" + std::to_string(m_limit) + ",";
-	for (auto current = m_items.begin(); current != m_items.end(); current++)
-	{
-		result += (*current)->get_description() + ",";
-	}
-	return result;*/
-	return u"empty";
 }
 
 Vision_list* Vision_list::clone()
@@ -550,17 +519,6 @@ bool Vision_component::update()
 	m_value = m_basic_value;
 	update_list(this);
 	return false;
-}
-
-std::u16string Vision_component::get_description()
-{
-	//std::string result = std::to_string(m_value) + "/" + std::to_string(m_limit) + ",";
-	//for (auto current = m_items.begin(); current != m_items.end(); current++)
-	//{
-	//	result += (*current)->get_description() + ",";
-	//}
-	//return result;
-	return u"";
 }
 
 Vision_component* Vision_component::clone()
@@ -1009,12 +967,6 @@ Interaction_copyist::Interaction_copyist()
 {
 }
 
-std::u16string Interaction_copyist::get_description()
-{
-	return u"slot";
-}
-
-
 Object_interaction* Interaction_copyist::clone()
 {
 	LOG(INFO) << "clone";
@@ -1076,11 +1028,6 @@ void Interaction_prefix::apply_effect(GameObject* unit, Object_interaction* obje
 	/*if (m_value) { m_value->apply_effect(unit, object); }*/
 }
 
-std::u16string Interaction_prefix::get_description()
-{
-	return u"none";
-}
-
 void Interaction_prefix::save()
 {
 	FILE* file = Serialization_manager::instance().m_file;
@@ -1100,11 +1047,6 @@ void Interaction_prefix::load()
 // Interaction_addon
 
 Interaction_addon::Interaction_addon() {};
-
-std::u16string Interaction_addon::get_description()
-{
-	return u"slot";
-}
 
 Object_interaction* Interaction_addon::clone()
 {
@@ -1154,11 +1096,6 @@ bool Interaction_time::on_turn()
 	else return false;
 }
 
-std::u16string Interaction_time::get_description()
-{
-	return u"slot";
-}
-
 Object_interaction* Interaction_time::clone()
 {
 	Interaction_time* effect = new Interaction_time();
@@ -1204,11 +1141,6 @@ bool Interaction_timer::on_turn()
 		m_turn = 0;
 	}
 	return m_value->on_turn();
-}
-
-std::u16string Interaction_timer::get_description()
-{
-	return u"slot";
 }
 
 Object_interaction* Interaction_timer::clone()
@@ -1268,11 +1200,6 @@ Effect* Effect::clone()
 	return effect;
 }
 
-std::u16string Effect::get_description()
-{
-	return Parser::m_string_effect_e[m_subtype] + u":" + Parser::CP866_to_UTF16(std::to_string(m_value));
-}
-
 void Effect::apply_effect(GameObject* unit, Object_interaction* object)
 {
 	switch (m_subtype)
@@ -1325,11 +1252,6 @@ Object_tag::Object_tag(object_tag_e key) :m_type(key)
 {
 	m_interaction_message_type = interaction_message_type_e::tag;
 };
-
-std::u16string Object_tag::get_description()
-{
-	return u"none";
-}
 
 bool Object_tag::on_turn()
 {
@@ -1657,11 +1579,6 @@ Instruction_slot_link::Instruction_slot_link()
 	m_enable = false;
 }
 
-std::u16string Instruction_slot_link::get_description()
-{
-	return u"slot";
-}
-
 
 Instruction_slot_link* Instruction_slot_link::clone()
 {
@@ -1804,12 +1721,6 @@ Instruction_slot_parameter::Instruction_slot_parameter()
 	m_value = nullptr;
 	m_interaction_message_type = interaction_message_type_e::instruction_slot_parameter;
 }
-
-std::u16string Instruction_slot_parameter::get_description()
-{
-	return u"slot";
-}
-
 
 Object_interaction* Instruction_slot_parameter::clone()
 {

@@ -869,7 +869,6 @@ public:
 	Object_interaction() { m_namename = u"base"; };
 	virtual void apply_effect(GameObject* unit, Object_interaction* object) {};
 	virtual bool on_turn() { return false; };
-	virtual std::u16string get_description() { return u""; };
 	virtual Object_interaction* clone() { return nullptr; };
 	virtual void do_predicat(Visitor& helper) { helper.visit(*this); };
 	virtual void apply_visitor(Visitor_generic& visitor);

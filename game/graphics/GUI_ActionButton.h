@@ -17,10 +17,10 @@ public:
 	GUI_ActionButton(int width, int height);
 	~GUI_ActionButton();
 
-	virtual void on_mouse_click(MouseEventArgs const& e);
-	virtual void on_mouse_move(MouseEventArgs const& e);
-	virtual void render(GraphicalController* Graph, int px, int py);	
-	virtual bool check_region(MouseEventArgs const& e);
+	void on_mouse_click(MouseEventArgs const& e) override;
+	void on_mouse_move(MouseEventArgs const& e) override;
+	void render(GraphicalController* Graph, int px, int py) override;
+	bool check_region(MouseEventArgs const& e) override;
 };
 
 #endif //GUI_ACTIONBUTTON_H
