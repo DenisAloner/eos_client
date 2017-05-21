@@ -9,6 +9,7 @@ void Object_manager::update_buff()
 {
 	Interaction_list* list;
 	Interaction_list* e;
+	Visitor_onturn_updater visitor;
 
 	for (auto object = m_items.begin(); object !=m_items.end(); ++object)
 	{
@@ -17,7 +18,8 @@ void Object_manager::update_buff()
 		{
 			e = list->clone();
 			e->apply_effect(*object, nullptr);
-			list->on_turn();
+			visitor.result = false;
+			list->apply_visitor(visitor);
 		}
 		for (auto item = (*object)->m_active_state->m_items.begin(); item != (*object)->m_active_state->m_items.end(); ++item)
 		{
@@ -26,7 +28,8 @@ void Object_manager::update_buff()
 				e = static_cast<Interaction_list*>((*item).second);
 				if (e->m_list_type == feature_list_type_e::parameter|| e->m_list_type == feature_list_type_e::parts|| e->m_list_type == feature_list_type_e::tag)
 				{
-					e->on_turn();
+					visitor.result = false;
+					e->apply_visitor(visitor);
 				}
 			}
 		}

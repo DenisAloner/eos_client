@@ -9,22 +9,6 @@ Interaction_list::Interaction_list()
 	m_list_type = feature_list_type_e::generic;
 }
 
-bool Interaction_list::on_turn()
-{
-	bool result = false;
-	for (auto item = m_items.begin(); item != m_items.end();)
-	{
-		if ((*item)->on_turn())
-		{
-			LOG(INFO) << "удалить!!";
-			item = m_items.erase(item);
-		}
-		else
-			++item;
-	}
-	return false;
-}
-
 bool Interaction_list::update()
 {
 	return false;
@@ -930,11 +914,6 @@ Interaction_slot::Interaction_slot()
 {
 }
 
-bool Interaction_slot::on_turn()
-{
-	return m_value->on_turn();
-}
-
 void Interaction_slot::do_predicat(Visitor& helper)
 {
 	helper.visit(*this);
@@ -1085,17 +1064,6 @@ Interaction_time::Interaction_time()
 
 }
 
-bool Interaction_time::on_turn()
-{
-	m_turn -= 1;
-	if (m_turn == 0)
-	{
-		m_value = nullptr;
-		return true;
-	}
-	else return false;
-}
-
 Object_interaction* Interaction_time::clone()
 {
 	Interaction_time* effect = new Interaction_time();
@@ -1131,16 +1099,6 @@ void Interaction_time::load()
 Interaction_timer::Interaction_timer()
 {
 	m_interaction_message_type = interaction_message_type_e::slot_time;
-}
-
-bool Interaction_timer::on_turn()
-{
-	m_turn += 1;
-	if (m_turn > m_period)
-	{
-		m_turn = 0;
-	}
-	return m_value->on_turn();
 }
 
 Object_interaction* Interaction_timer::clone()
@@ -1185,11 +1143,6 @@ void Interaction_timer::load()
 Effect::Effect(): m_value(0), m_subtype()
 {
 	m_interaction_message_type = interaction_message_type_e::effect;
-}
-
-bool Effect::on_turn()
-{
-	return false;
 }
 
 Effect* Effect::clone()
@@ -1252,11 +1205,6 @@ Object_tag::Object_tag(object_tag_e key) :m_type(key)
 {
 	m_interaction_message_type = interaction_message_type_e::tag;
 };
-
-bool Object_tag::on_turn()
-{
-	return false;
-}
 
 // ObjectTag::Poison_resist
 

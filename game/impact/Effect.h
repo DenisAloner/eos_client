@@ -13,7 +13,6 @@ public:
 	std::list<Object_interaction*> m_items;
 
 	Interaction_list();
-	bool on_turn() override;
 	virtual bool update();
 	virtual Interaction_list* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
@@ -255,7 +254,6 @@ public:
 	object_state_e m_value;
 	Slot_set_state() { m_interaction_message_type = interaction_message_type_e::set_attribute_map; };
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
-	virtual bool on_turn() { return false; };
 	virtual Slot_set_state* clone();
 	virtual void do_predicat(predicat func) { func(this); };
 
@@ -269,7 +267,6 @@ public:
 
 	Object_interaction* m_value;
 	Interaction_slot();
-	virtual bool on_turn();
 	virtual void do_predicat(Visitor& helper);
 	void reset_serialization_index() override;
 
@@ -332,7 +329,6 @@ public:
 
 	int m_turn;
 	Interaction_time();
-	virtual bool on_turn();
 	virtual Object_interaction* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
@@ -359,7 +355,6 @@ public:
 	int m_turn;
 	int m_period;
 	Interaction_timer();
-	virtual bool on_turn();
 	virtual Object_interaction* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
@@ -374,7 +369,6 @@ public:
 	int m_value;
 	effect_e m_subtype;
 	Effect();
-	virtual bool on_turn();
 	Effect* clone() override;
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
@@ -402,7 +396,6 @@ public:
 	object_tag_e m_type;
 	Object_tag(object_tag_e key);
 	virtual Object_tag* clone() = 0;
-	virtual bool on_turn();
 
 	constexpr static auto properties()
 	{
@@ -642,7 +635,6 @@ public:
 	bool m_result;
 
 	Instruction_game_owner();
-	virtual bool on_turn() { return false; };
 	virtual Object_interaction* clone() { return nullptr; };
 	virtual void apply_effect(GameObject* unit, Object_interaction* object) {};
 
@@ -658,7 +650,6 @@ public:
 	object_tag_e m_value;
 
 	Instruction_check_tag();
-	virtual bool on_turn() { return false; };
 	virtual Instruction_check_tag* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
@@ -688,7 +679,6 @@ public:
 	body_part_e m_value;
 
 	Instruction_check_part_type();
-	virtual bool on_turn() { return false; };
 	virtual Instruction_check_part_type* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
@@ -718,7 +708,6 @@ public:
 
 	Instruction_arg_extract();
 	virtual Instruction_arg_extract* clone();
-	virtual bool on_turn() { return false; };
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 	void reset_serialization_index() override;
 
@@ -748,7 +737,6 @@ public:
 
 	Instruction_get_owner();
 	virtual Instruction_get_owner* clone();
-	virtual bool on_turn() { return false; };
 	virtual void apply_effect(GameObject* unit, Object_interaction* object) ;
 	void reset_serialization_index() override;
 
@@ -792,7 +780,6 @@ public:
 	entity_e m_value;
 
 	Instruction_check_owner_type();
-	virtual bool on_turn() { return false; };
 	virtual Instruction_check_owner_type* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 

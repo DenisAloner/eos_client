@@ -363,11 +363,6 @@ GameObject::GameObject()
 	//rendering_necessary = false;
 }
 
-bool GameObject::on_turn()
-{
-	LOG(FATAL)<<"Метод не описан.";
-	return false;
-}
 
 Object_interaction* GameObject::clone()
 {
@@ -956,11 +951,6 @@ Object_part* Object_part::clone()
 	result->m_item = nullptr;
 	result->m_attributes = *m_attributes.clone();
 	return result;
-}
-
-bool Object_part::on_turn()
-{
-	return false;
 }
 
 void Object_part::do_predicat(Visitor& helper)

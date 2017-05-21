@@ -114,7 +114,6 @@ public:
 
 	Instruction_result();
 	virtual Instruction_result* clone() { return nullptr; };
-	bool on_turn() override { return false; };
 	virtual void apply_effect(GameObject* unit, Object_interaction* object) {};
 
 	virtual void save() {};

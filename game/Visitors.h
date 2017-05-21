@@ -88,4 +88,43 @@ public:
 
 };
 
+
+class Visitor_generic_updater :public Visitor_generic
+{
+public:
+
+	bool result;
+
+	void visit(GameObject& value) override;
+	void visit(Attribute_map& value) override;
+	void visit(Object_state& value) override;
+	void visit(Interaction_list& value) override;
+	void visit(Parameter_list& value) override;
+	void visit(Vision_list& value) override;
+	void visit(Vision_component& value) override;
+	void visit(Parts_list& value) override;
+	void visit(Tag_list& value) override;
+	void visit(Action_list& value) override;
+	void visit(Object_part& value) override;
+	void visit(ObjectTag::Requirements_to_object& value) override;
+	void visit(Instruction_slot_link& value) override;
+	void visit(Interaction_copyist& value) override;
+	void visit(Interaction_prefix& value) override;
+	void visit(Interaction_addon& value) override;
+	void visit(Interaction_time& value) override;
+	void visit(Interaction_timer& value) override;
+	void visit(Instruction_slot_parameter& value) override;
+
+};
+
+class Visitor_onturn_updater :public Visitor_generic_updater
+{
+public:
+
+	void visit(Interaction_time& value) override;
+	void visit(Interaction_timer& value) override;
+
+};
+
+
 #endif VISITORS_H

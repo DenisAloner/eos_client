@@ -38,7 +38,6 @@ public:
 	virtual char perfom(Parameter* parameter);
 	virtual std::u16string get_description(Parameter* parameter) = 0;
 	virtual void interaction_handler(Parameter* arg);
-	bool on_turn() override { return false; };
 	virtual Object_interaction* clone();
 
 	virtual void reset_serialization_index() { m_serialization_index = 0; };
@@ -71,7 +70,6 @@ public:
 
 	Action_wrapper();
 
-	virtual bool on_turn() { return false; };
 	virtual std::u16string get_description() { return u"действие"; };
 	virtual Action_wrapper* clone();
 	//virtual void perfom(Parameter* parameter);
