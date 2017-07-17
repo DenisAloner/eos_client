@@ -831,6 +831,10 @@ GUI_MapViewer::GUI_MapViewer(Application* app)
 	m_size = app->m_size;
 	m_shift.x = (m_size.w / 2) - tile_size_x_half;// (m_tile_count_x)* 32 * 0.5;
 	m_shift.y = (m_size.h / 2) - (m_tile_count_y)* tile_size_y_half - tile_size_y_half;// 1024 * 0.5 - (m_tile_count_y + 6) * 18 * 0.5;
+
+	/*m_shift.x = 0;
+	m_shift.y = 0;*/
+
 }
 
 GUI_MapViewer::~GUI_MapViewer(void)
@@ -1487,9 +1491,9 @@ void GUI_MapViewer::on_lose_focus(GUI_Object* sender)
 
 position_t GUI_MapViewer::local_xy(position_t p)
 {
-	float x = (p.x - m_shift.x) / tile_size_x;
-	float y = (p.y - m_shift.y)/ tile_size_y;
-	position_t Result = position_t(m_tile_count_x - (m_tile_count_y - x - m_tile_count_x + y + 1), m_tile_count_y - (x + y));
+	float x = (p.x - m_shift.x - tile_size_x_half) / tile_size_x;
+	float y = (p.y - m_shift.y) / tile_size_y;
+	position_t Result = position_t(m_tile_count_x - (m_tile_count_y - x - m_tile_count_x + y), m_tile_count_y - (x + y));
 	
 	if (Result.x > m_tile_count_x - 1) { Result.x = m_tile_count_x - 1; }
 	if (Result.x < 0) { Result.x = 0; }

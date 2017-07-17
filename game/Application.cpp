@@ -150,12 +150,8 @@ void Application::render()
 		}
 		glColor4d(1.0, 1.0, 1.0, 1.0);
 		glBindTexture(GL_TEXTURE_2D, m_mouse->m_cursor);
-//#warning TODO Избавиться от магических чисел!
-		
 		GraphicalController::rectangle_t rect(mouse.x, mouse.y, 48, 48);
 		m_graph->draw_sprite(rect);
-		//m_graph->draw_sprite(mouse.x, mouse.y, mouse.x, mouse.y + 48, mouse.x + 48, mouse.y + 48, mouse.x + 48, mouse.y);
-		
 	}
 	m_update_mutex.unlock();
 }
