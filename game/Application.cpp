@@ -152,6 +152,12 @@ void Application::render()
 		glBindTexture(GL_TEXTURE_2D, m_mouse->m_cursor);
 		GraphicalController::rectangle_t rect(mouse.x, mouse.y, 48, 48);
 		m_graph->draw_sprite(rect);
+
+		/*glDisable(GL_TEXTURE_2D);
+		glDisable(GL_BLEND);
+		m_graph->draw_rectangle(rect);
+		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_BLEND);*/
 	}
 	m_update_mutex.unlock();
 }
