@@ -1183,7 +1183,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 								glBindTexture(GL_TEXTURE_2D, Sprite);
 								Graph->set_uniform_sampler(Graph->m_mask_shader, "Unit", 1);
 								glActiveTexture(GL_TEXTURE0);
-								Graph->draw_tile_FBO(rect.a.x / static_cast<float>(m_size.w), (m_size.h - rect.a.y) / (float)m_size.h, rect.b.x / (float)m_size.w, (m_size.h - rect.b.y) / (float)m_size.h, rect);
+								Graph->draw_tile_FBO(rect.a.x / static_cast<float>(m_size.w), (m_size.h - rect.a.y) / static_cast<float>(m_size.h), rect.b.x / static_cast<float>(m_size.w), (m_size.h - rect.b.y) / static_cast<float>(m_size.h), rect);
 							}
 
 						}
