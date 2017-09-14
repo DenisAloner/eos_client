@@ -857,6 +857,18 @@ public:
 
 class Visitor_generic;
 
+class Apply_info
+{
+public:
+
+	GameObject* m_unit; 
+	Object_interaction* m_object;
+
+	Apply_info(GameObject* unit = nullptr, Object_interaction* object = nullptr);
+
+};
+
+
 class Object_interaction : public virtual iSerializable
 {
 public:
@@ -868,6 +880,8 @@ public:
 	std::u16string m_namename;
 	Object_interaction() { m_namename = u"base"; };
 	virtual void apply_effect(GameObject* unit, Object_interaction* object) {};
+
+	virtual void apply(Apply_info& value) {};
 	virtual Object_interaction* clone() { return nullptr; };
 	virtual void do_predicat(Visitor& helper) { helper.visit(*this); };
 	virtual void apply_visitor(Visitor_generic& visitor);

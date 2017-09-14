@@ -1564,61 +1564,61 @@ void Instruction_slot_link::apply_effect(GameObject* unit, Object_interaction* o
 	}
 	case interaction_message_type_e::instruction_result:
 	{
-			Instruction_result* ir = static_cast<Instruction_result*>(object);
-			Parameter_argument_t& a = ir->m_value;
-			switch (a.kind)
+		Instruction_result* ir = static_cast<Instruction_result*>(object);
+		Parameter_argument_t& a = ir->m_value;
+		switch (a.kind)
+		{
+		case type_e::gameobject:
+		{
+			auto i = a.m_object->m_active_state->get_list(m_subtype);
+			if (i)
 			{
-			case type_e::gameobject:
-			{
-				auto i = a.m_object->m_active_state->get_list(m_subtype);
-				if (i)
+				if (m_enable)
 				{
-					if (m_enable)
-					{
-						i->remove(m_value);
-						m_enable = false;
-					}
-					else
-					{
-						i->add(m_value);
-						m_enable = true;
-					}
+					i->remove(m_value);
+					m_enable = false;
 				}
-				break;
-			}
-			case type_e::object_owner:
-			{
-				Interaction_list* i = nullptr;
-				switch(a.m_owner->m_kind)
+				else
 				{
-				case entity_e::body_part:
-					{
-					i = static_cast<Object_part*>(a.m_owner)->m_attributes.get_list(m_subtype);
-					break;
-					}
-				case entity_e::game_object:
-				{
-					i = static_cast<GameObject*>(a.m_owner)->m_active_state->get_list(m_subtype);
-					break;
+					i->add(m_value);
+					m_enable = true;
 				}
-				}
-				if (i)
-				{
-					if (m_enable)
-					{
-						i->remove(m_value);
-						m_enable = false;
-					}
-					else
-					{
-						i->add(m_value);
-						m_enable = true;
-					}
-				}
-				break;
-			}
 			}
 			break;
+		}
+		case type_e::object_owner:
+		{
+			Interaction_list* i = nullptr;
+			switch (a.m_owner->m_kind)
+			{
+			case entity_e::body_part:
+			{
+				i = static_cast<Object_part*>(a.m_owner)->m_attributes.get_list(m_subtype);
+				break;
+			}
+			case entity_e::game_object:
+			{
+				i = static_cast<GameObject*>(a.m_owner)->m_active_state->get_list(m_subtype);
+				break;
+			}
+			}
+			if (i)
+			{
+				if (m_enable)
+				{
+					i->remove(m_value);
+					m_enable = false;
+				}
+				else
+				{
+					i->add(m_value);
+					m_enable = true;
+				}
+			}
+			break;
+		}
+		}
+		break;
 	}
 	default:
 	{
@@ -1628,7 +1628,6 @@ void Instruction_slot_link::apply_effect(GameObject* unit, Object_interaction* o
 		auto i = part->m_attributes.get_list(m_subtype);
 		if (i)
 		{
-			Instruction_slot_parameter* p = static_cast<Instruction_slot_parameter*>(object);
 			if (m_enable)
 			{
 				i->remove(m_value);
@@ -1738,7 +1737,7 @@ void ObjectTag::Equippable::apply_effect(GameObject* unit, Object_interaction* o
 	{
 		
 		Instruction_slot_parameter* parameter = static_cast<Instruction_slot_parameter*>(object);
-		Parameter& p(*(parameter->m_parameter));
+		Parameter& p(*parameter->m_parameter);
 
 		switch (p[2].m_owner->m_kind)
 		{
@@ -1752,7 +1751,6 @@ void ObjectTag::Equippable::apply_effect(GameObject* unit, Object_interaction* o
 		}
 		case entity_e::body_part:
 		{
-			
 			Instruction_game_owner* i = new Instruction_game_owner();
 			i->m_value = p[2].m_owner;
 			m_condition->apply_effect(unit, i);
@@ -1813,10 +1811,9 @@ void ObjectTag::Equippable::apply_effect(GameObject* unit, Object_interaction* o
 		}
 		case entity_e::body_part:
 		{
-			Parameter* p = static_cast<Instruction_slot_parameter*>(parameter)->m_parameter;
-			Object_part* part = static_cast<Object_part*>((*p)[2].m_owner);
-			part->m_item = (*p)[1].m_object;
-			(*p)[1].m_object->m_owner = part;
+			Object_part* part = static_cast<Object_part*>(p[2].m_owner);
+			part->m_item = p[1].m_object;
+			p[1].m_object->m_owner = part;
 			if (m_value) { m_value->apply_effect(unit, object); }
 			break;
 		}

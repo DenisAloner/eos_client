@@ -290,7 +290,7 @@ public:
 	interaction_e m_subtype;
 	Interaction_copyist();
 	virtual Object_interaction* clone();
-	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	void apply_effect(GameObject* unit, Object_interaction* object) override;
 
 	virtual void save();
 	virtual void load();

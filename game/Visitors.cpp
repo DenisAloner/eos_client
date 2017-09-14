@@ -269,7 +269,8 @@ void Visitor_generic_updater::visit(Parts_list& value)
 		else
 			++current;
 	}
-	result = value.m_items.empty();
+	//result = value.m_items.empty();
+	result = false;
 }
 
 void Visitor_generic_updater::visit(Object_part& value)

@@ -126,5 +126,4 @@ public:
 
 };
 
-
 #endif VISITORS_H

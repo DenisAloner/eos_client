@@ -25,6 +25,10 @@ std::u16string Packer<Action>::to_json(iSerializable* object)
 	return object_to_json<Action>(dynamic_cast<Action*>(object));
 }
 
+Apply_info::Apply_info(GameObject* unit, Object_interaction* object):m_unit(unit),m_object(object)
+{
+}
+
 void Object_interaction::apply_visitor(Visitor_generic& visitor)
 {
 }
