@@ -990,182 +990,384 @@ public:
 		static constexpr bool value = true;
 	};
 
-	template<typename T> static void from_json(const std::u16string value, typename std::enable_if<is_list<T>::value, T& >::type prop)
+	template<class T> struct always_false : std::false_type {};
+
+	template<typename T> static void from_json(const std::u16string value, T& prop)
 	{
-		using Value = typename T::value_type;
-		std::u16string temp = value;
-		scheme_list_t* s = read_array(temp);
-		if (s)
+		if constexpr (std::is_pointer<T>::value)
 		{
-			for (auto element : (*s))
+			if constexpr(std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value)
 			{
-				Value v;
-				from_json<Value>(element,v);
-				prop.push_back(v);
-			}
-		}
-		delete s;
-	};
-
-	/*template<typename T> static void from_json(const std::u16string value, typename std::enable_if<is_pair<T>::value, T& >::type prop)
-	{
-		LOG(INFO) << "ÏÀÐÀ";
-		using Key = typename T::first_type;
-		using Value = typename T::second_type;
-		std::u16string temp = value;
-		scheme_vector_t* s = read_pair(temp);
-		std::remove_const_t<Key> key;
-		from_json<std::remove_const_t<Key>>((*s)[0], key);
-		prop.first=key;
-		from_json<Value>((*s)[1], prop.second);
-	};*/
-
-	template<typename T> static void from_json(const std::u16string value, typename std::enable_if<is_map<T>::value, T& >::type prop)
-	{
-		using Key = typename T::key_type;
-		using Value = typename T::mapped_type;
-		std::u16string temp = value;
-		scheme_list_t* s = read_array(temp);
-		Key k;
-		Value v;
-		if(s)
-		{
-			for (auto element : (*s))
-			{
-				scheme_vector_t* p = read_pair(element);
-				from_json<Key>((*p)[0],k);
-				from_json<Value>((*p)[1], v);
-				prop[k]=v;
-				delete p;
-			}
-			delete s;
-		}
-	};
-
-
-	template<typename T> static void from_json(const std::u16string value, typename std::enable_if<std::is_pointer<T>::value&&std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T& >::type prop)
-	{
-		std::u16string temp(value);
-		scheme_map_t* s = read_object(temp);
-		if (s)
-		{
-			prop = dynamic_cast<T>(m_classes[get_value((*s)[u"$type"])](s));
-			LOG(INFO) << UTF16_to_CP866(prop->get_packer().get_type());
-			delete s;
-			return;
-		}
-		prop = nullptr;
-	}
-
-	template<typename T> static void from_json(const std::u16string value, typename std::enable_if<std::is_pointer<T>::value && !std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T& >::type prop);
-
-	template<typename T> static void from_json(const std::u16string value, typename std::enable_if<!std::is_pointer<T>::value&&!std::is_enum<T>::value && !is_pair<T>::value && !is_list<T>::value && !is_map<T>::value && !std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T& >::type prop);
-
-
-	template<typename T> static void from_json(const std::u16string value, typename std::enable_if<!std::is_pointer<T>::value&&std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T&>::type prop)
-	{
-		std::u16string temp(value);
-		scheme_map_t* s = read_object(temp);
-		prop.get_packer().from_json(&prop, s);
-		delete s;
-	};
-
-	template<typename T> static std::u16string to_json(typename std::enable_if< !std::is_enum<T>::value && !std::is_pointer<T>::value && !is_list<T>::value && !is_map<T>::value && !is_pair<T>::value && !std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T >::type value);
-
-	template<typename T> static std::u16string to_json(typename std::enable_if<std::is_pointer<T>::value&&std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T>::type value)
-	{
-		if (value)
-		{
-			if (value->get_packer().is_singleton())
-			{
-				LOG(INFO) << UTF16_to_CP866(value->get_packer().get_type());
-				std::u16string result = value->get_packer().to_json(value);
-				if (result.empty())
+				std::u16string temp(value);
+				scheme_map_t* s = read_object(temp);
+				if (s)
 				{
-					std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type() + u"\"}";
-					return out;
+					prop = dynamic_cast<T>(m_classes[get_value((*s)[u"$type"])](s));
+					LOG(INFO) << UTF16_to_CP866(prop->get_packer().get_type());
+					delete s;
+					return;
+				}
+				prop = nullptr;
+			}
+			else if constexpr(std::is_same<T, predicat_t*>::value)
+			{
+				LOG(INFO) << Parser::UTF16_to_CP866(get_value(value)) << Parser::UTF16_to_CP866(value);
+				if (get_value(value) == u"null")
+				{
+					prop = nullptr;
 				}
 				else
 				{
-					std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type() + u"\"," + result + u"}";
-					return out;
+					int result = to_int(value);
+					prop = Application::instance().m_ai_manager->m_path_qualifiers[result];
+				}
+			}
+			else if constexpr(std::is_same<T, light_t*>::value)
+			{
+				LOG(INFO) << Parser::UTF16_to_CP866(get_value(value)) << Parser::UTF16_to_CP866(value);
+				if (get_value(value) == u"null")
+				{
+					prop = nullptr;
+				}
+				else
+				{
+					prop = new light_t();
+					std::u16string temp = value;
+					scheme_vector_t* s = read_pair(temp);
+					from_json<int>((*s)[0], prop->R);
+					from_json<int>((*s)[1], prop->G);
+					from_json<int>((*s)[2], prop->B);
+				}
+			}
+			else if constexpr(std::is_same<T, optical_properties_t*>::value)
+			{
+				LOG(INFO) << Parser::UTF16_to_CP866(get_value(value)) << Parser::UTF16_to_CP866(value);
+				if (get_value(value) == u"null")
+				{
+					prop = nullptr;
+				}
+				else
+				{
+					prop = new optical_properties_t();
+					std::u16string temp = value;
+					scheme_vector_t* s = read_pair(temp);
+					from_json<float>((*s)[0], prop->attenuation.R);
+					from_json<float>((*s)[1], prop->attenuation.G);
+					from_json<float>((*s)[2], prop->attenuation.B);
 				}
 			}
 			else
+				static_assert(always_false<T>::value, "<from_json> for this type not found");
+		}
+		else if constexpr(std::is_enum<T>::value)
+		{
+			std::size_t start_pos = value.find(u'"');
+			if (start_pos != std::string::npos)
 			{
-				switch (value->m_serialization_index)
+				std::size_t end_pos = value.find(u'"', start_pos + 1);
+				if (end_pos != std::string::npos)
 				{
-				case 0:
+					prop = get_dictonary<T>().get_enum(UTF16_to_CP866(value.substr(start_pos + 1, end_pos - start_pos - 1)));
+					return;
+				}
+			}
+			prop = static_cast<T>(0);
+		}
+		else if constexpr(std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value)
+		{
+			std::u16string temp(value);
+			scheme_map_t* s = read_object(temp);
+			prop.get_packer().from_json(&prop, s);
+			delete s;
+		}
+		else if constexpr(is_list<T>::value)
+		{
+			using Value = typename T::value_type;
+			std::u16string temp = value;
+			scheme_list_t* s = read_array(temp);
+			if (s)
+			{
+				for (auto element : (*s))
 				{
-					m_object_index += 1;
-					value->m_serialization_index = m_object_index;
-					LOG(INFO) << UTF16_to_CP866(value->get_packer().get_type());
-					std::u16string result = value->get_packer().to_json(value);
-					if (result.empty())
+					Value v;
+					from_json<Value>(element, v);
+					prop.push_back(v);
+				}
+			}
+			delete s;
+		}
+		else if constexpr(is_map<T>::value)
+		{
+			using Key = typename T::key_type;
+			using Value = typename T::mapped_type;
+			std::u16string temp = value;
+			scheme_list_t* s = read_array(temp);
+			Key k;
+			Value v;
+			if (s)
+			{
+				for (auto element : (*s))
+				{
+					scheme_vector_t* p = read_pair(element);
+					from_json<Key>((*p)[0], k);
+					from_json<Value>((*p)[1], v);
+					prop[k] = v;
+					delete p;
+				}
+				delete s;
+			}
+		}
+		else if constexpr(std::is_same<T, int>::value)
+		{
+			const char16_t* opening_symbol = nullptr;
+			for (std::size_t i = 0; i < value.size(); ++i)
+			{
+				switch (value[i])
+				{
+				case u'0':case u'1':case u'2':case u'3':case u'4':case u'5':case u'6':case u'7':case u'8':case u'9':
+				{
+					if (opening_symbol == nullptr)
 					{
-						std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type() + u"\",\"$link_id\":" + to_u16string(value->m_serialization_index) + u"}";
-						return out;
-					}
-					else
-					{
-						std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type() + u"\",\"$link_id\":" + to_u16string(value->m_serialization_index) + u"," + result + u"}";
-						return out;
+						opening_symbol = &value[i];
 					}
 					break;
 				}
 				default:
 				{
-					std::u16string out = u"{\"$type\":\"link\",\"value\":" + to_u16string(value->m_serialization_index) + u"}";
-					return out;
-
+					if (opening_symbol != nullptr)
+					{
+						break;
+					}
 					break;
 				}
 				}
 			}
+			if (opening_symbol != nullptr)
+			{
+				static std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> convert;
+				std::u16string value(opening_symbol, &value[value.size() - 1] - opening_symbol + 1);
+				std::wstring ws = convert.from_bytes(
+					reinterpret_cast<const char*> (value.data()),
+					reinterpret_cast<const char*> (value.data() + value.size()));
+				prop = std::stoi(ws);
+			}
+			else
+			{
+				prop = 0;
+			}
+		}
+		else if constexpr(std::is_same<T, std::u16string>::value)
+		{
+			std::size_t start_pos = value.find(u'"');
+			if (start_pos != std::string::npos)
+			{
+				std::size_t end_pos = value.find(u'"', start_pos + 1);
+				if (end_pos != std::string::npos)
+				{
+					prop = value.substr(start_pos + 1, end_pos - start_pos - 1);
+					return;
+				}
+			}
+			prop = value;
+		}
+		else if constexpr(std::is_same<T, std::string>::value)
+		{
+			std::size_t start_pos = value.find(u'"');
+			if (start_pos != std::string::npos)
+			{
+				std::size_t end_pos = value.find(u'"', start_pos + 1);
+				if (end_pos != std::string::npos)
+				{
+					prop = UTF16_to_CP866(value.substr(start_pos + 1, end_pos - start_pos - 1));
+					return;
+				}
+			}
+			prop = UTF16_to_CP866(value);
+		}
+		else if constexpr(std::is_same<T, std::size_t>::value)
+		{
+			std::size_t result = to_int(value);
+			prop = result;
+		}
+		else if constexpr(std::is_same<T, float>::value)
+		{
+			float result = to_float(value);
+			prop = result;
+		}
+		else if constexpr(std::is_same<T, AI_FOV>::value)
+		{
+			std::u16string temp = value;
+			scheme_vector_t* s = read_pair(temp);
+			from_json<int>((*s)[0], prop.radius);
+			int x;
+			from_json<int>((*s)[1], x);
+			prop.qualifier = Application::instance().m_ai_manager->m_fov_qualifiers[x];
+			from_json<int>((*s)[2], prop.start_angle);
+			from_json<int>((*s)[3], prop.end_angle);
+		}
+		else if constexpr(std::is_same<T, game_object_size_t>::value)
+		{
+			std::u16string temp = value;
+			scheme_vector_t* s = read_pair(temp);
+			from_json<int>((*s)[0], prop.x);
+			from_json<int>((*s)[1], prop.y);
+			from_json<int>((*s)[2], prop.z);
 		}
 		else
-		{
-			return u"null";
-		}
-	}
-
-	template<typename T> static std::u16string to_json(typename std::enable_if<!std::is_pointer<T>::value&&std::is_base_of<iSerializable, T>::value, T>::type value)
-	{
-		return serialize_object(&value);
-	}
-
-	template<typename T> static std::u16string to_json(typename std::enable_if< std::is_pointer<T>::value && !is_list<T>::value && !is_map<T>::value && !is_pair<T>::value && !std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value, T >::type value)
-	{
-		if (value == nullptr)
-		{
-			return u"null";
-		}
-		else
-		{
-			using Type = typename std::remove_pointer_t<T>&;
-			return Parser::to_json<Type>(*value);
-		}
-	}
-
-	template<typename T> static std::u16string to_json(typename std::enable_if< is_list<T>::value || is_map<T>::value, T >::type value)
-	{
-		using Value = typename T::value_type;
-		std::u16string result = u"[";
-		for (auto element : (value))
-		{
-			if (result != u"[") { result += u","; }
-			result += Parser::to_json<Value>(element);
-		}
-		result += u"]";
-		return result;
+			static_assert(always_false<T>::value, "<from_json> for this type not found");
 	};
 
-	template<typename T> static std::u16string to_json(typename std::enable_if< is_pair<T>::value, T >::type value)
+	template<typename T> static std::u16string to_json(T value)
 	{
-		using Key = typename T::first_type;
-		using Value = typename T::second_type;
-		std::u16string result = u"[" + Parser::to_json<std::remove_const_t<Key>>(value.first) + u"," + Parser::to_json<Value>(value.second) + u"]";
-		return result;
+		if constexpr(std::is_pointer<T>::value)
+		{
+			if constexpr(std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value)
+			{
+				if (value)
+				{
+					if (value->get_packer().is_singleton())
+					{
+						LOG(INFO) << UTF16_to_CP866(value->get_packer().get_type());
+						std::u16string result = value->get_packer().to_json(value);
+						if (result.empty())
+						{
+							std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type() + u"\"}";
+							return out;
+						}
+						else
+						{
+							std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type() + u"\"," + result + u"}";
+							return out;
+						}
+					}
+					else
+					{
+						switch (value->m_serialization_index)
+						{
+						case 0:
+						{
+							m_object_index += 1;
+							value->m_serialization_index = m_object_index;
+							LOG(INFO) << UTF16_to_CP866(value->get_packer().get_type());
+							std::u16string result = value->get_packer().to_json(value);
+							if (result.empty())
+							{
+								std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type() + u"\",\"$link_id\":" + to_u16string(value->m_serialization_index) + u"}";
+								return out;
+							}
+							else
+							{
+								std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type() + u"\",\"$link_id\":" + to_u16string(value->m_serialization_index) + u"," + result + u"}";
+								return out;
+							}
+							break;
+						}
+						default:
+						{
+							std::u16string out = u"{\"$type\":\"link\",\"value\":" + to_u16string(value->m_serialization_index) + u"}";
+							return out;
+
+							break;
+						}
+						}
+					}
+				}
+				else
+				{
+					return u"null";
+				}
+
+			}
+			else if constexpr(!is_list<T>::value && !is_map<T>::value && !is_pair<T>::value && !std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value)
+			{
+				if (value == nullptr)
+				{
+					return u"null";
+				}
+				else
+				{
+					using Type = typename std::remove_pointer_t<T>&;
+					return Parser::to_json<Type>(*value);
+				}
+			}
+			else static_assert(always_false<T>::value, "<to_json> for this type not found");
+		}
+		else if constexpr(std::is_base_of<iSerializable, T>::value)
+		{
+			return serialize_object(&value);
+		}
+		else if constexpr(is_list<T>::value || is_map<T>::value)
+		{
+			using Value = typename T::value_type;
+			std::u16string result = u"[";
+			for (auto element : (value))
+			{
+				if (result != u"[") { result += u","; }
+				result += Parser::to_json<Value>(element);
+			}
+			result += u"]";
+			return result;
+		}
+		else if constexpr(is_pair<T>::value)
+		{
+			using Key = typename T::first_type;
+			using Value = typename T::second_type;
+			std::u16string result = u"[" + Parser::to_json<std::remove_const_t<Key>>(value.first) + u"," + Parser::to_json<Value>(value.second) + u"]";
+			return result;
+		}
+		else if constexpr(std::is_enum<T>::value)
+		{
+			std::u16string out = u"\"" + CP866_to_UTF16(get_dictonary<T>().get_string(value)) + u"\"";
+			return out;
+		}
+		else if constexpr(std::is_same<T, int>::value)
+		{
+			return to_u16string(value);
+		}
+		else if constexpr(std::is_same<T, std::u16string>::value)
+		{
+			return u"\"" + value + u"\"";
+		}
+		else if constexpr(std::is_same<T, std::string>::value)
+		{
+			return u"\"" + CP866_to_UTF16(value) + u"\"";
+		}
+		else if constexpr(std::is_same<T, game_object_size_t >::value)
+		{
+			std::u16string result = u"[" + to_json<int>(value.x) + u"," + to_json<int>(value.y) + u"," + to_json<int>(value.z) + u"]";
+			return result;
+		}
+		else if constexpr(std::is_same<T, predicat_t&>::value)
+		{
+			std::u16string out = to_u16string(value.index);
+			return out;
+		}
+		else if constexpr(std::is_same<T, std::size_t>::value)
+		{
+			std::u16string out = to_u16string(value);
+			return out;
+		}
+		else if constexpr(std::is_same<T, light_t&>::value)
+		{
+			std::u16string result = u"[" + to_json<int>(value.R) + u"," + to_json<int>(value.G) + u"," + to_json<int>(value.B) + u"]";
+			return result;
+		}
+		else if constexpr(std::is_same<T, float>::value)
+		{
+			std::u16string out = float_to_u16string(value);
+			return out;
+		}
+		else if constexpr(std::is_same<T, optical_properties_t&>::value)
+		{
+			std::u16string result = u"[" + to_json<float>(value.attenuation.R) + u"," + to_json<float>(value.attenuation.G) + u"," + to_json<float>(value.attenuation.B) + u"]";
+			return result;
+		}
+		else if constexpr(std::is_same<T, AI_FOV>::value)
+		{
+			std::u16string result = u"[" + to_json<int>(value.radius) + u"," + to_json<int>(value.qualifier->index) + u"," + to_json<int>(value.start_angle) + u"," + to_json<int>(value.end_angle) + u"]";
+			return result;
+		}
+		else static_assert(always_false<T>::value, "<to_json> for this type not found");
 	};
 
 	template<typename T> static Dictonary<T>& get_dictonary();
@@ -1213,27 +1415,6 @@ public:
 	template<> static Dictonary<effect_e>& get_dictonary<effect_e>()
 	{
 		return m_json_effect_e;
-	}
-
-	template<typename T> static inline void from_json(const std::u16string value, typename std::enable_if<std::is_enum<T>::value, T&>::type prop) 
-	{
-		std::size_t start_pos = value.find(u'"');
-		if (start_pos != std::string::npos)
-		{
-			std::size_t end_pos = value.find(u'"', start_pos + 1);
-			if (end_pos != std::string::npos)
-			{
-				prop=get_dictonary<T>().get_enum(UTF16_to_CP866(value.substr(start_pos + 1, end_pos - start_pos - 1)));
-				return;
-			}
-		}
-		prop=static_cast<T>(0);
-	}
-
-	template<typename T> static inline std::u16string to_json(typename std::enable_if<std::is_enum<T>::value, T>::type value)
-	{
-		std::u16string out = u"\"" + CP866_to_UTF16(get_dictonary<T>().get_string(value)) + u"\"";
-		return out;
 	}
 
 	template<typename T,typename P> static void from_json(const std::u16string value, typename std::enable_if<!std::is_same<T,P>::value, T&>::type prop);

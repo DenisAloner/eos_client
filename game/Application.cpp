@@ -245,7 +245,7 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 void Application::new_game()
 {
 	m_world = new Game_world();
-	GameMap* map = new GameMap(dimension_t(40, 40));
+	GameMap* map = new GameMap(dimension_t(100, 100));
 	map->generate_room();
 	m_world->m_maps.push_back(map);
 	int rx = 10;
