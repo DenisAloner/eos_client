@@ -205,6 +205,7 @@ std::unordered_map<object_tag_e, std::u16string>  Parser::m_string_object_tag_e 
 std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> Parser::m_convert;
 
 std::size_t Parser::m_object_index = 0;
+unsigned int Parser::m_type_id_counter = 0;
 
 Parser::Parser()
 {
@@ -220,16 +221,16 @@ std::u16string Parser::serialize_object(iSerializable* value)
 {
 	if (value)
 	{
-		LOG(INFO) << UTF16_to_CP866(value->get_packer().get_type());
+		LOG(INFO) << UTF16_to_CP866(value->get_packer().get_type_name());
 		std::u16string result = value->get_packer().to_json(value);
 		if (result.empty())
 		{
-			std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type() + u"\"}";
+			std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\"}";
 			return out;
 		}
 		else
 		{
-			std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type() + u"\"," + result + u"}";
+			std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\"," + result + u"}";
 			return out;
 		}
 	}

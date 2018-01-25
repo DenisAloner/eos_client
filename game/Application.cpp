@@ -259,6 +259,7 @@ void Application::new_game()
 	obj->reset_serialization_index();
 	std::string json = Parser::UTF16_to_CP866(Parser::to_json<GameObject*>(obj));
 	LOG(INFO) << json;
+	LOG(INFO) << std::to_string(obj->get_packer().get_type_id());
 
 	m_gui_controller.m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player, map, m_action_manager, m_game_log);
 

@@ -645,67 +645,47 @@ constexpr auto make_union(A a, B b) {
 	return std::tuple_cat(a,b);
 }
 
-template<typename T, typename P>
-void property_from_json(T* object, scheme_map_t& data, typename std::enable_if<std::is_same<typename P::Type, typename P::PropType>::value, P&>::type property)
+template<typename T, typename P> void property_from_json(T* object, scheme_map_t& data, P& property)
 {
-	
-	Parser::from_json<typename P::Type>(data[property.name], (*object.*(property.member)));
+	if constexpr(std::is_same<typename P::Type, typename P::PropType>::value)
+		Parser::from_json<typename P::Type>(data[property.name], (*object.*(property.member)));
+	else
+		Parser::from_json<typename P::Type, P::PropType>(data[property.name], (*object.*(property.member)));
 }
 
-template<typename T, typename P>
-void property_from_json(T* object, scheme_map_t& data, typename std::enable_if<!std::is_same<typename P::Type, typename P::PropType>::value, P&>::type property)
+template<std::size_t iteration, typename T> void set_property(T* object, scheme_map_t& data)
 {
-
-	Parser::from_json<typename P::Type, P::PropType>(data[property.name], (*object.*(property.member)));
-}
-
-template<std::size_t iteration, typename T>
-std::enable_if_t<(iteration > 0)> set_property(T* object, scheme_map_t& data) {
 	constexpr auto property = std::get<iteration>(T::properties());
-	using Type = typename decltype(property);
-	property_from_json<T,Type>(object, data, property);
-	set_property<iteration - 1, T>(object, data);
+	using Type = decltype(property);
+	property_from_json<T, Type>(object, data, property);
+	if constexpr(iteration > 0) set_property<iteration - 1, T>(object, data);
 }
 
-template<std::size_t iteration, typename T>
-std::enable_if_t<(iteration == 0)> set_property(T* object, scheme_map_t& data) {
-	constexpr auto property = std::get<iteration>(T::properties());
-	using Type = typename decltype(property);
-	property_from_json<T,Type>(object, data,property);
-}
-
-template<typename T>
-void object_from_json(T* object, scheme_map_t* value) {
+template<typename T> void object_from_json(T* object, scheme_map_t* value)
+{
 	set_property<std::tuple_size<decltype(T::properties())>::value - 1, T>(object, *value);
 }
 
-template<typename T,typename P>
-std::u16string property_to_json(T* object,typename std::enable_if<std::is_same<typename P::Type,typename P::PropType>::value,P&>::type property) {
-	
-	return u"\"" + std::u16string(property.name) + u"\":" + Parser::to_json<typename P::Type>(*object.*(property.member));
+template<typename T, typename P> std::u16string property_to_json(T* object, P& property)
+{
+	if constexpr(std::is_same<typename P::Type, typename P::PropType>::value)
+		return u"\"" + std::u16string(property.name) + u"\":" + Parser::to_json<typename P::Type>(*object.*(property.member));
+	else
+		return u"";
 }
 
-template<typename T, typename P>
-std::u16string property_to_json(T* object, typename std::enable_if<!std::is_same<typename P::Type, typename P::PropType>::value, P&>::type property) {
-	return u"";
-}
-
-template<std::size_t iteration, typename T>
-std::enable_if_t<(iteration > 0), std::u16string> get_property(T* object) {
+template<std::size_t iteration, typename T> std::u16string get_property(T* object)
+{
 	constexpr auto property = std::get<iteration>(T::properties());
-	using Type = typename decltype(property);
-	return property_to_json<T,Type>(object,property) + u"," + get_property<iteration - 1, T>(object);
+	using Type = decltype(property);
+	if constexpr(iteration == 0)
+		return property_to_json<T, Type>(object, property);
+	else
+		return property_to_json<T, Type>(object, property) + u"," + get_property<iteration - 1, T>(object);
 }
 
-template<std::size_t iteration, typename T>
-std::enable_if_t<(iteration == 0), std::u16string> get_property(T* object) {
-	constexpr auto property = std::get<iteration>(T::properties());
-	using Type = typename decltype(property);
-	return property_to_json<T, Type>(object, property);
-}
-
-template<typename T>
-std::u16string object_to_json(T* object) {
+template<typename T> std::u16string object_to_json(T* object)
+{
 	return get_property<std::tuple_size<decltype(T::properties())>::value - 1, T>(object);
 }
 
@@ -715,7 +695,8 @@ public:
 
 	virtual void from_json(iSerializable* object, scheme_map_t* value) = 0;
 	virtual std::u16string to_json(iSerializable* object) = 0;
-	virtual std::u16string get_type() = 0;
+	virtual std::u16string get_type_name() = 0;
+	virtual unsigned int get_type_id() = 0;
 	virtual bool is_singleton()
 	{
 		return false;
@@ -761,11 +742,17 @@ public:
 	Packer& operator=(Packer const&) = delete;  // Copy assign
 	Packer& operator=(Packer &&) = delete;      // Move assign
 
-	std::u16string m_class_name;
+	std::u16string m_type_name;
+	unsigned int m_type_id;
 
-	std::u16string get_type() override
+	std::u16string get_type_name() override
 	{
-		return m_class_name;
+		return m_type_name;
+	}
+
+	unsigned int get_type_id() override
+	{
+		return m_type_id;
 	}
 
 	void from_json(iSerializable* object, scheme_map_t* value) override
@@ -802,11 +789,17 @@ public:
 	Packer& operator=(Packer const&) = delete;  // Copy assign
 	Packer& operator=(Packer &&) = delete;      // Move assign
 
-	std::u16string m_class_name;
+	std::u16string m_type_name;
+	unsigned int m_type_id;
 
-	std::u16string get_type() override
+	std::u16string get_type_name() override
 	{
-		return m_class_name;
+		return m_type_name;
+	}
+
+	unsigned int get_type_id() override
+	{
+		return m_type_id;
 	}
 
 	void from_json(iSerializable* object, scheme_map_t* value) override
@@ -899,14 +892,17 @@ typedef iSerializable* (*instance_function_t)(scheme_map_t*);
 
 class Parser
 {
+
 private:
 	static std::size_t m_object_index;
-
+	static unsigned int m_type_id_counter;
+	
 public:
-
 	struct icon_t {};
 	struct icon_map_t {};
 	struct tilemanager_ref_t {};
+
+	
 
 	static std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> m_convert;
 	static std::map<std::u16string, instance_function_t> m_classes;
@@ -945,19 +941,22 @@ public:
 	static std::u16string CP866_to_UTF16(std::string const& value);
 	static void register_class(std::u16string class_name, instance_function_t function);
 
-
 	template<typename T>
 	static void register_class(std::u16string class_name)
 	{
 		m_classes[class_name] = create_instance<T>;
-		Packer<T>::Instance().m_class_name = class_name;
+		Packer<T>::Instance().m_type_name = class_name;
+		Packer<T>::Instance().m_type_id = m_type_id_counter;
+		m_type_id_counter += 1;
 	}
 
 	template<typename T>
 	static void register_class(std::u16string class_name,instance_function_t function)
 	{
 		m_classes[class_name] = function;
-		Packer<T>::Instance().m_class_name = class_name;
+		Packer<T>::Instance().m_type_name = class_name;
+		Packer<T>::Instance().m_type_id = m_type_id_counter;
+		m_type_id_counter += 1;
 	}
 
 	template <class T>
@@ -1003,7 +1002,7 @@ public:
 				if (s)
 				{
 					prop = dynamic_cast<T>(m_classes[get_value((*s)[u"$type"])](s));
-					LOG(INFO) << UTF16_to_CP866(prop->get_packer().get_type());
+					LOG(INFO) << UTF16_to_CP866(prop->get_packer().get_type_name());
 					delete s;
 					return;
 				}
@@ -1227,16 +1226,16 @@ public:
 				{
 					if (value->get_packer().is_singleton())
 					{
-						LOG(INFO) << UTF16_to_CP866(value->get_packer().get_type());
+						LOG(INFO) << UTF16_to_CP866(value->get_packer().get_type_name());
 						std::u16string result = value->get_packer().to_json(value);
 						if (result.empty())
 						{
-							std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type() + u"\"}";
+							std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\"}";
 							return out;
 						}
 						else
 						{
-							std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type() + u"\"," + result + u"}";
+							std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\"," + result + u"}";
 							return out;
 						}
 					}
@@ -1248,16 +1247,16 @@ public:
 						{
 							m_object_index += 1;
 							value->m_serialization_index = m_object_index;
-							LOG(INFO) << UTF16_to_CP866(value->get_packer().get_type());
+							LOG(INFO) << UTF16_to_CP866(value->get_packer().get_type_name());
 							std::u16string result = value->get_packer().to_json(value);
 							if (result.empty())
 							{
-								std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type() + u"\",\"$link_id\":" + to_u16string(value->m_serialization_index) + u"}";
+								std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\",\"$link_id\":" + to_u16string(value->m_serialization_index) + u"}";
 								return out;
 							}
 							else
 							{
-								std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type() + u"\",\"$link_id\":" + to_u16string(value->m_serialization_index) + u"," + result + u"}";
+								std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\",\"$link_id\":" + to_u16string(value->m_serialization_index) + u"," + result + u"}";
 								return out;
 							}
 							break;
