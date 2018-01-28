@@ -17,7 +17,6 @@ class Attribute_map;
 class Interaction_list;
 class Game_object_owner;
 
-
 class Config : public iSerializable
 {
 public:
@@ -25,7 +24,9 @@ public:
 	std::map<std::string, Object_interaction*> m_templates;
 	std::map<std::string, GameObject*> m_items;
 	std::map<std::string, TileManager*> m_tile_managers;
-	std::map<std::string, GLuint> m_icons;
+	std::vector<TileManager*> m_tile_managers_id;
+	std::map<std::string, Icon*> m_icons;
+	std::vector<Icon*> m_icons_id;
 
 	void save() override {}
 	void load() override {}
@@ -39,10 +40,12 @@ public:
 		return std::make_tuple(
 			make_property(&Config::m_items, u"items"),
 			make_property(&Config::m_templates, u"templates"),
-			make_property(&Config::m_tile_managers, u"tile_managers"),
+			make_property<Parser::tilemanager_map_t>(&Config::m_tile_managers, u"tile_managers"),
 			make_property<Parser::icon_map_t>(&Config::m_icons, u"icons")
 		);
 	}
+
+	void init();
 };
 
 class GameObjectManager:public iSerializable

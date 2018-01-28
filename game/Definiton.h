@@ -27,6 +27,13 @@ const int tile_size_y = 22;
 const int tile_size_x_half = 19;
 const int tile_size_y_half = 11;
 
+class Icon
+{
+public:
+	size_t m_index;
+	GLuint m_value;
+};
+
 struct position_t
 {
 	int x;
@@ -689,12 +696,56 @@ template<typename T> std::u16string object_to_json(T* object)
 	return get_property<std::tuple_size<decltype(T::properties())>::value - 1, T>(object);
 }
 
+
+template<typename T, typename P> void property_from_binary(T* object, const std::string& data, P& property, std::size_t& pos)
+{
+	if constexpr(std::is_same<typename P::Type, typename P::PropType>::value)
+		Parser::from_binary<typename P::Type>(data, (*object.*(property.member)), pos);
+	else
+		Parser::from_binary<typename P::Type, P::PropType>(data, (*object.*(property.member)),pos);
+}
+
+template<std::size_t iteration, typename T> void set_property_binary(T* object,const std::string& data,std::size_t& pos)
+{
+	constexpr auto property = std::get<iteration>(T::properties());
+	using Type = decltype(property);
+	property_from_binary<T, Type>(object, data, property,pos);
+	if constexpr(iteration > 0) set_property_binary<iteration - 1, T>(object, data,pos);
+}
+
+template<typename T> void object_from_binary(T* object,const std::string& value,std::size_t& pos)
+{
+	set_property_binary<std::tuple_size<decltype(T::properties())>::value - 1, T>(object, value, pos);
+}
+
+template<typename T, typename P> std::string property_to_binary(T* object, P& property)
+{
+	return Parser::to_binary<typename P::Type>(*object.*(property.member));
+}
+
+template<std::size_t iteration, typename T> std::string get_property_binary(T* object)
+{
+	constexpr auto property = std::get<iteration>(T::properties());
+	using Type = decltype(property);
+	if constexpr(iteration == 0)
+		return property_to_binary<T, Type>(object, property);
+	else
+		return property_to_binary<T, Type>(object, property) + get_property_binary<iteration - 1, T>(object);
+}
+
+template<typename T> std::string object_to_binary(T* object)
+{
+	return get_property_binary<std::tuple_size<decltype(T::properties())>::value - 1, T>(object);
+}
+
 class Packer_generic
 {
 public:
 
 	virtual void from_json(iSerializable* object, scheme_map_t* value) = 0;
 	virtual std::u16string to_json(iSerializable* object) = 0;
+	virtual void from_binary(iSerializable* object, const std::string& value, std::size_t& pos) = 0;
+	virtual std::string to_binary(iSerializable* object) = 0;
 	virtual std::u16string get_type_name() = 0;
 	virtual unsigned int get_type_id() = 0;
 	virtual bool is_singleton()
@@ -716,6 +767,23 @@ public:
 	virtual void load() = 0;
 
 	virtual Packer_generic& get_packer();
+
+	virtual void from_binary(const std::string& value, std::size_t& pos)
+	{
+		this->get_packer().from_binary(this, value, pos);
+	}
+
+	virtual void from_binary(const std::string& value, const std::size_t pos = 0)
+	{
+		std::size_t p = pos;
+		this->get_packer().from_binary(this, value, p);
+	}
+
+	virtual std::string to_binary()
+	{
+		return this->get_packer().to_binary(this);
+	}
+
 };
 
 template<typename T> iSerializable* create_instance(scheme_map_t* value)
@@ -724,6 +792,15 @@ template<typename T> iSerializable* create_instance(scheme_map_t* value)
 	out->get_packer().from_json(out, value);
 	return out;
 }
+
+template<typename T> iSerializable* create_instance2(const std::string& value,std::size_t& pos)
+{
+	T* out = new T;
+	Parser::m_items.push_back(out);
+	out->get_packer().from_binary(out, value, pos);
+	return out;
+}
+
 
 template<typename T>
 class Packer :public Packer_generic
@@ -764,6 +841,17 @@ public:
 	{
 
 		return object_to_json<T>(dynamic_cast<T*>(object));
+	}
+
+	void from_binary(iSerializable* object, const std::string& value, std::size_t& pos) override
+	{
+		object_from_binary<T>(dynamic_cast<T*>(object), value, pos);
+	}
+
+	std::string to_binary(iSerializable* object) override
+	{
+
+		return object_to_binary<T>(dynamic_cast<T*>(object));
 	}
 
 	Packer()
@@ -807,6 +895,13 @@ public:
 	}
 
 	std::u16string to_json(iSerializable* object) override;
+
+
+	void from_binary(iSerializable* object, const std::string& value, std::size_t& pos) override
+	{
+	}
+
+	std::string to_binary(iSerializable* object) override;
 
 	bool is_singleton() override
 	{
@@ -889,6 +984,7 @@ public:
 };
 
 typedef iSerializable* (*instance_function_t)(scheme_map_t*);
+typedef iSerializable* (*instance_function2_t)(const std::string&,std::size_t&);
 
 class Parser
 {
@@ -897,15 +993,18 @@ private:
 	static std::size_t m_object_index;
 	static unsigned int m_type_id_counter;
 	
+	
 public:
-	struct icon_t {};
+
 	struct icon_map_t {};
+	struct icon_ref_t {};
+	struct tilemanager_map_t {};
 	struct tilemanager_ref_t {};
 
-	
-
 	static std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> m_convert;
-	static std::map<std::u16string, instance_function_t> m_classes;
+	static std::map<std::u16string, instance_function_t> m_classes_u16string;
+	static std::vector<instance_function2_t> m_classes_int;
+	static std::vector<iSerializable*> m_items;
 
 	static Dictonary<interaction_e> m_json_interaction_e;
 	static Dictonary<object_tag_e> m_json_object_tag;
@@ -940,11 +1039,13 @@ public:
 	static std::string UTF16_to_CP866(std::u16string const& value);
 	static std::u16string CP866_to_UTF16(std::string const& value);
 	static void register_class(std::u16string class_name, instance_function_t function);
+	static void reset_object_counter();
 
 	template<typename T>
 	static void register_class(std::u16string class_name)
 	{
-		m_classes[class_name] = create_instance<T>;
+		m_classes_u16string[class_name] = create_instance<T>;
+		m_classes_int.push_back(create_instance2<T>);
 		Packer<T>::Instance().m_type_name = class_name;
 		Packer<T>::Instance().m_type_id = m_type_id_counter;
 		m_type_id_counter += 1;
@@ -953,7 +1054,8 @@ public:
 	template<typename T>
 	static void register_class(std::u16string class_name,instance_function_t function)
 	{
-		m_classes[class_name] = function;
+		m_classes_u16string[class_name] = function;
+		//m_classes_int.push_back(function);
 		Packer<T>::Instance().m_type_name = class_name;
 		Packer<T>::Instance().m_type_id = m_type_id_counter;
 		m_type_id_counter += 1;
@@ -1001,7 +1103,7 @@ public:
 				scheme_map_t* s = read_object(temp);
 				if (s)
 				{
-					prop = dynamic_cast<T>(m_classes[get_value((*s)[u"$type"])](s));
+					prop = dynamic_cast<T>(m_classes_u16string[get_value((*s)[u"$type"])](s));
 					LOG(INFO) << UTF16_to_CP866(prop->get_packer().get_type_name());
 					delete s;
 					return;
@@ -1369,6 +1471,198 @@ public:
 		else static_assert(always_false<T>::value, "<to_json> for this type not found");
 	};
 
+	template<typename T> static void from_binary(const std::string& value, T& prop, std::size_t& pos)
+	{
+		if constexpr (std::is_pointer<T>::value)
+		{
+			if constexpr(std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value)
+			{
+				unsigned int id = *reinterpret_cast<const unsigned int*>(&value[pos]);
+				pos += sizeof(unsigned int);
+				switch (id)
+				{
+				case 0:
+				{
+					prop = nullptr;
+					break;
+				}
+				case 1:
+				{
+					std::size_t index = (*reinterpret_cast<const std::size_t*>(&value[pos])) - 2;
+					pos += sizeof(std::size_t);
+					prop = dynamic_cast<T>(m_items[index]);
+					break;
+				}
+				default:
+				{
+					prop = dynamic_cast<T>(m_classes_int[id](value, pos));
+					break;
+				}
+				}
+			}
+			else
+			{
+				char id = *reinterpret_cast<const char*>(&value[pos]);
+				pos += sizeof(char);
+				switch (id)
+				{
+				case 0:
+				{
+					prop = nullptr;
+					break;
+				}
+				case 1:
+				{
+					using Type = typename std::remove_pointer_t<T>;
+					T v = new Type();
+					from_binary<Type>(value, *v, pos);
+					prop = v;
+					break;
+				}
+				}
+			}
+		}
+		else if constexpr(is_list<T>::value)
+		{
+			using Value = typename T::value_type;
+			std::size_t s = *reinterpret_cast<const std::size_t*>(&value[pos]);
+			pos += sizeof(std::size_t);
+			Value v;
+			for (std::size_t i = 0; i < s; ++i)
+			{
+				from_binary<Value>(value, v, pos);
+				prop.push_back(v);
+			}
+		}
+		else if constexpr(is_map<T>::value)
+		{
+			using Key = typename T::key_type;
+			using Value = typename T::mapped_type;
+			std::size_t s = *reinterpret_cast<const std::size_t*>(&value[pos]);
+			pos += sizeof(std::size_t);
+			Key k;
+			Value v;
+			for (std::size_t i = 0; i < s; ++i)
+			{
+				from_binary<Key>(value, k, pos);
+				from_binary<Value>(value, v, pos);
+				prop[k] = v;
+			}
+		}
+		else if constexpr(std::is_same<T, int>::value || std::is_same<T, float>::value ||std::is_enum<T>::value)
+		{
+			prop = *reinterpret_cast<const T*>(&value[pos]);
+			pos += sizeof(T);
+		}
+		else if constexpr(std::is_same<T, game_object_size_t&>::value)
+		{
+			from_binary<int>(value, prop.x, pos);
+			from_binary<int>(value, prop.y, pos);
+			from_binary<int>(value, prop.z, pos);
+		}
+		else if constexpr(std::is_same<T, light_t&>::value)
+		{
+			from_binary<int>(value, prop.R, pos);
+			from_binary<int>(value, prop.G, pos);
+			from_binary<int>(value, prop.B, pos);
+		}
+		else if constexpr(std::is_same<T, optical_properties_t&>::value)
+		{
+			from_binary<int>(value, prop.attenuation.R, pos);
+			from_binary<int>(value, prop.attenuation.G, pos);
+			from_binary<int>(value, prop.attenuation.B, pos);
+		}
+	}
+
+	template<typename T> static std::string to_binary(T value)
+	{
+		LOG(INFO) << "to_binary";
+		if constexpr(std::is_pointer<T>::value)
+		{
+			if constexpr(std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value)
+			{
+				if (value)
+				{
+					LOG(INFO) << UTF16_to_CP866(value->get_packer().get_type_name());
+					switch (value->m_serialization_index)
+					{
+					case 0:
+					{
+						LOG(INFO) << std::to_string(sizeof(unsigned int));
+						m_object_index += 1;
+						value->m_serialization_index = m_object_index;
+						unsigned int id = value->get_packer().get_type_id();
+						return std::string(reinterpret_cast<const char*>(&id),sizeof(unsigned int)) + value->to_binary();
+					}
+					default:
+					{
+						LOG(INFO) << std::to_string(sizeof(unsigned int)+ sizeof(std::size_t));
+						unsigned int id = 1;
+						return std::string(reinterpret_cast<const char*>(&id),sizeof(unsigned int)) + std::string(reinterpret_cast<const char*>(&(value->m_serialization_index)), sizeof(std::size_t));
+					}
+					}
+				}
+				LOG(INFO) << std::to_string(sizeof(unsigned int));
+				unsigned int id = 0;
+				return std::string(reinterpret_cast<const char*>(&id), sizeof(unsigned int));
+			}
+			else
+			{
+				if (value == nullptr)
+				{
+					char s = 0;
+					return std::string(reinterpret_cast<const char*>(&s), sizeof(char));
+				}
+				else
+				{
+					char s = 1;
+					using Type = typename std::remove_pointer_t<T>&;
+					return std::string(reinterpret_cast<const char*>(&s), sizeof(char))+Parser::to_binary<Type>(*value);
+				}
+			}
+		}
+		else if constexpr(std::is_same<T, int>::value||std::is_same<T, unsigned int>::value|| std::is_same<T, float>::value|| std::is_enum<T>::value)
+		{
+			LOG(INFO) << std::to_string(sizeof(T));
+			return std::string(reinterpret_cast<const char*>(&value), sizeof(T));
+		}
+		else if constexpr(is_list<T>::value || is_map<T>::value)
+		{
+			LOG(INFO) << std::to_string(sizeof(std::size_t));
+			using Value = typename T::value_type;
+			std::size_t s = value.size();
+			std::string result = std::string(reinterpret_cast<const char*>(&s), sizeof(std::size_t));
+			for (auto element : (value))
+			{
+				result += Parser::to_binary<Value>(element);
+			}
+			return result;
+		}
+		else if constexpr(is_pair<T>::value)
+		{
+			using Key = typename T::first_type;
+			using Value = typename T::second_type;
+			return Parser::to_binary<std::remove_const_t<Key>>(value.first) + Parser::to_binary<Value>(value.second);
+		}
+		else if constexpr(std::is_same<T, std::string>::value)
+		{
+			return value;
+		}
+		else if constexpr(std::is_same<T, game_object_size_t&>::value)
+		{
+			return to_binary<int>(value.x) + to_binary<int>(value.y) + to_binary<int>(value.z);
+		}
+		else if constexpr(std::is_same<T, light_t&>::value)
+		{
+			return to_binary<int>(value.R) + to_binary<int>(value.G) + to_binary<int>(value.B);
+		}
+		else if constexpr(std::is_same<T, optical_properties_t&>::value)
+		{
+			return to_binary<float>(value.attenuation.R) + to_binary<float>(value.attenuation.G) + to_binary<float>(value.attenuation.B);
+		}
+		return "";
+	}
+
 	template<typename T> static Dictonary<T>& get_dictonary();
     
 	template<> static Dictonary<object_tag_e>& get_dictonary<object_tag_e>()
@@ -1417,7 +1711,54 @@ public:
 	}
 
 	template<typename T,typename P> static void from_json(const std::u16string value, typename std::enable_if<!std::is_same<T,P>::value, T&>::type prop);
+	template<typename T, typename P> static void from_binary(const std::string& value, typename std::enable_if<!std::is_same<T, P>::value, T&>::type prop, std::size_t& pos)
+	{
+		if constexpr(std::is_same<T, TileManager*>::value&&std::is_same<T, tilemanager_ref_t*>::value)
+		{
+			std::size_t s = *reinterpret_cast<const std::size_t*>(&value[pos]);
+			pos += sizeof(std::size_t);
+			if (s == 0)
+			{
+				prop = nullptr;
+			}
+			else
+			{
+				prop = Application::instance().m_game_object_manager->m_config.m_tile_managers_id[s - 1];
+			}
+		}
+		else if constexpr(std::is_same<T, Icon*>::value&&std::is_same<T, icon_ref_t*>::value)
+		{
+			std::size_t s = *reinterpret_cast<const std::size_t*>(&value[pos]);
+			pos += sizeof(std::size_t);
+			if (s == 0)
+			{
+				prop = nullptr;
+			}
+			else
+			{
+				prop = Application::instance().m_game_object_manager->m_config.m_icons_id[s - 1];
+			}
+		}
+	}
+
 	template<typename T, typename P> static std::u16string to_json(typename std::enable_if<!std::is_same<T, P>::value, T&>::type value);
+
+	template<typename T, typename P> static std::string to_binary(typename std::enable_if<!std::is_same<T, P>::value, T&>::type value)
+	{
+		if constexpr(std::is_same<T, TileManager*>::value&&std::is_same<T, tilemanager_ref_t*>::value)
+		{
+			std::size_t s;
+			if (value) s = value->m_index + 1; else s = 0;
+			return std::string(reinterpret_cast<const char*>(&s), sizeof(std::size_t));
+		}
+		else if constexpr(std::is_same<T, Icon*>::value&&std::is_same<T, icon_ref_t*>::value)
+		{
+			std::size_t s;
+			if (value) s = value->m_index + 1; else s = 0;
+			return std::string(reinterpret_cast<const char*>(&s), sizeof(std::size_t));
+		}
+		return "";
+	}
 
 };
 

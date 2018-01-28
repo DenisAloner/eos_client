@@ -139,7 +139,7 @@ public:
 	object_state_e m_state;
 	int m_layer;
 	game_object_size_t m_size;
-	GLuint m_icon;
+	Icon* m_icon;
 	float m_weight;
 	light_t* m_light;
 	optical_properties_t* m_optical;
@@ -173,7 +173,7 @@ public:
 			make_property(&Object_state::m_layer, u"layer"),
 			make_property(&Object_state::m_ai, u"AI"),
 			make_property<Parser::tilemanager_ref_t>(&Object_state::m_tile_manager, u"tile_manager"),
-			make_property<Parser::icon_t>(&Object_state::m_icon, u"icon"),
+			make_property<Parser::icon_ref_t>(&Object_state::m_icon, u"icon"),
 			make_property(&Object_state::m_light, u"light"),
 			make_property(&Object_state::m_optical, u"optical")
 		), Attribute_map::properties());

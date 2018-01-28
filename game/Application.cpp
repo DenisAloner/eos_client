@@ -128,7 +128,7 @@ void Application::render()
 		if (m_clipboard.m_item)
 		{
 			glColor4d(1.0, 1.0, 1.0, 1.0);
-			glBindTexture(GL_TEXTURE_2D, m_clipboard.m_item->m_active_state->m_icon);
+			glBindTexture(GL_TEXTURE_2D, m_clipboard.m_item->m_active_state->m_icon->m_value);
 			//m_graph->draw_sprite(mouse.x - 32, mouse.y - 32, mouse.x - 32, mouse.y + 32, mouse.x + 32, mouse.y + 32, mouse.x + 32, mouse.y - 32);
 			GraphicalController::rectangle_t rect(mouse.x - 32, mouse.y - 32, 64, 64);
 			m_graph->draw_sprite(rect);
@@ -260,6 +260,49 @@ void Application::new_game()
 	std::string json = Parser::UTF16_to_CP866(Parser::to_json<GameObject*>(obj));
 	LOG(INFO) << json;
 	LOG(INFO) << std::to_string(obj->get_packer().get_type_id());
+
+
+	Object_state* m = new Object_state();
+	m->m_ai = nullptr;
+	m->m_icon = nullptr;
+	m->m_tile_manager = nullptr;
+	m->m_light = nullptr;
+	m->m_optical = nullptr;
+	m->m_state = object_state_e::equip;
+	m->m_size.x = 300;
+	
+	Interaction_list* l = new Interaction_list();
+
+	Effect* e=new Effect();
+	
+	e->m_value = 65;
+	e->m_subtype = effect_e::limit;
+
+	l->add(e);
+	l->add(e);
+	l->add(nullptr);
+
+	m->m_items[interaction_e::body] = l;
+
+	Parser::reset_object_counter();
+	m->reset_serialization_index();
+
+	std::string test = m->to_binary();
+	LOG(INFO) <<" | " << std::to_string(test.size());
+
+	std::size_t temp=0;
+	Object_state* tmp = new Object_state();
+	Parser::reset_object_counter();
+	tmp->reset_serialization_index();
+
+	tmp->from_binary(test);
+
+	tmp->reset_serialization_index();
+	Parser::reset_object_counter();
+	
+	LOG(INFO) << " | " << std::to_string(m->m_size.x);
+	//json = Parser::UTF16_to_CP866(Parser::to_json<Object_state*>(tmp));
+	//LOG(INFO) << json;
 
 	m_gui_controller.m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player, map, m_action_manager, m_game_log);
 

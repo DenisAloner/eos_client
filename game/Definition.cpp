@@ -25,6 +25,11 @@ std::u16string Packer<Action>::to_json(iSerializable* object)
 	return object_to_json<Action>(dynamic_cast<Action*>(object));
 }
 
+std::string Packer<Action>::to_binary(iSerializable* object)
+{
+	return "";
+}
+
 Apply_info::Apply_info(GameObject* unit, Object_interaction* object):m_unit(unit),m_object(object)
 {
 }
@@ -33,7 +38,9 @@ void Object_interaction::apply_visitor(Visitor_generic& visitor)
 {
 }
 
-std::map<std::u16string, instance_function_t> Parser::m_classes = {};
+std::map<std::u16string, instance_function_t> Parser::m_classes_u16string = {};
+std::vector<instance_function2_t> Parser::m_classes_int = {};
+std::vector<iSerializable*> Parser::m_items = {};
 
 Dictonary<object_tag_e> Parser::m_json_object_tag = {
 	{ object_tag_e::poison_resist,"poison_resist" },
@@ -209,8 +216,8 @@ unsigned int Parser::m_type_id_counter = 0;
 
 Parser::Parser()
 {
-	/*m_classes[u"A_class"] = A::create_instance;
-	m_classes[u"B_class"] = B::create_instance;*/
+	/*m_classes_u16string[u"A_class"] = A::create_instance;
+	m_classes_u16string[u"B_class"] = B::create_instance;*/
 }
 
 Parser::~Parser()
@@ -752,37 +759,74 @@ std::u16string Parser::CP866_to_UTF16(std::string const& value)
 
 void Parser::register_class(std::u16string class_name, instance_function_t function)
 {
-	m_classes[class_name] = function;
+	m_classes_u16string[class_name] = function;
 }
 
-template<> void Parser::from_json<GLuint, Parser::icon_t>(const std::u16string value, GLuint& prop)
+void Parser::reset_object_counter()
+{
+	m_items.clear();
+	m_object_index = 1;
+}
+
+template<> void Parser::from_json<Icon*, Parser::icon_ref_t>(const std::u16string value, Icon*& prop)
 {
 	std::string&& name = UTF16_to_CP866(get_value(value));
 	prop = GameObjectManager::m_config.m_icons[name];
 }
 
-template <> std::u16string Parser::to_json<GLuint, Parser::icon_t>(GLuint& value)
+template <> std::u16string Parser::to_json<GLuint, Parser::icon_ref_t>(GLuint& value)
 {
 	return u"";
 }
 
-template<> void Parser::from_json< std::map<std::string, GLuint>, Parser::icon_map_t>(const std::u16string value, std::map<std::string, GLuint>& prop)
+template<> void Parser::from_json< std::map<std::string, Icon*>, Parser::icon_map_t>(const std::u16string value, std::map<std::string, Icon*>& prop)
 {
 	std::u16string temp = value;
 	scheme_list_t* s = read_array(temp);
+	std::size_t i = 0;
 	if (s)
 	{
 		for (auto element : (*s))
 		{
-			
 			std::string&& name = UTF16_to_CP866(get_value(element));
-			prop[name] = Application::instance().m_graph->load_texture(FileSystem::instance().m_resource_path + "Tiles\\" + name + ".bmp");
+			Icon* icon = new Icon;
+			icon->m_value = Application::instance().m_graph->load_texture(FileSystem::instance().m_resource_path + "Tiles\\" + name + ".bmp");
+			icon->m_index = i;
+			prop[name] = icon;
+			i += 1;
 		}
 		delete s;
 	}
 }
 
-template <> std::u16string Parser::to_json<std::map<std::string, GLuint>, Parser::icon_map_t>(std::map<std::string, GLuint>& value)
+template <> std::u16string Parser::to_json<std::map<std::string, Icon*>, Parser::icon_map_t>(std::map<std::string, Icon*>& value)
+{
+	return u"";
+}
+
+template<> void Parser::from_json< std::map<std::string, TileManager*>, Parser::tilemanager_map_t>(const std::u16string value, std::map<std::string, TileManager*>& prop)
+{
+	std::size_t i = 0;
+	std::u16string temp = value;
+	scheme_list_t* s = read_array(temp);
+	std::string k;
+	TileManager* v;
+	if (s)
+	{
+		for (auto element : (*s))
+		{
+			scheme_vector_t* p = read_pair(element);
+			from_json<std::string>((*p)[0], k);
+			from_json<TileManager*>((*p)[1], v);
+			v->m_index = i;
+			prop[k] = v;
+			i += 1;
+		}
+		delete s;
+	}
+}
+
+template <> std::u16string Parser::to_json<std::map<std::string, TileManager*>, Parser::tilemanager_map_t>(std::map<std::string, TileManager*>& value)
 {
 	return u"";
 }
@@ -810,7 +854,7 @@ template <> std::u16string Parser::to_json<TileManager*,Parser::tilemanager_ref_
 	return out;
 }
 
-template<> void Parser::from_json< std::vector<GLuint>, Parser::icon_t>(const std::u16string value, std::vector<GLuint>& prop)
+template<> void Parser::from_json< std::vector<GLuint>, Parser::icon_ref_t>(const std::u16string value, std::vector<GLuint>& prop)
 {
 	std::u16string temp = value;
 	scheme_list_t* s = read_array(temp);
@@ -828,7 +872,7 @@ template<> void Parser::from_json< std::vector<GLuint>, Parser::icon_t>(const st
 	}
 }
 
-template <> std::u16string Parser::to_json<std::vector<GLuint>, Parser::icon_t>(std::vector<GLuint>& value)
+template <> std::u16string Parser::to_json<std::vector<GLuint>, Parser::icon_ref_t>(std::vector<GLuint>& value)
 {
 	return u"";
 }

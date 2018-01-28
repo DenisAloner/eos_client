@@ -31,7 +31,7 @@ public:
 
 	constexpr static auto properties() {
 		return std::make_tuple(
-			make_property<Parser::icon_t>(&TileManager::m_tiles, u"tiles")
+			make_property<Parser::icon_ref_t>(&TileManager::m_tiles, u"tiles")
 		);
 	}
 

@@ -90,7 +90,7 @@ void Interaction_list::reset_serialization_index()
 	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
 		LOG(INFO) << "шаг 6";
-		(*item)->reset_serialization_index();
+		if(*item) (*item)->reset_serialization_index();
 	}
 }
 

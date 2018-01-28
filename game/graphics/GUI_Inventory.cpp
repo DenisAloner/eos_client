@@ -39,7 +39,7 @@ void GUI_Part_slot::render(GraphicalController* Graph, int px, int py)
 	{
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_BLEND);
-		glBindTexture(GL_TEXTURE_2D,m_item->m_item->m_active_state->m_icon);
+		glBindTexture(GL_TEXTURE_2D,m_item->m_item->m_active_state->m_icon->m_value);
 		GraphicalController::rectangle_t rect(px, py, 64, m_size.h);
 		Graph->draw_sprite(rect);
 	}
