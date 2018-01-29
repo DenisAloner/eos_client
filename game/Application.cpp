@@ -301,8 +301,8 @@ void Application::new_game()
 	Parser::reset_object_counter();
 	
 	LOG(INFO) << " | " << std::to_string(m->m_size.x);
-	//json = Parser::UTF16_to_CP866(Parser::to_json<Object_state*>(tmp));
-	//LOG(INFO) << json;
+	json = Parser::UTF16_to_CP866(Parser::to_json<Object_state*>(tmp));
+	LOG(INFO) << json;
 
 	m_gui_controller.m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player, map, m_action_manager, m_game_log);
 

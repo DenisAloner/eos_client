@@ -678,7 +678,7 @@ template<typename T, typename P> std::u16string property_to_json(T* object, P& p
 	if constexpr(std::is_same<typename P::Type, typename P::PropType>::value)
 		return u"\"" + std::u16string(property.name) + u"\":" + Parser::to_json<typename P::Type>(*object.*(property.member));
 	else
-		return u"";
+		return u"\"" + std::u16string(property.name) + u"\":" + Parser::to_json<typename P::Type, P::PropType>(*object.*(property.member));
 }
 
 template<std::size_t iteration, typename T> std::u16string get_property(T* object)
@@ -720,7 +720,10 @@ template<typename T> void object_from_binary(T* object,const std::string& value,
 
 template<typename T, typename P> std::string property_to_binary(T* object, P& property)
 {
-	return Parser::to_binary<typename P::Type>(*object.*(property.member));
+	if constexpr(std::is_same<typename P::Type, typename P::PropType>::value)
+		return Parser::to_binary<typename P::Type>(*object.*(property.member));
+	else
+		return Parser::to_binary<typename P::Type, P::PropType>(*object.*(property.member));
 }
 
 template<std::size_t iteration, typename T> std::string get_property_binary(T* object)
@@ -1710,7 +1713,84 @@ public:
 		return m_json_effect_e;
 	}
 
-	template<typename T,typename P> static void from_json(const std::u16string value, typename std::enable_if<!std::is_same<T,P>::value, T&>::type prop);
+	template<typename T,typename P> static void from_json(const std::u16string value, typename std::enable_if<!std::is_same<T,P>::value, T&>::type prop)
+	{
+		if constexpr(std::is_same<T, Icon*>::value&&std::is_same<P, icon_ref_t>::value)
+		{
+			std::string&& name = UTF16_to_CP866(get_value(value));
+			prop = GameObjectManager::m_config.m_icons[name];
+		}
+		else if constexpr(std::is_same<T, std::map<std::string, Icon*>>::value&&std::is_same<P, icon_map_t>::value)
+		{
+			std::u16string temp = value;
+			scheme_list_t* s = read_array(temp);
+			std::size_t i = 0;
+			if (s)
+			{
+				for (auto element : (*s))
+				{
+					std::string&& name = UTF16_to_CP866(get_value(element));
+					Icon* icon = new Icon;
+					icon->m_value = Application::instance().m_graph->load_texture(FileSystem::instance().m_resource_path + "Tiles\\" + name + ".bmp");
+					icon->m_index = i;
+					prop[name] = icon;
+					i += 1;
+				}
+				delete s;
+			}
+		}
+		else if constexpr(std::is_same<T, TileManager*>::value&&std::is_same<P, tilemanager_ref_t>::value)
+		{
+			if (get_value(value) == u"null")
+			{
+				prop = nullptr;
+			}
+			else
+			{
+				std::string&& result = UTF16_to_CP866(get_value(value));
+				prop = Application::instance().m_game_object_manager->m_config.m_tile_managers[result];
+			}
+		}
+		else if constexpr(std::is_same<T, std::map<std::string, TileManager*>>::value&&std::is_same<P, tilemanager_map_t>::value)
+		{
+			std::size_t i = 0;
+			std::u16string temp = value;
+			scheme_list_t* s = read_array(temp);
+			std::string k;
+			TileManager* v;
+			if (s)
+			{
+				for (auto element : (*s))
+				{
+					scheme_vector_t* p = read_pair(element);
+					from_json<std::string>((*p)[0], k);
+					from_json<TileManager*>((*p)[1], v);
+					v->m_index = i;
+					prop[k] = v;
+					i += 1;
+				}
+				delete s;
+			}
+		}
+		else if constexpr(std::is_same<T, std::vector<GLuint>>::value&&std::is_same<P, icon_ref_t>::value)
+		{
+			std::u16string temp = value;
+			scheme_list_t* s = read_array(temp);
+			if (s)
+			{
+				prop.resize(s->size());
+				int i = 0;
+				for (auto element : (*s))
+				{
+					std::string&& name = UTF16_to_CP866(get_value(element));
+					prop[i] = Application::instance().m_graph->png_texture_load(FileSystem::instance().m_resource_path + "Tiles\\" + name + ".png");
+					i += 1;
+				}
+				delete s;
+			}
+		}
+	}
+
 	template<typename T, typename P> static void from_binary(const std::string& value, typename std::enable_if<!std::is_same<T, P>::value, T&>::type prop, std::size_t& pos)
 	{
 		if constexpr(std::is_same<T, TileManager*>::value&&std::is_same<T, tilemanager_ref_t*>::value)
@@ -1741,7 +1821,46 @@ public:
 		}
 	}
 
-	template<typename T, typename P> static std::u16string to_json(typename std::enable_if<!std::is_same<T, P>::value, T&>::type value);
+	template<typename T, typename P> static std::u16string to_json(typename std::enable_if<!std::is_same<T, P>::value, T&>::type value)
+	{
+		if constexpr(std::is_same<T, Icon*>::value&&std::is_same<P, icon_ref_t>::value)
+		{
+			if (value)
+			{
+				return u"temp";
+
+			}
+			else
+			{
+				return u"null";
+			}
+		}
+		else if constexpr(std::is_same<T, std::map<std::string, Icon*>>::value&&std::is_same<P, icon_map_t>::value)
+		{
+			return u"";
+		}
+		else if constexpr(std::is_same<T, TileManager*>::value&&std::is_same<P, tilemanager_ref_t>::value)
+		{
+			if (value)
+			{
+				return u"temp";
+				
+			}
+			else
+			{
+				return u"null";
+			}
+		}
+		else if constexpr(std::is_same<T, std::map<std::string, TileManager*>>::value&&std::is_same<P, tilemanager_map_t>::value)
+		{
+			return u"";
+		}
+		else if constexpr(std::is_same<T, std::vector<GLuint>>::value&&std::is_same<P, icon_ref_t>::value)
+		{
+			return u"";
+		}
+		return u"";
+	}
 
 	template<typename T, typename P> static std::string to_binary(typename std::enable_if<!std::is_same<T, P>::value, T&>::type value)
 	{

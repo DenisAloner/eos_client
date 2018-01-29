@@ -183,7 +183,7 @@ Object_state::Object_state()
 	m_layer = 1;
 	m_light = nullptr;
 	m_tile_manager = nullptr;
-	m_icon = GameObjectManager::m_config.m_icons.begin()->second;
+	m_icon = nullptr;// GameObjectManager::m_config.m_icons.begin()->second;
 	m_ai = nullptr;
 	m_optical = nullptr;
 	m_visibility = nullptr;
