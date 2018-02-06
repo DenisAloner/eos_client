@@ -265,7 +265,8 @@ void Application::new_game()
 	Object_state* m = new Object_state();
 	m->m_ai = nullptr;
 	m->m_icon = nullptr;
-	m->m_tile_manager = nullptr;
+	m->m_tile_manager = GameObjectManager::m_config.m_tile_managers.get_by_string("belt");
+	LOG(INFO)  << std::to_string(GameObjectManager::m_config.m_tile_managers.get_by_string("belt")->m_index);
 	m->m_light = nullptr;
 	m->m_optical = nullptr;
 	m->m_state = object_state_e::equip;
@@ -295,7 +296,7 @@ void Application::new_game()
 	Parser::reset_object_counter();
 	tmp->reset_serialization_index();
 
-	tmp->from_binary(test);
+	tmp->from_binary_const(test);
 
 	tmp->reset_serialization_index();
 	Parser::reset_object_counter();

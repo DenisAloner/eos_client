@@ -23,10 +23,8 @@ public:
 
 	std::map<std::string, Object_interaction*> m_templates;
 	std::map<std::string, GameObject*> m_items;
-	std::map<std::string, TileManager*> m_tile_managers;
-	std::vector<TileManager*> m_tile_managers_id;
-	std::map<std::string, Icon*> m_icons;
-	std::vector<Icon*> m_icons_id;
+	InstanceDictonary<TileManager*> m_tile_managers;
+	InstanceDictonary<Icon*> m_icons;
 
 	void save() override {}
 	void load() override {}
@@ -44,8 +42,6 @@ public:
 			make_property<Parser::icon_map_t>(&Config::m_icons, u"icons")
 		);
 	}
-
-	void init();
 };
 
 class GameObjectManager:public iSerializable

@@ -6,12 +6,11 @@
 #include "Application.h"
 
 
-class TileManager: public iSerializable
+class TileManager : public iSerializable, public InstanceDictonaryElement
 {
 public:
 
 	std::vector<GLuint> m_tiles;
-	size_t m_index;
 	animation_e m_animation;
 
 	TileManager();

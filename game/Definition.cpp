@@ -20,12 +20,17 @@ Packer_generic& iSerializable::get_packer()
 	return Packer<Object_interaction>::Instance();
 }
 
-std::u16string Packer<Action>::to_json(iSerializable* object)
+//Packer_generic& iSerializable::get_packer() const
+//{
+//	return Packer<Object_interaction>::Instance();
+//}
+
+std::u16string Packer<Action>::to_json(iSerializable& object)
 {
-	return object_to_json<Action>(dynamic_cast<Action*>(object));
+	return object_to_json<Action>(dynamic_cast<Action&>(object));
 }
 
-std::string Packer<Action>::to_binary(iSerializable* object)
+std::string Packer<Action>::to_binary(iSerializable& object)
 {
 	return "";
 }
@@ -224,28 +229,28 @@ Parser::~Parser()
 {
 }
 
-std::u16string Parser::serialize_object(iSerializable* value)
-{
-	if (value)
-	{
-		LOG(INFO) << UTF16_to_CP866(value->get_packer().get_type_name());
-		std::u16string result = value->get_packer().to_json(value);
-		if (result.empty())
-		{
-			std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\"}";
-			return out;
-		}
-		else
-		{
-			std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\"," + result + u"}";
-			return out;
-		}
-	}
-	else
-	{
-		return u"null";
-	}
-}
+//std::u16string Parser::serialize_object(iSerializable* value)
+//{
+//	if (value)
+//	{
+//		LOG(INFO) << UTF16_to_CP866((*value).get_packer().get_type_name());
+//		std::u16string result = value->get_packer().to_json(value);
+//		if (result.empty())
+//		{
+//			std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\"}";
+//			return out;
+//		}
+//		else
+//		{
+//			std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\"," + result + u"}";
+//			return out;
+//		}
+//	}
+//	else
+//	{
+//		return u"null";
+//	}
+//}
 
 scheme_map_t* Parser::read_object(std::u16string& value)
 {
@@ -620,7 +625,7 @@ void Parser::print_u16string(std::u16string value)
 
 
 
-std::u16string Parser::to_u16string(int const &value) {
+std::u16string Parser::to_u16string(const int &value) {
 	std::string temp = std::to_string(value);
 	std::u16string result(temp.size(), 0);
 	for (int i = 0; i < temp.size(); ++i)

@@ -525,10 +525,9 @@ void GameObjectManager::init()
 	std::u16string temp(json_config);
 	scheme_map_t* s = Parser::read_object(temp);
 	//Config* tempcfg = new Config;
-	object_from_json<Config>(&m_config, s);
+	m_config.from_json(s);
 	delete s;
 
-	m_config.init();
 	m_items.insert(m_config.m_items.begin(),m_config.m_items.end());
 
 	/*bytearray buffer;
@@ -599,21 +598,6 @@ std::string GameObjectManager::get_effect_prefix_string(effect_prefix_e key)
 		return value->second;
 	}
 	return "неизвестный тип";
-}
-
-
-void Config::init()
-{
-	m_tile_managers_id.resize(m_tile_managers.size());
-	for (auto element : m_tile_managers)
-	{
-		m_tile_managers_id[element.second->m_index] = element.second;
-	}
-	m_icons_id.resize(m_icons.size());
-	for (auto element : m_icons)
-	{
-		m_icons_id[element.second->m_index] = element.second;
-	}
 }
 
 effect_prefix_e GameObjectManager::get_effect_prefix_e(const std::string& key)
