@@ -43,7 +43,8 @@ public:
 		return Packer<Game_object_owner>::Instance();
 	}
 
-	constexpr static auto properties() {
+	constexpr static auto properties() 
+	{
 		return std::make_tuple(
 			make_property(&Game_object_owner::m_kind, u"kind"),
 			make_property(&Game_object_owner::m_owner, u"owner")
@@ -124,7 +125,8 @@ public:
 		return Packer<Attribute_map>::Instance();
 	}
 
-	constexpr static auto properties() {
+	constexpr static auto properties() 
+	{
 		return std::make_tuple(
 			make_property(&Attribute_map::m_items, u"item")
 		);
@@ -167,16 +169,18 @@ public:
 	}
 
 	constexpr static auto properties() {
-		return make_union(std::make_tuple(
-			make_property(&Object_state::m_state, u"state"),
-			make_property(&Object_state::m_size, u"size"),
-			make_property(&Object_state::m_layer, u"layer"),
-			make_property(&Object_state::m_ai, u"AI"),
-			make_property<Parser::tilemanager_ref_t>(&Object_state::m_tile_manager, u"tile_manager"),
-			make_property<Parser::icon_ref_t>(&Object_state::m_icon, u"icon"),
-			make_property(&Object_state::m_light, u"light"),
-			make_property(&Object_state::m_optical, u"optical")
-		), Attribute_map::properties());
+		return make_union(
+			Attribute_map::properties(),
+			std::make_tuple(
+				make_property(&Object_state::m_state, u"state"),
+				make_property(&Object_state::m_size, u"size"),
+				make_property(&Object_state::m_layer, u"layer"),
+				make_property(&Object_state::m_ai, u"AI"),
+				make_property<Parser::from_InstanceDictonary_t>(&Object_state::m_tile_manager, u"tile_manager"),
+				make_property<Parser::from_InstanceDictonary_t>(&Object_state::m_icon, u"icon"),
+				make_property(&Object_state::m_light, u"light"),
+				make_property(&Object_state::m_optical, u"optical")
+			));
 	}
 
 };
@@ -195,13 +199,15 @@ public:
 		return Packer<Object_state_equip>::Instance();
 	}
 
-	constexpr static auto properties() {
-		return make_union(std::make_tuple(
-			make_property(&Object_state_equip::m_body_part, u"body_part"),
-			make_property(&Object_state_equip::m_equip, u"equip")
-		), Object_state::properties());
+	constexpr static auto properties()
+	{
+		return make_union(
+			Object_state::properties(),
+			std::make_tuple(
+				make_property(&Object_state_equip::m_body_part, u"body_part"),
+				make_property(&Object_state_equip::m_equip, u"equip")
+			));
 	}
-
 };
 
 class GameObject : public Object_interaction, public GUI_connectable_i, public Game_object_owner
@@ -254,10 +260,13 @@ public:
 		return Packer<GameObject>::Instance();
 	}
 
-	constexpr static auto properties() { return std::make_tuple(
-		make_property(&GameObject::m_name, u"name"), 
-		make_property(&GameObject::m_state, u"state")
-	); }
+	constexpr static auto properties() 
+	{
+		return std::make_tuple(
+			make_property(&GameObject::m_name, u"name"),
+			make_property(&GameObject::m_state, u"state")
+		);
+	}
 
 private:
 
@@ -306,10 +315,13 @@ public:
 		return Packer<Inventory_cell>::Instance();
 	}
 
-	constexpr static auto properties() {
-		return make_union(std::make_tuple(
-			make_property(&Inventory_cell::m_item, u"item")
-		), Game_object_owner::properties());
+	constexpr static auto properties()
+	{
+		return make_union(
+			Game_object_owner::properties(),
+			std::make_tuple(
+				make_property(&Inventory_cell::m_item, u"item")
+			));
 	}
 };
 
@@ -335,12 +347,15 @@ public:
 		return Packer<Object_part>::Instance();
 	}
 
-	constexpr static auto properties() {
-		return make_union(std::make_tuple(
-			make_property(&Object_part::m_part_kind, u"part_kind"),
-			make_property(&Object_part::m_name, u"name"),
-			make_property(&Object_part::m_attributes, u"attributes")
-		), Inventory_cell::properties());
+	constexpr static auto properties() 
+	{
+		return make_union(
+			Inventory_cell::properties(),
+			std::make_tuple(
+				make_property(&Object_part::m_part_kind, u"part_kind"),
+				make_property(&Object_part::m_name, u"name"),
+				make_property(&Object_part::m_attributes, u"attributes")
+			));
 	}
 
 };

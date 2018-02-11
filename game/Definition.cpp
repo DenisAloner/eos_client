@@ -43,8 +43,8 @@ void Object_interaction::apply_visitor(Visitor_generic& visitor)
 {
 }
 
-std::map<std::u16string, instance_function_t> Parser::m_classes_u16string = {};
-std::vector<instance_function2_t> Parser::m_classes_int = {};
+std::map<std::u16string, constructor_from_json_t> Parser::m_constructors_from_json = {};
+std::vector<constructor_from_binary_t> Parser::m_constructors_from_binary = {};
 std::vector<iSerializable*> Parser::m_items = {};
 
 Dictonary<object_tag_e> Parser::m_json_object_tag = {
@@ -221,8 +221,8 @@ unsigned int Parser::m_type_id_counter = 0;
 
 Parser::Parser()
 {
-	/*m_classes_u16string[u"A_class"] = A::create_instance;
-	m_classes_u16string[u"B_class"] = B::create_instance;*/
+	/*m_constructors_from_json[u"A_class"] = A::create_instance;
+	m_constructors_from_json[u"B_class"] = B::create_instance;*/
 }
 
 Parser::~Parser()
@@ -762,9 +762,9 @@ std::u16string Parser::CP866_to_UTF16(std::string const& value)
 	return out;
 }
 
-void Parser::register_class(std::u16string class_name, instance_function_t function)
+void Parser::register_class(std::u16string class_name, constructor_from_json_t function)
 {
-	m_classes_u16string[class_name] = function;
+	m_constructors_from_json[class_name] = function;
 }
 
 void Parser::reset_object_counter()

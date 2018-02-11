@@ -35,7 +35,8 @@ public:
 		return Packer<Interaction_list>::Instance();
 	}
 
-	constexpr static auto properties() {
+	constexpr static auto properties() 
+	{
 		return std::make_tuple(
 			make_property(&Interaction_list::m_list_type, u"list_type"),
 			make_property(&Interaction_list::m_items, u"items")
@@ -69,12 +70,15 @@ public:
 		return Packer<Parameter_list>::Instance();
 	}
 
-	constexpr static auto properties() {
-		return make_union(std::make_tuple(
-			make_property(&Parameter_list::m_subtype, u"subtype"),
-			make_property(&Parameter_list::m_basic_value, u"basic_value"),
-			make_property(&Parameter_list::m_basic_limit, u"basic_limit")
-		), Interaction_list::properties());
+	constexpr static auto properties() 
+	{
+		return make_union(
+			Interaction_list::properties(),
+			std::make_tuple(
+				make_property(&Parameter_list::m_subtype, u"subtype"),
+				make_property(&Parameter_list::m_basic_value, u"basic_value"),
+				make_property(&Parameter_list::m_basic_limit, u"basic_limit")
+			));
 	}
 
 private:
@@ -113,9 +117,7 @@ public:
 		return Packer<Vision_list>::Instance();
 	}
 
-	constexpr static auto properties() {
-		return Interaction_list::properties();
-	}
+	constexpr static auto properties() { return Interaction_list::properties(); }
 
 private:
 	void update_list(Object_interaction* list);
@@ -140,10 +142,12 @@ public:
 		return Packer<Vision_component>::Instance();
 	}
 
-	constexpr static auto properties() {
-		return make_union(std::make_tuple(
-			make_property(&Vision_component::m_basic_value, u"basic_value")
-		), Interaction_list::properties());
+	constexpr static auto properties() 
+	{
+		return make_union(
+			Interaction_list::properties(),
+			std::make_tuple(make_property(&Vision_component::m_basic_value, u"basic_value")
+			));
 	}
 
 private:
@@ -169,9 +173,7 @@ public:
 		return Packer<Tag_list>::Instance();
 	}
 
-	constexpr static auto properties() {
-		return Interaction_list::properties();
-	}
+	constexpr static auto properties() { return Interaction_list::properties(); }
 
 private:
 	
@@ -206,9 +208,8 @@ public:
 		return Packer<Parts_list>::Instance();
 	}
 
-	constexpr static auto properties() {
-		return Interaction_list::properties();
-	}
+	constexpr static auto properties() { return Interaction_list::properties(); }
+
 
 private:
 
@@ -242,9 +243,7 @@ public:
 		return Packer<Action_list>::Instance();
 	}
 
-	constexpr static auto properties() {
-		return Interaction_list::properties();
-	}
+	constexpr static auto properties() { return Interaction_list::properties(); }
 };
 
 class Slot_set_state: public Object_interaction
@@ -275,7 +274,8 @@ public:
 		return Packer<Interaction_slot>::Instance();
 	}
 
-	constexpr static auto properties() {
+	constexpr static auto properties() 
+	{
 		return std::make_tuple(
 			make_property(&Interaction_slot::m_value, u"value")
 		);
@@ -341,9 +341,11 @@ public:
 	}
 
 	constexpr static auto properties() {
-		return make_union(std::make_tuple(
-			make_property(&Interaction_time::m_turn, u"m_turn")
-		), Interaction_slot::properties());
+		return make_union(
+			Interaction_slot::properties(),
+			std::make_tuple(
+				make_property(&Interaction_time::m_turn, u"m_turn")
+			));
 	}
 
 };
@@ -397,10 +399,7 @@ public:
 	Object_tag(object_tag_e key);
 	virtual Object_tag* clone() = 0;
 
-	constexpr static auto properties()
-	{
-		return std::make_tuple(make_property(&Object_tag::m_type, u"type"));
-	}
+	constexpr static auto properties() { return std::make_tuple(make_property(&Object_tag::m_type, u"type")); }
 };
 
 namespace ObjectTag
@@ -515,13 +514,15 @@ namespace ObjectTag
 			return Packer<Equippable>::Instance();
 		}
 
-		constexpr static auto properties() {
-			return make_union(std::make_tuple(
-				make_property(&Equippable::m_value, u"value"),
-				make_property(&Equippable::m_condition, u"condition")
-			), Object_tag::properties());
+		constexpr static auto properties()
+		{
+			return make_union(
+				Object_tag::properties(),
+				std::make_tuple(
+					make_property(&Equippable::m_value, u"value"),
+					make_property(&Equippable::m_condition, u"condition")
+				));
 		}
-
 	};
 
 	class Requirements_to_object : public Object_tag
@@ -545,10 +546,13 @@ namespace ObjectTag
 			return Packer<Requirements_to_object>::Instance();
 		}
 
-		constexpr static auto properties() {
-			return make_union(std::make_tuple(
-				make_property(&Requirements_to_object::m_value, u"value")
-			), Object_tag::properties());
+		constexpr static auto properties()
+		{
+			return make_union(
+				Object_tag::properties(),
+				std::make_tuple(
+					make_property(&Requirements_to_object::m_value, u"value")
+				));
 		}
 
 	};
@@ -574,9 +578,11 @@ namespace ObjectTag
 		}
 
 		constexpr static auto properties() {
-			return make_union(std::make_tuple(
-				make_property(&Can_transfer_object::m_value, u"value")
-			), Object_tag::properties());
+			return make_union(
+				Object_tag::properties(),
+				std::make_tuple(
+					make_property(&Can_transfer_object::m_value, u"value")
+				));
 		}
 	};
 }
@@ -604,10 +610,13 @@ public:
 		return Packer<Instruction_slot_link>::Instance();
 	}
 
-	constexpr static auto properties() {
-		return make_union(std::make_tuple(
-			make_property(&Instruction_slot_link::m_subtype, u"subtype")
-		), Interaction_slot::properties());
+	constexpr static auto properties()
+	{
+		return make_union(
+			Interaction_slot::properties(),
+			std::make_tuple(
+				make_property(&Instruction_slot_link::m_subtype, u"subtype")
+			));
 	}
 };
 
@@ -690,12 +699,12 @@ public:
 		return Packer<Instruction_check_part_type>::Instance();
 	}
 
-	constexpr static auto properties() {
+	constexpr static auto properties() 
+	{
 		return std::make_tuple(
 			make_property(&Instruction_check_part_type::m_value, u"value")
 		);
 	}
-
 };
 
 class Instruction_arg_extract : public Object_interaction
@@ -719,7 +728,8 @@ public:
 		return Packer<Instruction_arg_extract>::Instance();
 	}
 
-	constexpr static auto properties() {
+	constexpr static auto properties() 
+	{
 		return std::make_tuple(
 			make_property(&Instruction_arg_extract::m_value, u"value"),
 			make_property(&Instruction_arg_extract::m_index, u"index")
@@ -748,7 +758,8 @@ public:
 		return Packer<Instruction_get_owner>::Instance();
 	}
 
-	constexpr static auto properties() {
+	constexpr static auto properties() 
+	{
 		return std::make_tuple(
 			make_property(&Instruction_get_owner::m_value, u"value")
 		);
@@ -768,9 +779,7 @@ public:
 		return Packer<Instruction_get_owner_top>::Instance();
 	}
 
-	constexpr static auto properties() {
-		return Instruction_get_owner::properties();
-	}
+	constexpr static auto properties() { return Instruction_get_owner::properties(); }
 };
 
 class Instruction_check_owner_type :public Object_interaction
@@ -791,7 +800,8 @@ public:
 		return Packer<Instruction_check_owner_type>::Instance();
 	}
 
-	constexpr static auto properties() {
+	constexpr static auto properties()
+	{
 		return std::make_tuple(
 			make_property(&Instruction_check_owner_type::m_value, u"value")
 		);

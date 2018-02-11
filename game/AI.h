@@ -117,11 +117,7 @@ public:
 		return Packer<AI>::Instance();
 	}
 
-	constexpr static auto properties() {
-		return std::make_tuple(
-			make_property(&AI::m_ai_type, u"ai_type")
-		);
-	}
+	constexpr static auto properties() { return std::make_tuple(make_property(&AI::m_ai_type, u"ai_type")); }
 
 };
 
@@ -154,10 +150,12 @@ public:
 		return Packer<AI_enemy>::Instance();
 	}
 
-	constexpr static auto properties() {
-		return make_union(std::make_tuple(
+	constexpr static auto properties() 
+	{
+		return make_union(AI::properties(),
+			std::make_tuple(
 			make_property(&AI_enemy::m_path_qualifier, u"path_qualifier")
-		), AI::properties());
+		));
 	}
 
 };

@@ -28,9 +28,10 @@ public:
 	//	return Packer<Object_interaction>::Instance();
 	//}
 
-	constexpr static auto properties() {
+	constexpr static auto properties() 
+	{
 		return std::make_tuple(
-			make_property<Parser::icon_ref_t>(&TileManager::m_tiles, u"tiles")
+			make_property<Parser::tile_t>(&TileManager::m_tiles, u"tiles")
 		);
 	}
 
@@ -50,9 +51,7 @@ public:
 		return Packer<TileManager_Single>::Instance();
 	}
 
-	constexpr static auto properties() {
-		return TileManager::properties();
-	}
+	constexpr static auto properties() { return TileManager::properties(); }
 
 };
 
@@ -74,9 +73,11 @@ public:
 	}
 
 	constexpr static auto properties() {
-		return make_union(std::make_tuple(
-			make_property(&TileManager_rotate8_animate::m_frame, u"frame")
-		), TileManager::properties());
+		return make_union(
+			TileManager::properties(),
+			std::make_tuple(
+				make_property(&TileManager_rotate8_animate::m_frame, u"frame")
+			));
 	}
 };
 
@@ -97,10 +98,13 @@ public:
 		return Packer<TileManager_equilateral_animate>::Instance();
 	}
 
-	constexpr static auto properties() {
-		return make_union(std::make_tuple(
-			make_property(&TileManager_equilateral_animate::m_frame, u"frame")
-		), TileManager::properties());
+	constexpr static auto properties() 
+	{
+		return make_union(
+			TileManager::properties(),
+			std::make_tuple(
+				make_property(&TileManager_equilateral_animate::m_frame, u"frame")
+			));
 	}
 
 };

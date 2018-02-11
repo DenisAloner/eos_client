@@ -34,12 +34,13 @@ public:
 		return Packer<Config>::Instance();
 	}
 
-	constexpr static auto properties() {
+	constexpr static auto properties() 
+	{
 		return std::make_tuple(
-			make_property(&Config::m_items, u"items"),
+			make_property<Parser::InstanceDictonary_t>(&Config::m_icons, u"icons"),
+			make_property<Parser::InstanceDictonary_t>(&Config::m_tile_managers, u"tile_managers"),
 			make_property(&Config::m_templates, u"templates"),
-			make_property<Parser::tilemanager_map_t>(&Config::m_tile_managers, u"tile_managers"),
-			make_property<Parser::icon_map_t>(&Config::m_icons, u"icons")
+			make_property(&Config::m_items, u"items")
 		);
 	}
 };

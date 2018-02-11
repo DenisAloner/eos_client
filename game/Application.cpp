@@ -261,7 +261,6 @@ void Application::new_game()
 	LOG(INFO) << json;
 	LOG(INFO) << std::to_string(obj->get_packer().get_type_id());
 
-
 	Object_state* m = new Object_state();
 	m->m_ai = nullptr;
 	m->m_icon = nullptr;
@@ -285,14 +284,19 @@ void Application::new_game()
 
 	m->m_items[interaction_e::body] = l;
 
-	Parser::reset_object_counter();
-	m->reset_serialization_index();
+	GameObject* o = new GameObject();
+	o->m_name = u"test object";
+	o->m_state.push_back(m);
+	o->m_active_state = m;
 
-	std::string test = m->to_binary();
-	LOG(INFO) <<" | " << std::to_string(test.size());
+	Parser::reset_object_counter();
+	o->reset_serialization_index();
+
+	std::string test = o->to_binary();
 
 	std::size_t temp=0;
-	Object_state* tmp = new Object_state();
+	GameObject* tmp = new GameObject();
+
 	Parser::reset_object_counter();
 	tmp->reset_serialization_index();
 
@@ -302,7 +306,7 @@ void Application::new_game()
 	Parser::reset_object_counter();
 	
 	LOG(INFO) << " | " << std::to_string(m->m_size.x);
-	json = Parser::UTF16_to_CP866(Parser::to_json<Object_state*>(tmp));
+	json = Parser::UTF16_to_CP866(Parser::to_json<GameObject*>(tmp));
 	LOG(INFO) << json;
 
 	m_gui_controller.m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player, map, m_action_manager, m_game_log);

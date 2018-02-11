@@ -51,11 +51,7 @@ public:
 		return Packer<Action>::Instance();
 	}
 
-	constexpr static auto properties() {
-		return std::make_tuple(
-			make_property(&Action::m_kind, u"value")
-		);
-	}
+	constexpr static auto properties() { return std::make_tuple(make_property(&Action::m_kind, u"value")); }
 
 };
 
