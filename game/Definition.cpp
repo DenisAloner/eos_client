@@ -30,9 +30,31 @@ std::u16string Packer<Action>::to_json(iSerializable& object)
 	return object_to_json<Action>(dynamic_cast<Action&>(object));
 }
 
+std::u16string Packer<Action>::to_json(iSerializable* value)
+{
+	LOG(INFO) << Parser::UTF16_to_CP866(value->get_packer().get_type_name());
+	std::u16string result = value->to_json();
+	if (result.empty())
+	{
+		std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\"}";
+		return out;
+	}
+	else
+	{
+		std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\"," + result + u"}";
+		return out;
+	}
+}
+
 std::string Packer<Action>::to_binary(iSerializable& object)
 {
-	return "";
+	return object_to_binary<Action>(dynamic_cast<Action&>(object));
+}
+
+std::string Packer<Action>::to_binary(iSerializable* value)
+{
+	std::size_t id = value->get_packer().get_type_id() + 2;
+	return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + value->to_binary();
 }
 
 Apply_info::Apply_info(GameObject* unit, Object_interaction* object):m_unit(unit),m_object(object)
@@ -770,7 +792,8 @@ void Parser::register_class(std::u16string class_name, constructor_from_json_t f
 void Parser::reset_object_counter()
 {
 	m_items.clear();
-	m_object_index = 1;
+	m_object_index = 0;
+	m_type_id_counter = 0;
 }
 
 #endif //DEFINITION_CPP

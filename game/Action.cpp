@@ -293,7 +293,7 @@ char ActionClass_Move::perfom(Parameter* parameter)
 			break;
 		}
 		}
-		p[1].m_cell->m_map->move_object(p[0].m_object, p[1].m_cell);
+		p[1].m_cell->m_map->move_object(p[0].m_object, *p[1].m_cell);
 		//LOG(INFO) << p->m_object->m_name << "  " << "двигается:" << std::to_string(p->m_place->x) << "," << std::to_string(p->m_place->y);
 	}
 	else {

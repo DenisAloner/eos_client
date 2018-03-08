@@ -54,7 +54,7 @@ void GUI_MiniMap::render_on_canvas()
 			y2 = y1;
 			x3 = x2;
 			y3 = y0;
-			if (m_map_viewer->m_map->m_items[y][x]->m_mark==true)
+			if (m_map_viewer->m_map->get(y, x).m_mark==true)
 			{
 				glColor4d(1.0, 0.5, 0.0, 1.0);
 				glBegin(GL_QUADS);
@@ -65,7 +65,7 @@ void GUI_MiniMap::render_on_canvas()
 				glEnd();
 				continue;
 			}
-			for (std::list<GameObject*>::iterator obj = m_map_viewer->m_map->m_items[y][x]->m_items.begin(); obj != m_map_viewer->m_map->m_items[y][x]->m_items.end(); ++obj)
+			for (std::list<GameObject*>::iterator obj = m_map_viewer->m_map->get(y, x).m_items.begin(); obj != m_map_viewer->m_map->get(y, x).m_items.end(); ++obj)
 			{
 				glColor4d(0.0, 0.0, 0.0, 0.0);
 				if ((*obj)->m_name == u"floor")

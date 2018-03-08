@@ -161,35 +161,35 @@ MapCell* Game_algorithm::step_in_direction(GameObject* object, object_direction_
 	{
 	case object_direction_e::down:
 	{
-		return result->m_map->m_items[result->y - 1][result->x];
+		return &result->m_map->get(result->y - 1,result->x);
 	}
 	case object_direction_e::downleft:
 	{
-		return result->m_map->m_items[result->y - 1][result->x-1];
+		return &result->m_map->get(result->y - 1,result->x-1);
 	}
 	case object_direction_e::downright:
 	{
-		return result->m_map->m_items[result->y - 1][result->x + 1];
+		return &result->m_map->get(result->y - 1,result->x + 1);
 	}
 	case object_direction_e::left:
 	{
-		return result->m_map->m_items[result->y][result->x - 1];
+		return &result->m_map->get(result->y,result->x - 1);
 	}
 	case object_direction_e::right:
 	{
-		return result->m_map->m_items[result->y][result->x + 1];
+		return &result->m_map->get(result->y,result->x + 1);
 	}
 	case object_direction_e::top:
 	{
-		return result->m_map->m_items[result->y + 1][result->x];
+		return &result->m_map->get(result->y + 1,result->x);
 	}
 	case object_direction_e::topleft:
 	{
-		return result->m_map->m_items[result->y + 1][result->x - 1];
+		return &result->m_map->get(result->y + 1,result->x - 1);
 	}
 	case object_direction_e::topright:
 	{
-		return result->m_map->m_items[result->y + 1][result->x + 1];
+		return &result->m_map->get(result->y + 1,result->x + 1);
 	}
 	}
 }

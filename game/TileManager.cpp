@@ -2,6 +2,29 @@
 #include "game/GameObject.h"
 
 
+void vector_GLuint_from_json(std::u16string value, std::vector<GLuint>& prop)
+{
+	std::u16string temp = value;
+	scheme_list_t* s = Parser::read_array(temp);
+	if (s)
+	{
+		prop.resize(s->size());
+		int i = 0;
+		for (auto element : (*s))
+		{
+			std::string&& name = Parser::UTF16_to_CP866(Parser::get_value(element));
+			prop[i] = Application::instance().m_graph->png_texture_load(
+				FileSystem::instance().m_resource_path + "Tiles\\" + name + ".png");
+			i += 1;
+		}
+		delete s;
+	}
+}
+
+void vector_GLuint_from_binary(const std::string& value, std::vector<GLuint>& prop, std::size_t& pos)
+{
+}
+
 TileManager::TileManager():m_animation(animation_e::idle)
 {
 }

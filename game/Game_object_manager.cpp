@@ -423,6 +423,13 @@ iSerializable* get_serializable(scheme_map_t* value)
 	return Application::instance().m_actions[Parser::m_json_action_e.get_enum(Parser::UTF16_to_CP866(Parser::get_value((*value)[u"value"])))];
 }
 
+iSerializable* get_serializable(const std::string& value , std::size_t& pos)
+{
+	action_e::type x;
+	Parser::from_binary<action_e::type>(value, x, pos);
+	return Application::instance().m_actions[x];
+}
+
 iSerializable* get_template(scheme_map_t* value)
 {
 	LOG(INFO) << Parser::UTF16_to_CP866(Parser::get_value((*value)[u"value"]))<<"::"<<std::to_string(GameObjectManager::m_config.m_templates.size());
@@ -514,8 +521,11 @@ void GameObjectManager::init()
 	Parser::register_class<Instruction_check_tag>(u"instruction_check_tag");
 	Parser::register_class<Config>(u"config");
 	Parser::register_class<AI_enemy>(u"ai_enemy");
-	Parser::register_class<Action>(u"action", &get_serializable);
+	Parser::register_class<GameMap>(u"game_map");
+	Parser::register_class<MapCell>(u"map_cell");
+	Parser::register_class<Action>(u"action", &get_serializable, &get_serializable);
 	Parser::register_class(u"template", &get_template);
+	
 	
 	bytearray json;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.json", json);
@@ -598,6 +608,50 @@ std::string GameObjectManager::get_effect_prefix_string(effect_prefix_e key)
 		return value->second;
 	}
 	return "неизвестный тип";
+}
+
+void instancedictonary_icon_from_json(std::u16string value, InstanceDictonary<Icon*>& prop)
+{
+	std::u16string temp = value;
+	scheme_list_t* s = Parser::read_array(temp);
+	if (s)
+	{
+		for (auto element : (*s))
+		{
+			std::string&& name = Parser::UTF16_to_CP866(Parser::get_value(element));
+			Icon* icon = new Icon;
+			icon->m_value = Application::instance().m_graph->load_texture(FileSystem::instance().m_resource_path + "Tiles\\" + name + ".bmp");
+			prop.add(icon, name);
+		}
+		delete s;
+	}
+}
+
+void instancedictonary_icon_from_binary(const std::string& value, InstanceDictonary<Icon*>& prop, std::size_t& pos)
+{
+}
+
+void instancedictonary_tilemanager_from_json(std::u16string value, InstanceDictonary<TileManager*>& prop)
+{
+	std::u16string temp = value;
+	scheme_list_t* s = Parser::read_array(temp);
+	std::string k;
+	TileManager* v = nullptr;
+	if (s)
+	{
+		for (auto element : (*s))
+		{
+			scheme_vector_t* p = Parser::read_pair(element);
+			Parser::from_json<std::string>((*p)[0], k);
+			Parser::from_json<TileManager*>((*p)[1], v);
+			prop.add(v, k);
+		}
+		delete s;
+	}
+}
+
+void instancedictonary_tilemanager_from_binary(const std::string& value, InstanceDictonary<TileManager*>& prop, std::size_t& pos)
+{
 }
 
 effect_prefix_e GameObjectManager::get_effect_prefix_e(const std::string& key)

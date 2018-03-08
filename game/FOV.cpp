@@ -346,7 +346,7 @@ void FOV::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
 	{
 		for (int x = m_map_center.x - view.l, xf = m_view_center.x - view.l; x < m_map_center.x + view.r + 1; x++, xf++)
 		{
-			for (auto obj = map->m_items[y][x]->m_items.begin(); obj != map->m_items[y][x]->m_items.end(); ++obj)
+			for (auto obj = map->get(y,x).m_items.begin(); obj != map->get(y, x).m_items.end(); ++obj)
 			{
 				m_map[yf][xf].opaque = false;
 				if ((*obj) != unit&&qualifier((*obj)))
@@ -373,9 +373,9 @@ void FOV_help::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
 		for (int x = m_map_center.x - view.l, xf = m_view_center.x - view.l; x < m_map_center.x + view.r + 1; x++, xf++)
 		{
 			m_map[yf][xf].opaque = false;
-			if (map->m_items[y][x]->m_notable == true)
+			if (map->get(y, x).m_notable == true)
 			{
-				for (auto obj = map->m_items[y][x]->m_items.begin(); obj != map->m_items[y][x]->m_items.end(); ++obj)
+				for (auto obj = map->get(y, x).m_items.begin(); obj != map->get(y, x).m_items.end(); ++obj)
 				{
 					if ((*obj) != unit&&qualifier((*obj)))
 					{

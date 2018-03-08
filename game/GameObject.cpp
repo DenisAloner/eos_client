@@ -19,6 +19,19 @@ Game_object_owner* Game_object_owner::get_owner(entity_e kind)
 	return nullptr;
 }
 
+void Game_object_owner::reset_serialization_index()
+{
+	m_serialization_index = 0;
+	if (m_owner)
+	{
+		m_owner->reset_serialization_index();
+	}
+}
+
+Game_object_owner::Game_object_owner():m_owner(nullptr)
+{
+}
+
 Game_object_owner* Game_object_owner::get_owner()
 {
 	if (m_owner)
@@ -26,6 +39,13 @@ Game_object_owner* Game_object_owner::get_owner()
 		return m_owner->get_owner();
 	}
 	else return this;
+}
+
+MapCell::MapCell()
+{
+	m_kind = entity_e::cell;
+	m_notable = false;
+	m_owner = nullptr;
 }
 
 MapCell::MapCell(int x, int y, GameMap* map) :x(x), y(y), m_map(map)
@@ -38,6 +58,18 @@ MapCell::MapCell(int x, int y, GameMap* map) :x(x), y(y), m_map(map)
 void MapCell::add_object(GameObject* Object)
 {
 	m_items.push_back(Object);
+}
+
+void MapCell::reset_serialization_index()
+{
+	m_serialization_index = 0;
+	for (auto obj : (m_items))
+	{
+		if (obj->m_serialization_index != 0)
+		{
+			obj->reset_serialization_index();
+		}
+	}
 }
 
 void MapCell::save()
@@ -97,9 +129,9 @@ Attribute_map* Attribute_map::clone()
 void  Attribute_map::reset_serialization_index()
 {
 	m_serialization_index = 0;
-	for (auto item = m_items.begin(); item != m_items.end(); item++)
+	for (auto& m_item : m_items)
 	{
-		(*item).second->reset_serialization_index();
+		m_item.second->reset_serialization_index();
 	}
 }
 
@@ -177,6 +209,95 @@ void Attribute_map::apply_visitor(Visitor_generic& visitor)
 {
 	visitor.visit(*this);
 }
+
+std::u16string icon_to_json(Icon*& value)
+{
+	if (value)
+	{
+		return u"\"" + Parser::CP866_to_UTF16(value->m_json_string) + u"\"";
+	}
+	else
+	{
+		return u"null";
+	}
+}
+
+std::string icon_to_binary(Icon*& value)
+{
+	std::size_t s;
+	if (value) s = value->m_index + 1;
+	else s = 0;
+	return std::string(reinterpret_cast<const char*>(&s), sizeof(std::size_t));
+}
+
+void icon_from_json(std::u16string value, Icon*& prop)
+{
+	std::string&& name = Parser::UTF16_to_CP866(Parser::get_value(value));
+	prop = GameObjectManager::m_config.m_icons.get_by_string(name);
+}
+
+void icon_from_binary(const std::string& value, Icon*& prop, std::size_t& pos)
+{
+	std::size_t s = *reinterpret_cast<const std::size_t*>(&value[pos]);
+	pos += sizeof(std::size_t);
+	if (s == 0)
+	{
+		prop = nullptr;
+	}
+	else
+	{
+		prop = Application::instance().m_game_object_manager->m_config.m_icons.m_by_index[s - 1];
+	}
+}
+
+std::u16string tilemanager_to_json(TileManager*& value)
+{
+	if (value)
+	{
+		return u"\"" + Parser::CP866_to_UTF16(value->m_json_string) + u"\"";
+
+	}
+	else
+	{
+		return u"null";
+	}
+}
+
+std::string tilemanager_to_binary(TileManager*& value)
+{
+	std::size_t s;
+	if (value) s = value->m_index + 1; else s = 0;
+	return std::string(reinterpret_cast<const char*>(&s), sizeof(std::size_t));
+}
+
+void tilemanager_from_json(std::u16string value, TileManager*& prop)
+{
+	if (Parser::get_value(value) == u"null")
+	{
+		prop = nullptr;
+	}
+	else
+	{
+		std::string&& result = Parser::UTF16_to_CP866(Parser::get_value(value));
+		prop = Application::instance().m_game_object_manager->m_config.m_tile_managers.get_by_string(result);
+	}
+}
+
+void tilemanager_from_binary(const std::string& value, TileManager*& prop, std::size_t& pos)
+{
+	std::size_t s = *reinterpret_cast<const std::size_t*>(&value[pos]);
+	pos += sizeof(std::size_t);
+	if (s == 0)
+	{
+		prop = nullptr;
+	}
+	else
+	{
+		LOG(INFO) << "Tile manager" << std::to_string(s);
+		prop = Application::instance().m_game_object_manager->m_config.m_tile_managers.m_by_index[s - 1];
+	}
+}
+
 
 Object_state::Object_state()
 {
@@ -605,13 +726,13 @@ MapCell* GameObject::get_center(MapCell* c)
 		{
 			y = cell()->y - m_active_state->m_size.y / 2;
 		}
-		return cell()->m_map->m_items[y][x];
+		return &cell()->m_map->get(y, x);
 	}
 	else
 	{
 		int x = cell()->x + m_active_state->m_size.x / 2;
 		int y = cell()->y - m_active_state->m_size.y / 2;
-		return cell()->m_map->m_items[y][x];
+		return &cell()->m_map->get(y, x);
 	}
 }
 
@@ -780,9 +901,9 @@ void GameObject::reset_serialization_index()
 	{
 		m_owner->reset_serialization_index();
 	}
-	for (auto item = m_state.begin(); item != m_state.end(); ++item)
+	for (auto& item : m_state)
 	{
-		(*item)->reset_serialization_index();
+		item->reset_serialization_index();
 	}
 }
 
@@ -873,7 +994,7 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 		{
 			if (ai->m_fov->m_map[y - y_start][x - x_start].visible)
 			{
-				m_map->m_items[y][x]->m_notable = true;
+				m_map->get(y, x).m_notable = true;
 			}
 		}
 	}

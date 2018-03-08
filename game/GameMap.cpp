@@ -104,6 +104,57 @@ void Object_manager::load()
 	}
 }
 
+std::u16string vector_mapcell_to_json(std::vector<MapCell>& value)
+{
+	std::u16string result = u"[";
+	for (auto element : (value))
+	{
+		if (result != u"[") { result += u","; }
+		result += Parser::to_json<std::list<GameObject*>>(element.m_items);
+	}
+	result += u"]";
+	return result;
+}
+
+void vector_mapcell_from_json(std::u16string value, std::vector<MapCell>& prop)
+{
+	std::u16string temp = value;
+	scheme_list_t* s = Parser::read_array(temp);
+	if (s)
+	{
+		std::size_t i = 0;
+		prop.resize(s->size());
+		for (auto element : (*s))
+		{
+			Parser::from_json<MapCell>(element, prop[i]);
+			i += 1;
+		}
+	}
+	delete s;
+}
+
+std::string vector_mapcell_to_binary(std::vector<MapCell>& value)
+{
+	std::size_t s = value.size();
+	std::string result = std::string(reinterpret_cast<const char*>(&s), sizeof(std::size_t));
+	for (auto element : (value))
+	{
+		result += Parser::to_binary<MapCell>(element);
+	}
+	return result;
+}
+
+void vector_mapcell_from_binary(const std::string& value, std::vector<MapCell>& prop, std::size_t& pos)
+{
+	std::size_t s = *reinterpret_cast<const std::size_t*>(&value[pos]);
+	pos += sizeof(std::size_t);
+	prop.resize(s);
+	for (std::size_t i = 0; i < s; ++i)
+	{
+		Parser::from_binary<MapCell>(value, prop[i], pos);
+	}
+}
+
 GameMap::GameMap(dimension_t size)
 {
 	m_dijkstra_map = new Dijkstra_map();
@@ -115,17 +166,24 @@ GameMap::GameMap()
 	m_dijkstra_map = new Dijkstra_map();
 }
 
+MapCell& GameMap::get(int y, int x)
+{
+	return m_items[m_size.w*y + x];
+}
+
 void GameMap::init(dimension_t size)
 {
 	m_size = size;
 	LOG(INFO) << "Карта инициализирована с размером: " <<std::to_string( m_size.w )<< "x" << std::to_string(m_size.h);
-	m_items.resize(m_size.h);
+	m_items.resize(m_size.w*m_size.h);
 	for (int i = 0; i < m_size.h; i++)
 	{
-		m_items[i].resize(m_size.w);
 		for (int j = 0; j < m_size.w; j++)
 		{
-			m_items[i][j] = new MapCell(j, i, this);
+			MapCell& m = m_items[m_size.w*i+j];
+			m.x = j;
+			m.y = i;
+			m.m_map = this;
 		}
 	}
 }
@@ -161,17 +219,17 @@ void GameMap::generate_room(void)
 				if ((j == 0)|| (j == m_size.w - 1))
 				{
 					GameObject* obj = Application::instance().m_game_object_manager->new_object("wall");
-					add_object(obj, m_items[i][j]);
+					add_object(obj, get(i,j));
 				}
 				if ((i == 0)||(i == m_size.h - 1))
 				{
 					GameObject* obj = Application::instance().m_game_object_manager->new_object("wall");
-					add_object(obj, m_items[i][j]);
+					add_object(obj, get(i, j));
 				}
 			}
 			else {
 				GameObject* obj = Application::instance().m_game_object_manager->new_object("floor");
-				add_object(obj, m_items[i][j]);
+				add_object(obj, get(i, j));
 			}
 		}
 	}
@@ -182,7 +240,7 @@ void GameMap::generate_room(void)
 		for (int j = 1; j<m_size.w; j=j+20)
 		{
 			GameObject* obj = Application::instance().m_game_object_manager->new_object("torch");
-			add_to_map(obj, m_items[i][j]);
+			add_to_map(obj, get(i, j));
 			light_source_count += 1;
 		}
 	}
@@ -201,14 +259,14 @@ void GameMap::generate_room(void)
 }
 
 
-void GameMap::add_object(GameObject* object, MapCell* cell)
+void GameMap::add_object(GameObject* object, MapCell& cell)
 {
-	object->m_owner = cell;
+	object->m_owner = &cell;
 	for (int i = 0; i<object->m_active_state->m_size.y; i++)
 	{
 		for (int j = 0; j<object->m_active_state->m_size.x; j++)
 		{
-			m_items[cell->y - i][cell->x + j]->add_object(object);
+			get(cell.y - i, cell.x + j).add_object(object);
 		}
 	}
 }
@@ -219,13 +277,13 @@ void GameMap::remove_object(GameObject* object)
 	{
 		for (int j = 0; j<object->m_active_state->m_size.x; j++)
 		{
-			m_items[object->cell()->y - i][object->cell()->x + j]->m_items.remove(object);
+			get(object->cell()->y - i,object->cell()->x + j).m_items.remove(object);
 		}
 	}
 	object->m_owner = nullptr;
 }
 
-void GameMap::move_object(GameObject* object,MapCell* cell)
+void GameMap::move_object(GameObject* object, MapCell& cell)
 {
 	remove_object(object);
 	add_object(object, cell);
@@ -236,10 +294,10 @@ void  GameMap::turn_object(GameObject* object)
 	MapCell* position = object->cell();
 	remove_object(object);
 	object->turn();
-	add_object(object, position);
+	add_object(object, *position);
 }
 
-void GameMap::add_to_map(GameObject* object, MapCell* cell)
+void GameMap::add_to_map(GameObject* object, MapCell& cell)
 {
 	add_object(object, cell);
 }
@@ -356,9 +414,10 @@ void GameMap::fill()
 					add_object(obj, m_items[i][j]);*/
 				}
 				else {
-					m_items[i][j] = new MapCell(j, i, this);
+					MapCell& m = get(i, j);
+					m = MapCell(j, i, this);
 					GameObject* obj = Application::instance().m_game_object_manager->new_object("floor");
-					add_to_map(obj, m_items[i][j]);
+					add_to_map(obj,m);
 				}
 			}
 		}
@@ -399,27 +458,29 @@ void  GameMap::add_wall()
 	{
 		for (int x = 1; x< m_size.w-1; x++)
 		{
-			if (m_items[y][x]->m_items.empty())
+			MapCell& c = get(y, x);
+			if (c.m_items.empty())
 			{
 				empty = true;
 				for (int i = -1; i < 2; i++)
 				{
 					for (int j = -1; j < 2; j++)
 					{
-						if (!m_items[y+i][x +j]->m_items.empty()&&(!(i==0&&j==0)))
+						MapCell& nc = get(y + i,x + j);
+						if (!nc.m_items.empty()&&(!(i==0&&j==0)))
 						{
-							if (m_items[y + i][x + j]->m_items.front()->m_name == u"floor")
+							if (nc.m_items.front()->m_name == u"floor")
 								empty = false;
 						}
 					}
 				}
 				if (empty)
 				{
-					add_to_map(Application::instance().m_game_object_manager->new_object("dirt"), m_items[y][x]);
+					add_to_map(Application::instance().m_game_object_manager->new_object("dirt"), c);
 				}
 				else
 				{
-					add_to_map(Application::instance().m_game_object_manager->new_object("wall"), m_items[y][x]);
+					add_to_map(Application::instance().m_game_object_manager->new_object("wall"),c);
 				}
 			}
 		}
@@ -444,8 +505,9 @@ void GameMap::link_room(block_t* a, block_t* b)
 	{
 		for (int j = -3; j < 4; j++)
 		{
-			m_items[ac.y+j][i]->m_items.clear();
-			add_to_map(Application::instance().m_game_object_manager->new_object("floor"), m_items[ac.y + j][i]);
+			MapCell& c = get(ac.y + j,i);
+			c.m_items.clear();
+			add_to_map(Application::instance().m_game_object_manager->new_object("floor"), c);
 		}
 	}
 	if (ac.y < bc.y)
@@ -461,8 +523,9 @@ void GameMap::link_room(block_t* a, block_t* b)
 	{
 		for (int j = -3; j < 4; j++)
 		{
-			m_items[i][bc.x+j]->m_items.clear();
-			add_to_map(Application::instance().m_game_object_manager->new_object("floor"), m_items[i][bc.x + j]);
+			MapCell& c = get(i,bc.x + j);
+			c.m_items.clear();
+			add_to_map(Application::instance().m_game_object_manager->new_object("floor"), c);
 		}
 	}
 }
@@ -479,7 +542,8 @@ void  GameMap::add_doors()
 		b = false;
 		for (int i = rect.x; i < rect.x + rect.w+1; i++)
 		{
-			if (m_items[rect.y][i]->m_items.front()->m_name == u"floor") 
+			MapCell& c = get(rect.y,i);
+			if (c.m_items.front()->m_name == u"floor") 
 			{ 
 				if (!b)
 				{
@@ -487,7 +551,7 @@ void  GameMap::add_doors()
 					s = i;
 				}
 			}
-			if (m_items[rect.y][i]->m_items.front()->m_name == u"wall") 
+			if (c.m_items.front()->m_name == u"wall") 
 			{
 				if (b)
 				{
@@ -497,37 +561,37 @@ void  GameMap::add_doors()
 						GameObject* lever1 = Application::instance().m_game_object_manager->new_object("lever");
 						ObjectTag::Activator* l1 = new ObjectTag::Activator();
 						lever1->add_effect(interaction_e::tag, l1);
-						add_object(lever1, m_items[rect.y - 1][i - 1]);
+						add_object(lever1, get(rect.y - 1,i - 1));
 						GameObject* lever2 = Application::instance().m_game_object_manager->new_object("lever");
 						ObjectTag::Activator* l2 = new ObjectTag::Activator();
 						lever2->add_effect(interaction_e::tag, l2);
-						add_object(lever2, m_items[rect.y + 1][i - 7]);
+						add_object(lever2, get(rect.y + 1,i - 7));
 
 						l1->m_link.push_front(lever2);
 						l2->m_link.push_front(lever1);
 
-						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[rect.y][i - 1]);
+						add_object(Application::instance().m_game_object_manager->new_object("wall"),get(rect.y,i - 1));
 						GameObject*  obj = Application::instance().m_game_object_manager->new_object("door");
 						l1->m_link.push_front(obj);
 						l2->m_link.push_front(obj);
-						add_object(obj, m_items[rect.y][i - 2]);
+						add_object(obj, get(rect.y,i - 2));
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						l1->m_link.push_front(obj);
 						l2->m_link.push_front(obj);
-						add_object(obj, m_items[rect.y][i - 3]);
+						add_object(obj, get(rect.y,i - 3));
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						l1->m_link.push_front(obj);
 						l2->m_link.push_front(obj);
-						add_object(obj, m_items[rect.y][i - 4]);
+						add_object(obj, get(rect.y,i - 4));
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						l1->m_link.push_front(obj);
 						l2->m_link.push_front(obj);
-						add_object(obj, m_items[rect.y][i - 5]);
+						add_object(obj,get(rect.y,i - 5));
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						l1->m_link.push_front(obj);
 						l2->m_link.push_front(obj);
-						add_object(obj, m_items[rect.y][i - 6]);
-						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[rect.y][i - 7]);
+						add_object(obj, get(rect.y,i - 6));
+						add_object(Application::instance().m_game_object_manager->new_object("wall"), get(rect.y,i - 7));
 
 						Object_state* state = lever1->get_state(object_state_e::on);
 						state->add_effect(interaction_e::tag, l1);
@@ -544,7 +608,7 @@ void  GameMap::add_doors()
 		b = false;
 		for (int i = rect.x; i < rect.x + rect.w + 1; i++)
 		{
-			if (m_items[rect.y+rect.h][i]->m_items.front()->m_name == u"floor")
+			if (get(rect.y+rect.h,i).m_items.front()->m_name == u"floor")
 			{
 				if (!b)
 				{
@@ -552,7 +616,7 @@ void  GameMap::add_doors()
 					s = i;
 				}
 			}
-			if (m_items[rect.y + rect.h][i]->m_items.front()->m_name == u"wall")
+			if (get(rect.y + rect.h,i).m_items.front()->m_name == u"wall")
 			{
 				if (b)
 				{
@@ -561,37 +625,37 @@ void  GameMap::add_doors()
 						GameObject* lever1 = Application::instance().m_game_object_manager->new_object("lever");
 						ObjectTag::Activator* l1 = new ObjectTag::Activator();
 						lever1->add_effect(interaction_e::tag, l1);
-						add_object(lever1, m_items[rect.y + rect.h - 1][i - 1]);
+						add_object(lever1, get(rect.y + rect.h - 1,i - 1));
 						GameObject* lever2= Application::instance().m_game_object_manager->new_object("lever");
 						ObjectTag::Activator* l2 = new ObjectTag::Activator();
 						lever2->add_effect(interaction_e::tag, l2);
-						add_object(lever2, m_items[rect.y + rect.h + 1][i - 7]);
+						add_object(lever2, get(rect.y + rect.h + 1,i - 7));
 
 						l1->m_link.push_front(lever2);
 						l2->m_link.push_front(lever1);
 
-						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[rect.y + rect.h][i - 1]);
+						add_object(Application::instance().m_game_object_manager->new_object("wall"), get(rect.y + rect.h,i - 1));
 						GameObject*  obj = Application::instance().m_game_object_manager->new_object("door");
 						l1->m_link.push_front(obj);
 						l2->m_link.push_front(obj);
-						add_object(obj, m_items[rect.y + rect.h][i - 2]);
+						add_object(obj, get(rect.y + rect.h,i - 2));
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						l1->m_link.push_front(obj);
 						l2->m_link.push_front(obj);
-						add_object(obj, m_items[rect.y + rect.h][i - 3]);
+						add_object(obj, get(rect.y + rect.h,i - 3));
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						l1->m_link.push_front(obj);
 						l2->m_link.push_front(obj);
-						add_object(obj, m_items[rect.y + rect.h][i - 4]);
+						add_object(obj, get(rect.y + rect.h,i - 4));
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						l1->m_link.push_front(obj);
 						l2->m_link.push_front(obj);
-						add_object(obj, m_items[rect.y + rect.h][i - 5]);
+						add_object(obj, get(rect.y + rect.h,i - 5));
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						l1->m_link.push_front(obj);
 						l2->m_link.push_front(obj);
-						add_object(obj, m_items[rect.y + rect.h][i - 6]);
-						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[rect.y + rect.h][i - 7]);
+						add_object(obj, get(rect.y + rect.h,i - 6));
+						add_object(Application::instance().m_game_object_manager->new_object("wall"), get(rect.y + rect.h,i - 7));
 
 						Object_state* state = lever1->get_state(object_state_e::on);
 						state->add_effect(interaction_e::tag, l1);
@@ -606,7 +670,7 @@ void  GameMap::add_doors()
 		b = false;
 		for (int i = rect.y; i < rect.y + rect.h + 1; i++)
 		{
-			if (m_items[i][rect.x]->m_items.front()->m_name == u"floor")
+			if (get(i,rect.x).m_items.front()->m_name == u"floor")
 			{
 				if (!b)
 				{
@@ -614,7 +678,7 @@ void  GameMap::add_doors()
 					s = i;
 				}
 			}
-			if (m_items[i][rect.x]->m_items.front()->m_name == u"wall")
+			if (get(i,rect.x).m_items.front()->m_name == u"wall")
 			{
 				if (b)
 				{
@@ -624,44 +688,44 @@ void  GameMap::add_doors()
 						lever1->set_direction(object_direction_e::left);
 						ObjectTag::Activator* l1 = new ObjectTag::Activator();
 						lever1->add_effect(interaction_e::tag, l1);
-						add_object(lever1, m_items[i - 1][rect.x - 1]);
+						add_object(lever1, get(i - 1,rect.x - 1));
 						GameObject* lever2 = Application::instance().m_game_object_manager->new_object("lever");
 						lever2->set_direction(object_direction_e::left);
 						ObjectTag::Activator* l2 = new ObjectTag::Activator();
 						lever2->add_effect(interaction_e::tag, l2);
-						add_object(lever2, m_items[i - 7][rect.x + 1]);
+						add_object(lever2, get(i - 7,rect.x + 1));
 
 						l1->m_link.push_front(lever2);
 						l2->m_link.push_front(lever1);
 
-						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[i - 1][rect.x]);
+						add_object(Application::instance().m_game_object_manager->new_object("wall"),get(i - 1,rect.x));
 
 						GameObject* obj = Application::instance().m_game_object_manager->new_object("door");
 						obj->set_direction(object_direction_e::left);
 						l1->m_link.push_front(obj);
 						l2->m_link.push_front(obj);
-						add_object(obj, m_items[i - 2][rect.x]);
+						add_object(obj, get(i - 2,rect.x));
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						obj->set_direction(object_direction_e::left);
 						l1->m_link.push_front(obj);
 						l2->m_link.push_front(obj);
-						add_object(obj, m_items[i - 3][rect.x]);
+						add_object(obj, get(i - 3,rect.x));
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						obj->set_direction(object_direction_e::left);
 						l1->m_link.push_front(obj);
 						l2->m_link.push_front(obj);
-						add_object(obj, m_items[i - 4][rect.x]);
+						add_object(obj, get(i - 4,rect.x));
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						obj->set_direction(object_direction_e::left);
 						l1->m_link.push_front(obj);
 						l2->m_link.push_front(obj);
-						add_object(obj, m_items[i - 5][rect.x]);
+						add_object(obj, get(i - 5,rect.x));
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						obj->set_direction(object_direction_e::left);
 						l1->m_link.push_front(obj);
 						l2->m_link.push_front(obj);
-						add_object(obj, m_items[i - 6][rect.x]);
-						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[i - 7][rect.x]);
+						add_object(obj, get(i - 6,rect.x));
+						add_object(Application::instance().m_game_object_manager->new_object("wall"), get(i - 7,rect.x));
 
 						Object_state* state = lever1->get_state(object_state_e::on);
 						state->add_effect(interaction_e::tag, l1);
@@ -676,7 +740,7 @@ void  GameMap::add_doors()
 		b = false;
 		for (int i = rect.y; i < rect.y + rect.h + 1; i++)
 		{
-			if (m_items[i][rect.x + rect.w]->m_items.front()->m_name == u"floor")
+			if (get(i,rect.x + rect.w).m_items.front()->m_name == u"floor")
 			{
 				if (!b)
 				{
@@ -684,7 +748,7 @@ void  GameMap::add_doors()
 					s = i;
 				}
 			}
-			if (m_items[i][rect.x + rect.w]->m_items.front()->m_name == u"wall")
+			if (get(i,rect.x + rect.w).m_items.front()->m_name == u"wall")
 			{
 				if (b)
 				{
@@ -694,43 +758,43 @@ void  GameMap::add_doors()
 						lever1->set_direction(object_direction_e::left);
 						ObjectTag::Activator* l1 = new ObjectTag::Activator();
 						lever1->add_effect(interaction_e::tag, l1);
-						add_object(lever1, m_items[i - 1][rect.x + rect.w - 1]);
+						add_object(lever1, get(i - 1,rect.x + rect.w - 1));
 						GameObject* lever2 = Application::instance().m_game_object_manager->new_object("lever");
 						lever2->set_direction(object_direction_e::left);
 						ObjectTag::Activator* l2 = new ObjectTag::Activator();
 						lever2->add_effect(interaction_e::tag, l2);
-						add_object(lever2, m_items[i - 7][rect.x + rect.w + 1]);
+						add_object(lever2, get(i - 7,rect.x + rect.w + 1));
 
 						l1->m_link.push_front(lever2);
 						l2->m_link.push_front(lever1);
 
-						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[i - 1][rect.x + rect.w]);
+						add_object(Application::instance().m_game_object_manager->new_object("wall"), get(i - 1,rect.x + rect.w));
 						GameObject* obj = Application::instance().m_game_object_manager->new_object("door");
 						obj->set_direction(object_direction_e::left);
 						l1->m_link.push_front(obj);
 						l2->m_link.push_front(obj);
-						add_object(obj, m_items[i - 2][rect.x + rect.w]);
+						add_object(obj, get(i - 2,rect.x + rect.w));
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						obj->set_direction(object_direction_e::left);
 						l1->m_link.push_front(obj);
 						l2->m_link.push_front(obj);
-						add_object(obj, m_items[i - 3][rect.x + rect.w]);
+						add_object(obj, get(i - 3,rect.x + rect.w));
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						obj->set_direction(object_direction_e::left);
 						l1->m_link.push_front(obj);
 						l2->m_link.push_front(obj);
-						add_object(obj, m_items[i - 4][rect.x + rect.w]);
+						add_object(obj, get(i - 4,rect.x + rect.w));
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						obj->set_direction(object_direction_e::left);
 						l1->m_link.push_front(obj);
 						l2->m_link.push_front(obj);
-						add_object(obj, m_items[i - 5][rect.x + rect.w]);
+						add_object(obj, get(i - 5,rect.x + rect.w));
 						obj = Application::instance().m_game_object_manager->new_object("door");
 						obj->set_direction(object_direction_e::left);
 						l1->m_link.push_front(obj);
 						l2->m_link.push_front(obj);
-						add_object(obj, m_items[i - 6][rect.x + rect.w]);
-						add_object(Application::instance().m_game_object_manager->new_object("wall"), m_items[i - 7][rect.x + rect.w]);
+						add_object(obj, get(i - 6,rect.x + rect.w));
+						add_object(Application::instance().m_game_object_manager->new_object("wall"), get(i - 7,rect.x + rect.w));
 
 						Object_state* state = lever1->get_state(object_state_e::on);
 						state->add_effect(interaction_e::tag, l1);
@@ -763,11 +827,11 @@ void  GameMap::blur_lighting()
 				if (mx > m_size.w-1){ mx = m_size.w-1; }
 				if (my < 0){ my = 0; }
 				if (my > m_size.h-1){ my = m_size.h-1; }
-				l.R = l.R + m_items[my][mx]->m_light.R*Gauss[abs(i)];
-				l.G = l.G + m_items[my][mx]->m_light.G*Gauss[abs(i)];
-				l.B = l.B + m_items[my][mx]->m_light.B*Gauss[abs(i)];
+				l.R = l.R + get(my,mx).m_light.R*Gauss[abs(i)];
+				l.G = l.G + get(my, mx).m_light.G*Gauss[abs(i)];
+				l.B = l.B + get(my, mx).m_light.B*Gauss[abs(i)];
 			}
-			m_items[y][x]->m_light_blur = l;
+			get(y,x).m_light_blur = l;
 		}
 	}
 	for (int y = 0; y < m_size.h; y++)
@@ -783,11 +847,11 @@ void  GameMap::blur_lighting()
 				if (mx > m_size.w - 1) { mx = m_size.w - 1; }
 				if (my < 0) { my = 0; }
 				if (my > m_size.h - 1) { my = m_size.h - 1; }
-				l.R = l.R + m_items[my][mx]->m_light_blur.R*Gauss[abs(i)];
-				l.G = l.G + m_items[my][mx]->m_light_blur.G*Gauss[abs(i)];
-				l.B = l.B + m_items[my][mx]->m_light_blur.B*Gauss[abs(i)];
+				l.R = l.R + get(my, mx).m_light_blur.R*Gauss[abs(i)];
+				l.G = l.G + get(my, mx).m_light_blur.G*Gauss[abs(i)];
+				l.B = l.B + get(my, mx).m_light_blur.B*Gauss[abs(i)];
 			}
-			m_items[y][x]->m_light = l;
+			get(y, x).m_light = l;
 		}
 	}
 }
@@ -883,7 +947,7 @@ void GameMap::bresenham_line(MapCell* a, MapCell* b, std::function<void(MapCell*
 		{
 			for (x = a->x; x < b->x + 1; x++)
 			{
-				f(m_items[y][x]);
+				f(&get(y,x));
 				e = e + dy;
 				if (2 * e >= dx)
 				{
@@ -896,7 +960,7 @@ void GameMap::bresenham_line(MapCell* a, MapCell* b, std::function<void(MapCell*
 		{
 			for (x = a->x; x > b->x - 1; x--)
 			{
-				f(m_items[y][x]);
+				f(&get(y,x));
 				e = e + dy;
 				if (2 * e >= dx)
 				{
@@ -914,7 +978,7 @@ void GameMap::bresenham_line(MapCell* a, MapCell* b, std::function<void(MapCell*
 		{
 			for (y = a->y; y < b->y + 1; y++)
 			{
-				f(m_items[y][x]);
+				f(&get(y,x));
 				e = e + dx;
 				if (2 * e >= dy)
 				{
@@ -927,7 +991,7 @@ void GameMap::bresenham_line(MapCell* a, MapCell* b, std::function<void(MapCell*
 		{
 			for (y = a->y; y > b->y - 1; y--)
 			{
-				f(m_items[y][x]);
+				f(&get(y, x));
 				e = e + dx;
 				if (2 * e >= dy)
 				{
@@ -955,9 +1019,9 @@ MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, std::function<bool(Map
 		{
 			for (x = a->x; x < b->x + 1; x++)
 			{
-				if (f(m_items[y][x]))
+				if (f(&get(y, x)))
 				{
-					return m_items[y][x];
+					return &get(y, x);
 				}
 				e = e + dy;
 				if (2 * e >= dx)
@@ -966,15 +1030,15 @@ MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, std::function<bool(Map
 					e = e - dx;
 				}
 			}
-			return m_items[y][x - 1];
+			return &get(y,x - 1);
 		}
 		else
 		{
 			for (x = a->x; x > b->x - 1; x--)
 			{
-				if (f(m_items[y][x]))
+				if (f(&get(y, x)))
 				{
-					return m_items[y][x];
+					return &get(y, x);
 				}
 				e = e + dy;
 				if (2 * e >= dx)
@@ -983,7 +1047,7 @@ MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, std::function<bool(Map
 					e = e - dx;
 				}
 			}
-			return m_items[y][x + 1];
+			return &get(y,x + 1);
 		}
 	}
 	else
@@ -994,9 +1058,9 @@ MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, std::function<bool(Map
 		{
 			for (y = a->y; y < b->y + 1; y++)
 			{
-				if (f(m_items[y][x]))
+				if (f(&get(y, x)))
 				{
-					return m_items[y][x];
+					return &get(y, x);
 				}
 				e = e + dx;
 				if (2 * e >= dy)
@@ -1005,15 +1069,15 @@ MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, std::function<bool(Map
 					e = e - dy;
 				}
 			}
-			return m_items[y - 1][x];
+			return &get(y - 1,x);
 		}
 		else
 		{
 			for (y = a->y; y > b->y - 1; y--)
 			{
-				if (f(m_items[y][x]))
+				if (f(&get(y, x)))
 				{
-					return m_items[y][x];
+					return &get(y, x);
 				}
 				e = e + dx;
 				if (2 * e >= dy)
@@ -1022,7 +1086,7 @@ MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, std::function<bool(Map
 					e = e - dy;
 				}
 			}
-			return m_items[y + 1][x];
+			return &get(y + 1,x);
 		}
 	}
 }
@@ -1043,9 +1107,9 @@ MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, Parameter* p, std::fun
 		{
 			for (x = a->x; x < b->x + 1; x++)
 			{
-				if (f(p,m_items[y][x]))
+				if (f(p, &get(y, x)))
 				{
-					return m_items[y][x];
+					return &get(y, x);
 				}
 				e = e + dy;
 				if (2 * e >= dx)
@@ -1054,15 +1118,15 @@ MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, Parameter* p, std::fun
 					e = e - dx;
 				}
 			}
-			return m_items[y][x - 1];
+			return &get(y, x-1);
 		}
 		else
 		{
 			for (x = a->x; x > b->x - 1; x--)
 			{
-				if (f(p,m_items[y][x]))
+				if (f(p, &get(y, x)))
 				{
-					return m_items[y][x];
+					return &get(y, x);
 				}
 				e = e + dy;
 				if (2 * e >= dx)
@@ -1071,7 +1135,7 @@ MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, Parameter* p, std::fun
 					e = e - dx;
 				}
 			}
-			return m_items[y][x + 1];
+			return &get(y, x+1);
 		}
 	}
 	else
@@ -1082,9 +1146,9 @@ MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, Parameter* p, std::fun
 		{
 			for (y = a->y; y < b->y + 1; y++)
 			{
-				if (f(p,m_items[y][x]))
+				if (f(p, &get(y, x)))
 				{
-					return m_items[y][x];
+					return &get(y, x);
 				}
 				e = e + dx;
 				if (2 * e >= dy)
@@ -1093,15 +1157,15 @@ MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, Parameter* p, std::fun
 					e = e - dy;
 				}
 			}
-			return m_items[y - 1][x];
+			return &get(y-1, x);
 		}
 		else
 		{
 			for (y = a->y; y > b->y - 1; y--)
 			{
-				if (f(p,m_items[y][x]))
+				if (f(p, &get(y, x)))
 				{
-					return m_items[y][x];
+					return &get(y, x);
 				}
 				e = e + dx;
 				if (2 * e >= dy)
@@ -1110,7 +1174,7 @@ MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, Parameter* p, std::fun
 					e = e - dy;
 				}
 			}
-			return m_items[y + 1][x];
+			return &get(y+1, x);
 		}
 	}
 }
@@ -1125,22 +1189,22 @@ void GameMap::add_lighting()
 		//int tk;
 		//std::string torch_kind[] = { "torch", "red torch", "green torch", "blue torch" };
 		//tk = rand() % 1;
-		add_to_map(Application::instance().m_game_object_manager->new_object("torch"), m_items[block->rect.y + 1][block->rect.x + 1]);
+		add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(block->rect.y + 1,block->rect.x + 1));
 		//tk = rand() % 1;
-		add_to_map(Application::instance().m_game_object_manager->new_object("torch"), m_items[block->rect.y + 1][block->rect.x + block->rect.w - 1]);
+		add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(block->rect.y + 1,block->rect.x + block->rect.w - 1));
 		//tk = rand() % 1;
-		add_to_map(Application::instance().m_game_object_manager->new_object("torch"), m_items[block->rect.y + block->rect.h - 1][block->rect.x + block->rect.w - 1]);
+		add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(block->rect.y + block->rect.h - 1,block->rect.x + block->rect.w - 1));
 		//tk = rand() % 1;
-		add_to_map(Application::instance().m_game_object_manager->new_object("torch"), m_items[block->rect.y + block->rect.h - 1][block->rect.x + 1]);
+		add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(block->rect.y + block->rect.h - 1,block->rect.x + 1));
 		int j=0;
 		for (int i = block->rect.x + 1; i < block->rect.x + block->rect.w; i++)
 		{
 			if (j == 30)
 			{
 				//tk = rand() % 4;
-				add_to_map(Application::instance().m_game_object_manager->new_object("torch"), m_items[block->rect.y + 1][i]);
+				add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(block->rect.y + 1,i));
 				//tk = rand() % 4;
-				add_to_map(Application::instance().m_game_object_manager->new_object("torch"), m_items[block->rect.y + block->rect.h - 1][i]);
+				add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(block->rect.y + block->rect.h - 1,i));
 				j = -1;
 			}
 			j = j + 1;
@@ -1151,9 +1215,9 @@ void GameMap::add_lighting()
 			if (j == 30)
 			{
 				//tk = rand() % 4;
-				add_to_map(Application::instance().m_game_object_manager->new_object("torch"), m_items[i][block->rect.x + 1]);
+				add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(i,block->rect.x + 1));
 				//tk = rand() % 4;
-				add_to_map(Application::instance().m_game_object_manager->new_object("torch"), m_items[i][block->rect.x + block->rect.w - 1]);
+				add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(i,block->rect.x + block->rect.w - 1));
 				j = -1;
 			}
 			j = j + 1;
@@ -1174,11 +1238,18 @@ bool GameMap::check(int x, int y)
 void GameMap::reset_serialization_index()
 {
 	m_serialization_index = 0;
+	for (auto item : (m_items))
+	{
+		if (item.m_serialization_index != 0)
+		{
+			item.reset_serialization_index();
+		}
+	}
 }
 
 void GameMap::save()
 {
-	FILE* file = Serialization_manager::instance().m_file;
+	/*FILE* file = Serialization_manager::instance().m_file;
 	type_e t = type_e::gamemap;
 	fwrite(&t, sizeof(type_e), 1, file);
 	size_t s = m_index;
@@ -1197,12 +1268,12 @@ void GameMap::save()
 				Serialization_manager::instance().serialize(*item);
 			}
 		}
-	}
+	}*/
 }
 
 void GameMap::load()
 {
-	FILE* file = Serialization_manager::instance().m_file;
+	/*FILE* file = Serialization_manager::instance().m_file;
 	size_t s;
 	MapCell* cell;
 	for (int i = 0; i < m_size.h; i++)
@@ -1217,7 +1288,7 @@ void GameMap::load()
 				cell->m_items.push_back(dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize()));
 			}
 		}
-	}
+	}*/
 }
 
 Game_world::Game_world()
@@ -1293,7 +1364,7 @@ void Game_world::calculate_lighting()
 		{
 			for (int x = 0; x < map.m_size.w; x++)
 			{
-				map.m_items[y][x]->m_light = light_t();
+				map.get(y,x).m_light = light_t();
 			}
 		}
 	}
@@ -1331,9 +1402,9 @@ void Game_world::calculate_lighting()
 					lx = (*l)->cell()->x + x - 20;
 					if (!((lx < 0) || (lx > map->m_size.w - 1)))
 					{
-						map->m_items[ly][lx]->m_light.R += fl.m_map[y][x].light.R;
-						map->m_items[ly][lx]->m_light.G += fl.m_map[y][x].light.G;
-						map->m_items[ly][lx]->m_light.B += fl.m_map[y][x].light.B;
+						map->get(ly,lx).m_light.R += fl.m_map[y][x].light.R;
+						map->get(ly, lx).m_light.G += fl.m_map[y][x].light.G;
+						map->get(ly, lx).m_light.B += fl.m_map[y][x].light.B;
 					}
 				}
 			}

@@ -38,6 +38,13 @@ public:
 	virtual void load();
 };
 
+
+std::u16string vector_mapcell_to_json(std::vector<MapCell>& value);
+void vector_mapcell_from_json(std::u16string value, std::vector<MapCell>& prop);
+std::string vector_mapcell_to_binary(std::vector<MapCell>& value);
+void vector_mapcell_from_binary(const std::string& value, std::vector<MapCell>& prop, std::size_t& pos);
+
+
 class GameMap: public iSerializable
 {
 public:
@@ -56,7 +63,7 @@ public:
 
 	dimension_t m_size;
 
-	std::vector<std::vector<MapCell*> > m_items;
+	std::vector<MapCell> m_items;
 
 	std::list<block_t*> m_rooms;
 	std::list<block_t*> m_link_rooms;
@@ -64,17 +71,19 @@ public:
 	GameMap(dimension_t size);
 	GameMap();
 
+	MapCell& get(int y, int x);
+
 	void init(dimension_t size);
-	void add_object(GameObject* object, MapCell* cell);
+	void add_object(GameObject* object, MapCell& cell);
 	void remove_object(GameObject* object);
-	void move_object(GameObject* object, MapCell* cell);
+	void move_object(GameObject* object, MapCell& cell);
 	void turn_object(GameObject* object);
 
 	void generate_room(void);
 	bool divide_block(block_t* Block, int Depth, int Current);
 	void generate_level(void);
 
-	void add_to_map(GameObject* object, MapCell* cell);
+	void add_to_map(GameObject* object, MapCell& cell);
 
 	void fill();
 	void random_block(block_t* block);
@@ -93,9 +102,21 @@ public:
 
 	void blur_lighting();
 
-	virtual void reset_serialization_index();
+	void reset_serialization_index() override;
 	virtual void save();
 	virtual void load();
+
+	Packer_generic& get_packer() override
+	{
+		return Packer<GameMap>::Instance();
+	}
+
+	constexpr static auto properties()
+	{
+		return std::make_tuple(
+			make_property(&GameMap::m_items, u"item", &vector_mapcell_to_json, &vector_mapcell_from_json, &vector_mapcell_to_binary, &vector_mapcell_from_binary)
+		);
+	}
 
 };
 

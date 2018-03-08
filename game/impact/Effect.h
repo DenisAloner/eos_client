@@ -25,7 +25,7 @@ public:
 	virtual void do_predicat(Visitor& helper);
 	void apply_visitor(Visitor_generic& visitor) override;
 
-	virtual void reset_serialization_index();
+	void reset_serialization_index() override;
 	virtual void save();
 	virtual void load();
 
@@ -474,7 +474,7 @@ namespace ObjectTag
 	class Label : public Object_tag
 	{
 	public:
-		Label():Object_tag(object_tag_e::none){};
+		Label() :Object_tag(object_tag_e::none) {};
 		Label(object_tag_e type);
 		virtual Label* clone();
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);

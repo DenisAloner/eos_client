@@ -35,6 +35,8 @@ public:
 	entity_e m_kind;
 	Game_object_owner* m_owner;
 
+	Game_object_owner();
+
 	Game_object_owner* get_owner();
 	Game_object_owner* get_owner(entity_e kind);
 
@@ -50,6 +52,8 @@ public:
 			make_property(&Game_object_owner::m_owner, u"owner")
 		);
 	}
+
+	void reset_serialization_index() override;
 };
 
 class MapCell : public Game_object_owner
@@ -77,14 +81,29 @@ public:
 	light_t m_light;
 	light_t m_light_blur;
 
+	MapCell();
 	MapCell(int x, int y, GameMap* map);
 
 	void add_object(GameObject* Object);
 	//virtual Object_feature* find_property(property_e kind, GameObject* excluded);
 
-	virtual void reset_serialization_index() { m_serialization_index = 0; };
+	void reset_serialization_index() override;
 	virtual void save();
 	virtual void load();
+
+	Packer_generic& get_packer() override
+	{
+		return Packer<MapCell>::Instance();
+	}
+
+	constexpr static auto properties()
+	{
+		return std::make_tuple(
+			make_property(&MapCell::x, u"x"),
+			make_property(&MapCell::y, u"y"),
+			make_property(&MapCell::m_items, u"items")
+		);
+	}
 };
 
 class Tag_getter : public Visitor
@@ -110,7 +129,7 @@ public:
 	Interaction_list* create_feature_list(feature_list_type_e key, interaction_e name);
 	Attribute_map* clone();
 
-	virtual void reset_serialization_index();
+	void reset_serialization_index() override;
 	virtual void save();
 	virtual void load();
 
@@ -133,6 +152,17 @@ public:
 	}
 
 };
+
+
+std::u16string icon_to_json(Icon*& value);
+std::string icon_to_binary(Icon*& value);
+void icon_from_json(std::u16string value, Icon*& prop);
+void icon_from_binary(const std::string& value, Icon*& prop, std::size_t& pos);
+
+std::u16string tilemanager_to_json(TileManager*& value);
+std::string tilemanager_to_binary(TileManager*& value);
+void tilemanager_from_json(std::u16string value, TileManager*& prop);
+void tilemanager_from_binary(const std::string& value, TileManager*& prop, std::size_t& pos);
 
 class Object_state : public Attribute_map
 {
@@ -159,7 +189,7 @@ public:
 	virtual Object_state* clone();
 	void apply_visitor(Visitor_generic& visitor) override;
 
-	virtual void reset_serialization_index();
+	void reset_serialization_index() override;
 	virtual void save();
 	virtual void load();
 
@@ -167,7 +197,7 @@ public:
 	{
 		return Packer<Object_state>::Instance();
 	}
-
+	
 	constexpr static auto properties() {
 		return make_union(
 			Attribute_map::properties(),
@@ -176,8 +206,8 @@ public:
 				make_property(&Object_state::m_size, u"size"),
 				make_property(&Object_state::m_layer, u"layer"),
 				make_property(&Object_state::m_ai, u"AI"),
-				make_property<Parser::from_InstanceDictonary_t>(&Object_state::m_tile_manager, u"tile_manager"),
-				make_property<Parser::from_InstanceDictonary_t>(&Object_state::m_icon, u"icon"),
+				make_property(&Object_state::m_tile_manager, u"tile_manager", &tilemanager_to_json, &tilemanager_from_json, &tilemanager_to_binary, &tilemanager_from_binary),
+				make_property(&Object_state::m_icon, u"icon",&icon_to_json, &icon_from_json, &icon_to_binary, &icon_from_binary),
 				make_property(&Object_state::m_light, u"light"),
 				make_property(&Object_state::m_optical, u"optical")
 			));
@@ -248,7 +278,7 @@ public:
 	virtual void do_predicat(predicat func);
 	void apply_visitor(Visitor_generic& visitor) override;
 
-	virtual void reset_serialization_index();
+	void reset_serialization_index() override;
 	virtual void save();
 	virtual void load();
 

@@ -350,7 +350,7 @@ iSerializable* Serialization_manager::deserialize()
 		std::size_t map_index;
 		fread(&map_index, sizeof(std::size_t), 1, m_file);
 		LOG(INFO) << "Координаты " << std::to_string(x)<<" " << std::to_string(y)<<" "<< std::to_string(map_index);
-		return m_maps[map_index]->m_items[y][x];
+		return &m_maps[map_index]->get(y,x);
 	}
 	default:
 	{

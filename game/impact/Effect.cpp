@@ -84,13 +84,10 @@ void Interaction_list::apply_visitor(Visitor_generic& visitor)
 
 void Interaction_list::reset_serialization_index()
 {
-	LOG(INFO) << "шаг 4";
 	m_serialization_index = 0;
-	LOG(INFO) << "шаг 5";
-	for (auto item = m_items.begin(); item != m_items.end(); ++item)
+	for (auto& m_item : m_items)
 	{
-		LOG(INFO) << "шаг 6";
-		if(*item) (*item)->reset_serialization_index();
+		if(m_item) m_item->reset_serialization_index();
 	}
 }
 
@@ -733,7 +730,7 @@ void Parts_list::Update_visitor::visit(Object_interaction& value)
 						part.m_item = nullptr;
 						i->m_value = &part;
 						tag_equippable->m_value->apply_effect(nullptr, i);
-						cell->m_map->add_object(obj, cell);
+						cell->m_map->add_object(obj, *cell);
 						obj->m_owner = cell;
 						was_changed = true;
 						return;
@@ -755,7 +752,7 @@ void Parts_list::Update_visitor::visit(Object_interaction& value)
 							Instruction_slot_parameter* ip = new Instruction_slot_parameter();
 							ip->m_parameter = p;
 							tag_equippable->m_value->apply_effect(nullptr, ip);
-							cell->m_map->add_object(obj, cell);
+							cell->m_map->add_object(obj, *cell);
 							obj->m_owner = cell;
 							was_changed = true;
 							return;
@@ -1799,7 +1796,7 @@ void ObjectTag::Equippable::apply_effect(GameObject* unit, Object_interaction* o
 		case entity_e::cell:
 		{
 			//static_cast<MapCell*>(p->m_owner)->m_items.push_back(p->m_object);
-			static_cast<MapCell*>(p[2].m_owner)->m_map->add_object(p[1].m_object, static_cast<MapCell*>(p[2].m_owner));
+			static_cast<MapCell*>(p[2].m_owner)->m_map->add_object(p[1].m_object, *static_cast<MapCell*>(p[2].m_owner));
 			p[1].m_object->m_owner = p[2].m_owner;
 			break;
 		}

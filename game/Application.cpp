@@ -252,16 +252,36 @@ void Application::new_game()
 	int ry = 10;
 	GameObject* obj;
 	obj = m_game_object_manager->new_object("human");
-	map->add_to_map(obj, map->m_items[ry][rx]);
+	map->add_to_map(obj, map->get(ry,rx));
 	m_world->m_player = new Player(obj, map);
 	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
 
-	obj->reset_serialization_index();
-	std::string json = Parser::UTF16_to_CP866(Parser::to_json<GameObject*>(obj));
-	LOG(INFO) << json;
-	LOG(INFO) << std::to_string(obj->get_packer().get_type_id());
+	Parser::reset_object_counter();
+	map->reset_serialization_index();
+	std::string json = Parser::UTF16_to_CP866(Parser::to_json<GameMap*>(map));
+	//LOG(INFO) << json;
 
-	Object_state* m = new Object_state();
+	/*Parser::reset_object_counter();
+	map->reset_serialization_index();
+	std::string test = Parser::to_binary<GameMap*>(map);
+	LOG(INFO) << "Map size is "<< std::to_string(test.size());*/
+
+	FILE* m_file;
+	errno_t err = fopen_s(&m_file, (FileSystem::instance().m_resource_path + "Saves\\test.json").c_str(), "wb");
+	fwrite(&json[0], json.size(), 1, m_file);
+	fclose(m_file);
+
+	/*GameMap* tmp;
+	Parser::reset_object_counter();
+	std::size_t pos=0;
+	Parser::from_binary<GameMap*>(test, tmp, pos);
+
+	tmp->reset_serialization_index();
+	Parser::reset_object_counter();
+	json = Parser::UTF16_to_CP866(Parser::to_json<GameMap*>(tmp));
+	LOG(INFO) << json;*/
+
+	/*Object_state* m = new Object_state();
 	m->m_ai = nullptr;
 	m->m_icon = nullptr;
 	m->m_tile_manager = GameObjectManager::m_config.m_tile_managers.get_by_string("belt");
@@ -307,7 +327,7 @@ void Application::new_game()
 	
 	LOG(INFO) << " | " << std::to_string(m->m_size.x);
 	json = Parser::UTF16_to_CP866(Parser::to_json<GameObject*>(tmp));
-	LOG(INFO) << json;
+	LOG(INFO) << json;*/
 
 	m_gui_controller.m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player, map, m_action_manager, m_game_log);
 
@@ -345,23 +365,23 @@ void Application::new_game()
 
 			obj = m_game_object_manager->new_object("bat");
 			obj->set_direction(object_direction_e::top);
-			map->add_to_map(obj, map->m_items[ry - 2][rx-2]);
+			map->add_to_map(obj, map->get(ry - 2,rx-2));
 
 			obj = m_game_object_manager->new_object("bag");
 			obj->set_direction(object_direction_e::top);
-			map->add_to_map(obj, map->m_items[ry - 2][rx-1]);
+			map->add_to_map(obj, map->get(ry - 2,rx-1));
 
 			obj = m_game_object_manager->new_object("ring");
 			obj->set_direction(object_direction_e::top);
-			map->add_to_map(obj, map->m_items[ry - 2][rx + 1]);
+			map->add_to_map(obj, map->get(ry - 2,rx + 1));
 
 			obj = m_game_object_manager->new_object("boot");
 			obj->set_direction(object_direction_e::top);
-			map->add_to_map(obj, map->m_items[ry - 2][rx + 2]);
+			map->add_to_map(obj, map->get(ry - 2,rx + 2));
 
 			obj = m_game_object_manager->new_object("fountain");
 			obj->set_direction(object_direction_e::top);
-			map->add_to_map(obj, map->m_items[ry + 10][rx + 2]);
+			map->add_to_map(obj, map->get(ry + 10,rx + 2));
 
 			/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
 			fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), obj);
@@ -573,7 +593,7 @@ void Application::update()
 					{
 						if (ai->m_fov->m_map[y - y_start][x - x_start].visible)
 						{
-							map->m_items[y][x]->m_notable = true;
+							map->get(y,x).m_notable = true;
 						}
 					}
 				}
@@ -854,8 +874,8 @@ bool Application::command_check_position(GameObject*& object, MapCell*& position
 	{
 		for (int j = 0; j<object->m_active_state->m_size.x; j++)
 		{
-			if (map->m_items[position->y + i][position->x + j] == nullptr){ return false; }
-			for (std::list<GameObject*>::iterator item = map->m_items[position->y - i][position->x + j]->m_items.begin(); item != map->m_items[position->y - i][position->x + j]->m_items.end(); ++item)
+			//if (map->get(position->y + i,position->x + j) == nullptr){ return false; }
+			for (std::list<GameObject*>::iterator item = map->get(position->y - i,position->x + j).m_items.begin(); item != map->get(position->y - i,position->x + j).m_items.end(); ++item)
 			{
 				if (((*item) != object) && qualifier((*item)))
 				{
