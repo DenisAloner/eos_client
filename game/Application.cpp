@@ -258,7 +258,7 @@ void Application::new_game()
 
 	Parser::reset_object_counter();
 	map->reset_serialization_index();
-	std::string json = Parser::UTF16_to_CP866(Parser::to_json<GameMap*>(map));
+	std::u16string json = Parser::to_json<GameMap*>(map);
 	//LOG(INFO) << json;
 
 	/*Parser::reset_object_counter();

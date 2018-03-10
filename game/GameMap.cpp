@@ -104,9 +104,10 @@ void Object_manager::load()
 	}
 }
 
-std::u16string vector_mapcell_to_json(std::vector<MapCell>& value)
+std::u16string GameMap::vector_mapcell_to_json(std::vector<MapCell>& value)
 {
 	std::u16string result = u"[";
+	//result += Parser::to_json<dimension_t>(m_size) + u",";
 	for (auto element : (value))
 	{
 		if (result != u"[") { result += u","; }
@@ -116,7 +117,7 @@ std::u16string vector_mapcell_to_json(std::vector<MapCell>& value)
 	return result;
 }
 
-void vector_mapcell_from_json(std::u16string value, std::vector<MapCell>& prop)
+void GameMap::vector_mapcell_from_json(std::u16string value, std::vector<MapCell>& prop)
 {
 	std::u16string temp = value;
 	scheme_list_t* s = Parser::read_array(temp);
@@ -133,18 +134,18 @@ void vector_mapcell_from_json(std::u16string value, std::vector<MapCell>& prop)
 	delete s;
 }
 
-std::string vector_mapcell_to_binary(std::vector<MapCell>& value)
+std::string GameMap::vector_mapcell_to_binary(std::vector<MapCell>& value)
 {
 	std::size_t s = value.size();
 	std::string result = std::string(reinterpret_cast<const char*>(&s), sizeof(std::size_t));
 	for (auto element : (value))
 	{
-		result += Parser::to_binary<MapCell>(element);
+		result += Parser::to_binary<std::list<GameObject*>>(element.m_items);
 	}
 	return result;
 }
 
-void vector_mapcell_from_binary(const std::string& value, std::vector<MapCell>& prop, std::size_t& pos)
+void GameMap::vector_mapcell_from_binary(const std::string& value, std::vector<MapCell>& prop, std::size_t& pos)
 {
 	std::size_t s = *reinterpret_cast<const std::size_t*>(&value[pos]);
 	pos += sizeof(std::size_t);

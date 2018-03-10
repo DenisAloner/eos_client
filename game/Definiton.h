@@ -12,6 +12,7 @@
 #include <locale>
 #include <codecvt>
 #include <unordered_map>
+#include <optional>
 
 const float Pi = 3.14159265F;
 const float cos22_5 = cos(22.5F*Pi / 180.0F);
@@ -667,44 +668,43 @@ class iSerializable;
 template<typename Class, typename T>
 struct Property {
 	
-	typedef std::u16string(*to_json_function_t)(T&);
-	typedef void(*from_json_function_t)(std::u16string value, T& prop);
-	typedef std::string(*to_binary_function_t)(T&);
-	typedef void(*from_binary_function_t)(const std::string& value, T& prop, std::size_t& pos);
-
-	inline static const to_json_function_t default_to_json_function = nullptr;
-	inline static const from_json_function_t default_from_json_function = nullptr;
-	inline static const to_binary_function_t default_to_binary_function = nullptr;
-	inline static const from_binary_function_t default_from_binary_function = nullptr;
-	
-	
-	
-	constexpr Property(T Class::*aMember, const char16_t* aName, to_json_function_t func1 = default_to_json_function, from_json_function_t func2 = default_from_json_function, to_binary_function_t func3 = default_to_binary_function, from_binary_function_t func4 = default_from_binary_function) : member{ aMember }, name{ aName }, to_json_function(func1), from_json_function(func2), to_binary_function(func3), from_binary_function(func4){};
-	//constexpr Property(T Class::*aMember, const char16_t* aName,int i) : member{ aMember }, name{ aName } {};
+	typedef std::u16string(Class::*to_json_function_t)(T&);
+	typedef void(Class::*from_json_function_t)(std::u16string, T&);
+	typedef std::string(Class::*to_binary_function_t)(T&);
+	typedef void(Class::*from_binary_function_t)(const std::string&, T&, std::size_t&);
+	 
+	constexpr Property(T Class::*member, const char16_t* name, to_json_function_t to_json_function, from_json_function_t from_json_function, to_binary_function_t to_binary_function, from_binary_function_t from_binary_function) : member{ member }, name{ name }, to_json_function{ to_json_function }, from_json_function{ from_json_function }, to_binary_function{ to_binary_function }, from_binary_function{ from_binary_function } {};
+	constexpr Property(T Class::*member, const char16_t* name) : member{ member }, name{ name } {};
 
 	using Type = T;
 
 	T Class::*member;
 	const char16_t* name;
 
-	to_json_function_t to_json_function;
-	from_json_function_t from_json_function;
-	to_binary_function_t to_binary_function;
-	from_binary_function_t from_binary_function;
-	
-	constexpr inline Property& to_json(to_json_function_t value)
+	std::optional<to_json_function_t> to_json_function;
+	std::optional<from_json_function_t> from_json_function;
+	std::optional<to_binary_function_t> to_binary_function;
+	std::optional<from_binary_function_t> from_binary_function;
+
+	constexpr Property& to_json(to_json_function_t value)
 	{
 		to_json_function = value;
 		return *this;
 	}
 
-	constexpr inline Property& from_json(from_json_function_t value)
+	constexpr Property& from_json(from_json_function_t value)
 	{
 		from_json_function = value; 
 		return *this;
 	}
 
-	constexpr inline Property& from_binary(from_binary_function_t value)
+	constexpr Property& to_binary(to_binary_function_t value)
+	{
+		to_binary_function = value;
+		return *this;
+	}
+
+	constexpr Property& from_binary(from_binary_function_t value)
 	{
 		from_binary_function = value;
 		return *this;
@@ -713,8 +713,13 @@ struct Property {
 };
 
 template<typename Class, typename T>
-constexpr auto make_property(T Class::*member, const char16_t* name, std::u16string(*func1)(T&) = nullptr, void(*func2)(std::u16string value, T& prop)=nullptr, std::string(*func3)(T&)=nullptr, void(*func4)(const std::string& value, T& prop, std::size_t& pos) =nullptr) {
+constexpr auto make_property(T Class::*member, const char16_t* name, std::u16string(Class::*func1)(T&), void(Class::*func2)(std::u16string, T&), std::string(Class::*func3)(T&), void(Class::*func4)(const std::string&, T&, std::size_t&)) {
 	return Property<Class, T>{member, name, func1, func2, func3, func4};
+}
+
+template<typename Class, typename T>
+constexpr auto make_property(T Class::*member, const char16_t* name) {
+	return Property<Class, T>{member, name};
 }
 
 template<typename A, typename B>
@@ -736,9 +741,9 @@ template<typename T> void object_from_json(T& object, scheme_map_t* value)
 	for_sequence(std::make_index_sequence<nbProperties>{}, [&](auto i) {
 		constexpr auto property = std::get<i>(T::properties());
 		typedef decltype(property) P;
-		if(property.from_json_function!=P::default_from_json_function)
+		if(property.from_json_function)
 		{
-			property.from_json_function((*value)[property.name], object.*(property.member));
+			(object.*(property.from_json_function.value()))((*value)[property.name], object.*(property.member));
 		}
 		else Parser::from_json<typename P::Type>((*value)[property.name], object.*(property.member));
 	});
@@ -752,9 +757,9 @@ template<typename T> std::u16string object_to_json(T& object)
 		constexpr auto property = std::get<i>(T::properties());
 		typedef decltype(property) P;
 		if (i != 0) { result += u","; }
-		if (property.to_json_function != P::default_to_json_function)
+		if (property.to_json_function)
 		{
-			result += u"\"" + std::u16string(property.name) + u"\":" + property.to_json_function(object.*(property.member));
+			result += u"\"" + std::u16string(property.name) + u"\":" + (object.*(property.to_json_function.value()))(object.*(property.member));
 		}
 		else result += u"\"" + std::u16string(property.name) + u"\":" + Parser::to_json<typename P::Type>(object.*(property.member));
 	});
@@ -767,9 +772,9 @@ template<typename T> void object_from_binary(T& object, const std::string& value
 	for_sequence(std::make_index_sequence<nbProperties>{}, [&](auto i) {
 		constexpr auto property = std::get<i>(T::properties());
 		typedef decltype(property) P;
-		if(property.from_binary_function!=P::default_from_binary_function)
+		if(property.from_binary_function)
 		{
-			property.from_binary_function(value, object.*(property.member), pos);
+			(object.*(property.from_binary_function.value()))(value, object.*(property.member), pos);
 		}
 		else Parser::from_binary<typename P::Type>(value, object.*(property.member), pos);
 	});
@@ -782,9 +787,9 @@ template<typename T> std::string object_to_binary(T& object)
 	for_sequence(std::make_index_sequence<nbProperties>{}, [&](auto i) {
 		constexpr auto property = std::get<i>(T::properties());
 		typedef decltype(property) P;
-		if (property.to_binary_function != P::default_to_binary_function)
+		if (property.to_binary_function)
 		{
-			result += property.to_binary_function(object.*(property.member));
+			result += (object.*(property.to_binary_function.value()))(object.*(property.member));
 		}
 		else result += Parser::to_binary<typename P::Type>(object.*(property.member));
 	});
@@ -1458,6 +1463,13 @@ public:
 			from_json<float>((*s)[1], prop.attenuation.G);
 			from_json<float>((*s)[2], prop.attenuation.B);
 		}
+		else if constexpr(std::is_same<T, dimension_t>::value)
+		{
+			std::u16string temp = value;
+			scheme_vector_t* s = read_pair(temp);
+			from_json<int>((*s)[0], prop.w);
+			from_json<int>((*s)[1], prop.h);
+		}
 		else if constexpr(std::is_same<T, Icon>::value||std::is_same<T, TileManager>::value || is_instancedictonary<T>::value)
 		{
 			LOG(FATAL) << "<from_json> type error: " << typeid(value).name();
@@ -1479,59 +1491,11 @@ public:
 				if (value)
 				{
 					return value->get_packer().to_json(value);
-		/*			if (value->get_packer().is_singleton())
-					{
-						LOG(INFO) << UTF16_to_CP866(value->get_packer().get_type_name());
-						std::u16string result = value->to_json();
-						if (result.empty())
-						{
-							std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\"}";
-							return out;
-						}
-						else
-						{
-							std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\"," + result + u"}";
-							return out;
-						}
-					}
-					else
-					{
-						switch (value->m_serialization_index)
-						{
-						case 0:
-						{
-							m_object_index += 1;
-							value->m_serialization_index = m_object_index;
-							LOG(INFO) << UTF16_to_CP866(value->get_packer().get_type_name());
-							std::u16string result = value->to_json();
-							if (result.empty())
-							{
-								std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\",\"$link_id\":" + to_u16string(value->m_serialization_index) + u"}";
-								return out;
-							}
-							else
-							{
-								std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\",\"$link_id\":" + to_u16string(value->m_serialization_index) + u"," + result + u"}";
-								return out;
-							}
-						}
-						default:
-						{
-								if(m_object_index<value->m_serialization_index)
-								{
-									LOG(FATAL) << std::to_string(m_object_index) << " | " << std::to_string(value->m_serialization_index) << " | " << typeid(value).name() << " | " << UTF16_to_CP866(value->get_packer().get_type_name());
-								}
-							std::u16string out = u"{\"$type\":\"link\",\"value\":" + to_u16string(value->m_serialization_index) + u"}";
-							return out;
-						}
-						}
-					}*/
 				}
 				else
 				{
 					return u"null";
 				}
-
 			}
 			else
 			{
@@ -1638,6 +1602,11 @@ public:
 		{
 			LOG(FATAL) << "<to_json> type error: " << typeid(value).name();
 			return u"";
+		}
+		else if constexpr(std::is_same<T, dimension_t>::value)
+		{
+			std::u16string result = u"[" + to_json<int>(value.w) + u"," + to_json<int>(value.h) + u"]";
+			return result;
 		}
 		else
 		{
@@ -1794,6 +1763,11 @@ public:
 			from_binary<std::size_t>(value, result, pos);
 			prop = *Application::instance().m_ai_manager->m_path_qualifiers[result];
 		}
+		else if constexpr(std::is_same<T, dimension_t>::value)
+		{
+			from_binary<int>(value, prop.w, pos);
+			from_binary<int>(value, prop.h, pos);
+		}
 		else if constexpr(std::is_same<T, Icon>::value||std::is_same<T, TileManager>::value || is_instancedictonary<T>::value)
 		{
 			LOG(FATAL) << "<from_binary> type error: " << typeid(prop).name();
@@ -1813,15 +1787,7 @@ public:
 			{
 				if (value)
 				{
-					value->get_packer().to_binary(value);
-					/*if (value->get_packer().is_singleton())
-					{
-						
-					}
-					else
-					{
-						
-					}*/
+					return value->get_packer().to_binary(value);
 				}
 				std::size_t id = 0;
 				return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t));
@@ -1900,6 +1866,10 @@ public:
 		else if constexpr(std::is_same<T, predicat_t>::value)
 		{
 			return to_binary<std::size_t>(value.index);
+		}
+		else if constexpr(std::is_same<T, dimension_t>::value)
+		{
+			return to_binary<int>(value.w) + to_binary<int>(value.h);
 		}
 		else if constexpr(std::is_same<T, Icon>::value||std::is_same<T, TileManager>::value|| is_instancedictonary<T>::value)
 		{

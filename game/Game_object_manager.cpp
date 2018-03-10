@@ -610,7 +610,7 @@ std::string GameObjectManager::get_effect_prefix_string(effect_prefix_e key)
 	return "неизвестный тип";
 }
 
-void instancedictonary_icon_from_json(std::u16string value, InstanceDictonary<Icon*>& prop)
+void Config::instancedictonary_icon_from_json(std::u16string value, InstanceDictonary<Icon*>& prop)
 {
 	std::u16string temp = value;
 	scheme_list_t* s = Parser::read_array(temp);
@@ -627,11 +627,11 @@ void instancedictonary_icon_from_json(std::u16string value, InstanceDictonary<Ic
 	}
 }
 
-void instancedictonary_icon_from_binary(const std::string& value, InstanceDictonary<Icon*>& prop, std::size_t& pos)
+void Config::instancedictonary_icon_from_binary(const std::string& value, InstanceDictonary<Icon*>& prop, std::size_t& pos)
 {
 }
 
-void instancedictonary_tilemanager_from_json(std::u16string value, InstanceDictonary<TileManager*>& prop)
+void Config::instancedictonary_tilemanager_from_json(std::u16string value, InstanceDictonary<TileManager*>& prop)
 {
 	std::u16string temp = value;
 	scheme_list_t* s = Parser::read_array(temp);
@@ -650,7 +650,7 @@ void instancedictonary_tilemanager_from_json(std::u16string value, InstanceDicto
 	}
 }
 
-void instancedictonary_tilemanager_from_binary(const std::string& value, InstanceDictonary<TileManager*>& prop, std::size_t& pos)
+void Config::instancedictonary_tilemanager_from_binary(const std::string& value, InstanceDictonary<TileManager*>& prop, std::size_t& pos)
 {
 }
 

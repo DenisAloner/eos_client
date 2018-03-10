@@ -154,16 +154,6 @@ public:
 };
 
 
-std::u16string icon_to_json(Icon*& value);
-std::string icon_to_binary(Icon*& value);
-void icon_from_json(std::u16string value, Icon*& prop);
-void icon_from_binary(const std::string& value, Icon*& prop, std::size_t& pos);
-
-std::u16string tilemanager_to_json(TileManager*& value);
-std::string tilemanager_to_binary(TileManager*& value);
-void tilemanager_from_json(std::u16string value, TileManager*& prop);
-void tilemanager_from_binary(const std::string& value, TileManager*& prop, std::size_t& pos);
-
 class Object_state : public Attribute_map
 {
 public:
@@ -197,6 +187,16 @@ public:
 	{
 		return Packer<Object_state>::Instance();
 	}
+
+	std::u16string icon_to_json(Icon*& value);
+	std::string icon_to_binary(Icon*& value);
+	void icon_from_json(std::u16string value, Icon*& prop);
+	void icon_from_binary(const std::string& value, Icon*& prop, std::size_t& pos);
+
+	std::u16string tilemanager_to_json(TileManager*& value);
+	std::string tilemanager_to_binary(TileManager*& value);
+	void tilemanager_from_json(std::u16string value, TileManager*& prop);
+	void tilemanager_from_binary(const std::string& value, TileManager*& prop, std::size_t& pos);
 	
 	constexpr static auto properties() {
 		return make_union(
@@ -206,8 +206,8 @@ public:
 				make_property(&Object_state::m_size, u"size"),
 				make_property(&Object_state::m_layer, u"layer"),
 				make_property(&Object_state::m_ai, u"AI"),
-				make_property(&Object_state::m_tile_manager, u"tile_manager", &tilemanager_to_json, &tilemanager_from_json, &tilemanager_to_binary, &tilemanager_from_binary),
-				make_property(&Object_state::m_icon, u"icon",&icon_to_json, &icon_from_json, &icon_to_binary, &icon_from_binary),
+				make_property(&Object_state::m_tile_manager, u"tile_manager", &Object_state::tilemanager_to_json, &Object_state::tilemanager_from_json, &Object_state::tilemanager_to_binary, &Object_state::tilemanager_from_binary),
+				make_property(&Object_state::m_icon, u"icon", &Object_state::icon_to_json, &Object_state::icon_from_json, &Object_state::icon_to_binary, &Object_state::icon_from_binary),
 				make_property(&Object_state::m_light, u"light"),
 				make_property(&Object_state::m_optical, u"optical")
 			));

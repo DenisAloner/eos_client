@@ -17,11 +17,7 @@ class Attribute_map;
 class Interaction_list;
 class Game_object_owner;
 
-void instancedictonary_icon_from_json(std::u16string value, InstanceDictonary<Icon*>& prop);
-void instancedictonary_icon_from_binary(const std::string& value, InstanceDictonary<Icon*>& prop, std::size_t& pos);
 
-void instancedictonary_tilemanager_from_json(std::u16string value, InstanceDictonary<TileManager*>& prop);
-void instancedictonary_tilemanager_from_binary(const std::string& value, InstanceDictonary<TileManager*>& prop, std::size_t& pos);
 
 class Config : public iSerializable
 {
@@ -40,11 +36,17 @@ public:
 		return Packer<Config>::Instance();
 	}
 
+	void instancedictonary_icon_from_json(std::u16string value, InstanceDictonary<Icon*>& prop);
+	void instancedictonary_icon_from_binary(const std::string& value, InstanceDictonary<Icon*>& prop, std::size_t& pos);
+
+	void instancedictonary_tilemanager_from_json(std::u16string value, InstanceDictonary<TileManager*>& prop);
+	void instancedictonary_tilemanager_from_binary(const std::string& value, InstanceDictonary<TileManager*>& prop, std::size_t& pos);
+
 	constexpr static auto properties() 
 	{
 		return std::make_tuple(
-			make_property(&Config::m_icons, u"icons").from_json(&instancedictonary_icon_from_json).from_binary(&instancedictonary_icon_from_binary),
-			make_property(&Config::m_tile_managers, u"tile_managers").from_json(&instancedictonary_tilemanager_from_json).from_binary(instancedictonary_tilemanager_from_binary),
+			make_property(&Config::m_icons, u"icons").from_json(&Config::instancedictonary_icon_from_json).from_binary(&Config::instancedictonary_icon_from_binary),
+			make_property(&Config::m_tile_managers, u"tile_managers").from_json(&Config::instancedictonary_tilemanager_from_json).from_binary(&Config::instancedictonary_tilemanager_from_binary),
 			make_property(&Config::m_templates, u"templates"),
 			make_property(&Config::m_items, u"items")
 		);

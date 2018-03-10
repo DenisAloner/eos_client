@@ -5,9 +5,6 @@
 #include "graphics/gl.hpp"
 #include "Application.h"
 
-void vector_GLuint_from_json(std::u16string value, std::vector<GLuint>& prop);
-void vector_GLuint_from_binary(const std::string& value, std::vector<GLuint>& prop, std::size_t& pos);
-
 class TileManager : public iSerializable, public InstanceDictonaryElement
 {
 public:
@@ -30,10 +27,13 @@ public:
 	//	return Packer<Object_interaction>::Instance();
 	//}
 
+	void vector_GLuint_from_json(std::u16string value, std::vector<GLuint>& prop);
+	void vector_GLuint_from_binary(const std::string& value, std::vector<GLuint>& prop, std::size_t& pos);
+
 	constexpr static auto properties() 
 	{
 		return std::make_tuple(
-			make_property(&TileManager::m_tiles, u"tiles").from_json(&vector_GLuint_from_json).from_binary(&vector_GLuint_from_binary)
+			make_property(&TileManager::m_tiles, u"tiles").from_json(&TileManager::vector_GLuint_from_json).from_binary(&TileManager::vector_GLuint_from_binary)
 		);
 	}
 

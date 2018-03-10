@@ -210,7 +210,7 @@ void Attribute_map::apply_visitor(Visitor_generic& visitor)
 	visitor.visit(*this);
 }
 
-std::u16string icon_to_json(Icon*& value)
+std::u16string Object_state::icon_to_json(Icon*& value)
 {
 	if (value)
 	{
@@ -222,7 +222,7 @@ std::u16string icon_to_json(Icon*& value)
 	}
 }
 
-std::string icon_to_binary(Icon*& value)
+std::string Object_state::icon_to_binary(Icon*& value)
 {
 	std::size_t s;
 	if (value) s = value->m_index + 1;
@@ -230,13 +230,13 @@ std::string icon_to_binary(Icon*& value)
 	return std::string(reinterpret_cast<const char*>(&s), sizeof(std::size_t));
 }
 
-void icon_from_json(std::u16string value, Icon*& prop)
+void Object_state::icon_from_json(std::u16string value, Icon*& prop)
 {
 	std::string&& name = Parser::UTF16_to_CP866(Parser::get_value(value));
 	prop = GameObjectManager::m_config.m_icons.get_by_string(name);
 }
 
-void icon_from_binary(const std::string& value, Icon*& prop, std::size_t& pos)
+void Object_state::icon_from_binary(const std::string& value, Icon*& prop, std::size_t& pos)
 {
 	std::size_t s = *reinterpret_cast<const std::size_t*>(&value[pos]);
 	pos += sizeof(std::size_t);
@@ -250,7 +250,7 @@ void icon_from_binary(const std::string& value, Icon*& prop, std::size_t& pos)
 	}
 }
 
-std::u16string tilemanager_to_json(TileManager*& value)
+std::u16string Object_state::tilemanager_to_json(TileManager*& value)
 {
 	if (value)
 	{
@@ -263,14 +263,14 @@ std::u16string tilemanager_to_json(TileManager*& value)
 	}
 }
 
-std::string tilemanager_to_binary(TileManager*& value)
+std::string Object_state::tilemanager_to_binary(TileManager*& value)
 {
 	std::size_t s;
 	if (value) s = value->m_index + 1; else s = 0;
 	return std::string(reinterpret_cast<const char*>(&s), sizeof(std::size_t));
 }
 
-void tilemanager_from_json(std::u16string value, TileManager*& prop)
+void Object_state::tilemanager_from_json(std::u16string value, TileManager*& prop)
 {
 	if (Parser::get_value(value) == u"null")
 	{
@@ -283,7 +283,7 @@ void tilemanager_from_json(std::u16string value, TileManager*& prop)
 	}
 }
 
-void tilemanager_from_binary(const std::string& value, TileManager*& prop, std::size_t& pos)
+void Object_state::tilemanager_from_binary(const std::string& value, TileManager*& prop, std::size_t& pos)
 {
 	std::size_t s = *reinterpret_cast<const std::size_t*>(&value[pos]);
 	pos += sizeof(std::size_t);

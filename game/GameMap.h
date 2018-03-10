@@ -38,13 +38,6 @@ public:
 	virtual void load();
 };
 
-
-std::u16string vector_mapcell_to_json(std::vector<MapCell>& value);
-void vector_mapcell_from_json(std::u16string value, std::vector<MapCell>& prop);
-std::string vector_mapcell_to_binary(std::vector<MapCell>& value);
-void vector_mapcell_from_binary(const std::string& value, std::vector<MapCell>& prop, std::size_t& pos);
-
-
 class GameMap: public iSerializable
 {
 public:
@@ -111,10 +104,15 @@ public:
 		return Packer<GameMap>::Instance();
 	}
 
+	std::u16string vector_mapcell_to_json(std::vector<MapCell>& value);
+	void vector_mapcell_from_json(std::u16string value, std::vector<MapCell>& prop);
+	std::string vector_mapcell_to_binary(std::vector<MapCell>& value);
+	void vector_mapcell_from_binary(const std::string& value, std::vector<MapCell>& prop, std::size_t& pos);
+
 	constexpr static auto properties()
 	{
 		return std::make_tuple(
-			make_property(&GameMap::m_items, u"item", &vector_mapcell_to_json, &vector_mapcell_from_json, &vector_mapcell_to_binary, &vector_mapcell_from_binary)
+			make_property(&GameMap::m_items, u"item", &GameMap::vector_mapcell_to_json, &GameMap::vector_mapcell_from_json, &GameMap::vector_mapcell_to_binary, &GameMap::vector_mapcell_from_binary)
 		);
 	}
 
@@ -134,7 +132,7 @@ public:
 
 	Game_world();
 	void calculate_lighting();
-	virtual void reset_serialization_index();
+	void reset_serialization_index() override;
 	virtual void save();
 	virtual void load();
 };

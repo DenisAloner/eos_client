@@ -2,7 +2,7 @@
 #include "game/GameObject.h"
 
 
-void vector_GLuint_from_json(std::u16string value, std::vector<GLuint>& prop)
+void TileManager::vector_GLuint_from_json(std::u16string value, std::vector<GLuint>& prop)
 {
 	std::u16string temp = value;
 	scheme_list_t* s = Parser::read_array(temp);
@@ -21,7 +21,7 @@ void vector_GLuint_from_json(std::u16string value, std::vector<GLuint>& prop)
 	}
 }
 
-void vector_GLuint_from_binary(const std::string& value, std::vector<GLuint>& prop, std::size_t& pos)
+void TileManager::vector_GLuint_from_binary(const std::string& value, std::vector<GLuint>& prop, std::size_t& pos)
 {
 }
 
