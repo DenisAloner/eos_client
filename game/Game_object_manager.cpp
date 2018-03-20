@@ -418,24 +418,6 @@ void GameObjectManager::parser(const std::string& command)
 	}
 }
 
-iSerializable* get_serializable(scheme_map_t* value)
-{
-	return Application::instance().m_actions[Parser::m_json_action_e.get_enum(Parser::UTF16_to_CP866(Parser::get_value((*value)[u"value"])))];
-}
-
-iSerializable* get_serializable(const std::string& value , std::size_t& pos)
-{
-	action_e::type x;
-	Parser::from_binary<action_e::type>(value, x, pos);
-	return Application::instance().m_actions[x];
-}
-
-iSerializable* get_template(scheme_map_t* value)
-{
-	LOG(INFO) << Parser::UTF16_to_CP866(Parser::get_value((*value)[u"value"]))<<"::"<<std::to_string(GameObjectManager::m_config.m_templates.size());
-	return GameObjectManager::m_config.m_templates[Parser::UTF16_to_CP866(Parser::get_value((*value)[u"value"]))]->clone();
-}
-
 Config GameObjectManager::m_config = {};
 
 void GameObjectManager::init()
@@ -489,43 +471,6 @@ void GameObjectManager::init()
 	m_to_effect_prefix_e["physical_damage"] = effect_prefix_e::physical_damage;
 	m_to_effect_prefix_e["poison_damage"] = effect_prefix_e::poison_damage;
 
-	Parser::register_class<Instruction_arg_extract>(u"instruction_arg_extract");
-	Parser::register_class<TileManager_Single>(u"tilemanager_single");
-	Parser::register_class<TileManager_rotate8_animate>(u"tilemanager_rotate8_animate");
-	Parser::register_class<TileManager_equilateral_animate>(u"tilemanager_equilateral_animate");
-	Parser::register_class<Instruction_get_owner>(u"instruction_get_owner");
-	Parser::register_class<Instruction_get_owner_top>(u"instruction_get_owner_top");
-	Parser::register_class<Effect>(u"effect");
-	Parser::register_class<Interaction_time>(u"interaction_time");
-	Parser::register_class<ObjectTag::Can_transfer_object>(u"can_transfer_object");
-	Parser::register_class<Instruction_check_owner_type>(u"instruction_check_owner_type");
-	Parser::register_class<GameObject>(u"game_object");
-	Parser::register_class<Inventory_cell>(u"inventory_cell");
-	Parser::register_class<Object_part>(u"object_part");
-	Parser::register_class<Attribute_map>(u"attribute_map");
-	Parser::register_class<Object_state>(u"object_state");
-	Parser::register_class<Object_state_equip>(u"object_state_equip");
-	Parser::register_class<Interaction_list>(u"interaction_list");
-	Parser::register_class<Parameter_list>(u"parameter_list");
-	Parser::register_class<Vision_list>(u"vision_list");
-	Parser::register_class<Vision_component>(u"vision_component");
-	Parser::register_class<Tag_list>(u"tag_list");
-	Parser::register_class<Parts_list>(u"parts_list");
-	Parser::register_class<Action_list>(u"action_list");
-	Parser::register_class<Instruction_slot_link>(u"interaction_slot_link");
-	Parser::register_class<ObjectTag::Label>(u"label");
-	Parser::register_class<ObjectTag::Mortal>(u"objecttag_mortal");
-	Parser::register_class<ObjectTag::Equippable>(u"equippable");
-	Parser::register_class<ObjectTag::Requirements_to_object>(u"requirements_to_object");
-	Parser::register_class<Instruction_check_part_type>(u"instruction_check_part_type");
-	Parser::register_class<Instruction_check_tag>(u"instruction_check_tag");
-	Parser::register_class<Config>(u"config");
-	Parser::register_class<AI_enemy>(u"ai_enemy");
-	Parser::register_class<GameMap>(u"game_map");
-	Parser::register_class<MapCell>(u"map_cell");
-	Parser::register_class<Action>(u"action", &get_serializable, &get_serializable);
-	Parser::register_class(u"template", &get_template);
-	
 	
 	bytearray json;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.json", json);

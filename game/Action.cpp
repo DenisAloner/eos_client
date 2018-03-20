@@ -68,6 +68,45 @@ void Action::load()
 {
 }
 
+Packer_generic& Action::get_packer()
+{
+	return Packer<Action>::Instance();
+}
+
+std::u16string Packer<Action>::to_json(iSerializable* value)
+{
+	LOG(INFO) << Parser::UTF16_to_CP866(value->get_packer().get_type_name());
+	std::u16string result = value->to_json();
+	if (result.empty())
+	{
+		std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\"}";
+		return out;
+	}
+	else
+	{
+		std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\"," + result + u"}";
+		return out;
+	}
+}
+
+std::string Packer<Action>::to_binary(iSerializable* value)
+{
+	std::size_t id = value->get_packer().get_type_id() + 2;
+	return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + value->to_binary();
+}
+
+iSerializable* Packer<Action>::from_json(scheme_map_t* value)
+{
+	return Application::instance().m_actions[Parser::m_json_action_e.get_enum(Parser::UTF16_to_CP866(Parser::get_value((*value)[u"value"])))];
+}
+
+iSerializable* Packer<Action>::from_binary(const std::string& value, std::size_t& pos)
+{
+	action_e::type x;
+	Parser::from_binary<action_e::type>(value, x, pos);
+	return Application::instance().m_actions[x];
+}
+
 
 Action_wrapper::Action_wrapper()
 {

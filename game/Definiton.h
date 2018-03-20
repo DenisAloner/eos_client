@@ -801,9 +801,11 @@ class Packer_generic
 public:
 
 	virtual void from_json(iSerializable& object, scheme_map_t* value) = 0;
+	virtual iSerializable* from_json(scheme_map_t* value) = 0;
 	virtual std::u16string to_json(iSerializable& object) = 0;
 	virtual std::u16string to_json(iSerializable* object) = 0;
 	virtual void from_binary(iSerializable& object, const std::string& value, std::size_t& pos) = 0;
+	virtual iSerializable* from_binary(const std::string& value, std::size_t& pos) = 0;
 	virtual std::string to_binary(iSerializable& object) = 0;
 	virtual std::string to_binary(iSerializable* object) = 0;
 	virtual std::u16string get_type_name() = 0;
@@ -824,7 +826,7 @@ public:
 	virtual void save() = 0;
 	virtual void load() = 0;
 
-	virtual Packer_generic& get_packer();
+	virtual Packer_generic& get_packer() = 0;
 
 	virtual void from_binary(const std::string& value, std::size_t& pos)
 	{
@@ -861,7 +863,7 @@ template<typename T> iSerializable* create_instance(scheme_map_t* value)
 	return out;
 }
 
-template<typename T> iSerializable* create_instance(const std::string& value, std::size_t& pos)
+template<typename T> iSerializable* create_instance2(const std::string& value, std::size_t& pos)
 {
 	T* out = new T;
 	Parser::m_items.push_back(out);
@@ -887,8 +889,8 @@ public:
 	Packer& operator=(Packer const&) = delete;  // Copy assign
 	Packer& operator=(Packer &&) = delete;      // Move assign
 
-	std::u16string m_type_name;
-	std::size_t m_type_id;
+	static std::u16string m_type_name;
+	static std::size_t m_type_id;
 
 	std::u16string get_type_name() override
 	{
@@ -898,6 +900,29 @@ public:
 	std::size_t get_type_id() override
 	{
 		return m_type_id;
+	}
+
+	iSerializable* from_json(scheme_map_t* value) override
+	{
+		if constexpr(!std::is_abstract<T>::value)
+		{
+			T* out = new T;
+			out->from_json(value);
+			return out;
+		}
+		return nullptr;
+	}
+
+	iSerializable* from_binary(const std::string& value, std::size_t& pos) override
+	{
+		if constexpr(!std::is_abstract<T>::value)
+		{
+			T* out = new T;
+			Parser::m_items.push_back(out);
+			out->from_binary(value, pos);
+			return out;
+		}
+		return nullptr;
 	}
 
 	void from_json(iSerializable& object, scheme_map_t* value) override
@@ -981,56 +1006,12 @@ public:
 
 };
 
-template<>
-class Packer<Action> :public Packer_generic
-{
-public:
+template <typename T>
+std::u16string Packer<T>::m_type_name = u"";
 
-	static Packer& Instance()
-	{
-		static Packer self;
-		return self;
-	}
+template <typename T>
+std::size_t Packer<T>::m_type_id = 0;
 
-	// delete copy and move constructors and assign operators
-	Packer(Packer const&) = delete;             // Copy construct
-	Packer(Packer &&) = delete;                  // Move construct
-	Packer& operator=(Packer const&) = delete;  // Copy assign
-	Packer& operator=(Packer &&) = delete;      // Move assign
-
-	std::u16string m_type_name;
-	std::size_t m_type_id;
-
-	std::u16string get_type_name() override
-	{
-		return m_type_name;
-	}
-
-	std::size_t get_type_id() override
-	{
-		return m_type_id;
-	}
-
-	void from_json(iSerializable& object, scheme_map_t* value) override
-	{
-	}
-
-	std::u16string to_json(iSerializable& object) override;
-	std::u16string to_json(iSerializable* value) override;;
-
-
-	void from_binary(iSerializable& object, const std::string& value, std::size_t& pos) override
-	{
-	}
-
-	std::string to_binary(iSerializable& object) override;
-	std::string to_binary(iSerializable* value) override;
-
-	Packer()
-	{
-	}
-
-};
 
 template<typename T>
 class Tree
@@ -1092,16 +1073,15 @@ public:
 	virtual void do_predicat(Visitor& helper) { helper.visit(*this); };
 	virtual void apply_visitor(Visitor_generic& visitor);
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<Object_interaction>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties()
 	{
 		return std::make_tuple(make_property(&Object_interaction::m_namename, u"m_value"));
 	}
 
+	void save() override{};
+	void load() override{};
 };
 
 typedef iSerializable* (*constructor_from_json_t)(scheme_map_t*);
@@ -1119,8 +1099,10 @@ public:
 	static std::size_t m_object_index;
 
 	static std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> m_convert;
-	static std::map<std::u16string, constructor_from_json_t> m_constructors_from_json;
-	static std::vector<constructor_from_binary_t> m_constructors_from_binary;
+
+	static inline std::map<std::u16string, Packer_generic*> t_constructors_from_json = {};
+	static inline std::vector<Packer_generic*> t_constructors_from_binary = {};
+
 	static std::vector<iSerializable*> m_items;
 
 	static Dictonary<interaction_e> m_json_interaction_e;
@@ -1157,23 +1139,13 @@ public:
 	static std::u16string CP866_to_UTF16(std::string const& value);
 	static void reset_object_counter();
 
-	static void register_class(std::u16string class_name, constructor_from_json_t function);
-
+	
 	template<typename T>
-	static void register_class(std::u16string class_name)
+	static void register_packer(std::u16string class_name)
 	{
-		m_constructors_from_json[class_name] = create_instance<T>;
-		m_constructors_from_binary.push_back(create_instance<T>);
-		Packer<T>::Instance().m_type_name = class_name;
-		Packer<T>::Instance().m_type_id = m_type_id_counter;
-		m_type_id_counter += 1;
-	}
-
-	template<typename T>
-	static void register_class(std::u16string class_name, constructor_from_json_t function, constructor_from_binary_t function2)
-	{
-		m_constructors_from_json[class_name] = function;
-		m_constructors_from_binary.push_back(function2);
+		//Packer_generic* packer = &Packer<T>::Instance();
+		t_constructors_from_json[class_name] = &Packer<T>::Instance();
+		t_constructors_from_binary.push_back(&Packer<T>::Instance());
 		Packer<T>::Instance().m_type_name = class_name;
 		Packer<T>::Instance().m_type_id = m_type_id_counter;
 		m_type_id_counter += 1;
@@ -1241,7 +1213,7 @@ public:
 				scheme_map_t* s = read_object(temp);
 				if (s)
 				{
-					prop = dynamic_cast<T>(m_constructors_from_json[get_value((*s)[u"$type"])](s));
+					prop = dynamic_cast<T>(t_constructors_from_json[get_value((*s)[u"$type"])]->from_json(s));
 					LOG(INFO) << UTF16_to_CP866(prop->get_packer().get_type_name());
 					delete s;
 					return;
@@ -1640,7 +1612,7 @@ public:
 				default:
 				{
 					LOG(INFO)<<"form binaryyyyyyyyyyyy " << typeid(T).name();
-					prop = dynamic_cast<T>(m_constructors_from_binary[id - 2](value, pos));
+					prop = dynamic_cast<T>(t_constructors_from_binary[id - 2]->from_binary(value, pos));
 					LOG(INFO) << std::to_string(prop==nullptr);
 					break;
 				}
@@ -1907,6 +1879,17 @@ public:
 		else static_assert(always_false<T>::value, "<get_dictonary> type error");
 	}
 
+	class Initializator
+	{
+	public:
+		Initializator();
+	};
+
+	static inline Initializator initializator = Initializator();
+
+private:
+
+	
 };
 
 #endif //DEFINITION_H

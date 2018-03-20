@@ -112,10 +112,10 @@ public:
 	virtual AI* clone() = 0;
 	virtual void calculate_FOV(GameObject* object, GameMap* map) = 0;
 
-	Packer_generic& get_packer() override
-	{
+	Packer_generic& get_packer() override = 0;
+	/*{
 		return Packer<AI>::Instance();
-	}
+	}*/
 
 	constexpr static auto properties() { return std::make_tuple(make_property(&AI::m_ai_type, u"ai_type")); }
 
@@ -171,6 +171,12 @@ public:
 
 	virtual void save();
 	virtual void load();
+
+
+	Packer_generic& get_packer()
+	{
+		return Packer<AI_trap>::Instance();
+	}
 
 	virtual void calculate_FOV(GameObject* object, GameMap* map) {};
 };

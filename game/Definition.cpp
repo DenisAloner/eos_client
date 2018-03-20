@@ -15,47 +15,6 @@ object_direction_e operator+(object_direction_e lhs, const rotate_direction_e& r
 	}
 }
 
-Packer_generic& iSerializable::get_packer()
-{
-	return Packer<Object_interaction>::Instance();
-}
-
-//Packer_generic& iSerializable::get_packer() const
-//{
-//	return Packer<Object_interaction>::Instance();
-//}
-
-std::u16string Packer<Action>::to_json(iSerializable& object)
-{
-	return object_to_json<Action>(dynamic_cast<Action&>(object));
-}
-
-std::u16string Packer<Action>::to_json(iSerializable* value)
-{
-	LOG(INFO) << Parser::UTF16_to_CP866(value->get_packer().get_type_name());
-	std::u16string result = value->to_json();
-	if (result.empty())
-	{
-		std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\"}";
-		return out;
-	}
-	else
-	{
-		std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\"," + result + u"}";
-		return out;
-	}
-}
-
-std::string Packer<Action>::to_binary(iSerializable& object)
-{
-	return object_to_binary<Action>(dynamic_cast<Action&>(object));
-}
-
-std::string Packer<Action>::to_binary(iSerializable* value)
-{
-	std::size_t id = value->get_packer().get_type_id() + 2;
-	return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + value->to_binary();
-}
 
 Apply_info::Apply_info(GameObject* unit, Object_interaction* object):m_unit(unit),m_object(object)
 {
@@ -65,8 +24,12 @@ void Object_interaction::apply_visitor(Visitor_generic& visitor)
 {
 }
 
-std::map<std::u16string, constructor_from_json_t> Parser::m_constructors_from_json = {};
-std::vector<constructor_from_binary_t> Parser::m_constructors_from_binary = {};
+Packer_generic& Object_interaction::get_packer()
+{
+	return Packer<Object_interaction>::Instance();
+}
+
+
 std::vector<iSerializable*> Parser::m_items = {};
 
 Dictonary<object_tag_e> Parser::m_json_object_tag = {
@@ -236,6 +199,9 @@ std::unordered_map<object_tag_e, std::u16string>  Parser::m_string_object_tag_e 
 	{ object_tag_e::footwear , u"обувь" }
 };
 
+
+
+
 std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> Parser::m_convert;
 
 std::size_t Parser::m_object_index = 0;
@@ -243,8 +209,8 @@ unsigned int Parser::m_type_id_counter = 0;
 
 Parser::Parser()
 {
-	/*m_constructors_from_json[u"A_class"] = A::create_instance;
-	m_constructors_from_json[u"B_class"] = B::create_instance;*/
+	/*m_constructors_from_json[u"A_class"] = A::create_instance2;
+	m_constructors_from_json[u"B_class"] = B::create_instance2;*/
 }
 
 Parser::~Parser()
@@ -784,9 +750,50 @@ std::u16string Parser::CP866_to_UTF16(std::string const& value)
 	return out;
 }
 
-void Parser::register_class(std::u16string class_name, constructor_from_json_t function)
+iSerializable* Packer<Object_interaction>::from_json(scheme_map_t* value)
 {
-	m_constructors_from_json[class_name] = function;
+	LOG(INFO) << Parser::UTF16_to_CP866(Parser::get_value((*value)[u"value"])) << " :: " << std::to_string(GameObjectManager::m_config.m_templates.size());
+	return GameObjectManager::m_config.m_templates[Parser::UTF16_to_CP866(Parser::get_value((*value)[u"value"]))]->clone();
+}
+
+Parser::Initializator::Initializator()
+{
+	register_packer<Instruction_arg_extract>(u"instruction_arg_extract");
+	register_packer<TileManager_Single>(u"tilemanager_single");
+	register_packer<TileManager_rotate8_animate>(u"tilemanager_rotate8_animate");
+	register_packer<TileManager_equilateral_animate>(u"tilemanager_equilateral_animate");
+	register_packer<Instruction_get_owner>(u"instruction_get_owner");
+	register_packer<Instruction_get_owner_top>(u"instruction_get_owner_top");
+	register_packer<Effect>(u"effect");
+	register_packer<Interaction_time>(u"interaction_time");
+	register_packer<ObjectTag::Can_transfer_object>(u"can_transfer_object");
+	register_packer<Instruction_check_owner_type>(u"instruction_check_owner_type");
+	register_packer<GameObject>(u"game_object");
+	register_packer<Inventory_cell>(u"inventory_cell");
+	register_packer<Object_part>(u"object_part");
+	register_packer<Attribute_map>(u"attribute_map");
+	register_packer<Object_state>(u"object_state");
+	register_packer<Object_state_equip>(u"object_state_equip");
+	register_packer<Interaction_list>(u"interaction_list");
+	register_packer<Parameter_list>(u"parameter_list");
+	register_packer<Vision_list>(u"vision_list");
+	register_packer<Vision_component>(u"vision_component");
+	register_packer<Tag_list>(u"tag_list");
+	register_packer<Parts_list>(u"parts_list");
+	register_packer<Action_list>(u"action_list");
+	register_packer<Instruction_slot_link>(u"interaction_slot_link");
+	register_packer<ObjectTag::Label>(u"label");
+	register_packer<ObjectTag::Mortal>(u"objecttag_mortal");
+	register_packer<ObjectTag::Equippable>(u"equippable");
+	register_packer<ObjectTag::Requirements_to_object>(u"requirements_to_object");
+	register_packer<Instruction_check_part_type>(u"instruction_check_part_type");
+	register_packer<Instruction_check_tag>(u"instruction_check_tag");
+	register_packer<Config>(u"config");
+	register_packer<AI_enemy>(u"ai_enemy");
+	register_packer<GameMap>(u"game_map");
+	register_packer<MapCell>(u"map_cell");
+	register_packer<Action>(u"action");
+	register_packer<Object_interaction>(u"template");
 }
 
 void Parser::reset_object_counter()

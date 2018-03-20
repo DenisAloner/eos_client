@@ -245,7 +245,7 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 void Application::new_game()
 {
 	m_world = new Game_world();
-	GameMap* map = new GameMap(dimension_t(100, 100));
+	GameMap* map = new GameMap(dimension_t(25, 25));
 	map->generate_room();
 	m_world->m_maps.push_back(map);
 	int rx = 10;
@@ -259,7 +259,9 @@ void Application::new_game()
 	Parser::reset_object_counter();
 	map->reset_serialization_index();
 	std::u16string json = Parser::to_json<GameMap*>(map);
-	//LOG(INFO) << json;
+	char16_t marker = 0xFEFF;
+	json = marker + json;
+	LOG(INFO) << Parser::UTF16_to_CP866(json);
 
 	/*Parser::reset_object_counter();
 	map->reset_serialization_index();
@@ -268,7 +270,7 @@ void Application::new_game()
 
 	FILE* m_file;
 	errno_t err = fopen_s(&m_file, (FileSystem::instance().m_resource_path + "Saves\\test.json").c_str(), "wb");
-	fwrite(&json[0], json.size(), 1, m_file);
+	fwrite(&json[0], json.size()*2, 1, m_file);
 	fclose(m_file);
 
 	/*GameMap* tmp;

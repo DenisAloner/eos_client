@@ -53,7 +53,7 @@ public:
 	}
 };
 
-class GameObjectManager:public iSerializable
+class GameObjectManager
 {
 public:
 

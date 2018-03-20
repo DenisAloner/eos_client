@@ -258,6 +258,12 @@ public:
 
 	virtual void save();
 	virtual void load();
+
+
+	Packer_generic& get_packer()
+	{
+		return Packer<Slot_set_state>::Instance();
+	}
 };
 
 class Interaction_slot :public Object_interaction
@@ -269,10 +275,10 @@ public:
 	virtual void do_predicat(Visitor& helper);
 	void reset_serialization_index() override;
 
-	Packer_generic& get_packer() override
-	{
+	Packer_generic& get_packer() override = 0;
+	/*{
 		return Packer<Interaction_slot>::Instance();
-	}
+	}*/
 
 	constexpr static auto properties() 
 	{
@@ -294,6 +300,12 @@ public:
 
 	virtual void save();
 	virtual void load();
+
+
+	Packer_generic& get_packer()
+	{
+		return Packer<Interaction_copyist>::Instance();
+	}
 };
 
 
@@ -308,6 +320,11 @@ public:
 
 	virtual void save();
 	virtual void load();
+
+	Packer_generic& get_packer()
+	{
+		return Packer<Interaction_prefix>::Instance();
+	}
 };
 
 class Interaction_addon :public Interaction_slot
@@ -321,6 +338,12 @@ public:
 
 	virtual void save();
 	virtual void load();
+
+
+	Packer_generic& get_packer()
+	{
+		return Packer<Interaction_addon>::Instance();
+	}
 };
 
 class Interaction_time :public Interaction_slot
@@ -362,6 +385,12 @@ public:
 
 	virtual void save();
 	virtual void load();
+
+
+	Packer_generic& get_packer()
+	{
+		return Packer<Interaction_timer>::Instance();
+	}
 };
 
 class Effect :public Object_interaction
@@ -413,6 +442,12 @@ namespace ObjectTag
 
 		virtual void save();
 		virtual void load();
+
+
+		Packer_generic& get_packer()
+		{
+			return Packer<Poison_resist>::Instance();
+		}
 	};
 
 	class Mortal :public Object_tag
@@ -445,6 +480,12 @@ namespace ObjectTag
 
 		virtual void save();
 		virtual void load();
+
+
+		Packer_generic& get_packer()
+		{
+			return Packer<Purification_from_poison>::Instance();
+		}
 	};
 
 	class Activator : public Object_tag
@@ -458,6 +499,12 @@ namespace ObjectTag
 		virtual void reset_serialization_index();
 		virtual void save();
 		virtual void load();
+
+
+		Packer_generic& get_packer()
+		{
+			return Packer<Activator>::Instance();
+		}
 	};
 
 	class Fast_move : public Object_tag
@@ -469,6 +516,12 @@ namespace ObjectTag
 
 		virtual void save();
 		virtual void load();
+
+
+		Packer_generic& get_packer()
+		{
+			return Packer<Fast_move>::Instance();
+		}
 	};
 
 	class Label : public Object_tag
@@ -634,6 +687,11 @@ public:
 	virtual void save();
 	virtual void load();
 
+	Packer_generic& get_packer()
+	{
+		return Packer<Instruction_slot_parameter>::Instance();
+	}
+
 };
 
 class Instruction_game_owner :public Object_interaction
@@ -649,6 +707,11 @@ public:
 
 	virtual void save() {};
 	virtual void load() {};
+
+	Packer_generic& get_packer()
+	{
+		return Packer<Instruction_game_owner>::Instance();
+	}
 
 };
 

@@ -107,7 +107,6 @@ void Object_manager::load()
 std::u16string GameMap::vector_mapcell_to_json(std::vector<MapCell>& value)
 {
 	std::u16string result = u"[";
-	//result += Parser::to_json<dimension_t>(m_size) + u",";
 	for (auto element : (value))
 	{
 		if (result != u"[") { result += u","; }
@@ -127,7 +126,7 @@ void GameMap::vector_mapcell_from_json(std::u16string value, std::vector<MapCell
 		prop.resize(s->size());
 		for (auto element : (*s))
 		{
-			Parser::from_json<MapCell>(element, prop[i]);
+			Parser::from_json<std::list<GameObject*>>(element, prop[i].m_items);
 			i += 1;
 		}
 	}

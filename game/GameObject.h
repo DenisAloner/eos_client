@@ -40,10 +40,10 @@ public:
 	Game_object_owner* get_owner();
 	Game_object_owner* get_owner(entity_e kind);
 
-	Packer_generic& get_packer() override
-	{
+	Packer_generic& get_packer() override = 0;
+	/*{
 		return Packer<Game_object_owner>::Instance();
-	}
+	}*/
 
 	constexpr static auto properties() 
 	{
@@ -55,6 +55,9 @@ public:
 
 	void reset_serialization_index() override;
 };
+
+//template<>
+//class Packer<MapCell>;
 
 class MapCell : public Game_object_owner
 {
@@ -91,10 +94,7 @@ public:
 	virtual void save();
 	virtual void load();
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<MapCell>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties()
 	{
@@ -294,6 +294,7 @@ public:
 	{
 		return std::make_tuple(
 			make_property(&GameObject::m_name, u"name"),
+			make_property(&GameObject::m_owner, u"owner"),
 			make_property(&GameObject::m_state, u"state")
 		);
 	}
@@ -333,10 +334,11 @@ class Inventory_cell : public Game_object_owner
 public:
 
 	GameObject* m_item;
-	Inventory_cell():m_item(nullptr){}
-	Inventory_cell(GameObject* item);
 
-	virtual void reset_serialization_index();
+	//Inventory_cell();
+	Inventory_cell(GameObject* item = nullptr);
+
+	void reset_serialization_index() override;
 	virtual void save();
 	virtual void load();
 

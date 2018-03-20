@@ -48,6 +48,8 @@ public:
 	Parameter_argument_t* m_args;
 	size_t m_size;
 
+	Parameter(){};
+
 	Parameter(parameter_type_e kind);
 
 	template<typename... T> 
@@ -71,6 +73,19 @@ public:
 	virtual void reset_serialization_index();
 	virtual void save();
 	virtual void load();
+
+
+	Packer_generic& get_packer()
+	{
+		return Packer<Parameter>::Instance();
+	}
+
+	constexpr static auto properties()
+	{
+		return std::make_tuple(
+			make_property(&Parameter::m_size, u"size")
+		);
+	}
 
 private:
 
@@ -118,6 +133,12 @@ public:
 
 	virtual void save() {};
 	virtual void load() {};
+
+
+	Packer_generic& get_packer()
+	{
+		return Packer<Instruction_result>::Instance();
+	}
 };
 
 #endif //TPARAMETER_H

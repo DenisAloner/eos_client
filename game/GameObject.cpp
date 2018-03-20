@@ -89,6 +89,11 @@ void MapCell::load()
 {
 }
 
+Packer_generic& MapCell::get_packer()
+{
+	return Packer<MapCell>::Instance();
+}
+
 Attribute_map::Attribute_map(){};
 
 Interaction_list*  Attribute_map::create_feature_list(feature_list_type_e key, interaction_e name)
@@ -163,6 +168,28 @@ void Attribute_map::load()
 		LOG(INFO) << "ÌÀÐÊÅÐ ÀÒÐÈÁÓÒÀ  - " << std::to_string((int)ie);
 		m_items[ie] = dynamic_cast<Interaction_list*>(Serialization_manager::instance().deserialize());
 	}
+}
+
+std::u16string Packer<MapCell>::to_json(iSerializable* value)
+{
+	LOG(INFO) << Parser::UTF16_to_CP866(value->get_packer().get_type_name());
+	if (value)
+	{
+		MapCell& obj = *dynamic_cast<MapCell*>(value);
+		std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\",\"value\":[" + Parser::
+			to_u16string(obj.x) + u"," + Parser::to_u16string(obj.y) + u"]}";
+		return out;
+	}
+	else
+	{
+		std::u16string out = u"null";
+		return out;
+	}
+}
+
+std::string Packer<MapCell>::to_binary(iSerializable* value)
+{
+	return "";
 }
 
 Tag_getter::Tag_getter(object_tag_e key) :m_key(key), m_result(nullptr) {};
@@ -1022,7 +1049,11 @@ void Player::get_actions_list(std::list<Action_helper_t>& value)
 	m_object->get_actions_list(value);
 }
 
-Inventory_cell::Inventory_cell(GameObject* item = nullptr) : m_item(item)
+//Inventory_cell::Inventory_cell(): m_item(nullptr)
+//{
+//}
+
+Inventory_cell::Inventory_cell(GameObject* item) : m_item(item)
 {
 	m_kind = entity_e::inventory_cell;
 }

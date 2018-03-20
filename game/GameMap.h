@@ -33,9 +33,22 @@ public:
 	void update_buff();
 	void calculate_ai();
 
-	virtual void reset_serialization_index();
+	void reset_serialization_index() override;
 	virtual void save();
 	virtual void load();
+
+	Packer_generic& get_packer()
+	{
+		return Packer<Object_manager>::Instance();
+	}
+
+	constexpr static auto properties()
+	{
+		return std::make_tuple(
+			make_property(&Object_manager::m_items, u"items")
+		);
+	}
+
 };
 
 class GameMap: public iSerializable
@@ -112,6 +125,7 @@ public:
 	constexpr static auto properties()
 	{
 		return std::make_tuple(
+			make_property(&GameMap::m_size, u"size"),
 			make_property(&GameMap::m_items, u"item", &GameMap::vector_mapcell_to_json, &GameMap::vector_mapcell_from_json, &GameMap::vector_mapcell_to_binary, &GameMap::vector_mapcell_from_binary)
 		);
 	}
@@ -135,6 +149,20 @@ public:
 	void reset_serialization_index() override;
 	virtual void save();
 	virtual void load();
+
+
+	Packer_generic& get_packer()
+	{
+		return Packer<Game_world>::Instance();
+	}
+
+	constexpr static auto properties()
+	{
+		return std::make_tuple(
+			make_property(&Game_world::m_maps, u"maps")
+		);
+	}
+
 };
 
 #endif //GAMEMAP_H

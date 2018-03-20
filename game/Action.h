@@ -46,10 +46,7 @@ public:
 
 	virtual bool get_child(GameTask*& task) { return false; };
 
-	Packer_generic& get_packer() final
-	{
-		return Packer<Action>::Instance();
-	}
+	Packer_generic& get_packer() final;
 
 	constexpr static auto properties() { return std::make_tuple(make_property(&Action::m_kind, u"value")); }
 
@@ -76,6 +73,11 @@ public:
 
 	void set(GameObject* unit, Action* action, Parameter* parameter);
 	void update();
+
+	Packer_generic& get_packer()
+	{
+		return Packer<Action_wrapper>::Instance();
+	}
 
 private:
 	Interaction_prefix* m_prefix;
