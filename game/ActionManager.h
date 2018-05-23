@@ -1,14 +1,11 @@
-#ifndef TACTIONMANAGER_H
-#define	TACTIONMANAGER_H
+#ifndef ACTIONMANAGER_H
+#define	ACTIONMANAGER_H
 
 #include <list>
 #include <map>
 #include "Event.h"
-#include "GameObject.h"
 
 class Parameter;
-class Action;
-class GameObject;
 class Action;
 
 class GameTask
@@ -41,4 +38,4 @@ public:
 	GameTask* get_task();
 };
 
-#endif //TACTIONMANAGER_H
+#endif //ACTIONMANAGER_H

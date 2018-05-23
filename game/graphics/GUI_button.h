@@ -1,4 +1,6 @@
-#pragma once
+#ifndef GUI_BUTTON_H
+#define	GUI_BUTTON_H
+
 #include "GUI_Object.h"
 #include "GUI_Text.h"
 #include "Application.h"
@@ -27,3 +29,5 @@ public:
 
 	virtual void on_mouse_click(MouseEventArgs const& e);
 };
+
+#endif //GUI_BUTTON_H

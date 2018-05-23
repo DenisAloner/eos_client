@@ -135,7 +135,7 @@ void Visitor_object_description_getter::visit(Interaction_list& value)
 
 void Visitor_object_description_getter::visit(Parameter_list& value)
 {
-	handle_complex(Parser::CP866_to_UTF16(std::to_string(value.m_value) + "(" + std::to_string(value.m_basic_value) + ")/" + std::to_string(value.m_limit) + "(" + std::to_string(value.m_basic_limit) + "):"));
+	handle_complex(Parser::CP1251_to_UTF16(std::to_string(value.m_value) + "(" + std::to_string(value.m_basic_value) + ")/" + std::to_string(value.m_limit) + "(" + std::to_string(value.m_basic_limit) + "):"));
 	Visitor_simple::visit(value);
 	m_active.pop_front();
 }
@@ -149,7 +149,7 @@ void Visitor_object_description_getter::visit(Vision_list& value)
 
 void Visitor_object_description_getter::visit(Vision_component& value)
 {
-	handle_complex(Parser::CP866_to_UTF16(std::to_string(value.m_value.radius) + "," + std::to_string(value.m_value.start_angle) + "," + std::to_string(value.m_value.end_angle) + "/" + std::to_string(value.m_basic_value.radius) + "," + std::to_string(value.m_basic_value.start_angle) + "," + std::to_string(value.m_basic_value.end_angle)));
+	handle_complex(Parser::CP1251_to_UTF16(std::to_string(value.m_value.radius) + "," + std::to_string(value.m_value.start_angle) + "," + std::to_string(value.m_value.end_angle) + "/" + std::to_string(value.m_basic_value.radius) + "," + std::to_string(value.m_basic_value.start_angle) + "," + std::to_string(value.m_basic_value.end_angle)));
 	Visitor_simple::visit(value);
 	m_active.pop_front();
 }
@@ -209,7 +209,7 @@ void Visitor_object_description_getter::visit(Interaction_copyist& value)
 
 void Visitor_object_description_getter::visit(Interaction_prefix& value)
 {
-	handle_complex(u"<тип эффекта:" + Parser::CP866_to_UTF16(Application::instance().m_game_object_manager->get_effect_prefix_string(value.m_subtype)) + u">:");
+	handle_complex(u"<тип эффекта:" + Parser::CP1251_to_UTF16(Application::instance().m_game_object_manager->get_effect_prefix_string(value.m_subtype)) + u">:");
 	Visitor_simple::visit(value);
 	m_active.pop_front();
 }
@@ -223,21 +223,21 @@ void Visitor_object_description_getter::visit(Interaction_addon& value)
 
 void Visitor_object_description_getter::visit(Interaction_time& value)
 {
-	handle_complex(u"<длительное наложение эффекта:" + Parser::CP866_to_UTF16(std::to_string(value.m_turn)) + u">:");
+	handle_complex(u"<длительное наложение эффекта:" + Parser::CP1251_to_UTF16(std::to_string(value.m_turn)) + u">:");
 	Visitor_simple::visit(value);
 	m_active.pop_front();
 }
 
 void Visitor_object_description_getter::visit(Interaction_timer& value)
 {
-	handle_complex(u"<цикличное наложение эффекта:" + Parser::CP866_to_UTF16(std::to_string(value.m_turn) + "(" + std::to_string(value.m_period) + ")>:"));
+	handle_complex(u"<цикличное наложение эффекта:" + Parser::CP1251_to_UTF16(std::to_string(value.m_turn) + "(" + std::to_string(value.m_period) + ")>:"));
 	Visitor_simple::visit(value);
 	m_active.pop_front();
 }
 
 void Visitor_object_description_getter::visit(Effect& value)
 {
-	handle_simple(u":" + Parser::CP866_to_UTF16(std::to_string(value.m_value)));
+	handle_simple(u":" + Parser::CP1251_to_UTF16(std::to_string(value.m_value)));
 }
 
 void Visitor_object_description_getter::visit(Instruction_slot_parameter& value)

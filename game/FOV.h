@@ -1,4 +1,6 @@
-#pragma once
+#ifndef FOV_H
+#define	FOV_H
+
 #include <cmath>
 #include "GameObject.h"
 #include "GameMap.h"
@@ -75,3 +77,5 @@ protected:
 	virtual void calculate(GameObject* unit, GameMap* map, AI_FOV& fov);
 
 };
+
+#endif //FOV_H

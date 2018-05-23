@@ -1,5 +1,5 @@
 #include "game/TileManager.h"
-#include "game/GameObject.h"
+//#include "game/GameObject.h"
 
 
 void TileManager::vector_GLuint_from_json(std::u16string value, std::vector<GLuint>& prop)
@@ -12,7 +12,7 @@ void TileManager::vector_GLuint_from_json(std::u16string value, std::vector<GLui
 		int i = 0;
 		for (auto element : (*s))
 		{
-			std::string&& name = Parser::UTF16_to_CP866(Parser::get_value(element));
+			std::string&& name = Parser::UTF16_to_CP1251(Parser::get_value(element));
 			prop[i] = Application::instance().m_graph->png_texture_load(
 				FileSystem::instance().m_resource_path + "Tiles\\" + name + ".png");
 			i += 1;
@@ -62,6 +62,11 @@ int TileManager_Single::get_tile_index(const object_direction_e& direction, cons
 
 }
 
+Packer_generic& TileManager_Single::get_packer()
+{
+	return Packer<TileManager_Single>::Instance();
+}
+
 bool TileManager_Single::init(const std::string& filename, object_direction_e direction, int frame)
 {
 	m_tiles.resize(1);
@@ -103,6 +108,11 @@ void TileManager_rotate8_animate::set_tile(tile_t& tile, GameObject* obj, int fr
 	tile.coordinat[3] = 1.0 - ((iy + 1)*dy);
 }
 
+Packer_generic& TileManager_rotate8_animate::get_packer()
+{
+	return Packer<TileManager_rotate8_animate>::Instance();
+}
+
 TileManager_equilateral_animate::TileManager_equilateral_animate()
 {
 }
@@ -130,4 +140,9 @@ void TileManager_equilateral_animate::set_tile(tile_t& tile, GameObject* obj, in
 	tile.coordinat[1] = 1.0;
 	tile.coordinat[2] = (ix + 1)*dx;
 	tile.coordinat[3] = 0.0;
+}
+
+Packer_generic& TileManager_equilateral_animate::get_packer()
+{
+	return Packer<TileManager_equilateral_animate>::Instance();
 }

@@ -105,7 +105,7 @@ font_symbol_t& GraphicalController::get_symbol(char16_t value)
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, m_slot->bitmap.width, m_slot->bitmap.rows, 0, GL_ALPHA, GL_UNSIGNED_BYTE, m_slot->bitmap.buffer);
-		LOG(INFO) << std::to_string(texture) <<"    "<< Parser::UTF16_to_CP866({ value });
+		LOG(INFO) << std::to_string(texture) <<"    "<< Parser::UTF16_to_CP1251({ value });
 		font_symbol_t s;
 		s.id = texture;
 		s.size.w = m_slot->bitmap.width;

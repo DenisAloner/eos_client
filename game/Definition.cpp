@@ -29,6 +29,105 @@ Packer_generic& Object_interaction::get_packer()
 	return Packer<Object_interaction>::Instance();
 }
 
+iSerializable* Packer<Object_interaction>::from_json(scheme_map_t* value)
+{
+	//LOG(INFO) << Parser::UTF16_to_CP1251(Parser::get_value((*value)[u"value"])) << " :: " << std::to_string(GameObjectManager::m_config.m_templates.size());
+	return GameObjectManager::m_config->m_templates[Parser::UTF16_to_CP1251(Parser::get_value((*value)[u"value"]))]->clone();
+}
+
+
+std::u16string Packer<MapCell>::to_json(iSerializable* value)
+{
+	if (value)
+	{
+		MapCell& obj = *dynamic_cast<MapCell*>(value);
+		std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\",\"value\":[" + Parser::
+			int_to_u16string(obj.x) + u"," + Parser::int_to_u16string(obj.y) + u"]}";
+		return out;
+	}
+	else
+	{
+		std::u16string out = u"null";
+		return out;
+	}
+}
+
+std::string Packer<MapCell>::to_binary(iSerializable* value)
+{
+	if (value)
+	{
+		MapCell& obj = *dynamic_cast<MapCell*>(value);
+		std::size_t id = value->get_packer().get_type_id() + 1;
+		return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + Parser::to_binary<int>(obj.x) + Parser::to_binary<int>(obj.y);
+	}
+	else
+	{
+		std::size_t id = 0;
+		return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t));
+	}
+}
+
+iSerializable* Packer<MapCell>::from_json(scheme_map_t* value)
+{
+	scheme_vector_t* s = Parser::read_pair((*value)[u"value"]);
+	int x;
+	int y;
+	Parser::from_json<int>((*s)[0], x);
+	Parser::from_json<int>((*s)[1], y);
+	return &Application::instance().m_world->m_maps.front()->get(y, x);
+}
+
+iSerializable* Packer<MapCell>::from_binary(const std::string& value, std::size_t& pos)
+{
+	int x;
+	int y;
+	Parser::from_binary<int>(value, x,pos);
+	Parser::from_binary<int>(value, y, pos);
+	return &Application::instance().m_world->m_maps.front()->get(y, x);
+}
+
+iSerializable* Packer<Parser::Link>::from_json(scheme_map_t* value)
+{
+	std::size_t id;
+	Parser::from_json<std::size_t>((*value)[u"value"], id);
+	return Parser::m_items[id-1];
+}
+
+iSerializable* Packer<Parser::Link>::from_binary(const std::string& value, std::size_t& pos)
+{
+	std::size_t id;
+	Parser::from_binary<std::size_t>(value, id, pos);
+	return Parser::m_items[id - 1];
+}
+
+std::u16string Packer<GameObject>::to_json(iSerializable* value)
+{
+	std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\",\"value\":" + Parser::int_to_u16string(value->m_serialization_index) + u"}";
+	return out;
+}
+
+std::string Packer<GameObject>::to_binary(iSerializable* value)
+{
+	std::size_t id = value->get_packer().get_type_id() + 1;
+	std::size_t index = value->m_serialization_index;
+	return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + std::string(reinterpret_cast<const char*>(&index), sizeof(std::size_t));
+}
+
+iSerializable* Packer<GameObject>::from_json(scheme_map_t* value)
+{
+	LOG(INFO) << "iSerializable* Packer<GameObject>::from_json(scheme_map_t* value)";
+	const int i = Parser::to_int32((*value)[u"value"]);
+	const auto it = std::next(Application::instance().m_world->m_object_manager.m_items.begin(), i);
+	return &(*it);
+}
+
+iSerializable* Packer<GameObject>::from_binary(const std::string& value, std::size_t& pos)
+{
+	std::size_t i;
+	Parser::from_binary<std::size_t>(value, i, pos);
+	const auto it = std::next(Application::instance().m_world->m_object_manager.m_items.begin(), i);
+	return &(*it);
+}
 
 std::vector<iSerializable*> Parser::m_items = {};
 
@@ -200,10 +299,6 @@ std::unordered_map<object_tag_e, std::u16string>  Parser::m_string_object_tag_e 
 };
 
 
-
-
-std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> Parser::m_convert;
-
 std::size_t Parser::m_object_index = 0;
 unsigned int Parser::m_type_id_counter = 0;
 
@@ -221,7 +316,7 @@ Parser::~Parser()
 //{
 //	if (value)
 //	{
-//		LOG(INFO) << UTF16_to_CP866((*value).get_packer().get_type_name());
+//		LOG(INFO) << UTF16_to_CP1251((*value).get_packer().get_type_name());
 //		std::u16string result = value->get_packer().to_json(value);
 //		if (result.empty())
 //		{
@@ -264,8 +359,9 @@ scheme_map_t* Parser::read_object(std::u16string& value)
 				count = count - 1;
 				if (count == 0)
 				{
-					std::u16string value(opening_symbol + 1, &value[i] - opening_symbol - 1);
-					return parse_object(value);
+					std::u16string sub_value(opening_symbol + 1, &value[i] - opening_symbol - 1);
+					//LOG(INFO) << "read_object -> " << UTF16_to_CP1251(sub_value);
+					return parse_object(sub_value);
 				}
 			}
 			break;
@@ -300,8 +396,8 @@ scheme_list_t* Parser::read_array(std::u16string& value)
 				count = count - 1;
 				if (count == 0)
 				{
-					std::u16string value(opening_symbol + 1, &value[i] - opening_symbol - 1);
-					return parse_array(value);
+					std::u16string sub_value(opening_symbol + 1, &value[i] - opening_symbol - 1);
+					return parse_array(sub_value);
 				}
 			}
 			break;
@@ -336,8 +432,8 @@ scheme_vector_t* Parser::read_pair(std::u16string& value)
 				count = count - 1;
 				if (count == 0)
 				{
-					std::u16string value(opening_symbol + 1, &value[i] - opening_symbol - 1);
-					return parse_pair(value);
+					std::u16string sub_value(opening_symbol + 1, &value[i] - opening_symbol - 1);
+					return parse_pair(sub_value);
 				}
 			}
 			break;
@@ -385,7 +481,7 @@ std::u16string* get_token(std::u16string value, std::size_t& i)
 					std::u16string* result = new std::u16string(value.substr(opening_pos, i - opening_pos + 1));
 					if (pos != std::string::npos)
 					{
-						i = pos + 1;
+						i = pos;
 					}
 					else
 					{
@@ -424,7 +520,7 @@ std::u16string* get_token(std::u16string value, std::size_t& i)
 					std::u16string* result = new std::u16string(value.substr(opening_pos, i - opening_pos + 1));
 					if (pos != std::string::npos)
 					{
-						i = pos + 1;
+						i = pos;
 					}
 					else
 					{
@@ -475,16 +571,20 @@ scheme_map_t* Parser::parse_object(std::u16string& value)
 		{
 		case u'"':
 		{
+			//LOG(INFO) << "parse_object i -> " << UTF16_to_CP1251(std::u16string{ value[i] }) << "   index: " << std::to_string(i);
 			std::size_t j;
 			for (j = i + 1; j < value.size(); ++j)
 			{
+				//LOG(INFO) << "parse_object j -> " << UTF16_to_CP1251(std::u16string{ value[j] }) << "   index: " << std::to_string(j);
 				if (value[j] == u'"')
 				{
 					fname = new std::u16string(value.substr(i + 1, j - i - 1));
+					//LOG(INFO) << "parse_object -> " << UTF16_to_CP1251(*fname);
 					break;
 				}
 			}
 			i = j + 1;
+			//LOG(INFO) << "parse_object sep_pos -> "<< "   index: " << std::to_string(i);
 			if (fname)
 			{
 				auto sep_pos = value.find(u':', i);
@@ -498,7 +598,7 @@ scheme_map_t* Parser::parse_object(std::u16string& value)
 					}
 					if (result == nullptr) { result = new scheme_map_t; }
 					(*result)[*fname] = *fvalue;
-					i = sep_pos;
+					i = sep_pos-1;
 				}
 				else
 				{
@@ -528,6 +628,7 @@ scheme_list_t* Parser::parse_array(std::u16string& value)
 			return result;
 		}
 		if (result == nullptr) { result = new scheme_list_t; }
+		LOG(INFO) << "parse_array -> " << Parser::UTF16_to_CP1251(*fvalue);
 		result->push_back(*fvalue);
 	}
 	return result;
@@ -594,47 +695,31 @@ std::u16string Parser::get_value(const std::u16string& value)
 	return u"";
 }
 
-//void Parser::print_u16string(std::u16string value)
-//{
-//	std::wstring ws = m_convert.from_bytes(
-//		reinterpret_cast<const char*> (value.data()),
-//		reinterpret_cast<const char*> (value.data() + value.size()));
-//	std::wcout << ws << std::endl;
-//}
-
-void Parser::print_u16string(std::u16string value)
-{
-
-	/*std::wstring ws = m_convert.from_bytes(
-	reinterpret_cast<const char*> (value.data()),
-	reinterpret_cast<const char*> (value.data() + value.size()));
-	std::wcout << ws << std::endl;*/
-}
-
-
-
-std::u16string Parser::to_u16string(const int &value) {
+std::u16string Parser::int_to_u16string(const int &value) {
 	std::string temp = std::to_string(value);
 	std::u16string result(temp.size(), 0);
-	for (int i = 0; i < temp.size(); ++i)
+	for (std::size_t i = 0; i < temp.size(); ++i)
 	{
 		result[i] = temp[i];
 	}
 	return result;
 }
 
-std::u16string Parser::float_to_u16string(float const& i)
+std::u16string Parser::float_to_u16string(const float& i)
 {
-	return CP866_to_UTF16(std::to_string(i));
+	return CP1251_to_UTF16(std::to_string(i));
 }
 
-int Parser::to_int(const std::u16string& value) {
+int Parser::to_int32(const std::u16string& value)
+{
+	int result = 0;
 	const char16_t* opening_symbol = nullptr;
-	for (std::size_t i = 0; i < value.size(); ++i)
+	std::size_t i;
+	for (i = 0; i < value.size(); ++i)
 	{
 		switch (value[i])
 		{
-		case u'0':case u'1':case u'2':case u'3':case u'4':case u'5':case u'6':case u'7':case u'8':case u'9':
+		case u'-':case u'0':case u'1':case u'2':case u'3':case u'4':case u'5':case u'6':case u'7':case u'8':case u'9':
 		{
 			if (opening_symbol == nullptr)
 			{
@@ -642,35 +727,56 @@ int Parser::to_int(const std::u16string& value) {
 			}
 			break;
 		}
-		default:
-		{
-			if (opening_symbol != nullptr)
-			{
-				break;
-			}
-			break;
-		}
+		default: if (opening_symbol != nullptr) goto transform;
 		}
 	}
+transform:
 	if (opening_symbol != nullptr)
 	{
-		static std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> convert;
-		std::u16string value(opening_symbol, &value[value.size() - 1] - opening_symbol + 1);
-		std::wstring ws = convert.from_bytes(
-			reinterpret_cast<const char*> (value.data()),
-			reinterpret_cast<const char*> (value.data() + value.size()));
-		return std::stoi(ws);
+		const std::size_t len = &value[i - 1] - opening_symbol + 1;
+		if (opening_symbol[0] == u'-')
+		{
+			switch (len - 1) {
+			case 10:    result -= (opening_symbol[len - 10] - u'0') * 1000000000;
+			case 9:     result -= (opening_symbol[len - 9] - u'0') * 100000000;
+			case 8:     result -= (opening_symbol[len - 8] - u'0') * 10000000;
+			case 7:     result -= (opening_symbol[len - 7] - u'0') * 1000000;
+			case 6:     result -= (opening_symbol[len - 6] - u'0') * 100000;
+			case 5:     result -= (opening_symbol[len - 5] - u'0') * 10000;
+			case 4:     result -= (opening_symbol[len - 4] - u'0') * 1000;
+			case 3:     result -= (opening_symbol[len - 3] - u'0') * 100;
+			case 2:     result -= (opening_symbol[len - 2] - u'0') * 10;
+			case 1:     result -= (opening_symbol[len - 1] - u'0');
+			}
+		}
+		else
+		{
+			switch (len) {
+			case 10:    result += (opening_symbol[len - 10] - u'0') * 1000000000;
+			case 9:     result += (opening_symbol[len - 9] - u'0') * 100000000;
+			case 8:     result += (opening_symbol[len - 8] - u'0') * 10000000;
+			case 7:     result += (opening_symbol[len - 7] - u'0') * 1000000;
+			case 6:     result += (opening_symbol[len - 6] - u'0') * 100000;
+			case 5:     result += (opening_symbol[len - 5] - u'0') * 10000;
+			case 4:     result += (opening_symbol[len - 4] - u'0') * 1000;
+			case 3:     result += (opening_symbol[len - 3] - u'0') * 100;
+			case 2:     result += (opening_symbol[len - 2] - u'0') * 10;
+			case 1:     result += (opening_symbol[len - 1] - u'0');
+			}
+		}
 	}
-	return 0;
+	return result;
 }
 
 float Parser::to_float(const std::u16string& value) {
+	float result = 0.0;
 	const char16_t* opening_symbol = nullptr;
-	for (std::size_t i = 0; i < value.size(); ++i)
+	std::size_t i;
+	for (i = 0; i < value.size(); ++i)
 	{
 		switch (value[i])
 		{
-		case u'0':case u'1':case u'2':case u'3':case u'4':case u'5':case u'6':case u'7':case u'8':case u'9':case u'.':
+		case u'0':case u'1':case u'2':case u'3':case u'4':case u'5':case u'6':case u'7':case u'8':case u'9':case u'.':case u'-':
 		{
 			if (opening_symbol == nullptr)
 			{
@@ -678,29 +784,23 @@ float Parser::to_float(const std::u16string& value) {
 			}
 			break;
 		}
-		default:
-		{
-			if (opening_symbol != nullptr)
-			{
-				break;
-			}
-			break;
-		}
+		default: if (opening_symbol != nullptr) goto parse;
 		}
 	}
+parse:
 	if (opening_symbol != nullptr)
 	{
-		static std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> convert;
-		std::u16string value(opening_symbol, &value[value.size() - 1] - opening_symbol + 1);
-		std::wstring ws = convert.from_bytes(
-			reinterpret_cast<const char*> (value.data()),
-			reinterpret_cast<const char*> (value.data() + value.size()));
-		return std::stof(ws);
+		std::string v = UTF16_to_CP1251(std::u16string(opening_symbol, &value[i - 1] - opening_symbol + 1));
+		if (v != "-")
+		{
+			std::replace(v.begin(), v.end(), '.', *localeconv()->decimal_point);
+			result = std::stof(v);
+		}
 	}
-	return 0.0;
+	return result;
 }
 
-std::string Parser::UTF16_to_CP866(std::u16string const& value)
+std::string Parser::UTF16_to_CP1251(std::u16string const& value)
 {
 	std::string out(value.length(), '0');
 	for (int i = 0; i<value.length(); ++i)
@@ -725,7 +825,7 @@ std::string Parser::UTF16_to_CP866(std::u16string const& value)
 	return out;
 }
 
-std::u16string Parser::CP866_to_UTF16(std::string const& value)
+std::u16string Parser::CP1251_to_UTF16(std::string const& value)
 {
 	std::u16string out(value.length(), '0');
 	for (int i = 0; i<value.length(); ++i)
@@ -748,12 +848,6 @@ std::u16string Parser::CP866_to_UTF16(std::string const& value)
 		}
 	}
 	return out;
-}
-
-iSerializable* Packer<Object_interaction>::from_json(scheme_map_t* value)
-{
-	LOG(INFO) << Parser::UTF16_to_CP866(Parser::get_value((*value)[u"value"])) << " :: " << std::to_string(GameObjectManager::m_config.m_templates.size());
-	return GameObjectManager::m_config.m_templates[Parser::UTF16_to_CP866(Parser::get_value((*value)[u"value"]))]->clone();
 }
 
 Parser::Initializator::Initializator()
@@ -794,6 +888,9 @@ Parser::Initializator::Initializator()
 	register_packer<MapCell>(u"map_cell");
 	register_packer<Action>(u"action");
 	register_packer<Object_interaction>(u"template");
+	register_packer<Object_manager>(u"object_manager");
+	register_packer<Game_world>(u"game_world");
+	register_packer<Link>(u"link");
 }
 
 void Parser::reset_object_counter()

@@ -1,6 +1,5 @@
 #include "MouseController.h"
 
-
 MouseController::MouseController()
 : m_position()
 {

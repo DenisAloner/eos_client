@@ -118,6 +118,11 @@ void Interaction_list::load()
 	}
 }
 
+Packer_generic& Interaction_list::get_packer()
+{
+	return Packer<Interaction_list>::Instance();
+}
+
 // Patameter_list
 
 Parameter_list::Parameter_list(interaction_e subtype) :m_subtype(subtype)
@@ -275,6 +280,11 @@ void Parameter_list::load()
 		m_items.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
 	}
 	LOG(INFO) << "Конец листа параметров";
+}
+
+Packer_generic& Parameter_list::get_packer()
+{
+	return Packer<Parameter_list>::Instance();
 }
 
 // Vision_list
@@ -439,6 +449,11 @@ void Vision_list::load()
 	LOG(INFO) << "Конец листа зрения";
 }
 
+Packer_generic& Vision_list::get_packer()
+{
+	return Packer<Vision_list>::Instance();
+}
+
 
 // Vision_component
 
@@ -550,6 +565,11 @@ void Vision_component::load()
 	LOG(INFO) << "Конец компонента зрения";
 }
 
+Packer_generic& Vision_component::get_packer()
+{
+	return Packer<Vision_component>::Instance();
+}
+
 // Tag_list
 
 Tag_list::Tag_list()
@@ -615,6 +635,11 @@ void Tag_list::load()
 	{
 		m_items.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
 	}
+}
+
+Packer_generic& Tag_list::get_packer()
+{
+	return Packer<Tag_list>::Instance();
 }
 
 // Parts_list
@@ -793,6 +818,11 @@ void Parts_list::equip(Object_interaction* item)
 		LOG(INFO) <<std::to_string((int)((*current)->m_interaction_message_type));
 		
 	}
+}
+
+Packer_generic& Parts_list::get_packer()
+{
+	return Packer<Parts_list>::Instance();
 };
 
 void Parts_list::save()
@@ -877,6 +907,11 @@ void Action_list::apply_visitor(Visitor_generic& visitor)
 	visitor.visit(*this);
 }
 
+Packer_generic& Action_list::get_packer()
+{
+	return Packer<Action_list>::Instance();
+}
+
 
 // Slot_set_state
 
@@ -903,6 +938,11 @@ void Slot_set_state::save()
 
 void Slot_set_state::load()
 {
+}
+
+Packer_generic& Slot_set_state::get_packer()
+{
+	return Packer<Slot_set_state>::Instance();
 }
 
 // Interaction_slot
@@ -978,6 +1018,11 @@ void Interaction_copyist::load()
 	m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
 }
 
+Packer_generic& Interaction_copyist::get_packer()
+{
+	return Packer<Interaction_copyist>::Instance();
+}
+
 // Interaction_prefix
 
 Interaction_prefix::Interaction_prefix() {};
@@ -1020,6 +1065,11 @@ void Interaction_prefix::load()
 	m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
 }
 
+Packer_generic& Interaction_prefix::get_packer()
+{
+	return Packer<Interaction_prefix>::Instance();
+}
+
 // Interaction_addon
 
 Interaction_addon::Interaction_addon() {};
@@ -1052,6 +1102,11 @@ void Interaction_addon::load()
 	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_subtype, sizeof(interaction_e), 1, file);
 	m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
+}
+
+Packer_generic& Interaction_addon::get_packer()
+{
+	return Packer<Interaction_addon>::Instance();
 }
 
 // Interaction_time
@@ -1089,6 +1144,11 @@ void Interaction_time::load()
 	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_turn, sizeof(int), 1, file);
 	m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
+}
+
+Packer_generic& Interaction_time::get_packer()
+{
+	return Packer<Interaction_time>::Instance();
 }
 
 // Interaction_timer
@@ -1132,6 +1192,11 @@ void Interaction_timer::load()
 	fread(&m_turn, sizeof(int), 1, file);
 	fread(&m_period, sizeof(int), 1, file);
 	m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
+}
+
+Packer_generic& Interaction_timer::get_packer()
+{
+	return Packer<Interaction_timer>::Instance();
 }
 
 
@@ -1196,6 +1261,11 @@ void Effect::load()
 	fread(&m_subtype, sizeof(effect_e), 1, file);
 }
 
+Packer_generic& Effect::get_packer()
+{
+	return Packer<Effect>::Instance();
+}
+
 // Object_tag
 
 Object_tag::Object_tag(object_tag_e key) :m_type(key)
@@ -1235,6 +1305,11 @@ void ObjectTag::Poison_resist::save()
 
 void ObjectTag::Poison_resist::load()
 {
+}
+
+Packer_generic& ObjectTag::Poison_resist::get_packer()
+{
+	return Packer<Poison_resist>::Instance();
 }
 
 // ObjectTag::Mortal
@@ -1330,6 +1405,11 @@ void ObjectTag::Purification_from_poison::load()
 {
 }
 
+Packer_generic& ObjectTag::Purification_from_poison::get_packer()
+{
+	return Packer<Purification_from_poison>::Instance();
+}
+
 // ObjectTag::Activator::Activator
 
 ObjectTag::Activator::Activator() :Object_tag(object_tag_e::activator){};
@@ -1398,6 +1478,11 @@ void ObjectTag::Activator::load()
 	}
 }
 
+Packer_generic& ObjectTag::Activator::get_packer()
+{
+	return Packer<Activator>::Instance();
+}
+
 // ObjectTag::Fast_move
 
 ObjectTag::Fast_move::Fast_move() :Object_tag(object_tag_e::fast_move) {};
@@ -1442,6 +1527,11 @@ void ObjectTag::Fast_move::load()
 {
 }
 
+Packer_generic& ObjectTag::Fast_move::get_packer()
+{
+	return Packer<Fast_move>::Instance();
+}
+
 // ObjectTag::Label
 
 ObjectTag::Label::Label(object_tag_e type) :Object_tag(type){};
@@ -1471,6 +1561,11 @@ void ObjectTag::Label::load()
 {
 	FILE* file = Serialization_manager::instance().m_file;
 	fread(&m_type, sizeof(object_tag_e), 1, file);
+}
+
+Packer_generic& ObjectTag::Label::get_packer()
+{
+	return Packer<Label>::Instance();
 }
 
 Interaction_list* Effect_functions::create_feature_list(feature_list_type_e key, interaction_e name)
@@ -1657,6 +1752,11 @@ void Instruction_slot_link::load()
 	//m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
 }
 
+Packer_generic& Instruction_slot_link::get_packer()
+{
+	return Packer<Instruction_slot_link>::Instance();
+}
+
 
 // Instruction_slot_parameter
 
@@ -1706,6 +1806,11 @@ void Instruction_slot_parameter::load()
 	//FILE* file = Serialization_manager::instance().m_file;
 	//fread(&m_subtype, sizeof(interaction_e), 1, file);
 	//m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
+}
+
+Packer_generic& Instruction_slot_parameter::get_packer()
+{
+	return Packer<Instruction_slot_parameter>::Instance();
 }
 
 // ObjectTag::Equippable
@@ -1848,6 +1953,11 @@ void ObjectTag::Equippable::load()
 	fread(&m_type, sizeof(object_tag_e), 1, file);*/
 }
 
+Packer_generic& ObjectTag::Equippable::get_packer()
+{
+	return Packer<Equippable>::Instance();
+}
+
 
 // ObjectTag::Requirements_to_object
 
@@ -1912,6 +2022,11 @@ void ObjectTag::Requirements_to_object::reset_serialization_index()
 	}
 }
 
+Packer_generic& ObjectTag::Requirements_to_object::get_packer()
+{
+	return Packer<Requirements_to_object>::Instance();
+}
+
 // ObjectTag::Can_transfer_object
 
 ObjectTag::Can_transfer_object::Can_transfer_object() : Object_tag(object_tag_e::can_transfer_object)
@@ -1970,6 +2085,11 @@ void ObjectTag::Can_transfer_object::load()
 	fread(&m_type, sizeof(object_tag_e), 1, file);*/
 }
 
+Packer_generic& ObjectTag::Can_transfer_object::get_packer()
+{
+	return Packer<Can_transfer_object>::Instance();
+}
+
 // Instruction_game_owner
 
 Instruction_game_owner::Instruction_game_owner() 
@@ -1980,6 +2100,11 @@ Instruction_game_owner::Instruction_game_owner()
 };
 
 // Instruction_check_tag
+
+Packer_generic& Instruction_game_owner::get_packer()
+{
+	return Packer<Instruction_game_owner>::Instance();
+}
 
 Instruction_check_tag::Instruction_check_tag()
 {
@@ -2018,6 +2143,11 @@ void Instruction_check_tag::apply_effect(GameObject* unit, Object_interaction* o
 void Instruction_check_tag::apply_visitor(Visitor_generic& visitor)
 {
 	visitor.visit(*this);
+}
+
+Packer_generic& Instruction_check_tag::get_packer()
+{
+	return Packer<Instruction_check_tag>::Instance();
 };
 
 // Instruction_check_part_type
@@ -2050,6 +2180,11 @@ void Instruction_check_part_type::apply_effect(GameObject* unit, Object_interact
 		break;
 	}
 	}
+}
+
+Packer_generic& Instruction_check_part_type::get_packer()
+{
+	return Packer<Instruction_check_part_type>::Instance();
 };
 
 // Instruction_arg_extract
@@ -2132,6 +2267,11 @@ void Instruction_arg_extract::load()
 	fread(&m_type, sizeof(object_tag_e), 1, file);*/
 }
 
+Packer_generic& Instruction_arg_extract::get_packer()
+{
+	return Packer<Instruction_arg_extract>::Instance();
+}
+
 // Instruction_get_owner
 
 Instruction_get_owner::Instruction_get_owner()
@@ -2197,6 +2337,11 @@ void Instruction_get_owner::reset_serialization_index()
 
 // Instruction_get_owner_top
 
+Packer_generic& Instruction_get_owner::get_packer()
+{
+	return Packer<Instruction_get_owner>::Instance();
+}
+
 Instruction_get_owner_top::Instruction_get_owner_top()
 {
 	m_value = nullptr;
@@ -2256,6 +2401,11 @@ void Instruction_get_owner_top::apply_effect(GameObject* unit, Object_interactio
 		break;
 	}
 	}
+}
+
+Packer_generic& Instruction_get_owner_top::get_packer()
+{
+	return Packer<Instruction_get_owner_top>::Instance();
 };
 
 // Instruction_check_owner_type
@@ -2294,9 +2444,19 @@ void Instruction_check_owner_type::apply_effect(GameObject* unit, Object_interac
 		break;
 	}
 	}
+}
+
+Packer_generic& Instruction_check_owner_type::get_packer()
+{
+	return Packer<Instruction_check_owner_type>::Instance();
 };
 
 void ObjectTag::Mortal::apply_visitor(Visitor_generic& visitor)
 {
 	visitor.visit(*this);
+}
+
+Packer_generic& ObjectTag::Mortal::get_packer()
+{
+	return Packer<Mortal>::Instance();
 }

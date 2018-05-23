@@ -13,15 +13,15 @@ void Object_manager::update_buff()
 
 	for (auto object = m_items.begin(); object !=m_items.end(); ++object)
 	{
-		list = static_cast<Interaction_list*>((*object)->get_effect(interaction_e::buff));
+		list = static_cast<Interaction_list*>(object->get_effect(interaction_e::buff));
 		if (list)
 		{
 			e = list->clone();
-			e->apply_effect(*object, nullptr);
+			e->apply_effect(&(*object), nullptr);
 			visitor.result = false;
 			list->apply_visitor(visitor);
 		}
-		for (auto item = (*object)->m_active_state->m_items.begin(); item != (*object)->m_active_state->m_items.end(); ++item)
+		for (auto item = object->m_active_state->m_items.begin(); item != object->m_active_state->m_items.end(); ++item)
 		{
 			if ((*item).second->m_interaction_message_type == interaction_message_type_e::list)
 			{
@@ -33,8 +33,8 @@ void Object_manager::update_buff()
 				}
 			}
 		}
-		(*object)->update_interaction();
-		(*object)->event_update(VoidEventArgs());
+		object->update_interaction();
+		object->event_update(VoidEventArgs());
 	}
 }
 
@@ -42,26 +42,26 @@ void Object_manager::calculate_ai()
 {
 	for (auto object = m_items.begin(); object != m_items.end(); ++object)
 	{
-		if ((*object)->m_owner->m_kind == entity_e::cell)
+		if (object->m_owner->m_kind == entity_e::cell)
 		{
-			if (((*object)->m_active_state->m_ai) && ((*object) != Application::instance().m_world->m_player->m_object))
+			if ((object->m_active_state->m_ai) && (&(*object) != Application::instance().m_world->m_player->m_object))
 			{
-				switch ((*object)->m_active_state->m_ai->m_ai_type)
+				switch (object->m_active_state->m_ai->m_ai_type)
 				{
 				case ai_type_e::trap:
 				{
 					AI_trap obj;
-					obj = *static_cast<AI_trap*>((*object)->m_active_state->m_ai);
-					obj.m_object = (*object);
+					obj = *static_cast<AI_trap*>(object->m_active_state->m_ai);
+					obj.m_object = &*object;
 					obj.create();
 					break;
 				}
 				case ai_type_e::non_humanoid:
 				{
 					AI_enemy* obj;
-					obj = static_cast<AI_enemy*>((*object)->m_active_state->m_ai);
-					obj->m_map = static_cast<MapCell*>((*object)->m_owner)->m_map;
-					obj->m_object = (*object);
+					obj = static_cast<AI_enemy*>(object->m_active_state->m_ai);
+					obj->m_map = static_cast<MapCell*>(object->m_owner)->m_map;
+					obj->m_object = &*object;
 					obj->create();
 					break;
 				}
@@ -76,33 +76,39 @@ void Object_manager::reset_serialization_index()
 	m_serialization_index = 0;
 	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
-		(*item)->reset_serialization_index();
+		item->reset_serialization_index();
 	}
 }
 
 void Object_manager::save()
 {
-	FILE* file = Serialization_manager::instance().m_file;
+	/*FILE* file = Serialization_manager::instance().m_file;
 	size_t s = m_items.size();
 	fwrite(&s, sizeof(size_t), 1, file);
 	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
-		Serialization_manager::instance().serialize(*item);
-	}
+		Serialization_manager::instance().serialize(&*item);
+	}*/
 }
 
 void Object_manager::load()
 {
-	FILE* file = Serialization_manager::instance().m_file;
-	size_t s;
-	fread(&s, sizeof(size_t), 1, file);
-	GameObject* value;
-	for (size_t i = 0; i < s; i++)
-	{
-		value = dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize());
-		m_items.push_back(value);
-	}
+	//FILE* file = Serialization_manager::instance().m_file;
+	//size_t s;
+	//fread(&s, sizeof(size_t), 1, file);
+	//GameObject* value;
+	//for (size_t i = 0; i < s; i++)
+	//{
+	//	value = dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize());
+	//	m_items.push_back(value);
+	//}
 }
+
+Packer_generic& Object_manager::get_packer()
+{
+	return Packer<Object_manager>::Instance();
+}
+
 
 std::u16string GameMap::vector_mapcell_to_json(std::vector<MapCell>& value)
 {
@@ -151,7 +157,7 @@ void GameMap::vector_mapcell_from_binary(const std::string& value, std::vector<M
 	prop.resize(s);
 	for (std::size_t i = 0; i < s; ++i)
 	{
-		Parser::from_binary<MapCell>(value, prop[i], pos);
+		Parser::from_binary<std::list<GameObject*>>(value, prop[i].m_items, pos);
 	}
 }
 
@@ -1291,6 +1297,11 @@ void GameMap::load()
 	}*/
 }
 
+Packer_generic& GameMap::get_packer()
+{
+	return Packer<GameMap>::Instance();
+}
+
 Game_world::Game_world()
 {
 	float l;
@@ -1298,7 +1309,7 @@ Game_world::Game_world()
 	{
 		for (int x = 0; x< 21; x++)
 		{
-			l = (float)sqrt(x*x + y*y);
+			l = static_cast<float>(sqrt(x * x + y * y));
 			l = l / 20.0;
 			m_coefficient[y][x] = 1 - l;
 			if (m_coefficient[y][x] < 0) { m_coefficient[y][x] = 0; }
@@ -1310,9 +1321,9 @@ void Game_world::reset_serialization_index()
 {
 	m_serialization_index = 0;
 	m_object_manager.reset_serialization_index();
-	for (auto i = m_maps.begin(); i != m_maps.end(); ++i)
+	for (auto m_map : m_maps)
 	{
-		(*i)->reset_serialization_index();
+		m_map->reset_serialization_index();
 	}
 }
 
@@ -1349,6 +1360,134 @@ void Game_world::load()
 	m_player = new Player(object, map);
 }
 
+std::u16string Game_world::serialize()
+{
+	LOG(INFO) << "std::u16string Object_manager::items_to_json(std::list<GameObject>& value)";
+	std::size_t i = 0;
+	for (auto& element : m_object_manager.m_items)
+	{
+		element.m_serialization_index = i;
+		i += 1;
+	}
+	std::size_t ms = m_object_manager.m_items.size();
+	LOG(INFO) << "std::u16string Game_world::serialize() " << std::to_string(ms);
+	std::u16string result;
+	for (auto& element : m_maps.front()->m_items)
+	{
+		if (!result.empty()) { result += u","; };
+		result += Parser::to_json<std::list<GameObject*>>(element.m_items);
+	}
+	result = u"{\"map_size\":" + Parser::to_json<dimension_t>(m_maps.front()->m_size) + u",\"manager_size\":" + Parser::to_json<std::size_t>(ms) +u",\"cells\":[" + result + u"],\"items\":";
+	result += Parser::to_json<std::list<GameObject>>(m_object_manager.m_items);
+	result += u"}";
+	return result;
+}
+
+void Game_world::deserialize(std::u16string& value)
+{
+	LOG(INFO) << "deserialize -> " << Parser::UTF16_to_CP1251(value);
+	scheme_map_t* s = Parser::read_object(value);
+	dimension_t map_size;
+	for (const auto& element : *s)
+	{
+		LOG(INFO) << "deserialize -> " << Parser::UTF16_to_CP1251(element.first);
+	}
+	Parser::from_json<dimension_t>((*s)[u"map_size"], map_size);
+	GameMap* map = new GameMap(map_size);
+	m_maps.push_front(map);
+
+	std::size_t manager_size;
+	Parser::from_json<std::size_t>((*s)[u"manager_size"], manager_size);
+	m_object_manager.m_items.resize(manager_size);
+	
+	scheme_list_t* items = Parser::read_array((*s)[u"cells"]);
+	if (items)
+	{
+		std::size_t i = 0;
+		for (const auto& element : *items)
+		{
+			LOG(INFO) << "CELLS deserialize -> " << Parser::UTF16_to_CP1251(element);
+			Parser::from_json<std::list<GameObject*>>(element, map->m_items[i].m_items);
+			i += 1;
+		}
+		delete items;
+	}
+
+	items = Parser::read_array((*s)[u"items"]);
+	if (items)
+	{
+		std::size_t i = 0;
+		auto it = m_object_manager.m_items.begin();
+		for (const auto& element : *items)
+		{
+			Parser::from_json<GameObject>(element, *it);
+			i += 1;
+			++it;
+		}
+		delete items;
+	}
+
+	delete s;
+}
+
+std::string Game_world::bin_serialize()
+{
+	LOG(INFO) << "std::string Game_world::bin_serialize()";
+	std::size_t i = 0;
+	for (auto& element : m_object_manager.m_items)
+	{
+		element.m_serialization_index = i;
+		i += 1;
+	}
+	std::size_t ms = m_object_manager.m_items.size();
+	LOG(INFO) << "std::string Game_world::bin_serialize() "<<std::to_string(ms);
+	std::string result = Parser::to_binary<dimension_t>(m_maps.front()->m_size) + Parser::to_binary<std::size_t>(ms);
+	for (auto& element : m_maps.front()->m_items)
+	{
+		result += Parser::to_binary<std::list<GameObject*>>(element.m_items);
+	}
+	for (auto& element : m_object_manager.m_items)
+	{
+		result += Parser::to_binary<GameObject>(element);
+	}
+	return result;
+}
+
+void Game_world::bin_deserialize(std::string& value)
+{
+	LOG(INFO) << "Game_world::bin_deserialize(std::string& value)";
+
+	std::size_t pos = 0;
+	dimension_t map_size;
+	Parser::from_binary<dimension_t>(value, map_size,pos);
+	GameMap* map = new GameMap(map_size);
+	m_maps.push_front(map);
+
+	std::size_t manager_size;
+	Parser::from_binary<std::size_t>(value, manager_size,pos);
+	LOG(INFO) << "void Game_world::bin_deserialize(std::string& value) " << std::to_string(manager_size);
+	m_object_manager.m_items.resize(manager_size);
+
+	for (auto& element : m_maps.front()->m_items)
+	{
+		Parser::from_binary<std::list<GameObject*>>(value,element.m_items,pos);
+	}
+
+	std::size_t i=0;
+	for (auto& element : m_object_manager.m_items)
+	{
+		Parser::from_binary<GameObject>(value, element, pos);
+		++i;
+	}
+}
+
+Packer_generic& Game_world::get_packer()
+{
+	return Packer<Game_world>::Instance();
+}
+
+
+
 void Game_world::calculate_lighting()
 {
 	int lx;
@@ -1370,36 +1509,36 @@ void Game_world::calculate_lighting()
 	}
 	for (auto l = m_object_manager.m_items.begin(); l != m_object_manager.m_items.end(); ++l)
 	{
-		GameObject& object = *(*l);
+		GameObject& object = (*l);
 		if (!object.m_active_state->m_light) { continue; }
 		if (object.m_owner->m_kind != entity_e::cell) { continue; }
 		GameMap* map = static_cast<MapCell*>(object.m_owner)->m_map;
-		fl.calculate(20, *l, map);
+		fl.calculate(20, &*l, map);
 		for (int y = 0; y < 41; y++)
 		{
 			for (int x = 0; x < 41; x++)
 			{
 				lx = abs(x - 20);
 				ly = abs(y - 20);
-				c = ((*l)->m_active_state->m_light->R * m_coefficient[ly][lx])*fl.m_map[y][x].damping.R;
+				c = (l->m_active_state->m_light->R * m_coefficient[ly][lx])*fl.m_map[y][x].damping.R;
 				if (c < 0) { c = 0; }
 				fl.m_map[y][x].light.R = c;
-				c = ((*l)->m_active_state->m_light->G * m_coefficient[ly][lx])*fl.m_map[y][x].damping.G;
+				c = (l->m_active_state->m_light->G * m_coefficient[ly][lx])*fl.m_map[y][x].damping.G;
 				if (c < 0) { c = 0; }
 				fl.m_map[y][x].light.G = c;
-				c = ((*l)->m_active_state->m_light->B * m_coefficient[ly][lx])*fl.m_map[y][x].damping.B;
+				c = (l->m_active_state->m_light->B * m_coefficient[ly][lx])*fl.m_map[y][x].damping.B;
 				if (c < 0) { c = 0; }
 				fl.m_map[y][x].light.B = c;
 			}
 		}
 		for (int y = 0; y < 41; y++)
 		{
-			ly = (*l)->cell()->y + y - 20;
+			ly = l->cell()->y + y - 20;
 			if (!((ly < 0) || (ly > map->m_size.h - 1)))
 			{
 				for (int x = 0; x < 41; x++)
 				{
-					lx = (*l)->cell()->x + x - 20;
+					lx = l->cell()->x + x - 20;
 					if (!((lx < 0) || (lx > map->m_size.w - 1)))
 					{
 						map->get(ly,lx).m_light.R += fl.m_map[y][x].light.R;

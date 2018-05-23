@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GUI_ACTION_BAR_H
+#define	GUI_ACTION_BAR_H
 
 #include "GUI_Container.h"
 #include "GUI_ActionButton.h"
@@ -19,3 +20,4 @@ private:
 	GUI_connectable_i* m_object;
 };
 
+#endif //GUI_ACTION_BAR_H

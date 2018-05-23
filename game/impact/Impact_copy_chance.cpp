@@ -34,3 +34,8 @@ void Impact_copy_chance::load()
 	fread(&m_chance, sizeof(int), 1, file);
 	m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
 }
+
+Packer_generic& Impact_copy_chance::get_packer()
+{
+	return Packer<Impact_copy_chance>::Instance();
+}

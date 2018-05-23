@@ -1,4 +1,6 @@
-#pragma once
+#ifndef FOV_LIGHT_H
+#define	FOV_LIGHT_H
+
 #include <cmath>
 #include "GameObject.h"
 #include "GameMap.h"
@@ -32,3 +34,4 @@ public:
 
 };
 
+#endif //FOV_LIGHT_H

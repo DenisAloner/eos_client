@@ -28,6 +28,8 @@ class Tag_list;
 struct object_parameter_t;
 class Action;
 class AI;
+class Object_tag;
+class Icon;
 
 class Game_object_owner : public virtual iSerializable
 {
@@ -139,10 +141,7 @@ public:
 	virtual void apply_visitor(Visitor_generic& visitor);
 
 	// Для поддержки iSerializable
-	Packer_generic& get_packer() override
-	{
-		return Packer<Attribute_map>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() 
 	{
@@ -183,10 +182,7 @@ public:
 	virtual void save();
 	virtual void load();
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<Object_state>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	std::u16string icon_to_json(Icon*& value);
 	std::string icon_to_binary(Icon*& value);
@@ -224,10 +220,7 @@ public:
 	Object_state_equip();
 	virtual Object_state* clone();
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<Object_state_equip>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties()
 	{
@@ -285,10 +278,7 @@ public:
 	virtual void get_actions_list(std::list<Action_helper_t>& value);
 
 	// Для поддержки iJSONSerializable
-	Packer_generic& get_packer() override
-	{
-		return Packer<GameObject>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() 
 	{
@@ -313,6 +303,37 @@ private:
 
 	};
 
+};
+
+class Config : public iSerializable
+{
+public:
+
+	std::map<std::string, Object_interaction*> m_templates;
+	std::map<std::string, GameObject> m_items;
+	InstanceDictonary<TileManager*> m_tile_managers;
+	InstanceDictonary<Icon*> m_icons;
+
+	void save() override {}
+	void load() override {}
+
+	Packer_generic& get_packer() override;
+
+	void instancedictonary_icon_from_json(std::u16string value, InstanceDictonary<Icon*>& prop);
+	void instancedictonary_icon_from_binary(const std::string& value, InstanceDictonary<Icon*>& prop, std::size_t& pos);
+
+	void instancedictonary_tilemanager_from_json(std::u16string value, InstanceDictonary<TileManager*>& prop);
+	void instancedictonary_tilemanager_from_binary(const std::string& value, InstanceDictonary<TileManager*>& prop, std::size_t& pos);
+
+	constexpr static auto properties()
+	{
+		return std::make_tuple(
+			make_property(&Config::m_icons, u"icons").from_json(&Config::instancedictonary_icon_from_json).from_binary(&Config::instancedictonary_icon_from_binary),
+			make_property(&Config::m_tile_managers, u"tile_managers").from_json(&Config::instancedictonary_tilemanager_from_json).from_binary(&Config::instancedictonary_tilemanager_from_binary),
+			make_property(&Config::m_templates, u"templates"),
+			make_property(&Config::m_items, u"items")
+		);
+	}
 };
 
 class Player : public GUI_connectable_i
@@ -342,10 +363,7 @@ public:
 	virtual void save();
 	virtual void load();
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<Inventory_cell>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties()
 	{
@@ -374,10 +392,7 @@ public:
 	virtual void save();
 	virtual void load();
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<Object_part>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() 
 	{

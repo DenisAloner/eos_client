@@ -1,4 +1,6 @@
-#pragma once
+#ifndef EFFECT_H
+#define	EFFECT_H
+
 #include "GameObject.h"
 #include "Parameter.h"
 #include <functional>
@@ -30,10 +32,7 @@ public:
 	virtual void load();
 
 	// Для поддержки iJSONSerializable
-	Packer_generic& get_packer() override
-	{
-		return Packer<Interaction_list>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() 
 	{
@@ -65,10 +64,7 @@ public:
 	virtual void save();
 	virtual void load();
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<Parameter_list>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() 
 	{
@@ -112,10 +108,7 @@ public:
 	virtual void save();
 	virtual void load();
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<Vision_list>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() { return Interaction_list::properties(); }
 
@@ -137,10 +130,7 @@ public:
 	virtual void save();
 	virtual void load();
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<Vision_component>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() 
 	{
@@ -168,10 +158,7 @@ public:
 	virtual void save();
 	virtual void load();
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<Tag_list>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() { return Interaction_list::properties(); }
 
@@ -203,10 +190,7 @@ public:
 	void apply_visitor(Visitor_generic& visitor) override;
 	virtual void equip(Object_interaction* item);
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<Parts_list>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() { return Interaction_list::properties(); }
 
@@ -238,10 +222,7 @@ public:
 
 	void apply_visitor(Visitor_generic& visitor) override;
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<Action_list>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() { return Interaction_list::properties(); }
 };
@@ -260,10 +241,7 @@ public:
 	virtual void load();
 
 
-	Packer_generic& get_packer()
-	{
-		return Packer<Slot_set_state>::Instance();
-	}
+	Packer_generic& get_packer() override;
 };
 
 class Interaction_slot :public Object_interaction
@@ -302,10 +280,7 @@ public:
 	virtual void load();
 
 
-	Packer_generic& get_packer()
-	{
-		return Packer<Interaction_copyist>::Instance();
-	}
+	Packer_generic& get_packer() override;
 };
 
 
@@ -321,10 +296,7 @@ public:
 	virtual void save();
 	virtual void load();
 
-	Packer_generic& get_packer()
-	{
-		return Packer<Interaction_prefix>::Instance();
-	}
+	Packer_generic& get_packer() override;
 };
 
 class Interaction_addon :public Interaction_slot
@@ -340,10 +312,7 @@ public:
 	virtual void load();
 
 
-	Packer_generic& get_packer()
-	{
-		return Packer<Interaction_addon>::Instance();
-	}
+	Packer_generic& get_packer() override;
 };
 
 class Interaction_time :public Interaction_slot
@@ -358,10 +327,7 @@ public:
 	virtual void save();
 	virtual void load();
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<Interaction_time>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() {
 		return make_union(
@@ -387,10 +353,7 @@ public:
 	virtual void load();
 
 
-	Packer_generic& get_packer()
-	{
-		return Packer<Interaction_timer>::Instance();
-	}
+	Packer_generic& get_packer() override;
 };
 
 class Effect :public Object_interaction
@@ -406,10 +369,7 @@ public:
 	virtual void save();
 	virtual void load();
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<Effect>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() {
 		return std::make_tuple(
@@ -444,10 +404,7 @@ namespace ObjectTag
 		virtual void load();
 
 
-		Packer_generic& get_packer()
-		{
-			return Packer<Poison_resist>::Instance();
-		}
+		Packer_generic& get_packer() override;
 	};
 
 	class Mortal :public Object_tag
@@ -463,10 +420,7 @@ namespace ObjectTag
 		void apply_visitor(Visitor_generic& visitor) override;
 
 		// Для поддержки iSerializable
-		Packer_generic& get_packer() override
-		{
-			return Packer<Mortal>::Instance();
-		}
+		Packer_generic& get_packer() override;
 
 		/*constexpr static auto properties() { return Object_tag::properties(); }*/
 	};
@@ -482,10 +436,7 @@ namespace ObjectTag
 		virtual void load();
 
 
-		Packer_generic& get_packer()
-		{
-			return Packer<Purification_from_poison>::Instance();
-		}
+		Packer_generic& get_packer() override;
 	};
 
 	class Activator : public Object_tag
@@ -501,10 +452,7 @@ namespace ObjectTag
 		virtual void load();
 
 
-		Packer_generic& get_packer()
-		{
-			return Packer<Activator>::Instance();
-		}
+		Packer_generic& get_packer() override;
 	};
 
 	class Fast_move : public Object_tag
@@ -518,10 +466,7 @@ namespace ObjectTag
 		virtual void load();
 
 
-		Packer_generic& get_packer()
-		{
-			return Packer<Fast_move>::Instance();
-		}
+		Packer_generic& get_packer() override;
 	};
 
 	class Label : public Object_tag
@@ -538,10 +483,7 @@ namespace ObjectTag
 		virtual void load();
 
 		// Для поддержки iSerializable
-		Packer_generic& get_packer() override
-		{
-			return Packer<Label>::Instance();
-		}
+		Packer_generic& get_packer() override;
 
 		constexpr static auto properties() { return Object_tag::properties(); }
 	};
@@ -562,10 +504,7 @@ namespace ObjectTag
 		virtual void load();
 
 		// Для поддержки iSerializable
-		Packer_generic& get_packer() override
-		{
-			return Packer<Equippable>::Instance();
-		}
+		Packer_generic& get_packer() override;
 
 		constexpr static auto properties()
 		{
@@ -594,10 +533,7 @@ namespace ObjectTag
 		virtual void load();
 		void reset_serialization_index() override;
 
-		Packer_generic& get_packer() override
-		{
-			return Packer<Requirements_to_object>::Instance();
-		}
+		Packer_generic& get_packer() override;
 
 		constexpr static auto properties()
 		{
@@ -625,10 +561,7 @@ namespace ObjectTag
 		virtual void save();
 		virtual void load();
 
-		Packer_generic& get_packer() override
-		{
-			return Packer<Can_transfer_object>::Instance();
-		}
+		Packer_generic& get_packer() override;
 
 		constexpr static auto properties() {
 			return make_union(
@@ -658,10 +591,7 @@ public:
 	virtual void save();
 	virtual void load();
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<Instruction_slot_link>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties()
 	{
@@ -687,11 +617,7 @@ public:
 	virtual void save();
 	virtual void load();
 
-	Packer_generic& get_packer()
-	{
-		return Packer<Instruction_slot_parameter>::Instance();
-	}
-
+	Packer_generic& get_packer() override;
 };
 
 class Instruction_game_owner :public Object_interaction
@@ -708,11 +634,7 @@ public:
 	virtual void save() {};
 	virtual void load() {};
 
-	Packer_generic& get_packer()
-	{
-		return Packer<Instruction_game_owner>::Instance();
-	}
-
+	Packer_generic& get_packer() override;
 };
 
 class Instruction_check_tag :public Object_interaction
@@ -731,10 +653,7 @@ public:
 	virtual void save() {};
 	virtual void load() {};
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<Instruction_check_tag>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() {
 		return std::make_tuple(
@@ -757,10 +676,7 @@ public:
 	virtual void save() {};
 	virtual void load() {};
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<Instruction_check_part_type>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() 
 	{
@@ -786,10 +702,7 @@ public:
 	virtual void save();
 	virtual void load();
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<Instruction_arg_extract>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() 
 	{
@@ -816,10 +729,7 @@ public:
 	virtual void save() {};
 	virtual void load() {};
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<Instruction_get_owner>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() 
 	{
@@ -837,10 +747,7 @@ public:
 	Instruction_get_owner_top* clone() override;
 	void apply_effect(GameObject* unit, Object_interaction* object) override;
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<Instruction_get_owner_top>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() { return Instruction_get_owner::properties(); }
 };
@@ -858,10 +765,7 @@ public:
 	virtual void save() {};
 	virtual void load() {};
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<Instruction_check_owner_type>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties()
 	{
@@ -871,3 +775,5 @@ public:
 	}
 
 };
+
+#endif //EFFECT_H

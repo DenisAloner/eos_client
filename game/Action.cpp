@@ -75,7 +75,7 @@ Packer_generic& Action::get_packer()
 
 std::u16string Packer<Action>::to_json(iSerializable* value)
 {
-	LOG(INFO) << Parser::UTF16_to_CP866(value->get_packer().get_type_name());
+	LOG(INFO) << Parser::UTF16_to_CP1251(value->get_packer().get_type_name());
 	std::u16string result = value->to_json();
 	if (result.empty())
 	{
@@ -91,13 +91,13 @@ std::u16string Packer<Action>::to_json(iSerializable* value)
 
 std::string Packer<Action>::to_binary(iSerializable* value)
 {
-	std::size_t id = value->get_packer().get_type_id() + 2;
+	std::size_t id = value->get_packer().get_type_id() + 1;
 	return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + value->to_binary();
 }
 
 iSerializable* Packer<Action>::from_json(scheme_map_t* value)
 {
-	return Application::instance().m_actions[Parser::m_json_action_e.get_enum(Parser::UTF16_to_CP866(Parser::get_value((*value)[u"value"])))];
+	return Application::instance().m_actions[Parser::m_json_action_e.get_enum(Parser::UTF16_to_CP1251(Parser::get_value((*value)[u"value"])))];
 }
 
 iSerializable* Packer<Action>::from_binary(const std::string& value, std::size_t& pos)
@@ -205,6 +205,11 @@ void Action_wrapper::update()
 	}
 }
 
+Packer_generic& Action_wrapper::get_packer()
+{
+	return Packer<Action_wrapper>::Instance();
+}
+
 ActionClass_Move::ActionClass_Move()
 {
 	m_kind = action_e::move;
@@ -248,7 +253,7 @@ void ActionClass_Move::interaction_handler(Parameter* parameter)
 		if (temp)
 		{
 			p[1].set(Game_algorithm::step_in_direction(p[0].m_object, Game_algorithm::turn_to_cell(p[0].m_object, temp)));
-			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, u"Выбрана клетка {" + Parser::CP866_to_UTF16(std::to_string(p[1].m_cell->x)) + u"," + Parser::CP866_to_UTF16(std::to_string(p[1].m_cell->y)) + u"}"));
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, u"Выбрана клетка {" + Parser::CP1251_to_UTF16(std::to_string(p[1].m_cell->x)) + u"," + Parser::CP1251_to_UTF16(std::to_string(p[1].m_cell->y)) + u"}"));
 		}
 		else
 		{
@@ -352,9 +357,9 @@ std::u16string ActionClass_Move::get_description(Parameter* parameter)
 	if (p[1])
 	{
 		s += u" в X:";
-		s += Parser::CP866_to_UTF16(std::to_string(p[1].m_cell->x));
+		s += Parser::CP1251_to_UTF16(std::to_string(p[1].m_cell->x));
 		s += u",Y:";
-		s += Parser::CP866_to_UTF16(std::to_string(p[1].m_cell->y));
+		s += Parser::CP1251_to_UTF16(std::to_string(p[1].m_cell->y));
 	}
 	return s;
 }
@@ -755,7 +760,7 @@ void action_set_motion_path::interaction_handler(Parameter* parameter)
 	MapCell* cell = Application::instance().command_select_location(object);
 	if (cell)
 	{
-		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, u"Выбрана клетка {" + Parser::CP866_to_UTF16(std::to_string(cell->x) + "," + std::to_string(cell->y) + "}")));
+		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, u"Выбрана клетка {" + Parser::CP1251_to_UTF16(std::to_string(cell->x) + "," + std::to_string(cell->y) + "}")));
 	}
 	else
 	{
@@ -1260,7 +1265,7 @@ void action_hit_melee::interaction_handler(Parameter* parameter)
 		if (result)
 		{
 			p[3].set(result);
-			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, u"Выбрана клетка {" + Parser::CP866_to_UTF16(std::to_string(p[3].m_cell->x) + "," + std::to_string(p[3].m_cell->y) + "}:")));
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, u"Выбрана клетка {" + Parser::CP1251_to_UTF16(std::to_string(p[3].m_cell->x) + "," + std::to_string(p[3].m_cell->y) + "}:")));
 		}
 		else
 		{
@@ -1375,7 +1380,7 @@ char action_hit_melee::perfom(Parameter* parameter)
 		p[1].m_object->event_update(VoidEventArgs());
 		if (sbj_health->m_value - sbj_health_old_value != 0)
 		{
-			msg += u"Здоровье " + p[1].m_object->m_name + u" изменилось на " + Parser::CP866_to_UTF16(std::to_string(sbj_health->m_value - sbj_health_old_value)) + u".";
+			msg += u"Здоровье " + p[1].m_object->m_name + u" изменилось на " + Parser::CP1251_to_UTF16(std::to_string(sbj_health->m_value - sbj_health_old_value)) + u".";
 		}
 		if(p[1].m_object->m_active_state->m_state==object_state_e::dead)
 		{
@@ -1884,7 +1889,7 @@ void Action_shoot::interaction_handler(Parameter* parameter)
 				p[4].set(result);
 				if (check_cell(out_parameter))
 				{
-					Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, u"Выбрана клетка {" + Parser::CP866_to_UTF16(std::to_string(p[4].m_cell->x) + "," + std::to_string(p[4].m_cell->y) + "}:")));
+					Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, u"Выбрана клетка {" + Parser::CP1251_to_UTF16(std::to_string(p[4].m_cell->x) + "," + std::to_string(p[4].m_cell->y) + "}:")));
 					valid = true;
 				}
 				else
@@ -2017,7 +2022,7 @@ std::u16string Action_shoot::get_description(Parameter* parameter)
 		}
 		if (p[4])
 		{
-			s +=u" в "+ Parser::CP866_to_UTF16(std::to_string(p[4].m_cell->x)) + u"," + Parser::CP866_to_UTF16(std::to_string(p[4].m_cell->y));
+			s +=u" в "+ Parser::CP1251_to_UTF16(std::to_string(p[4].m_cell->x)) + u"," + Parser::CP1251_to_UTF16(std::to_string(p[4].m_cell->y));
 		}
 	}
 	return s;

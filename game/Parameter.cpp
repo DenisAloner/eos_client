@@ -1,4 +1,5 @@
 #include "Parameter.h"
+#include "GameObject.h"
 
 void Parameter_argument_t::set(GameObject* value)
 {
@@ -459,6 +460,11 @@ void Parameter::load()
 	}
 }
 
+Packer_generic& Parameter::get_packer()
+{
+	return Packer<Parameter>::Instance();
+}
+
 Parameter* Parameter::clone()
 {
 	Parameter* result_p = new Parameter(m_kind);
@@ -526,4 +532,9 @@ Instruction_result::Instruction_result()
 {
 	m_interaction_message_type = interaction_message_type_e::instruction_result;
 	m_result = false;
+}
+
+Packer_generic& Instruction_result::get_packer()
+{
+	return Packer<Instruction_result>::Instance();
 };

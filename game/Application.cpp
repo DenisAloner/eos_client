@@ -245,32 +245,55 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 void Application::new_game()
 {
 	m_world = new Game_world();
-	GameMap* map = new GameMap(dimension_t(25, 25));
+	GameMap* map = new GameMap(dimension_t(4, 4));
+
+	GameObject* obj;
 	map->generate_room();
 	m_world->m_maps.push_back(map);
-	int rx = 10;
-	int ry = 10;
-	GameObject* obj;
+	int rx = 1;
+	int ry = 1;
+	
 	obj = m_game_object_manager->new_object("human");
 	map->add_to_map(obj, map->get(ry,rx));
 	m_world->m_player = new Player(obj, map);
 	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
 
 	Parser::reset_object_counter();
-	map->reset_serialization_index();
-	std::u16string json = Parser::to_json<GameMap*>(map);
+	m_world->reset_serialization_index();
+	std::u16string json;
+	json  = m_world->serialize();
 	char16_t marker = 0xFEFF;
-	json = marker + json;
-	LOG(INFO) << Parser::UTF16_to_CP866(json);
 
-	/*Parser::reset_object_counter();
-	map->reset_serialization_index();
-	std::string test = Parser::to_binary<GameMap*>(map);
-	LOG(INFO) << "Map size is "<< std::to_string(test.size());*/
+	Parser::reset_object_counter();
+	m_world->reset_serialization_index();
+	std::string binary = m_world->bin_serialize();
+	
+	
+	//LOG(INFO) << Parser::UTF16_to_CP1251(json);
 
 	FILE* m_file;
-	errno_t err = fopen_s(&m_file, (FileSystem::instance().m_resource_path + "Saves\\test.json").c_str(), "wb");
+	errno_t err;
+	err = fopen_s(&m_file, (FileSystem::instance().m_resource_path + "Saves\\test.json").c_str(), "wb");
+	fwrite(&marker, sizeof(marker), 1, m_file);
 	fwrite(&json[0], json.size()*2, 1, m_file);
+	fclose(m_file);
+
+	err = fopen_s(&m_file, (FileSystem::instance().m_resource_path + "Saves\\test.bin").c_str(), "wb");
+	fwrite(&binary[0], binary.size(), 1, m_file);
+	fclose(m_file);
+
+	Game_world test_world;
+	Parser::reset_object_counter();
+	test_world.reset_serialization_index();
+	test_world.bin_deserialize(binary);
+
+	Parser::reset_object_counter();
+	test_world.reset_serialization_index();
+	json = test_world.serialize();
+
+	err = fopen_s(&m_file, (FileSystem::instance().m_resource_path + "Saves\\test2.json").c_str(), "wb");
+	fwrite(&marker, sizeof(marker), 1, m_file);
+	fwrite(&json[0], json.size() * 2, 1, m_file);
 	fclose(m_file);
 
 	/*GameMap* tmp;
@@ -280,7 +303,7 @@ void Application::new_game()
 
 	tmp->reset_serialization_index();
 	Parser::reset_object_counter();
-	json = Parser::UTF16_to_CP866(Parser::to_json<GameMap*>(tmp));
+	json = Parser::UTF16_to_CP1251(Parser::to_json<GameMap*>(tmp));
 	LOG(INFO) << json;*/
 
 	/*Object_state* m = new Object_state();
@@ -328,7 +351,7 @@ void Application::new_game()
 	Parser::reset_object_counter();
 	
 	LOG(INFO) << " | " << std::to_string(m->m_size.x);
-	json = Parser::UTF16_to_CP866(Parser::to_json<GameObject*>(tmp));
+	json = Parser::UTF16_to_CP1251(Parser::to_json<GameObject*>(tmp));
 	LOG(INFO) << json;*/
 
 	m_gui_controller.m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player, map, m_action_manager, m_game_log);
@@ -364,8 +387,8 @@ void Application::new_game()
 			/*obj = m_game_object_manager->new_object("blue potion");
 			obj->set_direction(object_direction_e::top);
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-2][rx]);*/
-
-			obj = m_game_object_manager->new_object("bat");
+	///////////////////////
+			/*obj = m_game_object_manager->new_object("bat");
 			obj->set_direction(object_direction_e::top);
 			map->add_to_map(obj, map->get(ry - 2,rx-2));
 
@@ -383,7 +406,7 @@ void Application::new_game()
 
 			obj = m_game_object_manager->new_object("fountain");
 			obj->set_direction(object_direction_e::top);
-			map->add_to_map(obj, map->get(ry + 10,rx + 2));
+			map->add_to_map(obj, map->get(ry + 10,rx + 2));*/
 
 			/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
 			fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), obj);
@@ -620,7 +643,7 @@ void Application::update()
 				(*m)->update(VoidEventArgs());
 			}
 			m_update_mutex.unlock();
-			std::u16string temp= u"Ход - " + Parser::CP866_to_UTF16(std::to_string(m_game_turn));
+			std::u16string temp= u"Ход - " + Parser::CP1251_to_UTF16(std::to_string(m_game_turn));
 			m_game_log.add(game_log_message_t(game_log_message_type_e::message_time,temp));
 			m_game_turn += 1;
 			std::chrono::milliseconds Duration(1);

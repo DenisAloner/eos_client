@@ -741,6 +741,7 @@ template<typename T> void object_from_json(T& object, scheme_map_t* value)
 	for_sequence(std::make_index_sequence<nbProperties>{}, [&](auto i) {
 		constexpr auto property = std::get<i>(T::properties());
 		typedef decltype(property) P;
+		LOG(INFO) << "name" << " :: " << Parser::UTF16_to_CP1251(std::u16string(property.name));
 		if(property.from_json_function)
 		{
 			(object.*(property.from_json_function.value()))((*value)[property.name], object.*(property.member));
@@ -907,6 +908,7 @@ public:
 		if constexpr(!std::is_abstract<T>::value)
 		{
 			T* out = new T;
+			Parser::m_items.push_back(out);
 			out->from_json(value);
 			return out;
 		}
@@ -944,16 +946,16 @@ public:
 		{
 			Parser::m_object_index += 1;
 			value->m_serialization_index = Parser::m_object_index;
-			LOG(INFO) << Parser::UTF16_to_CP866(value->get_packer().get_type_name());
+			LOG(INFO) << Parser::UTF16_to_CP1251(value->get_packer().get_type_name());
 			std::u16string result = value->to_json();
 			if (result.empty())
 			{
-				std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\",\"$link_id\":" + Parser::to_u16string(value->m_serialization_index) + u"}";
+				std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\",\"$link_id\":" + Parser::int_to_u16string(value->m_serialization_index) + u"}";
 				return out;
 			}
 			else
 			{
-				std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\",\"$link_id\":" + Parser::to_u16string(value->m_serialization_index) + u"," + result + u"}";
+				std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\",\"$link_id\":" + Parser::int_to_u16string(value->m_serialization_index) + u"," + result + u"}";
 				return out;
 			}
 		}
@@ -961,9 +963,9 @@ public:
 		{
 			if (Parser::m_object_index<value->m_serialization_index)
 			{
-				LOG(FATAL) << std::to_string(Parser::m_object_index) << " | " << std::to_string(value->m_serialization_index) << " | " << typeid(value).name() << " | " << Parser::UTF16_to_CP866(value->get_packer().get_type_name());
+				LOG(FATAL) << std::to_string(Parser::m_object_index) << " | " << std::to_string(value->m_serialization_index) << " | " << typeid(value).name() << " | " << Parser::UTF16_to_CP1251(value->get_packer().get_type_name());
 			}
-			std::u16string out = u"{\"$type\":\"link\",\"value\":" + Parser::to_u16string(value->m_serialization_index) + u"}";
+			std::u16string out = u"{\"$type\":\"link\",\"value\":" + Parser::int_to_u16string(value->m_serialization_index) + u"}";
 			return out;
 		}
 		}
@@ -982,19 +984,22 @@ public:
 
 	std::string to_binary(iSerializable* value) override
 	{
-
 		switch (value->m_serialization_index)
 		{
 		case 0:
 		{
 			Parser::m_object_index += 1;
 			value->m_serialization_index = Parser::m_object_index;
-			std::size_t id = value->get_packer().get_type_id() + 2;
+			std::size_t id = value->get_packer().get_type_id() + 1;
 			return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + value->to_binary();
 		}
 		default:
 		{
-			std::size_t id = 1;
+			if (Parser::m_object_index<value->m_serialization_index)
+			{
+				LOG(FATAL) << std::to_string(Parser::m_object_index) << " | " << std::to_string(value->m_serialization_index) << " | " << typeid(value).name() << " | " << Parser::UTF16_to_CP1251(value->get_packer().get_type_name());
+			}
+			std::size_t id = Parser::t_constructors_from_json[u"link"]->get_type_id() + 1;
 			return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + std::string(reinterpret_cast<const char*>(&(value->m_serialization_index)), sizeof(std::size_t));
 		}
 		}
@@ -1096,9 +1101,16 @@ private:
 
 public:
 
-	static std::size_t m_object_index;
+	class Link: public iSerializable
+	{
+	public:
+		constexpr static auto properties()
+		{
+			return std::make_tuple();
+		}
+	};
 
-	static std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> m_convert;
+	static std::size_t m_object_index;
 
 	static inline std::map<std::u16string, Packer_generic*> t_constructors_from_json = {};
 	static inline std::vector<Packer_generic*> t_constructors_from_binary = {};
@@ -1126,17 +1138,16 @@ public:
 	static scheme_map_t* read_object(std::u16string& value);
 	static scheme_list_t* read_array(std::u16string& value);
 	static scheme_vector_t* read_pair(std::u16string& value);
-	static void print_u16string(std::u16string value);
 	static scheme_map_t* parse_object(std::u16string& value);
 	static scheme_list_t* parse_array(std::u16string& value);
 	static scheme_vector_t* parse_pair(std::u16string& value);
 	static std::u16string get_value(const std::u16string& value);
-	static std::u16string to_u16string(int const& i);
-	static std::u16string float_to_u16string(float const& i);
-	static int to_int(const std::u16string& value);
+	static std::u16string int_to_u16string(int const& i);
+	static std::u16string float_to_u16string(const float& i);
+	static int to_int32(const std::u16string& value);
 	static float to_float(const std::u16string& value);
-	static std::string UTF16_to_CP866(std::u16string const& value);
-	static std::u16string CP866_to_UTF16(std::string const& value);
+	static std::string UTF16_to_CP1251(std::u16string const& value);
+	static std::u16string CP1251_to_UTF16(std::string const& value);
 	static void reset_object_counter();
 
 	
@@ -1147,8 +1158,8 @@ public:
 		t_constructors_from_json[class_name] = &Packer<T>::Instance();
 		t_constructors_from_binary.push_back(&Packer<T>::Instance());
 		Packer<T>::Instance().m_type_name = class_name;
-		Packer<T>::Instance().m_type_id = m_type_id_counter;
-		m_type_id_counter += 1;
+		Packer<T>::Instance().m_type_id = t_constructors_from_binary.size()-1;
+		//m_type_id_counter += 1;
 	}
 
 	template <class T>
@@ -1209,12 +1220,13 @@ public:
 		{
 			if constexpr(std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value)
 			{
+				LOG(INFO) << "from_json<iSerializable*> :: " << typeid(T).name();
 				std::u16string temp(value);
 				scheme_map_t* s = read_object(temp);
 				if (s)
 				{
 					prop = dynamic_cast<T>(t_constructors_from_json[get_value((*s)[u"$type"])]->from_json(s));
-					LOG(INFO) << UTF16_to_CP866(prop->get_packer().get_type_name());
+					LOG(INFO) << UTF16_to_CP1251(prop->get_packer().get_type_name());
 					delete s;
 					return;
 				}
@@ -1222,6 +1234,7 @@ public:
 			}
 			else
 			{
+				LOG(INFO) << "from_json<"<<typeid(T).name()<<">";
 				if (get_value(value) == u"null")
 				{
 					prop = nullptr;
@@ -1248,7 +1261,7 @@ public:
 				std::size_t end_pos = value.find(u'"', start_pos + 1);
 				if (end_pos != std::string::npos)
 				{
-					prop = get_dictonary<T>().get_enum(UTF16_to_CP866(value.substr(start_pos + 1, end_pos - start_pos - 1)));
+					prop = get_dictonary<T>().get_enum(UTF16_to_CP1251(value.substr(start_pos + 1, end_pos - start_pos - 1)));
 					return;
 				}
 			}
@@ -1256,7 +1269,9 @@ public:
 		}
 		else if constexpr(std::is_base_of<iSerializable, T>::value)
 		{
+			LOG(INFO) << "from_json<iSerializable> :: " << typeid(T).name();
 			std::u16string temp(value);
+			LOG(INFO) << UTF16_to_CP1251(temp);
 			scheme_map_t* s = read_object(temp);
 			prop.from_json(s);
 			delete s;
@@ -1281,36 +1296,38 @@ public:
 		}
 		else if constexpr(is_list<T>::value)
 		{
+			LOG(INFO) << "from_json<List>";
 			using Value = typename T::value_type;
 			std::u16string temp = value;
 			scheme_list_t* s = read_array(temp);
+			LOG(INFO) << "LIST : " << UTF16_to_CP1251(temp);
 			if (s)
 			{
-				for (auto element : (*s))
+				for (const auto& element : (*s))
 				{
-					Value v;
+					Value& v = prop.emplace_back();
 					from_json<Value>(element, v);
-					prop.push_back(v);
 				}
 			}
 			delete s;
 		}
 		else if constexpr(is_map<T>::value)
 		{
+			LOG(INFO) << "from_json<Map>";
 			using Key = typename T::key_type;
 			using Value = typename T::mapped_type;
 			std::u16string temp = value;
+			LOG(INFO) << UTF16_to_CP1251(temp);
 			scheme_list_t* s = read_array(temp);
-			Key k;
-			Value v;
 			if (s)
 			{
-				for (auto element : (*s))
+				for (auto& element : (*s))
 				{
 					scheme_vector_t* p = read_pair(element);
+					Key k;
 					from_json<Key>((*p)[0], k);
+					Value& v = prop[k];
 					from_json<Value>((*p)[1], v);
-					prop[k] = v;
 					delete p;
 				}
 				delete s;
@@ -1318,42 +1335,7 @@ public:
 		}
 		else if constexpr(std::is_same<T, int>::value)
 		{
-			const char16_t* opening_symbol = nullptr;
-			for (std::size_t i = 0; i < value.size(); ++i)
-			{
-				switch (value[i])
-				{
-				case u'0':case u'1':case u'2':case u'3':case u'4':case u'5':case u'6':case u'7':case u'8':case u'9':
-				{
-					if (opening_symbol == nullptr)
-					{
-						opening_symbol = &value[i];
-					}
-					break;
-				}
-				default:
-				{
-					if (opening_symbol != nullptr)
-					{
-						break;
-					}
-					break;
-				}
-				}
-			}
-			if (opening_symbol != nullptr)
-			{
-				static std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> convert;
-				std::u16string value(opening_symbol, &value[value.size() - 1] - opening_symbol + 1);
-				std::wstring ws = convert.from_bytes(
-					reinterpret_cast<const char*> (value.data()),
-					reinterpret_cast<const char*> (value.data() + value.size()));
-				prop = std::stoi(ws);
-			}
-			else
-			{
-				prop = 0;
-			}
+			prop = to_int32(value);
 		}
 		else if constexpr(std::is_same<T, std::u16string>::value)
 		{
@@ -1377,15 +1359,15 @@ public:
 				std::size_t end_pos = value.find(u'"', start_pos + 1);
 				if (end_pos != std::string::npos)
 				{
-					prop = UTF16_to_CP866(value.substr(start_pos + 1, end_pos - start_pos - 1));
+					prop = UTF16_to_CP1251(value.substr(start_pos + 1, end_pos - start_pos - 1));
 					return;
 				}
 			}
-			prop = UTF16_to_CP866(value);
+			prop = UTF16_to_CP1251(value);
 		}
 		else if constexpr(std::is_same<T, std::size_t>::value)
 		{
-			std::size_t result = to_int(value);
+			std::size_t result = to_int32(value);
 			prop = result;
 		}
 		else if constexpr(std::is_same<T, float>::value)
@@ -1411,11 +1393,12 @@ public:
 			from_json<int>((*s)[0], prop.x);
 			from_json<int>((*s)[1], prop.y);
 			from_json<int>((*s)[2], prop.z);
+			LOG(INFO) <<  std::to_string(prop.x)<<" " << std::to_string(prop.y) << " " << std::to_string(prop.z);
 		}
 		else if constexpr(std::is_same<T, predicat_t>::value)
 		{
-			LOG(INFO) << Parser::UTF16_to_CP866(get_value(value)) << Parser::UTF16_to_CP866(value);
-			int result = to_int(value);
+			LOG(INFO) << Parser::UTF16_to_CP1251(get_value(value)) << Parser::UTF16_to_CP1251(value);
+			int result = to_int32(value);
 			prop = *Application::instance().m_ai_manager->m_path_qualifiers[result];
 		}
 		else if constexpr(std::is_same<T, light_t>::value)
@@ -1428,7 +1411,7 @@ public:
 		}
 		else if constexpr(std::is_same<T, optical_properties_t>::value)
 		{
-			LOG(INFO) << Parser::UTF16_to_CP866(get_value(value)) << Parser::UTF16_to_CP866(value);
+			LOG(INFO) << Parser::UTF16_to_CP1251(get_value(value)) << Parser::UTF16_to_CP1251(value);
 			std::u16string temp = value;
 			scheme_vector_t* s = read_pair(temp);
 			from_json<float>((*s)[0], prop.attenuation.R);
@@ -1462,6 +1445,7 @@ public:
 			{
 				if (value)
 				{
+					LOG(INFO) << "to_json iSerializable*: " << UTF16_to_CP1251(value->get_packer().get_type_name());
 					return value->get_packer().to_json(value);
 				}
 				else
@@ -1484,7 +1468,7 @@ public:
 		}
 		else if constexpr(std::is_base_of<iSerializable, T>::value)
 		{
-			LOG(INFO) << UTF16_to_CP866(value.get_packer().get_type_name());
+			LOG(INFO) << UTF16_to_CP1251(value.get_packer().get_type_name());
 			std::u16string result = value.to_json();
 			if (result.empty())
 			{
@@ -1520,12 +1504,12 @@ public:
 		}
 		else if constexpr(std::is_enum<T>::value)
 		{
-			std::u16string out = u"\"" + CP866_to_UTF16(get_dictonary<T>().get_string(value)) + u"\"";
+			std::u16string out = u"\"" + CP1251_to_UTF16(get_dictonary<T>().get_string(value)) + u"\"";
 			return out;
 		}
-		else if constexpr(std::is_same<T, int>::value)
+		else if constexpr(std::is_same<T, int>::value|| std::is_same<T, std::size_t>::value)
 		{
-			return to_u16string(value);
+			return int_to_u16string(value);
 		}
 		else if constexpr(std::is_same<T, std::u16string>::value)
 		{
@@ -1533,7 +1517,7 @@ public:
 		}
 		else if constexpr(std::is_same<T, std::string>::value)
 		{
-			return u"\"" + CP866_to_UTF16(value) + u"\"";
+			return u"\"" + CP1251_to_UTF16(value) + u"\"";
 		}
 		else if constexpr(std::is_same<T, game_object_size_t >::value)
 		{
@@ -1542,12 +1526,12 @@ public:
 		}
 		else if constexpr(std::is_same<T, predicat_t>::value)
 		{
-			std::u16string out = to_u16string(value.index);
+			std::u16string out = int_to_u16string(value.index);
 			return out;
 		}
 		else if constexpr(std::is_same<T, std::size_t>::value)
 		{
-			std::u16string out = to_u16string(value);
+			std::u16string out = int_to_u16string(value);
 			return out;
 		}
 		else if constexpr(std::is_same<T, light_t>::value)
@@ -1602,17 +1586,18 @@ public:
 					prop = nullptr;
 					break;
 				}
-				case 1:
+			/*	case 1:
 				{
+					LOG(INFO) << "form binaryyyyyyyyyyyy " << typeid(T).name();
 					std::size_t index = *reinterpret_cast<const std::size_t*>(&value[pos]);
 					pos += sizeof(std::size_t);
 					prop = dynamic_cast<T>(m_items[index-1]);
 					break;
-				}
+				}*/
 				default:
 				{
-					LOG(INFO)<<"form binaryyyyyyyyyyyy " << typeid(T).name();
-					prop = dynamic_cast<T>(t_constructors_from_binary[id - 2]->from_binary(value, pos));
+					LOG(INFO) << "from binaryyyyyyyyyyyy " << typeid(T).name();
+					prop = dynamic_cast<T>(t_constructors_from_binary[id - 1]->from_binary(value, pos));
 					LOG(INFO) << std::to_string(prop==nullptr);
 					break;
 				}
@@ -1649,10 +1634,10 @@ public:
 			using Value = typename T::value_type;
 			std::size_t s = *reinterpret_cast<const std::size_t*>(&value[pos]);
 			pos += sizeof(std::size_t);
-			Value v;
 			prop.resize(s);
 			for (std::size_t i = 0; i < s; ++i)
 			{
+				Value v;
 				from_binary<Value>(value, prop[i], pos);
 			}
 		}
@@ -1661,9 +1646,9 @@ public:
 			using Value = typename T::value_type;
 			std::size_t s = *reinterpret_cast<const std::size_t*>(&value[pos]);
 			pos += sizeof(std::size_t);
-			Value v;
 			for (std::size_t i = 0; i < s; ++i)
 			{
+				Value v;
 				from_binary<Value>(value, v, pos);
 				prop.push_back(v);
 			}
@@ -1674,10 +1659,10 @@ public:
 			using Value = typename T::mapped_type;
 			std::size_t s = *reinterpret_cast<const std::size_t*>(&value[pos]);
 			pos += sizeof(std::size_t);
-			Key k;
-			Value v;
 			for (std::size_t i = 0; i < s; ++i)
 			{
+				Key k;
+				Value v;
 				from_binary<Key>(value, k, pos);
 				from_binary<Value>(value, v, pos);
 				prop[k] = v;
@@ -1701,6 +1686,7 @@ public:
 			pos += sizeof(std::size_t);
 			prop = std::u16string(reinterpret_cast<const char16_t*>(&value[pos]), s);
 			pos += s * 2;
+			LOG(INFO) << "NAME: " << Parser::UTF16_to_CP1251(prop);
 		}
 		else if constexpr(std::is_same<T, game_object_size_t>::value)
 		{

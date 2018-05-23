@@ -1,14 +1,12 @@
-#ifndef TPARAMETER_H
-#define	TPARAMETER_H
+#ifndef PARAMETER_H
+#define	PARAMETER_H
 
 #include "Definiton.h"
-#include "GameObject.h"
 
 class Game_object_owner;
+class GameObject;
 class MapCell;
-class GameMap;
 class Object_part;
-class Action;
 
 struct Parameter_argument_t
 {
@@ -75,10 +73,7 @@ public:
 	virtual void load();
 
 
-	Packer_generic& get_packer()
-	{
-		return Packer<Parameter>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties()
 	{
@@ -111,7 +106,7 @@ private:
 //	GameObject* m_object;
 //	MapCell* m_place;
 //	GameMap* m_map;
-//
+//Packer_generic& get_packer()
 //	Parameter_MoveObjectByUnit(void);
 //	~Parameter_MoveObjectByUnit(void);
 //
@@ -135,10 +130,7 @@ public:
 	virtual void load() {};
 
 
-	Packer_generic& get_packer()
-	{
-		return Packer<Instruction_result>::Instance();
-	}
+	Packer_generic& get_packer() override;
 };
 
-#endif //TPARAMETER_H
+#endif //PARAMETER_H

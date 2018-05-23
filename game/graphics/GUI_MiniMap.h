@@ -1,4 +1,6 @@
-#pragma once
+#ifndef GUI_MINIMAP_H
+#define	GUI_MINIMAP_H
+
 #include "game\graphics\GUI_Object.h"
 #include "game\graphics\GUI_MapViewer.h"
 #include "GameObject.h"
@@ -55,4 +57,4 @@ private:
 	bool m_canvas_create;
 };
 
-
+#endif //GUI_MINIMAP_H

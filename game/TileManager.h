@@ -48,10 +48,7 @@ public:
 	bool init(const std::string& filename, object_direction_e direction, int frame) override;
 	int get_tile_index(const object_direction_e& direction, const int& frame) override;
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<TileManager_Single>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() { return TileManager::properties(); }
 
@@ -69,10 +66,7 @@ public:
 	int get_tile_index(const object_direction_e& direction, const int& frame) override;
 	void set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction) override;
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<TileManager_rotate8_animate>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() {
 		return make_union(
@@ -95,10 +89,7 @@ public:
 	int get_tile_index(const object_direction_e& direction, const int& frame) override;
 	void set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction) override;
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<TileManager_equilateral_animate>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() 
 	{

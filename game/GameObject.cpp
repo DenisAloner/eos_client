@@ -1,7 +1,8 @@
 #include "game/GameObject.h"
-#include "game/Action.h"
+//#include "game/Action.h"
 #include "log.h"
-#include "AI.h"
+//#include "AI.h"
+
 
 Game_object_owner* Game_object_owner::get_owner(entity_e kind)
 {
@@ -63,7 +64,7 @@ void MapCell::add_object(GameObject* Object)
 void MapCell::reset_serialization_index()
 {
 	m_serialization_index = 0;
-	for (auto obj : (m_items))
+	for (auto obj : m_items)
 	{
 		if (obj->m_serialization_index != 0)
 		{
@@ -134,7 +135,7 @@ Attribute_map* Attribute_map::clone()
 void  Attribute_map::reset_serialization_index()
 {
 	m_serialization_index = 0;
-	for (auto& m_item : m_items)
+	for (auto m_item : m_items)
 	{
 		m_item.second->reset_serialization_index();
 	}
@@ -168,28 +169,6 @@ void Attribute_map::load()
 		LOG(INFO) << "ÌÀÐÊÅÐ ÀÒÐÈÁÓÒÀ  - " << std::to_string((int)ie);
 		m_items[ie] = dynamic_cast<Interaction_list*>(Serialization_manager::instance().deserialize());
 	}
-}
-
-std::u16string Packer<MapCell>::to_json(iSerializable* value)
-{
-	LOG(INFO) << Parser::UTF16_to_CP866(value->get_packer().get_type_name());
-	if (value)
-	{
-		MapCell& obj = *dynamic_cast<MapCell*>(value);
-		std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\",\"value\":[" + Parser::
-			to_u16string(obj.x) + u"," + Parser::to_u16string(obj.y) + u"]}";
-		return out;
-	}
-	else
-	{
-		std::u16string out = u"null";
-		return out;
-	}
-}
-
-std::string Packer<MapCell>::to_binary(iSerializable* value)
-{
-	return "";
 }
 
 Tag_getter::Tag_getter(object_tag_e key) :m_key(key), m_result(nullptr) {};
@@ -237,11 +216,16 @@ void Attribute_map::apply_visitor(Visitor_generic& visitor)
 	visitor.visit(*this);
 }
 
+Packer_generic& Attribute_map::get_packer()
+{
+	return Packer<Attribute_map>::Instance();
+}
+
 std::u16string Object_state::icon_to_json(Icon*& value)
 {
 	if (value)
 	{
-		return u"\"" + Parser::CP866_to_UTF16(value->m_json_string) + u"\"";
+		return u"\"" + Parser::CP1251_to_UTF16(value->m_json_string) + u"\"";
 	}
 	else
 	{
@@ -259,8 +243,8 @@ std::string Object_state::icon_to_binary(Icon*& value)
 
 void Object_state::icon_from_json(std::u16string value, Icon*& prop)
 {
-	std::string&& name = Parser::UTF16_to_CP866(Parser::get_value(value));
-	prop = GameObjectManager::m_config.m_icons.get_by_string(name);
+	std::string&& name = Parser::UTF16_to_CP1251(Parser::get_value(value));
+	prop = GameObjectManager::m_config->m_icons.get_by_string(name);
 }
 
 void Object_state::icon_from_binary(const std::string& value, Icon*& prop, std::size_t& pos)
@@ -273,7 +257,7 @@ void Object_state::icon_from_binary(const std::string& value, Icon*& prop, std::
 	}
 	else
 	{
-		prop = Application::instance().m_game_object_manager->m_config.m_icons.m_by_index[s - 1];
+		prop = Application::instance().m_game_object_manager->m_config->m_icons.m_by_index[s - 1];
 	}
 }
 
@@ -281,7 +265,7 @@ std::u16string Object_state::tilemanager_to_json(TileManager*& value)
 {
 	if (value)
 	{
-		return u"\"" + Parser::CP866_to_UTF16(value->m_json_string) + u"\"";
+		return u"\"" + Parser::CP1251_to_UTF16(value->m_json_string) + u"\"";
 
 	}
 	else
@@ -305,8 +289,8 @@ void Object_state::tilemanager_from_json(std::u16string value, TileManager*& pro
 	}
 	else
 	{
-		std::string&& result = Parser::UTF16_to_CP866(Parser::get_value(value));
-		prop = Application::instance().m_game_object_manager->m_config.m_tile_managers.get_by_string(result);
+		std::string&& result = Parser::UTF16_to_CP1251(Parser::get_value(value));
+		prop = Application::instance().m_game_object_manager->m_config->m_tile_managers.get_by_string(result);
 	}
 }
 
@@ -321,7 +305,7 @@ void Object_state::tilemanager_from_binary(const std::string& value, TileManager
 	else
 	{
 		LOG(INFO) << "Tile manager" << std::to_string(s);
-		prop = Application::instance().m_game_object_manager->m_config.m_tile_managers.m_by_index[s - 1];
+		prop = Application::instance().m_game_object_manager->m_config->m_tile_managers.m_by_index[s - 1];
 	}
 }
 
@@ -412,6 +396,11 @@ Object_state* Object_state_equip::clone()
 	return state;
 }
 
+Packer_generic& Object_state_equip::get_packer()
+{
+	return Packer<Object_state_equip>::Instance();
+}
+
 //Action* Object_state::find_action(action_e kind)
 //{
 //	for (std::list<Action*>::iterator Current = m_actions.begin(); Current != m_actions.end(); Current++)
@@ -480,6 +469,11 @@ void Object_state::load()
 	LOG(INFO) << "òàéë "<<std::to_string(s);
 	//m_tile_manager = Application::instance().m_graph->m_tile_managers[s];
 	m_ai = static_cast<AI*>(Serialization_manager::instance().deserialize());
+}
+
+Packer_generic& Object_state::get_packer()
+{
+	return Packer<Object_state>::Instance();
 }
 
 //Object_feature* MapCell::find_property(property_e kind, GameObject* excluded)
@@ -921,6 +915,11 @@ void GameObject::get_actions_list(std::list<Action_helper_t>& value)
 	parts->do_predicat(ag);
 }
 
+Packer_generic& GameObject::get_packer()
+{
+	return Packer<GameObject>::Instance();
+}
+
 void GameObject::reset_serialization_index()
 {
 	m_serialization_index = 0;
@@ -928,7 +927,7 @@ void GameObject::reset_serialization_index()
 	{
 		m_owner->reset_serialization_index();
 	}
-	for (auto& item : m_state)
+	for (auto item : m_state)
 	{
 		item->reset_serialization_index();
 	}
@@ -1085,6 +1084,11 @@ void Inventory_cell::load()
 	m_item = dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize());
 }
 
+Packer_generic& Inventory_cell::get_packer()
+{
+	return Packer<Inventory_cell>::Instance();
+}
+
 Object_part::Object_part(GameObject* item) :Inventory_cell(item)
 {
 	m_interaction_message_type = interaction_message_type_e::part;
@@ -1171,4 +1175,59 @@ void Object_part::load()
 		}
 	}
 	LOG(INFO) << "Êîíåö ÷àñòè";*/
+}
+
+Packer_generic& Object_part::get_packer()
+{
+	return Packer<Object_part>::Instance();
+}
+
+Packer_generic& Config::get_packer()
+{
+	return Packer<Config>::Instance();
+}
+
+
+void Config::instancedictonary_icon_from_json(std::u16string value, InstanceDictonary<Icon*>& prop)
+{
+	std::u16string temp = value;
+	scheme_list_t* s = Parser::read_array(temp);
+	if (s)
+	{
+		for (auto element : (*s))
+		{
+			std::string&& name = Parser::UTF16_to_CP1251(Parser::get_value(element));
+			Icon* icon = new Icon;
+			icon->m_value = Application::instance().m_graph->load_texture(FileSystem::instance().m_resource_path + "Tiles\\" + name + ".bmp");
+			prop.add(icon, name);
+		}
+		delete s;
+	}
+}
+
+void Config::instancedictonary_icon_from_binary(const std::string& value, InstanceDictonary<Icon*>& prop, std::size_t& pos)
+{
+}
+
+void Config::instancedictonary_tilemanager_from_json(std::u16string value, InstanceDictonary<TileManager*>& prop)
+{
+	std::u16string temp = value;
+	scheme_list_t* s = Parser::read_array(temp);
+	std::string k;
+	TileManager* v = nullptr;
+	if (s)
+	{
+		for (auto element : (*s))
+		{
+			scheme_vector_t* p = Parser::read_pair(element);
+			Parser::from_json<std::string>((*p)[0], k);
+			Parser::from_json<TileManager*>((*p)[1], v);
+			prop.add(v, k);
+		}
+		delete s;
+	}
+}
+
+void Config::instancedictonary_tilemanager_from_binary(const std::string& value, InstanceDictonary<TileManager*>& prop, std::size_t& pos)
+{
 }

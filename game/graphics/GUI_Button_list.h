@@ -1,4 +1,6 @@
-#pragma once
+#ifndef GUI_BUTTON_LIST_H
+#define	GUI_BUTTON_LIST_H
+
 #include "GUI_Container.h"
 #include "GUI_button.h"
 #include "Parameter.h"
@@ -16,3 +18,4 @@ public:
 
 };
 
+#endif //GUI_BUTTON_LIST_H

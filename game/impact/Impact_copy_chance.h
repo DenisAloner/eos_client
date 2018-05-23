@@ -19,10 +19,7 @@ public:
 	virtual void load();
 
 
-	Packer_generic& get_packer()
-	{
-		return Packer<Impact_copy_chance>::Instance();
-	}
+	Packer_generic& get_packer() override;
 };
 
 #endif // IMPACT_COPY_CHANCE_H

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef GAME_ALGORITHM_H
+#define	GAME_ALGORITHM_H
+
 #include "Definiton.h"
 #include "GameObject.h"
 
@@ -24,3 +26,5 @@ public:
 	//static int get_rotation(object_direction_e start, object_direction_e end);
 	static rotate_direction_e get_rotation(object_direction_e start, object_direction_e end);
 };
+
+#endif //GAME_ALGORITHM_H

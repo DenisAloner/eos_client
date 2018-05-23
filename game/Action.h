@@ -1,5 +1,5 @@
-#ifndef TACTION_H
-#define	TACTION_H
+#ifndef ACTION_H
+#define	ACTION_H
 
 #include <algorithm>
 #include <iterator>
@@ -40,7 +40,7 @@ public:
 	virtual void interaction_handler(Parameter* arg);
 	virtual Object_interaction* clone();
 
-	virtual void reset_serialization_index() { m_serialization_index = 0; };
+	void reset_serialization_index() override { m_serialization_index = 0; };
 	virtual void save();
 	virtual void load();
 
@@ -74,10 +74,7 @@ public:
 	void set(GameObject* unit, Action* action, Parameter* parameter);
 	void update();
 
-	Packer_generic& get_packer()
-	{
-		return Packer<Action_wrapper>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 private:
 	Interaction_prefix* m_prefix;
@@ -333,4 +330,4 @@ private:
 	bool check_cell(Parameter* parameter);
 };
 
-#endif //TACTION_H
+#endif //ACTION_H

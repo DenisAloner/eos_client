@@ -27,7 +27,7 @@ class Object_manager: public iSerializable
 
 public:
 
-	std::list<GameObject*> m_items;
+	std::list<GameObject> m_items;
 	Object_manager() {};
 
 	void update_buff();
@@ -37,10 +37,7 @@ public:
 	virtual void save();
 	virtual void load();
 
-	Packer_generic& get_packer()
-	{
-		return Packer<Object_manager>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties()
 	{
@@ -112,10 +109,7 @@ public:
 	virtual void save();
 	virtual void load();
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<GameMap>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	std::u16string vector_mapcell_to_json(std::vector<MapCell>& value);
 	void vector_mapcell_from_json(std::u16string value, std::vector<MapCell>& prop);
@@ -150,16 +144,20 @@ public:
 	virtual void save();
 	virtual void load();
 
+	std::u16string serialize();
+	void deserialize(std::u16string& value);
 
-	Packer_generic& get_packer()
-	{
-		return Packer<Game_world>::Instance();
-	}
+	std::string bin_serialize();
+	void bin_deserialize(std::string& value);
+
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties()
 	{
 		return std::make_tuple(
+			make_property(&Game_world::m_object_manager, u"object_manager"),
 			make_property(&Game_world::m_maps, u"maps")
+			
 		);
 	}
 

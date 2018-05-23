@@ -1,4 +1,6 @@
-#pragma once
+#ifndef AI_H
+#define	AI_H
+
 #include <iostream>
 #include <list>
 #include <vector>
@@ -113,9 +115,6 @@ public:
 	virtual void calculate_FOV(GameObject* object, GameMap* map) = 0;
 
 	Packer_generic& get_packer() override = 0;
-	/*{
-		return Packer<AI>::Instance();
-	}*/
 
 	constexpr static auto properties() { return std::make_tuple(make_property(&AI::m_ai_type, u"ai_type")); }
 
@@ -145,10 +144,7 @@ public:
 
 	virtual void calculate_FOV(GameObject* object, GameMap* map);
 
-	Packer_generic& get_packer() override
-	{
-		return Packer<AI_enemy>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() 
 	{
@@ -173,10 +169,7 @@ public:
 	virtual void load();
 
 
-	Packer_generic& get_packer()
-	{
-		return Packer<AI_trap>::Instance();
-	}
+	Packer_generic& get_packer() override;
 
 	virtual void calculate_FOV(GameObject* object, GameMap* map) {};
 };
@@ -190,3 +183,5 @@ public:
 
 	AI_manager();
 };
+
+#endif //AI_H
