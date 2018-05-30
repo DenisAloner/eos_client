@@ -1871,14 +1871,6 @@ public:
 		else static_assert(always_false<T>::value, "<get_dictonary> type error");
 	}
 
-	class Initializator
-	{
-	public:
-		Initializator();
-	};
-
-	static inline Initializator initializator = Initializator();
-
 private:
 
 	

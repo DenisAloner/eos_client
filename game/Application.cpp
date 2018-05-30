@@ -210,6 +210,7 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 		m_actions[i]->m_index = i;
 	}
 
+	Parser parser; //TODO костыль, решить как убрать
 	m_ai_manager = new AI_manager();
 	m_game_object_manager = new GameObjectManager();
 	Game_world gw; //TODO костыль, продумать исправление
@@ -247,7 +248,7 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 void Application::new_game()
 {
 	m_world = new Game_world();
-	GameMap* map = new GameMap(dimension_t(400, 400));
+	GameMap* map = new GameMap(dimension_t(4, 4));
 
 	GameObject* obj;
 	map->generate_room();

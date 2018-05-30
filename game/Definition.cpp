@@ -304,8 +304,45 @@ std::unordered_map<object_tag_e, std::u16string>  Parser::m_string_object_tag_e 
 
 Parser::Parser()
 {
-	/*m_constructors_from_json[u"A_class"] = A::create_instance2;
-	m_constructors_from_json[u"B_class"] = B::create_instance2;*/
+	register_packer<Instruction_arg_extract>(u"instruction_arg_extract");
+	register_packer<TileManager_Single>(u"tilemanager_single");
+	register_packer<TileManager_rotate8_animate>(u"tilemanager_rotate8_animate");
+	register_packer<TileManager_equilateral_animate>(u"tilemanager_equilateral_animate");
+	register_packer<Instruction_get_owner>(u"instruction_get_owner");
+	register_packer<Instruction_get_owner_top>(u"instruction_get_owner_top");
+	register_packer<Effect>(u"effect");
+	register_packer<Interaction_time>(u"interaction_time");
+	register_packer<ObjectTag::Can_transfer_object>(u"can_transfer_object");
+	register_packer<Instruction_check_owner_type>(u"instruction_check_owner_type");
+	register_packer<GameObject>(u"game_object");
+	register_packer<Inventory_cell>(u"inventory_cell");
+	register_packer<Object_part>(u"object_part");
+	register_packer<Attribute_map>(u"attribute_map");
+	register_packer<Object_state>(u"object_state");
+	register_packer<Object_state_equip>(u"object_state_equip");
+	register_packer<Interaction_list>(u"interaction_list");
+	register_packer<Parameter_list>(u"parameter_list");
+	register_packer<Vision_list>(u"vision_list");
+	register_packer<Vision_component>(u"vision_component");
+	register_packer<Tag_list>(u"tag_list");
+	register_packer<Parts_list>(u"parts_list");
+	register_packer<Action_list>(u"action_list");
+	register_packer<Instruction_slot_link>(u"interaction_slot_link");
+	register_packer<ObjectTag::Label>(u"label");
+	register_packer<ObjectTag::Mortal>(u"objecttag_mortal");
+	register_packer<ObjectTag::Equippable>(u"equippable");
+	register_packer<ObjectTag::Requirements_to_object>(u"requirements_to_object");
+	register_packer<Instruction_check_part_type>(u"instruction_check_part_type");
+	register_packer<Instruction_check_tag>(u"instruction_check_tag");
+	register_packer<Config>(u"config");
+	register_packer<AI_enemy>(u"ai_enemy");
+	register_packer<GameMap>(u"game_map");
+	register_packer<MapCell>(u"map_cell");
+	register_packer<Action>(u"action");
+	register_packer<Object_interaction>(u"template");
+	register_packer<Object_manager>(u"object_manager");
+	register_packer<Game_world>(u"game_world");
+	register_packer<Link>(u"link");
 }
 
 Parser::~Parser()
@@ -848,49 +885,6 @@ std::u16string Parser::CP1251_to_UTF16(std::string const& value)
 		}
 	}
 	return out;
-}
-
-Parser::Initializator::Initializator()
-{
-	register_packer<Instruction_arg_extract>(u"instruction_arg_extract");
-	register_packer<TileManager_Single>(u"tilemanager_single");
-	register_packer<TileManager_rotate8_animate>(u"tilemanager_rotate8_animate");
-	register_packer<TileManager_equilateral_animate>(u"tilemanager_equilateral_animate");
-	register_packer<Instruction_get_owner>(u"instruction_get_owner");
-	register_packer<Instruction_get_owner_top>(u"instruction_get_owner_top");
-	register_packer<Effect>(u"effect");
-	register_packer<Interaction_time>(u"interaction_time");
-	register_packer<ObjectTag::Can_transfer_object>(u"can_transfer_object");
-	register_packer<Instruction_check_owner_type>(u"instruction_check_owner_type");
-	register_packer<GameObject>(u"game_object");
-	register_packer<Inventory_cell>(u"inventory_cell");
-	register_packer<Object_part>(u"object_part");
-	register_packer<Attribute_map>(u"attribute_map");
-	register_packer<Object_state>(u"object_state");
-	register_packer<Object_state_equip>(u"object_state_equip");
-	register_packer<Interaction_list>(u"interaction_list");
-	register_packer<Parameter_list>(u"parameter_list");
-	register_packer<Vision_list>(u"vision_list");
-	register_packer<Vision_component>(u"vision_component");
-	register_packer<Tag_list>(u"tag_list");
-	register_packer<Parts_list>(u"parts_list");
-	register_packer<Action_list>(u"action_list");
-	register_packer<Instruction_slot_link>(u"interaction_slot_link");
-	register_packer<ObjectTag::Label>(u"label");
-	register_packer<ObjectTag::Mortal>(u"objecttag_mortal");
-	register_packer<ObjectTag::Equippable>(u"equippable");
-	register_packer<ObjectTag::Requirements_to_object>(u"requirements_to_object");
-	register_packer<Instruction_check_part_type>(u"instruction_check_part_type");
-	register_packer<Instruction_check_tag>(u"instruction_check_tag");
-	register_packer<Config>(u"config");
-	register_packer<AI_enemy>(u"ai_enemy");
-	register_packer<GameMap>(u"game_map");
-	register_packer<MapCell>(u"map_cell");
-	register_packer<Action>(u"action");
-	register_packer<Object_interaction>(u"template");
-	register_packer<Object_manager>(u"object_manager");
-	register_packer<Game_world>(u"game_world");
-	register_packer<Link>(u"link");
 }
 
 #endif //DEFINITION_CPP
