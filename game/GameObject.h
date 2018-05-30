@@ -184,15 +184,15 @@ public:
 
 	Packer_generic& get_packer() override;
 
-	std::u16string icon_to_json(Icon*& value);
-	std::string icon_to_binary(Icon*& value);
-	void icon_from_json(std::u16string value, Icon*& prop);
-	void icon_from_binary(const std::string& value, Icon*& prop, std::size_t& pos);
+	std::u16string icon_to_json(Icon*& value, Parser_context& context);
+	std::string icon_to_binary(Icon*& value, Parser_context& context);
+	void icon_from_json(std::u16string value, Icon*& prop, Parser_context& context);
+	void icon_from_binary(const std::string& value, Icon*& prop, std::size_t& pos, Parser_context& context);
 
-	std::u16string tilemanager_to_json(TileManager*& value);
-	std::string tilemanager_to_binary(TileManager*& value);
-	void tilemanager_from_json(std::u16string value, TileManager*& prop);
-	void tilemanager_from_binary(const std::string& value, TileManager*& prop, std::size_t& pos);
+	std::u16string tilemanager_to_json(TileManager*& value, Parser_context& context);
+	std::string tilemanager_to_binary(TileManager*& value, Parser_context& context);
+	void tilemanager_from_json(std::u16string value, TileManager*& prop, Parser_context& context);
+	void tilemanager_from_binary(const std::string& value, TileManager*& prop, std::size_t& pos, Parser_context& context);
 	
 	constexpr static auto properties() {
 		return make_union(
@@ -319,11 +319,11 @@ public:
 
 	Packer_generic& get_packer() override;
 
-	void instancedictonary_icon_from_json(std::u16string value, InstanceDictonary<Icon*>& prop);
-	void instancedictonary_icon_from_binary(const std::string& value, InstanceDictonary<Icon*>& prop, std::size_t& pos);
+	void instancedictonary_icon_from_json(std::u16string value, InstanceDictonary<Icon*>& prop, Parser_context& context);
+	void instancedictonary_icon_from_binary(const std::string& value, InstanceDictonary<Icon*>& prop, std::size_t& pos, Parser_context& context);
 
-	void instancedictonary_tilemanager_from_json(std::u16string value, InstanceDictonary<TileManager*>& prop);
-	void instancedictonary_tilemanager_from_binary(const std::string& value, InstanceDictonary<TileManager*>& prop, std::size_t& pos);
+	void instancedictonary_tilemanager_from_json(std::u16string value, InstanceDictonary<TileManager*>& prop, Parser_context& context);
+	void instancedictonary_tilemanager_from_binary(const std::string& value, InstanceDictonary<TileManager*>& prop, std::size_t& pos, Parser_context& context);
 
 	constexpr static auto properties()
 	{

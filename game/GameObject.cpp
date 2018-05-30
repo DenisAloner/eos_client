@@ -221,7 +221,7 @@ Packer_generic& Attribute_map::get_packer()
 	return Packer<Attribute_map>::Instance();
 }
 
-std::u16string Object_state::icon_to_json(Icon*& value)
+std::u16string Object_state::icon_to_json(Icon*& value, Parser_context& context)
 {
 	if (value)
 	{
@@ -233,7 +233,7 @@ std::u16string Object_state::icon_to_json(Icon*& value)
 	}
 }
 
-std::string Object_state::icon_to_binary(Icon*& value)
+std::string Object_state::icon_to_binary(Icon*& value, Parser_context& context)
 {
 	std::size_t s;
 	if (value) s = value->m_index + 1;
@@ -241,13 +241,13 @@ std::string Object_state::icon_to_binary(Icon*& value)
 	return std::string(reinterpret_cast<const char*>(&s), sizeof(std::size_t));
 }
 
-void Object_state::icon_from_json(std::u16string value, Icon*& prop)
+void Object_state::icon_from_json(std::u16string value, Icon*& prop, Parser_context& context)
 {
 	std::string&& name = Parser::UTF16_to_CP1251(Parser::get_value(value));
 	prop = GameObjectManager::m_config->m_icons.get_by_string(name);
 }
 
-void Object_state::icon_from_binary(const std::string& value, Icon*& prop, std::size_t& pos)
+void Object_state::icon_from_binary(const std::string& value, Icon*& prop, std::size_t& pos, Parser_context& context)
 {
 	std::size_t s = *reinterpret_cast<const std::size_t*>(&value[pos]);
 	pos += sizeof(std::size_t);
@@ -261,7 +261,7 @@ void Object_state::icon_from_binary(const std::string& value, Icon*& prop, std::
 	}
 }
 
-std::u16string Object_state::tilemanager_to_json(TileManager*& value)
+std::u16string Object_state::tilemanager_to_json(TileManager*& value, Parser_context& context)
 {
 	if (value)
 	{
@@ -274,14 +274,14 @@ std::u16string Object_state::tilemanager_to_json(TileManager*& value)
 	}
 }
 
-std::string Object_state::tilemanager_to_binary(TileManager*& value)
+std::string Object_state::tilemanager_to_binary(TileManager*& value, Parser_context& context)
 {
 	std::size_t s;
 	if (value) s = value->m_index + 1; else s = 0;
 	return std::string(reinterpret_cast<const char*>(&s), sizeof(std::size_t));
 }
 
-void Object_state::tilemanager_from_json(std::u16string value, TileManager*& prop)
+void Object_state::tilemanager_from_json(std::u16string value, TileManager*& prop, Parser_context& context)
 {
 	if (Parser::get_value(value) == u"null")
 	{
@@ -294,7 +294,7 @@ void Object_state::tilemanager_from_json(std::u16string value, TileManager*& pro
 	}
 }
 
-void Object_state::tilemanager_from_binary(const std::string& value, TileManager*& prop, std::size_t& pos)
+void Object_state::tilemanager_from_binary(const std::string& value, TileManager*& prop, std::size_t& pos, Parser_context& context)
 {
 	std::size_t s = *reinterpret_cast<const std::size_t*>(&value[pos]);
 	pos += sizeof(std::size_t);
@@ -1188,7 +1188,7 @@ Packer_generic& Config::get_packer()
 }
 
 
-void Config::instancedictonary_icon_from_json(std::u16string value, InstanceDictonary<Icon*>& prop)
+void Config::instancedictonary_icon_from_json(std::u16string value, InstanceDictonary<Icon*>& prop, Parser_context& context)
 {
 	std::u16string temp = value;
 	scheme_list_t* s = Parser::read_array(temp);
@@ -1205,11 +1205,11 @@ void Config::instancedictonary_icon_from_json(std::u16string value, InstanceDict
 	}
 }
 
-void Config::instancedictonary_icon_from_binary(const std::string& value, InstanceDictonary<Icon*>& prop, std::size_t& pos)
+void Config::instancedictonary_icon_from_binary(const std::string& value, InstanceDictonary<Icon*>& prop, std::size_t& pos, Parser_context& context)
 {
 }
 
-void Config::instancedictonary_tilemanager_from_json(std::u16string value, InstanceDictonary<TileManager*>& prop)
+void Config::instancedictonary_tilemanager_from_json(std::u16string value, InstanceDictonary<TileManager*>& prop, Parser_context& context)
 {
 	std::u16string temp = value;
 	scheme_list_t* s = Parser::read_array(temp);
@@ -1220,14 +1220,14 @@ void Config::instancedictonary_tilemanager_from_json(std::u16string value, Insta
 		for (auto element : (*s))
 		{
 			scheme_vector_t* p = Parser::read_pair(element);
-			Parser::from_json<std::string>((*p)[0], k);
-			Parser::from_json<TileManager*>((*p)[1], v);
+			Parser::from_json<std::string>((*p)[0], k,context);
+			Parser::from_json<TileManager*>((*p)[1], v,context);
 			prop.add(v, k);
 		}
 		delete s;
 	}
 }
 
-void Config::instancedictonary_tilemanager_from_binary(const std::string& value, InstanceDictonary<TileManager*>& prop, std::size_t& pos)
+void Config::instancedictonary_tilemanager_from_binary(const std::string& value, InstanceDictonary<TileManager*>& prop, std::size_t& pos, Parser_context& context)
 {
 }

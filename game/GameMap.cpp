@@ -110,19 +110,19 @@ Packer_generic& Object_manager::get_packer()
 }
 
 
-std::u16string GameMap::vector_mapcell_to_json(std::vector<MapCell>& value)
+std::u16string GameMap::vector_mapcell_to_json(std::vector<MapCell>& value, Parser_context& context)
 {
 	std::u16string result = u"[";
 	for (auto element : (value))
 	{
 		if (result != u"[") { result += u","; }
-		result += Parser::to_json<std::list<GameObject*>>(element.m_items);
+		result += Parser::to_json<std::list<GameObject*>>(element.m_items,context);
 	}
 	result += u"]";
 	return result;
 }
 
-void GameMap::vector_mapcell_from_json(std::u16string value, std::vector<MapCell>& prop)
+void GameMap::vector_mapcell_from_json(std::u16string value, std::vector<MapCell>& prop, Parser_context& context)
 {
 	std::u16string temp = value;
 	scheme_list_t* s = Parser::read_array(temp);
@@ -132,32 +132,32 @@ void GameMap::vector_mapcell_from_json(std::u16string value, std::vector<MapCell
 		prop.resize(s->size());
 		for (auto element : (*s))
 		{
-			Parser::from_json<std::list<GameObject*>>(element, prop[i].m_items);
+			Parser::from_json<std::list<GameObject*>>(element, prop[i].m_items,context);
 			i += 1;
 		}
 	}
 	delete s;
 }
 
-std::string GameMap::vector_mapcell_to_binary(std::vector<MapCell>& value)
+std::string GameMap::vector_mapcell_to_binary(std::vector<MapCell>& value, Parser_context& context)
 {
 	std::size_t s = value.size();
 	std::string result = std::string(reinterpret_cast<const char*>(&s), sizeof(std::size_t));
 	for (auto element : (value))
 	{
-		result += Parser::to_binary<std::list<GameObject*>>(element.m_items);
+		result += Parser::to_binary<std::list<GameObject*>>(element.m_items,context);
 	}
 	return result;
 }
 
-void GameMap::vector_mapcell_from_binary(const std::string& value, std::vector<MapCell>& prop, std::size_t& pos)
+void GameMap::vector_mapcell_from_binary(const std::string& value, std::vector<MapCell>& prop, std::size_t& pos, Parser_context& context)
 {
 	std::size_t s = *reinterpret_cast<const std::size_t*>(&value[pos]);
 	pos += sizeof(std::size_t);
 	prop.resize(s);
 	for (std::size_t i = 0; i < s; ++i)
 	{
-		Parser::from_binary<std::list<GameObject*>>(value, prop[i].m_items, pos);
+		Parser::from_binary<std::list<GameObject*>>(value, prop[i].m_items, pos,context);
 	}
 }
 
@@ -1360,7 +1360,7 @@ void Game_world::load()
 	m_player = new Player(object, map);
 }
 
-std::u16string Game_world::serialize()
+std::u16string Game_world::serialize(Parser_context& context)
 {
 	LOG(INFO) << "std::u16string Object_manager::items_to_json(std::list<GameObject>& value)";
 	std::size_t i = 0;
@@ -1375,15 +1375,15 @@ std::u16string Game_world::serialize()
 	for (auto& element : m_maps.front()->m_items)
 	{
 		if (!result.empty()) { result += u","; };
-		result += Parser::to_json<std::list<GameObject*>>(element.m_items);
+		result += Parser::to_json<std::list<GameObject*>>(element.m_items,context);
 	}
-	result = u"{\"map_size\":" + Parser::to_json<dimension_t>(m_maps.front()->m_size) + u",\"manager_size\":" + Parser::to_json<std::size_t>(ms) +u",\"cells\":[" + result + u"],\"items\":";
-	result += Parser::to_json<std::list<GameObject>>(m_object_manager.m_items);
+	result = u"{\"map_size\":" + Parser::to_json<dimension_t>(m_maps.front()->m_size,context) + u",\"manager_size\":" + Parser::to_json<std::size_t>(ms,context) +u",\"cells\":[" + result + u"],\"items\":";
+	result += Parser::to_json<std::list<GameObject>>(m_object_manager.m_items,context);
 	result += u"}";
 	return result;
 }
 
-void Game_world::deserialize(std::u16string& value)
+void Game_world::deserialize(std::u16string& value, Parser_context& context)
 {
 	LOG(INFO) << "deserialize -> " << Parser::UTF16_to_CP1251(value);
 	scheme_map_t* s = Parser::read_object(value);
@@ -1392,12 +1392,12 @@ void Game_world::deserialize(std::u16string& value)
 	{
 		LOG(INFO) << "deserialize -> " << Parser::UTF16_to_CP1251(element.first);
 	}
-	Parser::from_json<dimension_t>((*s)[u"map_size"], map_size);
+	Parser::from_json<dimension_t>((*s)[u"map_size"], map_size,context);
 	GameMap* map = new GameMap(map_size);
 	m_maps.push_front(map);
 
 	std::size_t manager_size;
-	Parser::from_json<std::size_t>((*s)[u"manager_size"], manager_size);
+	Parser::from_json<std::size_t>((*s)[u"manager_size"], manager_size,context);
 	m_object_manager.m_items.resize(manager_size);
 	
 	scheme_list_t* items = Parser::read_array((*s)[u"cells"]);
@@ -1407,7 +1407,7 @@ void Game_world::deserialize(std::u16string& value)
 		for (const auto& element : *items)
 		{
 			LOG(INFO) << "CELLS deserialize -> " << Parser::UTF16_to_CP1251(element);
-			Parser::from_json<std::list<GameObject*>>(element, map->m_items[i].m_items);
+			Parser::from_json<std::list<GameObject*>>(element, map->m_items[i].m_items,context);
 			i += 1;
 		}
 		delete items;
@@ -1420,7 +1420,7 @@ void Game_world::deserialize(std::u16string& value)
 		auto it = m_object_manager.m_items.begin();
 		for (const auto& element : *items)
 		{
-			Parser::from_json<GameObject>(element, *it);
+			Parser::from_json<GameObject>(element, *it,context);
 			i += 1;
 			++it;
 		}
@@ -1430,7 +1430,7 @@ void Game_world::deserialize(std::u16string& value)
 	delete s;
 }
 
-std::string Game_world::bin_serialize()
+std::string Game_world::bin_serialize(Parser_context& context)
 {
 	LOG(INFO) << "std::string Game_world::bin_serialize()";
 	std::size_t i = 0;
@@ -1441,42 +1441,42 @@ std::string Game_world::bin_serialize()
 	}
 	std::size_t ms = m_object_manager.m_items.size();
 	LOG(INFO) << "std::string Game_world::bin_serialize() "<<std::to_string(ms);
-	std::string result = Parser::to_binary<dimension_t>(m_maps.front()->m_size) + Parser::to_binary<std::size_t>(ms);
+	std::string result = Parser::to_binary<dimension_t>(m_maps.front()->m_size,context) + Parser::to_binary<std::size_t>(ms,context);
 	for (auto& element : m_maps.front()->m_items)
 	{
-		result += Parser::to_binary<std::list<GameObject*>>(element.m_items);
+		result += Parser::to_binary<std::list<GameObject*>>(element.m_items,context);
 	}
 	for (auto& element : m_object_manager.m_items)
 	{
-		result += Parser::to_binary<GameObject>(element);
+		result += Parser::to_binary<GameObject>(element,context);
 	}
 	return result;
 }
 
-void Game_world::bin_deserialize(std::string& value)
+void Game_world::bin_deserialize(std::string& value, Parser_context& context)
 {
 	LOG(INFO) << "Game_world::bin_deserialize(std::string& value)";
 
 	std::size_t pos = 0;
 	dimension_t map_size;
-	Parser::from_binary<dimension_t>(value, map_size,pos);
+	Parser::from_binary<dimension_t>(value, map_size,pos,context);
 	GameMap* map = new GameMap(map_size);
 	m_maps.push_front(map);
 
 	std::size_t manager_size;
-	Parser::from_binary<std::size_t>(value, manager_size,pos);
+	Parser::from_binary<std::size_t>(value, manager_size,pos,context);
 	LOG(INFO) << "void Game_world::bin_deserialize(std::string& value) " << std::to_string(manager_size);
 	m_object_manager.m_items.resize(manager_size);
 
 	for (auto& element : m_maps.front()->m_items)
 	{
-		Parser::from_binary<std::list<GameObject*>>(value,element.m_items,pos);
+		Parser::from_binary<std::list<GameObject*>>(value,element.m_items,pos,context);
 	}
 
 	std::size_t i=0;
 	for (auto& element : m_object_manager.m_items)
 	{
-		Parser::from_binary<GameObject>(value, element, pos);
+		Parser::from_binary<GameObject>(value, element, pos,context);
 		++i;
 	}
 }

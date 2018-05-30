@@ -3,7 +3,7 @@
 
 Config* GameObjectManager::m_config = new Config();
 
-void GameObjectManager::init()
+void GameObjectManager::init(Parser_context& context)
 {
 
 	m_effect_prefix_string[effect_prefix_e::physical_damage] = "физический урон";
@@ -21,7 +21,7 @@ void GameObjectManager::init()
 
 	std::u16string temp(json_config);
 	scheme_map_t* s = Parser::read_object(temp);
-	m_config->from_json(s);
+	m_config->from_json(s,context);
 	delete s;
 
 	//m_items.insert(m_config->m_items.begin(), m_config->m_items.end());

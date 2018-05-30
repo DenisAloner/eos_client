@@ -73,10 +73,10 @@ Packer_generic& Action::get_packer()
 	return Packer<Action>::Instance();
 }
 
-std::u16string Packer<Action>::to_json(iSerializable* value)
+std::u16string Packer<Action>::to_json(iSerializable* value,Parser_context& context)
 {
 	LOG(INFO) << Parser::UTF16_to_CP1251(value->get_packer().get_type_name());
-	std::u16string result = value->to_json();
+	std::u16string result = value->to_json(context);
 	if (result.empty())
 	{
 		std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\"}";
@@ -89,21 +89,21 @@ std::u16string Packer<Action>::to_json(iSerializable* value)
 	}
 }
 
-std::string Packer<Action>::to_binary(iSerializable* value)
+std::string Packer<Action>::to_binary(iSerializable* value, Parser_context& context)
 {
 	std::size_t id = value->get_packer().get_type_id() + 1;
-	return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + value->to_binary();
+	return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + value->to_binary(context);
 }
 
-iSerializable* Packer<Action>::from_json(scheme_map_t* value)
+iSerializable* Packer<Action>::from_json(scheme_map_t* value, Parser_context& context)
 {
 	return Application::instance().m_actions[Parser::m_json_action_e.get_enum(Parser::UTF16_to_CP1251(Parser::get_value((*value)[u"value"])))];
 }
 
-iSerializable* Packer<Action>::from_binary(const std::string& value, std::size_t& pos)
+iSerializable* Packer<Action>::from_binary(const std::string& value, std::size_t& pos, Parser_context& context)
 {
 	action_e::type x;
-	Parser::from_binary<action_e::type>(value, x, pos);
+	Parser::from_binary<action_e::type>(value, x, pos,context);
 	return Application::instance().m_actions[x];
 }
 

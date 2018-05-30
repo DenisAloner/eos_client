@@ -15,6 +15,12 @@ object_direction_e operator+(object_direction_e lhs, const rotate_direction_e& r
 	}
 }
 
+void Parser_context::reset()
+{
+	m_items.clear();
+	m_object_index = 0;
+}
+
 
 Apply_info::Apply_info(GameObject* unit, Object_interaction* object):m_unit(unit),m_object(object)
 {
@@ -29,14 +35,14 @@ Packer_generic& Object_interaction::get_packer()
 	return Packer<Object_interaction>::Instance();
 }
 
-iSerializable* Packer<Object_interaction>::from_json(scheme_map_t* value)
+iSerializable* Packer<Object_interaction>::from_json(scheme_map_t* value,Parser_context& context)
 {
 	//LOG(INFO) << Parser::UTF16_to_CP1251(Parser::get_value((*value)[u"value"])) << " :: " << std::to_string(GameObjectManager::m_config.m_templates.size());
 	return GameObjectManager::m_config->m_templates[Parser::UTF16_to_CP1251(Parser::get_value((*value)[u"value"]))]->clone();
 }
 
 
-std::u16string Packer<MapCell>::to_json(iSerializable* value)
+std::u16string Packer<MapCell>::to_json(iSerializable* value, Parser_context& context)
 {
 	if (value)
 	{
@@ -52,13 +58,13 @@ std::u16string Packer<MapCell>::to_json(iSerializable* value)
 	}
 }
 
-std::string Packer<MapCell>::to_binary(iSerializable* value)
+std::string Packer<MapCell>::to_binary(iSerializable* value, Parser_context& context)
 {
 	if (value)
 	{
 		MapCell& obj = *dynamic_cast<MapCell*>(value);
 		std::size_t id = value->get_packer().get_type_id() + 1;
-		return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + Parser::to_binary<int>(obj.x) + Parser::to_binary<int>(obj.y);
+		return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + Parser::to_binary<int>(obj.x,context) + Parser::to_binary<int>(obj.y,context);
 	}
 	else
 	{
@@ -67,69 +73,67 @@ std::string Packer<MapCell>::to_binary(iSerializable* value)
 	}
 }
 
-iSerializable* Packer<MapCell>::from_json(scheme_map_t* value)
+iSerializable* Packer<MapCell>::from_json(scheme_map_t* value, Parser_context& context)
 {
 	scheme_vector_t* s = Parser::read_pair((*value)[u"value"]);
 	int x;
 	int y;
-	Parser::from_json<int>((*s)[0], x);
-	Parser::from_json<int>((*s)[1], y);
-	return &Application::instance().m_world->m_maps.front()->get(y, x);
+	Parser::from_json<int>((*s)[0], x,context);
+	Parser::from_json<int>((*s)[1], y,context);
+	return &context.m_game_world.m_maps.front()->get(y, x);
 }
 
-iSerializable* Packer<MapCell>::from_binary(const std::string& value, std::size_t& pos)
+iSerializable* Packer<MapCell>::from_binary(const std::string& value, std::size_t& pos,Parser_context& context)
 {
 	int x;
 	int y;
-	Parser::from_binary<int>(value, x,pos);
-	Parser::from_binary<int>(value, y, pos);
-	return &Application::instance().m_world->m_maps.front()->get(y, x);
+	Parser::from_binary<int>(value, x,pos,context);
+	Parser::from_binary<int>(value, y, pos,context);
+	return &context.m_game_world.m_maps.front()->get(y, x);
 }
 
-iSerializable* Packer<Parser::Link>::from_json(scheme_map_t* value)
+iSerializable* Packer<Parser::Link>::from_json(scheme_map_t* value, Parser_context& context)
 {
 	std::size_t id;
-	Parser::from_json<std::size_t>((*value)[u"value"], id);
-	return Parser::m_items[id-1];
+	Parser::from_json<std::size_t>((*value)[u"value"], id,context);
+	return context.m_items[id - 1];
 }
 
-iSerializable* Packer<Parser::Link>::from_binary(const std::string& value, std::size_t& pos)
+iSerializable* Packer<Parser::Link>::from_binary(const std::string& value, std::size_t& pos, Parser_context& context)
 {
 	std::size_t id;
-	Parser::from_binary<std::size_t>(value, id, pos);
-	return Parser::m_items[id - 1];
+	Parser::from_binary<std::size_t>(value, id, pos,context);
+	return context.m_items[id - 1];
 }
 
-std::u16string Packer<GameObject>::to_json(iSerializable* value)
+std::u16string Packer<GameObject>::to_json(iSerializable* value, Parser_context& context)
 {
 	std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\",\"value\":" + Parser::int_to_u16string(value->m_serialization_index) + u"}";
 	return out;
 }
 
-std::string Packer<GameObject>::to_binary(iSerializable* value)
+std::string Packer<GameObject>::to_binary(iSerializable* value, Parser_context& context)
 {
 	std::size_t id = value->get_packer().get_type_id() + 1;
 	std::size_t index = value->m_serialization_index;
 	return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + std::string(reinterpret_cast<const char*>(&index), sizeof(std::size_t));
 }
 
-iSerializable* Packer<GameObject>::from_json(scheme_map_t* value)
+iSerializable* Packer<GameObject>::from_json(scheme_map_t* value, Parser_context& context)
 {
 	LOG(INFO) << "iSerializable* Packer<GameObject>::from_json(scheme_map_t* value)";
 	const int i = Parser::to_int32((*value)[u"value"]);
-	const auto it = std::next(Application::instance().m_world->m_object_manager.m_items.begin(), i);
+	const auto it = std::next(context.m_game_world.m_object_manager.m_items.begin(), i);
 	return &(*it);
 }
 
-iSerializable* Packer<GameObject>::from_binary(const std::string& value, std::size_t& pos)
+iSerializable* Packer<GameObject>::from_binary(const std::string& value, std::size_t& pos, Parser_context& context)
 {
 	std::size_t i;
-	Parser::from_binary<std::size_t>(value, i, pos);
-	const auto it = std::next(Application::instance().m_world->m_object_manager.m_items.begin(), i);
+	Parser::from_binary<std::size_t>(value, i, pos,context);
+	const auto it = std::next(context.m_game_world.m_object_manager.m_items.begin(), i);
 	return &(*it);
 }
-
-std::vector<iSerializable*> Parser::m_items = {};
 
 Dictonary<object_tag_e> Parser::m_json_object_tag = {
 	{ object_tag_e::poison_resist,"poison_resist" },
@@ -297,10 +301,6 @@ std::unordered_map<object_tag_e, std::u16string>  Parser::m_string_object_tag_e 
 	{ object_tag_e::can_transfer_object , u"может перекладывать предметы" },
 	{ object_tag_e::footwear , u"обувь" }
 };
-
-
-std::size_t Parser::m_object_index = 0;
-unsigned int Parser::m_type_id_counter = 0;
 
 Parser::Parser()
 {
@@ -891,13 +891,6 @@ Parser::Initializator::Initializator()
 	register_packer<Object_manager>(u"object_manager");
 	register_packer<Game_world>(u"game_world");
 	register_packer<Link>(u"link");
-}
-
-void Parser::reset_object_counter()
-{
-	m_items.clear();
-	m_object_index = 0;
-	m_type_id_counter = 0;
 }
 
 #endif //DEFINITION_CPP

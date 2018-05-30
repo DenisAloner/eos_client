@@ -23,7 +23,7 @@ public:
 
 	effect_prefix_e get_effect_prefix_e(const std::string& key);
 
-	void init();
+	void init(Parser_context& context);
 	GameObject* new_object(std::string unit_name);
 	//void register_object(GameObject*& object);
 

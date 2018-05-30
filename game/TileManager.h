@@ -27,8 +27,8 @@ public:
 	//	return Packer<Object_interaction>::Instance();
 	//}
 
-	void vector_GLuint_from_json(std::u16string value, std::vector<GLuint>& prop);
-	void vector_GLuint_from_binary(const std::string& value, std::vector<GLuint>& prop, std::size_t& pos);
+	void vector_GLuint_from_json(std::u16string value, std::vector<GLuint>& prop, Parser_context& context);
+	void vector_GLuint_from_binary(const std::string& value, std::vector<GLuint>& prop, std::size_t& pos, Parser_context& context);
 
 	constexpr static auto properties() 
 	{

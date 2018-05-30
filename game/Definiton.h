@@ -28,7 +28,6 @@ const int tile_size_y = 22;
 const int tile_size_x_half = 19;
 const int tile_size_y_half = 11;
 
-
 struct position_t
 {
 	int x;
@@ -664,14 +663,31 @@ public:
 };
 
 class iSerializable;
+class Game_world;
+class Parser_context
+{
+public:
+
+	Game_world & m_game_world;
+	std::size_t m_object_index;
+	std::vector<iSerializable*> m_items;
+
+	explicit Parser_context(Game_world& game_world)
+		: m_game_world(game_world), m_object_index(0)
+	{
+	}
+
+	void reset();
+};
+
 
 template<typename Class, typename T>
 struct Property {
 	
-	typedef std::u16string(Class::*to_json_function_t)(T&);
-	typedef void(Class::*from_json_function_t)(std::u16string, T&);
-	typedef std::string(Class::*to_binary_function_t)(T&);
-	typedef void(Class::*from_binary_function_t)(const std::string&, T&, std::size_t&);
+	typedef std::u16string(Class::*to_json_function_t)(T&, Parser_context&);
+	typedef void(Class::*from_json_function_t)(std::u16string, T&, Parser_context&);
+	typedef std::string(Class::*to_binary_function_t)(T&, Parser_context&);
+	typedef void(Class::*from_binary_function_t)(const std::string&, T&, std::size_t&, Parser_context&);
 	 
 	constexpr Property(T Class::*member, const char16_t* name, to_json_function_t to_json_function, from_json_function_t from_json_function, to_binary_function_t to_binary_function, from_binary_function_t from_binary_function) : member{ member }, name{ name }, to_json_function{ to_json_function }, from_json_function{ from_json_function }, to_binary_function{ to_binary_function }, from_binary_function{ from_binary_function } {};
 	constexpr Property(T Class::*member, const char16_t* name) : member{ member }, name{ name } {};
@@ -713,7 +729,7 @@ struct Property {
 };
 
 template<typename Class, typename T>
-constexpr auto make_property(T Class::*member, const char16_t* name, std::u16string(Class::*func1)(T&), void(Class::*func2)(std::u16string, T&), std::string(Class::*func3)(T&), void(Class::*func4)(const std::string&, T&, std::size_t&)) {
+constexpr auto make_property(T Class::*member, const char16_t* name, std::u16string(Class::*func1)(T&, Parser_context&), void(Class::*func2)(std::u16string, T&, Parser_context&), std::string(Class::*func3)(T&, Parser_context&), void(Class::*func4)(const std::string&, T&, std::size_t&, Parser_context&)) {
 	return Property<Class, T>{member, name, func1, func2, func3, func4};
 }
 
@@ -735,7 +751,7 @@ constexpr void for_sequence(std::integer_sequence<T, S...>, F&& f) {
 	};
 }
 
-template<typename T> void object_from_json(T& object, scheme_map_t* value)
+template<typename T> void object_from_json(T& object, scheme_map_t* value, Parser_context& context)
 {
 	constexpr auto nbProperties = std::tuple_size<decltype(T::properties())>::value;
 	for_sequence(std::make_index_sequence<nbProperties>{}, [&](auto i) {
@@ -744,13 +760,13 @@ template<typename T> void object_from_json(T& object, scheme_map_t* value)
 		LOG(INFO) << "name" << " :: " << Parser::UTF16_to_CP1251(std::u16string(property.name));
 		if(property.from_json_function)
 		{
-			(object.*(property.from_json_function.value()))((*value)[property.name], object.*(property.member));
+			(object.*(property.from_json_function.value()))((*value)[property.name], object.*(property.member),context);
 		}
-		else Parser::from_json<typename P::Type>((*value)[property.name], object.*(property.member));
+		else Parser::from_json<typename P::Type>((*value)[property.name], object.*(property.member),context);
 	});
 }
 
-template<typename T> std::u16string object_to_json(T& object)
+template<typename T> std::u16string object_to_json(T& object, Parser_context& context)
 {
 	std::u16string result;
 	constexpr auto nbProperties = std::tuple_size<decltype(T::properties())>::value;
@@ -760,14 +776,14 @@ template<typename T> std::u16string object_to_json(T& object)
 		if (i != 0) { result += u","; }
 		if (property.to_json_function)
 		{
-			result += u"\"" + std::u16string(property.name) + u"\":" + (object.*(property.to_json_function.value()))(object.*(property.member));
+			result += u"\"" + std::u16string(property.name) + u"\":" + (object.*(property.to_json_function.value()))(object.*(property.member),context);
 		}
-		else result += u"\"" + std::u16string(property.name) + u"\":" + Parser::to_json<typename P::Type>(object.*(property.member));
+		else result += u"\"" + std::u16string(property.name) + u"\":" + Parser::to_json<typename P::Type>(object.*(property.member),context);
 	});
 	return result;
 }
 
-template<typename T> void object_from_binary(T& object, const std::string& value, std::size_t& pos)
+template<typename T> void object_from_binary(T& object, const std::string& value, std::size_t& pos, Parser_context& context)
 {
 	constexpr auto nbProperties = std::tuple_size<decltype(T::properties())>::value;
 	for_sequence(std::make_index_sequence<nbProperties>{}, [&](auto i) {
@@ -775,13 +791,13 @@ template<typename T> void object_from_binary(T& object, const std::string& value
 		typedef decltype(property) P;
 		if(property.from_binary_function)
 		{
-			(object.*(property.from_binary_function.value()))(value, object.*(property.member), pos);
+			(object.*(property.from_binary_function.value()))(value, object.*(property.member), pos,context);
 		}
-		else Parser::from_binary<typename P::Type>(value, object.*(property.member), pos);
+		else Parser::from_binary<typename P::Type>(value, object.*(property.member), pos,context);
 	});
 }
 
-template<typename T> std::string object_to_binary(T& object)
+template<typename T> std::string object_to_binary(T& object,Parser_context& context)
 {
 	std::string result;
 	constexpr auto nbProperties = std::tuple_size<decltype(T::properties())>::value;
@@ -790,9 +806,9 @@ template<typename T> std::string object_to_binary(T& object)
 		typedef decltype(property) P;
 		if (property.to_binary_function)
 		{
-			result += (object.*(property.to_binary_function.value()))(object.*(property.member));
+			result += (object.*(property.to_binary_function.value()))(object.*(property.member),context);
 		}
-		else result += Parser::to_binary<typename P::Type>(object.*(property.member));
+		else result += Parser::to_binary<typename P::Type>(object.*(property.member),context);
 	});
 	return result;
 }
@@ -801,14 +817,14 @@ class Packer_generic
 {
 public:
 
-	virtual void from_json(iSerializable& object, scheme_map_t* value) = 0;
-	virtual iSerializable* from_json(scheme_map_t* value) = 0;
-	virtual std::u16string to_json(iSerializable& object) = 0;
-	virtual std::u16string to_json(iSerializable* object) = 0;
-	virtual void from_binary(iSerializable& object, const std::string& value, std::size_t& pos) = 0;
-	virtual iSerializable* from_binary(const std::string& value, std::size_t& pos) = 0;
-	virtual std::string to_binary(iSerializable& object) = 0;
-	virtual std::string to_binary(iSerializable* object) = 0;
+	virtual void from_json(iSerializable& object, scheme_map_t* value,Parser_context& context) = 0;
+	virtual iSerializable* from_json(scheme_map_t* value, Parser_context& context) = 0;
+	virtual std::u16string to_json(iSerializable& object, Parser_context& context) = 0;
+	virtual std::u16string to_json(iSerializable* object, Parser_context& context) = 0;
+	virtual void from_binary(iSerializable& object, const std::string& value, std::size_t& pos, Parser_context& context) = 0;
+	virtual iSerializable* from_binary(const std::string& value, std::size_t& pos, Parser_context& context) = 0;
+	virtual std::string to_binary(iSerializable& object, Parser_context& context) = 0;
+	virtual std::string to_binary(iSerializable* object, Parser_context& context) = 0;
 	virtual std::u16string get_type_name() = 0;
 	virtual std::size_t get_type_id() = 0;
 
@@ -829,30 +845,30 @@ public:
 
 	virtual Packer_generic& get_packer() = 0;
 
-	virtual void from_binary(const std::string& value, std::size_t& pos)
+	virtual void from_binary(const std::string& value, std::size_t& pos,Parser_context& context)
 	{
-		this->get_packer().from_binary(*this, value, pos);
+		this->get_packer().from_binary(*this, value, pos,context);
 	}
 
-	virtual void from_binary_const(const std::string& value, const std::size_t pos = 0)
+	virtual void from_binary_const(const std::string& value,Parser_context& context,const std::size_t pos = 0)
 	{
 		std::size_t p = pos;
-		this->get_packer().from_binary(*this, value, p);
+		this->get_packer().from_binary(*this, value, p,context);
 	}
 
-	virtual void from_json(scheme_map_t* value)
+	virtual void from_json(scheme_map_t* value,Parser_context& context)
 	{
-		return this->get_packer().from_json(*this, value);
+		return this->get_packer().from_json(*this, value,context);
 	}
 
-	virtual std::u16string to_json()
+	virtual std::u16string to_json(Parser_context& context)
 	{
-		return this->get_packer().to_json(*this);
+		return this->get_packer().to_json(*this,context);
 	}
 
-	virtual std::string to_binary()
+	virtual std::string to_binary(Parser_context& context)
 	{
-		return this->get_packer().to_binary(*this);
+		return this->get_packer().to_binary(*this,context);
 	}
 
 };
@@ -903,51 +919,51 @@ public:
 		return m_type_id;
 	}
 
-	iSerializable* from_json(scheme_map_t* value) override
+	iSerializable* from_json(scheme_map_t* value, Parser_context& context) override
 	{
 		if constexpr(!std::is_abstract<T>::value)
 		{
 			T* out = new T;
-			Parser::m_items.push_back(out);
-			out->from_json(value);
+			context.m_items.push_back(out);
+			out->from_json(value,context);
 			return out;
 		}
 		return nullptr;
 	}
 
-	iSerializable* from_binary(const std::string& value, std::size_t& pos) override
+	iSerializable* from_binary(const std::string& value, std::size_t& pos, Parser_context& context) override
 	{
 		if constexpr(!std::is_abstract<T>::value)
 		{
 			T* out = new T;
-			Parser::m_items.push_back(out);
-			out->from_binary(value, pos);
+			context.m_items.push_back(out);
+			out->from_binary(value, pos,context);
 			return out;
 		}
 		return nullptr;
 	}
 
-	void from_json(iSerializable& object, scheme_map_t* value) override
+	void from_json(iSerializable& object, scheme_map_t* value, Parser_context& context) override
 	{
-		object_from_json<T>(dynamic_cast<T&>(object), value);
+		object_from_json<T>(dynamic_cast<T&>(object), value,context);
 	}
 
-	std::u16string to_json(iSerializable& object) override
+	std::u16string to_json(iSerializable& object, Parser_context& context) override
 	{
 
-		return object_to_json<T>(dynamic_cast<T&>(object));
+		return object_to_json<T>(dynamic_cast<T&>(object),context);
 	}
 
-	std::u16string to_json(iSerializable* value) override
+	std::u16string to_json(iSerializable* value, Parser_context& context) override
 	{
 		switch (value->m_serialization_index)
 		{
 		case 0:
 		{
-			Parser::m_object_index += 1;
-			value->m_serialization_index = Parser::m_object_index;
+			context.m_object_index += 1;
+			value->m_serialization_index = context.m_object_index;
 			LOG(INFO) << Parser::UTF16_to_CP1251(value->get_packer().get_type_name());
-			std::u16string result = value->to_json();
+			std::u16string result = value->to_json(context);
 			if (result.empty())
 			{
 				std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\",\"$link_id\":" + Parser::int_to_u16string(value->m_serialization_index) + u"}";
@@ -961,9 +977,9 @@ public:
 		}
 		default:
 		{
-			if (Parser::m_object_index<value->m_serialization_index)
+			if (context.m_object_index<value->m_serialization_index)
 			{
-				LOG(FATAL) << std::to_string(Parser::m_object_index) << " | " << std::to_string(value->m_serialization_index) << " | " << typeid(value).name() << " | " << Parser::UTF16_to_CP1251(value->get_packer().get_type_name());
+				LOG(FATAL) << std::to_string(context.m_object_index) << " | " << std::to_string(value->m_serialization_index) << " | " << typeid(value).name() << " | " << Parser::UTF16_to_CP1251(value->get_packer().get_type_name());
 			}
 			std::u16string out = u"{\"$type\":\"link\",\"value\":" + Parser::int_to_u16string(value->m_serialization_index) + u"}";
 			return out;
@@ -971,33 +987,33 @@ public:
 		}
 	}
 
-	void from_binary(iSerializable& object, const std::string& value, std::size_t& pos) override
+	void from_binary(iSerializable& object, const std::string& value, std::size_t& pos, Parser_context& context) override
 	{
-		object_from_binary<T>(dynamic_cast<T&>(object), value, pos);
+		object_from_binary<T>(dynamic_cast<T&>(object), value, pos,context);
 	}
 
-	std::string to_binary(iSerializable& object) override
+	std::string to_binary(iSerializable& object, Parser_context& context) override
 	{
 
-		return object_to_binary<T>(dynamic_cast<T&>(object));
+		return object_to_binary<T>(dynamic_cast<T&>(object),context);
 	}
 
-	std::string to_binary(iSerializable* value) override
+	std::string to_binary(iSerializable* value, Parser_context& context) override
 	{
 		switch (value->m_serialization_index)
 		{
 		case 0:
 		{
-			Parser::m_object_index += 1;
-			value->m_serialization_index = Parser::m_object_index;
+			context.m_object_index += 1;
+			value->m_serialization_index = context.m_object_index;
 			std::size_t id = value->get_packer().get_type_id() + 1;
-			return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + value->to_binary();
+			return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + value->to_binary(context);
 		}
 		default:
 		{
-			if (Parser::m_object_index<value->m_serialization_index)
+			if (context.m_object_index<value->m_serialization_index)
 			{
-				LOG(FATAL) << std::to_string(Parser::m_object_index) << " | " << std::to_string(value->m_serialization_index) << " | " << typeid(value).name() << " | " << Parser::UTF16_to_CP1251(value->get_packer().get_type_name());
+				LOG(FATAL) << std::to_string(context.m_object_index) << " | " << std::to_string(value->m_serialization_index) << " | " << typeid(value).name() << " | " << Parser::UTF16_to_CP1251(value->get_packer().get_type_name());
 			}
 			std::size_t id = Parser::t_constructors_from_json[u"link"]->get_type_id() + 1;
 			return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + std::string(reinterpret_cast<const char*>(&(value->m_serialization_index)), sizeof(std::size_t));
@@ -1094,11 +1110,6 @@ typedef iSerializable* (*constructor_from_binary_t)(const std::string&, std::siz
 
 class Parser
 {
-
-private:
-	
-	static unsigned int m_type_id_counter;
-
 public:
 
 	class Link: public iSerializable
@@ -1110,12 +1121,9 @@ public:
 		}
 	};
 
-	static std::size_t m_object_index;
 
 	static inline std::map<std::u16string, Packer_generic*> t_constructors_from_json = {};
 	static inline std::vector<Packer_generic*> t_constructors_from_binary = {};
-
-	static std::vector<iSerializable*> m_items;
 
 	static Dictonary<interaction_e> m_json_interaction_e;
 	static Dictonary<object_tag_e> m_json_object_tag;
@@ -1148,9 +1156,7 @@ public:
 	static float to_float(const std::u16string& value);
 	static std::string UTF16_to_CP1251(std::u16string const& value);
 	static std::u16string CP1251_to_UTF16(std::string const& value);
-	static void reset_object_counter();
 
-	
 	template<typename T>
 	static void register_packer(std::u16string class_name)
 	{
@@ -1214,7 +1220,7 @@ public:
 
 	template<class T> struct always_false : std::false_type {};
 
-	template<typename T> static void from_json(const std::u16string value, T& prop)
+	template<typename T> static void from_json(const std::u16string value, T& prop,Parser_context& context)
 	{
 		if constexpr (std::is_pointer<T>::value)
 		{
@@ -1225,7 +1231,7 @@ public:
 				scheme_map_t* s = read_object(temp);
 				if (s)
 				{
-					prop = dynamic_cast<T>(t_constructors_from_json[get_value((*s)[u"$type"])]->from_json(s));
+					prop = dynamic_cast<T>(t_constructors_from_json[get_value((*s)[u"$type"])]->from_json(s,context));
 					LOG(INFO) << UTF16_to_CP1251(prop->get_packer().get_type_name());
 					delete s;
 					return;
@@ -1243,7 +1249,7 @@ public:
 				{
 					using Type = std::remove_pointer_t<T>;
 					T v = new Type();
-					Parser::from_json<Type>(value,*v);
+					Parser::from_json<Type>(value,*v,context);
 					prop = v;
 
 					/*using Type = std::remove_pointer_t<T>;
@@ -1273,7 +1279,7 @@ public:
 			std::u16string temp(value);
 			LOG(INFO) << UTF16_to_CP1251(temp);
 			scheme_map_t* s = read_object(temp);
-			prop.from_json(s);
+			prop.from_json(s,context);
 			delete s;
 		}
 		else if constexpr(is_vector<T>::value)
@@ -1288,7 +1294,7 @@ public:
 				for (auto element : (*s))
 				{
 					Value v;
-					from_json<Value>(element, prop[i]);
+					from_json<Value>(element, prop[i],context);
 					i += 1;
 				}
 			}
@@ -1306,7 +1312,7 @@ public:
 				for (const auto& element : (*s))
 				{
 					Value& v = prop.emplace_back();
-					from_json<Value>(element, v);
+					from_json<Value>(element, v,context);
 				}
 			}
 			delete s;
@@ -1325,9 +1331,9 @@ public:
 				{
 					scheme_vector_t* p = read_pair(element);
 					Key k;
-					from_json<Key>((*p)[0], k);
+					from_json<Key>((*p)[0], k,context);
 					Value& v = prop[k];
-					from_json<Value>((*p)[1], v);
+					from_json<Value>((*p)[1], v,context);
 					delete p;
 				}
 				delete s;
@@ -1379,20 +1385,20 @@ public:
 		{
 			std::u16string temp = value;
 			scheme_vector_t* s = read_pair(temp);
-			from_json<int>((*s)[0], prop.radius);
+			from_json<int>((*s)[0], prop.radius,context);
 			int x;
-			from_json<int>((*s)[1], x);
+			from_json<int>((*s)[1], x,context);
 			prop.qualifier = Application::instance().m_ai_manager->m_fov_qualifiers[x];
-			from_json<int>((*s)[2], prop.start_angle);
-			from_json<int>((*s)[3], prop.end_angle);
+			from_json<int>((*s)[2], prop.start_angle,context);
+			from_json<int>((*s)[3], prop.end_angle,context);
 		}
 		else if constexpr(std::is_same<T, game_object_size_t>::value)
 		{
 			std::u16string temp = value;
 			scheme_vector_t* s = read_pair(temp);
-			from_json<int>((*s)[0], prop.x);
-			from_json<int>((*s)[1], prop.y);
-			from_json<int>((*s)[2], prop.z);
+			from_json<int>((*s)[0], prop.x,context);
+			from_json<int>((*s)[1], prop.y,context);
+			from_json<int>((*s)[2], prop.z,context);
 			LOG(INFO) <<  std::to_string(prop.x)<<" " << std::to_string(prop.y) << " " << std::to_string(prop.z);
 		}
 		else if constexpr(std::is_same<T, predicat_t>::value)
@@ -1405,25 +1411,25 @@ public:
 		{
 			std::u16string temp = value;
 			scheme_vector_t* s = read_pair(temp);
-			from_json<int>((*s)[0], prop.R);
-			from_json<int>((*s)[1], prop.G);
-			from_json<int>((*s)[2], prop.B);
+			from_json<int>((*s)[0], prop.R,context);
+			from_json<int>((*s)[1], prop.G,context);
+			from_json<int>((*s)[2], prop.B,context);
 		}
 		else if constexpr(std::is_same<T, optical_properties_t>::value)
 		{
 			LOG(INFO) << Parser::UTF16_to_CP1251(get_value(value)) << Parser::UTF16_to_CP1251(value);
 			std::u16string temp = value;
 			scheme_vector_t* s = read_pair(temp);
-			from_json<float>((*s)[0], prop.attenuation.R);
-			from_json<float>((*s)[1], prop.attenuation.G);
-			from_json<float>((*s)[2], prop.attenuation.B);
+			from_json<float>((*s)[0], prop.attenuation.R,context);
+			from_json<float>((*s)[1], prop.attenuation.G,context);
+			from_json<float>((*s)[2], prop.attenuation.B,context);
 		}
 		else if constexpr(std::is_same<T, dimension_t>::value)
 		{
 			std::u16string temp = value;
 			scheme_vector_t* s = read_pair(temp);
-			from_json<int>((*s)[0], prop.w);
-			from_json<int>((*s)[1], prop.h);
+			from_json<int>((*s)[0], prop.w,context);
+			from_json<int>((*s)[1], prop.h,context);
 		}
 		else if constexpr(std::is_same<T, Icon>::value||std::is_same<T, TileManager>::value || is_instancedictonary<T>::value)
 		{
@@ -1437,7 +1443,7 @@ public:
 
 	};
 
-	template<typename T> static std::u16string to_json(T& value)
+	template<typename T> static std::u16string to_json(T& value, Parser_context& context)
 	{
 		if constexpr(std::is_pointer<T>::value)
 		{
@@ -1446,7 +1452,7 @@ public:
 				if (value)
 				{
 					LOG(INFO) << "to_json iSerializable*: " << UTF16_to_CP1251(value->get_packer().get_type_name());
-					return value->get_packer().to_json(value);
+					return value->get_packer().to_json(value,context);
 				}
 				else
 				{
@@ -1462,14 +1468,14 @@ public:
 				else
 				{
 					using Type = std::remove_pointer_t<T>;
-					return Parser::to_json<Type>(*value);
+					return Parser::to_json<Type>(*value,context);
 				}
 			}
 		}
 		else if constexpr(std::is_base_of<iSerializable, T>::value)
 		{
 			LOG(INFO) << UTF16_to_CP1251(value.get_packer().get_type_name());
-			std::u16string result = value.to_json();
+			std::u16string result = value.to_json(context);
 			if (result.empty())
 			{
 				// разобрать данный момент
@@ -1489,7 +1495,7 @@ public:
 			for (auto element : (value))
 			{
 				if (result != u"[") { result += u","; }
-				result += Parser::to_json<Value>(element);
+				result += Parser::to_json<Value>(element,context);
 			}
 			result += u"]";
 			return result;
@@ -1499,7 +1505,7 @@ public:
 			using Key = std::remove_const_t<typename T::first_type>;
 			using Value = typename T::second_type;
 			Key key = value.first;
-			std::u16string result = u"[" + Parser::to_json<Key>(key) + u"," + Parser::to_json<Value>(value.second) + u"]";
+			std::u16string result = u"[" + Parser::to_json<Key>(key,context) + u"," + Parser::to_json<Value>(value.second,context) + u"]";
 			return result;
 		}
 		else if constexpr(std::is_enum<T>::value)
@@ -1521,7 +1527,7 @@ public:
 		}
 		else if constexpr(std::is_same<T, game_object_size_t >::value)
 		{
-			std::u16string result = u"[" + to_json<int>(value.x) + u"," + to_json<int>(value.y) + u"," + to_json<int>(value.z) + u"]";
+			std::u16string result = u"[" + to_json<int>(value.x,context) + u"," + to_json<int>(value.y,context) + u"," + to_json<int>(value.z,context) + u"]";
 			return result;
 		}
 		else if constexpr(std::is_same<T, predicat_t>::value)
@@ -1536,7 +1542,7 @@ public:
 		}
 		else if constexpr(std::is_same<T, light_t>::value)
 		{
-			std::u16string result = u"[" + to_json<int>(value.R) + u"," + to_json<int>(value.G) + u"," + to_json<int>(value.B) + u"]";
+			std::u16string result = u"[" + to_json<int>(value.R,context) + u"," + to_json<int>(value.G,context) + u"," + to_json<int>(value.B,context) + u"]";
 			return result;
 		}
 		else if constexpr(std::is_same<T, float>::value)
@@ -1546,12 +1552,12 @@ public:
 		}
 		else if constexpr(std::is_same<T, optical_properties_t>::value)
 		{
-			std::u16string result = u"[" + to_json<float>(value.attenuation.R) + u"," + to_json<float>(value.attenuation.G) + u"," + to_json<float>(value.attenuation.B) + u"]";
+			std::u16string result = u"[" + to_json<float>(value.attenuation.R,context) + u"," + to_json<float>(value.attenuation.G,context) + u"," + to_json<float>(value.attenuation.B,context) + u"]";
 			return result;
 		}
 		else if constexpr(std::is_same<T, AI_FOV>::value)
 		{
-			std::u16string result = u"[" + to_json<int>(value.radius) + u"," + to_json<std::size_t>(value.qualifier->index) + u"," + to_json<int>(value.start_angle) + u"," + to_json<int>(value.end_angle) + u"]";
+			std::u16string result = u"[" + to_json<int>(value.radius,context) + u"," + to_json<std::size_t>(value.qualifier->index,context) + u"," + to_json<int>(value.start_angle,context) + u"," + to_json<int>(value.end_angle,context) + u"]";
 			return result;
 		}
 		else if constexpr(std::is_same<T, Icon>::value||std::is_same<T, TileManager>::value || is_instancedictonary<T>::value)
@@ -1561,7 +1567,7 @@ public:
 		}
 		else if constexpr(std::is_same<T, dimension_t>::value)
 		{
-			std::u16string result = u"[" + to_json<int>(value.w) + u"," + to_json<int>(value.h) + u"]";
+			std::u16string result = u"[" + to_json<int>(value.w,context) + u"," + to_json<int>(value.h,context) + u"]";
 			return result;
 		}
 		else
@@ -1571,7 +1577,7 @@ public:
 		}
 	};
 
-	template<typename T> static void from_binary(const std::string& value, T& prop, std::size_t& pos)
+	template<typename T> static void from_binary(const std::string& value, T& prop, std::size_t& pos, Parser_context& context)
 	{
 		if constexpr (std::is_pointer<T>::value)
 		{
@@ -1597,7 +1603,7 @@ public:
 				default:
 				{
 					LOG(INFO) << "from binaryyyyyyyyyyyy " << typeid(T).name();
-					prop = dynamic_cast<T>(t_constructors_from_binary[id - 1]->from_binary(value, pos));
+					prop = dynamic_cast<T>(t_constructors_from_binary[id - 1]->from_binary(value, pos,context));
 					LOG(INFO) << std::to_string(prop==nullptr);
 					break;
 				}
@@ -1618,7 +1624,7 @@ public:
 				{
 					using Type = typename std::remove_pointer_t<T>;
 					T v = new Type();
-					from_binary<Type>(value, *v, pos);
+					from_binary<Type>(value, *v, pos,context);
 					prop = v;
 					break;
 				}
@@ -1627,7 +1633,7 @@ public:
 		}
 		else if constexpr(std::is_base_of<iSerializable, T>::value)
 		{
-			prop.from_binary(value,pos);
+			prop.from_binary(value,pos,context);
 		}
 		else if constexpr(is_vector<T>::value)
 		{
@@ -1638,7 +1644,7 @@ public:
 			for (std::size_t i = 0; i < s; ++i)
 			{
 				Value v;
-				from_binary<Value>(value, prop[i], pos);
+				from_binary<Value>(value, prop[i], pos,context);
 			}
 		}
 		else if constexpr(is_list<T>::value)
@@ -1649,7 +1655,7 @@ public:
 			for (std::size_t i = 0; i < s; ++i)
 			{
 				Value v;
-				from_binary<Value>(value, v, pos);
+				from_binary<Value>(value, v, pos,context);
 				prop.push_back(v);
 			}
 		}
@@ -1663,8 +1669,8 @@ public:
 			{
 				Key k;
 				Value v;
-				from_binary<Key>(value, k, pos);
-				from_binary<Value>(value, v, pos);
+				from_binary<Key>(value, k, pos,context);
+				from_binary<Value>(value, v, pos,context);
 				prop[k] = v;
 			}
 		}
@@ -1690,41 +1696,41 @@ public:
 		}
 		else if constexpr(std::is_same<T, game_object_size_t>::value)
 		{
-			from_binary<int>(value, prop.x, pos);
-			from_binary<int>(value, prop.y, pos);
-			from_binary<int>(value, prop.z, pos);
+			from_binary<int>(value, prop.x, pos,context);
+			from_binary<int>(value, prop.y, pos,context);
+			from_binary<int>(value, prop.z, pos,context);
 		}
 		else if constexpr(std::is_same<T, light_t>::value)
 		{
-			from_binary<int>(value, prop.R, pos);
-			from_binary<int>(value, prop.G, pos);
-			from_binary<int>(value, prop.B, pos);
+			from_binary<int>(value, prop.R, pos,context);
+			from_binary<int>(value, prop.G, pos,context);
+			from_binary<int>(value, prop.B, pos,context);
 		}
 		else if constexpr(std::is_same<T, optical_properties_t>::value)
 		{
-			from_binary<float>(value, prop.attenuation.R, pos);
-			from_binary<float>(value, prop.attenuation.G, pos);
-			from_binary<float>(value, prop.attenuation.B, pos);
+			from_binary<float>(value, prop.attenuation.R, pos,context);
+			from_binary<float>(value, prop.attenuation.G, pos,context);
+			from_binary<float>(value, prop.attenuation.B, pos,context);
 		}
 		else if constexpr(std::is_same<T, AI_FOV>::value)
 		{
-			from_binary<int>(value, prop.radius, pos);
+			from_binary<int>(value, prop.radius, pos,context);
 			std::size_t x;
-			from_binary<std::size_t>(value, x, pos);
+			from_binary<std::size_t>(value, x, pos,context);
 			prop.qualifier = Application::instance().m_ai_manager->m_fov_qualifiers[x];
-			from_binary<int>(value, prop.start_angle, pos);
-			from_binary<int>(value, prop.end_angle, pos);
+			from_binary<int>(value, prop.start_angle, pos,context);
+			from_binary<int>(value, prop.end_angle, pos,context);
 		}
 		else if constexpr(std::is_same<T, predicat_t>::value)
 		{
 			std::size_t result;
-			from_binary<std::size_t>(value, result, pos);
+			from_binary<std::size_t>(value, result, pos,context);
 			prop = *Application::instance().m_ai_manager->m_path_qualifiers[result];
 		}
 		else if constexpr(std::is_same<T, dimension_t>::value)
 		{
-			from_binary<int>(value, prop.w, pos);
-			from_binary<int>(value, prop.h, pos);
+			from_binary<int>(value, prop.w, pos,context);
+			from_binary<int>(value, prop.h, pos,context);
 		}
 		else if constexpr(std::is_same<T, Icon>::value||std::is_same<T, TileManager>::value || is_instancedictonary<T>::value)
 		{
@@ -1737,7 +1743,7 @@ public:
 		}
 	}
 
-	template<typename T> static std::string to_binary(T& value)
+	template<typename T> static std::string to_binary(T& value, Parser_context& context)
 	{
 		if constexpr(std::is_pointer<T>::value)
 		{
@@ -1745,7 +1751,7 @@ public:
 			{
 				if (value)
 				{
-					return value->get_packer().to_binary(value);
+					return value->get_packer().to_binary(value,context);
 				}
 				std::size_t id = 0;
 				return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t));
@@ -1761,13 +1767,13 @@ public:
 				{
 					char s = 1;
 					using Type = typename std::remove_pointer_t<T>;
-					return std::string(reinterpret_cast<const char*>(&s), sizeof(char)) + Parser::to_binary<Type>(*value);
+					return std::string(reinterpret_cast<const char*>(&s), sizeof(char)) + Parser::to_binary<Type>(*value,context);
 				}
 			}
 		}
 		else if constexpr(std::is_base_of<iSerializable, T>::value)
 		{
-			return value.to_binary();
+			return value.to_binary(context);
 		}
 		else if constexpr(std::is_same<T, int>::value|| std::is_same<T, std::size_t>::value || std::is_same<T, float>::value || std::is_enum<T>::value)
 		{
@@ -1790,7 +1796,7 @@ public:
 			std::string result = std::string(reinterpret_cast<const char*>(&s), sizeof(std::size_t));
 			for (auto element : (value))
 			{
-				result += Parser::to_binary<Value>(element);
+				result += Parser::to_binary<Value>(element,context);
 			}
 			return result;
 		}
@@ -1799,7 +1805,7 @@ public:
 			using Key = std::remove_const_t<typename T::first_type>;
 			using Value = typename T::second_type;
 			Key key = value.first;
-			return Parser::to_binary<Key>(key) + Parser::to_binary<Value>(value.second);
+			return Parser::to_binary<Key>(key,context) + Parser::to_binary<Value>(value.second,context);
 		}
 		else if constexpr(std::is_same<T, std::string>::value)
 		{
@@ -1807,27 +1813,27 @@ public:
 		}
 		else if constexpr(std::is_same<T, game_object_size_t>::value)
 		{
-			return to_binary<int>(value.x) + to_binary<int>(value.y) + to_binary<int>(value.z);
+			return to_binary<int>(value.x,context) + to_binary<int>(value.y,context) + to_binary<int>(value.z,context);
 		}
 		else if constexpr(std::is_same<T, light_t>::value)
 		{
-			return to_binary<int>(value.R) + to_binary<int>(value.G) + to_binary<int>(value.B);
+			return to_binary<int>(value.R,context) + to_binary<int>(value.G,context) + to_binary<int>(value.B,context);
 		}
 		else if constexpr(std::is_same<T, optical_properties_t>::value)
 		{
-			return to_binary<float>(value.attenuation.R) + to_binary<float>(value.attenuation.G) + to_binary<float>(value.attenuation.B);
+			return to_binary<float>(value.attenuation.R,context) + to_binary<float>(value.attenuation.G,context) + to_binary<float>(value.attenuation.B,context);
 		}
 		else if constexpr(std::is_same<T, AI_FOV>::value)
 		{
-			return to_binary<int>(value.radius) + to_binary<std::size_t>(value.qualifier->index) + to_binary<int>(value.start_angle) + to_binary<int>(value.end_angle);
+			return to_binary<int>(value.radius,context) + to_binary<std::size_t>(value.qualifier->index,context) + to_binary<int>(value.start_angle,context) + to_binary<int>(value.end_angle,context);
 		}
 		else if constexpr(std::is_same<T, predicat_t>::value)
 		{
-			return to_binary<std::size_t>(value.index);
+			return to_binary<std::size_t>(value.index,context);
 		}
 		else if constexpr(std::is_same<T, dimension_t>::value)
 		{
-			return to_binary<int>(value.w) + to_binary<int>(value.h);
+			return to_binary<int>(value.w,context) + to_binary<int>(value.h,context);
 		}
 		else if constexpr(std::is_same<T, Icon>::value||std::is_same<T, TileManager>::value|| is_instancedictonary<T>::value)
 		{

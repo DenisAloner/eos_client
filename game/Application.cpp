@@ -212,7 +212,9 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 
 	m_ai_manager = new AI_manager();
 	m_game_object_manager = new GameObjectManager();
-	m_game_object_manager->init();
+	Game_world gw; //TODO костыль, продумать исправление
+	Parser_context pc(gw); //TODO костыль, продумать исправление
+	m_game_object_manager->init(pc);
 	LOG(INFO) << "Менеджер игровых объектов успешно инициализирован";
 
 	m_gui_controller.m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h);
@@ -245,7 +247,7 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 void Application::new_game()
 {
 	m_world = new Game_world();
-	GameMap* map = new GameMap(dimension_t(4, 4));
+	GameMap* map = new GameMap(dimension_t(400, 400));
 
 	GameObject* obj;
 	map->generate_room();
@@ -257,16 +259,19 @@ void Application::new_game()
 	map->add_to_map(obj, map->get(ry,rx));
 	m_world->m_player = new Player(obj, map);
 	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
-
-	Parser::reset_object_counter();
-	m_world->reset_serialization_index();
+	
+	
 	std::u16string json;
-	json  = m_world->serialize();
+	Parser_context pc(*m_world);
+	pc.reset();
+	m_world->reset_serialization_index();
+	json  = m_world->serialize(pc);
 	char16_t marker = 0xFEFF;
 
-	Parser::reset_object_counter();
+	
+	pc.reset();
 	m_world->reset_serialization_index();
-	std::string binary = m_world->bin_serialize();
+	std::string binary = m_world->bin_serialize(pc);
 	
 	
 	//LOG(INFO) << Parser::UTF16_to_CP1251(json);
@@ -283,13 +288,14 @@ void Application::new_game()
 	fclose(m_file);
 
 	Game_world test_world;
-	Parser::reset_object_counter();
+	Parser_context pc1(test_world);
+	pc1.reset();
 	test_world.reset_serialization_index();
-	test_world.bin_deserialize(binary);
+	test_world.bin_deserialize(binary,pc1);
 
-	Parser::reset_object_counter();
+	pc1.reset();
 	test_world.reset_serialization_index();
-	json = test_world.serialize();
+	json = test_world.serialize(pc1);
 
 	err = fopen_s(&m_file, (FileSystem::instance().m_resource_path + "Saves\\test2.json").c_str(), "wb");
 	fwrite(&marker, sizeof(marker), 1, m_file);

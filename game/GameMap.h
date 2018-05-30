@@ -111,10 +111,10 @@ public:
 
 	Packer_generic& get_packer() override;
 
-	std::u16string vector_mapcell_to_json(std::vector<MapCell>& value);
-	void vector_mapcell_from_json(std::u16string value, std::vector<MapCell>& prop);
-	std::string vector_mapcell_to_binary(std::vector<MapCell>& value);
-	void vector_mapcell_from_binary(const std::string& value, std::vector<MapCell>& prop, std::size_t& pos);
+	std::u16string vector_mapcell_to_json(std::vector<MapCell>& value, Parser_context& context);
+	void vector_mapcell_from_json(std::u16string value, std::vector<MapCell>& prop, Parser_context& context);
+	std::string vector_mapcell_to_binary(std::vector<MapCell>& value, Parser_context& context);
+	void vector_mapcell_from_binary(const std::string& value, std::vector<MapCell>& prop, std::size_t& pos, Parser_context& context);
 
 	constexpr static auto properties()
 	{
@@ -144,11 +144,11 @@ public:
 	virtual void save();
 	virtual void load();
 
-	std::u16string serialize();
-	void deserialize(std::u16string& value);
+	std::u16string serialize(Parser_context& context);
+	void deserialize(std::u16string& value, Parser_context& context);
 
-	std::string bin_serialize();
-	void bin_deserialize(std::string& value);
+	std::string bin_serialize(Parser_context& context);
+	void bin_deserialize(std::string& value, Parser_context& context);
 
 	Packer_generic& get_packer() override;
 
