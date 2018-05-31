@@ -554,7 +554,7 @@ void GameObject::set_direction(object_direction_e dir)
 			(*item)->m_size = game_object_size_t((*item)->m_size.y, (*item)->m_size.x, (*item)->m_size.z);
 		}
 	}*/
-	for (std::list<Object_state*>::iterator item = m_state.begin(); item != m_state.end(); ++item)
+	for (auto item = m_state.begin(); item != m_state.end(); ++item)
 	{
 		(*item)->set_tile_size();
 	}
@@ -563,7 +563,7 @@ void GameObject::set_direction(object_direction_e dir)
 
 void GameObject::set_state(object_state_e state)
 {
-	for (std::list<Object_state*>::iterator item = m_state.begin(); item != m_state.end(); ++item)
+	for (auto item = m_state.begin(); item != m_state.end(); ++item)
 	{
 		if ((*item)->m_state == state)
 		{
@@ -986,9 +986,9 @@ void GameObject::load()
 
 Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 {
-	AI_enemy* ai = static_cast<AI_enemy*>(m_object->m_active_state->m_ai);
+	AI_enemy* ai = dynamic_cast<AI_enemy*>(m_object->m_active_state->m_ai);
 	ai->calculate_FOV(m_object, map);
-	Vision_list* vl = static_cast<Vision_list*>(m_object->m_active_state->get_list(interaction_e::vision));
+	Vision_list* vl = dynamic_cast<Vision_list*>(m_object->m_active_state->get_list(interaction_e::vision));
 
 
 	int radius = vl->m_max_radius;

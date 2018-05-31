@@ -1375,10 +1375,13 @@ std::u16string Game_world::serialize(Parser_context& context)
 	for (auto& element : m_maps.front()->m_items)
 	{
 		if (!result.empty()) { result += u","; };
-		result += Parser::to_json<std::list<GameObject*>>(element.m_items,context);
+		result += Parser::to_json<bool>(element.m_notable, context);
+		result += u",";
+		result += Parser::to_json<std::list<GameObject*>>(element.m_items, context);
 	}
 	result = u"{\"map_size\":" + Parser::to_json<dimension_t>(m_maps.front()->m_size,context) + u",\"manager_size\":" + Parser::to_json<std::size_t>(ms,context) +u",\"cells\":[" + result + u"],\"items\":";
 	result += Parser::to_json<std::list<GameObject>>(m_object_manager.m_items,context);
+	result += u",\"player\":" + Parser::to_json<GameObject*>(m_player->m_object, context);
 	result += u"}";
 	return result;
 }
@@ -1403,12 +1406,13 @@ void Game_world::deserialize(std::u16string& value, Parser_context& context)
 	scheme_list_t* items = Parser::read_array((*s)[u"cells"]);
 	if (items)
 	{
-		std::size_t i = 0;
-		for (const auto& element : *items)
+		auto it = items->begin();
+		for (auto& element : m_maps.front()->m_items)
 		{
-			LOG(INFO) << "CELLS deserialize -> " << Parser::UTF16_to_CP1251(element);
-			Parser::from_json<std::list<GameObject*>>(element, map->m_items[i].m_items,context);
-			i += 1;
+			Parser::from_json<bool>(*it, element.m_notable, context);
+			++it;
+			Parser::from_json<std::list<GameObject*>>(*it, element.m_items,context);
+			++it;
 		}
 		delete items;
 	}
@@ -1426,6 +1430,10 @@ void Game_world::deserialize(std::u16string& value, Parser_context& context)
 		}
 		delete items;
 	}
+
+	GameObject* obj;
+	Parser::from_json<GameObject*>((*s)[u"player"], obj, context);
+	m_player = new Player(obj, map);
 
 	delete s;
 }
@@ -1445,11 +1453,13 @@ std::string Game_world::bin_serialize(Parser_context& context)
 	for (auto& element : m_maps.front()->m_items)
 	{
 		result += Parser::to_binary<std::list<GameObject*>>(element.m_items,context);
+		result += Parser::to_binary<bool>(element.m_notable, context);
 	}
 	for (auto& element : m_object_manager.m_items)
 	{
 		result += Parser::to_binary<GameObject>(element,context);
 	}
+	result += Parser::to_binary<GameObject*>(m_player->m_object, context);
 	return result;
 }
 
@@ -1471,6 +1481,7 @@ void Game_world::bin_deserialize(std::string& value, Parser_context& context)
 	for (auto& element : m_maps.front()->m_items)
 	{
 		Parser::from_binary<std::list<GameObject*>>(value,element.m_items,pos,context);
+		Parser::from_binary<bool>(value, element.m_notable, pos, context);
 	}
 
 	std::size_t i=0;
@@ -1479,6 +1490,9 @@ void Game_world::bin_deserialize(std::string& value, Parser_context& context)
 		Parser::from_binary<GameObject>(value, element, pos,context);
 		++i;
 	}
+	GameObject* obj;
+	Parser::from_binary<GameObject*>(value, obj, pos, context);
+	m_player = new Player(obj, map);
 }
 
 Packer_generic& Game_world::get_packer()

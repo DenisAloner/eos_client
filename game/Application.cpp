@@ -248,13 +248,13 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 void Application::new_game()
 {
 	m_world = new Game_world();
-	GameMap* map = new GameMap(dimension_t(4, 4));
+	GameMap* map = new GameMap(dimension_t(10, 10));
 
 	GameObject* obj;
 	map->generate_room();
 	m_world->m_maps.push_back(map);
-	int rx = 1;
-	int ry = 1;
+	int rx = 4;
+	int ry = 4;
 	
 	obj = m_game_object_manager->new_object("human");
 	map->add_to_map(obj, map->get(ry,rx));
@@ -269,39 +269,35 @@ void Application::new_game()
 	json  = m_world->serialize(pc);
 	char16_t marker = 0xFEFF;
 
-	
-	pc.reset();
-	m_world->reset_serialization_index();
-	std::string binary = m_world->bin_serialize(pc);
-	
-	
 	//LOG(INFO) << Parser::UTF16_to_CP1251(json);
 
-	FILE* m_file;
-	errno_t err;
-	err = fopen_s(&m_file, (FileSystem::instance().m_resource_path + "Saves\\test.json").c_str(), "wb");
-	fwrite(&marker, sizeof(marker), 1, m_file);
-	fwrite(&json[0], json.size()*2, 1, m_file);
-	fclose(m_file);
 
-	err = fopen_s(&m_file, (FileSystem::instance().m_resource_path + "Saves\\test.bin").c_str(), "wb");
-	fwrite(&binary[0], binary.size(), 1, m_file);
-	fclose(m_file);
+	/*std::ofstream in_file(FileSystem::instance().m_resource_path + "Saves\\test.json", std::ios::binary);
+	in_file.write(reinterpret_cast<const char*>(&marker), sizeof(marker));
+	in_file.write(reinterpret_cast<const char*>(&json[0]), json.size() * 2);
+	in_file.close();
 
-	Game_world test_world;
-	Parser_context pc1(test_world);
-	pc1.reset();
-	test_world.reset_serialization_index();
-	test_world.bin_deserialize(binary,pc1);
+	std::ifstream out_file(FileSystem::instance().m_resource_path + "Saves\\test.json", std::ios::binary | std::ios::ate);
+	const auto size = out_file.tellg();
+	std::string value(size, '\0');
+	out_file.seekg(0);
+	out_file.read(&value[0], size);
+	out_file.close();
+	value.erase(0, 2);
+	std::u16string out(value.length()/2, '0');
 
-	pc1.reset();
-	test_world.reset_serialization_index();
-	json = test_world.serialize(pc1);
+	auto* a = reinterpret_cast<char*>(&value[0]);
+	auto* b = reinterpret_cast<char*>(&json[0]);
+	for (int i = 0; i < value.size(); ++i)
+	{
+		b[i] = a[i];
+	}
+	auto* world = new Game_world();
+	Parser_context pc1(*world);
+	pc.reset();
+	world->reset_serialization_index();
+	world->deserialize(json, pc);*/
 
-	err = fopen_s(&m_file, (FileSystem::instance().m_resource_path + "Saves\\test2.json").c_str(), "wb");
-	fwrite(&marker, sizeof(marker), 1, m_file);
-	fwrite(&json[0], json.size() * 2, 1, m_file);
-	fclose(m_file);
 
 	/*GameMap* tmp;
 	Parser::reset_object_counter();
@@ -427,44 +423,20 @@ void Application::new_game()
 
 void Application::load_game()
 {
-
-	m_world = Serialization_manager::instance().load("save");
+	std::ifstream file(FileSystem::instance().m_resource_path + "Saves\\save.bin",std::ios::binary | std::ios::ate);
+	const auto size = file.tellg();
+	std::string value(size, '\0');
+	file.seekg(0);
+	file.read(&value[0], size);
+	file.close();
+	auto* world = new Game_world();
+	Parser_context pc(*world);
+	pc.reset();
+	world->reset_serialization_index();
+	world->bin_deserialize(value, pc);
+	m_world = world;
 	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
 	m_gui_controller.m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player, m_world->m_maps.front(), m_action_manager, m_game_log);
-	
-	//GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, "Мини-карта");
-	//GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(5, 5), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 30), m_GUI->MapViewer);
-	//MiniMap->add(mini_map);
-	////MenuLayer->add(MiniMap);
-
-	//MiniMap = new GUI_Window(300, 0, 400, 400, "Поле зрения player");
-	//GUI_FOV* fov = new GUI_FOV(position_t(5, 5), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 30), m_GUI->MapViewer->m_player->m_object);
-	//MiniMap->add(fov);
-
-	/*obj = m_game_object_manager->new_object("bat");
-	obj->set_direction(object_direction_e::top);
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx-2]);
-
-	obj = m_game_object_manager->new_object("bat");
-	obj->set_direction(object_direction_e::top);
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 4]);
-
-	obj = m_game_object_manager->new_object("bat");
-	obj->set_direction(object_direction_e::top);
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 6]);
-
-	obj = m_game_object_manager->new_object("bat");
-	obj->set_direction(object_direction_e::top);
-	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-8][rx]);*/
-
-
-	/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
-	fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), obj);
-	MiniMap->add(fov);*/
-
-	/*MenuLayer->add(m_GUI->Timer);
-	MenuLayer->add(MiniMap);*/
-
 	update_after_load();
 }
 

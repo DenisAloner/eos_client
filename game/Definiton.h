@@ -850,15 +850,9 @@ public:
 		this->get_packer().from_binary(*this, value, pos,context);
 	}
 
-	virtual void from_binary_const(const std::string& value,Parser_context& context,const std::size_t pos = 0)
-	{
-		std::size_t p = pos;
-		this->get_packer().from_binary(*this, value, p,context);
-	}
-
 	virtual void from_json(scheme_map_t* value,Parser_context& context)
 	{
-		return this->get_packer().from_json(*this, value,context);
+		return this->get_packer().from_json(*this, value, context);
 	}
 
 	virtual std::u16string to_json(Parser_context& context)
@@ -872,22 +866,6 @@ public:
 	}
 
 };
-
-template<typename T> iSerializable* create_instance(scheme_map_t* value)
-{
-	T* out = new T;
-	out->from_json(value);
-	return out;
-}
-
-template<typename T> iSerializable* create_instance2(const std::string& value, std::size_t& pos)
-{
-	T* out = new T;
-	Parser::m_items.push_back(out);
-	out->from_binary(value, pos);
-	return out;
-}
-
 
 template<typename T>
 class Packer :public Packer_generic
@@ -925,7 +903,7 @@ public:
 		{
 			T* out = new T;
 			context.m_items.push_back(out);
-			out->from_json(value,context);
+			out->from_json(value, context);
 			return out;
 		}
 		return nullptr;
@@ -937,7 +915,7 @@ public:
 		{
 			T* out = new T;
 			context.m_items.push_back(out);
-			out->from_binary(value, pos,context);
+			out->from_binary(value, pos, context);
 			return out;
 		}
 		return nullptr;
@@ -1134,6 +1112,7 @@ public:
 	static Dictonary<action_e::type> m_json_action_e;
 	static Dictonary<object_state_e> m_json_object_state_e;
 	static Dictonary<effect_e> m_json_effect_e;
+	static Dictonary<object_direction_e> m_json_object_direction_e;
 
 	static std::unordered_map<effect_e, std::u16string> m_string_effect_e;
 	static std::unordered_map<interaction_e, std::u16string> m_string_interaction_e;
@@ -1279,7 +1258,7 @@ public:
 			std::u16string temp(value);
 			LOG(INFO) << UTF16_to_CP1251(temp);
 			scheme_map_t* s = read_object(temp);
-			prop.from_json(s,context);
+			prop.from_json(s, context);
 			delete s;
 		}
 		else if constexpr(is_vector<T>::value)
@@ -1370,6 +1349,17 @@ public:
 				}
 			}
 			prop = UTF16_to_CP1251(value);
+		}
+		else if constexpr(std::is_same<T, bool>::value)
+		{
+			if (get_value(value) == u"true")
+			{
+				prop = nullptr;
+			}
+			else
+			{
+				prop = false;
+			}
 		}
 		else if constexpr(std::is_same<T, std::size_t>::value)
 		{
@@ -1520,6 +1510,17 @@ public:
 		else if constexpr(std::is_same<T, std::u16string>::value)
 		{
 			return u"\"" + value + u"\"";
+		}
+		else if constexpr(std::is_same<T, bool>::value)
+		{
+			if(value)
+			{
+				return u"true";
+			}
+			else
+			{
+				return u"false";
+			}
 		}
 		else if constexpr(std::is_same<T, std::string>::value)
 		{
@@ -1674,7 +1675,7 @@ public:
 				prop[k] = v;
 			}
 		}
-		else if constexpr(std::is_same<T, int>::value|| std::is_same<T, std::size_t>::value || std::is_same<T, float>::value || std::is_enum<T>::value)
+		else if constexpr(std::is_same<T, int>::value|| std::is_same<T, std::size_t>::value || std::is_same<T, float>::value || std::is_same<T, bool>::value || std::is_enum<T>::value)
 		{
 			prop = *reinterpret_cast<const T*>(&value[pos]);
 			pos += sizeof(T);
@@ -1775,7 +1776,7 @@ public:
 		{
 			return value.to_binary(context);
 		}
-		else if constexpr(std::is_same<T, int>::value|| std::is_same<T, std::size_t>::value || std::is_same<T, float>::value || std::is_enum<T>::value)
+		else if constexpr(std::is_same<T, int>::value|| std::is_same<T, std::size_t>::value || std::is_same<T, float>::value || std::is_same<T, bool>::value || std::is_enum<T>::value)
 		{
 			return std::string(reinterpret_cast<const char*>(&value), sizeof(T));
 		}
@@ -1868,6 +1869,8 @@ public:
 			return m_json_object_state_e;
 		else if constexpr(std::is_same<T, effect_e>::value)
 			return m_json_effect_e;
+		else if constexpr(std::is_same<T, object_direction_e>::value)
+			return m_json_object_direction_e;
 		else static_assert(always_false<T>::value, "<get_dictonary> type error");
 	}
 

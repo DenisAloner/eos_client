@@ -1662,7 +1662,15 @@ void Action_save::interaction_handler(Parameter* arg)
 {
 	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
-	Serialization_manager::instance().save("save", Application::instance().m_world);
+
+	auto* world = Application::instance().m_world;
+	Parser_context pc(*world);
+	pc.reset();
+	world->reset_serialization_index();
+	std::string binary = world->bin_serialize(pc);
+	std::ofstream file(FileSystem::instance().m_resource_path + "Saves\\save.bin", std::ios::binary);
+	file.write(&binary[0], binary.size());
+	file.close();
 	Application::instance().m_message_queue.m_busy = false;
 }
 

@@ -135,6 +135,14 @@ iSerializable* Packer<GameObject>::from_binary(const std::string& value, std::si
 	return &(*it);
 }
 
+void Packer<GameObject>::from_binary(iSerializable& object, const std::string& value, std::size_t& pos, Parser_context& context)
+{
+	GameObject& obj = dynamic_cast<GameObject&>(object);
+	object_from_binary<GameObject>(obj, value, pos, context);
+	obj.set_direction(obj.m_direction);
+	obj.update_interaction();
+}
+
 Dictonary<object_tag_e> Parser::m_json_object_tag = {
 	{ object_tag_e::poison_resist,"poison_resist" },
 	{ object_tag_e::purification_from_poison,"purification_from_poison" },
@@ -247,6 +255,17 @@ Dictonary<effect_e> Parser::m_json_effect_e = {
 	{ effect_e::limit,"limit" },
 	{ effect_e::start_angle,"start_angle" },
 	{ effect_e::end_angle,"end_angle" }
+};
+
+Dictonary<object_direction_e> Parser::m_json_object_direction_e = {
+	{ object_direction_e::down,"down" },
+	{ object_direction_e::downleft,"downleft" },
+	{ object_direction_e::left,"left" },
+	{ object_direction_e::topleft,"topleft" },
+	{ object_direction_e::top,"top" },
+	{ object_direction_e::topright,"topright" },
+	{ object_direction_e::right,"right" },
+	{ object_direction_e::downright,"downright" },
 };
 
 std::unordered_map<effect_e, std::u16string>  Parser::m_string_effect_e = {

@@ -71,7 +71,6 @@ public:
 	int m_state;
 
 	bool m_notable;
-
 	bool m_mark;
 
 	int x;
@@ -284,8 +283,10 @@ public:
 	{
 		return std::make_tuple(
 			make_property(&GameObject::m_name, u"name"),
+			make_property(&GameObject::m_direction, u"direction"),
 			make_property(&GameObject::m_owner, u"owner"),
-			make_property(&GameObject::m_state, u"state")
+			make_property(&GameObject::m_state, u"state"),
+			make_property(&GameObject::m_active_state, u"active_state")
 		);
 	}
 

@@ -919,16 +919,17 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	bool passable;
 	bool is_hide;
 	bool is_in_fov;
+
 	Application::instance().m_UI_mutex.lock();
 	for (auto current = Application::instance().m_gui_controller.m_hints.begin(); current != Application::instance().m_gui_controller.m_hints.end(); ++current)
 	{
 		(*current)->init(this);
 	}
 	Application::instance().m_UI_mutex.unlock();
+
 	bool m_observer;
-	
-	AI_enemy* ai = static_cast<AI_enemy*>(m_player->m_object->m_active_state->m_ai);
-	Vision_list* vl = static_cast<Vision_list*>(m_player->m_object->m_active_state->get_list(interaction_e::vision));
+	AI_enemy* ai = dynamic_cast<AI_enemy*>(m_player->m_object->m_active_state->m_ai);
+	Vision_list* vl = dynamic_cast<Vision_list*>(m_player->m_object->m_active_state->get_list(interaction_e::vision));
 	m_observer = !vl;
 	int max_fov_radius;
 	view_t fov;
