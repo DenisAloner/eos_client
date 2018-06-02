@@ -48,7 +48,7 @@ std::u16string Packer<MapCell>::to_json(iSerializable* value, Parser_context& co
 	{
 		MapCell& obj = *dynamic_cast<MapCell*>(value);
 		std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\",\"value\":[" + Parser::
-			int_to_u16string(obj.x) + u"," + Parser::int_to_u16string(obj.y) + u"]}";
+			int_to_u16string(obj.x) + u"," + Parser::int_to_u16string(obj.y) + u"," + Parser::int_to_u16string(obj.z) + u"]}";
 		return out;
 	}
 	else
@@ -64,7 +64,7 @@ std::string Packer<MapCell>::to_binary(iSerializable* value, Parser_context& con
 	{
 		MapCell& obj = *dynamic_cast<MapCell*>(value);
 		std::size_t id = value->get_packer().get_type_id() + 1;
-		return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + Parser::to_binary<int>(obj.x,context) + Parser::to_binary<int>(obj.y,context);
+		return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + Parser::to_binary<int>(obj.x,context) + Parser::to_binary<int>(obj.y,context) + Parser::to_binary<int>(obj.z, context);
 	}
 	else
 	{
@@ -78,18 +78,22 @@ iSerializable* Packer<MapCell>::from_json(scheme_map_t* value, Parser_context& c
 	scheme_vector_t* s = Parser::read_pair((*value)[u"value"]);
 	int x;
 	int y;
+	int z;
 	Parser::from_json<int>((*s)[0], x,context);
 	Parser::from_json<int>((*s)[1], y,context);
-	return &context.m_game_world.m_maps.front()->get(y, x);
+	Parser::from_json<int>((*s)[2], z, context);
+	return &context.m_game_world.m_maps.front()->get(z,y, x);
 }
 
 iSerializable* Packer<MapCell>::from_binary(const std::string& value, std::size_t& pos,Parser_context& context)
 {
 	int x;
 	int y;
-	Parser::from_binary<int>(value, x,pos,context);
-	Parser::from_binary<int>(value, y, pos,context);
-	return &context.m_game_world.m_maps.front()->get(y, x);
+	int z;
+	Parser::from_binary<int>(value, x, pos, context);
+	Parser::from_binary<int>(value, y, pos, context);
+	Parser::from_binary<int>(value, z, pos, context);
+	return &context.m_game_world.m_maps.front()->get(z,y, x);
 }
 
 iSerializable* Packer<Parser::Link>::from_json(scheme_map_t* value, Parser_context& context)

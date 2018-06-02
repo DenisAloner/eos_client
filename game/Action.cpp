@@ -1778,16 +1778,17 @@ Action_shoot::Action_shoot()
 	m_parameter_kind = parameter_type_e::bow_shoot;
 }
 
+//TODO Адаптировать для 3D
 bool Action_shoot::check_cell(Parameter* parameter)
 {
-	Parameter& p(*parameter);
+	/*Parameter& p(*parameter);
 	if (!p[0].m_object->is_own(p[4].m_cell))
 	{
 		MapCell* cell = p[0].m_object->get_center(p[4].m_cell);
 		int distance = (std::max)(abs(p[4].m_cell->x - cell->x) + p[0].m_object->m_active_state->m_size.x / 2 - 1, abs(p[4].m_cell->y - cell->y) + p[0].m_object->m_active_state->m_size.y / 2 - 1);
 		Parameter_list* range = p[2].m_part->m_item->get_parameter(interaction_e::weapon_range);
 		return distance <= range->m_value;
-	}
+	}*/
 	return true;
 }
 

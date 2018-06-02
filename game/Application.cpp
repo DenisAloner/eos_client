@@ -248,16 +248,16 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 void Application::new_game()
 {
 	m_world = new Game_world();
-	GameMap* map = new GameMap(dimension_t(10, 10));
+	GameMap* map = new GameMap(dimension3_t(20,20,20));
 
 	GameObject* obj;
 	map->generate_room();
 	m_world->m_maps.push_back(map);
-	int rx = 4;
-	int ry = 4;
+	int rx = 8;
+	int ry = 8;
 	
 	obj = m_game_object_manager->new_object("human");
-	map->add_to_map(obj, map->get(ry,rx));
+	map->add_to_map(obj, map->get(0,ry,rx));
 	m_world->m_player = new Player(obj, map);
 	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
 	
@@ -391,11 +391,11 @@ void Application::new_game()
 			obj->set_direction(object_direction_e::top);
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-2][rx]);*/
 	///////////////////////
-			/*obj = m_game_object_manager->new_object("bat");
+			obj = m_game_object_manager->new_object("bat");
 			obj->set_direction(object_direction_e::top);
-			map->add_to_map(obj, map->get(ry - 2,rx-2));
+			map->add_to_map(obj, map->get(0,ry - 2,rx-2));
 
-			obj = m_game_object_manager->new_object("bag");
+			/*obj = m_game_object_manager->new_object("bag");
 			obj->set_direction(object_direction_e::top);
 			map->add_to_map(obj, map->get(ry - 2,rx-1));
 
@@ -572,32 +572,44 @@ void Application::update()
 
 				int xc = object->cell()->x;
 				int yc = object->cell()->y;
-				int dx = object->m_active_state->m_size.x;
-				int dy = object->m_active_state->m_size.y;
+				int zc = object->cell()->z;
+				int dx = object->m_active_state->m_size.dx;
+				int dy = object->m_active_state->m_size.dy;
+				int dz = object->m_active_state->m_size.dz;
 
 				int xs = ((dx - 1) >> 1);
 				int ys = ((dy - 1) >> 1);
+				int zs = ((dz - 1) >> 1);
 
 				int x_start = xc - radius + xs;
 				x_start = max(x_start, 0);
-				x_start = min(x_start, map->m_size.w - 1);
+				x_start = min(x_start, map->m_size.dx - 1);
 				int x_end = xc + radius + xs;
 				x_end = max(x_end, 0);
-				x_end = min(x_end, map->m_size.w - 1);
+				x_end = min(x_end, map->m_size.dx - 1);
 				int y_start = yc - radius - ys;
 				y_start = max(y_start, 0);
-				y_start = min(y_start, map->m_size.h - 1);
+				y_start = min(y_start, map->m_size.dy - 1);
 				int y_end = yc + radius - ys;
 				y_end = max(y_end, 0);
-				y_end = min(y_end, map->m_size.h - 1);
+				y_end = min(y_end, map->m_size.dy - 1);
+				int z_start = zc - radius + zs;
+				z_start = max(z_start, 0);
+				z_start = min(z_start, map->m_size.dz - 1);
+				int z_end = zc + radius + zs;
+				z_end = max(z_end, 0);
+				z_end = min(z_end, map->m_size.dz - 1);
 
-				for (int y = y_start; y < y_end + 1; y++)
+				for (int z = z_start; z < z_end + 1; z++)
 				{
-					for (int x = x_start; x < x_end + 1; x++)
+					for (int y = y_start; y < y_end + 1; y++)
 					{
-						if (ai->m_fov->m_map[y - y_start][x - x_start].visible)
+						for (int x = x_start; x < x_end + 1; x++)
 						{
-							map->get(y,x).m_notable = true;
+							if (ai->m_fov->m_map[y - y_start][x - x_start].visible)
+							{
+								map->get(z,y, x).m_notable = true;
+							}
 						}
 					}
 				}
@@ -874,16 +886,19 @@ void Application::command_set_pickup_item_visibility(bool _Visibility)
 bool Application::command_check_position(GameObject*& object, MapCell*& position, GameMap*& map)
 {
 	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier->predicat;
-	for (int i = 0; i<object->m_active_state->m_size.y; i++)
+	for (int z = 0; z < object->m_active_state->m_size.dz; z++)
 	{
-		for (int j = 0; j<object->m_active_state->m_size.x; j++)
+		for (int y = 0; y < object->m_active_state->m_size.dy; y++)
 		{
-			//if (map->get(position->y + i,position->x + j) == nullptr){ return false; }
-			for (std::list<GameObject*>::iterator item = map->get(position->y - i,position->x + j).m_items.begin(); item != map->get(position->y - i,position->x + j).m_items.end(); ++item)
+			for (int x = 0; x < object->m_active_state->m_size.dx; x++)
 			{
-				if (((*item) != object) && qualifier((*item)))
+				//if (map->get(position->y + i,position->x + j) == nullptr){ return false; }
+				for (auto& m_item : map->get(position->z + z, position->y - y, position->x + x).m_items)
 				{
-					return false;
+					if ((m_item != object) && qualifier(m_item))
+					{
+						return false;
+					}
 				}
 			}
 		}

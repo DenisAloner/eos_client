@@ -64,25 +64,25 @@ public:
 		block_t(int x, int y, int w, int h) : rect(rectangle_t(x, y, w, h)) {}
 	};
 
-	dimension_t m_size;
+	dimension3_t m_size;
 
 	std::vector<MapCell> m_items;
 
 	std::list<block_t*> m_rooms;
 	std::list<block_t*> m_link_rooms;
 
-	GameMap(dimension_t size);
+	GameMap(dimension3_t size);
 	GameMap();
 
-	MapCell& get(int y, int x);
+	MapCell& get(int z, int y, int x);
 
-	void init(dimension_t size);
+	void init(dimension3_t size);
 	void add_object(GameObject* object, MapCell& cell);
 	void remove_object(GameObject* object);
 	void move_object(GameObject* object, MapCell& cell);
 	void turn_object(GameObject* object);
 
-	void generate_room(void);
+	void generate_room();
 	bool divide_block(block_t* Block, int Depth, int Current);
 	void generate_level(void);
 
@@ -100,7 +100,7 @@ public:
 	void bresenham_line(MapCell* a, MapCell* b, std::function<void(MapCell*)> f);
 	MapCell* bresenham_line2(MapCell* a, MapCell* b, std::function<bool(MapCell*)> f);
 	MapCell* bresenham_line2(MapCell* a, MapCell* b, Parameter* p, std::function<bool(Parameter*,MapCell*)> f);
-	bool check(int x,int y);
+	//bool check(int x,int y);
 	//MapCell* get_cell(int x, int y);
 
 	void blur_lighting();

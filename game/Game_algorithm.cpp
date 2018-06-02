@@ -1,18 +1,40 @@
 #include "Game_algorithm.h"
 
-bool Game_algorithm::check_distance(MapCell* a_cell, game_object_size_t& a_size, MapCell* b_cell, game_object_size_t& b_size)
+bool Game_algorithm::check_distance(MapCell* a_cell, dimension3_t& a_size, MapCell* b_cell, dimension3_t& b_size)
 {
-	return ((abs(a_cell->x - b_cell->x) < 2 || abs(a_cell->x - (b_cell->x + (b_size.x - 1))) < 2 || abs((a_cell->x + (a_size.x - 1)) - b_cell->x) < 2 || abs((a_cell->x + (a_size.x - 1)) - (b_cell->x + (b_size.x - 1))) < 2) && (abs(a_cell->y - b_cell->y) < 2 || abs(a_cell->y - (b_cell->y - (b_size.y - 1))) < 2 || abs((a_cell->y - (a_size.y - 1)) - b_cell->y) < 2 || abs((a_cell->y - (a_size.y - 1)) - (b_cell->y - (b_size.y - 1))) < 2));
+	return (abs(a_cell->x - b_cell->x) < 2
+		    || abs(a_cell->x - (b_cell->x + (b_size.dx - 1))) < 2
+		    || abs((a_cell->x + (a_size.dx - 1)) - b_cell->x) < 2
+		    || abs((a_cell->x + (a_size.dx - 1)) - (b_cell->x + (b_size.dx - 1))) < 2)
+		&& (abs(a_cell->y - b_cell->y) < 2
+			|| abs(a_cell->y - (b_cell->y - (b_size.dy - 1))) < 2
+			|| abs((a_cell->y - (a_size.dy - 1)) - b_cell->y) < 2
+			|| abs((a_cell->y - (a_size.dy - 1)) - (b_cell->y - (b_size.dy - 1))) < 2)
+		&& (abs(a_cell->z - b_cell->z) < 2
+			|| abs(a_cell->z - (b_cell->z + (b_size.dz - 1))) < 2
+			|| abs((a_cell->z + (a_size.dz - 1)) - b_cell->z) < 2
+			|| abs((a_cell->z + (a_size.dz - 1)) - (b_cell->z + (b_size.dz - 1))) < 2);
 }
 
-bool Game_algorithm::check_distance(position_t* a_cell, game_object_size_t& a_size, position_t* b_cell, game_object_size_t& b_size)
-{
-	return ((abs(a_cell->x - b_cell->x) < 2 || abs(a_cell->x - (b_cell->x + (b_size.x - 1))) < 2 || abs((a_cell->x + (a_size.x - 1)) - b_cell->x) < 2 || abs((a_cell->x + (a_size.x - 1)) - (b_cell->x + (b_size.x - 1))) < 2) && (abs(a_cell->y - b_cell->y) < 2 || abs(a_cell->y - (b_cell->y - (b_size.y - 1))) < 2 || abs((a_cell->y - (a_size.y - 1)) - b_cell->y) < 2 || abs((a_cell->y - (a_size.y - 1)) - (b_cell->y - (b_size.y - 1))) < 2));
-}
+//bool Game_algorithm::check_distance(position3_t* a_cell, dimension3_t& a_size, position3_t* b_cell, dimension3_t& b_size)
+//{
+//	return (abs(a_cell->x - b_cell->x) < 2
+//		    || abs(a_cell->x - (b_cell->x + (b_size.dx - 1))) < 2
+//		    || abs((a_cell->x + (a_size.dx - 1)) - b_cell->x) < 2
+//		    || abs((a_cell->x + (a_size.dx - 1)) - (b_cell->x + (b_size.dx - 1))) < 2)
+//		&& (abs(a_cell->y - b_cell->y) < 2
+//			|| abs(a_cell->y - (b_cell->y - (b_size.dy - 1))) < 2
+//			|| abs((a_cell->y - (a_size.dy - 1)) - b_cell->y) < 2
+//			|| abs((a_cell->y - (a_size.dy - 1)) - (b_cell->y - (b_size.dy - 1))) < 2)
+//		&& (abs(a_cell->z - b_cell->z) < 2
+//			|| abs(a_cell->z - (b_cell->z + (b_size.dz - 1))) < 2
+//			|| abs((a_cell->z + (a_size.dz - 1)) - b_cell->z) < 2
+//			|| abs((a_cell->z + (a_size.dz - 1)) - (b_cell->z + (b_size.dz - 1))) < 2);
+//}
 
 object_direction_e Game_algorithm::turn_to_object(GameObject* object, GameObject* turn_to)
 {
-	f2dvector_t v(turn_to->cell()->x + turn_to->m_active_state->m_size.x*0.5F - (object->cell()->x + object->m_active_state->m_size.x*0.5F), turn_to->cell()->y - turn_to->m_active_state->m_size.y*0.5F - (object->cell()->y - object->m_active_state->m_size.y*0.5F));
+	f2dvector_t v(turn_to->cell()->x + turn_to->m_active_state->m_size.dx*0.5F - (object->cell()->x + object->m_active_state->m_size.dx*0.5F), turn_to->cell()->y - turn_to->m_active_state->m_size.dy*0.5F - (object->cell()->y - object->m_active_state->m_size.dy*0.5F));
 	float cs = abs(v.y / sqrt(v.x*v.x+v.y*v.y));
 	if (v.y > 0.0F)
 	{
@@ -84,7 +106,7 @@ object_direction_e Game_algorithm::turn_to_object(GameObject* object, GameObject
 
 object_direction_e Game_algorithm::turn_to_cell(GameObject* object, MapCell* c)
 {
-	f2dvector_t v(c->x + 0.5F - (object->cell()->x + object->m_active_state->m_size.x*0.5F), c->y - 0.5F - (object->cell()->y - object->m_active_state->m_size.y*0.5F));
+	f2dvector_t v(c->x + 0.5F - (object->cell()->x + object->m_active_state->m_size.dx*0.5F), c->y - 0.5F - (object->cell()->y - object->m_active_state->m_size.dy*0.5F));
 	float cs = abs(v.y / sqrt(v.x*v.x + v.y*v.y));
 	if (v.y > 0.0F)
 	{
@@ -161,35 +183,35 @@ MapCell* Game_algorithm::step_in_direction(GameObject* object, object_direction_
 	{
 	case object_direction_e::down:
 	{
-		return &result->m_map->get(result->y - 1,result->x);
+		return &result->m_map->get(0,result->y - 1,result->x);
 	}
 	case object_direction_e::downleft:
 	{
-		return &result->m_map->get(result->y - 1,result->x-1);
+		return &result->m_map->get(0,result->y - 1,result->x-1);
 	}
 	case object_direction_e::downright:
 	{
-		return &result->m_map->get(result->y - 1,result->x + 1);
+		return &result->m_map->get(0,result->y - 1,result->x + 1);
 	}
 	case object_direction_e::left:
 	{
-		return &result->m_map->get(result->y,result->x - 1);
+		return &result->m_map->get(0,result->y,result->x - 1);
 	}
 	case object_direction_e::right:
 	{
-		return &result->m_map->get(result->y,result->x + 1);
+		return &result->m_map->get(0,result->y,result->x + 1);
 	}
 	case object_direction_e::top:
 	{
-		return &result->m_map->get(result->y + 1,result->x);
+		return &result->m_map->get(0,result->y + 1,result->x);
 	}
 	case object_direction_e::topleft:
 	{
-		return &result->m_map->get(result->y + 1,result->x - 1);
+		return &result->m_map->get(0,result->y + 1,result->x - 1);
 	}
 	case object_direction_e::topright:
 	{
-		return &result->m_map->get(result->y + 1,result->x + 1);
+		return &result->m_map->get(0,result->y + 1,result->x + 1);
 	}
 	}
 }

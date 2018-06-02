@@ -46,6 +46,26 @@ struct dimension_t
 	dimension_t() : w(0), h(0) {}
 };
 
+struct position3_t
+{
+	int x;
+	int y;
+	int z;
+
+	position3_t(int x, int y, int z) : x(x), y(y), z(z) {}
+	position3_t() : x(0), y(0), z(z) {}
+};
+
+struct dimension3_t
+{
+	int dx;
+	int dy;
+	int dz;
+
+	dimension3_t(int dx, int dy, int dz) : dx(dx), dy(dy), dz(dz) {}
+	dimension3_t() :dx(0), dy(0), dz(0) {}
+};
+
 struct view_t
 {
 	int l;
@@ -1421,6 +1441,14 @@ public:
 			from_json<int>((*s)[0], prop.w,context);
 			from_json<int>((*s)[1], prop.h,context);
 		}
+		else if constexpr(std::is_same<T, dimension3_t>::value)
+		{
+			std::u16string temp = value;
+			scheme_vector_t* s = read_pair(temp);
+			from_json<int>((*s)[0], prop.dx, context);
+			from_json<int>((*s)[1], prop.dy, context);
+			from_json<int>((*s)[2], prop.dz, context);
+		}
 		else if constexpr(std::is_same<T, Icon>::value||std::is_same<T, TileManager>::value || is_instancedictonary<T>::value)
 		{
 			LOG(FATAL) << "<from_json> type error: " << typeid(value).name();
@@ -1569,6 +1597,11 @@ public:
 		else if constexpr(std::is_same<T, dimension_t>::value)
 		{
 			std::u16string result = u"[" + to_json<int>(value.w,context) + u"," + to_json<int>(value.h,context) + u"]";
+			return result;
+		}
+		else if constexpr(std::is_same<T, dimension3_t>::value)
+		{
+			std::u16string result = u"[" + to_json<int>(value.dx, context) + u"," + to_json<int>(value.dy, context) + u"," + to_json<int>(value.dz, context) + u"]";
 			return result;
 		}
 		else
@@ -1733,6 +1766,12 @@ public:
 			from_binary<int>(value, prop.w, pos,context);
 			from_binary<int>(value, prop.h, pos,context);
 		}
+		else if constexpr(std::is_same<T, dimension3_t>::value)
+		{
+			from_binary<int>(value, prop.dx, pos, context);
+			from_binary<int>(value, prop.dy, pos, context);
+			from_binary<int>(value, prop.dz, pos, context);
+		}
 		else if constexpr(std::is_same<T, Icon>::value||std::is_same<T, TileManager>::value || is_instancedictonary<T>::value)
 		{
 			LOG(FATAL) << "<from_binary> type error: " << typeid(prop).name();
@@ -1835,6 +1874,10 @@ public:
 		else if constexpr(std::is_same<T, dimension_t>::value)
 		{
 			return to_binary<int>(value.w,context) + to_binary<int>(value.h,context);
+		}
+		else if constexpr(std::is_same<T, dimension3_t>::value)
+		{
+			return to_binary<int>(value.dx, context) + to_binary<int>(value.dy, context) + to_binary<int>(value.dz, context);
 		}
 		else if constexpr(std::is_same<T, Icon>::value||std::is_same<T, TileManager>::value|| is_instancedictonary<T>::value)
 		{

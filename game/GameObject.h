@@ -75,6 +75,7 @@ public:
 
 	int x;
 	int y;
+	int z;
 
 	cell_t m_pathfind_info;
 
@@ -86,7 +87,7 @@ public:
 	light_t m_light_blur;
 
 	MapCell();
-	MapCell(int x, int y, GameMap* map);
+	MapCell(int x, int y,int z, GameMap* map);
 
 	void add_object(GameObject* Object);
 	//virtual Object_feature* find_property(property_e kind, GameObject* excluded);
@@ -158,7 +159,7 @@ public:
 
 	object_state_e m_state;
 	int m_layer;
-	game_object_size_t m_size;
+	dimension3_t m_size;
 	Icon* m_icon;
 	float m_weight;
 	light_t* m_light;
@@ -263,7 +264,7 @@ public:
 	void add_from(interaction_e key, Interaction_list* feature);
 	void remove_from(interaction_e key, Interaction_list* feature);
 	bool is_own(MapCell* cell);
-	bool is_own(int x, int y);
+	bool is_own(int x, int y, int z);
 	MapCell* get_center(MapCell* c);
 
 	virtual Object_interaction* clone();

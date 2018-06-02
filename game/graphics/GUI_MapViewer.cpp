@@ -63,8 +63,8 @@ void mapviewer_hint_object_area::render(GUI_MapViewer* owner)
 	MapCell* Item = m_object->cell();
 	int bx;
 	int by;
-	bx = m_object->m_active_state->m_size.x;
-	by = m_object->m_active_state->m_size.y;
+	bx = m_object->m_active_state->m_size.dx;
+	by = m_object->m_active_state->m_size.dy;
 	for (int i = 0; i < by; i++)
 	{
 		for (int j = 0; j < bx; j++)
@@ -159,8 +159,8 @@ void mapviewer_hint_area::render(GUI_MapViewer* owner)
 	int by;
 	if (m_consider_object_size)
 	{
-		bx = m_object->m_active_state->m_size.x;
-		by = m_object->m_active_state->m_size.y;
+		bx = m_object->m_active_state->m_size.dx;
+		by = m_object->m_active_state->m_size.dy;
 	}
 	else
 	{
@@ -228,15 +228,15 @@ void mapviewer_hint_weapon_range::render(GUI_MapViewer* owner)
 	MapCell* item = m_object->cell();
 	int xc;
 	int yc;
-	xc = item->x + m_object->m_active_state->m_size.x / 2;
-	yc = item->y - m_object->m_active_state->m_size.y / 2;
-	int ax = 2*m_range + m_object->m_active_state->m_size.x;
-	int ay = 2*m_range + m_object->m_active_state->m_size.y;
+	xc = item->x + m_object->m_active_state->m_size.dx / 2;
+	yc = item->y - m_object->m_active_state->m_size.dy / 2;
+	int ax = 2*m_range + m_object->m_active_state->m_size.dx;
+	int ay = 2*m_range + m_object->m_active_state->m_size.dy;
 	int xr = ax / 2;
 	int yr = ay / 2;
 	float xrf = ax / 2.0F - 0.5F;
 	float yrf = ay / 2.0F - 0.5F;
-	float rf = m_range + m_object->m_active_state->m_size.x / 2.0F;
+	float rf = m_range + m_object->m_active_state->m_size.dx / 2.0F;
 	GraphicalController::rectangle_t r;
 	for (int i = 0; i < ay; i++)
 	{
@@ -246,7 +246,7 @@ void mapviewer_hint_weapon_range::render(GUI_MapViewer* owner)
 			//if (i*i + j*j <= m_range*m_range)
 			int xp = xc + j - xr;
 			int yp = yc - i + yr;
-			if ((!m_object->is_own(xp,yp))&&(rf*rf >= ((j - xrf)*(j - xrf) + (i - yrf)*(i - yrf))))
+			if ((!m_object->is_own(0,xp,yp))&&(rf*rf >= ((j - xrf)*(j - xrf) + (i - yrf)*(i - yrf))))
 			{
 				int x = px + xp - owner->m_center.x + owner->m_tile_count_x / 2;
 				int y = py + yp - owner->m_center.y + owner->m_tile_count_y / 2;
@@ -294,9 +294,9 @@ void mapviewer_hint_shoot::draw_cell(GUI_MapViewer* owner,MapCell* a)
 		int xp = owner->m_tile_count_y - y;
 		GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + owner->m_shift.x, (xp + yp) * tile_size_y_half + owner->m_shift.y, tile_size_x, -tile_size_y);
 		bool pass_able = true;
-		float xrf = a->x - m_object->cell()->x - m_object->m_active_state->m_size.x / 2.0F + 0.5F;
-		float yrf = a->y - m_object->cell()->y + m_object->m_active_state->m_size.y / 2.0F - 0.5F;
-		float rf = m_range + m_object->m_active_state->m_size.x / 2.0F;
+		float xrf = a->x - m_object->cell()->x - m_object->m_active_state->m_size.dx / 2.0F + 0.5F;
+		float yrf = a->y - m_object->cell()->y + m_object->m_active_state->m_size.dy / 2.0F - 0.5F;
+		float rf = m_range + m_object->m_active_state->m_size.dx / 2.0F;
 		glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_select);
 		if (rf*rf < (xrf*xrf + yrf*yrf))
 		{
@@ -493,8 +493,8 @@ void mapviewer_object_move::render(GUI_MapViewer* owner)
 		
 		int bx;
 		int by;
-		bx = m_object->m_active_state->m_size.x;
-		by = m_object->m_active_state->m_size.y;
+		bx = m_object->m_active_state->m_size.dx;
+		by = m_object->m_active_state->m_size.dy;
 		bool valid = true;//((abs(m_object->cell()->x - m_owner->m_cursored->x) < 2) && (abs(m_object->cell()->y - m_owner->m_cursored->y) < 2));
 		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01, 0);
 		GraphicalController::rectangle_t r;
@@ -641,14 +641,14 @@ void mapviewer_object_move::render_on_cell(GUI_MapViewer* owner,MapCell* c)
 		{
 			glColor4f(0.0F, 1.0F, 0.0F, 0.75F);
 			dimension_t object_size;
-			game_object_size_t size3d;
+			dimension3_t size3d;
 			object_size = m_object->m_active_state->m_tile_size;
 			size3d = m_object->m_active_state->m_size;
 			int x = c->x - owner->m_center.x + owner->m_tile_count_x / 2;
 			int y = c->y - owner->m_center.y + owner->m_tile_count_y / 2;
 			int yp = owner->m_tile_count_x - x;
 			int xp = owner->m_tile_count_y - y;
-			GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + owner->m_shift.x, (xp + yp+ size3d.x - 1) * tile_size_y_half + owner->m_shift.y, object_size.w, -object_size.h);
+			GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + owner->m_shift.x, (xp + yp+ size3d.dx - 1) * tile_size_y_half + owner->m_shift.y, object_size.w, -object_size.h);
 			tile_t tile;
 			m_object->m_active_state->m_tile_manager->set_tile(tile, m_object, Application::instance().m_timer->get_tick(), Game_algorithm::turn_to_cell(m_object, owner->m_cursored));
 			GLuint Sprite = tile.unit;
@@ -707,7 +707,7 @@ void mapviewer_object_rotate::render(GUI_MapViewer* owner)
 			{
 				if (m_fov->m_map[yf][xf].visible)
 				{  
-					c = &(owner->m_map->get(y,x));
+					c = &(owner->m_map->get(0,y,x));
 					yp = owner->m_tile_count_x / 2 - c->x + owner->m_center.x;
 					xp = owner->m_tile_count_y / 2 - c->y + owner->m_center.y;
 					xt = (xp - yp) * tile_size_x_half + owner->m_shift.x;
@@ -795,14 +795,14 @@ void mapviewer_object_rotate::render_on_cell(GUI_MapViewer* owner,MapCell* c)
 		{
 			glColor4f(0.0F, 1.0F, 0.0F, 0.75F);
 			dimension_t object_size;
-			game_object_size_t size3d;
+			dimension3_t size3d;
 			object_size = m_object->m_active_state->m_tile_size;
 			size3d = m_object->m_active_state->m_size;
 			int x = c->x - owner->m_center.x + owner->m_tile_count_x / 2;
 			int y = c->y - owner->m_center.y + owner->m_tile_count_y / 2;
 			int yp = owner->m_tile_count_x - x;
 			int xp = owner->m_tile_count_y - y;
-			GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + owner->m_shift.x, (xp + yp + size3d.x - 1) * tile_size_y_half + owner->m_shift.y, object_size.w, -object_size.h);
+			GraphicalController::rectangle_t r((xp - yp) * tile_size_x_half + owner->m_shift.x, (xp + yp + size3d.dx - 1) * tile_size_y_half + owner->m_shift.y, object_size.w, -object_size.h);
 			tile_t tile;
 			m_object->m_active_state->m_tile_manager->set_tile(tile, m_object, Application::instance().m_timer->get_tick(), m_direction);
 			GLuint Sprite = tile.unit;
@@ -911,7 +911,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	int dx;
 	glColor4d(1.0, 1.0, 1.0, 1.0);
 	dimension_t object_size;
-	game_object_size_t size3d;
+	dimension3_t size3d;
 
 	int j_limit;
 	int gx;
@@ -938,7 +938,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	{
 		max_fov_radius = vl->m_max_radius;
 		fov = ai->m_fov->m_view;
-		posc=position_t((m_player->m_object->m_active_state->m_size.x - 1) >> 1, (m_player->m_object->m_active_state->m_size.y - 1) >> 1);
+		posc=position_t((m_player->m_object->m_active_state->m_size.dx - 1) >> 1, (m_player->m_object->m_active_state->m_size.dy - 1) >> 1);
 	}
 	GraphicalController::rectangle_t rect;
 	for (int r = 0; r < 2; r++)
@@ -965,7 +965,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 				y = m_center.y + gy - m_tile_count_y / 2;
 				xf = x - m_player->m_object->cell()->x - posc.x;
 				yf = y - m_player->m_object->cell()->y + posc.y;
-				if ((x > -1) && (x<m_map->m_size.w) && (y>-1) && (y < m_map->m_size.h))
+				if ((x > -1) && (x<m_map->m_size.dx) && (y>-1) && (y < m_map->m_size.dy))
 				{
 					if (m_observer)
 					{
@@ -983,11 +983,11 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 						}
 					}
 
-					for (auto Current = m_map->get(y,x).m_items.begin(); Current != m_map->get(y, x).m_items.end(); ++Current)
+					for (auto Current = m_map->get(0,y,x).m_items.begin(); Current != m_map->get(0,y, x).m_items.end(); ++Current)
 					{
-						light[0] = (m_map->get(y, x).m_light.R / 100.0F);
-						light[1] = (m_map->get(y, x).m_light.G / 100.0F);
-						light[2] = (m_map->get(y, x).m_light.B / 100.0F);
+						light[0] = (m_map->get(0,y, x).m_light.R / 100.0F);
+						light[1] = (m_map->get(0,y, x).m_light.G / 100.0F);
+						light[2] = (m_map->get(0,y, x).m_light.B / 100.0F);
 						light[3] = 0.0;
 						/*light[0] = 1.0;
 						light[1] = 1.0;
@@ -998,7 +998,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 						passable = (*Current)->get_stat(object_tag_e::pass_able);
 						if ((r == 0 && passable) || (r == 1 && !passable))
 						{
-							if ((*Current)->cell()->y == m_map->get(y, x).y && (*Current)->cell()->x == m_map->get(y, x).x)
+							if ((*Current)->cell()->y == m_map->get(0,y, x).y && (*Current)->cell()->x == m_map->get(0,y, x).x)
 							{
 								//IsDraw = true;
 								size3d = (*Current)->m_active_state->m_size;
@@ -1020,11 +1020,11 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 
 								if (!IsDraw)
 								{
-									if (size3d.x > 1 || size3d.y > 1)
+									if (size3d.dx > 1 || size3d.dy > 1)
 									{
-										for (int m = 0; m < size3d.y; m++)
+										for (int m = 0; m < size3d.dy; m++)
 										{
-											for (int n = 0; n < size3d.x; n++)
+											for (int n = 0; n < size3d.dx; n++)
 											{
 												if ((xf + n >= -fov.l) && (xf + n <= fov.r) && (yf - m >= -fov.d) && (yf - m <= fov.u))
 												{
@@ -1036,7 +1036,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 											}
 										}
 									}
-									else if (m_map->get(y, x).m_notable)
+									else if (m_map->get(0,y, x).m_notable)
 									{
 										if (((*Current)->m_name == u"floor") || ((*Current)->m_name == u"wall"))
 										{
@@ -1052,26 +1052,26 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 							object_size = (*Current)->m_active_state->m_tile_size;
 							int yp = m_tile_count_x - px - gx;
 							int xp = m_tile_count_y - py - gy;
-							dx = object_size.w + m_map->get(y, x).x - (*Current)->cell()->x;
-							rect.set((xp - yp) * tile_size_x_half + m_shift.x, (xp + yp + size3d.x - 1) * tile_size_y_half + m_shift.y, object_size.w, -object_size.h);
+							dx = object_size.w + m_map->get(0,y, x).x - (*Current)->cell()->x;
+							rect.set((xp - yp) * tile_size_x_half + m_shift.x, (xp + yp + size3d.dx - 1) * tile_size_y_half + m_shift.y, object_size.w, -object_size.h);
 							// считаем среднюю освещенность для многотайловых объектов
-							if (size3d.x > 1 || size3d.y > 1)
+							if (size3d.dx > 1 || size3d.dy > 1)
 							{
 								light[0] = 0;
 								light[1] = 0;
 								light[2] = 0;
-								for (int m = 0; m < size3d.y; m++)
+								for (int m = 0; m < size3d.dy; m++)
 								{
-									for (int n = 0; n < size3d.x; n++)
+									for (int n = 0; n < size3d.dx; n++)
 									{
-										light[0] += m_map->get(y - m,x + n).m_light.R;
-										light[1] += m_map->get(y - m, x + n).m_light.G;
-										light[2] += m_map->get(y - m, x + n).m_light.B;
+										light[0] += m_map->get(0,y - m,x + n).m_light.R;
+										light[1] += m_map->get(0,y - m, x + n).m_light.G;
+										light[2] += m_map->get(0,y - m, x + n).m_light.B;
 									}
 								}
-								light[0] = light[0] / (size3d.x*size3d.y*100.0F);
-								light[1] = light[1] / (size3d.x*size3d.y*100.0F);
-								light[2] = light[2] / (size3d.x*size3d.y*100.0F);
+								light[0] = light[0] / (size3d.dx*size3d.dy*100.0F);
+								light[1] = light[1] / (size3d.dx*size3d.dy*100.0F);
+								light[2] = light[2] / (size3d.dx*size3d.dy*100.0F);
 								/*		light[0] = 1.0;
 										light[1] = 1.0;
 										light[2] = 1.0;
@@ -1097,7 +1097,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 							glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
 							Graph->draw_tile(tile, rect);
 
-							if ((*Current)->cell()->x == m_map->get(y,x).x)
+							if ((*Current)->cell()->x == m_map->get(0,y,x).x)
 							{
 								/*auto* feat = (*Current)->get_parameter(interaction_e::health);
 								if (feat)
@@ -1193,7 +1193,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 					Application::instance().m_UI_mutex.lock();
 						for (auto current = Application::instance().m_gui_controller.m_hints.begin(); current != Application::instance().m_gui_controller.m_hints.end(); ++current)
 						{
-							(*current)->render_on_cell(this,&m_map->get(y, x));
+							(*current)->render_on_cell(this,&m_map->get(0,y, x));
 						}
 						Application::instance().m_UI_mutex.unlock();
 				}
@@ -1362,10 +1362,10 @@ void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
 			y = m_center.y + p.y - m_tile_count_y / 2;
 			if (!m_just_focused)
 			{
-				if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
+				if (!((x<0) || (x>m_map->m_size.dx - 1) || (y<0) || (y>m_map->m_size.dy - 1)))
 				{
 					Parameter* p = new Parameter(parameter_type_e::owner);
-					(*p)[0].set(&m_map->get(y, x));
+					(*p)[0].set(&m_map->get(0,y, x));
 					if (Application::instance().m_message_queue.m_reader)
 					{
 						Application::instance().m_message_queue.push(p);
@@ -1385,10 +1385,10 @@ void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
 
 		x = m_center.x + p.x - m_tile_count_x / 2;
 		y = m_center.y + p.y - m_tile_count_y / 2;
-		if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
+		if (!((x<0) || (x>m_map->m_size.dx - 1) || (y<0) || (y>m_map->m_size.dy - 1)))
 		{
 			//UnderCursor(CursorEventArgs(e.x, e.y));
-			for (std::list<GameObject*>::iterator Current = m_map->get(y, x).m_items.begin(); Current != m_map->get(y, x).m_items.end(); ++Current)
+			for (std::list<GameObject*>::iterator Current = m_map->get(0,y, x).m_items.begin(); Current != m_map->get(0,y, x).m_items.end(); ++Current)
 			{
 				PopMenu->add((*Current)->m_name, (*Current));
 			}
@@ -1442,9 +1442,9 @@ void GUI_MapViewer::on_mouse_wheel(MouseEventArgs const& e)
 	position_t p = local_xy(position_t(e.position.x, e.position.y));
 	const int x = m_center.x + p.x - m_tile_count_x / 2;
 	const int y = m_center.y + p.y - m_tile_count_y / 2;
-	if (!(x < 0 || x > m_map->m_size.w - 1 || y < 0 || y > m_map->m_size.h - 1))
+	if (!(x < 0 || x > m_map->m_size.dx - 1 || y < 0 || y > m_map->m_size.dy - 1))
 	{
-		m_cursored = &m_map->get(y, x);
+		m_cursored = &m_map->get(0,y, x);
 	}
 }
 
@@ -1509,9 +1509,9 @@ void GUI_MapViewer::on_mouse_move(MouseEventArgs const& e)
 	int x = m_center.x + p.x - m_tile_count_x / 2;
 	int y = m_center.y + p.y - m_tile_count_y / 2;
 	
-	if (!(x < 0 || x > m_map->m_size.w - 1 || y < 0 || y > m_map->m_size.h - 1))
+	if (!(x < 0 || x > m_map->m_size.dx - 1 || y < 0 || y > m_map->m_size.dy - 1))
 	{
-		m_cursored = &m_map->get(y, x);
+		m_cursored = &m_map->get(0,y, x);
 	}
 
 		MouseEventArgs LocalMouseEventArgs = set_local_mouse_control(e);

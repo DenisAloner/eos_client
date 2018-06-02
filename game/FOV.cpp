@@ -263,8 +263,8 @@ void FOV::calculate_FOV(GameObject* object, GameMap* map, object_direction_e dir
 	Vision_list* vl = static_cast<Vision_list*>(object->m_active_state->get_list(interaction_e::vision));
 	int radius = vl->m_max_radius;
 
-	int dx = object->m_active_state->m_size.x;
-	int dy = object->m_active_state->m_size.y;
+	int dx = object->m_active_state->m_size.dx;
+	int dy = object->m_active_state->m_size.dy;
 
 	
 	m_fold = (dx >> 1 == (dx + 1) >> 1);
@@ -283,9 +283,9 @@ void FOV::calculate_FOV(GameObject* object, GameMap* map, object_direction_e dir
 		m_view.l = radius;
 	}
 
-	if (m_map_center.x+radius > map->m_size.w - 1)
+	if (m_map_center.x+radius > map->m_size.dx - 1)
 	{
-		m_view.r = map->m_size.w - 1 - m_map_center.x;
+		m_view.r = map->m_size.dx - 1 - m_map_center.x;
 	}
 	else
 	{
@@ -301,9 +301,9 @@ void FOV::calculate_FOV(GameObject* object, GameMap* map, object_direction_e dir
 		m_view.d = radius;
 	}
 
-	if (m_map_center.y + radius > map->m_size.h - 1)
+	if (m_map_center.y + radius > map->m_size.dy - 1)
 	{
-		m_view.u = map->m_size.h - 1 - m_map_center.y;
+		m_view.u = map->m_size.dy - 1 - m_map_center.y;
 	}
 	else
 	{
@@ -346,7 +346,7 @@ void FOV::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
 	{
 		for (int x = m_map_center.x - view.l, xf = m_view_center.x - view.l; x < m_map_center.x + view.r + 1; x++, xf++)
 		{
-			for (auto obj = map->get(y,x).m_items.begin(); obj != map->get(y, x).m_items.end(); ++obj)
+			for (auto obj = map->get(0,y,x).m_items.begin(); obj != map->get(0,y, x).m_items.end(); ++obj)
 			{
 				m_map[yf][xf].opaque = false;
 				if ((*obj) != unit&&qualifier((*obj)))
@@ -373,9 +373,9 @@ void FOV_help::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
 		for (int x = m_map_center.x - view.l, xf = m_view_center.x - view.l; x < m_map_center.x + view.r + 1; x++, xf++)
 		{
 			m_map[yf][xf].opaque = false;
-			if (map->get(y, x).m_notable == true)
+			if (map->get(0, y, x).m_notable)
 			{
-				for (auto obj = map->get(y, x).m_items.begin(); obj != map->get(y, x).m_items.end(); ++obj)
+				for (auto obj = map->get(0,y, x).m_items.begin(); obj != map->get(0,y, x).m_items.end(); ++obj)
 				{
 					if ((*obj) != unit&&qualifier((*obj)))
 					{

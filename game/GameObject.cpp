@@ -49,7 +49,7 @@ MapCell::MapCell()
 	m_owner = nullptr;
 }
 
-MapCell::MapCell(int x, int y, GameMap* map) :x(x), y(y), m_map(map)
+MapCell::MapCell(int x, int y, int z, GameMap* map) :m_map(map), x(x),y(y), z(z)
 {
 	m_kind = entity_e::cell;
 	m_notable = false;
@@ -415,7 +415,7 @@ Packer_generic& Object_state_equip::get_packer()
 
 void Object_state::set_tile_size()
 {
-	m_tile_size = dimension_t(tile_size_x_half*(m_size.x + m_size.y), tile_size_y_half*(m_size.x + m_size.y) + m_size.z * tile_size_y);
+	m_tile_size = dimension_t(tile_size_x_half*(m_size.dx + m_size.dy), tile_size_y_half*(m_size.dx + m_size.dy) + m_size.dz * tile_size_y);
 }
 
 void Object_state::reset_serialization_index()
@@ -709,51 +709,45 @@ MapCell* GameObject::cell(){
 
 bool GameObject::is_own(MapCell* c)
 {
-	if (c->x >= cell()->x&&c->x<cell()->x + m_active_state->m_size.x&&c->y <= cell()->y&&c->y > cell()->y - m_active_state->m_size.y)
-	{
-		return true;
-	}
-	return false;
+	MapCell& oc = *cell();
+	return c->x >= oc.x && c->x < oc.x + m_active_state->m_size.dx && c->y <= oc.y && c->y > oc.y - m_active_state->m_size.dy && c->z >= oc.z && c->z < oc.z + m_active_state->m_size.dz;
 }
 
-bool GameObject::is_own(int x, int y)
+bool GameObject::is_own(int x, int y, int z)
 {
-	if (x >= cell()->x&&x<cell()->x + m_active_state->m_size.x&&y <= cell()->y&&y > cell()->y - m_active_state->m_size.y)
-	{
-		return true;
-	}
-	return false;
+	MapCell& oc = *cell();
+	return x >= oc.x && x < oc.x + m_active_state->m_size.dx &&y <= oc.y && y > oc.y - m_active_state->m_size.dy && z >= oc.z && z < oc.z + m_active_state->m_size.dz;
 }
 
 MapCell* GameObject::get_center(MapCell* c)
 {
-	if ((m_active_state->m_size.x % 2) == 0)
+	if ((m_active_state->m_size.dx % 2) == 0)
 	{
 		int x;
 		int y;
-		if (c->x <= cell()->x + m_active_state->m_size.x / 2 - 1)
+		if (c->x <= cell()->x + m_active_state->m_size.dx / 2 - 1)
 		{
-			x = cell()->x + m_active_state->m_size.x / 2 - 1;
+			x = cell()->x + m_active_state->m_size.dx / 2 - 1;
 		}
 		else
 		{
-			x =cell()->x +m_active_state->m_size.x / 2;
+			x =cell()->x +m_active_state->m_size.dx / 2;
 		}
-		if (c->y >= cell()->y - m_active_state->m_size.y / 2 + 1)
+		if (c->y >= cell()->y - m_active_state->m_size.dy / 2 + 1)
 		{
-			y = cell()->y - m_active_state->m_size.y / 2 + 1;
+			y = cell()->y - m_active_state->m_size.dy / 2 + 1;
 		}
 		else
 		{
-			y = cell()->y - m_active_state->m_size.y / 2;
+			y = cell()->y - m_active_state->m_size.dy / 2;
 		}
-		return &cell()->m_map->get(y, x);
+		return &cell()->m_map->get(c->z,y, x);
 	}
 	else
 	{
-		int x = cell()->x + m_active_state->m_size.x / 2;
-		int y = cell()->y - m_active_state->m_size.y / 2;
-		return &cell()->m_map->get(y, x);
+		int x = cell()->x + m_active_state->m_size.dx / 2;
+		int y = cell()->y - m_active_state->m_size.dy / 2;
+		return &cell()->m_map->get(c->z,y, x);
 	}
 }
 
@@ -995,32 +989,44 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 
 	int xc = m_object->cell()->x;
 	int yc = m_object->cell()->y;
-	int dx = m_object->m_active_state->m_size.x;
-	int dy = m_object->m_active_state->m_size.y;
+	int zc = m_object->cell()->z;
+	int dx = m_object->m_active_state->m_size.dx;
+	int dy = m_object->m_active_state->m_size.dy;
+	int dz = m_object->m_active_state->m_size.dz;
 
 	int xs = ((dx - 1) >> 1);
 	int ys = ((dy - 1) >> 1);
+	int zs = ((dz - 1) >> 1);
 
 	int x_start = xc - radius + xs;
 	x_start = max(x_start, 0);
-	x_start = min(x_start, m_map->m_size.w - 1);
+	x_start = min(x_start, m_map->m_size.dx - 1);
 	int x_end = xc + radius + xs;
 	x_end = max(x_end, 0);
-	x_end = min(x_end, m_map->m_size.w - 1);
+	x_end = min(x_end, m_map->m_size.dx - 1);
 	int y_start = yc - radius - ys;
 	y_start = max(y_start, 0);
-	y_start = min(y_start, m_map->m_size.h - 1);
+	y_start = min(y_start, m_map->m_size.dy - 1);
 	int y_end = yc + radius - ys;
 	y_end = max(y_end, 0);
-	y_end = min(y_end, m_map->m_size.h - 1);
+	y_end = min(y_end, m_map->m_size.dy - 1);
+	int z_start = zc - radius + zs;
+	z_start = max(z_start, 0);
+	z_start = min(z_start, m_map->m_size.dz - 1);
+	int z_end = zc + radius + zs;
+	z_end = max(z_end, 0);
+	z_end = min(z_end, m_map->m_size.dz - 1);
 
-	for (int y = y_start; y < y_end + 1; y++)
+	for (int z = z_start; z < z_end + 1; ++z)
 	{
-		for (int x = x_start; x < x_end + 1; x++)
+		for (int y = y_start; y < y_end + 1; ++y)
 		{
-			if (ai->m_fov->m_map[y - y_start][x - x_start].visible)
+			for (int x = x_start; x < x_end + 1; ++x)
 			{
-				m_map->get(y, x).m_notable = true;
+				if (ai->m_fov->m_map[y - y_start][x - x_start].visible)
+				{
+					m_map->get(z, y, x).m_notable = true;
+				}
 			}
 		}
 	}

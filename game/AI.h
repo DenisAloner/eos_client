@@ -61,8 +61,8 @@ public:
 	GameMap* m_game_map;
 	MapCell* m_start_cell;
 	MapCell* m_goal_cell;
-	game_object_size_t m_start_size;
-	game_object_size_t m_goal_size;
+	dimension3_t m_start_size;
+	dimension3_t m_goal_size;
 	min_heap m_heap;
 
 	int m_open;

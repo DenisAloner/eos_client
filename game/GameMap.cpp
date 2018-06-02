@@ -161,7 +161,7 @@ void GameMap::vector_mapcell_from_binary(const std::string& value, std::vector<M
 	}
 }
 
-GameMap::GameMap(dimension_t size)
+GameMap::GameMap(dimension3_t size)
 {
 	m_dijkstra_map = new Dijkstra_map();
 	init(size);
@@ -172,24 +172,30 @@ GameMap::GameMap()
 	m_dijkstra_map = new Dijkstra_map();
 }
 
-MapCell& GameMap::get(int y, int x)
+MapCell& GameMap::get(int z,int y, int x)
 {
-	return m_items[m_size.w*y + x];
+	return m_items[z*(m_size.dy*m_size.dx) + m_size.dy*y + x];
 }
 
-void GameMap::init(dimension_t size)
+void GameMap::init(dimension3_t size)
 {
 	m_size = size;
-	LOG(INFO) << "Карта инициализирована с размером: " <<std::to_string( m_size.w )<< "x" << std::to_string(m_size.h);
-	m_items.resize(m_size.w*m_size.h);
-	for (int i = 0; i < m_size.h; i++)
+	LOG(INFO) << "Карта инициализирована с размером: " <<std::to_string( m_size.dx )<< "x" << std::to_string(m_size.dy) << "x" << std::to_string(m_size.dz);
+	m_items.resize(m_size.dz*m_size.dy*m_size.dx);
+	int i = 0;
+	for (int z = 0; z < m_size.dz; ++z)
 	{
-		for (int j = 0; j < m_size.w; j++)
+		for (int y = 0; y < m_size.dy; ++y)
 		{
-			MapCell& m = m_items[m_size.w*i+j];
-			m.x = j;
-			m.y = i;
-			m.m_map = this;
+			for (int x = 0; x < m_size.dx; ++x)
+			{
+				MapCell& m = m_items[i];
+				m.x = x;
+				m.y = y;
+				m.z = z;
+				m.m_map = this;
+				++i;
+			}
 		}
 	}
 }
@@ -214,43 +220,44 @@ void GameMap::init(dimension_t size)
 //	}
 //}
 
-void GameMap::generate_room(void)
+void GameMap::generate_room()
 {
-	for (int i = 0; i<m_size.h; i++)
+	for (int y = 0; y < m_size.dy; y++)
 	{
-		for (int j = 0; j<m_size.w; j++)
+		for (int x = 0; x < m_size.dx; x++)
 		{
-			if ((i == 0) || (j == 0) || (i == m_size.h - 1) || (j == m_size.w - 1))
+			if ((y == 0) || (x == 0) || (y == m_size.dy - 1) || (x == m_size.dx - 1))
 			{
-				if ((j == 0)|| (j == m_size.w - 1))
+				if ((x == 0) || (x == m_size.dx - 1))
 				{
 					GameObject* obj = Application::instance().m_game_object_manager->new_object("wall");
-					add_object(obj, get(i,j));
+					add_object(obj, get(0, y, x));
 				}
-				if ((i == 0)||(i == m_size.h - 1))
+				if ((y == 0) || (y == m_size.dy - 1))
 				{
 					GameObject* obj = Application::instance().m_game_object_manager->new_object("wall");
-					add_object(obj, get(i, j));
+					add_object(obj, get(0, y, x));
 				}
 			}
 			else {
 				GameObject* obj = Application::instance().m_game_object_manager->new_object("floor");
-				add_object(obj, get(i, j));
+				add_object(obj, get(0, y, x));
 			}
 		}
 	}
 
 	int light_source_count = 0;
-	for (int i = 1; i<m_size.h; i=i+20)
+	for (int y = 1; y < m_size.dy; y = y + 10)
 	{
-		for (int j = 1; j<m_size.w; j=j+20)
+		for (int x = 1; x < m_size.dx; x = x + 10)
 		{
 			GameObject* obj = Application::instance().m_game_object_manager->new_object("torch");
-			add_to_map(obj, get(i, j));
+			add_to_map(obj, get(0, y, x));
 			light_source_count += 1;
 		}
 	}
-	LOG(INFO) << " -= Всего источников света: "+std::to_string(light_source_count) << "=-";
+
+	LOG(INFO) << " -= Всего источников света: " + std::to_string(light_source_count) << "=-";
 
 	//GameObject* obj = Application::instance().m_game_object_manager->new_object("torch");
 	//*obj->m_active_state->m_light = light_t(80, 0, 0);
@@ -268,22 +275,29 @@ void GameMap::generate_room(void)
 void GameMap::add_object(GameObject* object, MapCell& cell)
 {
 	object->m_owner = &cell;
-	for (int i = 0; i<object->m_active_state->m_size.y; i++)
+	for (int z = 0; z<object->m_active_state->m_size.dz; ++z)
 	{
-		for (int j = 0; j<object->m_active_state->m_size.x; j++)
+		for (int y = 0; y<object->m_active_state->m_size.dy; ++y)
 		{
-			get(cell.y - i, cell.x + j).add_object(object);
+			for (int x = 0; x<object->m_active_state->m_size.dx; ++x)
+			{
+				get(cell.z + z, cell.y - y, cell.x + x).add_object(object);
+			}
 		}
 	}
 }
 
 void GameMap::remove_object(GameObject* object)
 {
-	for (int i = 0; i<object->m_active_state->m_size.y; i++)
+	MapCell& cell = *object->cell();
+	for (int z = 0; z<object->m_active_state->m_size.dz; z++)
 	{
-		for (int j = 0; j<object->m_active_state->m_size.x; j++)
+		for (int y = 0; y<object->m_active_state->m_size.dy; y++)
 		{
-			get(object->cell()->y - i,object->cell()->x + j).m_items.remove(object);
+			for (int x = 0; x<object->m_active_state->m_size.dx; x++)
+			{
+				get(cell.z + z, cell.y - y, cell.x + x).m_items.remove(object);
+			}
 		}
 	}
 	object->m_owner = nullptr;
@@ -310,7 +324,7 @@ void GameMap::add_to_map(GameObject* object, MapCell& cell)
 
 void GameMap::generate_level(void)
 {
-	srand(time(0));
+	/*srand(time(0));
 	block_t* block;
 	block = new block_t(0, 0, m_size.w - 1, m_size.h - 1);
 	divide_block(block, 5, 0);
@@ -319,7 +333,7 @@ void GameMap::generate_level(void)
 	add_wall();
 	add_doors();
 	generate_traps();
-	add_lighting();
+	add_lighting();*/
 }
 
 
@@ -404,30 +418,30 @@ void GameMap::random_block(block_t* block)
 
 void GameMap::fill()
 {
-	block_t* block;
-	for (std::list<block_t*>::iterator Current = m_rooms.begin(); Current != m_rooms.end(); ++Current)
-	{
-		block = (*Current);
-		random_block(block);
-		for (int i = block->rect.y; i < block->rect.y + block->rect.h + 1; i++)
-		{
-			for (int j = block->rect.x; j < block->rect.x + block->rect.w + 1; j++)
-			{
-				if ((i == block->rect.y) || (j == block->rect.x) || (i == block->rect.y + block->rect.h) || (j == block->rect.x + block->rect.w))
-				{
-				/*	m_items[i][j] = new MapCell(j, i);
-					GameObject* obj = Application::instance().m_game_object_manager.new_object("wall");
-					add_object(obj, m_items[i][j]);*/
-				}
-				else {
-					MapCell& m = get(i, j);
-					m = MapCell(j, i, this);
-					GameObject* obj = Application::instance().m_game_object_manager->new_object("floor");
-					add_to_map(obj,m);
-				}
-			}
-		}
-	}
+	//block_t* block;
+	//for (std::list<block_t*>::iterator Current = m_rooms.begin(); Current != m_rooms.end(); ++Current)
+	//{
+	//	block = (*Current);
+	//	random_block(block);
+	//	for (int i = block->rect.y; i < block->rect.y + block->rect.h + 1; i++)
+	//	{
+	//		for (int j = block->rect.x; j < block->rect.x + block->rect.w + 1; j++)
+	//		{
+	//			if ((i == block->rect.y) || (j == block->rect.x) || (i == block->rect.y + block->rect.h) || (j == block->rect.x + block->rect.w))
+	//			{
+	//			/*	m_items[i][j] = new MapCell(j, i);
+	//				GameObject* obj = Application::instance().m_game_object_manager.new_object("wall");
+	//				add_object(obj, m_items[i][j]);*/
+	//			}
+	//			else {
+	//				MapCell& m = get(i, j);
+	//				m = MapCell(j, i, this);
+	//				GameObject* obj = Application::instance().m_game_object_manager->new_object("floor");
+	//				add_to_map(obj,m);
+	//			}
+	//		}
+	//	}
+	//}
 }
 
 void GameMap::connect_room()
@@ -459,7 +473,7 @@ void GameMap::connect_room()
 
 void  GameMap::add_wall()
 { 
-	bool empty;
+	/*bool empty;
 	for (int y = 1; y < m_size.h-1; y++)
 	{
 		for (int x = 1; x< m_size.w-1; x++)
@@ -490,12 +504,12 @@ void  GameMap::add_wall()
 				}
 			}
 		}
-	}
+	}*/
 }
 
 void GameMap::link_room(block_t* a, block_t* b)
 {
-	position_t ac = position_t(a->rect.x + a->rect.w / 2, a->rect.y + a->rect.h / 2);
+	/*position_t ac = position_t(a->rect.x + a->rect.w / 2, a->rect.y + a->rect.h / 2);
 	position_t bc = position_t(b->rect.x + b->rect.w / 2, b->rect.y + b->rect.h / 2);
 	int s;
 	int e;
@@ -533,12 +547,12 @@ void GameMap::link_room(block_t* a, block_t* b)
 			c.m_items.clear();
 			add_to_map(Application::instance().m_game_object_manager->new_object("floor"), c);
 		}
-	}
+	}*/
 }
 
 void  GameMap::add_doors()
 {
-	rectangle_t rect;
+	/*rectangle_t rect;
 	int s;
 	bool b;
 	for (std::list<block_t*>::iterator Current = m_link_rooms.begin(); Current != m_link_rooms.end(); ++Current)
@@ -811,55 +825,55 @@ void  GameMap::add_doors()
 				b = false;
 			}
 		}
-	}
+	}*/
 }
 
 void  GameMap::blur_lighting()
 {
-	light_t l;
-	float Gauss[] = { 0.44198F, 0.27901F };
-	//float Gauss[] = { 0.39894228F, 0.241970725F, 0.053990967F };
-	//float Gauss[] = { 0.2270270270, 0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162 };
-	for (int y = 0; y < m_size.h; y++)
-	{
-		for (int x = 0; x < m_size.w; x++)
-		{
-			l = light_t();
-			for (int i = -1; i < 2; i++)
-			{
-				int mx = x + i;
-				int my = y;
-				if (mx < 0){ mx = 0; }
-				if (mx > m_size.w-1){ mx = m_size.w-1; }
-				if (my < 0){ my = 0; }
-				if (my > m_size.h-1){ my = m_size.h-1; }
-				l.R = l.R + get(my,mx).m_light.R*Gauss[abs(i)];
-				l.G = l.G + get(my, mx).m_light.G*Gauss[abs(i)];
-				l.B = l.B + get(my, mx).m_light.B*Gauss[abs(i)];
-			}
-			get(y,x).m_light_blur = l;
-		}
-	}
-	for (int y = 0; y < m_size.h; y++)
-	{
-		for (int x = 0; x < m_size.w; x++)
-		{
-			l = light_t();
-			for (int i = -1; i < 2; i++)
-			{
-				int mx = x;
-				int my = y + i;
-				if (mx < 0) { mx = 0; }
-				if (mx > m_size.w - 1) { mx = m_size.w - 1; }
-				if (my < 0) { my = 0; }
-				if (my > m_size.h - 1) { my = m_size.h - 1; }
-				l.R = l.R + get(my, mx).m_light_blur.R*Gauss[abs(i)];
-				l.G = l.G + get(my, mx).m_light_blur.G*Gauss[abs(i)];
-				l.B = l.B + get(my, mx).m_light_blur.B*Gauss[abs(i)];
-			}
-			get(y, x).m_light = l;
-		}
-	}
+	//light_t l;
+	//float Gauss[] = { 0.44198F, 0.27901F };
+	////float Gauss[] = { 0.39894228F, 0.241970725F, 0.053990967F };
+	////float Gauss[] = { 0.2270270270, 0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162 };
+	//for (int y = 0; y < m_size.h; y++)
+	//{
+	//	for (int x = 0; x < m_size.w; x++)
+	//	{
+	//		l = light_t();
+	//		for (int i = -1; i < 2; i++)
+	//		{
+	//			int mx = x + i;
+	//			int my = y;
+	//			if (mx < 0){ mx = 0; }
+	//			if (mx > m_size.w-1){ mx = m_size.w-1; }
+	//			if (my < 0){ my = 0; }
+	//			if (my > m_size.h-1){ my = m_size.h-1; }
+	//			l.R = l.R + get(my,mx).m_light.R*Gauss[abs(i)];
+	//			l.G = l.G + get(my, mx).m_light.G*Gauss[abs(i)];
+	//			l.B = l.B + get(my, mx).m_light.B*Gauss[abs(i)];
+	//		}
+	//		get(y,x).m_light_blur = l;
+	//	}
+	//}
+	//for (int y = 0; y < m_size.h; y++)
+	//{
+	//	for (int x = 0; x < m_size.w; x++)
+	//	{
+	//		l = light_t();
+	//		for (int i = -1; i < 2; i++)
+	//		{
+	//			int mx = x;
+	//			int my = y + i;
+	//			if (mx < 0) { mx = 0; }
+	//			if (mx > m_size.w - 1) { mx = m_size.w - 1; }
+	//			if (my < 0) { my = 0; }
+	//			if (my > m_size.h - 1) { my = m_size.h - 1; }
+	//			l.R = l.R + get(my, mx).m_light_blur.R*Gauss[abs(i)];
+	//			l.G = l.G + get(my, mx).m_light_blur.G*Gauss[abs(i)];
+	//			l.B = l.B + get(my, mx).m_light_blur.B*Gauss[abs(i)];
+	//		}
+	//		get(y, x).m_light = l;
+	//	}
+	//}
 }
 
 
@@ -937,304 +951,334 @@ void  GameMap::blur_lighting()
 //	return true;
 //}
 
+//TODO Адаптировать для 3D
+//void GameMap::bresenham_line(MapCell* a, MapCell* b, std::function<void(MapCell*)> f)
+//{
+//	int e = 0;
+//	int dx = abs(b->x - a->x);
+//	int dy = abs(b->y - a->y);
+//	int x;
+//	int y;
+//	int k;
+//	if (dx >= dy)
+//	{
+//		y = a->y;
+//		k = (a->y < b->y ? 1 : -1);
+//		if (a->x < b->x)
+//		{
+//			for (x = a->x; x < b->x + 1; x++)
+//			{
+//				f(&get(y,x));
+//				e = e + dy;
+//				if (2 * e >= dx)
+//				{
+//					y = y + k;
+//					e = e - dx;
+//				}
+//			}
+//		}
+//		else
+//		{
+//			for (x = a->x; x > b->x - 1; x--)
+//			{
+//				f(&get(y,x));
+//				e = e + dy;
+//				if (2 * e >= dx)
+//				{
+//					y = y + k;
+//					e = e - dx;
+//				}
+//			}
+//		}
+//	}
+//	else
+//	{
+//		x = a->x;
+//		k = (a->x < b->x ? 1 : -1);
+//		if (a->y < b->y)
+//		{
+//			for (y = a->y; y < b->y + 1; y++)
+//			{
+//				f(&get(y,x));
+//				e = e + dx;
+//				if (2 * e >= dy)
+//				{
+//					x = x + k;
+//					e = e - dy;
+//				}
+//			}
+//		}
+//		else
+//		{
+//			for (y = a->y; y > b->y - 1; y--)
+//			{
+//				f(&get(y, x));
+//				e = e + dx;
+//				if (2 * e >= dy)
+//				{
+//					x = x + k;
+//					e = e - dy;
+//				}
+//			}
+//		}
+//	}
+//}
+
 void GameMap::bresenham_line(MapCell* a, MapCell* b, std::function<void(MapCell*)> f)
 {
-	int e = 0;
-	int dx = abs(b->x - a->x);
-	int dy = abs(b->y - a->y);
-	int x;
-	int y;
-	int k;
-	if (dx >= dy)
+	if (a == b)
 	{
-		y = a->y;
-		k = (a->y < b->y ? 1 : -1);
-		if (a->x < b->x)
-		{
-			for (x = a->x; x < b->x + 1; x++)
-			{
-				f(&get(y,x));
-				e = e + dy;
-				if (2 * e >= dx)
-				{
-					y = y + k;
-					e = e - dx;
-				}
-			}
-		}
-		else
-		{
-			for (x = a->x; x > b->x - 1; x--)
-			{
-				f(&get(y,x));
-				e = e + dy;
-				if (2 * e >= dx)
-				{
-					y = y + k;
-					e = e - dx;
-				}
-			}
-		}
+		f(a); 
+		return;
 	}
-	else
+	float dx = b->x - a->x;
+	float dy = b->y - a->y;
+	float dz = b->z - a->z;
+	float max = abs(dx) > abs(dy) ? abs(dx) : abs(dy);
+	max = max > abs(dz) ? max : abs(dz);
+	dx /= max;
+	dy /= max;
+	dz /= max;
+	float x = a->x;
+	float y = a->y;
+	float z = a->z;
+	for (float i = 0.0; i < max + 1.0; i = i + 1)
 	{
-		x = a->x;
-		k = (a->x < b->x ? 1 : -1);
-		if (a->y < b->y)
-		{
-			for (y = a->y; y < b->y + 1; y++)
-			{
-				f(&get(y,x));
-				e = e + dx;
-				if (2 * e >= dy)
-				{
-					x = x + k;
-					e = e - dy;
-				}
-			}
-		}
-		else
-		{
-			for (y = a->y; y > b->y - 1; y--)
-			{
-				f(&get(y, x));
-				e = e + dx;
-				if (2 * e >= dy)
-				{
-					x = x + k;
-					e = e - dy;
-				}
-			}
-		}
+		f(&get(z, y, x));
+		x += dx;
+		y += dy;
+		z += dz;
 	}
 }
 
-MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, std::function<bool(MapCell*)> f)
-{
-	int e = 0;
-	int dx = abs(b->x - a->x);
-	int dy = abs(b->y - a->y);
-	int x;
-	int y;
-	int k;
-	if (dx >= dy)
-	{
-		y = a->y;
-		k = (a->y < b->y ? 1 : -1);
-		if (a->x < b->x)
-		{
-			for (x = a->x; x < b->x + 1; x++)
-			{
-				if (f(&get(y, x)))
-				{
-					return &get(y, x);
-				}
-				e = e + dy;
-				if (2 * e >= dx)
-				{
-					y = y + k;
-					e = e - dx;
-				}
-			}
-			return &get(y,x - 1);
-		}
-		else
-		{
-			for (x = a->x; x > b->x - 1; x--)
-			{
-				if (f(&get(y, x)))
-				{
-					return &get(y, x);
-				}
-				e = e + dy;
-				if (2 * e >= dx)
-				{
-					y = y + k;
-					e = e - dx;
-				}
-			}
-			return &get(y,x + 1);
-		}
-	}
-	else
-	{
-		x = a->x;
-		k = (a->x < b->x ? 1 : -1);
-		if (a->y < b->y)
-		{
-			for (y = a->y; y < b->y + 1; y++)
-			{
-				if (f(&get(y, x)))
-				{
-					return &get(y, x);
-				}
-				e = e + dx;
-				if (2 * e >= dy)
-				{
-					x = x + k;
-					e = e - dy;
-				}
-			}
-			return &get(y - 1,x);
-		}
-		else
-		{
-			for (y = a->y; y > b->y - 1; y--)
-			{
-				if (f(&get(y, x)))
-				{
-					return &get(y, x);
-				}
-				e = e + dx;
-				if (2 * e >= dy)
-				{
-					x = x + k;
-					e = e - dy;
-				}
-			}
-			return &get(y + 1,x);
-		}
-	}
-}
+//TODO Адаптировать для 3D
+//MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, std::function<bool(MapCell*)> f)
+//{
+//	int e = 0;
+//	int dx = abs(b->x - a->x);
+//	int dy = abs(b->y - a->y);
+//	int x;
+//	int y;
+//	int k;
+//	if (dx >= dy)
+//	{
+//		y = a->y;
+//		k = (a->y < b->y ? 1 : -1);
+//		if (a->x < b->x)
+//		{
+//			for (x = a->x; x < b->x + 1; x++)
+//			{
+//				if (f(&get(y, x)))
+//				{
+//					return &get(y, x);
+//				}
+//				e = e + dy;
+//				if (2 * e >= dx)
+//				{
+//					y = y + k;
+//					e = e - dx;
+//				}
+//			}
+//			return &get(y,x - 1);
+//		}
+//		else
+//		{
+//			for (x = a->x; x > b->x - 1; x--)
+//			{
+//				if (f(&get(y, x)))
+//				{
+//					return &get(y, x);
+//				}
+//				e = e + dy;
+//				if (2 * e >= dx)
+//				{
+//					y = y + k;
+//					e = e - dx;
+//				}
+//			}
+//			return &get(y,x + 1);
+//		}
+//	}
+//	else
+//	{
+//		x = a->x;
+//		k = (a->x < b->x ? 1 : -1);
+//		if (a->y < b->y)
+//		{
+//			for (y = a->y; y < b->y + 1; y++)
+//			{
+//				if (f(&get(y, x)))
+//				{
+//					return &get(y, x);
+//				}
+//				e = e + dx;
+//				if (2 * e >= dy)
+//				{
+//					x = x + k;
+//					e = e - dy;
+//				}
+//			}
+//			return &get(y - 1,x);
+//		}
+//		else
+//		{
+//			for (y = a->y; y > b->y - 1; y--)
+//			{
+//				if (f(&get(y, x)))
+//				{
+//					return &get(y, x);
+//				}
+//				e = e + dx;
+//				if (2 * e >= dy)
+//				{
+//					x = x + k;
+//					e = e - dy;
+//				}
+//			}
+//			return &get(y + 1,x);
+//		}
+//	}
+//}
 
-MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, Parameter* p, std::function<bool(Parameter*, MapCell*)> f)
-{
-	int e = 0;
-	int dx = abs(b->x - a->x);
-	int dy = abs(b->y - a->y);
-	int x;
-	int y;
-	int k;
-	if (dx >= dy)
-	{
-		y = a->y;
-		k = (a->y < b->y ? 1 : -1);
-		if (a->x < b->x)
-		{
-			for (x = a->x; x < b->x + 1; x++)
-			{
-				if (f(p, &get(y, x)))
-				{
-					return &get(y, x);
-				}
-				e = e + dy;
-				if (2 * e >= dx)
-				{
-					y = y + k;
-					e = e - dx;
-				}
-			}
-			return &get(y, x-1);
-		}
-		else
-		{
-			for (x = a->x; x > b->x - 1; x--)
-			{
-				if (f(p, &get(y, x)))
-				{
-					return &get(y, x);
-				}
-				e = e + dy;
-				if (2 * e >= dx)
-				{
-					y = y + k;
-					e = e - dx;
-				}
-			}
-			return &get(y, x+1);
-		}
-	}
-	else
-	{
-		x = a->x;
-		k = (a->x < b->x ? 1 : -1);
-		if (a->y < b->y)
-		{
-			for (y = a->y; y < b->y + 1; y++)
-			{
-				if (f(p, &get(y, x)))
-				{
-					return &get(y, x);
-				}
-				e = e + dx;
-				if (2 * e >= dy)
-				{
-					x = x + k;
-					e = e - dy;
-				}
-			}
-			return &get(y-1, x);
-		}
-		else
-		{
-			for (y = a->y; y > b->y - 1; y--)
-			{
-				if (f(p, &get(y, x)))
-				{
-					return &get(y, x);
-				}
-				e = e + dx;
-				if (2 * e >= dy)
-				{
-					x = x + k;
-					e = e - dy;
-				}
-			}
-			return &get(y+1, x);
-		}
-	}
-}
+//TODO Адаптировать для 3D
+//MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, Parameter* p, std::function<bool(Parameter*, MapCell*)> f)
+//{
+//	int e = 0;
+//	int dx = abs(b->x - a->x);
+//	int dy = abs(b->y - a->y);
+//	int x;
+//	int y;
+//	int k;
+//	if (dx >= dy)
+//	{
+//		y = a->y;
+//		k = (a->y < b->y ? 1 : -1);
+//		if (a->x < b->x)
+//		{
+//			for (x = a->x; x < b->x + 1; x++)
+//			{
+//				if (f(p, &get(y, x)))
+//				{
+//					return &get(y, x);
+//				}
+//				e = e + dy;
+//				if (2 * e >= dx)
+//				{
+//					y = y + k;
+//					e = e - dx;
+//				}
+//			}
+//			return &get(y, x-1);
+//		}
+//		else
+//		{
+//			for (x = a->x; x > b->x - 1; x--)
+//			{
+//				if (f(p, &get(y, x)))
+//				{
+//					return &get(y, x);
+//				}
+//				e = e + dy;
+//				if (2 * e >= dx)
+//				{
+//					y = y + k;
+//					e = e - dx;
+//				}
+//			}
+//			return &get(y, x+1);
+//		}
+//	}
+//	else
+//	{
+//		x = a->x;
+//		k = (a->x < b->x ? 1 : -1);
+//		if (a->y < b->y)
+//		{
+//			for (y = a->y; y < b->y + 1; y++)
+//			{
+//				if (f(p, &get(y, x)))
+//				{
+//					return &get(y, x);
+//				}
+//				e = e + dx;
+//				if (2 * e >= dy)
+//				{
+//					x = x + k;
+//					e = e - dy;
+//				}
+//			}
+//			return &get(y-1, x);
+//		}
+//		else
+//		{
+//			for (y = a->y; y > b->y - 1; y--)
+//			{
+//				if (f(p, &get(y, x)))
+//				{
+//					return &get(y, x);
+//				}
+//				e = e + dx;
+//				if (2 * e >= dy)
+//				{
+//					x = x + k;
+//					e = e - dy;
+//				}
+//			}
+//			return &get(y+1, x);
+//		}
+//	}
+//}
 
 
 void GameMap::add_lighting()
 {
-	block_t* block;
-	for (std::list<block_t*>::iterator Current = m_link_rooms.begin(); Current != m_link_rooms.end(); ++Current)
-	{
-		block = (*Current);
-		//int tk;
-		//std::string torch_kind[] = { "torch", "red torch", "green torch", "blue torch" };
-		//tk = rand() % 1;
-		add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(block->rect.y + 1,block->rect.x + 1));
-		//tk = rand() % 1;
-		add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(block->rect.y + 1,block->rect.x + block->rect.w - 1));
-		//tk = rand() % 1;
-		add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(block->rect.y + block->rect.h - 1,block->rect.x + block->rect.w - 1));
-		//tk = rand() % 1;
-		add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(block->rect.y + block->rect.h - 1,block->rect.x + 1));
-		int j=0;
-		for (int i = block->rect.x + 1; i < block->rect.x + block->rect.w; i++)
-		{
-			if (j == 30)
-			{
-				//tk = rand() % 4;
-				add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(block->rect.y + 1,i));
-				//tk = rand() % 4;
-				add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(block->rect.y + block->rect.h - 1,i));
-				j = -1;
-			}
-			j = j + 1;
-		}
-		j = 0;
-		for (int i = block->rect.y + 1; i < block->rect.y + block->rect.h; i++)
-		{
-			if (j == 30)
-			{
-				//tk = rand() % 4;
-				add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(i,block->rect.x + 1));
-				//tk = rand() % 4;
-				add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(i,block->rect.x + block->rect.w - 1));
-				j = -1;
-			}
-			j = j + 1;
-		}
-	}
+	//block_t* block;
+	//for (std::list<block_t*>::iterator Current = m_link_rooms.begin(); Current != m_link_rooms.end(); ++Current)
+	//{
+	//	block = (*Current);
+	//	//int tk;
+	//	//std::string torch_kind[] = { "torch", "red torch", "green torch", "blue torch" };
+	//	//tk = rand() % 1;
+	//	add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(block->rect.y + 1,block->rect.x + 1));
+	//	//tk = rand() % 1;
+	//	add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(block->rect.y + 1,block->rect.x + block->rect.w - 1));
+	//	//tk = rand() % 1;
+	//	add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(block->rect.y + block->rect.h - 1,block->rect.x + block->rect.w - 1));
+	//	//tk = rand() % 1;
+	//	add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(block->rect.y + block->rect.h - 1,block->rect.x + 1));
+	//	int j=0;
+	//	for (int i = block->rect.x + 1; i < block->rect.x + block->rect.w; i++)
+	//	{
+	//		if (j == 30)
+	//		{
+	//			//tk = rand() % 4;
+	//			add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(block->rect.y + 1,i));
+	//			//tk = rand() % 4;
+	//			add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(block->rect.y + block->rect.h - 1,i));
+	//			j = -1;
+	//		}
+	//		j = j + 1;
+	//	}
+	//	j = 0;
+	//	for (int i = block->rect.y + 1; i < block->rect.y + block->rect.h; i++)
+	//	{
+	//		if (j == 30)
+	//		{
+	//			//tk = rand() % 4;
+	//			add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(i,block->rect.x + 1));
+	//			//tk = rand() % 4;
+	//			add_to_map(Application::instance().m_game_object_manager->new_object("torch"), get(i,block->rect.x + block->rect.w - 1));
+	//			j = -1;
+	//		}
+	//		j = j + 1;
+	//	}
+	//}
 }
 
-bool GameMap::check(int x, int y)
-{
-	if (x<0 && x>m_size.h - 1 && y<0 && y>m_size.w - 1) { return false; };
-}
+//bool GameMap::check(int x, int y)
+//{
+//	if (x<0 && x>m_size.h - 1 && y<0 && y>m_size.w - 1) { return false; };
+//}
 
 //MapCell* GameMap::get_cell(int x, int y)
 //{
@@ -1379,7 +1423,7 @@ std::u16string Game_world::serialize(Parser_context& context)
 		result += u",";
 		result += Parser::to_json<std::list<GameObject*>>(element.m_items, context);
 	}
-	result = u"{\"map_size\":" + Parser::to_json<dimension_t>(m_maps.front()->m_size,context) + u",\"manager_size\":" + Parser::to_json<std::size_t>(ms,context) +u",\"cells\":[" + result + u"],\"items\":";
+	result = u"{\"map_size\":" + Parser::to_json<dimension3_t>(m_maps.front()->m_size,context) + u",\"manager_size\":" + Parser::to_json<std::size_t>(ms,context) +u",\"cells\":[" + result + u"],\"items\":";
 	result += Parser::to_json<std::list<GameObject>>(m_object_manager.m_items,context);
 	result += u",\"player\":" + Parser::to_json<GameObject*>(m_player->m_object, context);
 	result += u"}";
@@ -1390,12 +1434,12 @@ void Game_world::deserialize(std::u16string& value, Parser_context& context)
 {
 	LOG(INFO) << "deserialize -> " << Parser::UTF16_to_CP1251(value);
 	scheme_map_t* s = Parser::read_object(value);
-	dimension_t map_size;
+	dimension3_t map_size;
 	for (const auto& element : *s)
 	{
 		LOG(INFO) << "deserialize -> " << Parser::UTF16_to_CP1251(element.first);
 	}
-	Parser::from_json<dimension_t>((*s)[u"map_size"], map_size,context);
+	Parser::from_json<dimension3_t>((*s)[u"map_size"], map_size,context);
 	GameMap* map = new GameMap(map_size);
 	m_maps.push_front(map);
 
@@ -1449,7 +1493,7 @@ std::string Game_world::bin_serialize(Parser_context& context)
 	}
 	std::size_t ms = m_object_manager.m_items.size();
 	LOG(INFO) << "std::string Game_world::bin_serialize() "<<std::to_string(ms);
-	std::string result = Parser::to_binary<dimension_t>(m_maps.front()->m_size,context) + Parser::to_binary<std::size_t>(ms,context);
+	std::string result = Parser::to_binary<dimension3_t>(m_maps.front()->m_size,context) + Parser::to_binary<std::size_t>(ms,context);
 	for (auto& element : m_maps.front()->m_items)
 	{
 		result += Parser::to_binary<std::list<GameObject*>>(element.m_items,context);
@@ -1468,8 +1512,8 @@ void Game_world::bin_deserialize(std::string& value, Parser_context& context)
 	LOG(INFO) << "Game_world::bin_deserialize(std::string& value)";
 
 	std::size_t pos = 0;
-	dimension_t map_size;
-	Parser::from_binary<dimension_t>(value, map_size,pos,context);
+	dimension3_t map_size;
+	Parser::from_binary<dimension3_t>(value, map_size,pos,context);
 	GameMap* map = new GameMap(map_size);
 	m_maps.push_front(map);
 
@@ -1513,11 +1557,11 @@ void Game_world::calculate_lighting()
 	for (auto m = m_maps.begin(); m != m_maps.end(); ++m)
 	{
 		GameMap& map = *(*m);
-		for (int y = 0; y < map.m_size.h; y++)
+		for (int y = 0; y < map.m_size.dy; y++)
 		{
-			for (int x = 0; x < map.m_size.w; x++)
+			for (int x = 0; x < map.m_size.dx; x++)
 			{
-				map.get(y,x).m_light = light_t();
+				map.get(0,y,x).m_light = light_t();
 			}
 		}
 	}
@@ -1548,16 +1592,16 @@ void Game_world::calculate_lighting()
 		for (int y = 0; y < 41; y++)
 		{
 			ly = l->cell()->y + y - 20;
-			if (!((ly < 0) || (ly > map->m_size.h - 1)))
+			if (!((ly < 0) || (ly > map->m_size.dy - 1)))
 			{
 				for (int x = 0; x < 41; x++)
 				{
 					lx = l->cell()->x + x - 20;
-					if (!((lx < 0) || (lx > map->m_size.w - 1)))
+					if (!((lx < 0) || (lx > map->m_size.dx - 1)))
 					{
-						map->get(ly,lx).m_light.R += fl.m_map[y][x].light.R;
-						map->get(ly, lx).m_light.G += fl.m_map[y][x].light.G;
-						map->get(ly, lx).m_light.B += fl.m_map[y][x].light.B;
+						map->get(0,ly,lx).m_light.R += fl.m_map[y][x].light.R;
+						map->get(0,ly, lx).m_light.G += fl.m_map[y][x].light.G;
+						map->get(0,ly, lx).m_light.B += fl.m_map[y][x].light.B;
 					}
 				}
 			}

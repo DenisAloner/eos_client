@@ -350,7 +350,7 @@ iSerializable* Serialization_manager::deserialize()
 		std::size_t map_index;
 		fread(&map_index, sizeof(std::size_t), 1, m_file);
 		LOG(INFO) << "Координаты " << std::to_string(x)<<" " << std::to_string(y)<<" "<< std::to_string(map_index);
-		return &m_maps[map_index]->get(y,x);
+		return &m_maps[map_index]->get(0,y,x);
 	}
 	default:
 	{
@@ -541,7 +541,7 @@ void Serialization_manager::save(const std::string& path, Game_world* world)
 		fwrite(&index, sizeof(size_t), 1, m_file);
 		for (auto m =world->m_maps.begin(); m != world->m_maps.end(); ++m)
 		{
-			LOG(INFO) << "Карта сохранена с размером: " << std::to_string((*m)->m_size.w) << "x" << std::to_string((*m)->m_size.h);
+			LOG(INFO) << "Карта сохранена с размером: " << std::to_string((*m)->m_size.dx) << "x" << std::to_string((*m)->m_size.dy) << "x" << std::to_string((*m)->m_size.dz);
 			fwrite(&((*m)->m_size), sizeof(dimension_t), 1, m_file);
 		}
 		LOG(INFO) << "шаг 2";
@@ -563,7 +563,7 @@ void Serialization_manager::save(const std::string& path, Game_world* world)
 
 Game_world* Serialization_manager::load(const std::string& path)
 {
-	errno_t err;
+	/*errno_t err;
 	LOG(INFO) << "Загрузка игры";
 	err = fopen_s(&m_file, (FileSystem::instance().m_resource_path + "Saves\\" + path + ".txt").c_str(), "rb");
 	if (err == 0)
@@ -591,5 +591,6 @@ Game_world* Serialization_manager::load(const std::string& path)
 	{
 		LOG(INFO) << "Загрузка завершилась с ошибкой";
 		return nullptr;
-	}
+	}*/
+	return nullptr;
 }
