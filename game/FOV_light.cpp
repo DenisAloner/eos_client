@@ -16,19 +16,25 @@ void FOV_light::calculate(int radius, GameObject* unit, GameMap* map)
 {
 	m_radius = radius;
 	optical_properties_t* op;
-	for (int y = 0; y <m_max_size; y++)
-	{
-		for (int x = 0; x <m_max_size; x++)
+	/*for (int z = 0; z < m_max_size; ++z)
+	{*/
+		for (int y = 0; y < m_max_size; y++)
 		{
-			m_map[y][x].opaque = false;
-			m_map[y][x].damping = RGB_t(0.0, 0.0, 0.0);
-			m_map[y][x].attenuation_constant = RGB_t(0.0, 0.0, 0.0);
+			for (int x = 0; x < m_max_size; x++)
+			{
+				/*m_map[z][y][x].opaque = false;
+				m_map[z][y][x].damping = RGB_t(0.0, 0.0, 0.0);
+				m_map[z][y][x].attenuation_constant = RGB_t(0.0, 0.0, 0.0);*/
+				m_map[y][x].opaque = false;
+				m_map[y][x].damping = RGB_t(0.0, 0.0, 0.0);
+				m_map[y][x].attenuation_constant = RGB_t(0.0, 0.0, 0.0);
+			}
 		}
-	}
-	for (int z = unit->cell()->z - radius; z < unit->cell()->z + radius + 1; ++z)
+	/*}*/
+	/*for (int z = unit->cell()->z - radius; z < unit->cell()->z + radius + 1; ++z)
 	{
 		if (!((z < 0) || (z > map->m_size.dz - 1)))
-		{
+		{*/
 			for (int y = unit->cell()->y - radius; y < unit->cell()->y + radius + 1; ++y)
 			{
 				if (!((y < 0) || (y > map->m_size.dy - 1)))
@@ -37,11 +43,13 @@ void FOV_light::calculate(int radius, GameObject* unit, GameMap* map)
 					{
 						if (!((x < 0) || (x > map->m_size.dx - 1)))
 						{
-							for (auto obj = map->get(z,y, x).m_items.begin(); obj != map->get(z,y, x).m_items.end(); ++obj)
+							for (auto obj = map->get(0,y, x).m_items.begin(); obj != map->get(0,y, x).m_items.end(); ++obj)
 							{
 								op = (*obj)->m_active_state->m_optical;
 								if (op)
 								{
+									/*m_map[m_middle + (z - unit->cell()->z)][m_middle + (y - unit->cell()->y)][m_middle + (x - unit->cell()->x)].opaque = true;
+									m_map[m_middle + (z - unit->cell()->z)][m_middle + (y - unit->cell()->y)][m_middle + (x - unit->cell()->x)].attenuation_constant = op->attenuation;*/
 									m_map[m_middle + (y - unit->cell()->y)][m_middle + (x - unit->cell()->x)].opaque = true;
 									m_map[m_middle + (y - unit->cell()->y)][m_middle + (x - unit->cell()->x)].attenuation_constant = op->attenuation;
 								}
@@ -50,8 +58,8 @@ void FOV_light::calculate(int radius, GameObject* unit, GameMap* map)
 					}
 				}
 			}
-		}
-	}
+	/*	}
+	}*/
 	do_fov(m_middle, m_middle, m_radius);
 }
 

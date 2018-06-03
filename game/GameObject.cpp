@@ -438,7 +438,7 @@ void Object_state::save()
 	fwrite(&m_state, sizeof(object_state_e), 1, file);
 	fwrite(&m_layer, sizeof(int), 1, file);
 	fwrite(&m_icon, sizeof(unsigned int), 1, file);
-	fwrite(&m_size, sizeof(game_object_size_t), 1, file);
+	//fwrite(&m_size, sizeof(game_object_size_t), 1, file);
 	fwrite(&m_weight, sizeof(float), 1, file);
 	FileSystem::instance().serialize_pointer(m_light, type_e::light_t, file);
 	FileSystem::instance().serialize_pointer(m_optical, type_e::optical_properties_t, file);
@@ -460,7 +460,7 @@ void Object_state::load()
 	fread(&m_state, sizeof(object_state_e), 1, file);
 	fread(&m_layer, sizeof(int), 1, file);
 	fread(&m_icon, sizeof(unsigned int), 1, file);
-	fread(&m_size, sizeof(game_object_size_t), 1, file);
+	//fread(&m_size, sizeof(game_object_size_t), 1, file);
 	fread(&m_weight, sizeof(float), 1, file);
 	m_light = static_cast<light_t*>(FileSystem::instance().deserialize_pointer(file));
 	m_optical = static_cast<optical_properties_t*>(FileSystem::instance().deserialize_pointer(file));

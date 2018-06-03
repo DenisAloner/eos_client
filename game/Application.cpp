@@ -257,7 +257,7 @@ void Application::new_game()
 	int ry = 8;
 	
 	obj = m_game_object_manager->new_object("human");
-	map->add_to_map(obj, map->get(0,ry,rx));
+	map->add_to_map(obj, map->get(1,ry,rx));
 	m_world->m_player = new Player(obj, map);
 	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
 	
@@ -391,9 +391,13 @@ void Application::new_game()
 			obj->set_direction(object_direction_e::top);
 			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-2][rx]);*/
 	///////////////////////
-			obj = m_game_object_manager->new_object("bat");
+			/*obj = m_game_object_manager->new_object("bat");
 			obj->set_direction(object_direction_e::top);
-			map->add_to_map(obj, map->get(0,ry - 2,rx-2));
+			map->add_to_map(obj, map->get(0,ry - 2,rx-2));*/
+
+			obj = m_game_object_manager->new_object("floor");
+			obj->set_direction(object_direction_e::top);
+			map->add_to_map(obj, map->get(1,ry - 1,rx-1));
 
 			/*obj = m_game_object_manager->new_object("bag");
 			obj->set_direction(object_direction_e::top);

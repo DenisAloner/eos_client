@@ -243,16 +243,6 @@ struct tile_t
 	GLdouble coordinat[4];
 };
 
-struct game_object_size_t
-{
-	int x;
-	int y;
-	int z;
-
-	game_object_size_t(int x, int y, int z) : x(x), y(y), z(z) {}
-	game_object_size_t() : x(0), y(0), z(0) {}
-};
-
 struct RGBA_t
 {
 	float R, G, B, A;
@@ -1402,15 +1392,6 @@ public:
 			from_json<int>((*s)[2], prop.start_angle,context);
 			from_json<int>((*s)[3], prop.end_angle,context);
 		}
-		else if constexpr(std::is_same<T, game_object_size_t>::value)
-		{
-			std::u16string temp = value;
-			scheme_vector_t* s = read_pair(temp);
-			from_json<int>((*s)[0], prop.x,context);
-			from_json<int>((*s)[1], prop.y,context);
-			from_json<int>((*s)[2], prop.z,context);
-			LOG(INFO) <<  std::to_string(prop.x)<<" " << std::to_string(prop.y) << " " << std::to_string(prop.z);
-		}
 		else if constexpr(std::is_same<T, predicat_t>::value)
 		{
 			LOG(INFO) << Parser::UTF16_to_CP1251(get_value(value)) << Parser::UTF16_to_CP1251(value);
@@ -1553,11 +1534,6 @@ public:
 		else if constexpr(std::is_same<T, std::string>::value)
 		{
 			return u"\"" + CP1251_to_UTF16(value) + u"\"";
-		}
-		else if constexpr(std::is_same<T, game_object_size_t >::value)
-		{
-			std::u16string result = u"[" + to_json<int>(value.x,context) + u"," + to_json<int>(value.y,context) + u"," + to_json<int>(value.z,context) + u"]";
-			return result;
 		}
 		else if constexpr(std::is_same<T, predicat_t>::value)
 		{
@@ -1728,12 +1704,6 @@ public:
 			pos += s * 2;
 			LOG(INFO) << "NAME: " << Parser::UTF16_to_CP1251(prop);
 		}
-		else if constexpr(std::is_same<T, game_object_size_t>::value)
-		{
-			from_binary<int>(value, prop.x, pos,context);
-			from_binary<int>(value, prop.y, pos,context);
-			from_binary<int>(value, prop.z, pos,context);
-		}
 		else if constexpr(std::is_same<T, light_t>::value)
 		{
 			from_binary<int>(value, prop.R, pos,context);
@@ -1850,10 +1820,6 @@ public:
 		else if constexpr(std::is_same<T, std::string>::value)
 		{
 			return value;
-		}
-		else if constexpr(std::is_same<T, game_object_size_t>::value)
-		{
-			return to_binary<int>(value.x,context) + to_binary<int>(value.y,context) + to_binary<int>(value.z,context);
 		}
 		else if constexpr(std::is_same<T, light_t>::value)
 		{

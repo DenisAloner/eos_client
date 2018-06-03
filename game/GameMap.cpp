@@ -222,37 +222,38 @@ void GameMap::init(dimension3_t size)
 
 void GameMap::generate_room()
 {
-	for (int y = 0; y < m_size.dy; y++)
+	for (int z = 0; z < 6; ++z)
 	{
-		for (int x = 0; x < m_size.dx; x++)
+		for (int y = 0; y < m_size.dy; y++)
 		{
-			if ((y == 0) || (x == 0) || (y == m_size.dy - 1) || (x == m_size.dx - 1))
+			for (int x = 0; x < m_size.dx; x++)
 			{
-				if ((x == 0) || (x == m_size.dx - 1))
+				if(z==0)
 				{
-					GameObject* obj = Application::instance().m_game_object_manager->new_object("wall");
-					add_object(obj, get(0, y, x));
+					GameObject* obj = Application::instance().m_game_object_manager->new_object("floor");
+					add_object(obj, get(z, y, x));
 				}
-				if ((y == 0) || (y == m_size.dy - 1))
-				{
-					GameObject* obj = Application::instance().m_game_object_manager->new_object("wall");
-					add_object(obj, get(0, y, x));
+				else {
+					if ((y == 0) || (x == 0) || (y == m_size.dy - 1) || (x == m_size.dx - 1))
+					{
+						if ((x == 0) || (x == m_size.dx - 1) || (y == 0) || (y == m_size.dy - 1))
+						{
+							GameObject* obj = Application::instance().m_game_object_manager->new_object("wall");
+							add_object(obj, get(z, y, x));
+						}
+					}
 				}
-			}
-			else {
-				GameObject* obj = Application::instance().m_game_object_manager->new_object("floor");
-				add_object(obj, get(0, y, x));
 			}
 		}
 	}
 
 	int light_source_count = 0;
-	for (int y = 1; y < m_size.dy; y = y + 10)
+	for (int y = 1; y < m_size.dy; y = y + 20)
 	{
-		for (int x = 1; x < m_size.dx; x = x + 10)
+		for (int x = 1; x < m_size.dx; x = x + 20)
 		{
 			GameObject* obj = Application::instance().m_game_object_manager->new_object("torch");
-			add_to_map(obj, get(0, y, x));
+			add_to_map(obj, get(1, y, x));
 			light_source_count += 1;
 		}
 	}
