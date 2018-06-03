@@ -988,14 +988,14 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 						MapCell& cell = m_map->get(z, y, x);
 						for (auto Current = cell.m_items.begin(); Current != cell.m_items.end(); ++Current)
 						{
-							/*light[0] = cell.m_light.R / 100.0F;
+							light[0] = cell.m_light.R / 100.0F;
 							light[1] = cell.m_light.G / 100.0F;
 							light[2] = cell.m_light.B / 100.0F;
-							light[3] = 0.0;*/
-							light[0] = 1.0;
+							light[3] = 0.0;
+							/*light[0] = 1.0;
 							light[1] = 1.0;
 							light[2] = 1.0;
-							light[3] = 0.0;
+							light[3] = 0.0;*/
 							is_hide = false;
 							IsDraw = false;
 							passable = (*Current)->get_stat(object_tag_e::pass_able);

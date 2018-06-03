@@ -248,9 +248,9 @@ void GameMap::generate_room()
 	}
 
 	int light_source_count = 0;
-	for (int y = 1; y < m_size.dy; y = y + 20)
+	for (int y = 1; y < m_size.dy; y = y + 50)
 	{
-		for (int x = 1; x < m_size.dx; x = x + 20)
+		for (int x = 1; x < m_size.dx; x = x + 50)
 		{
 			GameObject* obj = Application::instance().m_game_object_manager->new_object("torch");
 			add_to_map(obj, get(1, y, x));
@@ -1350,14 +1350,17 @@ Packer_generic& GameMap::get_packer()
 Game_world::Game_world()
 {
 	float l;
-	for (int y = 0; y < 21; y++)
+	for (int z = 0; z < 21; z++)
 	{
-		for (int x = 0; x< 21; x++)
+		for (int y = 0; y < 21; y++)
 		{
-			l = static_cast<float>(sqrt(x * x + y * y));
-			l = l / 20.0;
-			m_coefficient[y][x] = 1 - l;
-			if (m_coefficient[y][x] < 0) { m_coefficient[y][x] = 0; }
+			for (int x = 0; x < 21; x++)
+			{
+				l = static_cast<float>(sqrt(x * x + y * y + z * z));
+				l = l / 20.0;
+				m_coefficient[z][y][x] = 1 - l;
+				if (m_coefficient[z][y][x] < 0) { m_coefficient[z][y][x] = 0; }
+			}
 		}
 	}
 }
@@ -1551,18 +1554,21 @@ void Game_world::calculate_lighting()
 {
 	int lx;
 	int ly;
+	int lz;
 	int c;
 	FOV_light fl;
-	light_t m_temp[41][41];
 
 	for (auto m = m_maps.begin(); m != m_maps.end(); ++m)
 	{
 		GameMap& map = *(*m);
-		for (int y = 0; y < map.m_size.dy; y++)
+		for (int z = 0; z < map.m_size.dz; ++z)
 		{
-			for (int x = 0; x < map.m_size.dx; x++)
+			for (int y = 0; y < map.m_size.dy; ++y)
 			{
-				map.get(0,y,x).m_light = light_t();
+				for (int x = 0; x < map.m_size.dx; ++x)
+				{
+					map.get(z, y, x).m_light = light_t();
+				}
 			}
 		}
 	}
@@ -1571,38 +1577,58 @@ void Game_world::calculate_lighting()
 		GameObject& object = (*l);
 		if (!object.m_active_state->m_light) { continue; }
 		if (object.m_owner->m_kind != entity_e::cell) { continue; }
-		GameMap* map = static_cast<MapCell*>(object.m_owner)->m_map;
+		GameMap* map = dynamic_cast<MapCell*>(object.m_owner)->m_map;
 		fl.calculate(20, &*l, map);
-		for (int y = 0; y < 41; y++)
+		for (int z = 0; z < 41; ++z)
 		{
-			for (int x = 0; x < 41; x++)
+			for (int y = 0; y < 41; ++y)
 			{
-				lx = abs(x - 20);
-				ly = abs(y - 20);
-				c = (l->m_active_state->m_light->R * m_coefficient[ly][lx])*fl.m_map[y][x].damping.R;
-				if (c < 0) { c = 0; }
-				fl.m_map[y][x].light.R = c;
-				c = (l->m_active_state->m_light->G * m_coefficient[ly][lx])*fl.m_map[y][x].damping.G;
-				if (c < 0) { c = 0; }
-				fl.m_map[y][x].light.G = c;
-				c = (l->m_active_state->m_light->B * m_coefficient[ly][lx])*fl.m_map[y][x].damping.B;
-				if (c < 0) { c = 0; }
-				fl.m_map[y][x].light.B = c;
+				for (int x = 0; x < 41; ++x)
+				{
+					/*if(fl.get(z,y,x).visible)
+					{*/
+						lx = abs(x - 20);
+						ly = abs(y - 20);
+						lz = abs(z - 20);
+						c = (l->m_active_state->m_light->R * m_coefficient[lz][ly][lx]);// *fl.m_map[y][x].damping.R;
+						if (c < 0) { c = 0; }
+						fl.get(z, y, x).light.R = c;
+						c = (l->m_active_state->m_light->G * m_coefficient[lz][ly][lx]);// *fl.m_map[y][x].damping.G;
+						if (c < 0) { c = 0; }
+						fl.get(z, y, x).light.G = c;
+						c = (l->m_active_state->m_light->B * m_coefficient[lz][ly][lx]);// *fl.m_map[y][x].damping.B;
+						if (c < 0) { c = 0; }
+						fl.get(z, y, x).light.B = c;
+				/*	}
+					else
+					{
+						fl.get(z, y, x).light.R = 0;
+						fl.get(z, y, x).light.G = 0;
+						fl.get(z, y, x).light.B = 0;
+					}*/
+				}
 			}
 		}
-		for (int y = 0; y < 41; y++)
+		for (int z = 0; z < 41; ++z)
 		{
-			ly = l->cell()->y + y - 20;
-			if (!((ly < 0) || (ly > map->m_size.dy - 1)))
+			lz = l->cell()->z + z - 20;
+			if (!((lz < 0) || (lz > map->m_size.dz - 1)))
 			{
-				for (int x = 0; x < 41; x++)
+				for (int y = 0; y < 41; y++)
 				{
-					lx = l->cell()->x + x - 20;
-					if (!((lx < 0) || (lx > map->m_size.dx - 1)))
+					ly = l->cell()->y + y - 20;
+					if (!((ly < 0) || (ly > map->m_size.dy - 1)))
 					{
-						map->get(0,ly,lx).m_light.R += fl.m_map[y][x].light.R;
-						map->get(0,ly, lx).m_light.G += fl.m_map[y][x].light.G;
-						map->get(0,ly, lx).m_light.B += fl.m_map[y][x].light.B;
+						for (int x = 0; x < 41; x++)
+						{
+							lx = l->cell()->x + x - 20;
+							if (!((lx < 0) || (lx > map->m_size.dx - 1)))
+							{
+								map->get(lz, ly, lx).m_light.R += fl.get(z, y, x).light.R;
+								map->get(lz, ly, lx).m_light.G += fl.get(z, y, x).light.G;
+								map->get(lz, ly, lx).m_light.B += fl.get(z, y, x).light.B;
+							}
+						}
 					}
 				}
 			}

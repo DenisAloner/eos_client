@@ -130,7 +130,7 @@ class Game_world : public iSerializable
 {
 public:
 
-	float m_coefficient[21][21];
+	float m_coefficient[21][21][21];
 
 	Object_manager m_object_manager;
 
