@@ -694,7 +694,7 @@ void mapviewer_object_rotate::render(GUI_MapViewer* owner)
 		int yp;
 		int xp;
 		MapCell* c;
-		glUseProgramObjectARB(0);
+		glUseProgram(0);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_select);
@@ -707,11 +707,11 @@ void mapviewer_object_rotate::render(GUI_MapViewer* owner)
 			{
 				if (m_fov->m_map[yf][xf].visible)
 				{  
-					c = &(owner->m_map->get(0,y,x));
+					c = &(owner->m_map->get(m_object->cell()->z,y,x));
 					yp = owner->m_tile_count_x / 2 - c->x + owner->m_center.x;
 					xp = owner->m_tile_count_y / 2 - c->y + owner->m_center.y;
 					xt = (xp - yp) * tile_size_x_half + owner->m_shift.x;
-					yt = (xp + yp) * tile_size_y_half + owner->m_shift.y;
+					yt = (xp + yp) * tile_size_y_half + owner->m_shift.y - m_object->cell()->z * 22;
 					GraphicalController::rectangle_t rect(xt, yt, tile_size_x, -tile_size_y);
 					Application::instance().m_graph->draw_sprite(rect);
 					glDisable(GL_BLEND);
@@ -823,6 +823,7 @@ GUI_MapViewer::GUI_MapViewer(Application* app)
 {
 	m_tile_count_x = 90;
 	m_tile_count_y = 90;
+	m_rotate = 0;
 	m_just_focused = false;
 	m_focus = nullptr;
 	m_cursored = nullptr;
@@ -907,6 +908,8 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	int y;
 	int xf;
 	int yf;
+	int xx;
+	int yy;
 
 	int dx;
 	glColor4d(1.0, 1.0, 1.0, 1.0);
@@ -941,7 +944,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 		posc = position_t((m_player->m_object->m_active_state->m_size.dx - 1) >> 1, (m_player->m_object->m_active_state->m_size.dy - 1) >> 1);
 	}
 	GraphicalController::rectangle_t rect;
-	for (int r = 0; r < 2; r++)
+	for (int r = 0; r < 2; ++r)
 	{
 		for (int i = 0; i < (m_tile_count_x + m_tile_count_y) - 1; i++)
 		{
@@ -959,10 +962,43 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 			}
 			for (int j = 0; j < j_limit; j++)
 			{
+				
 				gx -= 1;
 				gy += 1;
-				x = m_center.x + gx - m_tile_count_x / 2;
-				y = m_center.y + gy - m_tile_count_y / 2;
+
+				/*float sin_a = -1;
+				float cos_a = 0;
+				x = m_center.x + (gx - m_tile_count_x / 2) * cos_a - (gy - m_tile_count_y / 2) *sin_a;
+				y = m_center.y + (gy - m_tile_count_y / 2) * cos_a + (gx - m_tile_count_x / 2) *sin_a;*/
+
+				switch (m_rotate)
+				{
+				case 0:
+				{
+					x = m_center.x + (gx - m_tile_count_x / 2);
+					y = m_center.y + (gy - m_tile_count_y / 2);
+					break;
+				}
+				case 1:
+				{
+					x = m_center.x - (gy - m_tile_count_y / 2);
+					y = m_center.y + (gx - m_tile_count_x / 2);
+					break;
+				}
+				case 2:
+				{
+					x = m_center.x - (gx - m_tile_count_x / 2);
+					y = m_center.y - (gy - m_tile_count_y / 2);
+					break;
+				}
+				case 3:
+				{
+					x = m_center.x + (gy - m_tile_count_y / 2);
+					y = m_center.y - (gx - m_tile_count_x / 2);
+					break;
+				}
+				}
+
 				xf = x - m_player->m_object->cell()->x - posc.x;
 				yf = y - m_player->m_object->cell()->y + posc.y;
 				if ((x > -1) && (x<m_map->m_size.dx) && (y>-1) && (y < m_map->m_size.dy))
@@ -988,20 +1024,47 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 						MapCell& cell = m_map->get(z, y, x);
 						for (auto Current = cell.m_items.begin(); Current != cell.m_items.end(); ++Current)
 						{
-							light[0] = cell.m_light.R / 100.0F;
-							light[1] = cell.m_light.G / 100.0F;
-							light[2] = cell.m_light.B / 100.0F;
-							light[3] = 0.0;
-							/*light[0] = 1.0;
+							/*light[0] = cell.m_light.R * 0.01F;
+							light[1] = cell.m_light.G * 0.01F;
+							light[2] = cell.m_light.B * 0.01F;
+							light[3] = 0.0;*/
+							light[0] = 1.0;
 							light[1] = 1.0;
 							light[2] = 1.0;
-							light[3] = 0.0;*/
+							light[3] = 0.0;
 							is_hide = false;
 							IsDraw = false;
 							passable = (*Current)->get_stat(object_tag_e::pass_able);
 							if ((r == 0 && passable) || (r == 1 && !passable))
 							{
-								if ((*Current)->cell()->z == z && (*Current)->cell()->y == y && (*Current)->cell()->x == x)
+								switch (m_rotate)
+								{
+								case 0:
+								{
+									xx = x;
+									yy = y;
+									break;
+								}
+								case 1:
+								{
+									xx = x;
+									yy = y + (*Current)->m_active_state->m_size.dy - 1;
+									break;
+								}
+								case 2:
+								{
+									xx = x - (*Current)->m_active_state->m_size.dx + 1;
+									yy = y + (*Current)->m_active_state->m_size.dy - 1;;
+									break;
+								}
+								case 3:
+								{
+									xx = x - (*Current)->m_active_state->m_size.dx + 1;
+									yy = y;
+									break;
+								}
+								}
+								if ((*Current)->cell()->z == z && (*Current)->cell()->y == yy && (*Current)->cell()->x  == xx)
 								{
 									size3d = (*Current)->m_active_state->m_size;
 									IsDraw = true;
@@ -1055,7 +1118,6 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 								object_size = (*Current)->m_active_state->m_tile_size;
 								int yp = m_tile_count_x - px - gx;
 								int xp = m_tile_count_y - py - gy;
-								dx = object_size.w + m_map->get(0, y, x).x - (*Current)->cell()->x;
 								rect.set((xp - yp) * tile_size_x_half + m_shift.x, (xp + yp + size3d.dx - 1) * tile_size_y_half + m_shift.y-(*Current)->cell()->z*22, object_size.w, -object_size.h);
 								// считаем среднюю освещенность для многотайловых объектов
 								if (size3d.dx > 1 || size3d.dy > 1)
@@ -1090,7 +1152,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 									glUseProgram(Graph->m_tile_shader);
 								}
 
-								(*Current)->m_active_state->m_tile_manager->set_tile(tile, (*Current), Application::instance().m_timer->get_tick(), (*Current)->m_direction);
+								(*Current)->m_active_state->m_tile_manager->set_tile(tile, (*Current), Application::instance().m_timer->get_tick(), Game_algorithm::get_direction((*Current)->m_direction,m_rotate));
 								GLuint Sprite = tile.unit;
 								glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 								glActiveTexture(GL_TEXTURE0);
@@ -1205,7 +1267,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 		Application::instance().m_UI_mutex.lock();
 		if (r == 0)
 		{
-			for (std::list<gui_mapviewer_hint*>::iterator current = Application::instance().m_gui_controller.m_hints.begin(); current != Application::instance().m_gui_controller.m_hints.end(); ++current)
+			for (auto current = Application::instance().m_gui_controller.m_hints.begin(); current != Application::instance().m_gui_controller.m_hints.end(); ++current)
 			{
 				if (!(*current)->m_top)
 				{
@@ -1215,7 +1277,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 		}
 		else
 		{
-			for (std::list<gui_mapviewer_hint*>::iterator current = Application::instance().m_gui_controller.m_hints.begin(); current != Application::instance().m_gui_controller.m_hints.end(); ++current)
+			for (auto current = Application::instance().m_gui_controller.m_hints.begin(); current != Application::instance().m_gui_controller.m_hints.end(); ++current)
 			{
 				if ((*current)->m_top)
 				{
@@ -1228,8 +1290,42 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	if (m_cursored != nullptr)
 	{
 		MapCell* Item = m_cursored;
-		int x = px + Item->x - m_center.x + m_tile_count_x / 2;
-		int y = py + Item->y - m_center.y + m_tile_count_y / 2;
+
+		/*int x = px + Item->x - m_center.x + m_tile_count_x / 2;
+		int y = py + Item->y - m_center.y + m_tile_count_y / 2;*/
+
+		int x;
+		int y;
+
+		switch (m_rotate)
+		{
+		case 0:
+		{
+			x = px + Item->x - m_center.x + m_tile_count_x / 2;
+			y = py + Item->y - m_center.y + m_tile_count_y / 2;
+			break;
+		}
+		case 1:
+		{
+			x = -m_center.y + Item->y + m_tile_count_x / 2;
+			y = m_center.x - Item->x + m_tile_count_y / 2;
+			break;
+		}
+		case 2:
+		{
+			x = m_center.x - Item->x + m_tile_count_x / 2;
+			y = m_center.y - Item->y + m_tile_count_y / 2;
+			break;
+		}
+		case 3:
+		{
+			x = m_center.y - Item->y + m_tile_count_x / 2;
+			y = -m_center.x + Item->x + m_tile_count_y / 2;
+			break;
+		}
+		}
+
+
 		//x0 = (x - m_cursor_x + 1) * m_tile_size_x;
 		//y0 = (m_tile_count_y - y - m_cursor_y) * m_tile_size_y;
 		//x1 = (x - m_cursor_x + 1) * m_tile_size_x;
@@ -1357,12 +1453,41 @@ void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
 {
 	if (e.key == mk_left)
 	{
-
+		LOG(INFO) << "click";
 			position_t p = local_xy(position_t(e.position.x, e.position.y));
 			int x;
 			int y;
 			x = m_center.x + p.x - m_tile_count_x / 2;
 			y = m_center.y + p.y - m_tile_count_y / 2;
+
+			switch (m_rotate)
+			{
+			case 0:
+			{
+				x = m_center.x + (p.x - m_tile_count_x / 2);
+				y = m_center.y + (p.y - m_tile_count_y / 2);
+				break;
+			}
+			case 1:
+			{
+				x = m_center.x - (p.y - m_tile_count_y / 2);
+				y = m_center.y + (p.x - m_tile_count_x / 2);
+				break;
+			}
+			case 2:
+			{
+				x = m_center.x - (p.x - m_tile_count_x / 2);
+				y = m_center.y - (p.y - m_tile_count_y / 2);
+				break;
+			}
+			case 3:
+			{
+				x = m_center.x + (p.y - m_tile_count_y / 2);
+				y = m_center.y - (p.x - m_tile_count_x / 2);
+				break;
+			}
+			}
+
 			if (!m_just_focused)
 			{
 				if (!((x<0) || (x>m_map->m_size.dx - 1) || (y<0) || (y>m_map->m_size.dy - 1)))
@@ -1415,6 +1540,35 @@ void GUI_MapViewer::on_mouse_down(MouseEventArgs const& e)
 		int y;
 		x = m_center.x + p.x - m_tile_count_x / 2;
 		y = m_center.y + p.y - m_tile_count_y / 2;
+
+		switch (m_rotate)
+		{
+		case 0:
+		{
+			x = m_center.x + (p.x - m_tile_count_x / 2);
+			y = m_center.y + (p.y - m_tile_count_y / 2);
+			break;
+		}
+		case 1:
+		{
+			x = m_center.x - (p.y - m_tile_count_y / 2);
+			y = m_center.y + (p.x - m_tile_count_x / 2);
+			break;
+		}
+		case 2:
+		{
+			x = m_center.x - (p.x - m_tile_count_x / 2);
+			y = m_center.y - (p.y - m_tile_count_y / 2);
+			break;
+		}
+		case 3:
+		{
+			x = m_center.x + (p.y - m_tile_count_y / 2);
+			y = m_center.y - (p.x - m_tile_count_x / 2);
+			break;
+		}
+		}
+
 
 		//if (!((x<0) || (x>m_map->m_size.w - 1) || (y<0) || (y>m_map->m_size.h - 1)))
 		{
@@ -1509,8 +1663,39 @@ position_t GUI_MapViewer::local_xy(position_t p)
 void GUI_MapViewer::on_mouse_move(MouseEventArgs const& e)
 {
 	position_t p = local_xy(e.position);
-	int x = m_center.x + p.x - m_tile_count_x / 2;
-	int y = m_center.y + p.y - m_tile_count_y / 2;
+	/*int x = m_center.x + p.x - m_tile_count_x / 2;
+	int y = m_center.y + p.y - m_tile_count_y / 2;*/
+
+	int x;
+	int y;
+
+	switch (m_rotate)
+	{
+	case 0:
+	{
+		x = m_center.x + (p.x - m_tile_count_x / 2);
+		y = m_center.y + (p.y - m_tile_count_y / 2);
+		break;
+	}
+	case 1:
+	{
+		x = m_center.x - (p.y - m_tile_count_y / 2);
+		y = m_center.y + (p.x - m_tile_count_x / 2);
+		break;
+	}
+	case 2:
+	{
+		x = m_center.x - (p.x - m_tile_count_x / 2);
+		y = m_center.y - (p.y - m_tile_count_y / 2);
+		break;
+	}
+	case 3:
+	{
+		x = m_center.x + (p.y - m_tile_count_y / 2);
+		y = m_center.y - (p.x - m_tile_count_x / 2);
+		break;
+	}
+	}
 	
 	if (!(x < 0 || x > m_map->m_size.dx - 1 || y < 0 || y > m_map->m_size.dy - 1))
 	{
@@ -1527,15 +1712,65 @@ void GUI_MapViewer::on_mouse_move(MouseEventArgs const& e)
 void GUI_MapViewer::on_mouse_start_drag(MouseEventArgs const& e)
 {
 	position_t p = local_xy(position_t(e.position.x, e.position.y));
-	m_initial_position.x = m_center.x - p.x;
-	m_initial_position.y = m_center.y - p.y;
+	switch (m_rotate)
+	{
+	case 0:
+	{
+		m_initial_position.x = m_center.x - p.x;
+		m_initial_position.y = m_center.y - p.y;
+		break;
+	}
+	case 1:
+	{
+		m_initial_position.x = m_center.x + p.y;
+		m_initial_position.y = m_center.y - p.x;
+		break;
+	}
+	case 2:
+	{
+		m_initial_position.x = m_center.x + p.x;
+		m_initial_position.y = m_center.y + p.y;
+		break;
+	}
+	case 3:
+	{
+		m_initial_position.x = m_center.x - p.y;
+		m_initial_position.y = m_center.y + p.x;
+		break;
+	}
+	}
 }
 
 void GUI_MapViewer::on_mouse_drag(MouseEventArgs const& e)
 {
 	position_t p = local_xy(position_t(e.position.x, e.position.y));
-	m_center.x = m_initial_position.x + p.x;
-	m_center.y = m_initial_position.y + p.y;
+	switch (m_rotate)
+	{
+	case 0:
+	{
+		m_center.x = m_initial_position.x + p.x;
+		m_center.y = m_initial_position.y + p.y;
+		break;
+	}
+	case 1:
+	{
+		m_center.x = m_initial_position.x - p.y;
+		m_center.y = m_initial_position.y + p.x;
+		break;
+	}
+	case 2:
+	{
+		m_center.x = m_initial_position.x - p.x;
+		m_center.y = m_initial_position.y - p.y;
+		break;
+	}
+	case 3:
+	{
+		m_center.x = m_initial_position.x + p.y;
+		m_center.y = m_initial_position.y - p.x;
+		break;
+	}
+	}
 }
 
 void GUI_MapViewer::on_mouse_end_drag(MouseEventArgs const& e)

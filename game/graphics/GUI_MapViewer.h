@@ -52,8 +52,9 @@ public:
 
 	position_t m_center;
 	position_t m_initial_position;
+	int m_rotate;
 
-	virtual void on_key_press(WPARAM w);
+	void on_key_press(WPARAM w) override;
 	void on_mouse_click(MouseEventArgs const& e) override;
 	void on_mouse_down(MouseEventArgs const& e) override;
 	void on_mouse_wheel(MouseEventArgs const& e) override;

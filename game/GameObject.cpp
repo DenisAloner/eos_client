@@ -1040,6 +1040,7 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 	m_actions.push_front(Application::instance().m_actions[action_e::show_parameters]);
 	m_actions.push_front(Application::instance().m_actions[action_e::save]);
 	m_actions.push_front(Application::instance().m_actions[action_e::load]);
+	m_actions.push_front(Application::instance().m_actions[action_e::rotate_view]);
 
 	m_object->event_update += std::bind(&Event<VoidEventArgs>::operator(),&event_update, std::placeholders::_1);
 	

@@ -269,6 +269,16 @@ int Game_algorithm::get_angle(object_direction_e direction, int angle)
 	return result;
 }
 
+object_direction_e Game_algorithm::get_direction(object_direction_e direction, int camera_turn)
+{
+	int result = static_cast<int>(direction) + camera_turn*2;
+	if(result>8)
+	{
+		result -= 8;
+	}
+	return static_cast<object_direction_e>(result);
+}
+
 rotate_direction_e Game_algorithm::get_rotation(object_direction_e start, object_direction_e end)
 {
 	int a = static_cast<int>(start);

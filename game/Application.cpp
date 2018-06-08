@@ -204,6 +204,7 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 	m_actions[action_e::shoot] = new Action_shoot();
 	m_actions[action_e::load] = new Action_load();
 	m_actions[action_e::move_out] = new Action_move_out();
+	m_actions[action_e::rotate_view] = new Action_rotate_view();
 
 	for (size_t i = 0; i < action_e::max; i++)
 	{

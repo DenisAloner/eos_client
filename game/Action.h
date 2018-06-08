@@ -284,8 +284,8 @@ public:
 
 	Action_save();
 
-	virtual std::u16string get_description(Parameter* parameter);
-	virtual void interaction_handler(Parameter* arg);
+	std::u16string get_description(Parameter* parameter) override;
+	void interaction_handler(Parameter* arg) override;
 
 };
 
@@ -298,6 +298,18 @@ public:
 
 	virtual std::u16string get_description(Parameter* parameter);
 	virtual void interaction_handler(Parameter* arg);
+
+};
+
+class Action_rotate_view :
+	public Action
+{
+public:
+
+	Action_rotate_view();
+
+	std::u16string get_description(Parameter* parameter) override;
+	void interaction_handler(Parameter* arg) override;
 
 };
 

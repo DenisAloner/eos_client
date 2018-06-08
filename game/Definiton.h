@@ -182,6 +182,7 @@ public:
 		shoot,
 		load,
 		move_out,
+		rotate_view,
 		max
 	};
 };

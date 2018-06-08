@@ -41,7 +41,7 @@ public:
 		};
 	};
 
-	GLuint m_actions[16];
+	GLuint m_actions[17];
 
 	GLuint m_horizontal_shader;
 	GLuint m_vertical_shader;

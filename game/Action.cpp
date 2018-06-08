@@ -1706,6 +1706,28 @@ std::u16string Action_load::get_description(Parameter* parameter)
 	return s;
 }
 
+Action_rotate_view::Action_rotate_view()
+{
+	m_kind = action_e::rotate_view;
+	m_icon = Application::instance().m_graph->m_actions[16];
+	m_name = u"Повернуть вид";
+}
+
+std::u16string Action_rotate_view::get_description(Parameter* parameter)
+{
+	std::u16string s(u"Повернуть вид");
+	return s;
+}
+
+void Action_rotate_view::interaction_handler(Parameter* arg)
+{
+	Action::interaction_handler(nullptr);
+	Application::instance().m_message_queue.m_busy = true;
+	Application::instance().m_gui_controller.m_GUI->MapViewer->m_rotate += 1;
+	if (Application::instance().m_gui_controller.m_GUI->MapViewer->m_rotate > 3) { Application::instance().m_gui_controller.m_GUI->MapViewer->m_rotate = 0; };
+	Application::instance().m_message_queue.m_busy = false;
+}
+
 Action_autoexplore::Action_autoexplore()
 {
 	m_kind = action_e::autoexplore;
