@@ -1431,6 +1431,15 @@ public:
 			from_json<int>((*s)[1], prop.dy, context);
 			from_json<int>((*s)[2], prop.dz, context);
 		}
+		else if constexpr(std::is_same<T, rectangle_t>::value)
+		{
+			std::u16string temp = value;
+			scheme_vector_t* s = read_pair(temp);
+			from_json<int>((*s)[0], prop.x, context);
+			from_json<int>((*s)[1], prop.y, context);
+			from_json<int>((*s)[2], prop.w, context);
+			from_json<int>((*s)[3], prop.h, context);
+		}
 		else if constexpr(std::is_same<T, Icon>::value||std::is_same<T, TileManager>::value || is_instancedictonary<T>::value)
 		{
 			LOG(FATAL) << "<from_json> type error: " << typeid(value).name();
@@ -1579,6 +1588,11 @@ public:
 		else if constexpr(std::is_same<T, dimension3_t>::value)
 		{
 			std::u16string result = u"[" + to_json<int>(value.dx, context) + u"," + to_json<int>(value.dy, context) + u"," + to_json<int>(value.dz, context) + u"]";
+			return result;
+		}
+		else if constexpr(std::is_same<T, rectangle_t>::value)
+		{
+			std::u16string result = u"[" + to_json<int>(value.x, context) + u"," + to_json<int>(value.y, context) + u"," + to_json<int>(value.w, context) + u"," + to_json<int>(value.h, context) + u"]";
 			return result;
 		}
 		else

@@ -11,13 +11,16 @@ public:
 
 	std::vector<GLuint> m_tiles;
 	animation_e m_animation;
+	int m_layer;
 
 	TileManager();
 	~TileManager();
 
-	virtual bool init(const std::string& filename, object_direction_e direction, int frame);
+	//virtual bool init(const std::string& filename, object_direction_e direction, int frame);
+
 	virtual void set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction);
 	virtual int get_tile_index(const object_direction_e& direction, const int& frame) = 0;
+	virtual void set_tile(GLdouble (&tile)[12], GameObject* obj, int frame, const object_direction_e& direction);
 
 	void save() override {};
 	void load() override {};
@@ -39,13 +42,38 @@ public:
 
 };
 
+class TileManager_Single_Atlas :
+	public TileManager
+{
+public:
+
+	rectangle_t m_frame;
+
+	TileManager_Single_Atlas();
+	//bool init(const std::string& filename, object_direction_e direction, int frame) override;
+	int get_tile_index(const object_direction_e& direction, const int& frame) override;
+	void set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction) override;
+	void set_tile(GLdouble(&tile)[12], GameObject* obj, int frame, const object_direction_e& direction) override;
+
+	Packer_generic& get_packer() override;
+
+	constexpr static auto properties()
+	{
+		return std::make_tuple(
+			make_property(&TileManager_Single_Atlas::m_frame, u"frame")
+		);
+	}
+
+	
+};
+
 class TileManager_Single :
 	public TileManager
 {
 public:
 
 	TileManager_Single();
-	bool init(const std::string& filename, object_direction_e direction, int frame) override;
+	//bool init(const std::string& filename, object_direction_e direction, int frame) override;
 	int get_tile_index(const object_direction_e& direction, const int& frame) override;
 
 	Packer_generic& get_packer() override;
@@ -62,7 +90,7 @@ public:
 	int m_frame;
 
 	TileManager_rotate8_animate();
-	bool init(const std::string& filename, object_direction_e direction, int frame) override;
+	//bool init(const std::string& filename, object_direction_e direction, int frame) override;
 	int get_tile_index(const object_direction_e& direction, const int& frame) override;
 	void set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction) override;
 
@@ -85,7 +113,7 @@ public:
 	int m_frame;
 
 	TileManager_equilateral_animate();
-	bool init(const std::string& filename, object_direction_e direction, int frame) override;
+	//bool init(const std::string& filename, object_direction_e direction, int frame) override;
 	int get_tile_index(const object_direction_e& direction, const int& frame) override;
 	void set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction) override;
 

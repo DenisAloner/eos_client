@@ -49,6 +49,7 @@ public:
 	GLuint m_tile_shader_hide;
 	GLuint m_mask_shader;
 	GLuint m_mask_shader2;
+	GLuint m_atlas_shader;
 
 	GLuint m_empty_01;
 	GLuint m_empty_02;
@@ -62,6 +63,8 @@ public:
 	GLuint m_no_image;
 	GLuint m_visible;
 	GLuint m_blur;
+
+	GLuint m_atlas;
 
 	FT_Library    m_library;
 	FT_Error      m_error;
@@ -80,6 +83,7 @@ public:
 	GraphicalController(dimension_t size);
 
 	GLuint load_shader(const std::string& vPath,const std::string& fPath);
+	GLuint load_shader2(const std::string& vPath, const std::string& fPath);
 	std::string load_shader_source(const std::string& path);
 	bool set_uniform_vector(GLuint program, const char * name, const float * value);
 	bool set_uniform_sampler(GLuint object, const char * name, int index);
@@ -99,6 +103,7 @@ public:
 	font_symbol_t& get_symbol(char16_t value);
 
 	GLuint png_texture_load(const std::string& path);
+	GLuint texture_array_load(const std::vector<std::string>& path);
 
 	std::size_t measure_text_width(std::u16string& Text);
 

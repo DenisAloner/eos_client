@@ -25,6 +25,53 @@ void TileManager::vector_GLuint_from_binary(const std::string& value, std::vecto
 {
 }
 
+TileManager_Single_Atlas::TileManager_Single_Atlas()
+{
+	m_tiles.resize(1);
+}
+
+int TileManager_Single_Atlas::get_tile_index(const object_direction_e& direction, const int& frame)
+{
+	return 0;
+}
+
+void TileManager_Single_Atlas::set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction)
+{
+	tile.unit = m_tiles[0];
+	tile.coordinat[0] = m_frame.x / 38.0;
+	tile.coordinat[1] = m_frame.y / 88.0;
+	tile.coordinat[2] = (m_frame.x + m_frame.w) / 38.0;
+	tile.coordinat[3] = (m_frame.y + m_frame.h) / 38.0;
+}
+
+void TileManager_Single_Atlas::set_tile(GLdouble(&tile)[12], GameObject* obj, int frame, const object_direction_e& direction)
+{
+	const GLdouble x1 = m_frame.x / 38.0;
+	const GLdouble y1 = m_frame.y / 88.0;
+	const GLdouble x2 = (m_frame.x + m_frame.w) / 38.0;
+	const GLdouble y2 = (m_frame.y + m_frame.h) / 88.0;
+	tile[0] = x1;
+	tile[1] = y2;
+	tile[2] = (double)m_layer;
+
+	tile[3] = x1;
+	tile[4] = y1;
+	tile[5] = (double)m_layer;
+
+	tile[6] = x2;
+	tile[7] = y1;
+	tile[8] = (double)m_layer;
+
+	tile[9] = x2;
+	tile[10] = y2;
+	tile[11] = (double)m_layer;
+}
+
+Packer_generic& TileManager_Single_Atlas::get_packer()
+{
+	return Packer<TileManager_Single_Atlas>::Instance();
+}
+
 TileManager::TileManager():m_animation(animation_e::idle)
 {
 }
@@ -35,12 +82,12 @@ TileManager::~TileManager()
 }
 
 
-bool TileManager::init(const std::string& filename, object_direction_e direction, int frame)
-{
-	m_tiles.resize(1);
-	m_tiles[0] = Application::instance().m_graph->png_texture_load(FileSystem::instance().m_resource_path + "Tiles\\" + filename + ".png");
-	return true;
-}
+//bool TileManager::init(const std::string& filename, object_direction_e direction, int frame)
+//{
+//	m_tiles.resize(1);
+//	m_tiles[0] = Application::instance().m_graph->png_texture_load(FileSystem::instance().m_resource_path + "Tiles\\" + filename + ".png");
+//	return true;
+//}
 
 void TileManager::set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction)
 {
@@ -50,6 +97,10 @@ void TileManager::set_tile(tile_t& tile, GameObject* obj, int frame, const objec
 	tile.coordinat[1] = 1.0;
 	tile.coordinat[2] = 1.0;
 	tile.coordinat[3] = 0.0;
+}
+
+void TileManager::set_tile(GLdouble(& tile)[12], GameObject* obj, int frame, const object_direction_e& direction)
+{
 }
 
 TileManager_Single::TileManager_Single()
@@ -67,12 +118,12 @@ Packer_generic& TileManager_Single::get_packer()
 	return Packer<TileManager_Single>::Instance();
 }
 
-bool TileManager_Single::init(const std::string& filename, object_direction_e direction, int frame)
-{
-	m_tiles.resize(1);
-	m_tiles[0] = Application::instance().m_graph->png_texture_load(FileSystem::instance().m_resource_path + "Tiles\\" + filename + ".png");
-	return true;
-}
+//bool TileManager_Single::init(const std::string& filename, object_direction_e direction, int frame)
+//{
+//	m_tiles.resize(1);
+//	m_tiles[0] = Application::instance().m_graph->png_texture_load(FileSystem::instance().m_resource_path + "Tiles\\" + filename + ".png");
+//	return true;
+//}
 
 TileManager_rotate8_animate::TileManager_rotate8_animate()
 {
@@ -84,16 +135,16 @@ int TileManager_rotate8_animate::get_tile_index(const object_direction_e& direct
 
 }
 
-bool TileManager_rotate8_animate::init(const std::string& filename, object_direction_e direction, int frame)
-{
-	m_frame = frame;
-	m_tiles.resize(2);
-	for(int i=0;i<2;++i)
-	{
-		m_tiles[i] = Application::instance().m_graph->png_texture_load(FileSystem::instance().m_resource_path + "Tiles\\" + filename + std::to_string(i + 1) + ".png");
-	}
-	return true;
-}
+//bool TileManager_rotate8_animate::init(const std::string& filename, object_direction_e direction, int frame)
+//{
+//	m_frame = frame;
+//	m_tiles.resize(2);
+//	for(int i=0;i<2;++i)
+//	{
+//		m_tiles[i] = Application::instance().m_graph->png_texture_load(FileSystem::instance().m_resource_path + "Tiles\\" + filename + std::to_string(i + 1) + ".png");
+//	}
+//	return true;
+//}
 
 void TileManager_rotate8_animate::set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction)
 {
@@ -123,13 +174,13 @@ int TileManager_equilateral_animate::get_tile_index(const object_direction_e& di
 
 }
 
-bool TileManager_equilateral_animate::init(const std::string& filename, object_direction_e direction, int frame)
-{
-	m_frame = frame;
-	m_tiles.resize(1);
-	m_tiles[0] = Application::instance().m_graph->png_texture_load(FileSystem::instance().m_resource_path + "Tiles\\" + filename + ".png");
-	return true;
-}
+//bool TileManager_equilateral_animate::init(const std::string& filename, object_direction_e direction, int frame)
+//{
+//	m_frame = frame;
+//	m_tiles.resize(1);
+//	m_tiles[0] = Application::instance().m_graph->png_texture_load(FileSystem::instance().m_resource_path + "Tiles\\" + filename + ".png");
+//	return true;
+//}
 
 void TileManager_equilateral_animate::set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction)
 {

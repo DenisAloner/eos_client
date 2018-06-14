@@ -1216,6 +1216,42 @@ void Config::instancedictonary_icon_from_binary(const std::string& value, Instan
 {
 }
 
+void Config::instancedictonary_tilemanager_from_json_atlas(std::u16string value, InstanceDictonary<TileManager*>& prop, Parser_context& context)
+{
+	std::u16string temp = value;
+	scheme_vector_t* s = Parser::read_pair(temp);
+	std::string k;
+	TileManager* v = nullptr;
+	dimension_t size;
+	GLuint id;
+	std::vector<std::string> names;
+	if (s)
+	{
+		for (int i = 0; i < s->size(); i += 2)
+		{
+			auto& name = names.emplace_back();
+			Parser::from_json<std::string>((*s)[i], name, context);
+			name = FileSystem::instance().m_resource_path + "Tiles\\" + name + ".png";
+		}
+		id = Application::instance().m_graph->texture_array_load(names);
+
+		for (int i = 0; i<s->size(); i += 2)
+		{
+			scheme_vector_t* p = Parser::read_pair((*s)[i + 1]);
+			for (int j = 0; j < p->size(); j += 2)
+			{
+				Parser::from_json<std::string>((*p)[j], k, context);
+				Parser::from_json<TileManager*>((*p)[j + 1], v, context);
+				v->m_tiles[0] = id;
+				v->m_layer = i / 2;
+				m_tile_managers.add(v, k);
+			}
+			delete p;
+		}
+		delete s;
+	}
+}
+
 void Config::instancedictonary_tilemanager_from_json(std::u16string value, InstanceDictonary<TileManager*>& prop, Parser_context& context)
 {
 	std::u16string temp = value;

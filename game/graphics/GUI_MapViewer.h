@@ -27,6 +27,11 @@ class GUI_MapViewer : public GUI_Object
 { 
 public:
 
+	GLuint m_vertex_buffer;
+	GLuint m_textcoor_buffer;
+	GLuint m_light_buffer;
+	GLuint m_vao;
+
 	GUI_Object* m_focus;
 	MapCell* m_cursored;
 
@@ -54,6 +59,27 @@ public:
 	position_t m_initial_position;
 	int m_rotate;
 
+	struct quads_t
+	{
+		int value[8];
+	};
+
+	struct textcoor_t
+	{
+		GLdouble value[12];
+	};
+
+	struct light_val_t
+	{
+		GLfloat value[12];
+	};
+
+	std::vector<quads_t> m_triangles;
+	std::vector<textcoor_t> m_textcoords;
+	std::vector<light_val_t> m_light;
+
+	int m_max_count;
+
 	void on_key_press(WPARAM w) override;
 	void on_mouse_click(MouseEventArgs const& e) override;
 	void on_mouse_down(MouseEventArgs const& e) override;
@@ -68,7 +94,7 @@ public:
 	virtual void set_focus(bool state);
 	void update();
 	virtual bool select(int x, int y);
-	virtual void render(GraphicalController* Graph, int px, int py);
+	void render(GraphicalController* Graph, int px, int py) override;
 	void calculate();
 	virtual MouseEventArgs set_local_mouse_control(MouseEventArgs const& source);
 };

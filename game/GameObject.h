@@ -314,6 +314,7 @@ public:
 	std::map<std::string, Object_interaction*> m_templates;
 	std::map<std::string, GameObject> m_items;
 	InstanceDictonary<TileManager*> m_tile_managers;
+	InstanceDictonary<TileManager*> m_tile_managers_atlas;
 	InstanceDictonary<Icon*> m_icons;
 
 	void save() override {}
@@ -321,8 +322,11 @@ public:
 
 	Packer_generic& get_packer() override;
 
+
 	void instancedictonary_icon_from_json(std::u16string value, InstanceDictonary<Icon*>& prop, Parser_context& context);
 	void instancedictonary_icon_from_binary(const std::string& value, InstanceDictonary<Icon*>& prop, std::size_t& pos, Parser_context& context);
+
+	void instancedictonary_tilemanager_from_json_atlas(std::u16string value, InstanceDictonary<TileManager*>& prop, Parser_context& context);
 
 	void instancedictonary_tilemanager_from_json(std::u16string value, InstanceDictonary<TileManager*>& prop, Parser_context& context);
 	void instancedictonary_tilemanager_from_binary(const std::string& value, InstanceDictonary<TileManager*>& prop, std::size_t& pos, Parser_context& context);
@@ -331,6 +335,7 @@ public:
 	{
 		return std::make_tuple(
 			make_property(&Config::m_icons, u"icons").from_json(&Config::instancedictonary_icon_from_json).from_binary(&Config::instancedictonary_icon_from_binary),
+			make_property(&Config::m_tile_managers_atlas, u"atlases").from_json(&Config::instancedictonary_tilemanager_from_json_atlas),
 			make_property(&Config::m_tile_managers, u"tile_managers").from_json(&Config::instancedictonary_tilemanager_from_json).from_binary(&Config::instancedictonary_tilemanager_from_binary),
 			make_property(&Config::m_templates, u"templates"),
 			make_property(&Config::m_items, u"items")

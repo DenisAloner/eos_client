@@ -249,7 +249,7 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 void Application::new_game()
 {
 	m_world = new Game_world();
-	GameMap* map = new GameMap(dimension3_t(20,20,20));
+	GameMap* map = new GameMap(dimension3_t(128,128,20));
 
 	GameObject* obj;
 	map->generate_room();
@@ -263,12 +263,12 @@ void Application::new_game()
 	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
 	
 	
-	std::u16string json;
+	/*std::u16string json;
 	Parser_context pc(*m_world);
 	pc.reset();
 	m_world->reset_serialization_index();
 	json  = m_world->serialize(pc);
-	char16_t marker = 0xFEFF;
+	char16_t marker = 0xFEFF;*/
 
 	//LOG(INFO) << Parser::UTF16_to_CP1251(json);
 

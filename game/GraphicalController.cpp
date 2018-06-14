@@ -35,6 +35,7 @@ GraphicalController::GraphicalController(dimension_t size)
 		m_mask_shader2 = load_shader("EoS_mask", "EoS_mask2");
 		m_tile_shader = load_shader("EoS_tile", "EoS_tile");
 		m_tile_shader_hide = load_shader("EoS_tile", "EoS_tile_hide");
+		m_atlas_shader = load_shader2("EoS_Tile_atlas", "EoS_Tile_atlas");
 		m_empty_01 = create_empty_texture(m_size);
 		m_empty_02 = create_empty_texture(m_size);
 		m_empty_03 = create_empty_texture(m_size);
@@ -44,7 +45,7 @@ GraphicalController::GraphicalController(dimension_t size)
 		m_preselect = load_texture(FileSystem::instance().m_resource_path + "Tiles\\preselection.bmp");
 		m_select = load_texture(FileSystem::instance().m_resource_path + "Tiles\\iso_select.bmp");
 		m_cursor = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Cursor.bmp");
-		m_no_image = load_texture(FileSystem::instance().m_resource_path + "Tiles\\no_tile.bmp");
+		m_no_image = png_texture_load(FileSystem::instance().m_resource_path + "Tiles\\atlas_1.png");
 		m_visible = load_texture(FileSystem::instance().m_resource_path + "Tiles\\visible.bmp");
 		m_dir = load_texture(FileSystem::instance().m_resource_path + "Tiles\\directions.bmp");
 		m_logo = load_texture(FileSystem::instance().m_resource_path + "Tiles\\logo.bmp");
@@ -434,8 +435,8 @@ GLuint GraphicalController::load_texture(const std::string& path)
 	data = reinterpret_cast<char*>(buff.get() + sizeof(*header)+sizeof(*info));
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	/*glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);*/
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -617,6 +618,184 @@ GLuint GraphicalController::png_texture_load(const std::string& path)
 	return texture;
 }
 
+GLuint GraphicalController::texture_array_load(const std::vector<std::string>& path)
+{
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
+	for(int cnt=0;cnt<path.size();++cnt)
+	{
+		png_byte header[8];
+
+		LOG(INFO)<< "ПУТЬ: "<< path[cnt].c_str();
+
+		const char * file_name = path[cnt].c_str();
+		FILE *fp = fopen(file_name, "rb");
+		if (fp == 0)
+		{
+			perror(file_name);
+			return 0;
+		}
+
+		// read the header
+		fread(header, 1, 8, fp);
+
+		if (png_sig_cmp(header, 0, 8))
+		{
+			fprintf(stderr, "error: %s is not a PNG.\n", file_name);
+			fclose(fp);
+			return 0;
+		}
+
+		png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+		if (!png_ptr)
+		{
+			fprintf(stderr, "error: png_create_read_struct returned 0.\n");
+			fclose(fp);
+			return 0;
+		}
+
+		// create png info struct
+		png_infop info_ptr = png_create_info_struct(png_ptr);
+		if (!info_ptr)
+		{
+			fprintf(stderr, "error: png_create_info_struct returned 0.\n");
+			png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
+			fclose(fp);
+			return 0;
+		}
+
+		// create png info struct
+		png_infop end_info = png_create_info_struct(png_ptr);
+		if (!end_info)
+		{
+			fprintf(stderr, "error: png_create_info_struct returned 0.\n");
+			png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
+			fclose(fp);
+			return 0;
+		}
+
+		// the code in this if statement gets called if libpng encounters an error
+		if (setjmp(png_jmpbuf(png_ptr))) {
+			fprintf(stderr, "error from libpng\n");
+			png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+			fclose(fp);
+			return 0;
+		}
+
+		// init png reading
+		png_init_io(png_ptr, fp);
+
+		// let libpng know you already read the first 8 bytes
+		png_set_sig_bytes(png_ptr, 8);
+
+		// read all the info up to the image data
+		png_read_info(png_ptr, info_ptr);
+
+		// variables to pass to get info
+		int bit_depth, color_type;
+		png_uint_32 temp_width, temp_height;
+
+		// get info about png
+		png_get_IHDR(png_ptr, info_ptr, &temp_width, &temp_height, &bit_depth, &color_type,
+			NULL, NULL, NULL);
+
+		if(cnt==0)
+		{
+			//glTexStorage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, temp_width, temp_height, path.size());
+			glTexImage3D(GL_TEXTURE_2D_ARRAY,
+				0,                // level
+				GL_RGBA8,         // Internal format
+				temp_width, temp_height, path.size(), // width,height,depth
+				0,
+				GL_RGBA,          // format
+				GL_UNSIGNED_BYTE, // type
+				0);
+		}
+
+		//if (width) { *width = temp_width; }
+		//if (height) { *height = temp_height; }
+
+		//printf("%s: %lux%lu %d\n", file_name, temp_width, temp_height, color_type);
+
+		if (bit_depth != 8)
+		{
+			fprintf(stderr, "%s: Unsupported bit depth %d.  Must be 8.\n", file_name, bit_depth);
+			return 0;
+		}
+
+		GLint format;
+		switch (color_type)
+		{
+		case PNG_COLOR_TYPE_RGB:
+			format = GL_RGB;
+			break;
+		case PNG_COLOR_TYPE_RGB_ALPHA:
+			format = GL_RGBA;
+			break;
+		default:
+			fprintf(stderr, "%s: Unknown libpng color type %d.\n", file_name, color_type);
+			return 0;
+		}
+
+		// Update the png info struct.
+		png_read_update_info(png_ptr, info_ptr);
+
+		// Row size in bytes.
+		int rowbytes = png_get_rowbytes(png_ptr, info_ptr);
+
+		// glTexImage2d requires rows to be 4-byte aligned
+		rowbytes += 3 - ((rowbytes - 1) % 4);
+
+		// Allocate the image_data as a big block, to be given to opengl
+		png_byte * image_data = (png_byte *)malloc(rowbytes * temp_height * sizeof(png_byte) + 15);
+		if (image_data == NULL)
+		{
+			fprintf(stderr, "error: could not allocate memory for PNG image data\n");
+			png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+			fclose(fp);
+			return 0;
+		}
+
+		// row_pointers is for pointing to image_data for reading the png with libpng
+		png_byte ** row_pointers = (png_byte **)malloc(temp_height * sizeof(png_byte *));
+		if (row_pointers == NULL)
+		{
+			fprintf(stderr, "error: could not allocate memory for PNG row pointers\n");
+			png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+			free(image_data);
+			fclose(fp);
+			return 0;
+		}
+
+		// set the individual row_pointers to point at the correct offsets of image_data
+		for (unsigned int i = 0; i < temp_height; i++)
+		{
+			row_pointers[temp_height - 1 - i] = image_data + i * rowbytes;
+		}
+
+		// read the png into image_data through row_pointers
+		LOG(INFO) << file_name;
+		png_read_image(png_ptr, row_pointers);
+
+		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, cnt, temp_width, temp_height, 1, format, GL_UNSIGNED_BYTE, image_data);
+
+		// clean up
+		png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+		free(image_data);
+		free(row_pointers);
+		fclose(fp);
+	}
+
+	glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	m_atlas = texture;
+	return texture;
+}
+
 std::string GraphicalController::load_shader_source(const std::string& path)
 {
 	std::ifstream fstream(path, std::ifstream::binary);
@@ -648,7 +827,18 @@ GLuint GraphicalController::load_shader(const std::string& vPath, const std::str
 	glShaderSource(VertexShader, 1, &VertexShaderSource, NULL);
 	glCompileShader(VertexShader);
 	if (!CompileSuccessful(VertexShader))
-		LOG(FATAL) << "Не удалось скомпилировать вершинный шейдер `" << vPath << "`";
+	{
+		GLint maxLength = 0;
+		glGetShaderiv(VertexShader, GL_INFO_LOG_LENGTH, &maxLength);
+
+		// The maxLength includes the NULL character
+		std::vector<GLchar> errorLog(maxLength);
+		glGetShaderInfoLog(VertexShader, maxLength, &maxLength, &errorLog[0]);
+		std::string str(errorLog.begin(), errorLog.end());
+		LOG(FATAL) << "Не удалось скомпилировать вершинный шейдер `" << vPath << "` "<< str;
+	}
+		
+
 
 	glShaderSource(FragmentShader, 1, &FragmentShaderSource, NULL);
 	glCompileShader(FragmentShader);
@@ -657,6 +847,56 @@ GLuint GraphicalController::load_shader(const std::string& vPath, const std::str
 
 	glAttachShader(Program, VertexShader);
 	glAttachShader(Program, FragmentShader);
+	glLinkProgram(Program);
+	if (!LinkSuccessful(Program))
+		LOG(FATAL) << "Не удалось слинковать шейдерную программу!";
+	glValidateProgram(Program);
+	if (!ValidateSuccessful(Program))
+		LOG(FATAL) << "Ошибка при проверке шейдерной программы!";
+
+	return Program;
+}
+
+GLuint GraphicalController::load_shader2(const std::string& vPath, const std::string& fPath)
+{
+	const std::string v_src = load_shader_source(FileSystem::instance().m_resource_path + "Shaders\\" + vPath + ".vsh");
+	const std::string f_src = load_shader_source(FileSystem::instance().m_resource_path + "Shaders\\" + fPath + ".fsh");
+	const char *VertexShaderSource = v_src.c_str();
+	const char *FragmentShaderSource = f_src.c_str();
+	GLuint Program;
+	GLuint VertexShader;
+	GLuint FragmentShader;
+	Program = glCreateProgram();
+	VertexShader = glCreateShader(GL_VERTEX_SHADER);
+	FragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+
+	glShaderSource(VertexShader, 1, &VertexShaderSource, NULL);
+	glCompileShader(VertexShader);
+	if (!CompileSuccessful(VertexShader))
+	{
+		GLint maxLength = 0;
+		glGetShaderiv(VertexShader, GL_INFO_LOG_LENGTH, &maxLength);
+
+		// The maxLength includes the NULL character
+		std::vector<GLchar> errorLog(maxLength);
+		glGetShaderInfoLog(VertexShader, maxLength, &maxLength, &errorLog[0]);
+		std::string str(errorLog.begin(), errorLog.end());
+		LOG(FATAL) << "Не удалось скомпилировать вершинный шейдер `" << vPath << "` " << str;
+	}
+
+
+
+	glShaderSource(FragmentShader, 1, &FragmentShaderSource, NULL);
+	glCompileShader(FragmentShader);
+	if (!CompileSuccessful(FragmentShader))
+		LOG(FATAL) << "Не удалось скомпилировать фрагментный шейдер `" << fPath << "`";
+
+	glAttachShader(Program, VertexShader);
+	glAttachShader(Program, FragmentShader);
+
+	glBindAttribLocation(Program, 0, "in_Position");
+	glBindAttribLocation(Program, 1, "in_Color");
+
 	glLinkProgram(Program);
 	if (!LinkSuccessful(Program))
 		LOG(FATAL) << "Не удалось слинковать шейдерную программу!";
