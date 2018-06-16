@@ -44,27 +44,27 @@ void TileManager_Single_Atlas::set_tile(tile_t& tile, GameObject* obj, int frame
 	tile.coordinat[3] = (m_frame.y + m_frame.h) / 38.0;
 }
 
-void TileManager_Single_Atlas::set_tile(GLdouble(&tile)[12], GameObject* obj, int frame, const object_direction_e& direction)
+void TileManager_Single_Atlas::set_tile(quad_t& quad, GameObject* obj, int frame, const object_direction_e& direction)
 {
 	const GLdouble x1 = m_frame.x / 38.0;
 	const GLdouble y1 = m_frame.y / 88.0;
 	const GLdouble x2 = (m_frame.x + m_frame.w) / 38.0;
 	const GLdouble y2 = (m_frame.y + m_frame.h) / 88.0;
-	tile[0] = x1;
-	tile[1] = y2;
-	tile[2] = (double)m_layer;
+	quad.vertex[0].texcoord[0] = x1;
+	quad.vertex[0].texcoord[1] = y2;
+	quad.vertex[0].texcoord[2] = (double)m_layer;
 
-	tile[3] = x1;
-	tile[4] = y1;
-	tile[5] = (double)m_layer;
+	quad.vertex[1].texcoord[0] = x1;
+	quad.vertex[1].texcoord[1] = y1;
+	quad.vertex[1].texcoord[2] = (double)m_layer;
 
-	tile[6] = x2;
-	tile[7] = y1;
-	tile[8] = (double)m_layer;
+	quad.vertex[2].texcoord[0] = x2;
+	quad.vertex[2].texcoord[1] = y1;
+	quad.vertex[2].texcoord[2] = (double)m_layer;
 
-	tile[9] = x2;
-	tile[10] = y2;
-	tile[11] = (double)m_layer;
+	quad.vertex[3].texcoord[0] = x2;
+	quad.vertex[3].texcoord[1] = y2;
+	quad.vertex[3].texcoord[2] = (double)m_layer;
 }
 
 Packer_generic& TileManager_Single_Atlas::get_packer()
@@ -99,7 +99,7 @@ void TileManager::set_tile(tile_t& tile, GameObject* obj, int frame, const objec
 	tile.coordinat[3] = 0.0;
 }
 
-void TileManager::set_tile(GLdouble(& tile)[12], GameObject* obj, int frame, const object_direction_e& direction)
+void TileManager::set_tile(quad_t& quad, GameObject* obj, int frame, const object_direction_e& direction)
 {
 }
 

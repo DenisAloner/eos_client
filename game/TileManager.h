@@ -20,7 +20,7 @@ public:
 
 	virtual void set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction);
 	virtual int get_tile_index(const object_direction_e& direction, const int& frame) = 0;
-	virtual void set_tile(GLdouble (&tile)[12], GameObject* obj, int frame, const object_direction_e& direction);
+	virtual void set_tile(quad_t& quad, GameObject* obj, int frame, const object_direction_e& direction);
 
 	void save() override {};
 	void load() override {};
@@ -53,7 +53,7 @@ public:
 	//bool init(const std::string& filename, object_direction_e direction, int frame) override;
 	int get_tile_index(const object_direction_e& direction, const int& frame) override;
 	void set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction) override;
-	void set_tile(GLdouble(&tile)[12], GameObject* obj, int frame, const object_direction_e& direction) override;
+	void set_tile(quad_t& quad, GameObject* obj, int frame, const object_direction_e& direction) override;
 
 	Packer_generic& get_packer() override;
 

@@ -83,7 +83,6 @@ public:
 	GraphicalController(dimension_t size);
 
 	GLuint load_shader(const std::string& vPath,const std::string& fPath);
-	GLuint load_shader2(const std::string& vPath, const std::string& fPath);
 	std::string load_shader_source(const std::string& path);
 	bool set_uniform_vector(GLuint program, const char * name, const float * value);
 	bool set_uniform_sampler(GLuint object, const char * name, int index);
@@ -115,6 +114,7 @@ public:
 	void draw_tile(tile_t& tile, rectangle_t rect);
 	void draw_sprite_FBO(double TexWidth, double TexHeight, rectangle_t rect);
 	void draw_tile_FBO(double tx1, double ty1, double tx2, double ty2, rectangle_t rect);
+	void check_gl_error(const std::string& text);
 	
 
 private:

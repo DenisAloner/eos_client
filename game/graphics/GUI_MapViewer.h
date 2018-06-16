@@ -59,24 +59,8 @@ public:
 	position_t m_initial_position;
 	int m_rotate;
 
-	struct quads_t
-	{
-		int value[8];
-	};
+	std::vector<quad_t> m_quads;
 
-	struct textcoor_t
-	{
-		GLdouble value[12];
-	};
-
-	struct light_val_t
-	{
-		GLfloat value[12];
-	};
-
-	std::vector<quads_t> m_triangles;
-	std::vector<textcoor_t> m_textcoords;
-	std::vector<light_val_t> m_light;
 
 	int m_max_count;
 

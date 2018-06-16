@@ -14,6 +14,18 @@
 #include <unordered_map>
 #include <optional>
 
+struct vertex_t
+{
+	GLint position[2];
+	GLdouble texcoord[3];
+	GLfloat light[3];
+};
+
+struct quad_t
+{
+	vertex_t vertex[4];
+};
+
 const float Pi = 3.14159265F;
 const float cos22_5 = cos(22.5F*Pi / 180.0F);
 const float cos67_5 = cos(67.5F*Pi / 180.0F);

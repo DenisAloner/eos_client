@@ -3,6 +3,25 @@
 #include "TileManager.h"
 
 
+void GraphicalController::check_gl_error(const std::string& text)
+{
+	GLenum err = glGetError();
+	while (err != GL_NO_ERROR) {
+		std::string error;
+
+		switch (err) {
+		case GL_INVALID_OPERATION:      error = "INVALID_OPERATION";      break;
+		case GL_INVALID_ENUM:           error = "INVALID_ENUM";           break;
+		case GL_INVALID_VALUE:          error = "INVALID_VALUE";          break;
+		case GL_OUT_OF_MEMORY:          error = "OUT_OF_MEMORY";          break;
+		case GL_INVALID_FRAMEBUFFER_OPERATION:  error = "INVALID_FRAMEBUFFER_OPERATION";  break;
+		}
+
+		LOG(INFO) << text << ": GL_" << error;
+		err = glGetError();
+	}
+}
+
 GraphicalController::GraphicalController(dimension_t size)
 {
 	m_size = size;
@@ -35,7 +54,7 @@ GraphicalController::GraphicalController(dimension_t size)
 		m_mask_shader2 = load_shader("EoS_mask", "EoS_mask2");
 		m_tile_shader = load_shader("EoS_tile", "EoS_tile");
 		m_tile_shader_hide = load_shader("EoS_tile", "EoS_tile_hide");
-		m_atlas_shader = load_shader2("EoS_Tile_atlas", "EoS_Tile_atlas");
+		m_atlas_shader = load_shader("EoS_Tile_atlas", "EoS_Tile_atlas");
 		m_empty_01 = create_empty_texture(m_size);
 		m_empty_02 = create_empty_texture(m_size);
 		m_empty_03 = create_empty_texture(m_size);
@@ -847,56 +866,6 @@ GLuint GraphicalController::load_shader(const std::string& vPath, const std::str
 
 	glAttachShader(Program, VertexShader);
 	glAttachShader(Program, FragmentShader);
-	glLinkProgram(Program);
-	if (!LinkSuccessful(Program))
-		LOG(FATAL) << "Не удалось слинковать шейдерную программу!";
-	glValidateProgram(Program);
-	if (!ValidateSuccessful(Program))
-		LOG(FATAL) << "Ошибка при проверке шейдерной программы!";
-
-	return Program;
-}
-
-GLuint GraphicalController::load_shader2(const std::string& vPath, const std::string& fPath)
-{
-	const std::string v_src = load_shader_source(FileSystem::instance().m_resource_path + "Shaders\\" + vPath + ".vsh");
-	const std::string f_src = load_shader_source(FileSystem::instance().m_resource_path + "Shaders\\" + fPath + ".fsh");
-	const char *VertexShaderSource = v_src.c_str();
-	const char *FragmentShaderSource = f_src.c_str();
-	GLuint Program;
-	GLuint VertexShader;
-	GLuint FragmentShader;
-	Program = glCreateProgram();
-	VertexShader = glCreateShader(GL_VERTEX_SHADER);
-	FragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-	glShaderSource(VertexShader, 1, &VertexShaderSource, NULL);
-	glCompileShader(VertexShader);
-	if (!CompileSuccessful(VertexShader))
-	{
-		GLint maxLength = 0;
-		glGetShaderiv(VertexShader, GL_INFO_LOG_LENGTH, &maxLength);
-
-		// The maxLength includes the NULL character
-		std::vector<GLchar> errorLog(maxLength);
-		glGetShaderInfoLog(VertexShader, maxLength, &maxLength, &errorLog[0]);
-		std::string str(errorLog.begin(), errorLog.end());
-		LOG(FATAL) << "Не удалось скомпилировать вершинный шейдер `" << vPath << "` " << str;
-	}
-
-
-
-	glShaderSource(FragmentShader, 1, &FragmentShaderSource, NULL);
-	glCompileShader(FragmentShader);
-	if (!CompileSuccessful(FragmentShader))
-		LOG(FATAL) << "Не удалось скомпилировать фрагментный шейдер `" << fPath << "`";
-
-	glAttachShader(Program, VertexShader);
-	glAttachShader(Program, FragmentShader);
-
-	glBindAttribLocation(Program, 0, "in_Position");
-	glBindAttribLocation(Program, 1, "in_Color");
-
 	glLinkProgram(Program);
 	if (!LinkSuccessful(Program))
 		LOG(FATAL) << "Не удалось слинковать шейдерную программу!";
