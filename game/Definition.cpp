@@ -367,6 +367,7 @@ Parser::Parser()
 	register_packer<Game_world>(u"game_world");
 	register_packer<Link>(u"link");
 	register_packer <TileManager_Single_Atlas>(u"tilemanager_single_atlas");
+	register_packer <TileManager_Atlas_Rotatable>(u"tilemanager_atlas_rotatable");
 }
 
 Parser::~Parser()

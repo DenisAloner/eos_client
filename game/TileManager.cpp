@@ -37,39 +37,83 @@ int TileManager_Single_Atlas::get_tile_index(const object_direction_e& direction
 
 void TileManager_Single_Atlas::set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction)
 {
-	tile.unit = m_tiles[0];
+	/*tile.unit = m_tiles[0];
 	tile.coordinat[0] = m_frame.x / 38.0;
-	tile.coordinat[1] = m_frame.y / 88.0;
+	tile.coordinat[1] = m_frame.y / 264.0;
 	tile.coordinat[2] = (m_frame.x + m_frame.w) / 38.0;
-	tile.coordinat[3] = (m_frame.y + m_frame.h) / 38.0;
+	tile.coordinat[3] = (m_frame.y + m_frame.h) / 264.0;*/
 }
 
-void TileManager_Single_Atlas::set_tile(quad_t& quad, GameObject* obj, int frame, const object_direction_e& direction)
+void TileManager_Single_Atlas::set_tile(quad_t& quad, GameObject* obj, int pos, const object_direction_e& direction)
 {
-	const GLdouble x1 = m_frame.x / 38.0;
-	const GLdouble y1 = m_frame.y / 88.0;
-	const GLdouble x2 = (m_frame.x + m_frame.w) / 38.0;
-	const GLdouble y2 = (m_frame.y + m_frame.h) / 88.0;
+	const GLdouble x1 = m_frame.x / 950.0;
+	const GLdouble y1 = m_frame.y / 352.0;
+	const GLdouble x2 = (m_frame.x + 38) / 950.0;
+	const GLdouble y2 = (m_frame.y + 44) / 352.0;
 	quad.vertex[0].texcoord[0] = x1;
 	quad.vertex[0].texcoord[1] = y2;
-	quad.vertex[0].texcoord[2] = (double)m_layer;
+	quad.vertex[0].texcoord[2] = static_cast<double>(m_layer);
 
 	quad.vertex[1].texcoord[0] = x1;
 	quad.vertex[1].texcoord[1] = y1;
-	quad.vertex[1].texcoord[2] = (double)m_layer;
+	quad.vertex[1].texcoord[2] = static_cast<double>(m_layer);
 
 	quad.vertex[2].texcoord[0] = x2;
 	quad.vertex[2].texcoord[1] = y1;
-	quad.vertex[2].texcoord[2] = (double)m_layer;
+	quad.vertex[2].texcoord[2] = static_cast<double>(m_layer);
 
 	quad.vertex[3].texcoord[0] = x2;
 	quad.vertex[3].texcoord[1] = y2;
-	quad.vertex[3].texcoord[2] = (double)m_layer;
+	quad.vertex[3].texcoord[2] = static_cast<double>(m_layer);
 }
 
 Packer_generic& TileManager_Single_Atlas::get_packer()
 {
 	return Packer<TileManager_Single_Atlas>::Instance();
+}
+
+TileManager_Atlas_Rotatable::TileManager_Atlas_Rotatable()
+{
+	m_tiles.resize(1);
+}
+
+int TileManager_Atlas_Rotatable::get_tile_index(const object_direction_e& direction, const int& frame)
+{
+	return 0;
+}
+
+void TileManager_Atlas_Rotatable::set_tile(tile_t& tile, GameObject* obj, int frame,
+	const object_direction_e& direction)
+{
+}
+
+void TileManager_Atlas_Rotatable::set_tile(quad_t& quad, GameObject* obj, int pos,
+                                           const object_direction_e& direction)
+{
+	const GLdouble x1 = (m_frame.x + pos * 38) / 950.0;
+	const GLdouble y1 = (m_frame.y + static_cast<int>(direction) * 44) / 352.0;
+	const GLdouble x2 = (m_frame.x + (pos + 1) * 38) / 950.0;
+	const GLdouble y2 = (m_frame.y + (static_cast<int>(direction) + 1) * 44) / 352.0;
+	quad.vertex[0].texcoord[0] = x1;
+	quad.vertex[0].texcoord[1] = y2;
+	quad.vertex[0].texcoord[2] = static_cast<double>(m_layer);
+
+	quad.vertex[1].texcoord[0] = x1;
+	quad.vertex[1].texcoord[1] = y1;
+	quad.vertex[1].texcoord[2] = static_cast<double>(m_layer);
+
+	quad.vertex[2].texcoord[0] = x2;
+	quad.vertex[2].texcoord[1] = y1;
+	quad.vertex[2].texcoord[2] = static_cast<double>(m_layer);
+
+	quad.vertex[3].texcoord[0] = x2;
+	quad.vertex[3].texcoord[1] = y2;
+	quad.vertex[3].texcoord[2] = static_cast<double>(m_layer);
+}
+
+Packer_generic& TileManager_Atlas_Rotatable::get_packer()
+{
+	return Packer<TileManager_Atlas_Rotatable>::Instance();
 }
 
 TileManager::TileManager():m_animation(animation_e::idle)
@@ -99,7 +143,7 @@ void TileManager::set_tile(tile_t& tile, GameObject* obj, int frame, const objec
 	tile.coordinat[3] = 0.0;
 }
 
-void TileManager::set_tile(quad_t& quad, GameObject* obj, int frame, const object_direction_e& direction)
+void TileManager::set_tile(quad_t& quad, GameObject* obj, int pos, const object_direction_e& direction)
 {
 }
 

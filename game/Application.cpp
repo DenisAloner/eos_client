@@ -44,10 +44,10 @@ void gui_MessageQueue::push(Parameter* p)
 	m_items.pop_front();
 }
 
-game_clipboard::game_clipboard():m_item(nullptr){}
+game_clipboard::game_clipboard() :m_item(nullptr) {}
 
 Application::Application()
-: m_timer(new Timer(24, 100)), m_action_animation_timer(new Timer(24, 100))
+	: m_timer(new Timer(24, 100)), m_action_animation_timer(new Timer(24, 100))
 {
 	m_turn = false;
 }
@@ -100,9 +100,9 @@ void Application::render()
 
 	std::thread::id this_id = std::this_thread::get_id();
 	std::hash<std::thread::id> hasher;
-	
+
 	//OutputDebugString((std::to_string(hasher(this_id)) + " render\n").c_str());
-	
+
 	for (auto current = m_update_in_render_thread.begin(); current != m_update_in_render_thread.end(); ++current)
 	{
 		(*current)();
@@ -225,7 +225,7 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 	m_gui_controller.m_GUI->add(new GUI_Image((m_size.w - 1024) / 2, (m_size.h - 1024) / 2, 1024, 1024, m_graph->m_logo));
 
 	GUI_Window* MainMenu = new GUI_Window(0, 0, 400, 400, u"Главное меню");
-	MainMenu->m_position = position_t((m_size.w - MainMenu->m_size.w)/2, (m_size.h - MainMenu->m_size.h) / 2);
+	MainMenu->m_position = position_t((m_size.w - MainMenu->m_size.w) / 2, (m_size.h - MainMenu->m_size.h) / 2);
 	GUI_Button_list* menu = new GUI_Button_list(0, 0, 400, 400);
 	GUI_Mainmenu_button* button;
 	button = new GUI_Mainmenu_button(0, 0, 396, 47, u"Новая игра", parameter_type_e::new_game);
@@ -240,7 +240,7 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 	MainMenu->add(menu);
 
 	m_graph->set_VSync(false);
-	
+
 	m_ready = true;
 	start();
 }
@@ -249,20 +249,21 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 void Application::new_game()
 {
 	m_world = new Game_world();
-	GameMap* map = new GameMap(dimension3_t(128,128,20));
+	GameMap* map = new GameMap(dimension3_t(128, 128, 20));
 
 	GameObject* obj;
 	map->generate_room();
 	m_world->m_maps.push_back(map);
 	int rx = 8;
 	int ry = 8;
-	
+
 	obj = m_game_object_manager->new_object("human");
-	map->add_to_map(obj, map->get(1,ry,rx));
+	obj->set_direction(object_direction_e::down);
+	map->add_to_map(obj, map->get(1, ry, rx));
 	m_world->m_player = new Player(obj, map);
 	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
-	
-	
+
+
 	/*std::u16string json;
 	Parser_context pc(*m_world);
 	pc.reset();
@@ -319,11 +320,11 @@ void Application::new_game()
 	m->m_optical = nullptr;
 	m->m_state = object_state_e::equip;
 	m->m_size.x = 300;
-	
+
 	Interaction_list* l = new Interaction_list();
 
 	Effect* e=new Effect();
-	
+
 	e->m_value = 65;
 	e->m_subtype = effect_e::limit;
 
@@ -353,7 +354,7 @@ void Application::new_game()
 
 	tmp->reset_serialization_index();
 	Parser::reset_object_counter();
-	
+
 	LOG(INFO) << " | " << std::to_string(m->m_size.x);
 	json = Parser::UTF16_to_CP1251(Parser::to_json<GameObject*>(tmp));
 	LOG(INFO) << json;*/
@@ -379,56 +380,59 @@ void Application::new_game()
 	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 8][rx - 4]);*/
 
 
-		/*obj = m_game_object_manager->new_object("bow");
-		obj->set_direction(object_direction_e::top);
-		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-1][rx - 1]);
+	/*obj = m_game_object_manager->new_object("bow");
+	obj->set_direction(object_direction_e::top);
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-1][rx - 1]);
 
-		obj = m_game_object_manager->new_object("arrow");
-		obj->set_direction(object_direction_e::top);
-		m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 1][rx - 1]);*/
+	obj = m_game_object_manager->new_object("arrow");
+	obj->set_direction(object_direction_e::top);
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry - 1][rx - 1]);*/
 
 
-			/*obj = m_game_object_manager->new_object("blue potion");
-			obj->set_direction(object_direction_e::top);
-			m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-2][rx]);*/
+	/*obj = m_game_object_manager->new_object("blue potion");
+	obj->set_direction(object_direction_e::top);
+	m_GUI->MapViewer->m_map->add_to_map(obj, m_GUI->MapViewer->m_map->m_items[ry-2][rx]);*/
 	///////////////////////
 			/*obj = m_game_object_manager->new_object("bat");
 			obj->set_direction(object_direction_e::top);
 			map->add_to_map(obj, map->get(0,ry - 2,rx-2));*/
 
-			obj = m_game_object_manager->new_object("floor");
-			obj->set_direction(object_direction_e::top);
-			map->add_to_map(obj, map->get(1,ry - 1,rx-1));
+	rx = 8;
+	ry = 8;
 
-			/*obj = m_game_object_manager->new_object("bag");
-			obj->set_direction(object_direction_e::top);
-			map->add_to_map(obj, map->get(ry - 2,rx-1));
+	obj = m_game_object_manager->new_object("darkeye");
+	obj->set_direction(object_direction_e::down);
+	map->add_to_map(obj, map->get(1, ry-2, rx-2));
 
-			obj = m_game_object_manager->new_object("ring");
-			obj->set_direction(object_direction_e::top);
-			map->add_to_map(obj, map->get(ry - 2,rx + 1));
+	/*obj = m_game_object_manager->new_object("bag");
+	obj->set_direction(object_direction_e::top);
+	map->add_to_map(obj, map->get(ry - 2,rx-1));
 
-			obj = m_game_object_manager->new_object("boot");
-			obj->set_direction(object_direction_e::top);
-			map->add_to_map(obj, map->get(ry - 2,rx + 2));
+	obj = m_game_object_manager->new_object("ring");
+	obj->set_direction(object_direction_e::top);
+	map->add_to_map(obj, map->get(ry - 2,rx + 1));
 
-			obj = m_game_object_manager->new_object("fountain");
-			obj->set_direction(object_direction_e::top);
-			map->add_to_map(obj, map->get(ry + 10,rx + 2));*/
+	obj = m_game_object_manager->new_object("boot");
+	obj->set_direction(object_direction_e::top);
+	map->add_to_map(obj, map->get(ry - 2,rx + 2));
 
-			/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
-			fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), obj);
-			MiniMap->add(fov);*/
+	obj = m_game_object_manager->new_object("fountain");
+	obj->set_direction(object_direction_e::top);
+	map->add_to_map(obj, map->get(ry + 10,rx + 2));*/
 
-			/*MenuLayer->add(m_GUI->Timer);
-			MenuLayer->add(MiniMap);*/
+	/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
+	fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), obj);
+	MiniMap->add(fov);*/
+
+	/*MenuLayer->add(m_GUI->Timer);
+	MenuLayer->add(MiniMap);*/
 
 	update_after_load();
 }
 
 void Application::load_game()
 {
-	std::ifstream file(FileSystem::instance().m_resource_path + "Saves\\save.bin",std::ios::binary | std::ios::ate);
+	std::ifstream file(FileSystem::instance().m_resource_path + "Saves\\save.bin", std::ios::binary | std::ios::ate);
 	const auto size = file.tellg();
 	std::string value(size, '\0');
 	file.seekg(0);
@@ -540,12 +544,12 @@ void Application::update()
 	//	}
 	//}
 	GameTask* A;
-	
+
 	std::chrono::time_point<std::chrono::steady_clock> start;
 	std::chrono::time_point<std::chrono::steady_clock> end;
 	std::chrono::milliseconds elapsed;
 	while (true)
-	{ 
+	{
 		A = m_action_manager->get_task();
 		if (A)
 		{
@@ -572,7 +576,7 @@ void Application::update()
 				AI_enemy* ai = static_cast<AI_enemy*>(object->m_active_state->m_ai);
 				ai->calculate_FOV(object, map);
 				Vision_list* vl = static_cast<Vision_list*>(object->m_active_state->get_list(interaction_e::vision));
-				
+
 				int radius = vl->m_max_radius;
 
 				int xc = object->cell()->x;
@@ -613,7 +617,7 @@ void Application::update()
 						{
 							if (ai->m_fov->m_map[y - y_start][x - x_start].visible)
 							{
-								map->get(z,y, x).m_notable = true;
+								map->get(z, y, x).m_notable = true;
 							}
 						}
 					}
@@ -639,8 +643,8 @@ void Application::update()
 				(*m)->update(VoidEventArgs());
 			}
 			m_update_mutex.unlock();
-			std::u16string temp= u"Ход - " + Parser::CP1251_to_UTF16(std::to_string(m_game_turn));
-			m_game_log.add(game_log_message_t(game_log_message_type_e::message_time,temp));
+			std::u16string temp = u"Ход - " + Parser::CP1251_to_UTF16(std::to_string(m_game_turn));
+			m_game_log.add(game_log_message_t(game_log_message_type_e::message_time, temp));
 			m_game_turn += 1;
 			std::chrono::milliseconds Duration(1);
 			std::this_thread::sleep_for(Duration);
@@ -763,7 +767,7 @@ GameObject* Application::command_select_object_on_map()
 		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::object)
 		{
 			Parameter* p = m_message_queue.m_items.front();
-			if((*p)[0].m_object->m_owner->Game_object_owner::m_kind==entity_e::cell)
+			if ((*p)[0].m_object->m_owner->Game_object_owner::m_kind == entity_e::cell)
 			{
 				Result = (*p)[0].m_object;
 				Exit = true;
@@ -851,7 +855,7 @@ bool Application::command_open_body(GameObject*& Object)
 	Parts_list* Property = static_cast<Parts_list*>(Object->get_effect(interaction_e::body));
 	if (Property != nullptr)
 	{
-		GUI_body_window* Window = new GUI_body_window(m_size.w / 2 - (192 + 2) / 2, m_size.h / 2 - (4 * 64 + 2) / 2, 192 + 4, 4 * 64 + 27, Object->m_name + u"::body",Object);
+		GUI_body_window* Window = new GUI_body_window(m_size.w / 2 - (192 + 2) / 2, m_size.h / 2 - (4 * 64 + 2) / 2, 192 + 4, 4 * 64 + 27, Object->m_name + u"::body", Object);
 		/*GUI_Body* Inv = new GUI_Body(static_cast<Interaction_feature*>(Object->get_feature(object_feature_e::interaction_feature)));
 		Inv->m_position.x = 2;
 		Inv->m_position.y = Window->m_size.h - Inv->m_size.h - 2;
@@ -864,7 +868,7 @@ bool Application::command_open_body(GameObject*& Object)
 
 void Application::command_gui_show_characterization(GameObject*& object)
 {
-	GUI_Description_window* Window = new GUI_Description_window(m_size.w / 2 - (192 + 2) / 2, m_size.h / 2 - (4 * 64 + 2) / 2, 800 + 4, 8 * 64 + 27, object->m_name + u"::Характеристика",object);
+	GUI_Description_window* Window = new GUI_Description_window(m_size.w / 2 - (192 + 2) / 2, m_size.h / 2 - (4 * 64 + 2) / 2, 800 + 4, 8 * 64 + 27, object->m_name + u"::Характеристика", object);
 	//m_GUI->add_front(Window);
 }
 
@@ -915,7 +919,7 @@ void Application::process_game()
 {
 	command_main_menu_select();
 	std::unique_lock<std::mutex> lk(m_turn_mutex);
-	while(true)
+	while (true)
 	{
 		m_turn_cv.wait(lk);
 		std::chrono::time_point<std::chrono::steady_clock> start;
@@ -942,14 +946,14 @@ void my_audio_callback(void *userdata, uint8_t *stream, uint32_t len) {
 		return;
 
 	len = (len > audio_len ? audio_len : len);
-	SDL_memcpy (stream, audio_pos, len); 					// simply copy from one buffer into the other
+	SDL_memcpy(stream, audio_pos, len); 					// simply copy from one buffer into the other
 	//SDL_MixAudio(stream, audio_pos, len, SDL_MIX_MAXVOLUME);// mix from one buffer into another
 
 	audio_pos += len;
 	audio_len -= len;
 }
 
-Game_object_owner* Application::command_select_transfer(Parameter_destination* parameter){
+Game_object_owner* Application::command_select_transfer(Parameter_destination* parameter) {
 	Game_object_owner* Result = nullptr;
 	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Выберите назначение")));
 	bool Exit = false;
@@ -1088,12 +1092,12 @@ bool Application::command_agreement()
 		m_message_queue.m_processed_message = true;
 		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::accept)
 		{
-			result= true;
+			result = true;
 			Exit = true;
 		}
 		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::cancel)
 		{
-			result= false;
+			result = false;
 			Exit = true;
 		}
 		m_message_queue.m_read_message = false;

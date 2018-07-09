@@ -415,7 +415,8 @@ Packer_generic& Object_state_equip::get_packer()
 
 void Object_state::set_tile_size()
 {
-	m_tile_size = dimension_t(tile_size_x_half*(m_size.dx + m_size.dy), tile_size_y_half*(m_size.dx + m_size.dy) + m_size.dz * tile_size_y);
+	//m_tile_size = dimension_t(tile_size_x_half*(m_size.dx + m_size.dy), tile_size_y_half*(m_size.dx + m_size.dy) + m_size.dz * tile_size_y);
+	m_tile_size = dimension_t(tile_size_x_half*(1 + 1), tile_size_y_half*(1 + 1) + 1 * tile_size_y);
 }
 
 void Object_state::reset_serialization_index()

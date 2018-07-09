@@ -20,7 +20,7 @@ public:
 
 	virtual void set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction);
 	virtual int get_tile_index(const object_direction_e& direction, const int& frame) = 0;
-	virtual void set_tile(quad_t& quad, GameObject* obj, int frame, const object_direction_e& direction);
+	virtual void set_tile(quad_t& quad, GameObject* obj, int pos, const object_direction_e& direction);
 
 	void save() override {};
 	void load() override {};
@@ -53,7 +53,7 @@ public:
 	//bool init(const std::string& filename, object_direction_e direction, int frame) override;
 	int get_tile_index(const object_direction_e& direction, const int& frame) override;
 	void set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction) override;
-	void set_tile(quad_t& quad, GameObject* obj, int frame, const object_direction_e& direction) override;
+	void set_tile(quad_t& quad, GameObject* obj, int pos, const object_direction_e& direction) override;
 
 	Packer_generic& get_packer() override;
 
@@ -63,8 +63,29 @@ public:
 			make_property(&TileManager_Single_Atlas::m_frame, u"frame")
 		);
 	}
+};
 
-	
+class TileManager_Atlas_Rotatable :
+	public TileManager
+{
+public:
+
+	rectangle_t m_frame;
+
+	TileManager_Atlas_Rotatable();
+	//bool init(const std::string& filename, object_direction_e direction, int frame) override;
+	int get_tile_index(const object_direction_e& direction, const int& frame) override;
+	void set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction) override;
+	void set_tile(quad_t& quad, GameObject* obj, int pos, const object_direction_e& direction) override;
+
+	Packer_generic& get_packer() override;
+
+	constexpr static auto properties()
+	{
+		return std::make_tuple(
+			make_property(&TileManager_Atlas_Rotatable::m_frame, u"frame")
+		);
+	}
 };
 
 class TileManager_Single :

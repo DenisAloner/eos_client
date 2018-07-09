@@ -19,6 +19,10 @@ struct vertex_t
 	GLint position[2];
 	GLdouble texcoord[3];
 	GLfloat light[3];
+
+	inline const static void* position_offset = reinterpret_cast<void*>(offsetof(vertex_t, position));
+	inline const static void* texcoord_offset = reinterpret_cast<void*>(offsetof(vertex_t, texcoord));
+	inline const static void* light_offset = reinterpret_cast<void*>(offsetof(vertex_t, light));
 };
 
 struct quad_t
@@ -65,7 +69,7 @@ struct position3_t
 	int z;
 
 	position3_t(int x, int y, int z) : x(x), y(y), z(z) {}
-	position3_t() : x(0), y(0), z(z) {}
+	position3_t() : x(0), y(0), z(0) {}
 };
 
 struct dimension3_t

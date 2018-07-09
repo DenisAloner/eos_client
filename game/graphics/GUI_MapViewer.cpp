@@ -1062,13 +1062,13 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 								case 1:
 								{
 									xx = x;
-									yy = y + (*Current)->m_active_state->m_size.dy - 1;
+									yy = y +(*Current)->m_active_state->m_size.dy - 1;
 									break;
 								}
 								case 2:
 								{
-									xx = x - (*Current)->m_active_state->m_size.dx + 1;
-									yy = y + (*Current)->m_active_state->m_size.dy - 1;;
+									xx = x -(*Current)->m_active_state->m_size.dx + 1;
+									yy = y +(*Current)->m_active_state->m_size.dy - 1;
 									break;
 								}
 								case 3:
@@ -1078,9 +1078,11 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 									break;
 								}
 								}
-								if ((*Current)->cell()->z == z && (*Current)->cell()->y == yy && (*Current)->cell()->x  == xx)
+								//if ((*Current)->cell()->z == z && (*Current)->cell()->y == yy && (*Current)->cell()->x  == xx)
 								{
-									size3d = (*Current)->m_active_state->m_size;
+								size3d = (*Current)->m_active_state->m_size;
+								
+									
 									IsDraw = true;
 								/*	if (m_observer)
 									{
@@ -1132,7 +1134,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 								object_size = (*Current)->m_active_state->m_tile_size;
 								int yp = m_tile_count_x - px - gx;
 								int xp = m_tile_count_y - py - gy;
-								rect.set((xp - yp) * tile_size_x_half + m_shift.x, (xp + yp + size3d.dx - 1) * tile_size_y_half + m_shift.y-(*Current)->cell()->z*22, object_size.w, -object_size.h);
+								rect.set((xp - yp) * tile_size_x_half + m_shift.x, (xp + yp) * tile_size_y_half + m_shift.y - z * 22, object_size.w, -object_size.h);
 								// считаем среднюю освещенность для многотайловых объектов
 								//if (size3d.dx > 1 || size3d.dy > 1)
 								//{
@@ -1165,8 +1167,36 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 								{
 									glUseProgram(Graph->m_tile_shader);
 								}*/
-
-								(*Current)->m_active_state->m_tile_manager->set_tile(m_quads[count], (*Current), Application::instance().m_timer->get_tick(), Game_algorithm::get_direction((*Current)->m_direction,m_rotate));
+								int pos;
+								switch (m_rotate)
+								{
+								case 0:
+								{
+									pos = abs((*Current)->cell()->z - z)*(size3d.dx*size3d.dy) + abs((*Current)->cell()->y - yy)*size3d.dx + abs((*Current)->cell()->x - xx);
+									break;
+								}
+								case 1:
+								{
+									pos = abs((*Current)->cell()->z - z)*(size3d.dx*size3d.dy) + abs((*Current)->cell()->x - xx)*size3d.dx + abs((*Current)->cell()->y - yy);
+									break;
+								}
+								case 2:
+								{
+									pos = abs((*Current)->cell()->z - z)*(size3d.dx*size3d.dy) + abs((*Current)->cell()->y - yy)*size3d.dx + abs((*Current)->cell()->x - xx);
+									break;
+								}
+								case 3:
+								{
+									pos = abs((*Current)->cell()->z - z)*(size3d.dx*size3d.dy) + abs((*Current)->cell()->x - xx)*size3d.dx + abs((*Current)->cell()->y - yy);
+									break;
+								}
+								}
+								
+								/*if ((*Current)->m_name == u"darkeye")
+								{
+									LOG(INFO) << std::to_string(pos);
+								}*/
+								(*Current)->m_active_state->m_tile_manager->set_tile(m_quads[count], (*Current), pos, Game_algorithm::get_direction((*Current)->m_direction, m_rotate));
 								//GLuint Sprite = tile.unit;
 								glEnable(GL_BLEND);
 								glEnable(GL_TEXTURE_2D);
@@ -1367,11 +1397,11 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
         #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 		glBufferData(GL_ARRAY_BUFFER, sizeof(quad_t)* count, &m_quads[0], GL_DYNAMIC_DRAW);
-		glVertexAttribPointer(0, 2, GL_INT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(0));
+		glVertexAttribPointer(0, 2, GL_INT, GL_FALSE, sizeof(vertex_t), vertex_t::position_offset);
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 3, GL_DOUBLE, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(8));
+		glVertexAttribPointer(1, 3, GL_DOUBLE, GL_FALSE, sizeof(vertex_t), vertex_t::texcoord_offset);
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(32));
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), vertex_t::light_offset);
 		glEnableVertexAttribArray(2);
 		glDrawArrays(GL_QUADS, 0, 4*count);
 		glBindVertexArray(0);
