@@ -93,8 +93,7 @@ public:
 	//virtual Object_feature* find_property(property_e kind, GameObject* excluded);
 
 	void reset_serialization_index() override;
-	virtual void save();
-	virtual void load();
+	
 
 	Packer_generic& get_packer() override;
 
@@ -132,8 +131,7 @@ public:
 	Attribute_map* clone();
 
 	void reset_serialization_index() override;
-	virtual void save();
-	virtual void load();
+	
 
 	Interaction_list* get_list(interaction_e key);
 	bool get_stat(object_tag_e key);
@@ -179,8 +177,7 @@ public:
 	void apply_visitor(Visitor_generic& visitor) override;
 
 	void reset_serialization_index() override;
-	virtual void save();
-	virtual void load();
+	
 
 	Packer_generic& get_packer() override;
 
@@ -272,8 +269,7 @@ public:
 	void apply_visitor(Visitor_generic& visitor) override;
 
 	void reset_serialization_index() override;
-	virtual void save();
-	virtual void load();
+
 
 	virtual void get_actions_list(std::list<Action_helper_t>& value);
 
@@ -316,9 +312,6 @@ public:
 	InstanceDictonary<TileManager*> m_tile_managers;
 	InstanceDictonary<TileManager*> m_tile_managers_atlas;
 	InstanceDictonary<Icon*> m_icons;
-
-	void save() override {}
-	void load() override {}
 
 	Packer_generic& get_packer() override;
 
@@ -367,9 +360,7 @@ public:
 	Inventory_cell(GameObject* item = nullptr);
 
 	void reset_serialization_index() override;
-	virtual void save();
-	virtual void load();
-
+	
 	Packer_generic& get_packer() override;
 
 	constexpr static auto properties()
@@ -395,10 +386,8 @@ public:
 	virtual void do_predicat(Visitor& helper);
 	void apply_visitor(Visitor_generic& visitor) override;
 
-	virtual void reset_serialization_index();
-	virtual void save();
-	virtual void load();
-
+	void reset_serialization_index() override;
+	
 	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() 

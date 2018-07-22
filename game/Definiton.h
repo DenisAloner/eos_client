@@ -461,44 +461,10 @@ struct f2dvector_t
 enum class type_e
 {
 	null,
-	link,
-	light_t,
-	optical_properties_t,
-	object_state,
-	interaction_list,
-	parameter_list,
-	action_list,
-	parts_list,
-	tag_list,
 	object_part,
-	slot_set_state,
-	slot_select_cell,
-	slot_allocator,
-	slot_mover,
-	interaction_copyist,
-	interaction_prefix,
-	interaction_addon,
-	interaction_time,
-	interaction_timer,
-	effect,
-	tag_label,
-	tag_poison_resist,
-	tag_mortal,
-	tag_purification_from_poison,
-	tag_fast_move,
-	tag_activator,
-	action,
-	ai_enemy,
 	gameobject,
-	impact_copy_chance,
-	gamemap,
 	mapcell,
 	inventory_cell,
-	action_wrapper,
-	vision_list,
-	vision_component,
-	game_world,
-	parameter,
 	object_owner,
 	direction
 };
@@ -867,9 +833,6 @@ public:
 
 	virtual void reset_serialization_index() { m_serialization_index = 0; };
 
-	virtual void save() = 0;
-	virtual void load() = 0;
-
 	virtual Packer_generic& get_packer() = 0;
 
 	virtual void from_binary(const std::string& value, std::size_t& pos,Parser_context& context)
@@ -1105,9 +1068,6 @@ public:
 	{
 		return std::make_tuple(make_property(&Object_interaction::m_namename, u"m_value"));
 	}
-
-	void save() override{};
-	void load() override{};
 };
 
 typedef iSerializable* (*constructor_from_json_t)(scheme_map_t*);

@@ -80,30 +80,6 @@ void Object_manager::reset_serialization_index()
 	}
 }
 
-void Object_manager::save()
-{
-	/*FILE* file = Serialization_manager::instance().m_file;
-	size_t s = m_items.size();
-	fwrite(&s, sizeof(size_t), 1, file);
-	for (auto item = m_items.begin(); item != m_items.end(); ++item)
-	{
-		Serialization_manager::instance().serialize(&*item);
-	}*/
-}
-
-void Object_manager::load()
-{
-	//FILE* file = Serialization_manager::instance().m_file;
-	//size_t s;
-	//fread(&s, sizeof(size_t), 1, file);
-	//GameObject* value;
-	//for (size_t i = 0; i < s; i++)
-	//{
-	//	value = dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize());
-	//	m_items.push_back(value);
-	//}
-}
-
 Packer_generic& Object_manager::get_packer()
 {
 	return Packer<Object_manager>::Instance();
@@ -1298,49 +1274,6 @@ void GameMap::reset_serialization_index()
 	}
 }
 
-void GameMap::save()
-{
-	/*FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::gamemap;
-	fwrite(&t, sizeof(type_e), 1, file);
-	size_t s = m_index;
-	fwrite(&s, sizeof(std::size_t), 1, file);
-	MapCell* cell;
-	for (int i = 0; i < m_size.h; i++)
-	{
-		for (int j = 0; j < m_size.w; j++)
-		{
-			cell = m_items[i][j];
-			fwrite(&cell->m_notable, sizeof(bool), 1, file);
-			s = cell->m_items.size();
-			fwrite(&s, sizeof(size_t), 1, file);
-			for (auto item = cell->m_items.begin(); item != cell->m_items.end(); ++item)
-			{
-				Serialization_manager::instance().serialize(*item);
-			}
-		}
-	}*/
-}
-
-void GameMap::load()
-{
-	/*FILE* file = Serialization_manager::instance().m_file;
-	size_t s;
-	MapCell* cell;
-	for (int i = 0; i < m_size.h; i++)
-	{
-		for (int j = 0; j < m_size.w; j++)
-		{
-			cell = m_items[i][j];
-			fread(&cell->m_notable, sizeof(bool), 1, file);
-			fread(&s, sizeof(size_t), 1, file);
-			for (int k = 0; k < s; k++)
-			{
-				cell->m_items.push_back(dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize()));
-			}
-		}
-	}*/
-}
 
 Packer_generic& GameMap::get_packer()
 {
@@ -1373,39 +1306,6 @@ void Game_world::reset_serialization_index()
 	{
 		m_map->reset_serialization_index();
 	}
-}
-
-void Game_world::save()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::game_world;
-	fwrite(&t, sizeof(type_e), 1, file);
-	m_object_manager.save();
-	size_t s = m_maps.size();
-	fwrite(&s, sizeof(std::size_t), 1, file);
-	std::size_t index = 0;
-	for (auto m = m_maps.begin(); m != m_maps.end(); ++m)
-	{ 
-		Serialization_manager::instance().serialize(*m);
-	}
-	Serialization_manager::instance().serialize(m_player->m_object);
-}
-
-void Game_world::load()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	m_object_manager.load();
-	size_t s;
-	fread(&s, sizeof(size_t), 1, file);
-	GameMap* map;
-	for (size_t i = 0; i < s; i++)
-	{
-		map = dynamic_cast<GameMap*>(Serialization_manager::instance().deserialize());
-		m_maps.push_back(map);
-	}
-	GameObject* object = dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize());
-	map = static_cast<MapCell*>(object->m_owner)->m_map;
-	m_player = new Player(object, map);
 }
 
 std::u16string Game_world::serialize(Parser_context& context)

@@ -15,10 +15,6 @@ public:
 
 	virtual Object_interaction* clone();
 
-	virtual void save();
-	virtual void load();
-
-
 	Packer_generic& get_packer() override;
 };
 

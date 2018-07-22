@@ -31,8 +31,6 @@ struct Parameter_argument_t
 
 	void init();
 	void reset_serialization_index();
-	void save();
-	void load();
 
 	operator bool();
 
@@ -68,11 +66,8 @@ public:
 
 	Parameter* clone();
 
-	virtual void reset_serialization_index();
-	virtual void save();
-	virtual void load();
-
-
+	void reset_serialization_index() override;
+	
 	Packer_generic& get_packer() override;
 
 	constexpr static auto properties()
@@ -125,10 +120,6 @@ public:
 	Instruction_result();
 	virtual Instruction_result* clone() { return nullptr; };
 	virtual void apply_effect(GameObject* unit, Object_interaction* object) {};
-
-	virtual void save() {};
-	virtual void load() {};
-
 
 	Packer_generic& get_packer() override;
 };

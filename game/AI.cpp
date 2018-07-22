@@ -798,30 +798,6 @@ void AI_enemy::reset_serialization_index()
 	}
 }
 
-void AI_enemy::save()
-{
-	LOG(INFO) << "ÈÈ";
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::ai_enemy;
-	fwrite(&t, sizeof(type_e), 1, file);
-	fwrite(&m_ai_type, sizeof(ai_type_e), 1, file);
-	fwrite(&m_path_qualifier->index, sizeof(size_t), 1, file);
-	Serialization_manager::instance().serialize(m_action_controller);
-	LOG(INFO) << "Êîíåö ÈÈ";
-}
-
-void AI_enemy::load()
-{
-	LOG(INFO) << "ÈÈ";
-	FILE* file = Serialization_manager::instance().m_file;
-	fread(&m_ai_type, sizeof(ai_type_e), 1, file);
-	size_t s;
-	fread(&s, sizeof(size_t), 1, file);
-	m_path_qualifier = Application::instance().m_ai_manager->m_path_qualifiers[s];
-	m_action_controller = dynamic_cast<Action_wrapper*>(Serialization_manager::instance().deserialize());
-	LOG(INFO) << "Êîíåö ÈÈ";
-}
-
 AI_trap::AI_trap(){};
 
 GameObject* AI_trap::find_goal(){ return nullptr; };
@@ -851,14 +827,6 @@ void AI_trap::create()
 		}
 	}
 };
-
-void AI_trap::save()
-{
-}
-
-void AI_trap::load()
-{
-}
 
 Packer_generic& AI_trap::get_packer()
 {

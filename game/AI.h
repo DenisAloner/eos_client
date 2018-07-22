@@ -138,9 +138,7 @@ public:
 	virtual void create();
 	virtual AI* clone();
 
-	virtual void reset_serialization_index();
-	virtual void save();
-	virtual void load();
+	void reset_serialization_index() override;
 
 	virtual void calculate_FOV(GameObject* object, GameMap* map);
 
@@ -164,10 +162,6 @@ public:
 	virtual GameObject* find_goal();
 	virtual void create();
 	virtual AI* clone() { return nullptr; };
-
-	virtual void save();
-	virtual void load();
-
 
 	Packer_generic& get_packer() override;
 

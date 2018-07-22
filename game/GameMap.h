@@ -34,8 +34,6 @@ public:
 	void calculate_ai();
 
 	void reset_serialization_index() override;
-	virtual void save();
-	virtual void load();
 
 	Packer_generic& get_packer() override;
 
@@ -106,8 +104,6 @@ public:
 	void blur_lighting();
 
 	void reset_serialization_index() override;
-	virtual void save();
-	virtual void load();
 
 	Packer_generic& get_packer() override;
 
@@ -141,8 +137,6 @@ public:
 	Game_world();
 	void calculate_lighting();
 	void reset_serialization_index() override;
-	virtual void save();
-	virtual void load();
 
 	std::u16string serialize(Parser_context& context);
 	void deserialize(std::u16string& value, Parser_context& context);

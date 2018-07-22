@@ -402,7 +402,7 @@ void Application::new_game()
 
 	obj = m_game_object_manager->new_object("darkeye");
 	obj->set_direction(object_direction_e::down);
-	map->add_to_map(obj, map->get(1, ry-2, rx-2));
+	map->add_to_map(obj, map->get(1, ry, rx-2));
 
 	/*obj = m_game_object_manager->new_object("bag");
 	obj->set_direction(object_direction_e::top);

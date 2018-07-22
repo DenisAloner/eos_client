@@ -91,33 +91,6 @@ void Interaction_list::reset_serialization_index()
 	}
 }
 
-void Interaction_list::save()
-{
-	LOG(INFO) << "Лист общий";
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::interaction_list;
-	fwrite(&t, sizeof(type_e), 1, file);
-	size_t s = m_items.size();
-	fwrite(&s, sizeof(size_t), 1, file);
-	for (auto item = m_items.begin(); item != m_items.end(); ++item)
-	{
-		Serialization_manager::instance().serialize(*item);
-	}
-	LOG(INFO) << "Конец общего листа";
-}
-
-void Interaction_list::load()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	size_t s;
-	fread(&s, sizeof(size_t), 1, file);
-	m_items.clear();
-	for (size_t i = 0; i < s; i++)
-	{
-		m_items.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
-	}
-}
-
 Packer_generic& Interaction_list::get_packer()
 {
 	return Packer<Interaction_list>::Instance();
@@ -242,44 +215,6 @@ Parameter_list* Parameter_list::clone()
 void Parameter_list::apply_visitor(Visitor_generic& visitor)
 {
 	visitor.visit(*this);
-}
-
-void Parameter_list::save()
-{
-	LOG(INFO) << "Лист параметров";
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::parameter_list;
-	fwrite(&t, sizeof(type_e), 1, file);
-
-	fwrite(&m_subtype, sizeof(interaction_e), 1, file);
-	fwrite(&m_basic_value, sizeof(int), 1, file);
-	fwrite(&m_basic_limit, sizeof(int), 1, file);
-
-	size_t s = m_items.size();
-	fwrite(&s, sizeof(size_t), 1, file);
-	for (auto item = m_items.begin(); item != m_items.end(); ++item)
-	{
-		Serialization_manager::instance().serialize(*item);
-	}
-	LOG(INFO) << "Конец листа параметров";
-}
-
-void Parameter_list::load()
-{
-	LOG(INFO) << "Лист параметров";
-	FILE* file = Serialization_manager::instance().m_file;
-	fread(&m_subtype, sizeof(interaction_e), 1, file);
-	LOG(INFO) << "ТИП листа параметров " << std::to_string((int)m_subtype);
-	fread(&m_basic_value, sizeof(int), 1, file);
-	fread(&m_basic_limit, sizeof(int), 1, file);
-	size_t s;
-	fread(&s, sizeof(size_t), 1, file);
-	m_items.clear();
-	for (size_t i = 0; i < s; i++)
-	{
-		m_items.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
-	}
-	LOG(INFO) << "Конец листа параметров";
 }
 
 Packer_generic& Parameter_list::get_packer()
@@ -420,34 +355,7 @@ void Vision_list::unequip(Object_interaction* item)
 	}
 }
 
-void Vision_list::save()
-{
-	LOG(INFO) << "Лист зрения";
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::vision_list;
-	fwrite(&t, sizeof(type_e), 1, file);
-	size_t s = m_items.size();
-	fwrite(&s, sizeof(size_t), 1, file);
-	for (auto item = m_items.begin(); item != m_items.end(); ++item)
-	{
-		Serialization_manager::instance().serialize(*item);
-	}
-	LOG(INFO) << "Конец листа зрения";
-}
 
-void Vision_list::load()
-{
-	LOG(INFO) << "Лист зрения";
-	FILE* file = Serialization_manager::instance().m_file;
-	size_t s;
-	fread(&s, sizeof(size_t), 1, file);
-	m_items.clear();
-	for (size_t i = 0; i < s; i++)
-	{
-		m_items.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
-	}
-	LOG(INFO) << "Конец листа зрения";
-}
 
 Packer_generic& Vision_list::get_packer()
 {
@@ -534,37 +442,6 @@ void Vision_component::apply_visitor(Visitor_generic& visitor)
 	visitor.visit(*this);
 }
 
-void Vision_component::save()
-{
-	LOG(INFO) << "Компонент зрения";
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::vision_component;
-	fwrite(&t, sizeof(type_e), 1, file);
-	FileSystem::instance().serialize_AI_FOV(m_basic_value, file);
-	size_t s = m_items.size();
-	fwrite(&s, sizeof(size_t), 1, file);
-	for (auto item = m_items.begin(); item != m_items.end(); ++item)
-	{
-		Serialization_manager::instance().serialize(*item);
-	}
-	LOG(INFO) << "Конец компонента зрения";
-}
-
-void Vision_component::load()
-{
-	LOG(INFO) << "Компонент зрения";
-	FILE* file = Serialization_manager::instance().m_file;
-	FileSystem::instance().deserialize_AI_FOV(m_basic_value, file);
-	size_t s;
-	fread(&s, sizeof(size_t), 1, file);
-	m_items.clear();
-	for (size_t i = 0; i < s; i++)
-	{
-		m_items.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
-	}
-	LOG(INFO) << "Конец компонента зрения";
-}
-
 Packer_generic& Vision_component::get_packer()
 {
 	return Packer<Vision_component>::Instance();
@@ -607,34 +484,6 @@ bool Tag_list::update()
 	Update_visitor uh;
 	do_predicat(uh);
 	return uh.was_changed;
-}
-
-void Tag_list::save()
-{
-	LOG(INFO) << "Лист меток";
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::tag_list;
-	fwrite(&t, sizeof(type_e), 1, file);
-	size_t s = m_items.size();
-	fwrite(&s, sizeof(size_t), 1, file);
-
-	for (auto item = m_items.begin(); item != m_items.end(); ++item)
-	{
-		Serialization_manager::instance().serialize(*item);
-	}
-	LOG(INFO) << "Конец листа меток";
-}
-
-void Tag_list::load()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	size_t s;
-	fread(&s, sizeof(size_t), 1, file);
-	m_items.clear();
-	for (size_t i = 0; i < s; i++)
-	{
-		m_items.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
-	}
 }
 
 Packer_generic& Tag_list::get_packer()
@@ -825,32 +674,6 @@ Packer_generic& Parts_list::get_packer()
 	return Packer<Parts_list>::Instance();
 };
 
-void Parts_list::save()
-{
-	LOG(INFO) << "Лист частей";
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::parts_list;
-	fwrite(&t, sizeof(type_e), 1, file);
-	size_t s = m_items.size();
-	fwrite(&s, sizeof(size_t), 1, file);
-	for (auto item = m_items.begin(); item != m_items.end(); ++item)
-	{
-		Serialization_manager::instance().serialize(*item);
-	}
-	LOG(INFO) << "Конец листа частей";
-}
-
-void Parts_list::load()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	size_t s;
-	fread(&s, sizeof(size_t), 1, file);
-	m_items.clear();
-	for (size_t i = 0; i < s; i++)
-	{
-		m_items.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
-	}
-}
 
 void Parts_list::apply_visitor(Visitor_generic& visitor)
 {
@@ -873,33 +696,6 @@ Interaction_list* Action_list::clone()
 		result->m_items.push_back((*item)->clone());
 	}
 	return result;
-}
-
-void Action_list::save()
-{
-	LOG(INFO) << "Лист действий";
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::action_list;
-	fwrite(&t, sizeof(type_e), 1, file);
-	size_t s = m_items.size();
-	fwrite(&s, sizeof(size_t), 1, file);
-	for (auto item = m_items.begin(); item != m_items.end(); ++item)
-	{
-		Serialization_manager::instance().serialize(*item);
-	}
-	LOG(INFO) << "Конец листа действий";
-}
-
-void Action_list::load()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	size_t s;
-	fread(&s, sizeof(size_t), 1, file);
-	m_items.clear();
-	for (size_t i = 0; i < s; i++)
-	{
-		m_items.push_back(dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize()));
-	}
 }
 
 void Action_list::apply_visitor(Visitor_generic& visitor)
@@ -928,18 +724,6 @@ void Slot_set_state::apply_effect(GameObject* unit, Object_interaction* object)
 	unit->set_state(m_value);
 }
 
-void Slot_set_state::save()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::slot_set_state;
-	fwrite(&t, sizeof(type_e), 1, file);
-	fwrite(&m_value, sizeof(object_state_e), 1, file);
-}
-
-void Slot_set_state::load()
-{
-}
-
 Packer_generic& Slot_set_state::get_packer()
 {
 	return Packer<Slot_set_state>::Instance();
@@ -966,17 +750,6 @@ void Interaction_slot::reset_serialization_index()
 	}
 }
 
-//void Interaction_slot::save()
-//{
-//	FILE* file = Serialization_manager::instance().m_file;
-//	type_e t = type_e::interaction_slot;
-//	fwrite(&t, sizeof(type_e), 1, file);
-//}
-//
-//void Interaction_slot::load()
-//{
-//}
-
 // Interaction_copyist
 
 Interaction_copyist::Interaction_copyist()
@@ -1000,22 +773,6 @@ void Interaction_copyist::apply_effect(GameObject* unit, Object_interaction* obj
 	{
 		m_value->apply_effect(unit, i);
 	}
-}
-
-void Interaction_copyist::save()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::interaction_copyist;
-	fwrite(&t, sizeof(type_e), 1, file);
-	fwrite(&m_subtype, sizeof(interaction_e), 1, file);
-	Serialization_manager::instance().serialize(m_value);
-}
-
-void Interaction_copyist::load()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	fread(&m_subtype, sizeof(interaction_e), 1, file);
-	m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
 }
 
 Packer_generic& Interaction_copyist::get_packer()
@@ -1049,22 +806,6 @@ void Interaction_prefix::apply_effect(GameObject* unit, Object_interaction* obje
 	/*if (m_value) { m_value->apply_effect(unit, object); }*/
 }
 
-void Interaction_prefix::save()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::interaction_prefix;
-	fwrite(&t, sizeof(type_e), 1, file);
-	fwrite(&m_subtype, sizeof(effect_prefix_e), 1, file);
-	Serialization_manager::instance().serialize(m_value);
-}
-
-void Interaction_prefix::load()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	fread(&m_subtype, sizeof(effect_prefix_e), 1, file);
-	m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
-}
-
 Packer_generic& Interaction_prefix::get_packer()
 {
 	return Packer<Interaction_prefix>::Instance();
@@ -1086,22 +827,6 @@ Object_interaction* Interaction_addon::clone()
 void Interaction_addon::apply_effect(GameObject* unit, Object_interaction* object)
 {
 	unit->add_from(m_subtype, m_value->clone());
-}
-
-void Interaction_addon::save()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::interaction_addon;
-	fwrite(&t, sizeof(type_e), 1, file);
-	fwrite(&m_subtype, sizeof(interaction_e), 1, file);
-	Serialization_manager::instance().serialize(m_value);
-}
-
-void Interaction_addon::load()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	fread(&m_subtype, sizeof(interaction_e), 1, file);
-	m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
 }
 
 Packer_generic& Interaction_addon::get_packer()
@@ -1130,21 +855,6 @@ void Interaction_time::apply_effect(GameObject* unit, Object_interaction* object
 	m_value->apply_effect(unit, object);
 }
 
-void Interaction_time::save()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::interaction_time;
-	fwrite(&t, sizeof(type_e), 1, file);
-	fwrite(&m_turn, sizeof(int), 1, file);
-	Serialization_manager::instance().serialize(m_value);
-}
-
-void Interaction_time::load()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	fread(&m_turn, sizeof(int), 1, file);
-	m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
-}
 
 Packer_generic& Interaction_time::get_packer()
 {
@@ -1174,24 +884,6 @@ void Interaction_timer::apply_effect(GameObject* unit, Object_interaction* objec
 	{
 		m_value->apply_effect(unit, object);
 	}
-}
-
-void Interaction_timer::save()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::interaction_timer;
-	fwrite(&t, sizeof(type_e), 1, file);
-	fwrite(&m_turn, sizeof(int), 1, file);
-	fwrite(&m_period, sizeof(int), 1, file);
-	Serialization_manager::instance().serialize(m_value);
-}
-
-void Interaction_timer::load()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	fread(&m_turn, sizeof(int), 1, file);
-	fread(&m_period, sizeof(int), 1, file);
-	m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
 }
 
 Packer_generic& Interaction_timer::get_packer()
@@ -1245,22 +937,6 @@ void Effect::apply_effect(GameObject* unit, Object_interaction* object)
 	}
 }
 
-void Effect::save()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::effect;
-	fwrite(&t, sizeof(type_e), 1, file);
-	fwrite(&m_value, sizeof(int), 1, file);
-	fwrite(&m_subtype, sizeof(effect_e), 1, file);
-}
-
-void Effect::load()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	fread(&m_value, sizeof(int), 1, file);
-	fread(&m_subtype, sizeof(effect_e), 1, file);
-}
-
 Packer_generic& Effect::get_packer()
 {
 	return Packer<Effect>::Instance();
@@ -1294,17 +970,6 @@ void ObjectTag::Poison_resist::apply_effect(GameObject* unit, Object_interaction
 		break;
 	}
 	}
-}
-
-void ObjectTag::Poison_resist::save()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::tag_poison_resist;
-	fwrite(&t, sizeof(type_e), 1, file);
-}
-
-void ObjectTag::Poison_resist::load()
-{
 }
 
 Packer_generic& ObjectTag::Poison_resist::get_packer()
@@ -1346,17 +1011,6 @@ void ObjectTag::Mortal::apply_effect(GameObject* unit, Object_interaction* objec
 	}
 }
 
-void ObjectTag::Mortal::save()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::tag_mortal;
-	fwrite(&t, sizeof(type_e), 1, file);
-}
-
-void ObjectTag::Mortal::load()
-{
-}
-
 // ObjectTag::Purification_from_poison
 
 ObjectTag::Purification_from_poison::Purification_from_poison() :Object_tag(object_tag_e::purification_from_poison){};
@@ -1394,16 +1048,6 @@ void ObjectTag::Purification_from_poison::apply_effect(GameObject* unit, Object_
 	}
 }
 
-void ObjectTag::Purification_from_poison::save()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::tag_purification_from_poison;
-	fwrite(&t, sizeof(type_e), 1, file);
-}
-
-void ObjectTag::Purification_from_poison::load()
-{
-}
 
 Packer_generic& ObjectTag::Purification_from_poison::get_packer()
 {
@@ -1453,31 +1097,6 @@ void ObjectTag::Activator::reset_serialization_index()
 	}
 }
 
-void ObjectTag::Activator::save()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::tag_activator;
-	fwrite(&t, sizeof(type_e), 1, file);
-	size_t s = m_link.size();
-	fwrite(&s, sizeof(size_t), 1, file);
-	for (auto item = m_link.begin(); item != m_link.end(); ++item)
-	{
-		Serialization_manager::instance().serialize(*item);
-	}
-}
-
-void ObjectTag::Activator::load()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	size_t s;
-	fread(&s, sizeof(size_t), 1, file);
-	m_link.clear();
-	for (size_t i = 0; i < s; i++)
-	{
-		m_link.push_back(dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize()));
-	}
-}
-
 Packer_generic& ObjectTag::Activator::get_packer()
 {
 	return Packer<Activator>::Instance();
@@ -1516,17 +1135,6 @@ void ObjectTag::Fast_move::apply_effect(GameObject* unit, Object_interaction* ob
 	}
 }
 
-void ObjectTag::Fast_move::save()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::tag_fast_move;
-	fwrite(&t, sizeof(type_e), 1, file);
-}
-
-void ObjectTag::Fast_move::load()
-{
-}
-
 Packer_generic& ObjectTag::Fast_move::get_packer()
 {
 	return Packer<Fast_move>::Instance();
@@ -1548,20 +1156,6 @@ void ObjectTag::Label::apply_visitor(Visitor_generic& visitor)
 {
 	visitor.visit(*this);
 };
-
-void ObjectTag::Label::save()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::tag_label;
-	fwrite(&t, sizeof(type_e), 1, file);
-	fwrite(&m_type, sizeof(object_tag_e), 1, file);
-}
-
-void ObjectTag::Label::load()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	fread(&m_type, sizeof(object_tag_e), 1, file);
-}
 
 Packer_generic& ObjectTag::Label::get_packer()
 {
@@ -1736,22 +1330,6 @@ void Instruction_slot_link::apply_effect(GameObject* unit, Object_interaction* o
 	}
 }
 
-void Instruction_slot_link::save()
-{
-	//FILE* file = Serialization_manager::instance().m_file;
-	//type_e t = type_e::interaction_copyist;
-	//fwrite(&t, sizeof(type_e), 1, file);
-	//fwrite(&m_subtype, sizeof(interaction_e), 1, file);
-	//Serialization_manager::instance().serialize(m_value);
-}
-
-void Instruction_slot_link::load()
-{
-	//FILE* file = Serialization_manager::instance().m_file;
-	//fread(&m_subtype, sizeof(interaction_e), 1, file);
-	//m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
-}
-
 Packer_generic& Instruction_slot_link::get_packer()
 {
 	return Packer<Instruction_slot_link>::Instance();
@@ -1790,22 +1368,6 @@ void Instruction_slot_parameter::apply_effect(GameObject* unit, Object_interacti
 			m_enable = true;
 		}
 	}*/
-}
-
-void Instruction_slot_parameter::save()
-{
-	//FILE* file = Serialization_manager::instance().m_file;
-	//type_e t = type_e::interaction_copyist;
-	//fwrite(&t, sizeof(type_e), 1, file);
-	//fwrite(&m_subtype, sizeof(interaction_e), 1, file);
-	//Serialization_manager::instance().serialize(m_value);
-}
-
-void Instruction_slot_parameter::load()
-{
-	//FILE* file = Serialization_manager::instance().m_file;
-	//fread(&m_subtype, sizeof(interaction_e), 1, file);
-	//m_value = dynamic_cast<Object_interaction*>(Serialization_manager::instance().deserialize());
 }
 
 Packer_generic& Instruction_slot_parameter::get_packer()
@@ -1939,20 +1501,6 @@ void ObjectTag::Equippable::reset_serialization_index()
 	}
 }
 
-void ObjectTag::Equippable::save()
-{
-	/*FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::tag_label;
-	fwrite(&t, sizeof(type_e), 1, file);
-	fwrite(&m_type, sizeof(object_tag_e), 1, file);*/
-}
-
-void ObjectTag::Equippable::load()
-{
-	/*FILE* file = Serialization_manager::instance().m_file;
-	fread(&m_type, sizeof(object_tag_e), 1, file);*/
-}
-
 Packer_generic& ObjectTag::Equippable::get_packer()
 {
 	return Packer<Equippable>::Instance();
@@ -1998,20 +1546,6 @@ void ObjectTag::Requirements_to_object::apply_visitor(Visitor_generic& visitor)
 {
 	visitor.visit(*this);
 };
-
-void ObjectTag::Requirements_to_object::save()
-{
-	/*FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::tag_label;
-	fwrite(&t, sizeof(type_e), 1, file);
-	fwrite(&m_type, sizeof(object_tag_e), 1, file);*/
-}
-
-void ObjectTag::Requirements_to_object::load()
-{
-	/*FILE* file = Serialization_manager::instance().m_file;
-	fread(&m_type, sizeof(object_tag_e), 1, file);*/
-}
 
 void ObjectTag::Requirements_to_object::reset_serialization_index()
 {
@@ -2070,20 +1604,6 @@ void ObjectTag::Can_transfer_object::reset_serialization_index()
 		m_value->reset_serialization_index();
 	}
 };
-
-void ObjectTag::Can_transfer_object::save()
-{
-	/*FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::tag_label;
-	fwrite(&t, sizeof(type_e), 1, file);
-	fwrite(&m_type, sizeof(object_tag_e), 1, file);*/
-}
-
-void ObjectTag::Can_transfer_object::load()
-{
-	/*FILE* file = Serialization_manager::instance().m_file;
-	fread(&m_type, sizeof(object_tag_e), 1, file);*/
-}
 
 Packer_generic& ObjectTag::Can_transfer_object::get_packer()
 {
@@ -2251,20 +1771,6 @@ void Instruction_arg_extract::reset_serialization_index()
 	{
 		m_value->reset_serialization_index();
 	}
-}
-
-void Instruction_arg_extract::save()
-{
-	/*FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::tag_label;
-	fwrite(&t, sizeof(type_e), 1, file);
-	fwrite(&m_type, sizeof(object_tag_e), 1, file);*/
-}
-
-void Instruction_arg_extract::load()
-{
-	/*FILE* file = Serialization_manager::instance().m_file;
-	fread(&m_type, sizeof(object_tag_e), 1, file);*/
 }
 
 Packer_generic& Instruction_arg_extract::get_packer()

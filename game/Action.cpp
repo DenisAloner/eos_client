@@ -55,19 +55,6 @@ void Action::interaction_handler(Parameter* arg)
 	}
 }
 
-void Action::save()
-{
-	/*FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::action;
-	fwrite(&t, sizeof(type_e), 1, file);
-	LOG(INFO)<< m_name <<" " <<std::to_string(m_index);
-	fwrite(&m_index, sizeof(size_t), 1, file);*/
-}
-
-void Action::load()
-{
-}
-
 Packer_generic& Action::get_packer()
 {
 	return Packer<Action>::Instance();
@@ -145,33 +132,6 @@ void Action_wrapper::reset_serialization_index()
 			m_parameter->reset_serialization_index();
 		}
 	}
-}
-
-void Action_wrapper::save()
-{
-	LOG(INFO) << "Выполняемое действие";
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::action_wrapper;
-	fwrite(&t, sizeof(type_e), 1, file);
-	fwrite(&m_decay, sizeof(int), 1, file);
-	LOG(INFO) << " - запись объекта";
-	Serialization_manager::instance().serialize(m_action);
-	LOG(INFO) << " - запись параметра";
-	Serialization_manager::instance().serialize(m_parameter);
-	LOG(INFO) << "Конец выполняемого действия";
-}
-
-void Action_wrapper::load()
-{
-	LOG(INFO) << "Выполняемое действие";
-	FILE* file = Serialization_manager::instance().m_file;
-	fread(&m_decay, sizeof(int), 1, file);
-	LOG(INFO) << " - загрузка объекта";
-	m_action = dynamic_cast<Action*>(Serialization_manager::instance().deserialize());
-	LOG(INFO) << " - загрузка параметра";
-	m_parameter = dynamic_cast<Parameter*>(Serialization_manager::instance().deserialize());
-	LOG(INFO) << "Конец выполняемого действия";
-	done = false;
 }
 
 void Action_wrapper::set(GameObject* unit, Action* action, Parameter* parameter)

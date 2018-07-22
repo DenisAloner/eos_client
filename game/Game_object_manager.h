@@ -30,11 +30,6 @@ public:
 	std::string get_effect_prefix_string(effect_prefix_e key);
 
 	void bind_body(GameObject* object);
-
-	virtual void save();
-	virtual void load();
-
-
 };
 
 class Visitor_part_hierarchy_setter :public Visitor_simple

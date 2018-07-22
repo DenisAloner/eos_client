@@ -22,9 +22,6 @@ public:
 	virtual int get_tile_index(const object_direction_e& direction, const int& frame) = 0;
 	virtual void set_tile(quad_t& quad, GameObject* obj, int pos, const object_direction_e& direction);
 
-	void save() override {};
-	void load() override {};
-
 	//Packer_generic& get_packer() override
 	//{
 	//	return Packer<Object_interaction>::Instance();

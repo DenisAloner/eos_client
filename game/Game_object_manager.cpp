@@ -88,19 +88,6 @@ effect_prefix_e GameObjectManager::get_effect_prefix_e(const std::string& key)
 	return value->second;
 }
 
-void GameObjectManager::save()
-{
-	/*for (auto object = m_objects.begin(); object != m_objects.end(); object++)
-	{
-	(*object)->save(file);
-	}*/
-}
-
-void GameObjectManager::load()
-{
-}
-
-
 void GameObjectManager::bind_body(GameObject* object)
 {
 	Interaction_list* list;

@@ -73,23 +73,6 @@ void MapCell::reset_serialization_index()
 	}
 }
 
-void MapCell::save()
-{
-	LOG(INFO) << "Запись клетки карты";
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::mapcell;
-	fwrite(&t, sizeof(type_e), 1, file);
-	fwrite(&x, sizeof(int), 1, file);
-	fwrite(&y, sizeof(int), 1, file);
-	fwrite(&(m_map->m_index), sizeof(std::size_t), 1, file);
-	LOG(INFO) << "Координаты " << std::to_string(x) << " " << std::to_string(y) << " " << std::to_string(m_map->m_index);
-	LOG(INFO) << "Конец записи клетки карты";
-}
-
-void MapCell::load()
-{
-}
-
 Packer_generic& MapCell::get_packer()
 {
 	return Packer<MapCell>::Instance();
@@ -138,36 +121,6 @@ void  Attribute_map::reset_serialization_index()
 	for (auto m_item : m_items)
 	{
 		m_item.second->reset_serialization_index();
-	}
-}
-
-void Attribute_map::save()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	size_t s = m_items.size();
-	fwrite(&s, sizeof(size_t), 1, file);
-	LOG(INFO) << "листов " << std::to_string(s);
-	for (auto item = m_items.begin(); item != m_items.end(); item++)
-	{
-		LOG(INFO) << "МАРКЕР АТРИБУТА  - " << std::to_string((int)(*item).first);
-		fwrite(&((*item).first), sizeof(interaction_e), 1, file);
-		Serialization_manager::instance().serialize((*item).second);
-	}
-}
-
-void Attribute_map::load()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	size_t s;
-	fread(&s, sizeof(size_t), 1, file);
-	m_items.clear();
-	interaction_e ie;
-	LOG(INFO) << "листов " << std::to_string(s);
-	for (size_t i = 0; i < s; i++)
-	{
-		fread(&ie, sizeof(interaction_e), 1, file);
-		LOG(INFO) << "МАРКЕР АТРИБУТА  - " << std::to_string((int)ie);
-		m_items[ie] = dynamic_cast<Interaction_list*>(Serialization_manager::instance().deserialize());
 	}
 }
 
@@ -427,49 +380,6 @@ void Object_state::reset_serialization_index()
 	{
 		m_ai->reset_serialization_index();
 	}
-}
-
-void Object_state::save()
-{
-	LOG(INFO) << "Состояние";
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::object_state;
-	fwrite(&t, sizeof(type_e), 1, file);
-	Attribute_map::save();
-	fwrite(&m_state, sizeof(object_state_e), 1, file);
-	fwrite(&m_layer, sizeof(int), 1, file);
-	fwrite(&m_icon, sizeof(unsigned int), 1, file);
-	//fwrite(&m_size, sizeof(game_object_size_t), 1, file);
-	fwrite(&m_weight, sizeof(float), 1, file);
-	FileSystem::instance().serialize_pointer(m_light, type_e::light_t, file);
-	FileSystem::instance().serialize_pointer(m_optical, type_e::optical_properties_t, file);
-	if(m_tile_manager->m_index>28)
-	{
-		LOG(FATAL) << "Тайловый менеджер с ошибкой " <<std::to_string(m_tile_manager->m_index);
-	}
-	fwrite(&m_tile_manager->m_index, sizeof(size_t), 1, file);
-	LOG(INFO) << "ИИ";
-	Serialization_manager::instance().serialize(m_ai);
-	LOG(INFO) << "Конец ИИ";
-	LOG(INFO) << "Конец состояния";
-}
-
-void Object_state::load()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	Attribute_map::load();
-	fread(&m_state, sizeof(object_state_e), 1, file);
-	fread(&m_layer, sizeof(int), 1, file);
-	fread(&m_icon, sizeof(unsigned int), 1, file);
-	//fread(&m_size, sizeof(game_object_size_t), 1, file);
-	fread(&m_weight, sizeof(float), 1, file);
-	m_light = static_cast<light_t*>(FileSystem::instance().deserialize_pointer(file));
-	m_optical = static_cast<optical_properties_t*>(FileSystem::instance().deserialize_pointer(file));
-	size_t s;
-	fread(&s, sizeof(size_t), 1, file);
-	LOG(INFO) << "тайл "<<std::to_string(s);
-	//m_tile_manager = Application::instance().m_graph->m_tile_managers[s];
-	m_ai = static_cast<AI*>(Serialization_manager::instance().deserialize());
 }
 
 Packer_generic& Object_state::get_packer()
@@ -928,57 +838,6 @@ void GameObject::reset_serialization_index()
 	}
 }
 
-void GameObject::save()
-{
-	/*LOG(INFO) << m_name;
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::gameobject;
-	fwrite(&t, sizeof(type_e), 1, file);
-	FileSystem::instance().serialize_string(m_name, file);
-	fwrite(&m_direction, sizeof(object_direction_e), 1, file);
-	LOG(INFO) << " --- Запись владельца";
-	Serialization_manager::instance().serialize(m_owner);
-	LOG(INFO) << " --- Конец запись владельца";
-	size_t s = m_state.size();
-	fwrite(&s, sizeof(size_t), 1, file);
-	for (auto item = m_state.begin(); item != m_state.end(); ++item)
-	{
-		Serialization_manager::instance().serialize(*item);
-	}
-	Serialization_manager::instance().serialize(m_active_state);*/
-}
-
-void GameObject::load()
-{
-	/*FILE* file = Serialization_manager::instance().m_file;
-	FileSystem::instance().deserialize_string(m_name, file);
-	LOG(INFO) << m_name;
-	fread(&m_direction, sizeof(object_direction_e), 1, file);
-	LOG(INFO) << " --- Загрузка владельца";
-	m_owner = dynamic_cast<Game_object_owner*>(Serialization_manager::instance().deserialize());
-	if (m_owner)
-	{
-		LOG(INFO) << " --- Конец загрузки владельца " << std::to_string((int)m_owner->m_kind);
-	}
-	else
-	{
-		LOG(INFO) << " --- Конец загрузки пустого владельца " ;
-	}
-	
-	size_t s;
-	fread(&s, sizeof(size_t), 1, file);
-	Object_state* value;
-	for (size_t i = 0; i < s; i++)
-	{
-		value = static_cast<Object_state*>(Serialization_manager::instance().deserialize());
-		m_state.push_back(value);
-	}
-	m_active_state = static_cast<Object_state*>(Serialization_manager::instance().deserialize());
-	set_direction(m_direction);
-	update_interaction();
-	LOG(INFO) << "конец загрузки объекта";*/
-}
-
 Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 {
 	AI_enemy* ai = dynamic_cast<AI_enemy*>(m_object->m_active_state->m_ai);
@@ -1078,20 +937,6 @@ void Inventory_cell::reset_serialization_index()
 	}
 }
 
-void Inventory_cell::save()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::inventory_cell;
-	fwrite(&t, sizeof(type_e), 1, file);
-	Serialization_manager::instance().serialize(m_item);
-}
-
-void Inventory_cell::load()
-{
-	FILE* file = Serialization_manager::instance().m_file;
-	m_item = dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize());
-}
-
 Packer_generic& Inventory_cell::get_packer()
 {
 	return Packer<Inventory_cell>::Instance();
@@ -1143,46 +988,6 @@ void Object_part::reset_serialization_index()
 			m_item->reset_serialization_index();
 		}
 	}
-}
-
-void Object_part::save()
-{
-	/*LOG(INFO) << "Часть";
-	FILE* file = Serialization_manager::instance().m_file;
-	type_e t = type_e::object_part;
-	fwrite(&t, sizeof(type_e), 1, file);
-	LOG(INFO) << "Состояние";
-	m_attributes.save();
-	LOG(INFO) << "Конец состояния";
-	fwrite(&m_part_kind, sizeof(body_part_e), 1, file);
-	FileSystem::instance().serialize_string(m_name, file);
-	LOG(INFO) << "--- Запись объекта ---";
-	Serialization_manager::instance().serialize(m_item);
-	LOG(INFO) << "--- Конец записи объекта ---";
-	LOG(INFO) << "Конец листа частей";*/
-}
-
-void Object_part::load()
-{
-	/*LOG(INFO) << "Часть";
-	FILE* file = Serialization_manager::instance().m_file;
-	m_attributes.load();
-	fread(&m_part_kind, sizeof(body_part_e), 1, file);
-	FileSystem::instance().deserialize_string(m_name, file);
-	LOG(INFO) << "Объект в части";
-	m_item = dynamic_cast<GameObject*>(Serialization_manager::instance().deserialize());
-	if (m_item)
-	{
-		LOG(INFO) << "Конец объекта в части " << m_item->m_name;
-		if (m_item->m_owner)
-		{
-			LOG(INFO) << "Объект имеет владельца";
-		}
-		else {
-			LOG(INFO) << "Объект не имеет владельца";
-		}
-	}
-	LOG(INFO) << "Конец части";*/
 }
 
 Packer_generic& Object_part::get_packer()

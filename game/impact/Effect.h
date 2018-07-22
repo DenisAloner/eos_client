@@ -28,8 +28,6 @@ public:
 	void apply_visitor(Visitor_generic& visitor) override;
 
 	void reset_serialization_index() override;
-	virtual void save();
-	virtual void load();
 
 	// Для поддержки iJSONSerializable
 	Packer_generic& get_packer() override;
@@ -60,9 +58,6 @@ public:
 	virtual bool update();
 	virtual Parameter_list* clone();
 	void apply_visitor(Visitor_generic& visitor) override;
-
-	virtual void save();
-	virtual void load();
 
 	Packer_generic& get_packer() override;
 
@@ -105,9 +100,6 @@ public:
 	virtual void equip(Object_interaction* item);
 	virtual void unequip(Object_interaction* item);
 
-	virtual void save();
-	virtual void load();
-
 	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() { return Interaction_list::properties(); }
@@ -126,9 +118,6 @@ public:
 	virtual bool update();
 	virtual Vision_component* clone();
 	void apply_visitor(Visitor_generic& visitor) override;
-
-	virtual void save();
-	virtual void load();
 
 	Packer_generic& get_packer() override;
 
@@ -155,8 +144,6 @@ public:
 	virtual Tag_list* clone();
 
 	virtual bool update();
-	virtual void save();
-	virtual void load();
 
 	Packer_generic& get_packer() override;
 
@@ -184,8 +171,6 @@ public:
 	Parts_list();
 	virtual Parts_list* clone();
 	virtual bool update();
-	virtual void save();
-	virtual void load();
 
 	void apply_visitor(Visitor_generic& visitor) override;
 	virtual void equip(Object_interaction* item);
@@ -217,9 +202,6 @@ public:
 	Action_list();
 	virtual Interaction_list* clone();
 
-	virtual void save();
-	virtual void load();
-
 	void apply_visitor(Visitor_generic& visitor) override;
 
 	Packer_generic& get_packer() override;
@@ -236,10 +218,6 @@ public:
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 	virtual Slot_set_state* clone();
 	virtual void do_predicat(predicat func) { func(this); };
-
-	virtual void save();
-	virtual void load();
-
 
 	Packer_generic& get_packer() override;
 };
@@ -276,10 +254,6 @@ public:
 	virtual Object_interaction* clone();
 	void apply_effect(GameObject* unit, Object_interaction* object) override;
 
-	virtual void save();
-	virtual void load();
-
-
 	Packer_generic& get_packer() override;
 };
 
@@ -293,9 +267,6 @@ public:
 	virtual Interaction_prefix* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
-	virtual void save();
-	virtual void load();
-
 	Packer_generic& get_packer() override;
 };
 
@@ -308,10 +279,6 @@ public:
 	virtual Object_interaction* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
-	virtual void save();
-	virtual void load();
-
-
 	Packer_generic& get_packer() override;
 };
 
@@ -323,9 +290,6 @@ public:
 	Interaction_time();
 	virtual Object_interaction* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
-
-	virtual void save();
-	virtual void load();
 
 	Packer_generic& get_packer() override;
 
@@ -349,10 +313,6 @@ public:
 	virtual Object_interaction* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
-	virtual void save();
-	virtual void load();
-
-
 	Packer_generic& get_packer() override;
 };
 
@@ -365,9 +325,6 @@ public:
 	Effect();
 	Effect* clone() override;
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
-
-	virtual void save();
-	virtual void load();
 
 	Packer_generic& get_packer() override;
 
@@ -400,10 +357,6 @@ namespace ObjectTag
 		virtual Poison_resist* clone();
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
-		virtual void save();
-		virtual void load();
-
-
 		Packer_generic& get_packer() override;
 	};
 
@@ -413,9 +366,6 @@ namespace ObjectTag
 		Mortal();
 		virtual Mortal* clone();
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
-
-		virtual void save();
-		virtual void load();
 
 		void apply_visitor(Visitor_generic& visitor) override;
 
@@ -432,10 +382,6 @@ namespace ObjectTag
 		virtual Purification_from_poison* clone();
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
-		virtual void save();
-		virtual void load();
-
-
 		Packer_generic& get_packer() override;
 	};
 
@@ -447,11 +393,8 @@ namespace ObjectTag
 		virtual Activator* clone();
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
-		virtual void reset_serialization_index();
-		virtual void save();
-		virtual void load();
-
-
+		void reset_serialization_index() override;
+		
 		Packer_generic& get_packer() override;
 	};
 
@@ -461,10 +404,6 @@ namespace ObjectTag
 		Fast_move();
 		virtual Fast_move* clone();
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
-
-		virtual void save();
-		virtual void load();
-
 
 		Packer_generic& get_packer() override;
 	};
@@ -478,9 +417,6 @@ namespace ObjectTag
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
 		void apply_visitor(Visitor_generic& visitor) override;
-
-		virtual void save();
-		virtual void load();
 
 		// Для поддержки iSerializable
 		Packer_generic& get_packer() override;
@@ -499,9 +435,6 @@ namespace ObjectTag
 		virtual Equippable* clone();
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
 		void reset_serialization_index() override;
-
-		virtual void save();
-		virtual void load();
 
 		// Для поддержки iSerializable
 		Packer_generic& get_packer() override;
@@ -529,8 +462,6 @@ namespace ObjectTag
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
 		void apply_visitor(Visitor_generic& visitor) override;
 
-		virtual void save();
-		virtual void load();
 		void reset_serialization_index() override;
 
 		Packer_generic& get_packer() override;
@@ -557,9 +488,6 @@ namespace ObjectTag
 		virtual Can_transfer_object* clone();
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
 		void reset_serialization_index() override;
-
-		virtual void save();
-		virtual void load();
 
 		Packer_generic& get_packer() override;
 
@@ -588,9 +516,6 @@ public:
 	virtual Instruction_slot_link* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
-	virtual void save();
-	virtual void load();
-
 	Packer_generic& get_packer() override;
 
 	constexpr static auto properties()
@@ -614,9 +539,6 @@ public:
 	virtual Object_interaction* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 
-	virtual void save();
-	virtual void load();
-
 	Packer_generic& get_packer() override;
 };
 
@@ -630,9 +552,6 @@ public:
 	Instruction_game_owner();
 	virtual Object_interaction* clone() { return nullptr; };
 	virtual void apply_effect(GameObject* unit, Object_interaction* object) {};
-
-	virtual void save() {};
-	virtual void load() {};
 
 	Packer_generic& get_packer() override;
 };
@@ -649,9 +568,6 @@ public:
 
 
 	void apply_visitor(Visitor_generic& visitor) override;
-
-	virtual void save() {};
-	virtual void load() {};
 
 	Packer_generic& get_packer() override;
 
@@ -672,9 +588,6 @@ public:
 	Instruction_check_part_type();
 	virtual Instruction_check_part_type* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
-
-	virtual void save() {};
-	virtual void load() {};
 
 	Packer_generic& get_packer() override;
 
@@ -699,9 +612,6 @@ public:
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
 	void reset_serialization_index() override;
 
-	virtual void save();
-	virtual void load();
-
 	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() 
@@ -725,9 +635,6 @@ public:
 	virtual Instruction_get_owner* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object) ;
 	void reset_serialization_index() override;
-
-	virtual void save() {};
-	virtual void load() {};
 
 	Packer_generic& get_packer() override;
 
@@ -761,9 +668,6 @@ public:
 	Instruction_check_owner_type();
 	virtual Instruction_check_owner_type* clone();
 	virtual void apply_effect(GameObject* unit, Object_interaction* object);
-
-	virtual void save() {};
-	virtual void load() {};
 
 	Packer_generic& get_packer() override;
 

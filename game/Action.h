@@ -41,8 +41,6 @@ public:
 	virtual Object_interaction* clone();
 
 	void reset_serialization_index() override { m_serialization_index = 0; };
-	virtual void save();
-	virtual void load();
 
 	virtual bool get_child(GameTask*& task) { return false; };
 
@@ -67,9 +65,7 @@ public:
 	virtual Action_wrapper* clone();
 	//virtual void perfom(Parameter* parameter);
 
-	virtual void reset_serialization_index();
-	virtual void save();
-	virtual void load();
+	void reset_serialization_index() override;
 
 	void set(GameObject* unit, Action* action, Parameter* parameter);
 	void update();
