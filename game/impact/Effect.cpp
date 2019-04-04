@@ -386,7 +386,6 @@ void Vision_component::update_list(Object_interaction* list)
 	}
 	case interaction_message_type_e::slot_time:
 	{
-		LOG(INFO) << "buff in parameter";
 		Interaction_time* item = static_cast<Interaction_time*>(list);
 		update_list(item->m_value);
 		break;
@@ -659,14 +658,14 @@ bool Parts_list::update()
 
 void Parts_list::equip(Object_interaction* item)
 {
-	LOG(INFO) << std::to_string((int)m_list_type); m_items.push_back(item); LOG(INFO) << std::to_string(m_items.size());
+	 m_items.push_back(item); 
 
-	for (auto current = m_items.begin(); current != m_items.end(); ++current)
-	{
-		//Object_part* a = dynamic_cast<Object_part*>(*current);
-		LOG(INFO) <<std::to_string((int)((*current)->m_interaction_message_type));
-		
-	}
+	//for (auto current = m_items.begin(); current != m_items.end(); ++current)
+	//{
+	//	//Object_part* a = dynamic_cast<Object_part*>(*current);
+	//	LOG(INFO) <<std::to_string((int)((*current)->m_interaction_message_type));
+	//	
+	//}
 }
 
 Packer_generic& Parts_list::get_packer()
@@ -758,7 +757,6 @@ Interaction_copyist::Interaction_copyist()
 
 Object_interaction* Interaction_copyist::clone()
 {
-	LOG(INFO) << "clone";
 	Interaction_copyist* effect = new Interaction_copyist();
 	effect->m_interaction_message_type = m_interaction_message_type;
 	effect->m_subtype = m_subtype;

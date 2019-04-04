@@ -1,5 +1,4 @@
 #include "GUI_Inventory.h"
-#include "game/utils/log.h"
 
 GUI_Part_slot::GUI_Part_slot(int width, int height, Object_part* item, GUI_Body* owner) : m_item(item), m_owner(owner)
 {

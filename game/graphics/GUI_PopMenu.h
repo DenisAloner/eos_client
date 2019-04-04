@@ -6,6 +6,7 @@
 #include "GUI_Container.h"
 #include "GameObject.h"
 #include "Application.h"
+#include <algorithm>
 
 class GameObject;
 class Application;
@@ -90,7 +91,7 @@ public:
 		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); ++Current)
 		{
 			object = (GUI_PopMenu::Item*)(*Current);
-			maxlen = max(Application::instance().m_graph->measure_text_width(object->m_text), maxlen);
+			maxlen = std::max<size_t>(Application::instance().m_graph->measure_text_width(object->m_text), maxlen);
 		}
 		resize(maxlen + 8, m_items.size() * ((Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender) >> 6));
 		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); ++Current)

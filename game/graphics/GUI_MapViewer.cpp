@@ -2,7 +2,7 @@
 #include "game/graphics/GUI_Layer.h"
 #include "game/graphics/GUI_PopMenu.h"
 #include "game/ActionManager.h"
-#include "log.h"
+#include "game/utils/Logger.h"
 #include <algorithm>
 
 gui_mapviewer_hint::gui_mapviewer_hint() { m_top = false; }
@@ -806,7 +806,7 @@ void mapviewer_object_rotate::render_on_cell(GUI_MapViewer* owner,MapCell* c)
 			tile_t tile;
 			m_object->m_active_state->m_tile_manager->set_tile(tile, m_object, Application::instance().m_timer->get_tick(), m_direction);
 			GLuint Sprite = tile.unit;
-			LOG(INFO) << std::to_string(tile.coordinat[0])<<"  "<<std::to_string(tile.coordinat[1]) << "  " << std::to_string(tile.coordinat[2]) << "  " << std::to_string(tile.coordinat[3]);
+			Logger::Instance().info(std::to_string(tile.coordinat[0]) + " " + std::to_string(tile.coordinat[1]) + "  " + std::to_string(tile.coordinat[2]) + "  " + std::to_string(tile.coordinat[3]));
 			glUseProgramObjectARB(0);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glActiveTexture(GL_TEXTURE0);
@@ -1385,7 +1385,7 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 		if(count>m_max_count)
 		{
 			m_max_count = count;
-			LOG(INFO) << "m_max_count: " <<std::to_string(m_max_count);
+			Logger::Instance().info( "m_max_count: " + std::to_string(m_max_count));
 		}
 
 		glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
@@ -1397,11 +1397,11 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
         #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 		glBufferData(GL_ARRAY_BUFFER, sizeof(quad_t)* count, &m_quads[0], GL_DYNAMIC_DRAW);
-		glVertexAttribPointer(0, 2, GL_INT, GL_FALSE, sizeof(vertex_t), vertex_t::position_offset);
+		glVertexAttribPointer(0, 2, GL_INT, GL_FALSE, sizeof(vertex_t), position_offset);
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 3, GL_DOUBLE, GL_FALSE, sizeof(vertex_t), vertex_t::texcoord_offset);
+		glVertexAttribPointer(1, 3, GL_DOUBLE, GL_FALSE, sizeof(vertex_t), texcoord_offset);
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), vertex_t::light_offset);
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), light_offset);
 		glEnableVertexAttribArray(2);
 		glDrawArrays(GL_QUADS, 0, 4*count);
 		glBindVertexArray(0);
@@ -1595,7 +1595,6 @@ void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
 {
 	if (e.key == mk_left)
 	{
-		LOG(INFO) << "click";
 			position_t p = local_xy(position_t(e.position.x, e.position.y));
 			int x;
 			int y;

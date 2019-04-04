@@ -1,7 +1,7 @@
 #include "Renderer.h"
 #include "game/Application.h"
 #include "game/graphics/gl.hpp"
-#include "game/utils/log.h"
+#include "game/utils/logger.h"
 #include <chrono>
 
 
@@ -42,7 +42,7 @@ void Renderer::work()
 	// Создаем render context (RC)
 	HGLRC hRC = wglCreateContext(m_hDC);
 	bool is_ok = wglMakeCurrent(m_hDC, hRC);
-	LOG(INFO) << "Создание контекста OpenGL " << (is_ok ? "ok" : "err");
+	Logger::Instance().info("Создание контекста OpenGL {}", (is_ok ? "ok" : "err"));
 
 	// Инициализируем графику
 	glewInit();
@@ -78,7 +78,7 @@ void Renderer::work()
 
 		// если на отрисовку ушло больше normal_duration, никакой задержки не должно быть
 		if (start + normal_duration < end) continue;
-		std::chrono::microseconds duration(std::chrono::duration_cast<std::chrono::microseconds>(end - start));
+		auto duration(std::chrono::duration_cast<std::chrono::microseconds>(end - start));
 		std::this_thread::sleep_for(normal_duration - duration);
 	}
 	// renderer остановлен, останавливаем потоки приложения

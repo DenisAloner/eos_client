@@ -4,7 +4,7 @@
 #include <functional>
 #include "graphics/gl.hpp"
 #include <list>
-#include <log.h>
+#include "game/utils/Logger.h"
 
 #include <string>
 #include <map>
@@ -20,10 +20,18 @@ struct vertex_t
 	GLdouble texcoord[3];
 	GLfloat light[3];
 
-	inline const static void* position_offset = reinterpret_cast<void*>(offsetof(vertex_t, position));
+	/*inline const static void* position_offset = reinterpret_cast<void*>(offsetof(vertex_t, position));
 	inline const static void* texcoord_offset = reinterpret_cast<void*>(offsetof(vertex_t, texcoord));
-	inline const static void* light_offset = reinterpret_cast<void*>(offsetof(vertex_t, light));
+	inline const static void* light_offset = reinterpret_cast<void*>(offsetof(vertex_t, light));*/
 };
+
+constexpr const auto position_off = offsetof(vertex_t, position);
+constexpr const auto texcoord_off = offsetof(vertex_t, texcoord);
+constexpr const auto light_off = offsetof(vertex_t, light);
+
+const auto position_offset = reinterpret_cast<void*>(position_off);
+const auto texcoord_offset = reinterpret_cast<void*>(texcoord_off);
+const auto light_offset = reinterpret_cast<void*>(light_off);
 
 struct quad_t
 {
@@ -594,7 +602,7 @@ public:
 		auto value = m_by_enum.find(key);
 		if (value == m_by_enum.end())
 		{
-			LOG(FATAL) << "Ёлемент отсутствует";
+			Logger::Instance().critical( "Ёлемент отсутствует");
 		}
 		return value->second;
 	}
@@ -604,7 +612,7 @@ public:
 		auto value = m_by_string.find(key);
 		if (value == m_by_string.end())
 		{
-			LOG(FATAL) << "Ёлемент отсутствует";
+			Logger::Instance().critical ("Ёлемент отсутствует");
 		}
 		return value->second;
 	}
@@ -649,7 +657,7 @@ public:
 		auto value = m_by_string.find(key);
 		if (value == m_by_string.end())
 		{
-			LOG(FATAL) << "Ёлемент отсутствует";
+			Logger::Instance().critical ("Ёлемент отсутствует");
 		}
 		return value->second;
 	}
@@ -750,7 +758,6 @@ template<typename T> void object_from_json(T& object, scheme_map_t* value, Parse
 	for_sequence(std::make_index_sequence<nbProperties>{}, [&](auto i) {
 		constexpr auto property = std::get<i>(T::properties());
 		typedef decltype(property) P;
-		LOG(INFO) << "name" << " :: " << Parser::UTF16_to_CP1251(std::u16string(property.name));
 		if(property.from_json_function)
 		{
 			(object.*(property.from_json_function.value()))((*value)[property.name], object.*(property.member),context);
@@ -930,7 +937,6 @@ public:
 		{
 			context.m_object_index += 1;
 			value->m_serialization_index = context.m_object_index;
-			LOG(INFO) << Parser::UTF16_to_CP1251(value->get_packer().get_type_name());
 			std::u16string result = value->to_json(context);
 			if (result.empty())
 			{
@@ -947,7 +953,7 @@ public:
 		{
 			if (context.m_object_index<value->m_serialization_index)
 			{
-				LOG(FATAL) << std::to_string(context.m_object_index) << " | " << std::to_string(value->m_serialization_index) << " | " << typeid(value).name() << " | " << Parser::UTF16_to_CP1251(value->get_packer().get_type_name());
+				Logger::Instance().critical (std::to_string(context.m_object_index)+ " | " + std::to_string(value->m_serialization_index) + " | " + typeid(value).name() + " | " + Parser::UTF16_to_CP1251(value->get_packer().get_type_name()));
 			}
 			std::u16string out = u"{\"$type\":\"link\",\"value\":" + Parser::int_to_u16string(value->m_serialization_index) + u"}";
 			return out;
@@ -981,7 +987,7 @@ public:
 		{
 			if (context.m_object_index<value->m_serialization_index)
 			{
-				LOG(FATAL) << std::to_string(context.m_object_index) << " | " << std::to_string(value->m_serialization_index) << " | " << typeid(value).name() << " | " << Parser::UTF16_to_CP1251(value->get_packer().get_type_name());
+				Logger::Instance().critical (std::to_string(context.m_object_index) + " | " + std::to_string(value->m_serialization_index) + " | " + typeid(value).name() + " | " + Parser::UTF16_to_CP1251(value->get_packer().get_type_name()));
 			}
 			std::size_t id = Parser::t_constructors_from_json[u"link"]->get_type_id() + 1;
 			return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + std::string(reinterpret_cast<const char*>(&(value->m_serialization_index)), sizeof(std::size_t));
@@ -1192,13 +1198,13 @@ public:
 		{
 			if constexpr(std::is_base_of<iSerializable, std::remove_pointer_t<T>>::value)
 			{
-				LOG(INFO) << "from_json<iSerializable*> :: " << typeid(T).name();
+				//LOG(INFO) << "from_json<iSerializable*> :: " << typeid(T).name();
 				std::u16string temp(value);
 				scheme_map_t* s = read_object(temp);
 				if (s)
 				{
 					prop = dynamic_cast<T>(t_constructors_from_json[get_value((*s)[u"$type"])]->from_json(s,context));
-					LOG(INFO) << UTF16_to_CP1251(prop->get_packer().get_type_name());
+					//LOG(INFO) << UTF16_to_CP1251(prop->get_packer().get_type_name());
 					delete s;
 					return;
 				}
@@ -1206,7 +1212,7 @@ public:
 			}
 			else
 			{
-				LOG(INFO) << "from_json<"<<typeid(T).name()<<">";
+				//LOG(INFO) << "from_json<"<<typeid(T).name()<<">";
 				if (get_value(value) == u"null")
 				{
 					prop = nullptr;
@@ -1241,9 +1247,9 @@ public:
 		}
 		else if constexpr(std::is_base_of<iSerializable, T>::value)
 		{
-			LOG(INFO) << "from_json<iSerializable> :: " << typeid(T).name();
+			//LOG(INFO) << "from_json<iSerializable> :: " << typeid(T).name();
 			std::u16string temp(value);
-			LOG(INFO) << UTF16_to_CP1251(temp);
+			//LOG(INFO) << UTF16_to_CP1251(temp);
 			scheme_map_t* s = read_object(temp);
 			prop.from_json(s, context);
 			delete s;
@@ -1268,11 +1274,11 @@ public:
 		}
 		else if constexpr(is_list<T>::value)
 		{
-			LOG(INFO) << "from_json<List>";
+			//LOG(INFO) << "from_json<List>";
 			using Value = typename T::value_type;
 			std::u16string temp = value;
 			scheme_list_t* s = read_array(temp);
-			LOG(INFO) << "LIST : " << UTF16_to_CP1251(temp);
+			//LOG(INFO) << "LIST : " << UTF16_to_CP1251(temp);
 			if (s)
 			{
 				for (const auto& element : (*s))
@@ -1285,11 +1291,11 @@ public:
 		}
 		else if constexpr(is_map<T>::value)
 		{
-			LOG(INFO) << "from_json<Map>";
+			//LOG(INFO) << "from_json<Map>";
 			using Key = typename T::key_type;
 			using Value = typename T::mapped_type;
 			std::u16string temp = value;
-			LOG(INFO) << UTF16_to_CP1251(temp);
+			//LOG(INFO) << UTF16_to_CP1251(temp);
 			scheme_list_t* s = read_array(temp);
 			if (s)
 			{
@@ -1371,7 +1377,7 @@ public:
 		}
 		else if constexpr(std::is_same<T, predicat_t>::value)
 		{
-			LOG(INFO) << Parser::UTF16_to_CP1251(get_value(value)) << Parser::UTF16_to_CP1251(value);
+			//LOG(INFO) << Parser::UTF16_to_CP1251(get_value(value)) << Parser::UTF16_to_CP1251(value);
 			int result = to_int32(value);
 			prop = *Application::instance().m_ai_manager->m_path_qualifiers[result];
 		}
@@ -1385,7 +1391,7 @@ public:
 		}
 		else if constexpr(std::is_same<T, optical_properties_t>::value)
 		{
-			LOG(INFO) << Parser::UTF16_to_CP1251(get_value(value)) << Parser::UTF16_to_CP1251(value);
+			//LOG(INFO) << Parser::UTF16_to_CP1251(get_value(value)) << Parser::UTF16_to_CP1251(value);
 			std::u16string temp = value;
 			scheme_vector_t* s = read_pair(temp);
 			from_json<float>((*s)[0], prop.attenuation.R,context);
@@ -1418,11 +1424,11 @@ public:
 		}
 		else if constexpr(std::is_same<T, Icon>::value||std::is_same<T, TileManager>::value || is_instancedictonary<T>::value)
 		{
-			LOG(FATAL) << "<from_json> type error: " << typeid(value).name();
+		Logger::Instance().critical ("<from_json> type error: {}" , typeid(value).name());
 		}
 		else
 		{
-			LOG(FATAL) << "<from_json> type error: " << typeid(value).name();
+		Logger::Instance().critical ( "<from_json> type error: {}" , typeid(value).name());
 			//static_assert(always_false<T>::value, "<from_json> type error");
 		}
 
@@ -1436,7 +1442,7 @@ public:
 			{
 				if (value)
 				{
-					LOG(INFO) << "to_json iSerializable*: " << UTF16_to_CP1251(value->get_packer().get_type_name());
+					//LOG(INFO) << "to_json iSerializable*: " << UTF16_to_CP1251(value->get_packer().get_type_name());
 					return value->get_packer().to_json(value,context);
 				}
 				else
@@ -1459,7 +1465,7 @@ public:
 		}
 		else if constexpr(std::is_base_of<iSerializable, T>::value)
 		{
-			LOG(INFO) << UTF16_to_CP1251(value.get_packer().get_type_name());
+			//LOG(INFO) << UTF16_to_CP1251(value.get_packer().get_type_name());
 			std::u16string result = value.to_json(context);
 			if (result.empty())
 			{
@@ -1498,7 +1504,7 @@ public:
 			std::u16string out = u"\"" + CP1251_to_UTF16(get_dictonary<T>().get_string(value)) + u"\"";
 			return out;
 		}
-		else if constexpr(std::is_same<T, int>::value|| std::is_same<T, std::size_t>::value)
+		else if constexpr (std::is_same<T, int>::value || std::is_same<T, unsigned int>::value || std::is_same<T, std::size_t>::value)
 		{
 			return int_to_u16string(value);
 		}
@@ -1553,7 +1559,7 @@ public:
 		}
 		else if constexpr(std::is_same<T, Icon>::value||std::is_same<T, TileManager>::value || is_instancedictonary<T>::value)
 		{
-			LOG(FATAL) << "<to_json> type error: " << typeid(value).name();
+			//LOG(FATAL) << "<to_json> type error: " << typeid(value).name();
 			return u"";
 		}
 		else if constexpr(std::is_same<T, dimension_t>::value)
@@ -1573,7 +1579,7 @@ public:
 		}
 		else
 		{
-			LOG(FATAL) << "<to_json> type error: " << typeid(value).name();
+			//LOG(FATAL) << "<to_json> type error: " << typeid(value).name();
 			//static_assert(always_false<T>::value, "<to_json> for this type not found");
 		}
 	};
@@ -1603,9 +1609,9 @@ public:
 				}*/
 				default:
 				{
-					LOG(INFO) << "from binaryyyyyyyyyyyy " << typeid(T).name();
+					//LOG(INFO) << "from binaryyyyyyyyyyyy " << typeid(T).name();
 					prop = dynamic_cast<T>(t_constructors_from_binary[id - 1]->from_binary(value, pos,context));
-					LOG(INFO) << std::to_string(prop==nullptr);
+					//LOG(INFO) << std::to_string(prop==nullptr);
 					break;
 				}
 				}
@@ -1693,7 +1699,7 @@ public:
 			pos += sizeof(std::size_t);
 			prop = std::u16string(reinterpret_cast<const char16_t*>(&value[pos]), s);
 			pos += s * 2;
-			LOG(INFO) << "NAME: " << Parser::UTF16_to_CP1251(prop);
+			//LOG(INFO) << "NAME: " << Parser::UTF16_to_CP1251(prop);
 		}
 		else if constexpr(std::is_same<T, light_t>::value)
 		{
@@ -1735,11 +1741,11 @@ public:
 		}
 		else if constexpr(std::is_same<T, Icon>::value||std::is_same<T, TileManager>::value || is_instancedictonary<T>::value)
 		{
-			LOG(FATAL) << "<from_binary> type error: " << typeid(prop).name();
+		Logger::Instance().critical( "<from_binary> type error: {}" , typeid(prop).name());
 		}
 		else
 		{
-			LOG(FATAL) << "<from_binary> type error: " << typeid(prop).name();
+		Logger::Instance().critical("<from_binary> type error: {}", typeid(prop).name());
 			//static_assert(always_false<T>::value, "<from_binary> type error");
 		}
 	}
@@ -1838,12 +1844,12 @@ public:
 		}
 		else if constexpr(std::is_same<T, Icon>::value||std::is_same<T, TileManager>::value|| is_instancedictonary<T>::value)
 		{
-			LOG(FATAL) << "<to_binary> type error: " << typeid(value).name();
+			Logger::Instance().critical ("<to_binary> type error: " , typeid(value).name());
 			return "";
 		}
 		else
 		{
-			LOG(FATAL) << "<to_binary> type error: " <<typeid(value).name();
+			Logger::Instance().critical("<to_binary> type error: ", typeid(value).name());
 			//static_assert(always_false<T>::value, "<to_binary> type error");
 			return "";
 		}

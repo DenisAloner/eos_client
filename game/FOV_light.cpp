@@ -39,7 +39,7 @@ void FOV_light::calculate(int radius, GameObject* unit, GameMap* map)
 	{
 		if (!((z < 0) || (z > map->m_size.dz - 1)))
 		{
-			LOG(INFO) <<"Выполнено для уровня: " <<std::to_string(z);
+			//LOG(INFO) <<"Выполнено для уровня: " <<std::to_string(z);
 			for (int y = unit->cell()->y - radius; y < unit->cell()->y + radius + 1; ++y)
 			{
 				if (!((y < 0) || (y > map->m_size.dy - 1)))
@@ -121,7 +121,7 @@ void FOV_light::calculate(int radius, GameObject* unit, GameMap* map)
 		{
 			v += std::to_string(m_yz[z][y].opaque);
 		}
-		LOG(INFO) << v;
+		//LOG(INFO) << v;
 	}
 
 	for (int y = 0; y < m_max_size; y++)
@@ -322,7 +322,7 @@ void FOV_light::do_fov(uint x, uint y, uint radius)
 		cast_light_xz(x, y, radius, 1, 1.0, 0.0, multipliers1[0][i], multipliers1[1][i], multipliers1[2][i], multipliers1[3][i]);
 	}
 
-	LOG(INFO) << "After Shadowcasting";
+	//LOG(INFO) << "After Shadowcasting";
 	for (int z = 0; z < m_max_size; z++)
 	{
 		std::string v = "";
@@ -338,7 +338,7 @@ void FOV_light::do_fov(uint x, uint y, uint radius)
 			}
 			
 		}
-		LOG(INFO) << v;
+		//LOG(INFO) << v;
 	}
 
 	for (int z = 0; z < m_max_size; z++)

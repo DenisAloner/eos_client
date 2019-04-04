@@ -8,15 +8,8 @@
 #include "game/graphics/GUI_MapViewer.h"
 #include "game/graphics/GUI_TextBox.h"
 #include "game/graphics/GUI_Timer.h"
-#include "utils/log.h"
 #include <chrono>
 #include <graphics/GUI_Description_window.h>
-
-void my_audio_callback(void *userdata, uint8_t *stream, uint32_t len);
-
-// variable declarations
-static Uint8 *audio_pos; // global pointer to the audio buffer to be played
-static Uint32 audio_len; // remaining length of the sample we have to play
 
 gui_MessageQueue::gui_MessageQueue()
 {
@@ -170,7 +163,6 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 	wglShareLists(this->m_hRC, subhRC);
 	m_size = work_area_size;
 	m_gui_controller.m_size = m_size;
-	music = NULL;
 	m_game_turn = 1;
 	m_ready = false;
 	m_graph = new GraphicalController(m_size);
@@ -217,7 +209,7 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 	Game_world gw; //TODO костыль, продумать исправление
 	Parser_context pc(gw); //TODO костыль, продумать исправление
 	m_game_object_manager->init(pc);
-	LOG(INFO) << "Менеджер игровых объектов успешно инициализирован";
+	Logger::Instance().info ( "Менеджер игровых объектов успешно инициализирован");
 
 	m_gui_controller.m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h);
 	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
@@ -490,10 +482,6 @@ void Application::stop()
 	}
 }
 
-void Application::PlaySound1()
-{
-	Mix_PlayChannel(-1, music, 0);
-}
 
 bool Application::check_action_completion(GameObject*& object)
 {
@@ -663,7 +651,7 @@ void Application::update()
 
 void Application::command_main_menu_select()
 {
-	LOG(INFO) << "Ожидание выбора в главном меню";
+	Logger::Instance().info(  "Ожидание выбора в главном меню");
 	bool Exit = false;
 	while (Exit == false)
 	{
@@ -698,7 +686,7 @@ void Application::command_main_menu_select()
 		m_message_queue.m_condition_variable.notify_one();
 		m_message_queue.m_reader = false;
 	}
-	LOG(INFO) << "Окончание ожидания выбора в главном меню";
+	Logger::Instance().info ( "Окончание ожидания выбора в главном меню");
 }
 
 MapCell* Application::command_select_location(GameObject* object)
@@ -930,7 +918,7 @@ void Application::process_game()
 		m_turn = false;
 		end = std::chrono::high_resolution_clock::now();
 		elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-		LOG(INFO) << "Просчет 10 ходов: " << std::to_string(elapsed.count());
+		Logger::Instance().info ("Просчет 10 ходов: " + std::to_string(elapsed.count()));
 	}
 }
 
@@ -938,19 +926,6 @@ void Application::on_turn()
 {
 	std::lock_guard<std::mutex> lk(m_turn_mutex);
 	m_turn_cv.notify_one();
-}
-
-void my_audio_callback(void *userdata, uint8_t *stream, uint32_t len) {
-
-	if (audio_len == 0)
-		return;
-
-	len = (len > audio_len ? audio_len : len);
-	SDL_memcpy(stream, audio_pos, len); 					// simply copy from one buffer into the other
-	//SDL_MixAudio(stream, audio_pos, len, SDL_MIX_MAXVOLUME);// mix from one buffer into another
-
-	audio_pos += len;
-	audio_len -= len;
 }
 
 Game_object_owner* Application::command_select_transfer(Parameter_destination* parameter) {

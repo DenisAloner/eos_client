@@ -1,5 +1,4 @@
 #include "game\graphics\GUI_MiniMap.h"
-#include "log.h"
 
 
 GUI_MiniMap::GUI_MiniMap(position_t position, dimension_t size, GUI_MapViewer* map_viewer) :m_map_viewer(map_viewer)

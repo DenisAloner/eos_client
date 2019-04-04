@@ -1,6 +1,5 @@
 #include "game/GameObject.h"
 //#include "game/Action.h"
-#include "log.h"
 //#include "AI.h"
 
 
@@ -257,7 +256,7 @@ void Object_state::tilemanager_from_binary(const std::string& value, TileManager
 	}
 	else
 	{
-		LOG(INFO) << "Tile manager" << std::to_string(s);
+		//LOG(INFO) << "Tile manager" << std::to_string(s);
 		prop = Application::instance().m_game_object_manager->m_config->m_tile_managers.m_by_index[s - 1];
 	}
 }
@@ -419,14 +418,14 @@ GameObject::GameObject()
 
 Object_interaction* GameObject::clone()
 {
-	LOG(FATAL) << "Метод не описан.";
+	Logger::Instance().critical ( "Метод не описан.");
 	return nullptr;
 }
 
 void GameObject::do_predicat(predicat func)
 { 
 	func(this); 
-	LOG(FATAL) << "Метод не описан.";
+	Logger::Instance().critical("Метод не описан.");
 }
 
 void GameObject::apply_visitor(Visitor_generic& visitor)

@@ -9,7 +9,7 @@ void Parameter_argument_t::set(GameObject* value)
 	}
 	else
 	{
-		LOG(FATAL) << "“ип аргумента дл€ Parameter не соотвутствует ожидаемому";
+		Logger::Instance().critical ("“ип аргумента дл€ Parameter не соотвутствует ожидаемому");
 	}
 };
 
@@ -49,7 +49,7 @@ void Parameter_argument_t::set(Game_object_owner* value)
 		return;
 	}
 	}
-	LOG(FATAL) << "“ип аргумента дл€ Parameter не соотвутствует ожидаемому";
+	Logger::Instance().critical( "“ип аргумента дл€ Parameter не соотвутствует ожидаемому");
 };
 
 void Parameter_argument_t::set(object_direction_e value)
@@ -60,7 +60,7 @@ void Parameter_argument_t::set(object_direction_e value)
 	}
 	else
 	{
-		LOG(FATAL) << "“ип аргумента дл€ Parameter не соотвутствует ожидаемому";
+		Logger::Instance().critical( "“ип аргумента дл€ Parameter не соотвутствует ожидаемому");
 	}
 };
 
@@ -99,7 +99,7 @@ Parameter_argument_t::operator bool()
 	}
 	default:
 	{
-		LOG(FATAL) << "Ќеверный тип дл€ Parameter_argument_t::operator bool()";
+		Logger::Instance().critical("Ќеверный тип дл€ Parameter_argument_t::operator bool()");
 		break;
 	}
 	}

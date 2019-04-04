@@ -1,6 +1,6 @@
 #include "AI.h"
-#include "log.h"
 #include "GameObject.h"
+#include <spdlog/spdlog.h>
 
 min_heap::min_heap(void)
 {
@@ -433,7 +433,6 @@ void Dijkstra_map::trace()
 		}
 		i += 1;
 	} while (was_change);
-	LOG(INFO) << std::to_string(i);
 }
 
 MapCell* Dijkstra_map::next(GameObject* object)
@@ -684,7 +683,7 @@ void AI_enemy::create()
 					attack_area.p2.y = max(attack_area.p2.y, m_goal->cell()->y - m_goal->m_active_state->m_size.dy + 1);
 					GameMap* map = c->m_map;
 					(*p)[3].set(&map->get(0,attack_area.p1.y,attack_area.p1.x));
-					LOG(INFO) << "Удар противника в точку [" << std::to_string(attack_area.p1.x) << "," << std::to_string(attack_area.p1.y) << "]";
+					Logger::Instance().info("Удар противника в точку [" + std::to_string(attack_area.p1.x) + "," + std::to_string(attack_area.p1.y) + "]");
 					m_action_controller->set((*p)[0].m_object, i->action, p);
 					break;
 				}

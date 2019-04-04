@@ -125,7 +125,7 @@ std::string Packer<GameObject>::to_binary(iSerializable* value, Parser_context& 
 
 iSerializable* Packer<GameObject>::from_json(scheme_map_t* value, Parser_context& context)
 {
-	LOG(INFO) << "iSerializable* Packer<GameObject>::from_json(scheme_map_t* value)";
+	//LOG(INFO) << "iSerializable* Packer<GameObject>::from_json(scheme_map_t* value)";
 	const int i = Parser::to_int32((*value)[u"value"]);
 	const auto it = std::next(context.m_game_world.m_object_manager.m_items.begin(), i);
 	return &(*it);
@@ -690,7 +690,6 @@ scheme_list_t* Parser::parse_array(std::u16string& value)
 			return result;
 		}
 		if (result == nullptr) { result = new scheme_list_t; }
-		LOG(INFO) << "parse_array -> " << Parser::UTF16_to_CP1251(*fvalue);
 		result->push_back(*fvalue);
 	}
 	return result;

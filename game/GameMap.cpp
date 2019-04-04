@@ -1,7 +1,6 @@
 #include "game/GameMap.h"
 #include "game/GameObject.h"
 #include "game/Application.h"
-#include "log.h"
 #include "Effect.h"
 #include "AI.h"
 
@@ -156,7 +155,7 @@ MapCell& GameMap::get(int z,int y, int x)
 void GameMap::init(dimension3_t size)
 {
 	m_size = size;
-	LOG(INFO) << "Карта инициализирована с размером: " <<std::to_string( m_size.dx )<< "x" << std::to_string(m_size.dy) << "x" << std::to_string(m_size.dz);
+	Logger::Instance().info("Карта инициализирована с размером: " + std::to_string(m_size.dx) < +"x" + std::to_string(m_size.dy) + "x" + std::to_string(m_size.dz));
 	m_items.resize(m_size.dz*m_size.dy*m_size.dx);
 	int i = 0;
 	for (int z = 0; z < m_size.dz; ++z)
@@ -234,7 +233,7 @@ void GameMap::generate_room()
 		}
 	}
 
-	LOG(INFO) << " -= Всего источников света: " + std::to_string(light_source_count) << "=-";
+	Logger::Instance().info (" -= Всего источников света: " + std::to_string(light_source_count) + "=-");
 
 	//GameObject* obj = Application::instance().m_game_object_manager->new_object("torch");
 	//*obj->m_active_state->m_light = light_t(80, 0, 0);
@@ -1310,7 +1309,7 @@ void Game_world::reset_serialization_index()
 
 std::u16string Game_world::serialize(Parser_context& context)
 {
-	LOG(INFO) << "std::u16string Object_manager::items_to_json(std::list<GameObject>& value)";
+	//LOG(INFO) << "std::u16string Object_manager::items_to_json(std::list<GameObject>& value)";
 	std::size_t i = 0;
 	for (auto& element : m_object_manager.m_items)
 	{
@@ -1318,7 +1317,7 @@ std::u16string Game_world::serialize(Parser_context& context)
 		i += 1;
 	}
 	std::size_t ms = m_object_manager.m_items.size();
-	LOG(INFO) << "std::u16string Game_world::serialize() " << std::to_string(ms);
+	//LOG(INFO) << "std::u16string Game_world::serialize() " << std::to_string(ms);
 	std::u16string result;
 	for (auto& element : m_maps.front()->m_items)
 	{
@@ -1336,12 +1335,12 @@ std::u16string Game_world::serialize(Parser_context& context)
 
 void Game_world::deserialize(std::u16string& value, Parser_context& context)
 {
-	LOG(INFO) << "deserialize -> " << Parser::UTF16_to_CP1251(value);
+	//LOG(INFO) << "deserialize -> " << Parser::UTF16_to_CP1251(value);
 	scheme_map_t* s = Parser::read_object(value);
 	dimension3_t map_size;
 	for (const auto& element : *s)
 	{
-		LOG(INFO) << "deserialize -> " << Parser::UTF16_to_CP1251(element.first);
+		//LOG(INFO) << "deserialize -> " << Parser::UTF16_to_CP1251(element.first);
 	}
 	Parser::from_json<dimension3_t>((*s)[u"map_size"], map_size,context);
 	GameMap* map = new GameMap(map_size);
@@ -1388,7 +1387,7 @@ void Game_world::deserialize(std::u16string& value, Parser_context& context)
 
 std::string Game_world::bin_serialize(Parser_context& context)
 {
-	LOG(INFO) << "std::string Game_world::bin_serialize()";
+	//LOG(INFO) << "std::string Game_world::bin_serialize()";
 	std::size_t i = 0;
 	for (auto& element : m_object_manager.m_items)
 	{
@@ -1396,7 +1395,7 @@ std::string Game_world::bin_serialize(Parser_context& context)
 		i += 1;
 	}
 	std::size_t ms = m_object_manager.m_items.size();
-	LOG(INFO) << "std::string Game_world::bin_serialize() "<<std::to_string(ms);
+	//LOG(INFO) << "std::string Game_world::bin_serialize() "<<std::to_string(ms);
 	std::string result = Parser::to_binary<dimension3_t>(m_maps.front()->m_size,context) + Parser::to_binary<std::size_t>(ms,context);
 	for (auto& element : m_maps.front()->m_items)
 	{
@@ -1413,7 +1412,7 @@ std::string Game_world::bin_serialize(Parser_context& context)
 
 void Game_world::bin_deserialize(std::string& value, Parser_context& context)
 {
-	LOG(INFO) << "Game_world::bin_deserialize(std::string& value)";
+	//LOG(INFO) << "Game_world::bin_deserialize(std::string& value)";
 
 	std::size_t pos = 0;
 	dimension3_t map_size;
@@ -1423,7 +1422,7 @@ void Game_world::bin_deserialize(std::string& value, Parser_context& context)
 
 	std::size_t manager_size;
 	Parser::from_binary<std::size_t>(value, manager_size,pos,context);
-	LOG(INFO) << "void Game_world::bin_deserialize(std::string& value) " << std::to_string(manager_size);
+	//LOG(INFO) << "void Game_world::bin_deserialize(std::string& value) " << std::to_string(manager_size);
 	m_object_manager.m_items.resize(manager_size);
 
 	for (auto& element : m_maps.front()->m_items)

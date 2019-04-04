@@ -10,8 +10,6 @@
 #include "game/Description_GUI.h"
 #include "game/FileSystem.h"
 #include "game/TileManager.h"
-#include "SDL.h"
-#include "SDL_mixer.h"
 #include <thread>
 #include <mutex>
 #include <condition_variable>
@@ -116,8 +114,6 @@ public:
 	
 	Event<WPARAM> key_press;
 
-	Mix_Chunk *music;
-
 	GUI_Window_manager* m_window_manager;
 
 	std::list<std::function<void()>> m_update_in_render_thread;
@@ -173,8 +169,6 @@ public:
 	void console(std::string text);
 
 	void on_turn();
-	
-	void PlaySound1();
 
 private:
 	std::shared_ptr<std::thread> m_game_thread;

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.8)
 project(eos_client)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -18,7 +18,7 @@ set(SOURCE_FILES
 	${SRC_GAME}
 	${SRC_GAME_GRAPHICS}
 	${SRC_GAME_UTILS}
-        ${SRC_GAME_IMPACT}
+	${SRC_GAME_IMPACT}
 )
 
 source_group("platform" FILES ${SRC_PLATFORM})
@@ -46,27 +46,12 @@ find_library(GLEW_LIB_RELEASE glew32
 	DOC "OpenGL libraries"
 )
 
-find_library(SDL_LIB SDL2
-	PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}
-	DOC "SDL libraries"
-)
-
-find_library(SDLMIXER_LIB SDL2_Mixer
-	PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}
-	DOC "SDL libraries"
-)
-
-find_library(GLOG_LIB libglog
-	PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}
-	DOC "Logging library"
-)
-
-find_library(FREETYPE_LIB_DEBUG freetype27d
+find_library(FREETYPE_LIB_DEBUG freetype
        PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/debug
        DOC "freetype libraries"
 )
 
-find_library(FREETYPE_LIB_RELEASE freetype27
+find_library(FREETYPE_LIB_RELEASE freetype
        $PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/release
        DOC "freetype libraries"
 )
@@ -96,17 +81,13 @@ include_directories(
 	${PROJECT_DIR}/game
 	${PROJECT_DIR}/game/graphics
 	${PROJECT_DIR}/game/utils
-        ${PROJECT_DIR}/game/impact
+	${PROJECT_DIR}/game/impact
 	${PROJECT_DIR}/include
-	${PROJECT_DIR}/lib/glog/src/windows
 )
 
 set(EXT_LIBRARIES
 	${OGL_LIB}
         $<$<CONFIG:Debug>:${GLEW_LIB_DEBUG}>$<$<CONFIG:Release>:${GLEW_LIB_RELEASE}>
-	${SDL_LIB}
-	${SDLMIXER_LIB}
-	${GLOG_LIB}
 	$<$<CONFIG:Debug>:${FREETYPE_LIB_DEBUG}>$<$<CONFIG:Release>:${FREETYPE_LIB_RELEASE}>
         $<$<CONFIG:Debug>:${LIBPNG_LIB_DEBUG}>$<$<CONFIG:Release>:${LIBPNG_LIB_RELEASE}>
         $<$<CONFIG:Debug>:${ZLIB_LIB_DEBUG}>$<$<CONFIG:Release>:${ZLIB_LIB_RELEASE}>

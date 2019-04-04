@@ -1,5 +1,4 @@
 #include "GraphicalController.h"
-#include "utils/log.h"
 #include "TileManager.h"
 
 
@@ -17,7 +16,7 @@ void GraphicalController::check_gl_error(const std::string& text)
 		case GL_INVALID_FRAMEBUFFER_OPERATION:  error = "INVALID_FRAMEBUFFER_OPERATION";  break;
 		}
 
-		LOG(INFO) << text << ": GL_" << error;
+		Logger::Instance().info (text + ": GL_" + error);
 		err = glGetError();
 	}
 }
@@ -71,7 +70,7 @@ GraphicalController::GraphicalController(dimension_t size)
 	}
 	catch(std::logic_error e)
 	{
-		LOG(FATAL) << "Ошибка при загрузке ресурсов: " << e.what();
+		Logger::Instance().critical("Ошибка при загрузке ресурсов: {}" , e.what());
 	}
 
 	m_scissors.push_front(frectangle_t(0.0f, 0.0f, (float)m_size.w, (float)m_size.h));
@@ -83,13 +82,13 @@ void GraphicalController::Load_font(std::string font_filename)
 	m_error = FT_Init_FreeType(&m_library);
 	if (m_error != 0)
 	{
-		LOG(FATAL) << "Ошибка инициализации FreeType";
+		Logger::Instance().critical ("Ошибка инициализации FreeType");
 	}
 
 	m_error = FT_New_Face(m_library, font_filename.c_str(), 0, &m_face);
 	if (m_error != 0)
 	{
-		LOG(FATAL) << "Ошибка инициализации шрифта";
+		Logger::Instance().critical( "Ошибка инициализации шрифта");
 	}
 
 	m_error = FT_Set_Pixel_Sizes(m_face, font_size_c, 0);
@@ -110,7 +109,7 @@ font_symbol_t& GraphicalController::get_symbol(char16_t value)
 
 		if (m_error != 0)
 		{
-			LOG(INFO) << "Ошибка загрузки символа";
+			Logger::Instance().critical( "Ошибка загрузки символа");
 			return m_unicode_symbols[u'?'];
 		}
 
@@ -126,7 +125,6 @@ font_symbol_t& GraphicalController::get_symbol(char16_t value)
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, m_slot->bitmap.width, m_slot->bitmap.rows, 0, GL_ALPHA, GL_UNSIGNED_BYTE, m_slot->bitmap.buffer);
-		LOG(INFO) << std::to_string(texture) <<"    "<< Parser::UTF16_to_CP1251({ value });
 		font_symbol_t s;
 		s.id = texture;
 		s.size.w = m_slot->bitmap.width;
@@ -604,7 +602,6 @@ GLuint GraphicalController::png_texture_load(const std::string& path)
 	}
 
 	// read the png into image_data through row_pointers
-	LOG(INFO) << file_name;
 	png_read_image(png_ptr, row_pointers);
 
 	// Generate the OpenGL texture object
@@ -645,9 +642,6 @@ GLuint GraphicalController::texture_array_load(const std::vector<std::string>& p
 	for(int cnt=0;cnt<path.size();++cnt)
 	{
 		png_byte header[8];
-
-		LOG(INFO)<< "ПУТЬ: "<< path[cnt].c_str();
-
 		const char * file_name = path[cnt].c_str();
 		FILE *fp = fopen(file_name, "rb");
 		if (fp == 0)
@@ -794,7 +788,6 @@ GLuint GraphicalController::texture_array_load(const std::vector<std::string>& p
 		}
 
 		// read the png into image_data through row_pointers
-		LOG(INFO) << file_name;
 		png_read_image(png_ptr, row_pointers);
 
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, cnt, temp_width, temp_height, 1, format, GL_UNSIGNED_BYTE, image_data);
@@ -854,7 +847,7 @@ GLuint GraphicalController::load_shader(const std::string& vPath, const std::str
 		std::vector<GLchar> errorLog(maxLength);
 		glGetShaderInfoLog(VertexShader, maxLength, &maxLength, &errorLog[0]);
 		std::string str(errorLog.begin(), errorLog.end());
-		LOG(FATAL) << "Не удалось скомпилировать вершинный шейдер `" << vPath << "` "<< str;
+		Logger::Instance().critical("Не удалось скомпилировать вершинный шейдер `" + vPath + "` " + str);
 	}
 		
 
@@ -862,16 +855,16 @@ GLuint GraphicalController::load_shader(const std::string& vPath, const std::str
 	glShaderSource(FragmentShader, 1, &FragmentShaderSource, NULL);
 	glCompileShader(FragmentShader);
 	if (!CompileSuccessful(FragmentShader))
-		LOG(FATAL) << "Не удалось скомпилировать фрагментный шейдер `" << fPath << "`";
+		Logger::Instance().critical( "Не удалось скомпилировать фрагментный шейдер `" + fPath + "`");
 
 	glAttachShader(Program, VertexShader);
 	glAttachShader(Program, FragmentShader);
 	glLinkProgram(Program);
 	if (!LinkSuccessful(Program))
-		LOG(FATAL) << "Не удалось слинковать шейдерную программу!";
+		Logger::Instance().critical( "Не удалось слинковать шейдерную программу!");
 	glValidateProgram(Program);
 	if (!ValidateSuccessful(Program))
-		LOG(FATAL) << "Ошибка при проверке шейдерной программы!";
+		Logger::Instance().critical ("Ошибка при проверке шейдерной программы!");
 
 	return Program;
 }

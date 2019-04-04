@@ -1,5 +1,6 @@
 #include "GUI_controller.h"
 #include <ApplicationGUI.h>
+#include <spdlog/spdlog.h>
 
 GUI_Controller::GUI_Controller():m_dragged(false),m_GUI(nullptr)
 {
@@ -14,7 +15,7 @@ void GUI_Controller::key_press(WPARAM w)
 {
 	if (m_GUI)
 	{
-		LOG(INFO) << "yes";
+		Logger::Instance().info("yes");
 		m_GUI->key_press(w);
 	}
 }

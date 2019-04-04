@@ -5,7 +5,6 @@
 #include "game/GameObject.h"
 #include "game/Parameter.h"
 #include "game/graphics/GUI_MapViewer.h"
-#include "log.h"
 #include  "impact/Effect.h"
 
 Action::Action(void)
@@ -24,7 +23,6 @@ Action::~Action(void)
 
 Object_interaction* Action::clone()
 {
-	LOG(INFO) << std::to_string(m_index);
 	return Application::instance().m_actions[m_index];
 }
 
@@ -62,7 +60,6 @@ Packer_generic& Action::get_packer()
 
 std::u16string Packer<Action>::to_json(iSerializable* value,Parser_context& context)
 {
-	LOG(INFO) << Parser::UTF16_to_CP1251(value->get_packer().get_type_name());
 	std::u16string result = value->to_json(context);
 	if (result.empty())
 	{
@@ -301,7 +298,6 @@ char ActionClass_Move::perfom(Parameter* parameter)
 		//LOG(INFO) << p->m_object->m_name << "  " << "двигается:" << std::to_string(p->m_place->x) << "," << std::to_string(p->m_place->y);
 	}
 	else {
-		LOG(INFO) << "errror";
 		//LOG(INFO) << p->m_object->m_name << " движение не вышло";
 		return 1;
 	}
@@ -1294,7 +1290,7 @@ char action_hit_melee::perfom(Parameter* parameter)
 			if (light > 100) { light = 100; };
 			if (accuracy > 0)
 			{
-				accuracy = (ms->m_value + rand() % accuracy)*(light + rand() % (100 - light + 1)*0.5);
+				accuracy = (ms->m_value + rand() % accuracy) * (light + rand() % (100 - light + 1) * 0.5);
 				//???Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Точность: "+std::to_string(accuracy*0.0000001)));
 			}
 			else
@@ -1303,7 +1299,7 @@ char action_hit_melee::perfom(Parameter* parameter)
 			}
 			if (accuracy > 0)
 			{
-				Effect* item = new Effect();
+				auto* item = new Effect();
 				item->m_interaction_message_type = interaction_message_type_e::single;
 				item->m_subtype = effect_e::value;
 				item->m_value = -accuracy*0.0000001*sb*0.01*wd*str->m_value;
@@ -1739,7 +1735,6 @@ bool Action_autoexplore::get_child(GameTask*& task)
 	task = nullptr;
 	if (c)
 	{ 
-		LOG(INFO) << std::to_string(c->x) << " " << std::to_string(c->y);
 		Parameter* p = new Parameter(parameter_type_e::position);
 		(*p)[0].set(object);
 		(*p)[1].set(c);

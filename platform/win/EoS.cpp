@@ -8,7 +8,7 @@
 #include "game/Application.h"
 #include "game/MouseController.h"
 #include "game/GraphicalController.h"
-#include "game/utils/winlog.h"
+//#include "game/utils/winlog.h"
 
 // Function Declarations
 
@@ -29,11 +29,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	BOOL quit = FALSE;
 
 	// initialize logging
-	FLAGS_logtostderr = true;
-	FLAGS_colorlogtostderr = true;
-	google::InitGoogleLogging("EoS");
-	std::shared_ptr<WinDebugSink> sink(new WinDebugSink());
-	google::AddLogSink(sink.get());
+	//FLAGS_logtostderr = true;
+	//FLAGS_colorlogtostderr = true;
+	//google::InitGoogleLogging("EoS");
+	//std::shared_ptr<WinDebugSink> sink(new WinDebugSink());
+	//google::AddLogSink(sink.get());
 
 	// register window class
 	wc.style = CS_OWNDC;

@@ -33,7 +33,7 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 	const auto it = m_config->m_items.find(unit_name);
 	if (it == m_config->m_items.end())
 	{
-		LOG(FATAL) << "Ёлемент `" << unit_name << "` отсутствует в m_items";
+		Logger::Instance().critical ("Ёлемент `" + unit_name + "` отсутствует в m_items");
 	}
 	GameObject& config = it->second;
 	
@@ -83,7 +83,7 @@ effect_prefix_e GameObjectManager::get_effect_prefix_e(const std::string& key)
 	auto value = m_to_effect_prefix_e.find(key);
 	if (value == m_to_effect_prefix_e.end())
 	{
-		LOG(FATAL) << "Ёлемент `" << key << "` отсутствует в m_items";
+		Logger::Instance().critical("Ёлемент `" + key + "` отсутствует в m_items");
 	}
 	return value->second;
 }

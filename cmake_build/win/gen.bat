@@ -30,7 +30,7 @@ rem Очищаем текущий каталог для генерации но�
 for /F "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
 
 rem Генерируем файлы решения VisualStudio
-cmake %~dp0 -DLIB_PLATFORM=%LIB_PLATFORM_PARAM% -G "Visual Studio %VSVER%%PROJ_TYPE%"
+cmake %~dp0 -DLIB_PLATFORM=%LIB_PLATFORM_PARAM% -G "Visual Studio %VSVER%" -A x64
 
 goto end
 
