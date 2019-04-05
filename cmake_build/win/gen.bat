@@ -6,31 +6,23 @@ if "%1"=="" goto usage
 rem Версия используемой VisualStudio
 set VSVER=%1
 
-set PLATFORM=x86
-if /i "%2"=="x86"       set PLATFORM=x86
-if /i "%2"=="amd64"     set PLATFORM=amd64
+set PLATFORM=amd64
 if /i "%2"=="x64"       set PLATFORM=amd64
-if /i "%2"=="arm"       set PLATFORM=arm
-if /i "%2"=="x86_arm"   set PLATFORM=x86_arm
-if /i "%2"=="x86_amd64" set PLATFORM=x86_amd64
+if /i "%2"=="x86"       set PLATFORM=x86
 
 rem Платформа, используется при генерации проекта MSVS
-set PROJ_TYPE=
-if /i %PLATFORM%==amd64     set PROJ_TYPE= Win64
-if /i %PLATFORM%==x64       set PROJ_TYPE= Win64
-if /i %PLATFORM%==x86_amd64 set PROJ_TYPE= Win64
+set PROJ_TYPE=x64
+if /i %PLATFORM%==x86       set PROJ_TYPE=Win32
 
 rem Платформа (x86/x64), используется в CMakeLists.txt для определения папки с библиотеками
-set LIB_PLATFORM_PARAM=x86
-if /i %PLATFORM%==amd64     set LIB_PLATFORM_PARAM=x64
-if /i %PLATFORM%==x64       set LIB_PLATFORM_PARAM=x64
-if /i %PLATFORM%==x86_amd64 set LIB_PLATFORM_PARAM=x64
+set LIB_PLATFORM_PARAM=x64
+if /i %PLATFORM%==x86 set LIB_PLATFORM_PARAM=x86
 
 rem Очищаем текущий каталог для генерации новых файлов проекта
 for /F "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
 
 rem Генерируем файлы решения VisualStudio
-cmake %~dp0 -DLIB_PLATFORM=%LIB_PLATFORM_PARAM% -G "Visual Studio %VSVER%" -A x64
+cmake %~dp0 -DLIB_PLATFORM=%LIB_PLATFORM_PARAM% -G "Visual Studio %VSVER%" -A %PROJ_TYPE%
 
 goto end
 

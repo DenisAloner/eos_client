@@ -10,25 +10,16 @@ set BUILD_TYPE=Debug
 if /i "%2"=="debug"		set BUILD_TYPE=Debug
 if /i "%2"=="release"	set BUILD_TYPE=Release
 
-set PLATFORM=x86
-if /i "%3"=="x86"       set PLATFORM=x86
-if /i "%3"=="amd64"     set PLATFORM=amd64
-if /i "%3"=="x64"       set PLATFORM=amd64
-if /i "%3"=="arm"       set PLATFORM=arm
-if /i "%3"=="x86_arm"   set PLATFORM=x86_arm
-if /i "%3"=="x86_amd64" set PLATFORM=x86_amd64
+set PLATFORM=amd64
+if /i "%2"=="x86"       set PLATFORM=x86
 
 rem Платформа, используется при генерации проекта MSVS
-set PROJ_TYPE=
-if /i %PLATFORM%==amd64     set PROJ_TYPE= Win64
-if /i %PLATFORM%==x64       set PROJ_TYPE= Win64
-if /i %PLATFORM%==x86_amd64 set PROJ_TYPE= Win64
+set PROJ_TYPE=x64
+if /i %PLATFORM%==x86       set PROJ_TYPE=Win32
 
 rem Платформа (x86/x64), используется в CMakeLists.txt для определения папки с библиотеками
-set LIB_PLATFORM_PARAM=x86
-if /i %PLATFORM%==amd64     set LIB_PLATFORM_PARAM=x64
-if /i %PLATFORM%==x64       set LIB_PLATFORM_PARAM=x64
-if /i %PLATFORM%==x86_amd64 set LIB_PLATFORM_PARAM=x64
+set LIB_PLATFORM_PARAM=x64
+if /i %PLATFORM%==x86 set LIB_PLATFORM_PARAM=x86
 
 rem Каталог установки используемой VisualStudio
 set VSDIR=
@@ -47,7 +38,7 @@ rem Выполняем конфигурирование VisualStudio
 call "%VSDIR%\VC\vcvarsall.bat" %PLATFORM%
 
 rem Генерируем файлы решения VisualStudio
-cmake %~dp0 -DLIB_PLATFORM=%LIB_PLATFORM_PARAM% -G "Visual Studio %VSVER%%PROJ_TYPE%"
+cmake %~dp0 -DLIB_PLATFORM=%LIB_PLATFORM_PARAM% -G "Visual Studio %VSVER%" -A %PROJ_TYPE%
 
 rem Запускаем сборку проекта
 cmake --build .\ --target ALL_BUILD --config %BUILD_TYPE%
