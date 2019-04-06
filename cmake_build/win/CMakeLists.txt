@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.8)
 project(eos_client)
 
+add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>)
+add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/std:c++latest>)
+add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/bigobj>)
+
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(PROJECT_DIR ${CMAKE_SOURCE_DIR}/../../)
@@ -87,10 +91,10 @@ include_directories(
 
 set(EXT_LIBRARIES
 	${OGL_LIB}
-        $<$<CONFIG:Debug>:${GLEW_LIB_DEBUG}>$<$<CONFIG:Release>:${GLEW_LIB_RELEASE}>
+    $<$<CONFIG:Debug>:${GLEW_LIB_DEBUG}>$<$<CONFIG:Release>:${GLEW_LIB_RELEASE}>
 	$<$<CONFIG:Debug>:${FREETYPE_LIB_DEBUG}>$<$<CONFIG:Release>:${FREETYPE_LIB_RELEASE}>
-        $<$<CONFIG:Debug>:${LIBPNG_LIB_DEBUG}>$<$<CONFIG:Release>:${LIBPNG_LIB_RELEASE}>
-        $<$<CONFIG:Debug>:${ZLIB_LIB_DEBUG}>$<$<CONFIG:Release>:${ZLIB_LIB_RELEASE}>
+    $<$<CONFIG:Debug>:${LIBPNG_LIB_DEBUG}>$<$<CONFIG:Release>:${LIBPNG_LIB_RELEASE}>
+    $<$<CONFIG:Debug>:${ZLIB_LIB_DEBUG}>$<$<CONFIG:Release>:${ZLIB_LIB_RELEASE}>
 )
 
 include(${PROJECT_DIR}/cmake_build/common/game.cmake)
