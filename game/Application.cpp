@@ -111,7 +111,7 @@ void Application::render()
 	{
 		m_gui_controller.m_GUI->render(m_graph, 0, 0);
 	}
-	const position_t mouse = Application::instance().m_mouse->get_mouse_position();
+	const auto mouse = Application::instance().m_mouse->get_mouse_position();
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_2D);
@@ -216,11 +216,10 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 	m_gui_controller.m_GUI->add(m_window_manager);
 	m_gui_controller.m_GUI->add(new GUI_Image((m_size.w - 1024) / 2, (m_size.h - 1024) / 2, 1024, 1024, m_graph->m_logo));
 
-	GUI_Window* MainMenu = new GUI_Window(0, 0, 400, 400, u"Главное меню");
+	auto MainMenu = new GUI_Window(0, 0, 400, 400, u"Главное меню");
 	MainMenu->m_position = position_t((m_size.w - MainMenu->m_size.w) / 2, (m_size.h - MainMenu->m_size.h) / 2);
-	GUI_Button_list* menu = new GUI_Button_list(0, 0, 400, 400);
-	GUI_Mainmenu_button* button;
-	button = new GUI_Mainmenu_button(0, 0, 396, 47, u"Новая игра", parameter_type_e::new_game);
+	auto menu = new GUI_Button_list(0, 0, 400, 400);
+	auto button = new GUI_Mainmenu_button(0, 0, 396, 47, u"Новая игра", parameter_type_e::new_game);
 	button->mouse_click += std::bind(&GUI_Window::on_close, MainMenu, MainMenu);
 	menu->add_item_control(button);
 	button = new GUI_Mainmenu_button(0, 0, 396, 47, u"Загрузка игры", parameter_type_e::load_game);
@@ -241,15 +240,14 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 void Application::new_game()
 {
 	m_world = new Game_world();
-	GameMap* map = new GameMap(dimension3_t(128, 128, 20));
+	auto map = new GameMap(dimension3_t(128, 128, 20));
 
-	GameObject* obj;
 	map->generate_room();
 	m_world->m_maps.push_back(map);
 	int rx = 8;
 	int ry = 8;
 
-	obj = m_game_object_manager->new_object("human");
+	auto obj = m_game_object_manager->new_object("human");
 	obj->set_direction(object_direction_e::down);
 	map->add_to_map(obj, map->get(1, ry, rx));
 	m_world->m_player = new Player(obj, map);
@@ -353,14 +351,14 @@ void Application::new_game()
 
 	m_gui_controller.m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player, map, m_action_manager, m_game_log);
 
-	GUI_Window* MiniMap = new GUI_Window(0, 0, 400, 400, u"Мини-карта");
-	rectangle_t cr = MiniMap->client_rect();
-	GUI_MiniMap* mini_map = new GUI_MiniMap(position_t(0, 0), dimension_t(cr.w, cr.h), m_gui_controller.m_GUI->MapViewer);
+	auto MiniMap = new GUI_Window(0, 0, 400, 400, u"Мини-карта");
+	auto cr = MiniMap->client_rect();
+	auto* mini_map = new GUI_MiniMap(position_t(0, 0), dimension_t(cr.w, cr.h), m_gui_controller.m_GUI->MapViewer);
 	MiniMap->add(mini_map);
 
 	MiniMap = new GUI_Window(300, 0, 400, 400, u"Поле зрения player");
 	cr = MiniMap->client_rect();
-	GUI_FOV* fov = new GUI_FOV(position_t(0, 0), dimension_t(cr.w, cr.h), m_world->m_player->m_object);
+	auto fov = new GUI_FOV(position_t(0, 0), dimension_t(cr.w, cr.h), m_world->m_player->m_object);
 	MiniMap->add(fov);
 
 	/*obj = m_game_object_manager->new_object("bat");
@@ -392,9 +390,9 @@ void Application::new_game()
 	rx = 8;
 	ry = 8;
 
-	obj = m_game_object_manager->new_object("darkeye");
+	/*obj = m_game_object_manager->new_object("darkeye");
 	obj->set_direction(object_direction_e::down);
-	map->add_to_map(obj, map->get(1, ry, rx-2));
+	map->add_to_map(obj, map->get(1, ry, rx-2));*/
 
 	/*obj = m_game_object_manager->new_object("bag");
 	obj->set_direction(object_direction_e::top);
@@ -691,7 +689,7 @@ void Application::command_main_menu_select()
 
 MapCell* Application::command_select_location(GameObject* object)
 {
-	MapCell* Result = nullptr;
+	MapCell* result = nullptr;
 	/*if (object)
 	{
 		m_GUI->MapViewer->m_cursor_x = object->m_active_state->m_size.x;
@@ -703,8 +701,8 @@ MapCell* Application::command_select_location(GameObject* object)
 		m_GUI->MapViewer->m_cursor_y = 1;
 	}*/
 	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Выберите клетку")));
-	bool Exit = false;
-	while (Exit == false)
+	auto exit = false;
+	while (!exit)
 	{
 		std::unique_lock<std::mutex> lk(m_message_queue.m_mutex);
 		m_message_queue.m_reader = true;
@@ -715,16 +713,16 @@ MapCell* Application::command_select_location(GameObject* object)
 		m_message_queue.m_processed_message = true;
 		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::owner)
 		{
-			Parameter* p = m_message_queue.m_items.front();
+			auto p = m_message_queue.m_items.front();
 			if ((*p)[0].m_owner->m_kind == entity_e::cell)
 			{
-				Result = static_cast<MapCell*>((*p)[0].m_owner);
-				Exit = true;
+				result = static_cast<MapCell*>((*p)[0].m_owner);
+				exit = true;
 			}
 		}
 		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::cancel)
 		{
-			Exit = true;
+			exit = true;
 		}
 		m_message_queue.m_read_message = false;
 		lk.unlock();
@@ -733,17 +731,17 @@ MapCell* Application::command_select_location(GameObject* object)
 	}
 	/*m_GUI->MapViewer->m_cursor_x = 1;
 	m_GUI->MapViewer->m_cursor_y = 1;*/
-	return Result;
+	return result;
 }
 
 GameObject* Application::command_select_object_on_map()
 {
-	GameObject* Result = nullptr;
+	GameObject* result = nullptr;
 	/*m_GUI->MapViewer->m_cursor_x = 1;
 	m_GUI->MapViewer->m_cursor_y = 1;*/
 	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Выберите обьект")));
-	bool Exit = false;
-	while (Exit == false)
+	auto exit = false;
+	while (!exit)
 	{
 		std::unique_lock<std::mutex> lk(m_message_queue.m_mutex);
 		m_message_queue.m_reader = true;
@@ -754,23 +752,23 @@ GameObject* Application::command_select_object_on_map()
 		m_message_queue.m_processed_message = true;
 		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::object)
 		{
-			Parameter* p = m_message_queue.m_items.front();
+			auto p = m_message_queue.m_items.front();
 			if ((*p)[0].m_object->m_owner->Game_object_owner::m_kind == entity_e::cell)
 			{
-				Result = (*p)[0].m_object;
-				Exit = true;
+				result = (*p)[0].m_object;
+				exit = true;
 			}
 		}
 		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::cancel)
 		{
-			Exit = true;
+			exit = true;
 		}
 		m_message_queue.m_read_message = false;
 		lk.unlock();
 		m_message_queue.m_condition_variable.notify_one();
 		m_message_queue.m_reader = false;
 	}
-	return Result;
+	return result;
 }
 
 GameObject* Application::command_select_object()

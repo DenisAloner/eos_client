@@ -205,7 +205,7 @@ void GameMap::generate_room()
 			{
 				if(z==0)
 				{
-					GameObject* obj = Application::instance().m_game_object_manager->new_object("floor");
+					auto obj = Application::instance().m_game_object_manager->new_object("floor");
 					add_object(obj, get(z, y, x));
 				}
 				else {
@@ -213,7 +213,7 @@ void GameMap::generate_room()
 					{
 						if ((x == 0) || (x == m_size.dx - 1) || (y == 0) || (y == m_size.dy - 1))
 						{
-							GameObject* obj = Application::instance().m_game_object_manager->new_object("wall");
+							auto obj = Application::instance().m_game_object_manager->new_object("wall");
 							add_object(obj, get(z, y, x));
 						}
 					}

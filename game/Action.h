@@ -8,7 +8,7 @@
 #include "MouseController.h"
 #include "GameObject.h"
 #include "Game_algorithm.h"
-#include  "impact\Effect.h"
+#include  "impact/Effect.h"
 
 class Application;
 class Parameter;
@@ -35,10 +35,10 @@ public:
 	~Action(void);
 
 	virtual bool check(Parameter* parameter);
-	virtual char perfom(Parameter* parameter);
+	virtual char perform(Parameter* parameter);
 	virtual std::u16string get_description(Parameter* parameter) = 0;
-	virtual void interaction_handler(Parameter* arg);
-	virtual Object_interaction* clone();
+	virtual void interaction_handler(Parameter* parameter);
+	Object_interaction* clone() override;
 
 	void reset_serialization_index() override { m_serialization_index = 0; };
 
@@ -62,7 +62,7 @@ public:
 	Action_wrapper();
 
 	virtual std::u16string get_description() { return u"действие"; };
-	virtual Action_wrapper* clone();
+	Action_wrapper* clone() override;
 	//virtual void perfom(Parameter* parameter);
 
 	void reset_serialization_index() override;
@@ -84,10 +84,10 @@ public:
 	ActionClass_Move();
 	~ActionClass_Move();
 
-	virtual bool check(Parameter* parameter);
-	virtual char perfom(Parameter* parameter);
-	virtual std::u16string get_description(Parameter* parameter);
-	virtual void interaction_handler(Parameter* arg);
+	bool check(Parameter* parameter) override;
+	char perform(Parameter* parameter) override;
+	std::u16string get_description(Parameter* parameter) override;
+	void interaction_handler(Parameter* parameter) override;
 };
 
 class action_move_step :
@@ -97,7 +97,7 @@ public:
 
 	action_move_step();
 
-	virtual bool check(Parameter* parameter);
+	bool check(Parameter* parameter) override;
 };
 
 class ActionClass_Push :
@@ -108,10 +108,10 @@ public:
 	ActionClass_Push();
 	~ActionClass_Push();
 
-	virtual bool check(Parameter* parameter);
-	virtual char perfom(Parameter* parameter);
-	virtual std::u16string get_description(Parameter* parameter);
-	virtual void interaction_handler(Parameter* arg);
+	bool check(Parameter* parameter) override;
+	char perform(Parameter* parameter) override;
+	std::u16string get_description(Parameter* parameter) override;
+	void interaction_handler(Parameter* parameter) override;
 
 };
 
@@ -123,10 +123,10 @@ public:
 	ActionClass_Turn();
 	~ActionClass_Turn();
 
-	virtual bool check(Parameter* parameter);
-	virtual char perfom(Parameter* parameter);
-	virtual std::u16string get_description(Parameter* parameter);
-	virtual void interaction_handler(Parameter* arg);
+	bool check(Parameter* parameter) override;
+	char perform(Parameter* parameter) override;
+	std::u16string get_description(Parameter* parameter) override;
+	void interaction_handler(Parameter* parameter) override;
 
 };
 
@@ -138,10 +138,10 @@ public:
 	Action_OpenInventory();
 	~Action_OpenInventory();
 
-	virtual bool check(Parameter* parameter);
-	virtual char perfom(Parameter* parameter);
-	virtual std::u16string get_description(Parameter* parameter);
-	virtual void interaction_handler(Parameter* arg);
+	bool check(Parameter* parameter) override;
+	char perform(Parameter* parameter) override;
+	std::u16string get_description(Parameter* parameter) override;
+	void interaction_handler(Parameter* parameter) override;
 
 };
 
@@ -152,10 +152,10 @@ public:
 
 	Action_CellInfo();
 
-	virtual bool check(Parameter* parameter);
-	virtual char perfom(Parameter* parameter);
-	virtual std::u16string get_description(Parameter* parameter);
-	virtual void interaction_handler(Parameter* arg);
+	bool check(Parameter* parameter) override;
+	char perform(Parameter* parameter) override;
+	std::u16string get_description(Parameter* parameter) override;
+	void interaction_handler(Parameter* arg) override;
 
 };
 
@@ -166,9 +166,9 @@ public:
 
 	action_set_motion_path();
 
-	virtual char perfom(Parameter* parameter);
-	virtual std::u16string get_description(Parameter* parameter);
-	virtual void interaction_handler(Parameter* arg);
+	char perform(Parameter* parameter) override;
+	std::u16string get_description(Parameter* parameter) override;
+	void interaction_handler(Parameter* arg) override;
 };
 
 
@@ -179,9 +179,9 @@ public:
 
 	Action_pick();
 
-	virtual char perfom(Parameter* parameter);
-	virtual std::u16string get_description(Parameter* parameter);
-	virtual void interaction_handler(Parameter* arg);
+	char perform(Parameter* parameter) override;
+	std::u16string get_description(Parameter* parameter) override;
+	void interaction_handler(Parameter* parameter) override;
 	void apply_visitor(Visitor_generic& visitor) override;
 
 };
@@ -193,7 +193,7 @@ public:
 
 	Action_move_out();
 
-	virtual std::u16string get_description(Parameter* parameter);
+	std::u16string get_description(Parameter* parameter) override;
 
 };
 
@@ -204,9 +204,9 @@ public:
 
 	Action_open();
 
-	virtual char perfom(Parameter* parameter);
-	virtual std::u16string get_description(Parameter* parameter);
-	virtual void interaction_handler(Parameter* arg);
+	char perform(Parameter* parameter) override;
+	std::u16string get_description(Parameter* parameter) override;
+	void interaction_handler(Parameter* arg) override;
 
 };
 
@@ -216,10 +216,10 @@ class Action_hit :
 public:
 
 	Action_hit();
-	virtual bool check(Parameter* parameter);
-	virtual char perfom(Parameter* parameter);
-	virtual std::u16string get_description(Parameter* parameter);
-	virtual void interaction_handler(Parameter* arg);
+	bool check(Parameter* parameter) override;
+	char perform(Parameter* parameter) override;
+	std::u16string get_description(Parameter* parameter) override;
+	void interaction_handler(Parameter* arg) override;
 
 };
 
@@ -229,8 +229,8 @@ class action_hit_melee :
 public:
 
 	action_hit_melee();
-	virtual void interaction_handler(Parameter* arg);
-	virtual char perfom(Parameter* parameter);
+	void interaction_handler(Parameter* arg) override;
+	char perform(Parameter* parameter) override;
 };
 
 class Action_equip :
@@ -240,10 +240,10 @@ public:
 
 	Action_equip();
 
-	virtual bool check(Parameter* parameter);
-	virtual char perfom(Parameter* parameter);
-	virtual std::u16string get_description(Parameter* parameter);
-	virtual void interaction_handler(Parameter* arg);
+	bool check(Parameter* parameter) override;
+	char perform(Parameter* parameter) override;
+	std::u16string get_description(Parameter* parameter) override;
+	void interaction_handler(Parameter* arg) override;
 
 };
 
@@ -254,8 +254,8 @@ public:
 
 	Action_show_parameters();
 
-	virtual std::u16string get_description(Parameter* parameter);
-	virtual void interaction_handler(Parameter* arg);
+	std::u16string get_description(Parameter* parameter) override;
+	void interaction_handler(Parameter* arg) override;
 
 };
 
@@ -267,10 +267,10 @@ public:
 
 	Action_use();
 
-	virtual bool check(Parameter* parameter);
-	virtual char perfom(Parameter* parameter);
+	bool check(Parameter* parameter) override;
+	char perform(Parameter* parameter) override;
 	std::u16string get_description(Parameter* parameter) override;
-	virtual void interaction_handler(Parameter* arg);
+	void interaction_handler(Parameter* parameter) override;
 };
 
 class Action_save :
@@ -292,8 +292,8 @@ public:
 
 	Action_load();
 
-	virtual std::u16string get_description(Parameter* parameter);
-	virtual void interaction_handler(Parameter* arg);
+	std::u16string get_description(Parameter* parameter) override;
+	void interaction_handler(Parameter* arg) override;
 
 };
 
@@ -316,9 +316,9 @@ public:
 
 	Action_autoexplore();
 
-	virtual std::u16string get_description(Parameter* parameter);
-	virtual void interaction_handler(Parameter* arg);
-	virtual bool get_child(GameTask*& task);
+	std::u16string get_description(Parameter* parameter) override;
+	void interaction_handler(Parameter* arg) override;
+	bool get_child(GameTask*& task) override;
 
 };
 
@@ -328,10 +328,10 @@ class Action_shoot :
 public:
 
 	Action_shoot();
-	virtual bool check(Parameter* parameter);
-	virtual char perfom(Parameter* parameter);
-	virtual std::u16string get_description(Parameter* parameter);
-	virtual void interaction_handler(Parameter* arg);
+	bool check(Parameter* parameter) override;
+	char perform(Parameter* parameter) override;
+	std::u16string get_description(Parameter* parameter) override;
+	void interaction_handler(Parameter* parameter) override;
 	bool process_cell(Parameter* parameter,MapCell* cell);
 private:
 	int m_distance;

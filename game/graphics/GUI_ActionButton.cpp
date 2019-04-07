@@ -18,7 +18,7 @@ void GUI_ActionButton::render(GraphicalController* Graph, int px, int py)
 	glDisable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	int y_shift = (m_size.h - ((Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender) >> 6)) / 2;
+	int y_shift = (m_size.h - (Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender >> 6)) / 2;
 	GraphicalController::rectangle_t rect(px, py, m_size.w, m_size.h);
 	if (focused)
 	{
@@ -31,7 +31,7 @@ void GUI_ActionButton::render(GraphicalController* Graph, int px, int py)
 		glColor4d(1, 1, 1, 1);
 	}
 	glEnable(GL_TEXTURE_2D);
-	std::u16string desc = m_value.action->get_description(m_value.parameter);
+	auto desc = m_value.action->get_description(m_value.parameter);
 	Graph->output_text(px + m_size.h + 4, py + y_shift, desc, 8, 17);
 	glDisable(GL_BLEND);
 	glColor4d(1, 1, 1, 1);
@@ -62,9 +62,5 @@ void GUI_ActionButton::on_mouse_click(MouseEventArgs const& e)
 
 bool GUI_ActionButton::check_region(MouseEventArgs const& e)
 {
-	if (this->m_position.x <= e.position.x&&this->m_position.x + m_size.w >= e.position.x&&this->m_position.y <= e.position.y&&this->m_position.y + m_size.h >= e.position.y)
-	{
-		return true;
-	}
-	return false;
+	return this->m_position.x <= e.position.x && this->m_position.x + m_size.w >= e.position.x && this->m_position.y <= e.position.y && this->m_position.y + m_size.h >= e.position.y;
 }

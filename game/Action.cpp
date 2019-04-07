@@ -33,7 +33,7 @@ bool Action::check(Parameter* parameter)
 }
 
 
-char Action::perfom(Parameter* parameter)
+char Action::perform(Parameter* parameter)
 {
 	return 0;
 }
@@ -46,10 +46,10 @@ void Action::interaction_handler(Parameter* arg)
 	{
 		if (Application::instance().m_message_queue.m_reader)
 		{
-			Parameter* p = new Parameter(parameter_type_e::cancel);
+			auto p = new Parameter(parameter_type_e::cancel);
 			Application::instance().m_message_queue.push(p);
 		}
-		while (Application::instance().m_message_queue.m_busy){}
+		while (Application::instance().m_message_queue.m_busy) {}
 	}
 }
 
@@ -58,24 +58,24 @@ Packer_generic& Action::get_packer()
 	return Packer<Action>::Instance();
 }
 
-std::u16string Packer<Action>::to_json(iSerializable* value,Parser_context& context)
+std::u16string Packer<Action>::to_json(iSerializable* value, Parser_context& context)
 {
-	std::u16string result = value->to_json(context);
+	auto result = value->to_json(context);
 	if (result.empty())
 	{
-		std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\"}";
+		auto out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\"}";
 		return out;
 	}
 	else
 	{
-		std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\"," + result + u"}";
+		auto out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\"," + result + u"}";
 		return out;
 	}
 }
 
 std::string Packer<Action>::to_binary(iSerializable* value, Parser_context& context)
 {
-	std::size_t id = value->get_packer().get_type_id() + 1;
+	auto id = value->get_packer().get_type_id() + 1;
 	return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + value->to_binary(context);
 }
 
@@ -87,7 +87,7 @@ iSerializable* Packer<Action>::from_json(scheme_map_t* value, Parser_context& co
 iSerializable* Packer<Action>::from_binary(const std::string& value, std::size_t& pos, Parser_context& context)
 {
 	action_e::type x;
-	Parser::from_binary<action_e::type>(value, x, pos,context);
+	Parser::from_binary<action_e::type>(value, x, pos, context);
 	return Application::instance().m_actions[x];
 }
 
@@ -105,7 +105,7 @@ Action_wrapper::Action_wrapper()
 
 Action_wrapper* Action_wrapper::clone()
 {
-	Action_wrapper* result = new Action_wrapper();
+	auto result = new Action_wrapper();
 	result->m_action = m_action;
 	result->m_parameter = m_parameter;
 	result->m_decay = m_decay;
@@ -146,7 +146,7 @@ void Action_wrapper::update()
 	{
 		if (done)
 		{
-			m_action->perfom(m_parameter);
+			m_action->perform(m_parameter);
 			done = false;
 		}
 		m_decay -= 1;
@@ -186,7 +186,6 @@ void ActionClass_Move::interaction_handler(Parameter* parameter)
 {
 	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
-	MapCell* temp;
 	Parameter* out_parameter;
 	if (parameter)
 	{
@@ -196,7 +195,7 @@ void ActionClass_Move::interaction_handler(Parameter* parameter)
 	{
 		out_parameter = new Parameter(m_parameter_kind);
 	}
-	Parameter& p(*out_parameter);
+	auto& p(*out_parameter);
 	if (!p[0])
 	{
 		p[0].set(Application::instance().m_world->m_player->m_object);
@@ -204,9 +203,9 @@ void ActionClass_Move::interaction_handler(Parameter* parameter)
 	if (!p[1])
 	{
 		Application::instance().m_UI_mutex.lock();
-		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_object_move( p[0].m_object));
+		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_object_move(p[0].m_object));
 		Application::instance().m_UI_mutex.unlock();
-		temp = Application::instance().command_select_location(p[0].m_object);
+		auto temp = Application::instance().command_select_location(p[0].m_object);
 		if (temp)
 		{
 			p[1].set(Game_algorithm::step_in_direction(p[0].m_object, Game_algorithm::turn_to_cell(p[0].m_object, temp)));
@@ -229,9 +228,9 @@ void ActionClass_Move::interaction_handler(Parameter* parameter)
 	Application::instance().m_message_queue.m_busy = false;
 }
 
-bool ActionClass_Move::check(Parameter* parameter)
+bool ActionClass_Move::check(Parameter * parameter)
 {
-	Parameter& p(*parameter);
+	auto& p(*parameter);
 	return Application::instance().command_check_position(p[0].m_object, p[1].m_cell, p[1].m_cell->m_map);
 }
 
@@ -245,19 +244,19 @@ action_move_step::action_move_step()
 	m_animation = animation_e::move;
 }
 
-bool action_move_step::check(Parameter* parameter)
+bool action_move_step::check(Parameter * parameter)
 {
-	Parameter& p(*parameter);
-	if (abs(p[0].m_object->cell()->x - p[1].m_cell->x) < 2 && abs(p[0].m_object->cell()->y - p[1].m_cell->y)< 2)
+	auto& p(*parameter);
+	if (abs(p[0].m_object->cell()->x - p[1].m_cell->x) < 2 && abs(p[0].m_object->cell()->y - p[1].m_cell->y) < 2)
 	{
 		return Application::instance().command_check_position(p[0].m_object, p[1].m_cell, p[1].m_cell->m_map);
 	}
 	else return false;
 }
 
-char ActionClass_Move::perfom(Parameter* parameter)
+char ActionClass_Move::perform(Parameter * parameter)
 {
-	Parameter& p(*parameter);
+	auto& p(*parameter);
 	if (check(parameter))
 	{
 		int dx = p[1].m_cell->x - p[0].m_object->cell()->x;
@@ -301,14 +300,14 @@ char ActionClass_Move::perfom(Parameter* parameter)
 		//LOG(INFO) << p->m_object->m_name << " движение не вышло";
 		return 1;
 	}
-		return 0;
-	
+	return 0;
+
 }
 
 
-std::u16string ActionClass_Move::get_description(Parameter* parameter)
+std::u16string ActionClass_Move::get_description(Parameter * parameter)
 {
-	Parameter& p(*parameter);
+	auto& p(*parameter);
 	std::u16string s(u"Идти");
 	if (p[1])
 	{
@@ -333,9 +332,9 @@ ActionClass_Push::~ActionClass_Push(void)
 }
 
 
-std::u16string ActionClass_Push::get_description(Parameter* parameter)
+std::u16string ActionClass_Push::get_description(Parameter * parameter)
 {
-	Parameter& p(*parameter);
+	auto& p(*parameter);
 	std::u16string s(u"Переместить ");
 	//s += p->m_object->m_name;
 	//s += " в X:" + std::to_string(p->m_place->x);
@@ -345,7 +344,7 @@ std::u16string ActionClass_Push::get_description(Parameter* parameter)
 }
 
 
-bool ActionClass_Push::check(Parameter* parameter)
+bool ActionClass_Push::check(Parameter * parameter)
 {
 	//m_error = "";
 	//Parameter_MoveObjectByUnit* p = static_cast<Parameter_MoveObjectByUnit*>(parameter);
@@ -408,7 +407,7 @@ bool ActionClass_Push::check(Parameter* parameter)
 }
 
 
-char ActionClass_Push::perfom(Parameter* parameter)
+char ActionClass_Push::perform(Parameter * parameter)
 {
 	//Parameter_MoveObjectByUnit* p = static_cast<Parameter_MoveObjectByUnit*>(parameter);
 	//if (check(p))
@@ -421,7 +420,7 @@ char ActionClass_Push::perfom(Parameter* parameter)
 }
 
 
-void ActionClass_Push::interaction_handler(Parameter* arg)
+void ActionClass_Push::interaction_handler(Parameter * parameter)
 {
 	//Action::interaction_handler(nullptr);
 	//Application::instance().m_message_queue.m_busy = true;
@@ -482,13 +481,12 @@ ActionClass_Turn::~ActionClass_Turn(void)
 }
 
 
-std::u16string ActionClass_Turn::get_description(Parameter* parameter)
+std::u16string ActionClass_Turn::get_description(Parameter * parameter)
 {
-	Parameter& p(*parameter);
 	std::u16string s(u"Повернуть");
 	if (parameter)
 	{
-		Parameter& p(*parameter);
+		auto& p(*parameter);
 		if (p[0])
 		{
 			s += u" " + p[0].m_object->m_name;
@@ -498,24 +496,24 @@ std::u16string ActionClass_Turn::get_description(Parameter* parameter)
 }
 
 
-bool ActionClass_Turn::check(Parameter* parameter)
+bool ActionClass_Turn::check(Parameter * parameter)
 {
 	/*Parameter_direction* p = static_cast<Parameter_direction*>(parameter);*/
 	return true;
 }
 
-char ActionClass_Turn::perfom(Parameter* parameter)
+char ActionClass_Turn::perform(Parameter * parameter)
 {
-	Parameter& p(*parameter);
 	if (check(parameter))
 	{
+		auto& p(*parameter);
 		p[0].m_object->set_direction(p[1].m_direction);
 	}
 	else return 1;
 	return 0;
 }
 
-void ActionClass_Turn::interaction_handler(Parameter* parameter)
+void ActionClass_Turn::interaction_handler(Parameter * parameter)
 {
 	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
@@ -528,10 +526,10 @@ void ActionClass_Turn::interaction_handler(Parameter* parameter)
 	{
 		out_parameter = new Parameter(m_parameter_kind);
 	}
-	Parameter& p(*out_parameter);
+	auto& p(*out_parameter);
 	if (!p[0])
 	{
-		GameObject* result = Application::instance().command_select_object_on_map();
+		auto result = Application::instance().command_select_object_on_map();
 		if (result)
 		{
 			p[0].set(result);
@@ -550,9 +548,9 @@ void ActionClass_Turn::interaction_handler(Parameter* parameter)
 	if (!p[1])
 	{
 		Application::instance().m_UI_mutex.lock();
-		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_object_rotate( p[0].m_object));
+		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_object_rotate(p[0].m_object));
 		Application::instance().m_UI_mutex.unlock();
-		MapCell* result = Application::instance().command_select_location(p[0].m_object);
+		auto result = Application::instance().command_select_location(p[0].m_object);
 		if (result)
 		{
 			p[1].set(Game_algorithm::turn_to_cell(p[0].m_object, result));
@@ -571,11 +569,11 @@ void ActionClass_Turn::interaction_handler(Parameter* parameter)
 			return;
 		}
 	}
-	rotate_direction_e rotate = Game_algorithm::get_rotation(p[0].m_object->m_direction, p[1].m_direction);
-	for (auto i = p[0].m_object->m_direction; i!= p[1].m_direction;)
+	auto rotate = Game_algorithm::get_rotation(p[0].m_object->m_direction, p[1].m_direction);
+	for (auto i = p[0].m_object->m_direction; i != p[1].m_direction;)
 	{
 		i = i + rotate;
-		Application::instance().m_action_manager->add(new GameTask(this, new Parameter(parameter_type_e::direction,p[0].m_object,i)));
+		Application::instance().m_action_manager->add(new GameTask(this, new Parameter(parameter_type_e::direction, p[0].m_object, i)));
 	}
 	Application::instance().m_message_queue.m_busy = false;
 }
@@ -594,7 +592,7 @@ Action_OpenInventory::~Action_OpenInventory()
 }
 
 
-void Action_OpenInventory::interaction_handler(Parameter* parameter)
+void Action_OpenInventory::interaction_handler(Parameter * parameter)
 {
 	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
@@ -607,10 +605,10 @@ void Action_OpenInventory::interaction_handler(Parameter* parameter)
 	{
 		out_parameter = new Parameter(m_parameter_kind);
 	}
-	Parameter& p(*out_parameter);
-	GameObject* result = Application::instance().command_select_object_on_map();
+	auto result = Application::instance().command_select_object_on_map();
 	if (result)
 	{
+		auto& p(*out_parameter);
 		p[0].m_object = result;
 		std::u16string a = u"Выбран ";
 		a.append(p[0].m_object->m_name);
@@ -627,19 +625,19 @@ void Action_OpenInventory::interaction_handler(Parameter* parameter)
 }
 
 
-bool Action_OpenInventory::check(Parameter* parameter)
+bool Action_OpenInventory::check(Parameter * parameter)
 {
 	return true;
 }
 
 
-char Action_OpenInventory::perfom(Parameter* parameter)
+char Action_OpenInventory::perform(Parameter * parameter)
 {
 	return 0;
 }
 
 
-std::u16string Action_OpenInventory::get_description(Parameter* parameter)
+std::u16string Action_OpenInventory::get_description(Parameter * parameter)
 {
 	return u"Открыть инвернтарь";
 }
@@ -651,7 +649,7 @@ Action_CellInfo::Action_CellInfo()
 	m_name = u"Информация о клетке";
 }
 
-void Action_CellInfo::interaction_handler(Parameter* arg)
+void Action_CellInfo::interaction_handler(Parameter * arg)
 {
 	//Action::interaction_handler(nullptr);
 	//Application::instance().m_message_queue.m_busy = true;
@@ -683,17 +681,17 @@ void Action_CellInfo::interaction_handler(Parameter* arg)
 	//Application::instance().m_message_queue.m_busy = false;
 }
 
-bool Action_CellInfo::check(Parameter* parameter)
+bool Action_CellInfo::check(Parameter * parameter)
 {
 	return true;
 }
 
-char Action_CellInfo::perfom(Parameter* parameter)
+char Action_CellInfo::perform(Parameter * parameter)
 {
 	return 0;
 }
 
-std::u16string Action_CellInfo::get_description(Parameter* parameter)
+std::u16string Action_CellInfo::get_description(Parameter * parameter)
 {
 	return u"Информация о клетке";
 }
@@ -705,15 +703,15 @@ action_set_motion_path::action_set_motion_path()
 	m_name = u"Идти в указанную позицию";
 }
 
-void action_set_motion_path::interaction_handler(Parameter* parameter)
+void action_set_motion_path::interaction_handler(Parameter * parameter)
 {
 	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
-	GameObject* object = Application::instance().m_world->m_player->m_object;
+	auto object = Application::instance().m_world->m_player->m_object;
 	Application::instance().m_UI_mutex.lock();
-	Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_line( object->cell(), object));
+	Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_line(object->cell(), object));
 	Application::instance().m_UI_mutex.unlock();
-	MapCell* cell = Application::instance().command_select_location(object);
+	auto cell = Application::instance().command_select_location(object);
 	if (cell)
 	{
 		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, u"Выбрана клетка {" + Parser::CP1251_to_UTF16(std::to_string(cell->x) + "," + std::to_string(cell->y) + "}")));
@@ -732,19 +730,18 @@ void action_set_motion_path::interaction_handler(Parameter* parameter)
 	Application::instance().m_gui_controller.m_hints.pop_front();
 	Application::instance().m_UI_mutex.unlock();
 	Path::instance().map_costing(cell->m_map, object, cell, 40);
-	std::vector<MapCell*>* path;
-	path = Path::instance().get_path_to_cell();
+	auto path = Path::instance().get_path_to_cell();
 	if (path)
 	{
 		Application::instance().m_UI_mutex.lock();
-		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_path(path,object));
+		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_path(path, object));
 		Application::instance().m_UI_mutex.unlock();
 		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Следовать под данному пути? [Y/N]")));
-		if(Application::instance().command_agreement())
+		if (Application::instance().command_agreement())
 		{
-			for (int i=0; i < path->size(); ++i)
+			for (int i = 0; i < path->size(); ++i)
 			{
-				Parameter* p = new Parameter(parameter_type_e::position, object, (*path)[(path->size() - 1) - i]);
+				auto* p = new Parameter(parameter_type_e::position, object, (*path)[(path->size() - 1) - i]);
 				Application::instance().m_action_manager->add(new GameTask(Application::instance().m_actions[action_e::move_step], p));
 			}
 		}
@@ -764,12 +761,12 @@ void action_set_motion_path::interaction_handler(Parameter* parameter)
 	Application::instance().m_message_queue.m_busy = false;
 }
 
-char action_set_motion_path::perfom(Parameter* parameter)
+char action_set_motion_path::perform(Parameter * parameter)
 {
 	return 0;
 }
 
-std::u16string action_set_motion_path::get_description(Parameter* parameter)
+std::u16string action_set_motion_path::get_description(Parameter * parameter)
 {
 	return u"Идти в указанную позицию";
 }
@@ -783,7 +780,7 @@ Action_pick::Action_pick()
 	m_parameter_kind = parameter_type_e::destination;
 }
 
-void Action_pick::interaction_handler(Parameter* parameter)
+void Action_pick::interaction_handler(Parameter * parameter)
 {
 	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
@@ -796,14 +793,14 @@ void Action_pick::interaction_handler(Parameter* parameter)
 	{
 		out_parameter = new Parameter(m_parameter_kind);
 	}
-	Parameter& p(*out_parameter);
+	auto& p(*out_parameter);
 	if (!p[0])
 	{
 		p[0].set(Application::instance().m_world->m_player->m_object);
 	}
 	if (!p[2])
 	{
-		Game_object_owner* result = Application::instance().command_select_transfer(nullptr);
+		auto result = Application::instance().command_select_transfer(nullptr);
 		if (result)
 		{
 			p[2].set(result);
@@ -820,9 +817,9 @@ void Action_pick::interaction_handler(Parameter* parameter)
 	if (!p[1])
 	{
 		Application::instance().m_UI_mutex.lock();
-		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_area( p[0].m_object, true));
+		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_area(p[0].m_object, true));
 		Application::instance().m_UI_mutex.unlock();
-		GameObject* result = Application::instance().command_select_object();
+		auto result = Application::instance().command_select_object();
 		if (result)
 		{
 			p[1].set(result);
@@ -850,15 +847,15 @@ void Action_pick::interaction_handler(Parameter* parameter)
 	Application::instance().m_message_queue.m_busy = false;
 }
 
-char Action_pick::perfom(Parameter* parameter)
+char Action_pick::perform(Parameter * parameter)
 {
-	Parameter& p(*parameter);
+	auto& p(*parameter);
 	if (check(parameter))
 	{
-		Instruction_slot_parameter* np = new Instruction_slot_parameter();
+		auto* np = new Instruction_slot_parameter();
 		np->m_parameter = parameter;
 		np->m_result = true;
-		ObjectTag::Can_transfer_object* t=static_cast<ObjectTag::Can_transfer_object*>(p[3].m_part->m_attributes.get_tag(object_tag_e::can_transfer_object));
+		auto t = static_cast<ObjectTag::Can_transfer_object*>(p[3].m_part->m_attributes.get_tag(object_tag_e::can_transfer_object));
 		t->apply_effect(nullptr, np);
 		if (!np->m_result) { return 1; };
 		np->m_result = false;
@@ -868,13 +865,13 @@ char Action_pick::perfom(Parameter* parameter)
 	return 0;
 }
 
-std::u16string Action_pick::get_description(Parameter* parameter)
+std::u16string Action_pick::get_description(Parameter * parameter)
 {
-	
+
 	std::u16string s(u"Поднять");
 	if (parameter)
 	{
-		Parameter& p(*parameter);
+		auto& p(*parameter);
 		if (p[1])
 		{
 			s += u" " + p[1].m_object->m_name;
@@ -907,7 +904,7 @@ std::u16string Action_pick::get_description(Parameter* parameter)
 	return s;
 }
 
-void Action_pick::apply_visitor(Visitor_generic& visitor)
+void Action_pick::apply_visitor(Visitor_generic & visitor)
 {
 	visitor.visit(*this);
 }
@@ -921,13 +918,13 @@ Action_move_out::Action_move_out()
 	m_parameter_kind = parameter_type_e::destination;
 }
 
-std::u16string Action_move_out::get_description(Parameter* parameter)
+std::u16string Action_move_out::get_description(Parameter * parameter)
 {
 
 	std::u16string s(u"Переместить");
 	if (parameter)
 	{
-		Parameter& p(*parameter);
+		auto& p(*parameter);
 		if (p[1])
 		{
 			s += u" " + p[1].m_object->m_name;
@@ -986,7 +983,7 @@ Action_open::Action_open()
 	m_name = u"Открыть ";
 }
 
-void Action_open::interaction_handler(Parameter* arg)
+void Action_open::interaction_handler(Parameter * arg)
 {
 	/*Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
@@ -1011,7 +1008,7 @@ void Action_open::interaction_handler(Parameter* arg)
 	Application::instance().m_message_queue.m_busy = false;*/
 }
 
-char Action_open::perfom(Parameter* parameter)
+char Action_open::perform(Parameter * parameter)
 {
 	/*P_object* p = static_cast<P_object*>(parameter);
 	if (check(p))
@@ -1044,9 +1041,9 @@ char Action_open::perfom(Parameter* parameter)
 	return 0;
 }
 
-std::u16string Action_open::get_description(Parameter* parameter)
+std::u16string Action_open::get_description(Parameter * parameter)
 {
-	Parameter& p(*parameter);
+	auto& p(*parameter);
 	std::u16string s(u"Открыть ");
 	/*s += p->m_object->m_name + ".";*/
 	return s;
@@ -1061,7 +1058,7 @@ Action_hit::Action_hit()
 	m_parameter_kind = parameter_type_e::unit_interaction;
 }
 
-void Action_hit::interaction_handler(Parameter* arg)
+void Action_hit::interaction_handler(Parameter * arg)
 {
 	/*Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
@@ -1102,7 +1099,7 @@ void Action_hit::interaction_handler(Parameter* arg)
 	Application::instance().m_message_queue.m_busy = false;*/
 }
 
-bool Action_hit::check(Parameter* parameter)
+bool Action_hit::check(Parameter * parameter)
 {
 	/*m_error = "";
 	P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
@@ -1115,7 +1112,7 @@ bool Action_hit::check(Parameter* parameter)
 	return true;
 }
 
-char Action_hit::perfom(Parameter* parameter)
+char Action_hit::perform(Parameter * parameter)
 {
 	/*P_unit_interaction* p = static_cast<P_unit_interaction*>(parameter);
 	if (check(p))
@@ -1152,9 +1149,9 @@ action_hit_melee::action_hit_melee()
 	m_parameter_kind = parameter_type_e::interaction_cell;
 }
 
-void action_hit_melee::interaction_handler(Parameter* parameter)
+void action_hit_melee::interaction_handler(Parameter * parameter)
 {
-	Action::interaction_handler(nullptr);
+	Action_hit::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
 	Parameter* out_parameter;
 	if (parameter)
@@ -1165,14 +1162,14 @@ void action_hit_melee::interaction_handler(Parameter* parameter)
 	{
 		out_parameter = new Parameter(m_parameter_kind);
 	}
-	Parameter& p(*out_parameter);
+	auto& p(*out_parameter);
 	if (!p[0])
-	{ 
+	{
 		p[0].set(Application::instance().m_world->m_player->m_object);
 	}
 	if (!p[2])
 	{
-		Object_part* result = Application::instance().command_select_body_part();
+		auto result = Application::instance().command_select_body_part();
 		if (result)
 		{
 			p[2].set(result);
@@ -1188,9 +1185,9 @@ void action_hit_melee::interaction_handler(Parameter* parameter)
 	if (!p[1])
 	{
 		Application::instance().m_UI_mutex.lock();
-		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_area( p[0].m_object, true));
+		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_area(p[0].m_object, true));
 		Application::instance().m_UI_mutex.unlock();
-		GameObject* result = Application::instance().command_select_object_on_map();
+		auto result = Application::instance().command_select_object_on_map();
 		if (result)
 		{
 			p[1].set(result);
@@ -1212,12 +1209,12 @@ void action_hit_melee::interaction_handler(Parameter* parameter)
 		Application::instance().m_gui_controller.m_hints.pop_front();
 		Application::instance().m_UI_mutex.unlock();
 	}
-	if(!p[3])
+	if (!p[3])
 	{
 		Application::instance().m_UI_mutex.lock();
-		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_object_area( p[1].m_object));
+		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_object_area(p[1].m_object));
 		Application::instance().m_UI_mutex.unlock();
-		MapCell* result = Application::instance().command_select_location(p[1].m_object);
+		auto result = Application::instance().command_select_location(p[1].m_object);
 		if (result)
 		{
 			p[3].set(result);
@@ -1240,18 +1237,18 @@ void action_hit_melee::interaction_handler(Parameter* parameter)
 	Application::instance().m_message_queue.m_busy = false;
 }
 
-char action_hit_melee::perfom(Parameter* parameter)
+char action_hit_melee::perform(Parameter * parameter)
 {
-	Parameter& p(*parameter);
-	Parameter_list* sbj_health = p[1].m_object->get_parameter(interaction_e::health);
-	int sbj_health_old_value = sbj_health->m_value;
+	auto& p(*parameter);
+	auto sbj_health = p[1].m_object->get_parameter(interaction_e::health);
+	auto sbj_health_old_value = sbj_health->m_value;
 	if (check(parameter))
 	{
-		std::u16string msg= p[0].m_object->m_name + u" атакует " + p[1].m_object->m_name + u". ";
+		auto msg = p[0].m_object->m_name + u" атакует " + p[1].m_object->m_name + u". ";
 		srand(time(NULL));
-		Parameter_list* dexterity_subject = p[0].m_object->get_parameter(interaction_e::dexterity);
-		Parameter_list* dexterity_object = p[1].m_object->get_parameter(interaction_e::dexterity);
-		Parameter_list* evasion_skill_object = p[1].m_object->get_parameter(interaction_e::evasion_skill);
+		auto dexterity_subject = p[0].m_object->get_parameter(interaction_e::dexterity);
+		auto dexterity_object = p[1].m_object->get_parameter(interaction_e::dexterity);
+		auto evasion_skill_object = p[1].m_object->get_parameter(interaction_e::evasion_skill);
 		int evasion;
 		if (dexterity_subject->m_value != 0)
 		{
@@ -1265,7 +1262,7 @@ char action_hit_melee::perfom(Parameter* parameter)
 		//???Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text(std::to_string(evasion)));
 		if (rand() % 100 > evasion)
 		{
-			Parameter_list* str = p[0].m_object->get_parameter(interaction_e::strength);
+			auto str = p[0].m_object->get_parameter(interaction_e::strength);
 			Parameter_list* ms;
 			int dws;
 			int wd;
@@ -1284,8 +1281,8 @@ char action_hit_melee::perfom(Parameter* parameter)
 				wd = 1;
 				sb = 100;
 			}
-			int accuracy = (ms->m_value - dws);
-			int light = (p[3].m_cell->m_light.R > p[3].m_cell->m_light.G ? p[3].m_cell->m_light.R : p[3].m_cell->m_light.G);
+			auto accuracy = (ms->m_value - dws);
+			auto light = (p[3].m_cell->m_light.R > p[3].m_cell->m_light.G ? p[3].m_cell->m_light.R : p[3].m_cell->m_light.G);
 			light = (light > p[3].m_cell->m_light.B ? light : p[3].m_cell->m_light.B);
 			if (light > 100) { light = 100; };
 			if (accuracy > 0)
@@ -1295,16 +1292,16 @@ char action_hit_melee::perfom(Parameter* parameter)
 			}
 			else
 			{
-				accuracy = (ms->m_value - rand() % accuracy)*(light + rand() % (100 - light + 1)*0.5);
+				accuracy = (ms->m_value - rand() % accuracy) * (light + rand() % (100 - light + 1) * 0.5);
 			}
 			if (accuracy > 0)
 			{
 				auto* item = new Effect();
 				item->m_interaction_message_type = interaction_message_type_e::single;
 				item->m_subtype = effect_e::value;
-				item->m_value = -accuracy*0.0000001*sb*0.01*wd*str->m_value;
+				item->m_value = -accuracy * 0.0000001 * sb * 0.01 * wd * str->m_value;
 				//???Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Урон: " + std::to_string(item->m_value)));
-				Interaction_copyist* item1 = new Interaction_copyist();
+				auto item1 = new Interaction_copyist();
 				item1->m_interaction_message_type = interaction_message_type_e::single;
 				item1->m_subtype = interaction_e::health;
 				item1->m_value = item;
@@ -1338,7 +1335,7 @@ char action_hit_melee::perfom(Parameter* parameter)
 		{
 			msg += u"Здоровье " + p[1].m_object->m_name + u" изменилось на " + Parser::CP1251_to_UTF16(std::to_string(sbj_health->m_value - sbj_health_old_value)) + u".";
 		}
-		if(p[1].m_object->m_active_state->m_state==object_state_e::dead)
+		if (p[1].m_object->m_active_state->m_state == object_state_e::dead)
 		{
 			msg += p[1].m_object->m_name + u" повержен.";
 		}
@@ -1348,12 +1345,12 @@ char action_hit_melee::perfom(Parameter* parameter)
 	return 0;
 }
 
-std::u16string Action_hit::get_description(Parameter* parameter)
+std::u16string Action_hit::get_description(Parameter * parameter)
 {
 	std::u16string s(u"Ударить");
 	if (parameter)
 	{
-		Parameter& p(*parameter);
+		auto& p(*parameter);
 		if (p[1])
 		{
 			s += u" " + p[1].m_object->m_name;
@@ -1373,7 +1370,7 @@ Action_equip::Action_equip()
 	m_parameter_kind = parameter_type_e::object;
 }
 
-void Action_equip::interaction_handler(Parameter* parameter)
+void Action_equip::interaction_handler(Parameter * parameter)
 {
 	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
@@ -1386,8 +1383,8 @@ void Action_equip::interaction_handler(Parameter* parameter)
 	{
 		out_parameter = new Parameter(m_parameter_kind);
 	}
-	Parameter& p(*out_parameter);
-	GameObject* result = Application::instance().command_select_object_on_map();
+	auto& p(*out_parameter);
+	auto result = Application::instance().command_select_object_on_map();
 	if (result)
 	{
 		p[0].m_object = result;
@@ -1406,25 +1403,25 @@ void Action_equip::interaction_handler(Parameter* parameter)
 	Application::instance().m_message_queue.m_busy = false;
 }
 
-bool Action_equip::check(Parameter* parameter)
+bool Action_equip::check(Parameter * parameter)
 {
 	m_error = u"";
 	return true;
 }
 
 
-char Action_equip::perfom(Parameter* parameter)
+char Action_equip::perform(Parameter * parameter)
 {
 	return 0;
 }
 
-std::u16string Action_equip::get_description(Parameter* parameter)
+std::u16string Action_equip::get_description(Parameter * parameter)
 {
-	Parameter& p(*parameter);
+	auto& p(*parameter);
 	std::u16string s(u"Экипировка");
 	if (parameter)
 	{
-		Parameter& p(*parameter);
+		auto& p(*parameter);
 		if (p[0])
 		{
 			s += u" " + p[0].m_object->m_name;
@@ -1441,7 +1438,7 @@ Action_show_parameters::Action_show_parameters()
 	m_parameter_kind = parameter_type_e::object;
 }
 
-void Action_show_parameters::interaction_handler(Parameter* parameter)
+void Action_show_parameters::interaction_handler(Parameter * parameter)
 {
 	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
@@ -1454,10 +1451,10 @@ void Action_show_parameters::interaction_handler(Parameter* parameter)
 	{
 		out_parameter = new Parameter(m_parameter_kind);
 	}
-	Parameter& p(*out_parameter);
+	auto& p(*out_parameter);
 	if (!p[0])
 	{
-		GameObject* result = Application::instance().command_select_object_on_map();
+		auto result = Application::instance().command_select_object_on_map();
 		if (result)
 		{
 			p[0].set(result);
@@ -1477,13 +1474,13 @@ void Action_show_parameters::interaction_handler(Parameter* parameter)
 	Application::instance().m_message_queue.m_busy = false;
 }
 
-std::u16string Action_show_parameters::get_description(Parameter* parameter)
+std::u16string Action_show_parameters::get_description(Parameter * parameter)
 {
-	Parameter& p(*parameter);
+	auto& p(*parameter);
 	std::u16string s(u"Показать характеристики");
 	if (parameter)
 	{
-		Parameter& p(*parameter);
+		auto& p(*parameter);
 		if (p[0])
 		{
 			s += u" " + p[0].m_object->m_name;
@@ -1501,7 +1498,7 @@ Action_use::Action_use()
 	m_parameter_kind = parameter_type_e::unit_interaction;
 }
 
-void Action_use::interaction_handler(Parameter* parameter)
+void Action_use::interaction_handler(Parameter * parameter)
 {
 	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
@@ -1514,7 +1511,7 @@ void Action_use::interaction_handler(Parameter* parameter)
 	{
 		out_parameter = new Parameter(m_parameter_kind);
 	}
-	Parameter& p(*out_parameter);
+	auto& p(*out_parameter);
 	if (!p[0])
 	{
 		GameObject* result = Application::instance().command_select_object();
@@ -1535,7 +1532,7 @@ void Action_use::interaction_handler(Parameter* parameter)
 	}
 	if (!p[1])
 	{
-		GameObject* result = Application::instance().command_select_object();
+		auto result = Application::instance().command_select_object();
 		if (result)
 		{
 			p[1].set(result);
@@ -1556,12 +1553,12 @@ void Action_use::interaction_handler(Parameter* parameter)
 }
 
 
-bool Action_use::check(Parameter* parameter)
+bool Action_use::check(Parameter * parameter)
 {
 	return true;
 }
 
-char Action_use::perfom(Parameter* parameter)
+char Action_use::perform(Parameter * parameter)
 {
 	//Parameter& p(*parameter);
 	//if (check(parameter))
@@ -1600,9 +1597,9 @@ char Action_use::perfom(Parameter* parameter)
 	return 0;
 }
 
-std::u16string Action_use::get_description(Parameter* parameter)
+std::u16string Action_use::get_description(Parameter * parameter)
 {
-	Parameter& p(*parameter);
+	auto& p(*parameter);
 	std::u16string s(u"Применить");
 	return s;
 }
@@ -1614,7 +1611,7 @@ Action_save::Action_save()
 	m_name = u"Сохранить игру";
 }
 
-void Action_save::interaction_handler(Parameter* arg)
+void Action_save::interaction_handler(Parameter * arg)
 {
 	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
@@ -1623,14 +1620,14 @@ void Action_save::interaction_handler(Parameter* arg)
 	Parser_context pc(*world);
 	pc.reset();
 	world->reset_serialization_index();
-	std::string binary = world->bin_serialize(pc);
+	auto binary = world->bin_serialize(pc);
 	std::ofstream file(FileSystem::instance().m_resource_path + "Saves\\save.bin", std::ios::binary);
 	file.write(&binary[0], binary.size());
 	file.close();
 	Application::instance().m_message_queue.m_busy = false;
 }
 
-std::u16string Action_save::get_description(Parameter* parameter)
+std::u16string Action_save::get_description(Parameter * parameter)
 {
 	std::u16string s(u"Сохранить игру");
 	return s;
@@ -1643,7 +1640,7 @@ Action_load::Action_load()
 	m_name = u"Загрузить игру";
 }
 
-void Action_load::interaction_handler(Parameter* arg)
+void Action_load::interaction_handler(Parameter * arg)
 {
 	std::mutex update_lock;
 	Action::interaction_handler(nullptr);
@@ -1656,7 +1653,7 @@ void Action_load::interaction_handler(Parameter* arg)
 	Application::instance().m_message_queue.m_busy = false;
 }
 
-std::u16string Action_load::get_description(Parameter* parameter)
+std::u16string Action_load::get_description(Parameter * parameter)
 {
 	std::u16string s(u"Загрузить игру");
 	return s;
@@ -1669,13 +1666,13 @@ Action_rotate_view::Action_rotate_view()
 	m_name = u"Повернуть вид";
 }
 
-std::u16string Action_rotate_view::get_description(Parameter* parameter)
+std::u16string Action_rotate_view::get_description(Parameter * parameter)
 {
 	std::u16string s(u"Повернуть вид");
 	return s;
 }
 
-void Action_rotate_view::interaction_handler(Parameter* arg)
+void Action_rotate_view::interaction_handler(Parameter * arg)
 {
 	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
@@ -1691,7 +1688,7 @@ Action_autoexplore::Action_autoexplore()
 	m_name = u"Автоисследование";
 }
 
-void Action_autoexplore::interaction_handler(Parameter* arg)
+void Action_autoexplore::interaction_handler(Parameter * arg)
 {
 	//Action::interaction_handler();
 	//Application::instance().m_message_queue.m_busy = true;
@@ -1720,22 +1717,22 @@ void Action_autoexplore::interaction_handler(Parameter* arg)
 	Application::instance().m_action_manager->add(new GameTask(this, nullptr));
 }
 
-std::u16string Action_autoexplore::get_description(Parameter* parameter)
+std::u16string Action_autoexplore::get_description(Parameter * parameter)
 {
 	return u"Автоисследование";
 }
 
-bool Action_autoexplore::get_child(GameTask*& task)
+bool Action_autoexplore::get_child(GameTask * &task)
 {
-	GameObject* object = Application::instance().m_world->m_player->m_object;
-	GameMap* map = static_cast<MapCell*>(object->m_owner)->m_map;
+	auto object = Application::instance().m_world->m_player->m_object;
+	auto map = static_cast<MapCell*>(object->m_owner)->m_map;
 	map->m_dijkstra_map->calculate_cost_autoexplore(map, object);
 	map->m_dijkstra_map->trace();
-	MapCell* c = map->m_dijkstra_map->next(object);
+	auto c = map->m_dijkstra_map->next(object);
 	task = nullptr;
 	if (c)
-	{ 
-		Parameter* p = new Parameter(parameter_type_e::position);
+	{
+		auto* p = new Parameter(parameter_type_e::position);
 		(*p)[0].set(object);
 		(*p)[1].set(c);
 		if (Application::instance().m_actions[action_e::move_step]->check(p))
@@ -1756,7 +1753,7 @@ Action_shoot::Action_shoot()
 }
 
 //TODO Адаптировать для 3D
-bool Action_shoot::check_cell(Parameter* parameter)
+bool Action_shoot::check_cell(Parameter * parameter)
 {
 	/*Parameter& p(*parameter);
 	if (!p[0].m_object->is_own(p[4].m_cell))
@@ -1769,7 +1766,7 @@ bool Action_shoot::check_cell(Parameter* parameter)
 	return true;
 }
 
-void Action_shoot::interaction_handler(Parameter* parameter)
+void Action_shoot::interaction_handler(Parameter * parameter)
 {
 	Action::interaction_handler(nullptr);
 	Application::instance().m_message_queue.m_busy = true;
@@ -1782,7 +1779,7 @@ void Action_shoot::interaction_handler(Parameter* parameter)
 	{
 		out_parameter = new Parameter(m_parameter_kind);
 	}
-	Parameter& p(*out_parameter);
+	auto& p(*out_parameter);
 	if (!p[0])
 	{
 		p[0].set(Application::instance().m_world->m_player->m_object);
@@ -1790,7 +1787,7 @@ void Action_shoot::interaction_handler(Parameter* parameter)
 
 	if (!p[2])
 	{
-		Object_part* result = Application::instance().command_select_body_part();
+		auto result = Application::instance().command_select_body_part();
 		if (result)
 		{
 			p[2].set(result);
@@ -1806,7 +1803,7 @@ void Action_shoot::interaction_handler(Parameter* parameter)
 
 	if (!p[3])
 	{
-		Object_part* result = Application::instance().command_select_body_part();
+		auto result = Application::instance().command_select_body_part();
 		if (result)
 		{
 			p[3].set(result);
@@ -1836,7 +1833,7 @@ void Action_shoot::interaction_handler(Parameter* parameter)
 		}
 		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Выбрать еще заряд? [Y/N]")));
 	} while (Application::instance().command_agreement());*/
-	
+
 	/*if (!p[1])
 	{
 		Application::instance().m_GUI->MapViewer->m_hints.push_front(new mapviewer_hint_area(Application::instance().m_GUI->MapViewer, p[0].m_object, true));
@@ -1861,15 +1858,15 @@ void Action_shoot::interaction_handler(Parameter* parameter)
 
 	if (!p[4])
 	{
-		Parameter_list* wr = p[2].m_part->m_item->get_parameter(interaction_e::weapon_range);
+		auto wr = p[2].m_part->m_item->get_parameter(interaction_e::weapon_range);
 		Application::instance().m_UI_mutex.lock();
 		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_shoot(p[0].m_object, wr->m_value));
-		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_weapon_range( p[0].m_object, wr->m_value));
+		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_weapon_range(p[0].m_object, wr->m_value));
 		Application::instance().m_UI_mutex.unlock();
-		bool valid = false;
+		auto valid = false;
 		while (!valid)
 		{
-			MapCell* result = Application::instance().command_select_location(nullptr);
+			auto result = Application::instance().command_select_location(nullptr);
 			if (result)
 			{
 				p[4].set(result);
@@ -1903,7 +1900,7 @@ void Action_shoot::interaction_handler(Parameter* parameter)
 	Application::instance().m_message_queue.m_busy = false;
 }
 
-bool Action_shoot::check(Parameter* parameter)
+bool Action_shoot::check(Parameter * parameter)
 {
 	//m_error = "";
 	//P_bow_shoot* p = static_cast<P_bow_shoot*>(parameter);
@@ -1922,9 +1919,9 @@ bool Action_shoot::check(Parameter* parameter)
 	return true;
 }
 
-bool Action_shoot::process_cell(Parameter* parameter, MapCell* cell)
+bool Action_shoot::process_cell(Parameter * parameter, MapCell * cell)
 {
-	Parameter& p(*parameter);
+	auto& p(*parameter);
 	for (auto c_object = cell->m_items.begin(); c_object != cell->m_items.end(); ++c_object)
 	{
 		if (!p[0].m_object->is_own(cell))
@@ -1938,45 +1935,45 @@ bool Action_shoot::process_cell(Parameter* parameter, MapCell* cell)
 	return false;
 }
 
-char Action_shoot::perfom(Parameter* parameter)
+char Action_shoot::perform(Parameter * parameter)
 {
-	Parameter& p(*parameter);
+	auto& p(*parameter);
 	if (check(parameter))
 	{
-	/*	MapCell* center= p[0].m_object->get_center(p[4].m_cell);
-		MapCell* c= p[4].m_cell->m_map->bresenham_line2(center, p[4].m_cell,parameter, std::bind(&Action_shoot::process_cell, this, std::placeholders::_1, std::placeholders::_2));
-		GameObject* temp = p[3].m_part->m_items;
-		Application::instance().command_unequip(p[0].m_object, p[3].m_part, temp);
-		c->m_map->add_object(temp, c);
-		temp->m_owner = c;*/
+		/*	MapCell* center= p[0].m_object->get_center(p[4].m_cell);
+			MapCell* c= p[4].m_cell->m_map->bresenham_line2(center, p[4].m_cell,parameter, std::bind(&Action_shoot::process_cell, this, std::placeholders::_1, std::placeholders::_2));
+			GameObject* temp = p[3].m_part->m_items;
+			Application::instance().command_unequip(p[0].m_object, p[3].m_part, temp);
+			c->m_map->add_object(temp, c);
+			temp->m_owner = c;*/
 
-		//switch (p->m_owner->m_kind)
-		//{
-		//case entity_e::cell:
-		//{
-		//	//static_cast<MapCell*>(p->m_owner)->m_items.push_back(p->m_object);
-		//	static_cast<MapCell*>(p->m_owner)->m_map->add_object(p->m_object, static_cast<MapCell*>(p->m_owner));
-		//	p->m_object->m_owner = p->m_owner;
-		//	break;
-		//}
-		//case entity_e::inventory_cell:
-		//{
-		//	static_cast<Inventory_cell*>(p->m_owner)->m_items = p->m_object;
-		//	p->m_object->m_owner = p->m_owner;
-		//	break;
-		//}
-		//case entity_e::body_part:
-		//{
-		//	Application::instance().command_equip(p->m_unit, static_cast<Object_part*>(p->m_owner), p->m_object);
-		//	break;
-		//}
-		//}
+			//switch (p->m_owner->m_kind)
+			//{
+			//case entity_e::cell:
+			//{
+			//	//static_cast<MapCell*>(p->m_owner)->m_items.push_back(p->m_object);
+			//	static_cast<MapCell*>(p->m_owner)->m_map->add_object(p->m_object, static_cast<MapCell*>(p->m_owner));
+			//	p->m_object->m_owner = p->m_owner;
+			//	break;
+			//}
+			//case entity_e::inventory_cell:
+			//{
+			//	static_cast<Inventory_cell*>(p->m_owner)->m_items = p->m_object;
+			//	p->m_object->m_owner = p->m_owner;
+			//	break;
+			//}
+			//case entity_e::body_part:
+			//{
+			//	Application::instance().command_equip(p->m_unit, static_cast<Object_part*>(p->m_owner), p->m_object);
+			//	break;
+			//}
+			//}
 
 
-		//GameObject* obj = Application::instance().m_game_object_manager->new_object("arrow");
-		//c->m_map->add_to_map(obj, c);
-		///*p->m_object->update_interaction();
-		//p->m_object->event_update(VoidEventArgs());*/
+			//GameObject* obj = Application::instance().m_game_object_manager->new_object("arrow");
+			//c->m_map->add_to_map(obj, c);
+			///*p->m_object->update_interaction();
+			//p->m_object->event_update(VoidEventArgs());*/
 	}
 	else
 	{
@@ -1986,29 +1983,28 @@ char Action_shoot::perfom(Parameter* parameter)
 	return 0;
 }
 
-std::u16string Action_shoot::get_description(Parameter* parameter)
+std::u16string Action_shoot::get_description(Parameter * parameter)
 {
 	/*Parameter& p(*parameter);
 	std::string s(" [");
 	s += std::to_string(p[4].m_cell->x) + "," + std::to_string(p[4].m_cell->y) + "]";
 	return s;*/
 
-	Parameter& p(*parameter);
 	std::u16string s(u"Выстрелить");
 	if (parameter)
 	{
-		Parameter& p(*parameter);
+		auto& p(*parameter);
 		if (p[2])
 		{
 			s += u" из " + p[2].m_part->m_item->m_name;
 		}
 		if (p[3])
 		{
-			s += u"(" + p[3].m_part->m_item->m_name+u")";
+			s += u"(" + p[3].m_part->m_item->m_name + u")";
 		}
 		if (p[4])
 		{
-			s +=u" в "+ Parser::CP1251_to_UTF16(std::to_string(p[4].m_cell->x)) + u"," + Parser::CP1251_to_UTF16(std::to_string(p[4].m_cell->y));
+			s += u" в " + Parser::CP1251_to_UTF16(std::to_string(p[4].m_cell->x)) + u"," + Parser::CP1251_to_UTF16(std::to_string(p[4].m_cell->y));
 		}
 	}
 	return s;
