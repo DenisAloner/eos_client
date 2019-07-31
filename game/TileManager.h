@@ -27,13 +27,13 @@ public:
 	//	return Packer<Object_interaction>::Instance();
 	//}
 
-	void vector_GLuint_from_json(std::u16string value, std::vector<GLuint>& prop, Parser_context& context);
-	void vector_GLuint_from_binary(const std::string& value, std::vector<GLuint>& prop, std::size_t& pos, Parser_context& context);
+	void vector_gl_uint_from_json(const std::u16string& value, std::vector<GLuint>& prop, Parser_context& context);
+	void vector_gl_uint_from_binary(const std::string& value, std::vector<GLuint>& prop, std::size_t& pos, Parser_context& context);
 
 	constexpr static auto properties() 
 	{
 		return std::make_tuple(
-			make_property(&TileManager::m_tiles, u"tiles").from_json(&TileManager::vector_GLuint_from_json).from_binary(&TileManager::vector_GLuint_from_binary)
+			make_property(&TileManager::m_tiles, u"tiles").from_json(&TileManager::vector_gl_uint_from_json).from_binary(&TileManager::vector_gl_uint_from_binary)
 		);
 	}
 

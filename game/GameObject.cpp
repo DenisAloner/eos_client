@@ -38,7 +38,7 @@ Game_object_owner* Game_object_owner::get_owner()
 	{
 		return m_owner->get_owner();
 	}
-	else return this;
+	return this;
 }
 
 MapCell::MapCell()
@@ -48,16 +48,16 @@ MapCell::MapCell()
 	m_owner = nullptr;
 }
 
-MapCell::MapCell(int x, int y, int z, GameMap* map) :m_map(map), x(x),y(y), z(z)
+MapCell::MapCell(int x, int y, int z, GameMap* map) :m_map(map), x(x), y(y), z(z)
 {
 	m_kind = entity_e::cell;
 	m_notable = false;
 	m_owner = nullptr;
 }
 
-void MapCell::add_object(GameObject* Object)
+void MapCell::add_object(GameObject* object)
 {
-	m_items.push_back(Object);
+	m_items.push_back(object);
 }
 
 void MapCell::reset_serialization_index()
@@ -81,7 +81,7 @@ Attribute_map::Attribute_map(){};
 
 Interaction_list*  Attribute_map::create_feature_list(feature_list_type_e key, interaction_e name)
 {
-	Interaction_list* result = Effect_functions::create_feature_list(key, name);
+	const auto result = Effect_functions::create_feature_list(key, name);
 	m_items[name] = result;	
 	return result;
 }
@@ -193,15 +193,15 @@ std::string Object_state::icon_to_binary(Icon*& value, Parser_context& context)
 	return std::string(reinterpret_cast<const char*>(&s), sizeof(std::size_t));
 }
 
-void Object_state::icon_from_json(std::u16string value, Icon*& prop, Parser_context& context)
+void Object_state::icon_from_json(const std::u16string& value, Icon*& prop, Parser_context& context)
 {
-	std::string&& name = Parser::UTF16_to_CP1251(Parser::get_value(value));
+	auto&& name = Parser::UTF16_to_CP1251(Parser::get_value(value));
 	prop = GameObjectManager::m_config->m_icons.get_by_string(name);
 }
 
 void Object_state::icon_from_binary(const std::string& value, Icon*& prop, std::size_t& pos, Parser_context& context)
 {
-	std::size_t s = *reinterpret_cast<const std::size_t*>(&value[pos]);
+	const auto s = *reinterpret_cast<const std::size_t*>(&value[pos]);
 	pos += sizeof(std::size_t);
 	if (s == 0)
 	{
@@ -233,7 +233,7 @@ std::string Object_state::tilemanager_to_binary(TileManager*& value, Parser_cont
 	return std::string(reinterpret_cast<const char*>(&s), sizeof(std::size_t));
 }
 
-void Object_state::tilemanager_from_json(std::u16string value, TileManager*& prop, Parser_context& context)
+void Object_state::tilemanager_from_json(const std::u16string& value, TileManager*& prop, Parser_context& context)
 {
 	if (Parser::get_value(value) == u"null")
 	{
@@ -241,7 +241,7 @@ void Object_state::tilemanager_from_json(std::u16string value, TileManager*& pro
 	}
 	else
 	{
-		std::string&& result = Parser::UTF16_to_CP1251(Parser::get_value(value));
+		auto&& result = Parser::UTF16_to_CP1251(Parser::get_value(value));
 		prop = Application::instance().m_game_object_manager->m_config->m_tile_managers.get_by_string(result);
 	}
 }
@@ -302,9 +302,9 @@ Object_state* Object_state::clone()
 		state->m_visibility = new float;
 		*state->m_visibility = *m_visibility;
 	}
-	for (auto item = m_items.begin(); item != m_items.end(); item++)
+	for (auto& m_item : m_items)
 	{
-		state->m_items[item->first] = item->second->clone();
+		state->m_items[m_item.first] = m_item.second->clone();
 	}
 	return state;
 }
@@ -321,7 +321,7 @@ Object_state_equip::Object_state_equip()
 
 Object_state* Object_state_equip::clone()
 {
-	Object_state_equip* state = new Object_state_equip();
+	auto* state = new Object_state_equip();
 	state->m_body_part = m_body_part;
 	state->m_state = m_state;
 	state->m_layer = m_layer;
@@ -336,14 +336,14 @@ Object_state* Object_state_equip::clone()
 	}
 	else state->m_ai = nullptr;
 	
-	for (auto item = m_items.begin(); item != m_items.end(); item++)
+	for (auto& m_item : m_items)
 	{
-		state->m_items[item->first] = item->second->clone();
+		state->m_items[m_item.first] = m_item.second->clone();
 	}
 
-	for (auto item = m_equip.m_items.begin(); item != m_equip.m_items.end(); item++)
+	for (auto& m_item : m_equip.m_items)
 	{
-		state->m_equip.m_items[item->first] = item->second->clone();
+		state->m_equip.m_items[m_item.first] = m_item.second->clone();
 	}
 	return state;
 }
@@ -464,20 +464,20 @@ void GameObject::set_direction(object_direction_e dir)
 			(*item)->m_size = game_object_size_t((*item)->m_size.y, (*item)->m_size.x, (*item)->m_size.z);
 		}
 	}*/
-	for (auto item = m_state.begin(); item != m_state.end(); ++item)
+	for (auto& item : m_state)
 	{
-		(*item)->set_tile_size();
+		item->set_tile_size();
 	}
 	m_direction = dir;
 }
 
 void GameObject::set_state(object_state_e state)
 {
-	for (auto item = m_state.begin(); item != m_state.end(); ++item)
+	for (auto& item : m_state)
 	{
-		if ((*item)->m_state == state)
+		if (item->m_state == state)
 		{
-			m_active_state = (*item);
+			m_active_state = item;
 			return;
 		}
 	}
@@ -485,11 +485,11 @@ void GameObject::set_state(object_state_e state)
 
 Object_state* GameObject::get_state(object_state_e state)
 {
-	for (std::list<Object_state*>::iterator item = m_state.begin(); item != m_state.end(); ++item)
+	for (auto& item : m_state)
 	{
-		if ((*item)->m_state == state)
+		if (item->m_state == state)
 		{
-			return (*item);
+			return item;
 		}
 	}
 	return nullptr;
@@ -619,13 +619,13 @@ MapCell* GameObject::cell(){
 
 bool GameObject::is_own(MapCell* c)
 {
-	MapCell& oc = *cell();
+	auto& oc = *cell();
 	return c->x >= oc.x && c->x < oc.x + m_active_state->m_size.dx && c->y <= oc.y && c->y > oc.y - m_active_state->m_size.dy && c->z >= oc.z && c->z < oc.z + m_active_state->m_size.dz;
 }
 
 bool GameObject::is_own(int x, int y, int z)
 {
-	MapCell& oc = *cell();
+	auto& oc = *cell();
 	return x >= oc.x && x < oc.x + m_active_state->m_size.dx &&y <= oc.y && y > oc.y - m_active_state->m_size.dy && z >= oc.z && z < oc.z + m_active_state->m_size.dz;
 }
 
@@ -655,8 +655,8 @@ MapCell* GameObject::get_center(MapCell* c)
 	}
 	else
 	{
-		int x = cell()->x + m_active_state->m_size.dx / 2;
-		int y = cell()->y - m_active_state->m_size.dy / 2;
+		auto x = cell()->x + m_active_state->m_size.dx / 2;
+		auto y = cell()->y - m_active_state->m_size.dy / 2;
 		return &cell()->m_map->get(c->z,y, x);
 	}
 }
@@ -670,9 +670,9 @@ void GameObject::update_interaction()
 		do
 		{
 			was_changed = false;
-			for (auto item = m_active_state->m_items.begin(); item != m_active_state->m_items.end(); ++item)
+			for (auto& m_item : m_active_state->m_items)
 			{
-				was_changed = item->second->update();
+				was_changed = m_item.second->update();
 				if (was_changed) break;
 			}
 			i += 1;
@@ -680,7 +680,7 @@ void GameObject::update_interaction()
 	}
 }
 
-GameObject::Action_getter::Action_getter(GameObject* object, std::list<Action_helper_t>& list) : m_object(object), m_list(list) {}
+GameObject::Action_getter::Action_getter(GameObject* object, std::list<Action_helper_t>& list) : m_list(list), m_object(object) {}
 
 void GameObject::Action_getter::visit(Object_interaction& value)
 {
@@ -1000,7 +1000,7 @@ Packer_generic& Config::get_packer()
 }
 
 
-void Config::instancedictonary_icon_from_json(std::u16string value, InstanceDictonary<Icon*>& prop, Parser_context& context)
+void Config::instancedictonary_icon_from_json(const std::u16string& value, InstanceDictonary<Icon*>& prop, Parser_context& context)
 {
 	std::u16string temp = value;
 	scheme_list_t* s = Parser::read_array(temp);
@@ -1021,7 +1021,7 @@ void Config::instancedictonary_icon_from_binary(const std::string& value, Instan
 {
 }
 
-void Config::instancedictonary_tilemanager_from_json_atlas(std::u16string value, InstanceDictonary<TileManager*>& prop, Parser_context& context)
+void Config::instancedictonary_tilemanager_from_json_atlas(const std::u16string& value, InstanceDictonary<TileManager*>& prop, Parser_context& context)
 {
 	std::u16string temp = value;
 	scheme_vector_t* s = Parser::read_pair(temp);
@@ -1057,17 +1057,17 @@ void Config::instancedictonary_tilemanager_from_json_atlas(std::u16string value,
 	}
 }
 
-void Config::instancedictonary_tilemanager_from_json(std::u16string value, InstanceDictonary<TileManager*>& prop, Parser_context& context)
+void Config::instancedictonary_tilemanager_from_json(const std::u16string& value, InstanceDictonary<TileManager*>& prop, Parser_context& context)
 {
-	std::u16string temp = value;
-	scheme_list_t* s = Parser::read_array(temp);
+	auto temp = value;
+	const auto s = Parser::read_array(temp);
 	std::string k;
 	TileManager* v = nullptr;
 	if (s)
 	{
 		for (auto element : (*s))
 		{
-			scheme_vector_t* p = Parser::read_pair(element);
+			const auto p = Parser::read_pair(element);
 			Parser::from_json<std::string>((*p)[0], k,context);
 			Parser::from_json<TileManager*>((*p)[1], v,context);
 			prop.add(v, k);

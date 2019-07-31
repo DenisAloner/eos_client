@@ -19,7 +19,7 @@ public:
 
 	void on_mouse_click(MouseEventArgs const& e) override;
 	void on_mouse_move(MouseEventArgs const& e) override;
-	void render(GraphicalController* Graph, int px, int py) override;
+	void render(GraphicalController* graph, int px, int py) override;
 	bool check_region(MouseEventArgs const& e) override;
 };
 

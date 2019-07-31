@@ -32,10 +32,11 @@ void GUI_Item::resize(int _width, int _height)
 {
 	m_size.w = _width;
 	//m_size.h = m_text->m_size.h + m_text->m_position.y + 2;
-	m_items.front()->m_position.x = m_size.w - (m_size.h - 4) - 2;
-	m_items.front()->m_position.y = 2;
-	m_items.front()->m_size.w = m_size.h - 4;
-	m_items.front()->m_size.h = m_size.h - 4;
+	const auto front = m_items.front();
+	front->m_position.x = m_size.w - (m_size.h - 4) - 2;
+	front->m_position.y = 2;
+	front->m_size.w = m_size.h - 4;
+	front->m_size.h = m_size.h - 4;
 
 }
 

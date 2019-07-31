@@ -13,7 +13,7 @@ GUI_ActionButton::~GUI_ActionButton()
 {
 }
 
-void GUI_ActionButton::render(GraphicalController* Graph, int px, int py)
+void GUI_ActionButton::render(GraphicalController* graph, int px, int py)
 {
 	glDisable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
@@ -23,7 +23,7 @@ void GUI_ActionButton::render(GraphicalController* Graph, int px, int py)
 	if (focused)
 	{
 		glColor4d(1.0, 1.0, 1.0, 0.75);
-		Graph->draw_sprite(rect);
+		graph->draw_sprite(rect);
 		glColor4d(0, 0, 0, 1);
 	}
 	else 
@@ -32,19 +32,19 @@ void GUI_ActionButton::render(GraphicalController* Graph, int px, int py)
 	}
 	glEnable(GL_TEXTURE_2D);
 	auto desc = m_value.action->get_description(m_value.parameter);
-	Graph->output_text(px + m_size.h + 4, py + y_shift, desc, 8, 17);
+	graph->output_text(px + m_size.h + 4, py + y_shift, desc, 8, 17);
 	glDisable(GL_BLEND);
 	glColor4d(1, 1, 1, 1);
 	glActiveTextureARB(GL_TEXTURE0_ARB);
 	glBindTexture(GL_TEXTURE_2D, m_value.action->m_icon);
 	rect.set(px, py, m_size.h, m_size.h);
-	Graph->draw_sprite(rect);
+	graph->draw_sprite(rect);
 
 	if (focused)
 	{
 		glDisable(GL_TEXTURE_2D);
 		glColor4d(0.75, 0.75, 0.75, 1.0);
-		Graph->draw_rectangle(GraphicalController::rectangle_t(px, py, m_size.w, m_size.h));
+		graph->draw_rectangle(GraphicalController::rectangle_t(px, py, m_size.w, m_size.h));
 	}
 }
 

@@ -12,13 +12,11 @@ class GameObject;
 class Application;
 
 template<typename _val>
-class GUI_PopMenu :
-	public GUI_Container
+class GUI_PopMenu :public GUI_Container
 {
 public:
 
-	class Item :
-		public GUI_Object
+	class Item : public GUI_Object
 	{
 	public:
 
@@ -30,18 +28,18 @@ public:
 		Item(void){ m_size.h = (Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender) >> 6; }
 		~Item(void);
 
-		virtual void on_mouse_click(MouseEventArgs const& e)
+		void on_mouse_click(MouseEventArgs const& e) override
 		{
 			set_focus(true);
 			m_owner->item_click(this);
 		}
 
-		virtual void on_mouse_move(MouseEventArgs const& e) { set_focus(true); }
+		void on_mouse_move(MouseEventArgs const& e) override { set_focus(true); }
 		/*virtual void on_get_focus(GUI_Object* sender) { m_object->m_selected = true; }
 		virtual void on_lose_focus(GUI_Object* sender) { m_object->m_selected = false; }*/
 
 
-		virtual void render(GraphicalController* Graph, int px, int py)
+		void render(GraphicalController* Graph, int px, int py) override
 		{
 			glEnable(GL_BLEND);
 			glDisable(GL_TEXTURE_2D);
@@ -67,18 +65,17 @@ public:
 	GUI_PopMenu(void) :GUI_Container(0, 0, 0, 0){ item_click += std::bind(&GUI_PopMenu::on_item_click, this, std::placeholders::_1); }
 	~GUI_PopMenu(void);
 
-	virtual void add(std::u16string Text, _val Object)
+	virtual void add_item(std::u16string text, _val tag)
 	{
-		GUI_PopMenu::Item* object;
-		object = new GUI_PopMenu::Item();
-		object->m_text = Text;
+		Item* object = new Item();
+		object->m_text = text;
 		object->m_owner = this;
-		object->m_object = Object;
+		object->m_object = tag;
 		if (!m_items.empty())
 		{
-			GUI_Object* Back = m_items.back();
+			const auto back = m_items.back();
 			object->m_position.x = 0;
-			object->m_position.y = Back->m_position.y + Back->m_size.h;
+			object->m_position.y = back->m_position.y + back->m_size.h;
 		}
 		else
 		{
@@ -86,28 +83,29 @@ public:
 			object->m_position.y = 0;
 		}
 		GUI_Layer::add(object);
-		std::size_t maxlen = 0;
+		std::size_t max_length = 0;
 		std::size_t height = 0;
-		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); ++Current)
+		for (auto current = m_items.begin(); current != m_items.end(); ++current)
 		{
-			object = (GUI_PopMenu::Item*)(*Current);
-			maxlen = std::max<size_t>(Application::instance().m_graph->measure_text_width(object->m_text), maxlen);
+			object = static_cast<Item*>(*current);
+			max_length = std::max<size_t>(Application::instance().m_graph->measure_text_width(object->m_text), max_length);
 		}
-		resize(maxlen + 8, m_items.size() * ((Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender) >> 6));
-		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); ++Current)
+		resize(max_length + 8, m_items.size() * ((Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender) >> 6));
+		for (auto& current : m_items)
 		{
-			(*Current)->m_size.w = m_size.w - 1;
+			current->m_size.w = m_size.w - 1;
 		}
 	};
 
-	virtual void on_lose_focus(GUI_Object* sender){ destroy(this); }
-	virtual void on_mouse_move(MouseEventArgs const& e)
+	void on_lose_focus(GUI_Object* sender) override { destroy(this); }
+
+	void on_mouse_move(MouseEventArgs const& e) override
 	{
-		for (std::list<GUI_Object*>::iterator Current = m_items.begin(); Current != m_items.end(); ++Current)
+		for (auto& current : m_items)
 		{
-			if ((*Current)->check_region(MouseEventArgs(position_t(e.position.x - m_position.x, e.position.y - m_position.y), e.key, e.value)))
+			if (current->check_region(MouseEventArgs(position_t(e.position.x - m_position.x, e.position.y - m_position.y), e.key, e.value)))
 			{
-				(*Current)->mouse_move(MouseEventArgs(position_t(e.position.x - m_position.x, e.position.y - m_position.y), e.key, e.value));
+				current->mouse_move(MouseEventArgs(position_t(e.position.x - m_position.x, e.position.y - m_position.y), e.key, e.value));
 				return;
 			}
 		}
@@ -120,7 +118,7 @@ class Select_object_popmenu :public GUI_PopMenu < GameObject* >
 {
 public:
 
-	virtual void on_item_click(Item* sender);
+	void on_item_click(Item* sender) override;
 };
 
 #endif //GUI_POPMENU_H

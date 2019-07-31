@@ -108,7 +108,7 @@ public:
 	Packer_generic& get_packer() override;
 
 	std::u16string vector_mapcell_to_json(std::vector<MapCell>& value, Parser_context& context);
-	void vector_mapcell_from_json(std::u16string value, std::vector<MapCell>& prop, Parser_context& context);
+	void vector_mapcell_from_json(const std::u16string& value, std::vector<MapCell>& prop, Parser_context& context);
 	std::string vector_mapcell_to_binary(std::vector<MapCell>& value, Parser_context& context);
 	void vector_mapcell_from_binary(const std::string& value, std::vector<MapCell>& prop, std::size_t& pos, Parser_context& context);
 

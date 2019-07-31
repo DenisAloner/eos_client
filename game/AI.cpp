@@ -152,7 +152,7 @@ void Path::map_costing(GameMap* map, GameObject* object, MapCell* gc, int radius
 	m_start_cell = object->cell();
 	m_start_size = object->m_active_state->m_size;
 	m_goal_cell = gc;
-	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier->predicat;
+	const auto qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier->predicat;
 	for (int y = 0; y < map->m_size.dy; y++)
 	{
 		for (int x = 0; x < map->m_size.dx; x++)
@@ -160,7 +160,7 @@ void Path::map_costing(GameMap* map, GameObject* object, MapCell* gc, int radius
 			c = &map->get(0,y, x);
 			c->m_closed = false;
 			c->m_state = 0;
-			for (std::list<GameObject*>::iterator item = c->m_items.begin(); item != c->m_items.end(); ++item)
+			for (auto item = c->m_items.begin(); item != c->m_items.end(); ++item)
 			{
 				if (((*item) != object) && qualifier((*item)))
 				{
@@ -237,22 +237,23 @@ void Path::insert_into_open(int x, int y, int dg, Node* p)
 			else return;
 		}
 	}
-	MapCell* c = &m_game_map->get(0,y, x);
+	const auto c = &m_game_map->get(0,y, x);
 	if (!c->m_closed)
 	{
 		m_open += 1;
 		m_game_map->get(0,y, x).m_mark = true;
-		int n = is_in_open(c);
+		const auto n = is_in_open(c);
 		if (n == -1)
 		{
 			m_heap.push(new Node(c, p->g + dg, manhattan(c, m_goal_cell, m_start_cell), p));
 		}
 		else {
-			if (p->g + dg < m_heap.m_items[n]->g){
-				m_heap.m_items[n]->parent = p;
-				m_heap.m_items[n]->g = p->g + dg;
-				m_heap.m_items[n]->h = manhattan(m_heap.m_items[n]->cell, m_goal_cell, m_start_cell);
-				m_heap.edit(n, m_heap.m_items[n]->g + m_heap.m_items[n]->h);
+			const auto item = m_heap.m_items[n];
+			if (p->g + dg < item->g){
+				item->parent = p;
+				item->g = p->g + dg;
+				item->h = manhattan(item->cell, m_goal_cell, m_start_cell);
+				m_heap.edit(n, item->g + item->h);
 			}
 		}
 	}
@@ -260,9 +261,9 @@ void Path::insert_into_open(int x, int y, int dg, Node* p)
 
 std::vector<MapCell*>* Path::back(Node* c)
 {
-	MapCell* cell = static_cast<MapCell*>(m_unit->m_owner);
-	std::vector<MapCell*>* result = new std::vector<MapCell*>();
-	Node* current=c;
+	//auto cell = static_cast<MapCell*>(m_unit->m_owner);
+	auto* result = new std::vector<MapCell*>();
+	auto current = c;
 	while (current)
 	{
 		result->push_back(current->cell);
@@ -272,11 +273,10 @@ std::vector<MapCell*>* Path::back(Node* c)
 }
 
 std::vector<MapCell*>* Path::get_path(){
-	Node* current;
 	m_heap.push(new Node(m_start_cell, 0, manhattan(m_start_cell, m_goal_cell, m_start_cell)));
 	while (!m_heap.m_items.empty())
 	{
-		current = m_heap.pop();
+		const auto current = m_heap.pop();
 		if (Game_algorithm::check_distance(current->cell,m_start_size,m_goal_cell,m_goal_size))
 		{
 			return back(current);
@@ -507,37 +507,36 @@ AI* AI_enemy::clone()
 
 GameObject* AI_enemy::find_goal()
 {
-	FOV::cell* fc;
-	Vision_list* vl = static_cast<Vision_list*>(m_object->m_active_state->get_list(interaction_e::vision));
-	int radius = vl->m_max_radius;
+	auto vl = static_cast<Vision_list*>(m_object->m_active_state->get_list(interaction_e::vision));
+	auto radius = vl->m_max_radius;
 
-	int xc = m_object->cell()->x;
-	int yc = m_object->cell()->y;
-	int zc = m_object->cell()->z;
-	int dx = m_object->m_active_state->m_size.dx;
-	int dy = m_object->m_active_state->m_size.dy;
-	int dz = m_object->m_active_state->m_size.dz;
+	auto xc = m_object->cell()->x;
+	auto yc = m_object->cell()->y;
+	auto zc = m_object->cell()->z;
+	auto dx = m_object->m_active_state->m_size.dx;
+	auto dy = m_object->m_active_state->m_size.dy;
+	auto dz = m_object->m_active_state->m_size.dz;
 
-	int xs = ((dx - 1) >> 1);
-	int ys = ((dy - 1) >> 1);
-	int zs = ((dz - 1) >> 1);
+	auto xs = dx - 1 >> 1;
+	auto ys = dy - 1 >> 1;
+	auto zs = dz - 1 >> 1;
 
-	int x_start = xc - radius + xs;
+	auto x_start = xc - radius + xs;
 	x_start = max(x_start, 0);
 	x_start = min(x_start, m_map->m_size.dx - 1);
-	int x_end = xc + radius + xs;
+	auto x_end = xc + radius + xs;
 	x_end = max(x_end, 0);
 	x_end = min(x_end, m_map->m_size.dx - 1);
-	int y_start = yc - radius - ys;
+	auto y_start = yc - radius - ys;
 	y_start = max(y_start, 0);
 	y_start = min(y_start, m_map->m_size.dy - 1);
-	int y_end = yc + radius - ys;
+	auto y_end = yc + radius - ys;
 	y_end = max(y_end, 0);
 	y_end = min(y_end, m_map->m_size.dy - 1);
-	int z_start = zc - radius + zs;
+	auto z_start = zc - radius + zs;
 	z_start = max(z_start, 0);
 	z_start = min(z_start, m_map->m_size.dz - 1);
-	int z_end = zc + radius + zs;
+	auto z_end = zc + radius + zs;
 	z_end = max(z_end, 0);
 	z_end = min(z_end, m_map->m_size.dz - 1);
 
@@ -547,12 +546,12 @@ GameObject* AI_enemy::find_goal()
 		{
 			for (int x = x_start; x < x_end + 1; x++)
 			{
-				fc = &m_fov->m_map[y - y_start][x - x_start];
+				const auto fc = &m_fov->m_map[y - y_start][x - x_start];
 				if (fc->visible)
 				{
-					for (auto item = m_map->get(z,y, x).m_items.begin(); item != m_map->get(z,y, x).m_items.end(); ++item)
+					for (auto& m_item : m_map->get(z, y, x).m_items)
 					{
-						if ((*item) == Application::instance().m_world->m_player->m_object)
+						if (m_item == Application::instance().m_world->m_player->m_object)
 						{
 							return Application::instance().m_world->m_player->m_object;
 						}
@@ -566,20 +565,19 @@ GameObject* AI_enemy::find_goal()
 
 bool AI_enemy::check_goal()
 {
-	FOV::cell* fc;
-	Vision_list* vl = static_cast<Vision_list*>(m_object->m_active_state->get_list(interaction_e::vision));
-	int radius = vl->m_max_radius;
+	auto vl = static_cast<Vision_list*>(m_object->m_active_state->get_list(interaction_e::vision));
+	auto radius = vl->m_max_radius;
 
-	int xc = m_object->cell()->x;
-	int yc = m_object->cell()->y;
-	int zc = m_object->cell()->y;
-	int dx = m_object->m_active_state->m_size.dx;
-	int dy = m_object->m_active_state->m_size.dy;
-	int dz = m_object->m_active_state->m_size.dz;
+	auto xc = m_object->cell()->x;
+	auto yc = m_object->cell()->y;
+	auto zc = m_object->cell()->y;
+	auto dx = m_object->m_active_state->m_size.dx;
+	auto dy = m_object->m_active_state->m_size.dy;
+	auto dz = m_object->m_active_state->m_size.dz;
 
-	int xs = ((dx - 1) >> 1);
-	int ys = ((dy - 1) >> 1);
-	int zs = ((dz - 1) >> 1);
+	auto xs = dx - 1 >> 1;
+	auto ys = dy - 1 >> 1;
+	auto zs = dz - 1 >> 1;
 
 	int x_start = xc - radius + xs;
 	x_start = max(x_start, 0);
@@ -606,12 +604,12 @@ bool AI_enemy::check_goal()
 		{
 			for (int x = x_start; x < x_end + 1; x++)
 			{
-				fc = &m_fov->m_map[y - y_start][x - x_start];
+				const auto fc = &m_fov->m_map[y - y_start][x - x_start];
 				if (fc->visible)
 				{
-					for (auto item = m_map->get(z,y, x).m_items.begin(); item != m_map->get(z,y, x).m_items.end(); ++item)
+					for (auto& m_item : m_map->get(z, y, x).m_items)
 					{
-						if ((*item) == m_goal)
+						if (m_item == m_goal)
 						{
 							return true;
 						}

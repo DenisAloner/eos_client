@@ -831,8 +831,8 @@ GUI_MapViewer::GUI_MapViewer(Application* app)
 	m_cursor_x = 1;
 	m_cursor_y = 1;
 	m_size = app->m_size;
-	m_shift.x = (m_size.w / 2) - tile_size_x_half;// (m_tile_count_x)* 32 * 0.5;
-	m_shift.y = (m_size.h / 2) - (m_tile_count_y)* tile_size_y_half - tile_size_y_half;// 1024 * 0.5 - (m_tile_count_y + 6) * 18 * 0.5;
+	m_shift.x = float(m_size.w) / 2 - tile_size_x_half;// (m_tile_count_x)* 32 * 0.5;
+	m_shift.y = float(m_size.h) / 2 - m_tile_count_y* tile_size_y_half - tile_size_y_half;// 1024 * 0.5 - (m_tile_count_y + 6) * 18 * 0.5;
 
 	m_vao = 0;
 	glGenVertexArrays(1, &m_vao);
@@ -1659,12 +1659,12 @@ void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
 			//UnderCursor(CursorEventArgs(e.x, e.y));
 			for (std::list<GameObject*>::iterator Current = m_map->get(0,y, x).m_items.begin(); Current != m_map->get(0,y, x).m_items.end(); ++Current)
 			{
-				PopMenu->add((*Current)->m_name, (*Current));
+				PopMenu->add_item((*Current)->m_name, (*Current));
 			}
 		}
 		if (PopMenu->m_items.size() == 0)
 		{
-			PopMenu->add(u"Нет действий", nullptr);
+			PopMenu->add_item(u"Нет действий", nullptr);
 		}
 		PopMenu->destroy += std::bind(&GUI_Layer::remove, m_GUI, std::placeholders::_1);
 		m_GUI->add_front(PopMenu);

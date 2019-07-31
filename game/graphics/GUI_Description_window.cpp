@@ -1,4 +1,5 @@
 #include "GUI_Description_window.h"
+#include <utility>
 
 Visitor_object_description_getter::Visitor_object_description_getter() :m_value(nullptr)
 {
@@ -316,9 +317,8 @@ void GUI_Window::on_mouse_wheel(MouseEventArgs const& e)
 	}
 }
 
-GUI_TreeElement::GUI_TreeElement(std::u16string text, GUI_TextFormat* format, int level) :level(level), m_format(format), m_hide(false)
+GUI_TreeElement::GUI_TreeElement(std::u16string text, GUI_TextFormat* format, int level) :level(level), m_format(format), m_text(std::move(text)),m_hide(false)
 {
-	m_text = text;
 	m_size.h = (Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender) >> 6;
 	m_size.w = Application::instance().m_graph->measure_text_width(m_text) + 10 + 2;
 }

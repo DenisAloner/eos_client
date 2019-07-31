@@ -16,7 +16,7 @@ void GUI_Part_slot::render(GraphicalController* Graph, int px, int py)
 	if (focused)
 	{
 		glColor4d(1.0, 1.0, 1.0, 0.75);
-		GraphicalController::rectangle_t rect(px, py, m_size.w, m_size.h);
+		const GraphicalController::rectangle_t rect(px, py, m_size.w, m_size.h);
 		Graph->draw_sprite(rect);
 		glColor4d(0, 0, 0, 1);
 	}
@@ -54,7 +54,7 @@ void GUI_Part_slot::on_mouse_down(MouseEventArgs const& e)
 	set_focus(true);
 	if (Application::instance().m_message_queue.m_reader)
 	{
-		Parameter* p = new Parameter(parameter_type_e::owner);
+		const auto p = new Parameter(parameter_type_e::owner);
 		(*p)[0].set(m_item);
 		Application::instance().m_message_queue.push(p);
 	}
@@ -70,7 +70,7 @@ void Visitor_container_hierarchy_getter::visit(Object_part& value)
 	std::u16string name = u"";
 	for (auto i = m_active.begin(); i != m_active.end(); ++i)
 	{
-		if (name == u"")
+		if (name.empty())
 		{
 			name += (*i);
 		}
@@ -79,8 +79,8 @@ void Visitor_container_hierarchy_getter::visit(Object_part& value)
 			name += u" < " + (*i);
 		}
 	}
-	std::size_t s = Application::instance().m_graph->measure_text_width(name);
-	GUI_Part_slot* gui_item = new GUI_Part_slot(0, 64, &value, m_owner);
+	auto s = Application::instance().m_graph->measure_text_width(name);
+	auto* gui_item = new GUI_Part_slot(0, 64, &value, m_owner);
 	gui_item->m_name = name;
 	m_result.push_back(gui_item);
 	Visitor_simple::visit(value);

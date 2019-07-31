@@ -25,7 +25,7 @@ GraphicalController::GraphicalController(dimension_t size)
 {
 	m_size = size;
 	
-	Load_font(FileSystem::instance().m_resource_path + "Fonts\\9746.ttf");
+	load_font(FileSystem::instance().m_resource_path + "Fonts\\9746.ttf");
 
 	try
 	{
@@ -77,7 +77,7 @@ GraphicalController::GraphicalController(dimension_t size)
 	glGenFramebuffers(1, &m_FBO);
 }
 
-void GraphicalController::Load_font(std::string font_filename)
+void GraphicalController::load_font(const std::string& font_filename)
 {
 	m_error = FT_Init_FreeType(&m_library);
 	if (m_error != 0)
@@ -884,7 +884,7 @@ GLint GraphicalController::create_empty_texture(dimension_t size)
 	return texture;
 }
 
-void GraphicalController::draw_sprite(rectangle_t rect)
+void GraphicalController::draw_sprite(const rectangle_t &rect)
 {
 	glBegin(GL_QUADS);
 	glTexCoord2d(0, 0); glVertex2d(rect.a.x, rect.b.y);

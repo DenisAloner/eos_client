@@ -98,7 +98,7 @@ public:
 	void set_VSync(bool sync);
 	bool set_uniform_float(GLuint program, const char * name, const float value);
 	GLint create_empty_texture(dimension_t size);
-	void Load_font(std::string font_filename);
+	void load_font(const std::string& font_filename);
 	font_symbol_t& get_symbol(char16_t value);
 
 	GLuint png_texture_load(const std::string& path);
@@ -108,7 +108,7 @@ public:
 
 	position_t center_aling_to_point(int x, int y, std::u16string text);
 
-	void draw_sprite(rectangle_t rect);
+	void draw_sprite(const rectangle_t &rect);
 	void draw_rectangle(rectangle_t rect);
 	void stroke_cell(int x, int y, int xs, int ys);
 	void draw_tile(tile_t& tile, rectangle_t rect);

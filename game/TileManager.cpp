@@ -2,17 +2,17 @@
 //#include "game/GameObject.h"
 
 
-void TileManager::vector_GLuint_from_json(std::u16string value, std::vector<GLuint>& prop, Parser_context& context)
+void TileManager::vector_gl_uint_from_json(const std::u16string& value, std::vector<GLuint>& prop, Parser_context& context)
 {
-	std::u16string temp = value;
-	scheme_list_t* s = Parser::read_array(temp);
+	auto temp = value;
+	const auto s = Parser::read_array(temp);
 	if (s)
 	{
 		prop.resize(s->size());
-		int i = 0;
-		for (auto element : (*s))
+		auto i = 0;
+		for (const auto& element : (*s))
 		{
-			std::string&& name = Parser::UTF16_to_CP1251(Parser::get_value(element));
+			auto&& name = Parser::UTF16_to_CP1251(Parser::get_value(element));
 			prop[i] = Application::instance().m_graph->png_texture_load(
 				FileSystem::instance().m_resource_path + "Tiles\\" + name + ".png");
 			i += 1;
@@ -21,7 +21,7 @@ void TileManager::vector_GLuint_from_json(std::u16string value, std::vector<GLui
 	}
 }
 
-void TileManager::vector_GLuint_from_binary(const std::string& value, std::vector<GLuint>& prop, std::size_t& pos, Parser_context& context)
+void TileManager::vector_gl_uint_from_binary(const std::string& value, std::vector<GLuint>& prop, std::size_t& pos, Parser_context& context)
 {
 }
 

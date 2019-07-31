@@ -89,7 +89,7 @@ public:
 	MapCell();
 	MapCell(int x, int y,int z, GameMap* map);
 
-	void add_object(GameObject* Object);
+	void add_object(GameObject* object);
 	//virtual Object_feature* find_property(property_e kind, GameObject* excluded);
 
 	void reset_serialization_index() override;
@@ -183,12 +183,12 @@ public:
 
 	std::u16string icon_to_json(Icon*& value, Parser_context& context);
 	std::string icon_to_binary(Icon*& value, Parser_context& context);
-	void icon_from_json(std::u16string value, Icon*& prop, Parser_context& context);
+	void icon_from_json(const std::u16string& value, Icon*& prop, Parser_context& context);
 	void icon_from_binary(const std::string& value, Icon*& prop, std::size_t& pos, Parser_context& context);
 
 	std::u16string tilemanager_to_json(TileManager*& value, Parser_context& context);
 	std::string tilemanager_to_binary(TileManager*& value, Parser_context& context);
-	void tilemanager_from_json(std::u16string value, TileManager*& prop, Parser_context& context);
+	void tilemanager_from_json(const std::u16string& value, TileManager*& prop, Parser_context& context);
 	void tilemanager_from_binary(const std::string& value, TileManager*& prop, std::size_t& pos, Parser_context& context);
 	
 	constexpr static auto properties() {
@@ -316,12 +316,12 @@ public:
 	Packer_generic& get_packer() override;
 
 
-	void instancedictonary_icon_from_json(std::u16string value, InstanceDictonary<Icon*>& prop, Parser_context& context);
+	void instancedictonary_icon_from_json(const std::u16string& value, InstanceDictonary<Icon*>& prop, Parser_context& context);
 	void instancedictonary_icon_from_binary(const std::string& value, InstanceDictonary<Icon*>& prop, std::size_t& pos, Parser_context& context);
 
-	void instancedictonary_tilemanager_from_json_atlas(std::u16string value, InstanceDictonary<TileManager*>& prop, Parser_context& context);
+	void instancedictonary_tilemanager_from_json_atlas(const std::u16string& value, InstanceDictonary<TileManager*>& prop, Parser_context& context);
 
-	void instancedictonary_tilemanager_from_json(std::u16string value, InstanceDictonary<TileManager*>& prop, Parser_context& context);
+	void instancedictonary_tilemanager_from_json(const std::u16string& value, InstanceDictonary<TileManager*>& prop, Parser_context& context);
 	void instancedictonary_tilemanager_from_binary(const std::string& value, InstanceDictonary<TileManager*>& prop, std::size_t& pos, Parser_context& context);
 
 	constexpr static auto properties()

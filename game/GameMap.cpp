@@ -97,7 +97,7 @@ std::u16string GameMap::vector_mapcell_to_json(std::vector<MapCell>& value, Pars
 	return result;
 }
 
-void GameMap::vector_mapcell_from_json(std::u16string value, std::vector<MapCell>& prop, Parser_context& context)
+void GameMap::vector_mapcell_from_json(const std::u16string& value, std::vector<MapCell>& prop, Parser_context& context)
 {
 	std::u16string temp = value;
 	scheme_list_t* s = Parser::read_array(temp);

@@ -686,7 +686,7 @@ template<typename Class, typename T>
 struct Property {
 	
 	typedef std::u16string(Class::*to_json_function_t)(T&, Parser_context&);
-	typedef void(Class::*from_json_function_t)(std::u16string, T&, Parser_context&);
+	typedef void(Class::*from_json_function_t)(const std::u16string&, T&, Parser_context&);
 	typedef std::string(Class::*to_binary_function_t)(T&, Parser_context&);
 	typedef void(Class::*from_binary_function_t)(const std::string&, T&, std::size_t&, Parser_context&);
 	 
@@ -730,7 +730,7 @@ struct Property {
 };
 
 template<typename Class, typename T>
-constexpr auto make_property(T Class::*member, const char16_t* name, std::u16string(Class::*func1)(T&, Parser_context&), void(Class::*func2)(std::u16string, T&, Parser_context&), std::string(Class::*func3)(T&, Parser_context&), void(Class::*func4)(const std::string&, T&, std::size_t&, Parser_context&)) {
+constexpr auto make_property(T Class::*member, const char16_t* name, std::u16string(Class::*func1)(T&, Parser_context&), void(Class::*func2)(const std::u16string&, T&, Parser_context&), std::string(Class::*func3)(T&, Parser_context&), void(Class::*func4)(const std::string&, T&, std::size_t&, Parser_context&)) {
 	return Property<Class, T>{member, name, func1, func2, func3, func4};
 }
 
@@ -1786,11 +1786,11 @@ public:
 		{
 			return std::string(reinterpret_cast<const char*>(&value), sizeof(T));
 		}
-		else if constexpr(std::is_same<T, std::string>::value)
-		{
-			std::size_t s = value.size();
-			return std::string(reinterpret_cast<const char*>(&s), sizeof(std::size_t)) + value;
-		}
+		//else if constexpr(std::is_same<T, std::string>::value)
+		//{
+		//	std::size_t s = value.size();
+		//	return std::string(reinterpret_cast<const char*>(&s), sizeof(std::size_t)) + value;
+		//}
 		else if constexpr(std::is_same<T, std::u16string>::value)
 		{
 			std::size_t s = value.size();
