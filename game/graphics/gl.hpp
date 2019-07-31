@@ -4,8 +4,8 @@
 
 #if defined __DESKTOP__
 	#ifdef _WIN32	// Windows
-		#include <glew.h>
-		#include <GL/gl.h>
+        #include <glbinding/gl/gl.h>
+        #include <glbinding/glbinding.h>
 	#else			// Linux
 		#define GL_GLEXT_PROTOTYPES
 		#include <GL/gl.h>
@@ -14,11 +14,5 @@
 #else
 	#error "Unknown platform"
 #endif
-
-
-#ifdef __DESKTOP__
-	#define GL_RGBA8_OES GL_RGBA8
-#endif//__DESKTOP__
-
 
 #endif//GL_HPP

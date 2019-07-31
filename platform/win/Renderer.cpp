@@ -1,7 +1,7 @@
 #include "Renderer.h"
 #include "game/Application.h"
 #include "game/graphics/gl.hpp"
-#include "game/utils/logger.h"
+#include "game/utils/Logger.h"
 #include <chrono>
 
 
@@ -40,12 +40,12 @@ void Renderer::stop()
 void Renderer::work()
 {
 	// Создаем render context (RC)
-	HGLRC hRC = wglCreateContext(m_hDC);
+	auto hRC = wglCreateContext(m_hDC);
 	bool is_ok = wglMakeCurrent(m_hDC, hRC);
 	Logger::Instance().info("Создание контекста OpenGL {}", (is_ok ? "ok" : "err"));
 
 	// Инициализируем графику
-	glewInit();
+	glbinding::initialize(nullptr);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0, m_size.w, m_size.h, 0, -1, 1);

@@ -1,10 +1,11 @@
 #include "GraphicalController.h"
 #include "TileManager.h"
 
+using namespace gl;
 
 void GraphicalController::check_gl_error(const std::string& text)
 {
-	GLenum err = glGetError();
+	auto err = glGetError();
 	while (err != GL_NO_ERROR) {
 		std::string error;
 
@@ -121,8 +122,8 @@ font_symbol_t& GraphicalController::get_symbol(char16_t value)
 		
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, m_slot->bitmap.width, m_slot->bitmap.rows, 0, GL_ALPHA, GL_UNSIGNED_BYTE, m_slot->bitmap.buffer);
 		font_symbol_t s;
@@ -145,21 +146,21 @@ bool GraphicalController::CompileSuccessful(int obj)
 {
 	int status;
 	glGetShaderiv(obj, GL_COMPILE_STATUS, &status);
-	return status == GL_TRUE;
+	return GLboolean(status) == GL_TRUE;
 }
 
 bool GraphicalController::LinkSuccessful(int obj)
 {
 	int status;
 	glGetProgramiv(obj, GL_LINK_STATUS, &status);
-	return status == GL_TRUE;
+	return GLboolean(status) == GL_TRUE;
 }
 
 bool GraphicalController::ValidateSuccessful(int obj)
 {
 	int status;
 	glGetProgramiv(obj, GL_VALIDATE_STATUS, &status);
-	return status == GL_TRUE;
+	return GLboolean(status) == GL_TRUE;
 }
 
 void GraphicalController::set_VSync(bool sync)
@@ -374,6 +375,263 @@ bool GraphicalController::set_uniform_float(GLuint program, const char * name, c
 	return true;
 }
 
+#define SWAP_ROWS_DOUBLE(a, b) { double* _tmp = a; (a) = (b); (b) = _tmp; }
+#define SWAP_ROWS_FLOAT(a, b) { float* _tmp = a; (a) = (b); (b) = _tmp; }
+#define MAT(m, r, c) (m)[(c) * 4 + (r)]
+
+// This code comes directly from GLU except that it is for float
+int glhInvertMatrixf2(GLdouble* m, GLdouble* out)
+{
+	float wtmp[4][8];
+	float m0, m1, m2, m3, s;
+	float* r0, * r1, * r2, * r3;
+	r0 = wtmp[0], r1 = wtmp[1], r2 = wtmp[2], r3 = wtmp[3];
+	r0[0] = MAT(m, 0, 0), r0[1] = MAT(m, 0, 1),
+		r0[2] = MAT(m, 0, 2), r0[3] = MAT(m, 0, 3),
+		r0[4] = 1.0, r0[5] = r0[6] = r0[7] = 0.0,
+		r1[0] = MAT(m, 1, 0), r1[1] = MAT(m, 1, 1),
+		r1[2] = MAT(m, 1, 2), r1[3] = MAT(m, 1, 3),
+		r1[5] = 1.0, r1[4] = r1[6] = r1[7] = 0.0,
+		r2[0] = MAT(m, 2, 0), r2[1] = MAT(m, 2, 1),
+		r2[2] = MAT(m, 2, 2), r2[3] = MAT(m, 2, 3),
+		r2[6] = 1.0, r2[4] = r2[5] = r2[7] = 0.0,
+		r3[0] = MAT(m, 3, 0), r3[1] = MAT(m, 3, 1),
+		r3[2] = MAT(m, 3, 2), r3[3] = MAT(m, 3, 3),
+		r3[7] = 1.0, r3[4] = r3[5] = r3[6] = 0.0;
+	/* choose pivot - or die */
+	if (fabsf(r3[0]) > fabsf(r2[0]))
+		SWAP_ROWS_FLOAT(r3, r2);
+	if (fabsf(r2[0]) > fabsf(r1[0]))
+		SWAP_ROWS_FLOAT(r2, r1);
+	if (fabsf(r1[0]) > fabsf(r0[0]))
+		SWAP_ROWS_FLOAT(r1, r0);
+	if (0.0 == r0[0])
+		return 0;
+	/* eliminate first variable */
+	m1 = r1[0] / r0[0];
+	m2 = r2[0] / r0[0];
+	m3 = r3[0] / r0[0];
+	s = r0[1];
+	r1[1] -= m1 * s;
+	r2[1] -= m2 * s;
+	r3[1] -= m3 * s;
+	s = r0[2];
+	r1[2] -= m1 * s;
+	r2[2] -= m2 * s;
+	r3[2] -= m3 * s;
+	s = r0[3];
+	r1[3] -= m1 * s;
+	r2[3] -= m2 * s;
+	r3[3] -= m3 * s;
+	s = r0[4];
+	if (s != 0.0) {
+		r1[4] -= m1 * s;
+		r2[4] -= m2 * s;
+		r3[4] -= m3 * s;
+	}
+	s = r0[5];
+	if (s != 0.0) {
+		r1[5] -= m1 * s;
+		r2[5] -= m2 * s;
+		r3[5] -= m3 * s;
+	}
+	s = r0[6];
+	if (s != 0.0) {
+		r1[6] -= m1 * s;
+		r2[6] -= m2 * s;
+		r3[6] -= m3 * s;
+	}
+	s = r0[7];
+	if (s != 0.0) {
+		r1[7] -= m1 * s;
+		r2[7] -= m2 * s;
+		r3[7] -= m3 * s;
+	}
+	/* choose pivot - or die */
+	if (fabsf(r3[1]) > fabsf(r2[1]))
+		SWAP_ROWS_FLOAT(r3, r2);
+	if (fabsf(r2[1]) > fabsf(r1[1]))
+		SWAP_ROWS_FLOAT(r2, r1);
+	if (0.0 == r1[1])
+		return 0;
+	/* eliminate second variable */
+	m2 = r2[1] / r1[1];
+	m3 = r3[1] / r1[1];
+	r2[2] -= m2 * r1[2];
+	r3[2] -= m3 * r1[2];
+	r2[3] -= m2 * r1[3];
+	r3[3] -= m3 * r1[3];
+	s = r1[4];
+	if (0.0 != s) {
+		r2[4] -= m2 * s;
+		r3[4] -= m3 * s;
+	}
+	s = r1[5];
+	if (0.0 != s) {
+		r2[5] -= m2 * s;
+		r3[5] -= m3 * s;
+	}
+	s = r1[6];
+	if (0.0 != s) {
+		r2[6] -= m2 * s;
+		r3[6] -= m3 * s;
+	}
+	s = r1[7];
+	if (0.0 != s) {
+		r2[7] -= m2 * s;
+		r3[7] -= m3 * s;
+	}
+	/* choose pivot - or die */
+	if (fabsf(r3[2]) > fabsf(r2[2]))
+		SWAP_ROWS_FLOAT(r3, r2);
+	if (0.0 == r2[2])
+		return 0;
+	/* eliminate third variable */
+	m3 = r3[2] / r2[2];
+	r3[3] -= m3 * r2[3], r3[4] -= m3 * r2[4],
+		r3[5] -= m3 * r2[5], r3[6] -= m3 * r2[6], r3[7] -= m3 * r2[7];
+	/* last check */
+	if (0.0 == r3[3])
+		return 0;
+	s = 1.0 / r3[3];		/* now back substitute row 3 */
+	r3[4] *= s;
+	r3[5] *= s;
+	r3[6] *= s;
+	r3[7] *= s;
+	m2 = r2[3];			/* now back substitute row 2 */
+	s = 1.0 / r2[2];
+	r2[4] = s * (r2[4] - r3[4] * m2), r2[5] = s * (r2[5] - r3[5] * m2),
+		r2[6] = s * (r2[6] - r3[6] * m2), r2[7] = s * (r2[7] - r3[7] * m2);
+	m1 = r1[3];
+	r1[4] -= r3[4] * m1, r1[5] -= r3[5] * m1,
+		r1[6] -= r3[6] * m1, r1[7] -= r3[7] * m1;
+	m0 = r0[3];
+	r0[4] -= r3[4] * m0, r0[5] -= r3[5] * m0,
+		r0[6] -= r3[6] * m0, r0[7] -= r3[7] * m0;
+	m1 = r1[2];			/* now back substitute row 1 */
+	s = 1.0 / r1[1];
+	r1[4] = s * (r1[4] - r2[4] * m1), r1[5] = s * (r1[5] - r2[5] * m1),
+		r1[6] = s * (r1[6] - r2[6] * m1), r1[7] = s * (r1[7] - r2[7] * m1);
+	m0 = r0[2];
+	r0[4] -= r2[4] * m0, r0[5] -= r2[5] * m0,
+		r0[6] -= r2[6] * m0, r0[7] -= r2[7] * m0;
+	m0 = r0[1];			/* now back substitute row 0 */
+	s = 1.0 / r0[0];
+	r0[4] = s * (r0[4] - r1[4] * m0), r0[5] = s * (r0[5] - r1[5] * m0),
+		r0[6] = s * (r0[6] - r1[6] * m0), r0[7] = s * (r0[7] - r1[7] * m0);
+	MAT(out, 0, 0) = r0[4];
+	MAT(out, 0, 1) = r0[5], MAT(out, 0, 2) = r0[6];
+	MAT(out, 0, 3) = r0[7], MAT(out, 1, 0) = r1[4];
+	MAT(out, 1, 1) = r1[5], MAT(out, 1, 2) = r1[6];
+	MAT(out, 1, 3) = r1[7], MAT(out, 2, 0) = r2[4];
+	MAT(out, 2, 1) = r2[5], MAT(out, 2, 2) = r2[6];
+	MAT(out, 2, 3) = r2[7], MAT(out, 3, 0) = r3[4];
+	MAT(out, 3, 1) = r3[5], MAT(out, 3, 2) = r3[6];
+	MAT(out, 3, 3) = r3[7];
+	return 1;
+}
+
+void multiply_matrix_by_vector4_by4_open_gl_float(GLdouble* resultvector, const GLdouble* matrix, const GLdouble* pvector)
+{
+	resultvector[0] = matrix[0] * pvector[0] + matrix[4] * pvector[1] + matrix[8] * pvector[2] + matrix[12] * pvector[3];
+	resultvector[1] = matrix[1] * pvector[0] + matrix[5] * pvector[1] + matrix[9] * pvector[2] + matrix[13] * pvector[3];
+	resultvector[2] = matrix[2] * pvector[0] + matrix[6] * pvector[1] + matrix[10] * pvector[2] + matrix[14] * pvector[3];
+	resultvector[3] = matrix[3] * pvector[0] + matrix[7] * pvector[1] + matrix[11] * pvector[2] + matrix[15] * pvector[3];
+}
+
+
+void multiply_matrices4_by4_open_gl_float(GLdouble* result, const GLdouble* matrix1, const GLdouble* matrix2)
+{
+	result[0] = matrix1[0] * matrix2[0] +
+		matrix1[4] * matrix2[1] +
+		matrix1[8] * matrix2[2] +
+		matrix1[12] * matrix2[3];
+	result[4] = matrix1[0] * matrix2[4] +
+		matrix1[4] * matrix2[5] +
+		matrix1[8] * matrix2[6] +
+		matrix1[12] * matrix2[7];
+	result[8] = matrix1[0] * matrix2[8] +
+		matrix1[4] * matrix2[9] +
+		matrix1[8] * matrix2[10] +
+		matrix1[12] * matrix2[11];
+	result[12] = matrix1[0] * matrix2[12] +
+		matrix1[4] * matrix2[13] +
+		matrix1[8] * matrix2[14] +
+		matrix1[12] * matrix2[15];
+	result[1] = matrix1[1] * matrix2[0] +
+		matrix1[5] * matrix2[1] +
+		matrix1[9] * matrix2[2] +
+		matrix1[13] * matrix2[3];
+	result[5] = matrix1[1] * matrix2[4] +
+		matrix1[5] * matrix2[5] +
+		matrix1[9] * matrix2[6] +
+		matrix1[13] * matrix2[7];
+	result[9] = matrix1[1] * matrix2[8] +
+		matrix1[5] * matrix2[9] +
+		matrix1[9] * matrix2[10] +
+		matrix1[13] * matrix2[11];
+	result[13] = matrix1[1] * matrix2[12] +
+		matrix1[5] * matrix2[13] +
+		matrix1[9] * matrix2[14] +
+		matrix1[13] * matrix2[15];
+	result[2] = matrix1[2] * matrix2[0] +
+		matrix1[6] * matrix2[1] +
+		matrix1[10] * matrix2[2] +
+		matrix1[14] * matrix2[3];
+	result[6] = matrix1[2] * matrix2[4] +
+		matrix1[6] * matrix2[5] +
+		matrix1[10] * matrix2[6] +
+		matrix1[14] * matrix2[7];
+	result[10] = matrix1[2] * matrix2[8] +
+		matrix1[6] * matrix2[9] +
+		matrix1[10] * matrix2[10] +
+		matrix1[14] * matrix2[11];
+	result[14] = matrix1[2] * matrix2[12] +
+		matrix1[6] * matrix2[13] +
+		matrix1[10] * matrix2[14] +
+		matrix1[14] * matrix2[15];
+	result[3] = matrix1[3] * matrix2[0] +
+		matrix1[7] * matrix2[1] +
+		matrix1[11] * matrix2[2] +
+		matrix1[15] * matrix2[3];
+	result[7] = matrix1[3] * matrix2[4] +
+		matrix1[7] * matrix2[5] +
+		matrix1[11] * matrix2[6] +
+		matrix1[15] * matrix2[7];
+	result[11] = matrix1[3] * matrix2[8] +
+		matrix1[7] * matrix2[9] +
+		matrix1[11] * matrix2[10] +
+		matrix1[15] * matrix2[11];
+	result[15] = matrix1[3] * matrix2[12] +
+		matrix1[7] * matrix2[13] +
+		matrix1[11] * matrix2[14] +
+		matrix1[15] * matrix2[15];
+}
+
+position_t glhUnProjectf(float winx, float winy, float winz, GLdouble* modelview, GLdouble* projection, int* viewport)
+{
+	// Transformation matrices
+	GLdouble m[16], a[16];
+	GLdouble in[4], out[4];
+	// Calculation for inverting a matrix, compute projection x modelview
+	// and store in A[16]
+	multiply_matrices4_by4_open_gl_float(a, projection, modelview);
+	// Now compute the inverse of matrix A
+	if (glhInvertMatrixf2(a, m) == 0)
+		return position_t(0, 0);
+	// Transformation of normalized coordinates between -1 and 1
+	in[0] = (winx - float(viewport[0])) / float(viewport[2]) * 2.0 - 1.0;
+	in[1] = (winy - float(viewport[1])) / float(viewport[3]) * 2.0 - 1.0;
+	in[2] = 2.0 * winz - 1.0;
+	in[3] = 1.0;
+	// Objects coordinates
+	multiply_matrix_by_vector4_by4_open_gl_float(out, m, in);
+	if (out[3] == 0.0)
+		return position_t(0, 0);
+	out[3] = double(1.0) / out[3];
+	return position_t(out[0] * out[3], out[1] * out[3]);
+}
+
 position_t GraphicalController::get_OpenGL_position(float x, float y)
 {
 	GLint viewport[4];
@@ -381,10 +639,7 @@ position_t GraphicalController::get_OpenGL_position(float x, float y)
 	GLdouble projection[16];
 	GLfloat winX, winY, winZ;
 
-	struct
-	{
-		GLdouble x, y, z;
-	} point;
+
 	// ВНИМАНИЕ! Нельзя вызывать функции gl вне графического потока!
 	glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
 	glGetDoublev(GL_PROJECTION_MATRIX, projection);
@@ -392,8 +647,7 @@ position_t GraphicalController::get_OpenGL_position(float x, float y)
 	winX = x;
 	winY = (float)viewport[3] - y;
 	glReadPixels(x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
-	gluUnProject(winX, winY, winZ, modelview, projection, viewport, &point.x, &point.y, &point.z);
-	return position_t(point.x, point.y);
+	return glhUnProjectf(winX, winY, winZ, modelview, projection, viewport);
 }
 
 //GLuint GraphicalController::load_texture(const char * filename)
@@ -438,26 +692,23 @@ position_t GraphicalController::get_OpenGL_position(float x, float y)
 GLuint GraphicalController::load_texture(const std::string& path)
 {
 	GLuint texture;
-	BITMAPFILEHEADER* header;
-	BITMAPINFOHEADER* info;
-	char* data;
 	bytearray buff;
 	if (!FileSystem::instance().load_from_file(path, buff))
 	{
 		//MessageBox(NULL, path.c_str(), "", MB_OK);
 		throw std::logic_error("Не удалось загрузить файл `" + path + "`");
 	}
-	header = reinterpret_cast<BITMAPFILEHEADER*>(buff.get());
-	info = reinterpret_cast<BITMAPINFOHEADER*>(buff.get() + sizeof(*header));
-	data = reinterpret_cast<char*>(buff.get() + sizeof(*header)+sizeof(*info));
+	auto header = reinterpret_cast<BITMAPFILEHEADER*>(buff.get());
+	auto info = reinterpret_cast<BITMAPINFOHEADER*>(buff.get() + sizeof(*header));
+	const auto data = reinterpret_cast<char*>(buff.get() + sizeof(*header) + sizeof(*info));
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	/*glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);*/
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, info->biWidth, info->biHeight, GL_BGRA, GL_UNSIGNED_BYTE, data);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, info->biWidth, info->biHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
 	return texture;
 }
 
@@ -551,7 +802,7 @@ GLuint GraphicalController::png_texture_load(const std::string& path)
 		return 0;
 	}
 
-	GLint format;
+	GLenum format;
 	switch (color_type)
 	{
 	case PNG_COLOR_TYPE_RGB:
@@ -608,14 +859,14 @@ GLuint GraphicalController::png_texture_load(const std::string& path)
 	GLuint texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	/*glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);*/
 	//gluBuild2DMipmaps(GL_TEXTURE_2D, format, temp_width, temp_height, format, GL_UNSIGNED_BYTE, image_data);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, format, temp_width, temp_height, 0, format, GL_UNSIGNED_BYTE, image_data);
 	
 
@@ -737,7 +988,7 @@ GLuint GraphicalController::texture_array_load(const std::vector<std::string>& p
 			return 0;
 		}
 
-		GLint format;
+		GLenum format;
 		switch (color_type)
 		{
 		case PNG_COLOR_TYPE_RGB:
@@ -799,11 +1050,11 @@ GLuint GraphicalController::texture_array_load(const std::vector<std::string>& p
 		fclose(fp);
 	}
 
-	glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	m_atlas = texture;
 	return texture;
 }
@@ -874,10 +1125,10 @@ GLint GraphicalController::create_empty_texture(dimension_t size)
 	GLuint texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.w, size.h, 0, GL_BGRA, GL_UNSIGNED_BYTE, nullptr);
 	glGenerateMipmap(GL_TEXTURE_2D);

@@ -40,12 +40,12 @@ else (OPENGL_FOUND)
 	message("OpenGL environment missing")
 endif (OPENGL_FOUND)
 
-find_library(GLEW_LIB_DEBUG glew32d
+find_library(GLBINDING_LIB_DEBUG glbindingd
 	PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/debug
 	DOC "OpenGL libraries"
 )
 
-find_library(GLEW_LIB_RELEASE glew32
+find_library(GLBINDING_LIB_RELEASE glbinding
 	PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/release
 	DOC "OpenGL libraries"
 )
@@ -91,7 +91,7 @@ include_directories(
 
 set(EXT_LIBRARIES
 	${OGL_LIB}
-    $<$<CONFIG:Debug>:${GLEW_LIB_DEBUG}>$<$<CONFIG:Release>:${GLEW_LIB_RELEASE}>
+    $<$<CONFIG:Debug>:${GLBINDING_LIB_DEBUG}>$<$<CONFIG:Release>:${GLBINDING_LIB_RELEASE}>
 	$<$<CONFIG:Debug>:${FREETYPE_LIB_DEBUG}>$<$<CONFIG:Release>:${FREETYPE_LIB_RELEASE}>
     $<$<CONFIG:Debug>:${LIBPNG_LIB_DEBUG}>$<$<CONFIG:Release>:${LIBPNG_LIB_RELEASE}>
     $<$<CONFIG:Debug>:${ZLIB_LIB_DEBUG}>$<$<CONFIG:Release>:${ZLIB_LIB_RELEASE}>

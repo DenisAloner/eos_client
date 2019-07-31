@@ -14,6 +14,8 @@
 #include <unordered_map>
 #include <optional>
 
+using namespace gl;
+
 struct vertex_t
 {
 	GLint position[2];
@@ -25,9 +27,9 @@ struct vertex_t
 	inline const static void* light_offset = reinterpret_cast<void*>(offsetof(vertex_t, light));*/
 };
 
-constexpr const auto position_off = offsetof(vertex_t, position);
-constexpr const auto texcoord_off = offsetof(vertex_t, texcoord);
-constexpr const auto light_off = offsetof(vertex_t, light);
+constexpr auto position_off = offsetof(vertex_t, position);
+constexpr auto texcoord_off = offsetof(vertex_t, texcoord);
+constexpr auto light_off = offsetof(vertex_t, light);
 
 const auto position_offset = reinterpret_cast<void*>(position_off);
 const auto texcoord_offset = reinterpret_cast<void*>(texcoord_off);
