@@ -900,16 +900,16 @@ Player::Player(GameObject* object, GameMap* map) :m_object(object), m_map(map)
 	m_actions.push_front(Application::instance().m_actions[action_e::save]);
 	m_actions.push_front(Application::instance().m_actions[action_e::load]);
 	m_actions.push_front(Application::instance().m_actions[action_e::rotate_view]);
-
+	m_actions.push_front(Application::instance().m_actions[action_e::change_z_level]);
 	m_object->event_update += std::bind(&Event<VoidEventArgs>::operator(),&event_update, std::placeholders::_1);
 	
 }
 
 void Player::get_actions_list(std::list<Action_helper_t>& value)
 {
-	for (auto item = m_actions.begin(); item != m_actions.end(); ++item)
+	for (auto& m_action : m_actions)
 	{
-		value.push_back(Action_helper_t(*item));
+		value.emplace_back(m_action);
 	}
 	m_object->get_actions_list(value);
 }
@@ -964,9 +964,9 @@ Object_part* Object_part::clone()
 void Object_part::do_predicat(Visitor& helper)
 { 
 	helper.visit(*this);
-	for (auto item = m_attributes.m_items.begin(); item != m_attributes.m_items.end(); item++)
+	for (auto& m_item : m_attributes.m_items)
 	{
-		item->second->do_predicat(helper);
+		m_item.second->do_predicat(helper);
 	}
 }
 
@@ -1002,14 +1002,14 @@ Packer_generic& Config::get_packer()
 
 void Config::instancedictonary_icon_from_json(const std::u16string& value, InstanceDictonary<Icon*>& prop, Parser_context& context)
 {
-	std::u16string temp = value;
-	scheme_list_t* s = Parser::read_array(temp);
+	auto temp = value;
+	const auto s = Parser::read_array(temp);
 	if (s)
 	{
-		for (auto element : (*s))
+		for (const auto& element : (*s))
 		{
-			std::string&& name = Parser::UTF16_to_CP1251(Parser::get_value(element));
-			Icon* icon = new Icon;
+			auto&& name = Parser::UTF16_to_CP1251(Parser::get_value(element));
+			const auto icon = new Icon;
 			icon->m_value = Application::instance().m_graph->load_texture(FileSystem::instance().m_resource_path + "Tiles\\" + name + ".bmp");
 			prop.add(icon, name);
 		}

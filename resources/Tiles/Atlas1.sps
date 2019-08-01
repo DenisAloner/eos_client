@@ -23,4 +23,10 @@
           <childs>
           </childs>
      </node>
+     <node typeid="1" id="4" ownerId="-1">
+          <params filename="selection.png" filepath="E:\GIT\eos_client\resources\Tiles\" relativepath="">
+          </params>
+          <childs>
+          </childs>
+     </node>
 </SpritePacker>

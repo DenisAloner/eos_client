@@ -1681,6 +1681,28 @@ void Action_rotate_view::interaction_handler(Parameter * arg)
 	Application::instance().m_message_queue.m_busy = false;
 }
 
+Action_change_z_level::Action_change_z_level()
+{
+	m_kind = action_e::change_z_level;
+	m_icon = Application::instance().m_graph->m_actions[17];
+	m_name = u"Увеличить уровень просмотра";
+}
+
+std::u16string Action_change_z_level::get_description(Parameter* parameter)
+{
+	std::u16string s(u"Увеличить уровень просмотра");
+	return s;
+}
+
+void Action_change_z_level::interaction_handler(Parameter* arg)
+{
+	Action::interaction_handler(nullptr);
+	Application::instance().m_message_queue.m_busy = true;
+	Application::instance().m_gui_controller.m_GUI->MapViewer->m_z_level += 1;
+	//if (Application::instance().m_gui_controller.m_GUI->MapViewer->m_rotate > 3) { Application::instance().m_gui_controller.m_GUI->MapViewer->m_z_level += 1; };
+	Application::instance().m_message_queue.m_busy = false;
+}
+
 Action_autoexplore::Action_autoexplore()
 {
 	m_kind = action_e::autoexplore;

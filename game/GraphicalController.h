@@ -16,7 +16,6 @@
 #include <freetype/ftglyph.h>
 #include <freetype/ftoutln.h>
 #include <freetype/fttrigon.h>
-#include <png.h>
 
 class TileManager;
 
@@ -41,7 +40,7 @@ public:
 		};
 	};
 
-	GLuint m_actions[17];
+	GLuint m_actions[18];
 
 	GLuint m_horizontal_shader;
 	GLuint m_vertical_shader;
@@ -90,7 +89,7 @@ public:
 	position_t get_OpenGL_position(float x, float y);
 	GLuint load_texture(const std::string& path);
 	void output_text(int x, int y, std::u16string& Text, int sizex, int sizey);
-	void center_text(int x, int y, std::u16string Text, int sizex, int sizey);
+	void center_text(int x, int y, std::u16string text, int sizex, int sizey);
 	void render_text(double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
 	bool add_scissor(const frectangle_t& rect);
 	void remove_scissor();
@@ -111,9 +110,10 @@ public:
 	void draw_sprite(const rectangle_t &rect);
 	void draw_rectangle(rectangle_t rect);
 	void stroke_cell(int x, int y, int xs, int ys);
+	void selection_cell(int x, int y, int z, int xs, int ys);
 	void draw_tile(tile_t& tile, rectangle_t rect);
-	void draw_sprite_FBO(double TexWidth, double TexHeight, rectangle_t rect);
-	void draw_tile_FBO(double tx1, double ty1, double tx2, double ty2, rectangle_t rect);
+	void draw_sprite_fbo(double tex_width, double tex_height, rectangle_t rect);
+	void draw_tile_fbo(double tx1, double ty1, double tx2, double ty2, rectangle_t rect);
 	void check_gl_error(const std::string& text);
 	
 

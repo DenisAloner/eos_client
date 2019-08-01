@@ -40,10 +40,9 @@ void Renderer::stop()
 void Renderer::work()
 {
 	// Создаем render context (RC)
-	auto hRC = wglCreateContext(m_hDC);
-	bool is_ok = wglMakeCurrent(m_hDC, hRC);
+	const auto hRC = wglCreateContext(m_hDC);
+	const bool is_ok = wglMakeCurrent(m_hDC, hRC);
 	Logger::Instance().info("Создание контекста OpenGL {}", (is_ok ? "ok" : "err"));
-
 	// Инициализируем графику
 	glbinding::initialize(nullptr);
 	glMatrixMode(GL_PROJECTION);
@@ -64,17 +63,15 @@ void Renderer::work()
 
 	//???? Application::instance().start();
 
-	// Для контроля fps определяем максимальный fps = 60
-	std::chrono::time_point<std::chrono::system_clock> start, end;
 	const std::chrono::milliseconds normal_duration(1000/60);
 	// Выполняем графический цикл, пока renderer не будет остановлен
 	while (m_working)
 	{
-		start = std::chrono::system_clock::now();
+		auto start = std::chrono::system_clock::now();
 		//if (Application::instance().m_GUI) { if (Application::instance().m_GUI->MapViewer) { Application::instance().m_GUI->MapViewer->update(); } }
 		Application::instance().render();
 		SwapBuffers(m_hDC);
-		end = std::chrono::system_clock::now();
+		auto end = std::chrono::system_clock::now();
 
 		// если на отрисовку ушло больше normal_duration, никакой задержки не должно быть
 		if (start + normal_duration < end) continue;
@@ -85,6 +82,6 @@ void Renderer::work()
 	Application::instance().stop();
 
 	// Разрушаем графический контекст OpenGL
-	wglMakeCurrent(NULL, NULL);
+	wglMakeCurrent(nullptr, nullptr);
 	wglDeleteContext(hRC);
 }

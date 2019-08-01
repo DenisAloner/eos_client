@@ -155,7 +155,7 @@ void Application::render()
 	m_update_mutex.unlock();
 }
 
-void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
+void Application::initialize(const dimension_t work_area_size, const HDC m_hDC, const HGLRC hRC)
 {
 	this->m_hDC = m_hDC;
 	this->m_hRC = hRC;
@@ -197,6 +197,7 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 	m_actions[action_e::load] = new Action_load();
 	m_actions[action_e::move_out] = new Action_move_out();
 	m_actions[action_e::rotate_view] = new Action_rotate_view();
+	m_actions[action_e::change_z_level] = new Action_change_z_level();
 
 	for (size_t i = 0; i < action_e::max; i++)
 	{
@@ -206,8 +207,8 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 	Parser parser; //TODO костыль, решить как убрать
 	m_ai_manager = new AI_manager();
 	m_game_object_manager = new GameObjectManager();
-	Game_world gw; //TODO костыль, продумать исправление
-	Parser_context pc(gw); //TODO костыль, продумать исправление
+	const auto gw = new Game_world; //TODO костыль, продумать исправление
+	Parser_context pc(*gw); //TODO костыль, продумать исправление
 	m_game_object_manager->init(pc);
 	Logger::Instance().info ( "Менеджер игровых объектов успешно инициализирован");
 
@@ -216,19 +217,19 @@ void Application::initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC)
 	m_gui_controller.m_GUI->add(m_window_manager);
 	m_gui_controller.m_GUI->add(new GUI_Image((m_size.w - 1024) / 2, (m_size.h - 1024) / 2, 1024, 1024, m_graph->m_logo));
 
-	auto MainMenu = new GUI_Window(0, 0, 400, 400, u"Главное меню");
-	MainMenu->m_position = position_t((m_size.w - MainMenu->m_size.w) / 2, (m_size.h - MainMenu->m_size.h) / 2);
+	auto main_menu = new GUI_Window(0, 0, 400, 400, u"Главное меню");
+	main_menu->m_position = position_t((m_size.w - main_menu->m_size.w) / 2, (m_size.h - main_menu->m_size.h) / 2);
 	auto menu = new GUI_Button_list(0, 0, 400, 400);
 	auto button = new GUI_Mainmenu_button(0, 0, 396, 47, u"Новая игра", parameter_type_e::new_game);
-	button->mouse_click += std::bind(&GUI_Window::on_close, MainMenu, MainMenu);
+	button->mouse_click += std::bind(&GUI_Window::on_close, main_menu, main_menu);
 	menu->add_item_control(button);
 	button = new GUI_Mainmenu_button(0, 0, 396, 47, u"Загрузка игры", parameter_type_e::load_game);
-	button->mouse_click += std::bind(&GUI_Window::on_close, MainMenu, MainMenu);
+	button->mouse_click += std::bind(&GUI_Window::on_close, main_menu, main_menu);
 	menu->add_item_control(button);
 	button = new GUI_Mainmenu_button(0, 0, 396, 47, u"Выход", parameter_type_e::game_quit);
-	button->mouse_click += std::bind(&GUI_Window::on_close, MainMenu, MainMenu);
+	button->mouse_click += std::bind(&GUI_Window::on_close, main_menu, main_menu);
 	menu->add_item_control(button);
-	MainMenu->add(menu);
+	main_menu->add(menu);
 
 	m_graph->set_VSync(false);
 

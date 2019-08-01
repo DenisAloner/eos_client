@@ -38,7 +38,7 @@ public:
 	bool m_just_focused;
 
 	GUI_MapViewer(Application* app);
-	~GUI_MapViewer(void);
+	~GUI_MapViewer();
 
 	int m_tile_count_x;
 	int m_tile_count_y;
@@ -49,11 +49,13 @@ public:
 	int m_cursor_x;
 	int m_cursor_y;
 
+	int m_z_level;
+
 	fposition_t m_shift;
 
 	Player* m_player;
 	GameMap* m_map;
-	GUI_Layer* m_GUI;
+	GUI_Layer* m_gui;
 
 	position_t m_center;
 	position_t m_initial_position;
@@ -73,12 +75,12 @@ public:
 	void on_mouse_drag(MouseEventArgs const& e)override;
 	void on_mouse_end_drag(MouseEventArgs const& e)override;
 	virtual void on_item_get_focus(GUI_Object* sender);
-	virtual void on_lose_focus(GUI_Object* sender);
+	void on_lose_focus(GUI_Object* sender) override;
 	position_t local_xy(position_t p);
-	virtual void set_focus(bool state);
+	void set_focus(bool state) override;
 	void update();
 	virtual bool select(int x, int y);
-	void render(GraphicalController* Graph, int px, int py) override;
+	void render(GraphicalController* graph, int px, int py) override;
 	void calculate();
 	virtual MouseEventArgs set_local_mouse_control(MouseEventArgs const& source);
 };

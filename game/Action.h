@@ -297,12 +297,20 @@ public:
 
 };
 
-class Action_rotate_view :
-	public Action
-{
+class Action_rotate_view :public Action {
 public:
 
 	Action_rotate_view();
+
+	std::u16string get_description(Parameter* parameter) override;
+	void interaction_handler(Parameter* arg) override;
+
+};
+
+class Action_change_z_level :public Action {
+public:
+
+	Action_change_z_level();
 
 	std::u16string get_description(Parameter* parameter) override;
 	void interaction_handler(Parameter* arg) override;

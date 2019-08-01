@@ -147,7 +147,7 @@ GameMap::GameMap()
 	m_dijkstra_map = new Dijkstra_map();
 }
 
-MapCell& GameMap::get(int z,int y, int x)
+MapCell& GameMap::get(const int z, const int y, const int x)
 {
 	return m_items[z*(m_size.dy*m_size.dx) + m_size.dy*y + x];
 }

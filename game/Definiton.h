@@ -209,6 +209,7 @@ public:
 		load,
 		move_out,
 		rotate_view,
+		change_z_level,
 		max
 	};
 };
@@ -1194,7 +1195,7 @@ public:
 
 	template<class T> struct always_false : std::false_type {};
 
-	template<typename T> static void from_json(const std::u16string value, T& prop,Parser_context& context)
+	template<typename T> static void from_json(const std::u16string& value, T& prop,Parser_context& context)
 	{
 		if constexpr (std::is_pointer<T>::value)
 		{

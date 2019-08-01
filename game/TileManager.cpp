@@ -46,10 +46,10 @@ void TileManager_Single_Atlas::set_tile(tile_t& tile, GameObject* obj, int frame
 
 void TileManager_Single_Atlas::set_tile(quad_t& quad, GameObject* obj, int pos, const object_direction_e& direction)
 {
-	const GLdouble x1 = m_frame.x / 950.0;
-	const GLdouble y1 = m_frame.y / 352.0;
-	const GLdouble x2 = (m_frame.x + 38) / 950.0;
-	const GLdouble y2 = (m_frame.y + 44) / 352.0;
+	const auto x1 = m_frame.x / 950.0;
+	const auto y1 = m_frame.y / 352.0;
+	const auto x2 = (m_frame.x + 38) / 950.0;
+	const auto y2 = (m_frame.y + 44) / 352.0;
 	quad.vertex[0].texcoord[0] = x1;
 	quad.vertex[0].texcoord[1] = y2;
 	quad.vertex[0].texcoord[2] = static_cast<double>(m_layer);

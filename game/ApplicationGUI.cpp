@@ -53,7 +53,7 @@ ApplicationGUI::ApplicationGUI(int x, int y, int width, int height, Player* p, G
 	add(Application::instance().m_window_manager);
 	add(MenuLayer);
 	add(MapViewer);
-	MapViewer->m_GUI = MenuLayer;
+	MapViewer->m_gui = MenuLayer;
 	m_main_layer = MenuLayer;
 }
 

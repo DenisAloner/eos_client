@@ -1,5 +1,7 @@
+#define STB_IMAGE_IMPLEMENTATION
 #include "GraphicalController.h"
 #include "TileManager.h"
+#include <stb_image.h>
 
 using namespace gl;
 
@@ -22,11 +24,11 @@ void GraphicalController::check_gl_error(const std::string& text)
 	}
 }
 
-GraphicalController::GraphicalController(dimension_t size)
+GraphicalController::GraphicalController(const dimension_t size)
 {
 	m_size = size;
 	
-	load_font(FileSystem::instance().m_resource_path + "Fonts\\9746.ttf");
+	load_font(FileSystem::instance().m_resource_path + "Fonts\\augusta_modern.ttf");
 
 	try
 	{
@@ -47,6 +49,7 @@ GraphicalController::GraphicalController(dimension_t size)
 		m_actions[14] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_13.bmp");
 		m_actions[15] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_14.bmp");
 		m_actions[16] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_15.bmp");
+		m_actions[17] = png_texture_load(FileSystem::instance().m_resource_path + "Tiles\\up_z_level.png");
 
 		m_horizontal_shader = load_shader("EoS_blur", "EoS_blur_horizontal");
 		m_vertical_shader = load_shader("EoS_blur", "EoS_blur_vertical");
@@ -69,7 +72,7 @@ GraphicalController::GraphicalController(dimension_t size)
 		m_dir = load_texture(FileSystem::instance().m_resource_path + "Tiles\\directions.bmp");
 		m_logo = load_texture(FileSystem::instance().m_resource_path + "Tiles\\logo.bmp");
 	}
-	catch(std::logic_error e)
+	catch(std::logic_error& e)
 	{
 		Logger::Instance().critical("Ошибка при загрузке ресурсов: {}" , e.what());
 	}
@@ -119,17 +122,17 @@ font_symbol_t& GraphicalController::get_symbol(char16_t value)
 		
 		GLuint texture;
 		glGenTextures(1, &texture);
-		
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, m_slot->bitmap.width, m_slot->bitmap.rows, 0, GL_ALPHA, GL_UNSIGNED_BYTE, m_slot->bitmap.buffer);
 		font_symbol_t s;
 		s.id = texture;
-		s.size.w = m_slot->bitmap.width;
-		s.size.h = m_slot->bitmap.rows;
+		s.size.w = int(m_slot->bitmap.width);
+		s.size.h = int(m_slot->bitmap.rows);
 		s.bearing.w = m_slot->bitmap_left;
 		s.bearing.h = s.size.h - m_slot->bitmap_top;
 		m_unicode_symbols[value] = s;
@@ -263,25 +266,25 @@ void GraphicalController::output_text(int x, int y, std::u16string& Text, int si
 std::size_t GraphicalController::measure_text_width(std::u16string& Text)
 {
 	int result = 0;
-	for (int k = 0; k<Text.length(); k++)
+	for (char16_t k : Text)
 	{
-		font_symbol_t& fs = get_symbol(Text[k]);
+		auto& fs = get_symbol(k);
 		result += fs.size.w;
 	}
 	return result;
 }
 
-void GraphicalController::center_text(int x, int y, std::u16string Text, int sizex, int sizey)
+void GraphicalController::center_text(int x, int y, std::u16string text, int sizex, int sizey)
 {
-	int width = 0;
-	for (int k = 0; k<Text.length(); k++)
+	auto width = 0;
+	for (auto k : text)
 	{
-		font_symbol_t& fs = get_symbol(Text[k]);
+		auto& fs = get_symbol(k);
 		width += fs.size.w;
 	}
-	int cx = x - (width / 2);
-	int cy = y - ((m_face->size->metrics.ascender - m_face->size->metrics.descender) >> 7);
-	output_text(cx, cy, Text, sizex, sizey);
+	const auto cx = x - (width / 2);
+	const auto cy = y - ((m_face->size->metrics.ascender - m_face->size->metrics.descender) >> 7);
+	output_text(cx, cy, text, sizex, sizey);
 }
 
 
@@ -325,17 +328,17 @@ void GraphicalController::blur_rect(int x, int y, int width, int height)
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_empty_02, 0);
 	glUseProgram(m_horizontal_shader);
 	set_uniform_sampler(m_horizontal_shader, "Map",0);
-	draw_sprite_FBO(Tx, Ty, rectangle_t(0, m_size.h, width, -height));
+	draw_sprite_fbo(Tx, Ty, rectangle_t(0, m_size.h, width, -height));
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_empty_01, 0);
 	glUseProgram(m_vertical_shader);
 	set_uniform_sampler(m_vertical_shader, "Map",0);
 	glBindTexture(GL_TEXTURE_2D, m_empty_02);
-	draw_sprite_FBO(Tx, Ty, rectangle_t(0, m_size.h, width, -height));
+	draw_sprite_fbo(Tx, Ty, rectangle_t(0, m_size.h, width, -height));
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(0);
 	glEnable(GL_SCISSOR_TEST);
 	glBindTexture(GL_TEXTURE_2D, m_empty_01);
-	draw_sprite_FBO(Tx, Ty, rectangle_t(x,y+height, width, -height));
+	draw_sprite_fbo(Tx, Ty, rectangle_t(x,y+height, width, -height));
 	glColor4f(1.0, 1.0, 1.0, 1.0);
 }
 
@@ -359,7 +362,7 @@ bool GraphicalController::set_uniform_sampler(GLuint object, const char * name, 
 
 bool GraphicalController::set_uniform_ptr(GLuint program, const char * name, const int value)
 {
-	GLint loc = glGetUniformLocation(program, name);
+	const auto loc = glGetUniformLocation(program, name);
 	if (loc < 0)
 		return false;
 	glUniform1iv(loc, 1, &value);
@@ -637,17 +640,17 @@ position_t GraphicalController::get_OpenGL_position(float x, float y)
 	GLint viewport[4];
 	GLdouble modelview[16];
 	GLdouble projection[16];
-	GLfloat winX, winY, winZ;
+	GLfloat win_z;
 
 
 	// ВНИМАНИЕ! Нельзя вызывать функции gl вне графического потока!
 	glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
 	glGetDoublev(GL_PROJECTION_MATRIX, projection);
 	glGetIntegerv(GL_VIEWPORT, viewport);
-	winX = x;
-	winY = (float)viewport[3] - y;
-	glReadPixels(x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
-	return glhUnProjectf(winX, winY, winZ, modelview, projection, viewport);
+	const auto win_x = x;
+	const auto win_y = float(viewport[3]) - y;
+	glReadPixels(x, int(win_y), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &win_z);
+	return glhUnProjectf(win_x, win_y, win_z, modelview, projection, viewport);
 }
 
 //GLuint GraphicalController::load_texture(const char * filename)
@@ -714,148 +717,31 @@ GLuint GraphicalController::load_texture(const std::string& path)
 
 GLuint GraphicalController::png_texture_load(const std::string& path)
 {
-	
-	// This function was originally written by David Grayson for
-	// https://github.com/DavidEGrayson/ahrs-visualizer
+	int width, height, channels;
+	stbi_set_flip_vertically_on_load(true);
+	const auto file_name = path.c_str();
+	const auto image_data = stbi_load(file_name,
+		&width,
+		&height,
+		&channels,
+		STBI_rgb);
 
-	png_byte header[8];
+	//GLenum format;
+	//switch (channels)
+	//{
+	//case PNG_COLOR_TYPE_RGB:
+	//	format = GL_RGB;
+	//	break;
+	//case PNG_COLOR_TYPE_RGB_ALPHA:
+	//	format = GL_RGBA;
+	//	break;
+	//default:
+	//	fprintf(stderr, "%s: Unknown libpng color type %d.\n", file_name, color_type);
+	//	return 0;
+	//}
+	//
 
-	const char * file_name = path.c_str();
-	FILE *fp = fopen(file_name, "rb");
-	if (fp == 0)
-	{
-		perror(file_name);
-		return 0;
-	}
-
-	// read the header
-	fread(header, 1, 8, fp);
-
-	if (png_sig_cmp(header, 0, 8))
-	{
-		fprintf(stderr, "error: %s is not a PNG.\n", file_name);
-		fclose(fp);
-		return 0;
-	}
-
-	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-	if (!png_ptr)
-	{
-		fprintf(stderr, "error: png_create_read_struct returned 0.\n");
-		fclose(fp);
-		return 0;
-	}
-
-	// create png info struct
-	png_infop info_ptr = png_create_info_struct(png_ptr);
-	if (!info_ptr)
-	{
-		fprintf(stderr, "error: png_create_info_struct returned 0.\n");
-		png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
-		fclose(fp);
-		return 0;
-	}
-
-	// create png info struct
-	png_infop end_info = png_create_info_struct(png_ptr);
-	if (!end_info)
-	{
-		fprintf(stderr, "error: png_create_info_struct returned 0.\n");
-		png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
-		fclose(fp);
-		return 0;
-	}
-
-	// the code in this if statement gets called if libpng encounters an error
-	if (setjmp(png_jmpbuf(png_ptr))) {
-		fprintf(stderr, "error from libpng\n");
-		png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
-		fclose(fp);
-		return 0;
-	}
-
-	// init png reading
-	png_init_io(png_ptr, fp);
-
-	// let libpng know you already read the first 8 bytes
-	png_set_sig_bytes(png_ptr, 8);
-
-	// read all the info up to the image data
-	png_read_info(png_ptr, info_ptr);
-
-	// variables to pass to get info
-	int bit_depth, color_type;
-	png_uint_32 temp_width, temp_height;
-
-	// get info about png
-	png_get_IHDR(png_ptr, info_ptr, &temp_width, &temp_height, &bit_depth, &color_type,
-		NULL, NULL, NULL);
-
-	//if (width) { *width = temp_width; }
-	//if (height) { *height = temp_height; }
-
-	//printf("%s: %lux%lu %d\n", file_name, temp_width, temp_height, color_type);
-
-	if (bit_depth != 8)
-	{
-		fprintf(stderr, "%s: Unsupported bit depth %d.  Must be 8.\n", file_name, bit_depth);
-		return 0;
-	}
-
-	GLenum format;
-	switch (color_type)
-	{
-	case PNG_COLOR_TYPE_RGB:
-		format = GL_RGB;
-		break;
-	case PNG_COLOR_TYPE_RGB_ALPHA:
-		format = GL_RGBA;
-		break;
-	default:
-		fprintf(stderr, "%s: Unknown libpng color type %d.\n", file_name, color_type);
-		return 0;
-	}
-
-	// Update the png info struct.
-	png_read_update_info(png_ptr, info_ptr);
-
-	// Row size in bytes.
-	int rowbytes = png_get_rowbytes(png_ptr, info_ptr);
-
-	// glTexImage2d requires rows to be 4-byte aligned
-	rowbytes += 3 - ((rowbytes - 1) % 4);
-
-	// Allocate the image_data as a big block, to be given to opengl
-	png_byte * image_data = (png_byte *)malloc(rowbytes * temp_height * sizeof(png_byte) + 15);
-	if (image_data == NULL)
-	{
-		fprintf(stderr, "error: could not allocate memory for PNG image data\n");
-		png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
-		fclose(fp);
-		return 0;
-	}
-
-	// row_pointers is for pointing to image_data for reading the png with libpng
-	png_byte ** row_pointers = (png_byte **)malloc(temp_height * sizeof(png_byte *));
-	if (row_pointers == NULL)
-	{
-		fprintf(stderr, "error: could not allocate memory for PNG row pointers\n");
-		png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
-		free(image_data);
-		fclose(fp);
-		return 0;
-	}
-
-	// set the individual row_pointers to point at the correct offsets of image_data
-	for (unsigned int i = 0; i < temp_height; i++)
-	{
-		row_pointers[temp_height - 1 - i] = image_data + i * rowbytes;
-	}
-
-	// read the png into image_data through row_pointers
-	png_read_image(png_ptr, row_pointers);
-
-	// Generate the OpenGL texture object
+		// Generate the OpenGL texture object
 	GLuint texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -867,21 +753,8 @@ GLuint GraphicalController::png_texture_load(const std::string& path)
 	//gluBuild2DMipmaps(GL_TEXTURE_2D, format, temp_width, temp_height, format, GL_UNSIGNED_BYTE, image_data);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, format, temp_width, temp_height, 0, format, GL_UNSIGNED_BYTE, image_data);
-	
-
-	//LOG(INFO) << std::to_string(temp_width)<<"  "<< std::to_string(temp_height);
-	/*glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, format, temp_width, temp_height, 0, format, GL_UNSIGNED_BYTE, image_data);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);*/
-
-	// clean up
-	png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
-	free(image_data);
-	free(row_pointers);
-	fclose(fp);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
+	stbi_image_free(image_data);
 	return texture;
 }
 
@@ -890,166 +763,17 @@ GLuint GraphicalController::texture_array_load(const std::vector<std::string>& p
 	GLuint texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
-	for(int cnt=0;cnt<path.size();++cnt)
+	for (std::size_t index = 0; index < path.size(); ++index)
 	{
-		png_byte header[8];
-		const char * file_name = path[cnt].c_str();
-		FILE *fp = fopen(file_name, "rb");
-		if (fp == 0)
-		{
-			perror(file_name);
-			return 0;
+		const auto file_name = path[index].c_str();
+		int width, height, channels;
+		const auto image_data = stbi_load(file_name, &width, &height, &channels, STBI_rgb_alpha);
+		if (index == 0) {
+			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, width, height, path.size(), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 		}
-
-		// read the header
-		fread(header, 1, 8, fp);
-
-		if (png_sig_cmp(header, 0, 8))
-		{
-			fprintf(stderr, "error: %s is not a PNG.\n", file_name);
-			fclose(fp);
-			return 0;
-		}
-
-		png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-		if (!png_ptr)
-		{
-			fprintf(stderr, "error: png_create_read_struct returned 0.\n");
-			fclose(fp);
-			return 0;
-		}
-
-		// create png info struct
-		png_infop info_ptr = png_create_info_struct(png_ptr);
-		if (!info_ptr)
-		{
-			fprintf(stderr, "error: png_create_info_struct returned 0.\n");
-			png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
-			fclose(fp);
-			return 0;
-		}
-
-		// create png info struct
-		png_infop end_info = png_create_info_struct(png_ptr);
-		if (!end_info)
-		{
-			fprintf(stderr, "error: png_create_info_struct returned 0.\n");
-			png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
-			fclose(fp);
-			return 0;
-		}
-
-		// the code in this if statement gets called if libpng encounters an error
-		if (setjmp(png_jmpbuf(png_ptr))) {
-			fprintf(stderr, "error from libpng\n");
-			png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
-			fclose(fp);
-			return 0;
-		}
-
-		// init png reading
-		png_init_io(png_ptr, fp);
-
-		// let libpng know you already read the first 8 bytes
-		png_set_sig_bytes(png_ptr, 8);
-
-		// read all the info up to the image data
-		png_read_info(png_ptr, info_ptr);
-
-		// variables to pass to get info
-		int bit_depth, color_type;
-		png_uint_32 temp_width, temp_height;
-
-		// get info about png
-		png_get_IHDR(png_ptr, info_ptr, &temp_width, &temp_height, &bit_depth, &color_type,
-			NULL, NULL, NULL);
-
-		if(cnt==0)
-		{
-			//glTexStorage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, temp_width, temp_height, path.size());
-			glTexImage3D(GL_TEXTURE_2D_ARRAY,
-				0,                // level
-				GL_RGBA8,         // Internal format
-				temp_width, temp_height, path.size(), // width,height,depth
-				0,
-				GL_RGBA,          // format
-				GL_UNSIGNED_BYTE, // type
-				0);
-		}
-
-		//if (width) { *width = temp_width; }
-		//if (height) { *height = temp_height; }
-
-		//printf("%s: %lux%lu %d\n", file_name, temp_width, temp_height, color_type);
-
-		if (bit_depth != 8)
-		{
-			fprintf(stderr, "%s: Unsupported bit depth %d.  Must be 8.\n", file_name, bit_depth);
-			return 0;
-		}
-
-		GLenum format;
-		switch (color_type)
-		{
-		case PNG_COLOR_TYPE_RGB:
-			format = GL_RGB;
-			break;
-		case PNG_COLOR_TYPE_RGB_ALPHA:
-			format = GL_RGBA;
-			break;
-		default:
-			fprintf(stderr, "%s: Unknown libpng color type %d.\n", file_name, color_type);
-			return 0;
-		}
-
-		// Update the png info struct.
-		png_read_update_info(png_ptr, info_ptr);
-
-		// Row size in bytes.
-		int rowbytes = png_get_rowbytes(png_ptr, info_ptr);
-
-		// glTexImage2d requires rows to be 4-byte aligned
-		rowbytes += 3 - ((rowbytes - 1) % 4);
-
-		// Allocate the image_data as a big block, to be given to opengl
-		png_byte * image_data = (png_byte *)malloc(rowbytes * temp_height * sizeof(png_byte) + 15);
-		if (image_data == NULL)
-		{
-			fprintf(stderr, "error: could not allocate memory for PNG image data\n");
-			png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
-			fclose(fp);
-			return 0;
-		}
-
-		// row_pointers is for pointing to image_data for reading the png with libpng
-		png_byte ** row_pointers = (png_byte **)malloc(temp_height * sizeof(png_byte *));
-		if (row_pointers == NULL)
-		{
-			fprintf(stderr, "error: could not allocate memory for PNG row pointers\n");
-			png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
-			free(image_data);
-			fclose(fp);
-			return 0;
-		}
-
-		// set the individual row_pointers to point at the correct offsets of image_data
-		for (unsigned int i = 0; i < temp_height; i++)
-		{
-			row_pointers[temp_height - 1 - i] = image_data + i * rowbytes;
-		}
-
-		// read the png into image_data through row_pointers
-		png_read_image(png_ptr, row_pointers);
-
-		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, cnt, temp_width, temp_height, 1, format, GL_UNSIGNED_BYTE, image_data);
-
-		// clean up
-		png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
-		free(image_data);
-		free(row_pointers);
-		fclose(fp);
+		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, index, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+		stbi_image_free(image_data);
 	}
-
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -1165,11 +889,10 @@ void GraphicalController::draw_rectangle(rectangle_t rect)
 	glEnd();
 }
 
-void GraphicalController::stroke_cell(int x,int y, int xs, int ys)
+void GraphicalController::stroke_cell(const int x, const int y, const int xs, const int ys)
 {
-	int x0, y0;
-	x0 = (x - y) * tile_size_x_half + xs;
-	y0 = (x + y) * tile_size_y_half + ys;
+	const auto x0 = (x - y) * tile_size_x_half + xs;
+	const auto y0 = (x + y) * tile_size_y_half + ys;
 	glBegin(GL_LINES);
 	glVertex2d(x0, y0 - tile_size_y_half);
 	glVertex2d(x0 + tile_size_x_half, y0 - tile_size_y);
@@ -1179,6 +902,40 @@ void GraphicalController::stroke_cell(int x,int y, int xs, int ys)
 	glVertex2d(x0 + tile_size_x_half, y0);
 	glVertex2d(x0 + tile_size_x_half, y0);
 	glVertex2d(x0, y0 - tile_size_y_half);
+	glEnd();
+}
+
+void GraphicalController::selection_cell(const int x, const int y,const int z, const int xs, const int ys)
+{
+	const auto x0 = (x - y) * tile_size_x_half + xs;
+	const auto y0 = (x + y) * tile_size_y_half + ys;
+	const auto y1 = y0 - (z + 1) * tile_size_y;
+	glBegin(GL_LINES);
+	//glVertex2d(x0, y0 - tile_size_y_half);
+	//glVertex2d(x0 + tile_size_x_half, y0 - tile_size_y);
+	//glVertex2d(x0 + tile_size_x_half, y0 - tile_size_y);
+	//glVertex2d(x0 + tile_size_x, y0 - tile_size_y_half);
+	glVertex2d(x0 + tile_size_x, y0 - tile_size_y_half);
+	glVertex2d(x0 + tile_size_x_half, y0);
+	glVertex2d(x0 + tile_size_x_half, y0);
+	glVertex2d(x0, y0 - tile_size_y_half);
+
+	glVertex2d(x0, y1 - tile_size_y_half);
+	glVertex2d(x0 + tile_size_x_half, y1 - tile_size_y);
+	glVertex2d(x0 + tile_size_x_half, y1 - tile_size_y);
+	glVertex2d(x0 + tile_size_x, y1 - tile_size_y_half);
+	glVertex2d(x0 + tile_size_x, y1 - tile_size_y_half);
+	glVertex2d(x0 + tile_size_x_half, y1);
+	glVertex2d(x0 + tile_size_x_half, y1);
+	glVertex2d(x0, y1 - tile_size_y_half);
+
+	glVertex2d(x0, y0 - tile_size_y_half);
+	glVertex2d(x0, y1 - tile_size_y_half);
+	glVertex2d(x0 + tile_size_x_half, y0);
+	glVertex2d(x0 + tile_size_x_half, y1);
+	glVertex2d(x0 + tile_size_x, y0 - tile_size_y_half);
+	glVertex2d(x0 + tile_size_x, y1 - tile_size_y_half);
+
 	glEnd();
 }
 
@@ -1192,21 +949,21 @@ void GraphicalController::draw_tile(tile_t& tile, rectangle_t rect)
 	glEnd();
 }
 
-void GraphicalController::draw_sprite_FBO(double TexWidth, double TexHeight, rectangle_t rect)
+void GraphicalController::draw_sprite_fbo(double tex_width, double tex_height, rectangle_t rect)
 {
 	glBegin(GL_QUADS);
-	glTexCoord2d(0, TexHeight); 
+	glTexCoord2d(0, tex_height); 
 	glVertex2d(rect.a.x, rect.b.y);
 	glTexCoord2d(0, 0); 
 	glVertex2d(rect.a.x, rect.a.y);
-	glTexCoord2d(TexWidth, 0); 
+	glTexCoord2d(tex_width, 0); 
 	glVertex2d(rect.b.x, rect.a.y);
-	glTexCoord2d(TexWidth, TexHeight); 
+	glTexCoord2d(tex_width, tex_height); 
 	glVertex2d(rect.b.x, rect.b.y);
 	glEnd();
 }
 
-void GraphicalController::draw_tile_FBO(double tx1, double ty1, double tx2, double ty2, rectangle_t rect)
+void GraphicalController::draw_tile_fbo(double tx1, double ty1, double tx2, double ty2, rectangle_t rect)
 {
 	glBegin(GL_QUADS);
 	glMultiTexCoord2f(GL_TEXTURE0, tx1, ty2);

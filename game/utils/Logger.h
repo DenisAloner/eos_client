@@ -11,8 +11,8 @@ class Logger
 public:
 	static Logger& Instance()
 	{
-		static Logger theSingleInstance;
-		return theSingleInstance;
+		static Logger the_single_instance;
+		return the_single_instance;
 	}
 
 	template<typename... Args> void info(const char* fmt, const Args& ... args)

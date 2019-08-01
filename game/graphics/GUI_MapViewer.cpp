@@ -821,6 +821,7 @@ void mapviewer_object_rotate::render_on_cell(GUI_MapViewer* owner,MapCell* c)
 
 GUI_MapViewer::GUI_MapViewer(Application* app)
 {
+	m_z_level = 0;
 	m_max_count = 0;
 	m_tile_count_x = 90;
 	m_tile_count_y = 90;
@@ -899,25 +900,26 @@ struct rgb
 	GLfloat value[3];
 };
 
-void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
+void GUI_MapViewer::render(GraphicalController* graph, int px, int py)
 {
+	graph->check_gl_error("test");
 	float light[4];
-	glBindFramebuffer(GL_FRAMEBUFFER, Graph->m_FBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, graph->m_FBO);
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glUseProgram(0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, graph->m_empty_01, 0);
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_02, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, graph->m_empty_02, 0);
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_03, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, graph->m_empty_03, 0);
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	bool IsDraw;
-	tile_t tile;
+	bool is_draw;
+	tile_t tile{};
 	int x;
 	int y;
 	int xf;
@@ -938,15 +940,15 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	bool is_in_fov;
 
 	Application::instance().m_UI_mutex.lock();
-	for (auto current = Application::instance().m_gui_controller.m_hints.begin(); current != Application::instance().m_gui_controller.m_hints.end(); ++current)
+	for (auto& m_hint : Application::instance().m_gui_controller.m_hints)
 	{
-		(*current)->init(this);
+		m_hint->init(this);
 	}
 	Application::instance().m_UI_mutex.unlock();
 
 	bool m_observer;
-	AI_enemy* ai = dynamic_cast<AI_enemy*>(m_player->m_object->m_active_state->m_ai);
-	Vision_list* vl = dynamic_cast<Vision_list*>(m_player->m_object->m_active_state->get_list(interaction_e::vision));
+	auto ai = dynamic_cast<AI_enemy*>(m_player->m_object->m_active_state->m_ai);
+	auto vl = dynamic_cast<Vision_list*>(m_player->m_object->m_active_state->get_list(interaction_e::vision));
 	m_observer = !vl;
 	int max_fov_radius;
 	view_t fov;
@@ -960,284 +962,284 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 	GraphicalController::rectangle_t rect;
 
 	int count = 0;
-		for (int i = 0; i < (m_tile_count_x + m_tile_count_y) - 1; i++)
+	for (int i = 0; i < (m_tile_count_x + m_tile_count_y) - 1; i++)
+	{
+		if (i < m_tile_count_y)
 		{
-			if (i < m_tile_count_y)
+			j_limit = i + 1;
+			gx = m_tile_count_x;
+			gy = m_tile_count_y - i - 1;
+		}
+		else
+		{
+			j_limit = (m_tile_count_x + m_tile_count_y) - i;
+			gx = (m_tile_count_x + m_tile_count_y) - i;
+			gy = -1;
+		}
+		for (int j = 0; j < j_limit; j++)
+		{
+
+			gx -= 1;
+			gy += 1;
+
+			/*float sin_a = -1;
+			float cos_a = 0;
+			x = m_center.x + (gx - m_tile_count_x / 2) * cos_a - (gy - m_tile_count_y / 2) *sin_a;
+			y = m_center.y + (gy - m_tile_count_y / 2) * cos_a + (gx - m_tile_count_x / 2) *sin_a;*/
+
+			switch (m_rotate)
 			{
-				j_limit = i + 1;
-				gx = m_tile_count_x;
-				gy = m_tile_count_y - i - 1;
+			case 0:
+			{
+				x = m_center.x + (gx - m_tile_count_x / 2);
+				y = m_center.y + (gy - m_tile_count_y / 2);
+				break;
 			}
-			else
+			case 1:
 			{
-				j_limit = (m_tile_count_x + m_tile_count_y) - i;
-				gx = (m_tile_count_x + m_tile_count_y) - i;
-				gy = -1;
+				x = m_center.x - (gy - m_tile_count_y / 2);
+				y = m_center.y + (gx - m_tile_count_x / 2);
+				break;
 			}
-			for (int j = 0; j < j_limit; j++)
+			case 2:
 			{
-				
-				gx -= 1;
-				gy += 1;
+				x = m_center.x - (gx - m_tile_count_x / 2);
+				y = m_center.y - (gy - m_tile_count_y / 2);
+				break;
+			}
+			case 3:
+			{
+				x = m_center.x + (gy - m_tile_count_y / 2);
+				y = m_center.y - (gx - m_tile_count_x / 2);
+				break;
+			}
+			}
 
-				/*float sin_a = -1;
-				float cos_a = 0;
-				x = m_center.x + (gx - m_tile_count_x / 2) * cos_a - (gy - m_tile_count_y / 2) *sin_a;
-				y = m_center.y + (gy - m_tile_count_y / 2) * cos_a + (gx - m_tile_count_x / 2) *sin_a;*/
-
-				switch (m_rotate)
+			xf = x - m_player->m_object->cell()->x - posc.x;
+			yf = y - m_player->m_object->cell()->y + posc.y;
+			if ((x > -1) && (x < m_map->m_size.dx) && (y > -1) && (y < m_map->m_size.dy))
+			{
+				if (m_observer)
 				{
-				case 0:
-				{
-					x = m_center.x + (gx - m_tile_count_x / 2);
-					y = m_center.y + (gy - m_tile_count_y / 2);
-					break;
+					is_in_fov = true;
 				}
-				case 1:
+				else
 				{
-					x = m_center.x - (gy - m_tile_count_y / 2);
-					y = m_center.y + (gx - m_tile_count_x / 2);
-					break;
-				}
-				case 2:
-				{
-					x = m_center.x - (gx - m_tile_count_x / 2);
-					y = m_center.y - (gy - m_tile_count_y / 2);
-					break;
-				}
-				case 3:
-				{
-					x = m_center.x + (gy - m_tile_count_y / 2);
-					y = m_center.y - (gx - m_tile_count_x / 2);
-					break;
-				}
-				}
-
-				xf = x - m_player->m_object->cell()->x - posc.x;
-				yf = y - m_player->m_object->cell()->y + posc.y;
-				if ((x > -1) && (x<m_map->m_size.dx) && (y>-1) && (y < m_map->m_size.dy))
-				{
-					if (m_observer)
+					if ((xf >= -fov.l) && (xf <= fov.r) && (yf >= -fov.d) && (yf <= fov.u))
 					{
 						is_in_fov = true;
 					}
 					else
 					{
-						if ((xf >= -fov.l) && (xf <= fov.r) && (yf >= -fov.d) && (yf <= fov.u))
-						{
-							is_in_fov = true;
-						}
-						else
-						{
-							is_in_fov = false;
-						}
+						is_in_fov = false;
 					}
+				}
 
-					for (int z = 0; z < m_map->m_size.dz; ++z)
+				for (int z = 0; z < m_map->m_size.dz; ++z)
+				{
+					auto& cell = m_map->get(z, y, x);
+					for (auto current = cell.m_items.begin(); current != cell.m_items.end(); ++current)
 					{
-						MapCell& cell = m_map->get(z, y, x);
-						for (auto Current = cell.m_items.begin(); Current != cell.m_items.end(); ++Current)
-						{
-							light[0] = cell.m_light.R * 0.01F;
-							light[1] = cell.m_light.G * 0.01F;
-							light[2] = cell.m_light.B * 0.01F;
-							light[3] = 0.0;
+						light[0] = cell.m_light.R * 0.01F;
+						light[1] = cell.m_light.G * 0.01F;
+						light[2] = cell.m_light.B * 0.01F;
+						light[3] = 0.0;
 						/*	light[0] = 1.0;
 							light[1] = 1.0;
 							light[2] = 1.0;
 							light[3] = 0.0;*/
-							is_hide = false;
-							IsDraw = false;
-							passable = (*Current)->get_stat(object_tag_e::pass_able);
-							/*if ((r == 0 && passable) || (r == 1 && !passable))
-							{*/
-								switch (m_rotate)
-								{
-								case 0:
-								{
-									xx = x;
-									yy = y;
-									break;
-								}
-								case 1:
-								{
-									xx = x;
-									yy = y +(*Current)->m_active_state->m_size.dy - 1;
-									break;
-								}
-								case 2:
-								{
-									xx = x -(*Current)->m_active_state->m_size.dx + 1;
-									yy = y +(*Current)->m_active_state->m_size.dy - 1;
-									break;
-								}
-								case 3:
-								{
-									xx = x - (*Current)->m_active_state->m_size.dx + 1;
-									yy = y;
-									break;
-								}
-								}
-								//if ((*Current)->cell()->z == z && (*Current)->cell()->y == yy && (*Current)->cell()->x  == xx)
-								{
-								size3d = (*Current)->m_active_state->m_size;
-								
-									
-									IsDraw = true;
-								/*	if (m_observer)
-									{
-										IsDraw = true;
-									}
-									else
-									{
-										if (is_in_fov)
-										{
-											if (ai->m_fov->m_map[fov.d + yf][fov.l + xf].visible)
-											{
+						is_hide = false;
+						is_draw = false;
+						passable = (*current)->get_stat(object_tag_e::pass_able);
+						/*if ((r == 0 && passable) || (r == 1 && !passable))
+						{*/
+						switch (m_rotate)
+						{
+						case 0:
+						{
+							xx = x;
+							yy = y;
+							break;
+						}
+						case 1:
+						{
+							xx = x;
+							yy = y + (*current)->m_active_state->m_size.dy - 1;
+							break;
+						}
+						case 2:
+						{
+							xx = x - (*current)->m_active_state->m_size.dx + 1;
+							yy = y + (*current)->m_active_state->m_size.dy - 1;
+							break;
+						}
+						case 3:
+						{
+							xx = x - (*current)->m_active_state->m_size.dx + 1;
+							yy = y;
+							break;
+						}
+						}
+						//if ((*Current)->cell()->z == z && (*Current)->cell()->y == yy && (*Current)->cell()->x  == xx)
+						{
+							size3d = (*current)->m_active_state->m_size;
 
-												IsDraw = true;
-											}
+
+							is_draw = true;
+							/*	if (m_observer)
+								{
+									IsDraw = true;
+								}
+								else
+								{
+									if (is_in_fov)
+									{
+										if (ai->m_fov->m_map[fov.d + yf][fov.l + xf].visible)
+										{
+
+											IsDraw = true;
 										}
 									}
+								}
 
-									if (!IsDraw)
+								if (!IsDraw)
+								{
+									if (size3d.dx > 1 || size3d.dy > 1)
 									{
-										if (size3d.dx > 1 || size3d.dy > 1)
+										for (int m = 0; m < size3d.dy; m++)
 										{
-											for (int m = 0; m < size3d.dy; m++)
+											for (int n = 0; n < size3d.dx; n++)
 											{
-												for (int n = 0; n < size3d.dx; n++)
+												if ((xf + n >= -fov.l) && (xf + n <= fov.r) && (yf - m >= -fov.d) && (yf - m <= fov.u))
 												{
-													if ((xf + n >= -fov.l) && (xf + n <= fov.r) && (yf - m >= -fov.d) && (yf - m <= fov.u))
+													if (ai->m_fov->m_map[fov.d + yf - m][fov.l + xf + n].visible)
 													{
-														if (ai->m_fov->m_map[fov.d + yf - m][fov.l + xf + n].visible)
-														{
-															IsDraw = true;
-														}
+														IsDraw = true;
 													}
 												}
 											}
 										}
-										else if (m_map->get(0, y, x).m_notable)
+									}
+									else if (m_map->get(0, y, x).m_notable)
+									{
+										if (((*Current)->m_name == u"floor") || ((*Current)->m_name == u"wall"))
 										{
-											if (((*Current)->m_name == u"floor") || ((*Current)->m_name == u"wall"))
-											{
-												IsDraw = true;
-												is_hide = true;
-											}
+											IsDraw = true;
+											is_hide = true;
 										}
-									}*/
-								}
-							/*}*/
-							if (IsDraw)
+									}
+								}*/
+						}
+						/*}*/
+						if (is_draw)
+						{
+							object_size = (*current)->m_active_state->m_tile_size;
+							auto yp = m_tile_count_x - px - gx;
+							auto xp = m_tile_count_y - py - gy;
+							rect.set((xp - yp) * tile_size_x_half + m_shift.x, (xp + yp) * tile_size_y_half + m_shift.y - z * tile_size_y, object_size.w, -object_size.h);
+							// считаем среднюю освещенность для многотайловых объектов
+							//if (size3d.dx > 1 || size3d.dy > 1)
+							//{
+							//	light[0] = 0;
+							//	light[1] = 0;
+							//	light[2] = 0;
+							//	for (int m = 0; m < size3d.dy; m++)
+							//	{
+							//		for (int n = 0; n < size3d.dx; n++)
+							//		{
+							//			light[0] += m_map->get(0, y - m, x + n).m_light.R;
+							//			light[1] += m_map->get(0, y - m, x + n).m_light.G;
+							//			light[2] += m_map->get(0, y - m, x + n).m_light.B;
+							//		}
+							//	}
+							//	light[0] = light[0] / (size3d.dx*size3d.dy*100.0F);
+							//	light[1] = light[1] / (size3d.dx*size3d.dy*100.0F);
+							//	light[2] = light[2] / (size3d.dx*size3d.dy*100.0F);
+							//	/*		light[0] = 1.0;
+							//			light[1] = 1.0;
+							//			light[2] = 1.0;
+							//			light[3] = 0.0;*/
+							//}
+
+							/*if (is_hide)
 							{
-								object_size = (*Current)->m_active_state->m_tile_size;
-								int yp = m_tile_count_x - px - gx;
-								int xp = m_tile_count_y - py - gy;
-								rect.set((xp - yp) * tile_size_x_half + m_shift.x, (xp + yp) * tile_size_y_half + m_shift.y - z * 22, object_size.w, -object_size.h);
-								// считаем среднюю освещенность для многотайловых объектов
-								//if (size3d.dx > 1 || size3d.dy > 1)
-								//{
-								//	light[0] = 0;
-								//	light[1] = 0;
-								//	light[2] = 0;
-								//	for (int m = 0; m < size3d.dy; m++)
-								//	{
-								//		for (int n = 0; n < size3d.dx; n++)
-								//		{
-								//			light[0] += m_map->get(0, y - m, x + n).m_light.R;
-								//			light[1] += m_map->get(0, y - m, x + n).m_light.G;
-								//			light[2] += m_map->get(0, y - m, x + n).m_light.B;
-								//		}
-								//	}
-								//	light[0] = light[0] / (size3d.dx*size3d.dy*100.0F);
-								//	light[1] = light[1] / (size3d.dx*size3d.dy*100.0F);
-								//	light[2] = light[2] / (size3d.dx*size3d.dy*100.0F);
-								//	/*		light[0] = 1.0;
-								//			light[1] = 1.0;
-								//			light[2] = 1.0;
-								//			light[3] = 0.0;*/
-								//}
+								glUseProgram(Graph->m_tile_shader_hide);
+							}
+							else
+							{
+								glUseProgram(Graph->m_tile_shader);
+							}*/
+							int pos;
+							switch (m_rotate)
+							{
+							case 0:
+							{
+								pos = abs((*current)->cell()->z - z) * (size3d.dx * size3d.dy) + abs((*current)->cell()->y - yy) * size3d.dx + abs((*current)->cell()->x - xx);
+								break;
+							}
+							case 1:
+							{
+								pos = abs((*current)->cell()->z - z) * (size3d.dx * size3d.dy) + abs((*current)->cell()->x - xx) * size3d.dx + abs((*current)->cell()->y - yy);
+								break;
+							}
+							case 2:
+							{
+								pos = abs((*current)->cell()->z - z) * (size3d.dx * size3d.dy) + abs((*current)->cell()->y - yy) * size3d.dx + abs((*current)->cell()->x - xx);
+								break;
+							}
+							case 3:
+							{
+								pos = abs((*current)->cell()->z - z) * (size3d.dx * size3d.dy) + abs((*current)->cell()->x - xx) * size3d.dx + abs((*current)->cell()->y - yy);
+								break;
+							}
+							}
 
-								/*if (is_hide)
-								{
-									glUseProgram(Graph->m_tile_shader_hide);
-								}
-								else
-								{
-									glUseProgram(Graph->m_tile_shader);
-								}*/
-								int pos;
-								switch (m_rotate)
-								{
-								case 0:
-								{
-									pos = abs((*Current)->cell()->z - z)*(size3d.dx*size3d.dy) + abs((*Current)->cell()->y - yy)*size3d.dx + abs((*Current)->cell()->x - xx);
-									break;
-								}
-								case 1:
-								{
-									pos = abs((*Current)->cell()->z - z)*(size3d.dx*size3d.dy) + abs((*Current)->cell()->x - xx)*size3d.dx + abs((*Current)->cell()->y - yy);
-									break;
-								}
-								case 2:
-								{
-									pos = abs((*Current)->cell()->z - z)*(size3d.dx*size3d.dy) + abs((*Current)->cell()->y - yy)*size3d.dx + abs((*Current)->cell()->x - xx);
-									break;
-								}
-								case 3:
-								{
-									pos = abs((*Current)->cell()->z - z)*(size3d.dx*size3d.dy) + abs((*Current)->cell()->x - xx)*size3d.dx + abs((*Current)->cell()->y - yy);
-									break;
-								}
-								}
-								
-								/*if ((*Current)->m_name == u"darkeye")
-								{
-									LOG(INFO) << std::to_string(pos);
-								}*/
-								(*Current)->m_active_state->m_tile_manager->set_tile(m_quads[count], (*Current), pos, Game_algorithm::get_direction((*Current)->m_direction, m_rotate));
-								//GLuint Sprite = tile.unit;
-								glEnable(GL_BLEND);
-								glEnable(GL_TEXTURE_2D);
-								glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-						/*		glActiveTexture(GL_TEXTURE0);
-								glBindTexture(GL_TEXTURE_2D, Sprite);*/
-								//Graph->set_uniform_sampler(Graph->m_tile_shader, "Map", 0);
-								//Graph->set_uniform_vector(Graph->m_tile_shader, "light", light);
-								/*glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
-								glUseProgramObjectARB(0);*/
+							/*if ((*Current)->m_name == u"darkeye")
+							{
+								LOG(INFO) << std::to_string(pos);
+							}*/
+							(*current)->m_active_state->m_tile_manager->set_tile(m_quads[count], (*current), pos, Game_algorithm::get_direction((*current)->m_direction, m_rotate));
+							//GLuint Sprite = tile.unit;
+							glEnable(GL_BLEND);
+							glEnable(GL_TEXTURE_2D);
+							glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+							/*		glActiveTexture(GL_TEXTURE0);
+									glBindTexture(GL_TEXTURE_2D, Sprite);*/
+									//Graph->set_uniform_sampler(Graph->m_tile_shader, "Map", 0);
+									//Graph->set_uniform_vector(Graph->m_tile_shader, "light", light);
+									/*glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
+									glUseProgramObjectARB(0);*/
 
-								auto& vb = m_quads[count];
+							auto& vb = m_quads[count];
 
-								vb.vertex[0].position[0] = rect.a.x;
-								vb.vertex[0].position[1] = rect.b.y;
-								vb.vertex[1].position[0] = rect.a.x;
-								vb.vertex[1].position[1] = rect.a.y;
-								vb.vertex[2].position[0] = rect.b.x;
-								vb.vertex[2].position[1] = rect.a.y;
-								vb.vertex[3].position[0] = rect.b.x;
-								vb.vertex[3].position[1] = rect.b.y;
+							vb.vertex[0].position[0] = rect.a.x;
+							vb.vertex[0].position[1] = rect.b.y;
+							vb.vertex[1].position[0] = rect.a.x;
+							vb.vertex[1].position[1] = rect.a.y;
+							vb.vertex[2].position[0] = rect.b.x;
+							vb.vertex[2].position[1] = rect.a.y;
+							vb.vertex[3].position[0] = rect.b.x;
+							vb.vertex[3].position[1] = rect.b.y;
 
-								//auto& lb = m_light[count];
-								vb.vertex[0].light[0] = light[0];
-								vb.vertex[0].light[1] = light[1];
-								vb.vertex[0].light[2] = light[2];
+							//auto& lb = m_light[count];
+							vb.vertex[0].light[0] = light[0];
+							vb.vertex[0].light[1] = light[1];
+							vb.vertex[0].light[2] = light[2];
 
-								vb.vertex[1].light[0] = light[0];
-								vb.vertex[1].light[1] = light[1];
-								vb.vertex[1].light[2] = light[2];
+							vb.vertex[1].light[0] = light[0];
+							vb.vertex[1].light[1] = light[1];
+							vb.vertex[1].light[2] = light[2];
 
-								vb.vertex[2].light[0] = light[0];
-								vb.vertex[2].light[1] = light[1];
-								vb.vertex[2].light[2] = light[2];
+							vb.vertex[2].light[0] = light[0];
+							vb.vertex[2].light[1] = light[1];
+							vb.vertex[2].light[2] = light[2];
 
-								vb.vertex[3].light[0] = light[0];
-								vb.vertex[3].light[1] = light[1];
-								vb.vertex[3].light[2] = light[2];
+							vb.vertex[3].light[0] = light[0];
+							vb.vertex[3].light[1] = light[1];
+							vb.vertex[3].light[2] = light[2];
 
-				
-					
+
+
 
 							/*	auto& tb = m_textcoords[count];
 								tb.value[0] = 0.0;
@@ -1252,186 +1254,267 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 
 								//LOG(INFO) << std::to_string(m_textcoords[count].value[1]);
 
-								count += 1;
-
-								
-
-								/*tb[0].value[0] = 1.0;
-								tb[0].value[1] = 0;
-								tb[0].value[2] = 0;
-								tb[1].value[0] = 1.0;
-								tb[1].value[1] = 0;
-								tb[1].value[2] = 0;
-								tb[2].value[0] = 1.0;
-								tb[2].value[1] = 0;
-								tb[2].value[2] = 0;
-								tb[3].value[0] = 0;
-								tb[3].value[1] = 0;
-								tb[3].value[2] = 0;*/
-					
-
-								//glBindBuffer(GL_ARRAY_BUFFER, m_textcoor_buffer);
-								//glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 12, tb, GL_DYNAMIC_DRAW);
-								//glColorPointer(3, GL_FLOAT, 0, nullptr);
-
-								
+							count += 1;
 
 
-								//Graph->draw_tile(tile, rect);
 
-								if ((*Current)->cell()->x == m_map->get(0, y, x).x)
+							/*tb[0].value[0] = 1.0;
+							tb[0].value[1] = 0;
+							tb[0].value[2] = 0;
+							tb[1].value[0] = 1.0;
+							tb[1].value[1] = 0;
+							tb[1].value[2] = 0;
+							tb[2].value[0] = 1.0;
+							tb[2].value[1] = 0;
+							tb[2].value[2] = 0;
+							tb[3].value[0] = 0;
+							tb[3].value[1] = 0;
+							tb[3].value[2] = 0;*/
+
+
+							//glBindBuffer(GL_ARRAY_BUFFER, m_textcoor_buffer);
+							//glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 12, tb, GL_DYNAMIC_DRAW);
+							//glColorPointer(3, GL_FLOAT, 0, nullptr);
+
+
+
+
+							//Graph->draw_tile(tile, rect);
+
+							if ((*current)->cell()->x == m_map->get(0, y, x).x)
+							{
+								/*auto* feat = (*Current)->get_parameter(interaction_e::health);
+								if (feat)
 								{
-									/*auto* feat = (*Current)->get_parameter(interaction_e::health);
-									if (feat)
-									{
-									float x0, y0, x1, y1, x2, y2, x3, y3;
-									float h = feat->m_basic_value / 100.0;
-									x0 = (px + gx - object_size.w / 2.0 + 1)*m_tile_size_x - 32;
-									y0 = (m_tile_count_y - py - gy - object_size.h)*m_tile_size_y - 8;
-									x1 = x0;
-									y1 = (m_tile_count_y - py - gy - object_size.h)*m_tile_size_y;
-									x2 = (px + gx - object_size.w / 2.0 + 1)*m_tile_size_x + 32;
-									y2 = y1;
-									x3 = x2;
-									y3 = y0;
-									glUseProgram(0);
-									glDisable(GL_TEXTURE_2D);
-									glColor4d(1.0 - h, h, 0.0, 0.5);
-									glBegin(GL_LINES);
-									glVertex2d(x0, y0);
-									glVertex2d(x1, y1);
-									glVertex2d(x1, y1);
-									glVertex2d(x2, y2);
-									glVertex2d(x2, y2);
-									glVertex2d(x3, y3);
-									glVertex2d(x3, y3);
-									glVertex2d(x0, y0);
-									glEnd();
-									x0 = (px + gx - object_size.w / 2.0 + 1)*m_tile_size_x - 32;
-									x1 = x0;
-									x2 = x0 + (h)* 64;
-									x3 = x2;
-									Graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
-									glEnable(GL_TEXTURE_2D);
-									}*/
-								}
-
-								//if ((*Current)->m_active_state->m_layer == 1)
-								//{
-								//	/*if (is_hide)
-								//	{
-								//		glUseProgram(Graph->m_tile_shader_hide);
-								//	}
-								//	else
-								//	{*/
-								//	glUseProgram(Graph->m_tile_shader);
-								//	/*}*/
-								//	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_02, 0);
-								//	Graph->draw_tile(tile, rect);
-
-								//	/*glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
-								//	glUseProgram(Graph->m_mask_shader2);
-								//	glActiveTexture(GL_TEXTURE0);
-								//	glBindTexture(GL_TEXTURE_2D, Graph->m_empty_03);
-								//	Graph->set_uniform_sampler(Graph->m_mask_shader2, "Map", 0);
-								//	glActiveTexture(GL_TEXTURE1);
-								//	glBindTexture(GL_TEXTURE_2D, Sprite);
-								//	Graph->set_uniform_sampler(Graph->m_mask_shader2, "Unit", 1);
-								//	glActiveTexture(GL_TEXTURE0);
-								//	Graph->draw_tile_FBO(x1 / 1024.0, (1024 - y1) / 1024.0, x3 / 1024.0, (1024 - y3) / 1024.0, x0, y0, x1, y1, x2, y2, x3, y3);*/
-								//}
-
-								//if ((*Current)->m_active_state->m_layer == 2)
-								//{
-								//	/*glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
-								//	glUseProgram(Graph->m_mask_shader2);
-								//	glActiveTexture(GL_TEXTURE0);
-								//	glBindTexture(GL_TEXTURE_2D, Graph->m_empty_03);
-								//	Graph->set_uniform_sampler(Graph->m_mask_shader2, "Map1", 0);
-								//	glActiveTexture(GL_TEXTURE1);
-								//	glBindTexture(GL_TEXTURE_2D, Sprite);
-								//	Graph->set_uniform_sampler(Graph->m_mask_shader2, "Unit", 1);
-								//	glActiveTexture(GL_TEXTURE2);
-								//	glBindTexture(GL_TEXTURE_2D, Graph->m_empty_02);
-								//	Graph->set_uniform_sampler(Graph->m_mask_shader2, "Map2", 2);
-								//	glActiveTexture(GL_TEXTURE0);
-								//	Graph->draw_tile_FBO(x1 /(float)m_size.w, (m_size.h - y1) / (float)m_size.h, x3 / (float)m_size.w, (m_size.h - y3) /(float) m_size.h, x0, y0, x1, y1, x2, y2, x3, y3);*/
-
-								//	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
-								//	glUseProgram(Graph->m_mask_shader);
-								//	glActiveTexture(GL_TEXTURE0);
-								//	glBindTexture(GL_TEXTURE_2D, Graph->m_empty_02);
-								//	Graph->set_uniform_sampler(Graph->m_mask_shader, "Map", 0);
-								//	glActiveTexture(GL_TEXTURE1);
-								//	glBindTexture(GL_TEXTURE_2D, Sprite);
-								//	Graph->set_uniform_sampler(Graph->m_mask_shader, "Unit", 1);
-								//	glActiveTexture(GL_TEXTURE0);
-								//	Graph->draw_tile_FBO(rect.a.x / static_cast<float>(m_size.w), (m_size.h - rect.a.y) / static_cast<float>(m_size.h), rect.b.x / static_cast<float>(m_size.w), (m_size.h - rect.b.y) / static_cast<float>(m_size.h), rect);
-								//}
-
+								float x0, y0, x1, y1, x2, y2, x3, y3;
+								float h = feat->m_basic_value / 100.0;
+								x0 = (px + gx - object_size.w / 2.0 + 1)*m_tile_size_x - 32;
+								y0 = (m_tile_count_y - py - gy - object_size.h)*m_tile_size_y - 8;
+								x1 = x0;
+								y1 = (m_tile_count_y - py - gy - object_size.h)*m_tile_size_y;
+								x2 = (px + gx - object_size.w / 2.0 + 1)*m_tile_size_x + 32;
+								y2 = y1;
+								x3 = x2;
+								y3 = y0;
+								glUseProgram(0);
+								glDisable(GL_TEXTURE_2D);
+								glColor4d(1.0 - h, h, 0.0, 0.5);
+								glBegin(GL_LINES);
+								glVertex2d(x0, y0);
+								glVertex2d(x1, y1);
+								glVertex2d(x1, y1);
+								glVertex2d(x2, y2);
+								glVertex2d(x2, y2);
+								glVertex2d(x3, y3);
+								glVertex2d(x3, y3);
+								glVertex2d(x0, y0);
+								glEnd();
+								x0 = (px + gx - object_size.w / 2.0 + 1)*m_tile_size_x - 32;
+								x1 = x0;
+								x2 = x0 + (h)* 64;
+								x3 = x2;
+								Graph->draw_sprite(x0, y0, x1, y1, x2, y2, x3, y3);
+								glEnable(GL_TEXTURE_2D);
+								}*/
 							}
+
+							//if ((*Current)->m_active_state->m_layer == 1)
+							//{
+							//	/*if (is_hide)
+							//	{
+							//		glUseProgram(Graph->m_tile_shader_hide);
+							//	}
+							//	else
+							//	{*/
+							//	glUseProgram(Graph->m_tile_shader);
+							//	/*}*/
+							//	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_02, 0);
+							//	Graph->draw_tile(tile, rect);
+
+							//	/*glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
+							//	glUseProgram(Graph->m_mask_shader2);
+							//	glActiveTexture(GL_TEXTURE0);
+							//	glBindTexture(GL_TEXTURE_2D, Graph->m_empty_03);
+							//	Graph->set_uniform_sampler(Graph->m_mask_shader2, "Map", 0);
+							//	glActiveTexture(GL_TEXTURE1);
+							//	glBindTexture(GL_TEXTURE_2D, Sprite);
+							//	Graph->set_uniform_sampler(Graph->m_mask_shader2, "Unit", 1);
+							//	glActiveTexture(GL_TEXTURE0);
+							//	Graph->draw_tile_FBO(x1 / 1024.0, (1024 - y1) / 1024.0, x3 / 1024.0, (1024 - y3) / 1024.0, x0, y0, x1, y1, x2, y2, x3, y3);*/
+							//}
+
+							//if ((*Current)->m_active_state->m_layer == 2)
+							//{
+							//	/*glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
+							//	glUseProgram(Graph->m_mask_shader2);
+							//	glActiveTexture(GL_TEXTURE0);
+							//	glBindTexture(GL_TEXTURE_2D, Graph->m_empty_03);
+							//	Graph->set_uniform_sampler(Graph->m_mask_shader2, "Map1", 0);
+							//	glActiveTexture(GL_TEXTURE1);
+							//	glBindTexture(GL_TEXTURE_2D, Sprite);
+							//	Graph->set_uniform_sampler(Graph->m_mask_shader2, "Unit", 1);
+							//	glActiveTexture(GL_TEXTURE2);
+							//	glBindTexture(GL_TEXTURE_2D, Graph->m_empty_02);
+							//	Graph->set_uniform_sampler(Graph->m_mask_shader2, "Map2", 2);
+							//	glActiveTexture(GL_TEXTURE0);
+							//	Graph->draw_tile_FBO(x1 /(float)m_size.w, (m_size.h - y1) / (float)m_size.h, x3 / (float)m_size.w, (m_size.h - y3) /(float) m_size.h, x0, y0, x1, y1, x2, y2, x3, y3);*/
+
+							//	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
+							//	glUseProgram(Graph->m_mask_shader);
+							//	glActiveTexture(GL_TEXTURE0);
+							//	glBindTexture(GL_TEXTURE_2D, Graph->m_empty_02);
+							//	Graph->set_uniform_sampler(Graph->m_mask_shader, "Map", 0);
+							//	glActiveTexture(GL_TEXTURE1);
+							//	glBindTexture(GL_TEXTURE_2D, Sprite);
+							//	Graph->set_uniform_sampler(Graph->m_mask_shader, "Unit", 1);
+							//	glActiveTexture(GL_TEXTURE0);
+							//	Graph->draw_tile_FBO(rect.a.x / static_cast<float>(m_size.w), (m_size.h - rect.a.y) / static_cast<float>(m_size.h), rect.b.x / static_cast<float>(m_size.w), (m_size.h - rect.b.y) / static_cast<float>(m_size.h), rect);
+							//}
+
 						}
 					}
-					/*Application::instance().m_UI_mutex.lock();
-						for (auto current = Application::instance().m_gui_controller.m_hints.begin(); current != Application::instance().m_gui_controller.m_hints.end(); ++current)
-						{
-							(*current)->render_on_cell(this,&m_map->get(0,y, x));
+					if (m_z_level== z) {
+						if (m_cursored != nullptr && m_cursored->x == cell.x && m_cursored->y == cell.y) {
+							auto item = m_cursored;
+						/*	int x;
+							int y;
+
+							switch (m_rotate) {
+							case 0: {
+								x = px + item->x - m_center.x + m_tile_count_x / 2;
+								y = py + item->y - m_center.y + m_tile_count_y / 2;
+								break;
+							}
+							case 1: {
+								x = -m_center.y + item->y + m_tile_count_x / 2;
+								y = m_center.x - item->x + m_tile_count_y / 2;
+								break;
+							}
+							case 2: {
+								x = m_center.x - item->x + m_tile_count_x / 2;
+								y = m_center.y - item->y + m_tile_count_y / 2;
+								break;
+							}
+							case 3: {
+								x = m_center.y - item->y + m_tile_count_x / 2;
+								y = -m_center.x + item->x + m_tile_count_y / 2;
+								break;
+							}
+							}*/
+							
+							auto yp = m_tile_count_x - px - gx;
+							auto xp = m_tile_count_y - py - gy;
+							rect.set((xp - yp)* tile_size_x_half + m_shift.x, (xp + yp)* tile_size_y_half + m_shift.y - z * tile_size_y, tile_size_x, -2 * tile_size_y);
+							auto& vb = m_quads[count];
+
+							vb.vertex[0].position[0] = rect.a.x;
+							vb.vertex[0].position[1] = rect.b.y;
+							vb.vertex[1].position[0] = rect.a.x;
+							vb.vertex[1].position[1] = rect.a.y;
+							vb.vertex[2].position[0] = rect.b.x;
+							vb.vertex[2].position[1] = rect.a.y;
+							vb.vertex[3].position[0] = rect.b.x;
+							vb.vertex[3].position[1] = rect.b.y;
+
+						
+							vb.vertex[0].light[0] = 1;
+							vb.vertex[0].light[1] = 1;
+							vb.vertex[0].light[2] = 1;
+
+							vb.vertex[1].light[0] = 1;
+							vb.vertex[1].light[1] = 1;
+							vb.vertex[1].light[2] = 1;
+
+							vb.vertex[2].light[0] = 1;
+							vb.vertex[2].light[1] = 1;
+							vb.vertex[2].light[2] = 1;
+
+							vb.vertex[3].light[0] = 1;
+							vb.vertex[3].light[1] = 1;
+							vb.vertex[3].light[2] = 1;
+
+							const auto x1 = 0 / 950.0;
+							const auto y1 = 220 / 352.0;
+							const auto x2 = (0 + 38) / 950.0;
+							const auto y2 = (220 + 44) / 352.0;
+							vb.vertex[0].texcoord[0] = x1;
+							vb.vertex[0].texcoord[1] = y2;
+							vb.vertex[0].texcoord[2] = static_cast<double>(1);
+
+							vb.vertex[1].texcoord[0] = x1;
+							vb.vertex[1].texcoord[1] = y1;
+							vb.vertex[1].texcoord[2] = static_cast<double>(1);
+
+							vb.vertex[2].texcoord[0] = x2;
+							vb.vertex[2].texcoord[1] = y1;
+							vb.vertex[2].texcoord[2] = static_cast<double>(1);
+
+							vb.vertex[3].texcoord[0] = x2;
+							vb.vertex[3].texcoord[1] = y2;
+							vb.vertex[3].texcoord[2] = static_cast<double>(1);
+
+							count += 1;
 						}
-						Application::instance().m_UI_mutex.unlock();*/
+					}
 				}
+				/*Application::instance().m_UI_mutex.lock();
+					for (auto current = Application::instance().m_gui_controller.m_hints.begin(); current != Application::instance().m_gui_controller.m_hints.end(); ++current)
+					{
+						(*current)->render_on_cell(this,&m_map->get(0,y, x));
+					}
+					Application::instance().m_UI_mutex.unlock();*/
 			}
 		}
+	}
 
-		if(count>m_max_count)
-		{
-			m_max_count = count;
-			Logger::Instance().info( "m_max_count: " + std::to_string(m_max_count));
-		}
-
-		glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
-		glUseProgram(Graph->m_atlas_shader);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D_ARRAY,Graph->m_atlas);
-		Graph->set_uniform_sampler(Graph->m_atlas_shader, "atlas", 0);
-		glBindVertexArray(m_vao);
-		glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
-        #define BUFFER_OFFSET(i) ((char *)NULL + (i))
-		glBufferData(GL_ARRAY_BUFFER, sizeof(quad_t)* count, &m_quads[0], GL_DYNAMIC_DRAW);
-		glVertexAttribPointer(0, 2, GL_INT, GL_FALSE, sizeof(vertex_t), position_offset);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 3, GL_DOUBLE, GL_FALSE, sizeof(vertex_t), texcoord_offset);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), light_offset);
-		glEnableVertexAttribArray(2);
-		glDrawArrays(GL_QUADS, 0, 4*count);
-		glBindVertexArray(0);
-		
-		/*Application::instance().m_UI_mutex.lock();
-		if (r == 0)
-		{
-			for (auto current = Application::instance().m_gui_controller.m_hints.begin(); current != Application::instance().m_gui_controller.m_hints.end(); ++current)
-			{
-				if (!(*current)->m_top)
-				{
-					(*current)->render(this);
-				}
-			}
-		}
-		else
-		{
-			for (auto current = Application::instance().m_gui_controller.m_hints.begin(); current != Application::instance().m_gui_controller.m_hints.end(); ++current)
-			{
-				if ((*current)->m_top)
-				{
-					(*current)->render(this);
-				}
-			}
-		}
-		Application::instance().m_UI_mutex.unlock();*/
-
-	if (m_cursored != nullptr)
+	if (count > m_max_count)
 	{
-		MapCell* Item = m_cursored;
+		m_max_count = count;
+		Logger::Instance().info("m_max_count : " + std::to_string(m_max_count));
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
+	glUseProgram(graph->m_atlas_shader);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, graph->m_atlas);
+	graph->set_uniform_sampler(graph->m_atlas_shader, "atlas", 0);
+	glBindVertexArray(m_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
+	#define BUFFER_OFFSET(i) ((char *)NULL + (i))
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quad_t) * count, &m_quads[0], GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(0, 2, GL_INT, GL_FALSE, sizeof(vertex_t), position_offset);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_DOUBLE, GL_FALSE, sizeof(vertex_t), texcoord_offset);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), light_offset);
+	glEnableVertexAttribArray(2);
+	Logger::Instance().info("check " + std::to_string(m_max_count));
+	glDrawArrays(GL_QUADS, 0, 4 * count);
+	glBindVertexArray(0);
+	/*Application::instance().m_UI_mutex.lock();
+	if (r == 0)
+	{
+		for (auto current = Application::instance().m_gui_controller.m_hints.begin(); current != Application::instance().m_gui_controller.m_hints.end(); ++current)
+		{
+			if (!(*current)->m_top)
+			{
+				(*current)->render(this);
+			}
+		}
+	}
+	else
+	{
+		for (auto current = Application::instance().m_gui_controller.m_hints.begin(); current != Application::instance().m_gui_controller.m_hints.end(); ++current)
+		{
+			if ((*current)->m_top)
+			{
+				(*current)->render(this);
+			}
+		}
+	}
+	Application::instance().m_UI_mutex.unlock();*/
+
+	if (m_cursored != nullptr){
+		auto item = m_cursored;
 
 		/*int x = px + Item->x - m_center.x + m_tile_count_x / 2;
 		int y = py + Item->y - m_center.y + m_tile_count_y / 2;*/
@@ -1439,30 +1522,25 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 		int x;
 		int y;
 
-		switch (m_rotate)
-		{
-		case 0:
-		{
-			x = px + Item->x - m_center.x + m_tile_count_x / 2;
-			y = py + Item->y - m_center.y + m_tile_count_y / 2;
+		switch (m_rotate) {
+		case 0: {
+			x = px + item->x - m_center.x + m_tile_count_x / 2;
+			y = py + item->y - m_center.y + m_tile_count_y / 2;
 			break;
 		}
-		case 1:
-		{
-			x = -m_center.y + Item->y + m_tile_count_x / 2;
-			y = m_center.x - Item->x + m_tile_count_y / 2;
+		case 1: {
+			x = -m_center.y + item->y + m_tile_count_x / 2;
+			y = m_center.x - item->x + m_tile_count_y / 2;
 			break;
 		}
-		case 2:
-		{
-			x = m_center.x - Item->x + m_tile_count_x / 2;
-			y = m_center.y - Item->y + m_tile_count_y / 2;
+		case 2: {
+			x = m_center.x - item->x + m_tile_count_x / 2;
+			y = m_center.y - item->y + m_tile_count_y / 2;
 			break;
 		}
-		case 3:
-		{
-			x = m_center.y - Item->y + m_tile_count_x / 2;
-			y = -m_center.x + Item->x + m_tile_count_y / 2;
+		case 3: {
+			x = m_center.y - item->y + m_tile_count_x / 2;
+			y = -m_center.x + item->x + m_tile_count_y / 2;
 			break;
 		}
 		}
@@ -1476,41 +1554,19 @@ void GUI_MapViewer::render(GraphicalController* Graph, int px, int py)
 		//y2 = (m_tile_count_y - y) * m_tile_size_y;
 		//x3 = (x + 1) * m_tile_size_x;
 		//y3 = (m_tile_count_y - y - m_cursor_y) * m_tile_size_y;
-		int yp = m_tile_count_x - x;
-		int xp = m_tile_count_y - y;
-		rect.set((xp - yp) * tile_size_x_half + m_shift.x, (xp + yp) * tile_size_y_half + m_shift.y, tile_size_x, -tile_size_y);
+		auto yp = m_tile_count_x - x;
+		auto xp = m_tile_count_y - y;
+		rect.set((xp - yp)* tile_size_x_half + m_shift.x, (xp + yp - m_z_level * 2)* tile_size_y_half + m_shift.y, tile_size_x, -tile_size_y);
 		glUseProgram(0);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Graph->m_empty_01, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, graph->m_empty_01, 0);
 		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glActiveTexture(GL_TEXTURE0);
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, Graph->m_select);
-		glColor4f(0.0, 1.0, 0.0, 0.25);
-		Graph->draw_sprite(rect);
-		glDisable(GL_BLEND);
 		glDisable(GL_TEXTURE_2D);
-		glColor4f(0.0, 1.0, 0.0, 1.0);
-		Application::instance().m_graph->stroke_cell(xp,yp,m_shift.x, m_shift.y);
-		glEnable(GL_BLEND);
-		glEnable(GL_TEXTURE_2D);
-		/*	glDisable(GL_BLEND);
-			glDisable(GL_TEXTURE_2D);
-			glBegin(GL_LINES);
-			glColor4f(0.0, 1.0, 0.0, 1.0);
-			glVertex2d(x0, y0);
-			glVertex2d(x1, y1);
-			glVertex2d(x1, y1);
-			glVertex2d(x2, y2);
-			glVertex2d(x2, y2);
-			glVertex2d(x3, y3);
-			glVertex2d(x3, y3);
-			glVertex2d(x0, y0);
-			glEnd();*/
-		glEnable(GL_BLEND);
+		glColor4f(0.0, 1.0, 0.0, 0.75);
+		Application::instance().m_graph->selection_cell(xp, yp, m_z_level, int(m_shift.x), int(m_shift.y));
 		glEnable(GL_TEXTURE_2D);
 		glColor4f(1.0, 1.0, 1.0, 1.0);
 	}
+
 	//glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
 	//glUseProgram(0);
 	//glDisable(GL_BLEND);
@@ -1591,84 +1647,73 @@ void GUI_MapViewer::on_key_press(WPARAM w)
 	}
 }
 
-void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e)
-{
-	if (e.key == mk_left)
-	{
-			position_t p = local_xy(position_t(e.position.x, e.position.y));
-			int x;
-			int y;
-			x = m_center.x + p.x - m_tile_count_x / 2;
-			y = m_center.y + p.y - m_tile_count_y / 2;
+void GUI_MapViewer::on_mouse_click(MouseEventArgs const& e) {
+	if (e.key == mk_left) {
+		const auto p = local_xy(position_t(e.position.x, e.position.y));
+		auto x = m_center.x + p.x - m_tile_count_x / 2;
+		auto y = m_center.y + p.y - m_tile_count_y / 2;
+		switch (m_rotate) {
+		case 0:
+		{
+			x = m_center.x + (p.x - m_tile_count_x / 2);
+			y = m_center.y + (p.y - m_tile_count_y / 2);
+			break;
+		}
+		case 1:
+		{
+			x = m_center.x - (p.y - m_tile_count_y / 2);
+			y = m_center.y + (p.x - m_tile_count_x / 2);
+			break;
+		}
+		case 2:
+		{
+			x = m_center.x - (p.x - m_tile_count_x / 2);
+			y = m_center.y - (p.y - m_tile_count_y / 2);
+			break;
+		}
+		case 3:
+		{
+			x = m_center.x + (p.y - m_tile_count_y / 2);
+			y = m_center.y - (p.x - m_tile_count_x / 2);
+			break;
+		}
+		}
 
-			switch (m_rotate)
-			{
-			case 0:
-			{
-				x = m_center.x + (p.x - m_tile_count_x / 2);
-				y = m_center.y + (p.y - m_tile_count_y / 2);
-				break;
-			}
-			case 1:
-			{
-				x = m_center.x - (p.y - m_tile_count_y / 2);
-				y = m_center.y + (p.x - m_tile_count_x / 2);
-				break;
-			}
-			case 2:
-			{
-				x = m_center.x - (p.x - m_tile_count_x / 2);
-				y = m_center.y - (p.y - m_tile_count_y / 2);
-				break;
-			}
-			case 3:
-			{
-				x = m_center.x + (p.y - m_tile_count_y / 2);
-				y = m_center.y - (p.x - m_tile_count_x / 2);
-				break;
-			}
-			}
-
-			if (!m_just_focused)
-			{
-				if (!((x<0) || (x>m_map->m_size.dx - 1) || (y<0) || (y>m_map->m_size.dy - 1)))
+		if (!m_just_focused) {
+			if (!(x < 0 || x > m_map->m_size.dx - 1 || y < 0 || y > m_map->m_size.dy - 1)) {
+				const auto parameter = new Parameter(parameter_type_e::owner);
+				(*parameter)[0].set(&m_map->get(m_z_level, y, x));
+				if (Application::instance().m_message_queue.m_reader)
 				{
-					Parameter* p = new Parameter(parameter_type_e::owner);
-					(*p)[0].set(&m_map->get(0,y, x));
-					if (Application::instance().m_message_queue.m_reader)
-					{
-						Application::instance().m_message_queue.push(p);
-					}
+					Application::instance().m_message_queue.push(parameter);
 				}
 			}
-			m_just_focused = false;
+		}
+		m_just_focused = false;
 	}
 	else {
-		Select_object_popmenu *PopMenu;
-		PopMenu = new Select_object_popmenu();
-		PopMenu->m_position.x = e.position.x;
-		PopMenu->m_position.y = e.position.y;
-		position_t p = local_xy(position_t(e.position.x, e.position.y));
-		int x;
-		int y;
+		auto pop_menu = new Select_object_popmenu();
+		pop_menu->m_position.x = e.position.x;
+		pop_menu->m_position.y = e.position.y;
+		const auto p = local_xy(position_t(e.position.x, e.position.y));
 
-		x = m_center.x + p.x - m_tile_count_x / 2;
-		y = m_center.y + p.y - m_tile_count_y / 2;
-		if (!((x<0) || (x>m_map->m_size.dx - 1) || (y<0) || (y>m_map->m_size.dy - 1)))
+		const auto x = m_center.x + p.x - m_tile_count_x / 2;
+		const auto y = m_center.y + p.y - m_tile_count_y / 2;
+		if (!((x < 0) || (x > m_map->m_size.dx - 1) || (y < 0) || (y > m_map->m_size.dy - 1)))
 		{
 			//UnderCursor(CursorEventArgs(e.x, e.y));
-			for (std::list<GameObject*>::iterator Current = m_map->get(0,y, x).m_items.begin(); Current != m_map->get(0,y, x).m_items.end(); ++Current)
+			for (auto& m_item : m_map->get(m_z_level, y, x).m_items)
 			{
-				PopMenu->add_item((*Current)->m_name, (*Current));
+				pop_menu->add_item(m_item->m_name, m_item);
 			}
 		}
-		if (PopMenu->m_items.size() == 0)
+		if (pop_menu->m_items.empty())
 		{
-			PopMenu->add_item(u"Нет действий", nullptr);
+			pop_menu->add_item(u"Нет действий", nullptr);
 		}
-		PopMenu->destroy += std::bind(&GUI_Layer::remove, m_GUI, std::placeholders::_1);
-		m_GUI->add_front(PopMenu);
-		PopMenu->m_items.front()->set_focus(true);
+		pop_menu->destroy += std::bind(&GUI_Layer::remove, m_gui, std::placeholders::_1);
+		m_gui->add_front(pop_menu);
+		pop_menu->m_items.front()->set_focus(true);
 	}
 }
 
@@ -1788,22 +1833,22 @@ void GUI_MapViewer::on_lose_focus(GUI_Object* sender)
 	m_cursored = nullptr;
 }
 
-position_t GUI_MapViewer::local_xy(position_t p)
+position_t GUI_MapViewer::local_xy(const position_t p)
 {
-	float x = (p.x - m_shift.x - tile_size_x_half) / tile_size_x;
-	float y = (p.y - m_shift.y) / tile_size_y;
-	position_t Result = position_t(m_tile_count_x - (m_tile_count_y - x - m_tile_count_x + y), m_tile_count_y - (x + y));
+	const auto x = (p.x - m_shift.x - tile_size_x_half) / tile_size_x;
+	const auto y = (p.y - m_shift.y) / tile_size_y;
+	auto result = position_t(m_tile_count_x - (m_tile_count_y - x - m_tile_count_x + y), m_tile_count_y - (x + y));
 	
-	if (Result.x > m_tile_count_x - 1) { Result.x = m_tile_count_x - 1; }
-	if (Result.x < 0) { Result.x = 0; }
-	if (Result.y > m_tile_count_y - 1) { Result.y = m_tile_count_y - 1; }
-	if (Result.y < 0) { Result.y = 0; }
-	return Result;
+	if (result.x > m_tile_count_x - 1) { result.x = m_tile_count_x - 1; }
+	if (result.x < 0) { result.x = 0; }
+	if (result.y > m_tile_count_y - 1) { result.y = m_tile_count_y - 1; }
+	if (result.y < 0) { result.y = 0; }
+	return result;
 }
 
 void GUI_MapViewer::on_mouse_move(MouseEventArgs const& e)
 {
-	position_t p = local_xy(e.position);
+	const auto p = local_xy(e.position);
 	/*int x = m_center.x + p.x - m_tile_count_x / 2;
 	int y = m_center.y + p.y - m_tile_count_y / 2;*/
 
@@ -1837,22 +1882,22 @@ void GUI_MapViewer::on_mouse_move(MouseEventArgs const& e)
 		break;
 	}
 	}
-	
+
 	if (!(x < 0 || x > m_map->m_size.dx - 1 || y < 0 || y > m_map->m_size.dy - 1))
 	{
-		m_cursored = &m_map->get(0,y, x);
+		m_cursored = &m_map->get(m_z_level, y, x);
 	}
 
-		MouseEventArgs LocalMouseEventArgs = set_local_mouse_control(e);
-		if (m_focus)
-		{
-			m_focus->mouse_move(LocalMouseEventArgs);
-		}
+	const auto local_mouse_event_args = set_local_mouse_control(e);
+	if (m_focus)
+	{
+		m_focus->mouse_move(local_mouse_event_args);
+	}
 }
 
 void GUI_MapViewer::on_mouse_start_drag(MouseEventArgs const& e)
 {
-	position_t p = local_xy(position_t(e.position.x, e.position.y));
+	const auto p = local_xy(position_t(e.position.x, e.position.y));
 	switch (m_rotate)
 	{
 	case 0:
@@ -1884,7 +1929,7 @@ void GUI_MapViewer::on_mouse_start_drag(MouseEventArgs const& e)
 
 void GUI_MapViewer::on_mouse_drag(MouseEventArgs const& e)
 {
-	position_t p = local_xy(position_t(e.position.x, e.position.y));
+	const auto p = local_xy(position_t(e.position.x, e.position.y));
 	switch (m_rotate)
 	{
 	case 0:

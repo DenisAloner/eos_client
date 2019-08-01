@@ -60,26 +60,6 @@ find_library(FREETYPE_LIB_RELEASE freetype
        DOC "freetype libraries"
 )
 
-find_library(LIBPNG_LIB_DEBUG libpng16
-       PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/debug
-       DOC "libpng libraries"
-)
-
-find_library(LIBPNG_LIB_RELEASE libpng16
-       PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/release
-       DOC "libpng libraries"
-)
-
-find_library(ZLIB_LIB_DEBUG zlibd
-       PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/debug
-       DOC "zlib libraries"
-)
-
-find_library(ZLIB_LIB_RELEASE zlib
-       PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/release
-       DOC "zlib libraries"
-)
-
 include_directories(
 	${PROJECT_DIR}
 	${PROJECT_DIR}/game
@@ -93,8 +73,6 @@ set(EXT_LIBRARIES
 	${OGL_LIB}
     $<$<CONFIG:Debug>:${GLBINDING_LIB_DEBUG}>$<$<CONFIG:Release>:${GLBINDING_LIB_RELEASE}>
 	$<$<CONFIG:Debug>:${FREETYPE_LIB_DEBUG}>$<$<CONFIG:Release>:${FREETYPE_LIB_RELEASE}>
-    $<$<CONFIG:Debug>:${LIBPNG_LIB_DEBUG}>$<$<CONFIG:Release>:${LIBPNG_LIB_RELEASE}>
-    $<$<CONFIG:Debug>:${ZLIB_LIB_DEBUG}>$<$<CONFIG:Release>:${ZLIB_LIB_RELEASE}>
 )
 
 include(${PROJECT_DIR}/cmake_build/common/game.cmake)

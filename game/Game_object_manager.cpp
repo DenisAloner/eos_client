@@ -16,12 +16,12 @@ void GameObjectManager::init(Parser_context& context)
 
 	bytearray json;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.json", json);
-	std::u16string json_config(json);
+	const std::u16string json_config(json);
 
 
-	std::u16string temp(json_config);
-	scheme_map_t* s = Parser::read_object(temp);
-	m_config->from_json(s,context);
+	auto temp(json_config);
+	const auto s = Parser::read_object(temp);
+	m_config->from_json(s, context);
 	delete s;
 
 	//m_items.insert(m_config->m_items.begin(), m_config->m_items.end());
@@ -29,13 +29,13 @@ void GameObjectManager::init(Parser_context& context)
 
 GameObject* GameObjectManager::new_object(std::string unit_name)
 {
-	GameObject& obj = Application::instance().m_world->m_object_manager.m_items.emplace_back();
+	auto& obj = Application::instance().m_world->m_object_manager.m_items.emplace_back();
 	const auto it = m_config->m_items.find(unit_name);
 	if (it == m_config->m_items.end())
 	{
 		Logger::Instance().critical ("Ёлемент `" + unit_name + "` отсутствует в m_items");
 	}
-	GameObject& config = it->second;
+	auto& config = it->second;
 	
 	/*Parser::reset_object_counter();
 	config.reset_serialization_index();
@@ -44,10 +44,9 @@ GameObject* GameObjectManager::new_object(std::string unit_name)
 
 	obj.m_direction = config.m_direction;
 	obj.m_name = config.m_name;
-	Object_state* state;
 	for (auto& item : config.m_state)
 	{
-		state = item->clone();
+		auto state = item->clone();
 		obj.m_state.push_back(state);
 	}
 	obj.m_active_state = obj.m_state.front();
@@ -90,10 +89,9 @@ effect_prefix_e GameObjectManager::get_effect_prefix_e(const std::string& key)
 
 void GameObjectManager::bind_body(GameObject* object)
 {
-	Interaction_list* list;
 	for (auto item = object->m_state.begin(); item != object->m_state.end(); ++item)
 	{
-		Interaction_list* list = (*item)->get_list(interaction_e::body);
+		auto list = (*item)->get_list(interaction_e::body);
 		if (list)
 		{
 			Visitor_part_hierarchy_setter setter;
