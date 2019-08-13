@@ -39,11 +39,11 @@ void Renderer::stop()
 
 void Renderer::work()
 {
-	// Создаем render context (RC)
+	// РЎРѕР·РґР°РµРј render context (RC)
 	const auto hRC = wglCreateContext(m_hDC);
 	const bool is_ok = wglMakeCurrent(m_hDC, hRC);
-	Logger::Instance().info("Создание контекста OpenGL {}", (is_ok ? "ok" : "err"));
-	// Инициализируем графику
+	Logger::instance().info("РЎРѕР·РґР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° OpenGL {}", (is_ok ? "ok" : "err"));
+	// РРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РіСЂР°С„РёРєСѓ
 	glbinding::initialize(nullptr);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -51,7 +51,7 @@ void Renderer::work()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	// Инициализируем приложение
+	// РРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РїСЂРёР»РѕР¶РµРЅРёРµ
 	Application::instance().initialize(m_size,m_hDC, hRC);
 
 
@@ -59,12 +59,12 @@ void Renderer::work()
 	//???? Application::instance().m_GUI->MapViewer->m_center.y = Application::instance().m_GUI->MapViewer->m_player->m_object->cell()->y;
 
 
-	// Запускаем потоки приложения
+	// Р—Р°РїСѓСЃРєР°РµРј РїРѕС‚РѕРєРё РїСЂРёР»РѕР¶РµРЅРёСЏ
 
 	//???? Application::instance().start();
 
 	const std::chrono::milliseconds normal_duration(1000/60);
-	// Выполняем графический цикл, пока renderer не будет остановлен
+	// Р’С‹РїРѕР»РЅСЏРµРј РіСЂР°С„РёС‡РµСЃРєРёР№ С†РёРєР», РїРѕРєР° renderer РЅРµ Р±СѓРґРµС‚ РѕСЃС‚Р°РЅРѕРІР»РµРЅ
 	while (m_working)
 	{
 		auto start = std::chrono::system_clock::now();
@@ -73,15 +73,15 @@ void Renderer::work()
 		SwapBuffers(m_hDC);
 		auto end = std::chrono::system_clock::now();
 
-		// если на отрисовку ушло больше normal_duration, никакой задержки не должно быть
+		// РµСЃР»Рё РЅР° РѕС‚СЂРёСЃРѕРІРєСѓ СѓС€Р»Рѕ Р±РѕР»СЊС€Рµ normal_duration, РЅРёРєР°РєРѕР№ Р·Р°РґРµСЂР¶РєРё РЅРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ
 		if (start + normal_duration < end) continue;
 		auto duration(std::chrono::duration_cast<std::chrono::microseconds>(end - start));
 		std::this_thread::sleep_for(normal_duration - duration);
 	}
-	// renderer остановлен, останавливаем потоки приложения
+	// renderer РѕСЃС‚Р°РЅРѕРІР»РµРЅ, РѕСЃС‚Р°РЅР°РІР»РёРІР°РµРј РїРѕС‚РѕРєРё РїСЂРёР»РѕР¶РµРЅРёСЏ
 	Application::instance().stop();
 
-	// Разрушаем графический контекст OpenGL
+	// Р Р°Р·СЂСѓС€Р°РµРј РіСЂР°С„РёС‡РµСЃРєРёР№ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 	wglMakeCurrent(nullptr, nullptr);
 	wglDeleteContext(hRC);
 }

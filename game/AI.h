@@ -27,7 +27,7 @@ struct Node
 	int f;
 	Node* parent;
 
-	Node(MapCell* c, int G, int H, Node* p = nullptr) : cell(c), g(G), h(H), parent(p), f(g + h) {}
+	Node(MapCell* c, int G, int H, Node* p = nullptr) : cell(c), g(G), h(H), f(g + h), parent(p) {}
 };
 
 class min_heap
@@ -53,8 +53,8 @@ public:
 
 	static Path& instance()
 	{
-		static Path Singleton;
-		return Singleton;
+		static Path singleton;
+		return singleton;
 	}
 
 	GameObject* m_unit;
@@ -72,7 +72,7 @@ public:
 	int manhattan(MapCell* a, MapCell* b,MapCell* c);
 	std::vector<MapCell*>* get_path();
 	std::vector<MapCell*>* get_path_to_cell();
-	void insert_into_open(int x, int y, int dg, Node* p);
+	void insert_into_open(int x, int y,int z, int dg, Node* p);
 	int is_in_open(MapCell* c);
 	std::vector<MapCell*>* back(Node* c);
 
@@ -112,7 +112,7 @@ public:
 	virtual GameObject* find_goal() = 0;
 	virtual void create() = 0;
 	virtual AI* clone() = 0;
-	virtual void calculate_FOV(GameObject* object, GameMap* map) = 0;
+	virtual void calculate_fov(GameObject* object, GameMap* map) = 0;
 
 	Packer_generic& get_packer() override = 0;
 
@@ -130,17 +130,17 @@ public:
 	GameObject* m_goal;
 	MapCell* m_memory_goal_cell;
 
-	predicat_t* m_path_qualifier;
+	predicate_t* m_path_qualifier;
 
 	AI_enemy();
 	virtual bool check_goal();
-	virtual GameObject* find_goal();
-	virtual void create();
-	virtual AI* clone();
+	GameObject* find_goal() override;
+	void create() override;
+	AI* clone() override;
 
 	void reset_serialization_index() override;
 
-	virtual void calculate_FOV(GameObject* object, GameMap* map);
+	void calculate_fov(GameObject* object, GameMap* map) override;
 
 	Packer_generic& get_packer() override;
 
@@ -159,21 +159,21 @@ class AI_trap : public AI
 public:
 
 	AI_trap();
-	virtual GameObject* find_goal();
-	virtual void create();
-	virtual AI* clone() { return nullptr; };
+	GameObject* find_goal() override;
+	void create() override;
+	AI* clone() override { return nullptr; };
 
 	Packer_generic& get_packer() override;
 
-	virtual void calculate_FOV(GameObject* object, GameMap* map) {};
+	void calculate_fov(GameObject* object, GameMap* map) override {};
 };
 
 class AI_manager
 {
 public:
 
-	std::vector<predicat_t*> m_fov_qualifiers;
-	std::vector<predicat_t*> m_path_qualifiers;
+	std::vector<predicate_t*> m_fov_qualifiers;
+	std::vector<predicate_t*> m_path_qualifiers;
 
 	AI_manager();
 };

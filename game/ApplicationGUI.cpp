@@ -19,42 +19,40 @@ ApplicationGUI::ApplicationGUI(int x, int y, int width, int height, Player* p, G
 	//m_action_panel = ActionPanel;
 	//ActionPanel->bind(p);
 
-	GUI_Layer* MenuLayer;
-	MenuLayer = new GUI_Layer(0, 0, m_size.w, m_size.h);
+	auto menu_layer = new GUI_Layer(0, 0, m_size.w, m_size.h);
 
-	int b = 2;
-	int w1 = m_size.w / 5;
-	int w2 = w1 * 2;
-	int w3 = w2 + w2;
-	int h1 = m_size.h / 4;
-	int h2 = 47;
+	const auto b = 2;
+	const auto w1 = m_size.w / 5;
+	const auto w2 = w1 * 2;
+	const auto w3 = w2 + w2;
+	const auto h1 = m_size.h / 4;
+	const auto h2 = 47;
 
-	GUI_game_console* console = new GUI_game_console(gl);
+	auto console = new GUI_game_console(gl);
 	console->m_position.x = b;
 	console->m_position.y = m_size.h - h1;
 	console->resize(w2 - b, h1 - b);
 
-	GUI_ActionManager* AMTextBox;
-	AMTextBox = new GUI_ActionManager(w2 + b, m_size.h - h1, w2 - b, h1 - b, am);
+	const auto am_text_box = new GUI_ActionManager(w2 + b, m_size.h - h1, w2 - b, h1 - b, am);
 
-	GUI_button* button = new GUI_button(w3 + b, m_size.h - (h2 + b), m_size.w - w3 - b * 2, h2, u"Õîä");
+	auto button = new GUI_button(w3 + b, m_size.h - (h2 + b), m_size.w - w3 - b * 2, h2, u"Ğ¥Ğ¾Ğ´");
 	button->mouse_click += std::bind(&Application::on_turn, &Application::instance());
 
 	m_action_bar = new GUI_Action_bar(w3 + b, y + b, m_size.w - w3 - b * 2, m_size.h - (h2 + b * 3));
 	m_action_bar->bind(p);
 
-	MenuLayer->add(AMTextBox);
+	menu_layer->add(am_text_box);
 	//MenuLayer->add(ActionPanel);
-	MenuLayer->add(console);
-	MenuLayer->add(button);
-	MenuLayer->add(m_action_bar);
+	menu_layer->add(console);
+	menu_layer->add(button);
+	menu_layer->add(m_action_bar);
 
 
-	add(Application::instance().m_window_manager);
-	add(MenuLayer);
-	add(MapViewer);
-	MapViewer->m_gui = MenuLayer;
-	m_main_layer = MenuLayer;
+	GUI_Layer::add(Application::instance().m_window_manager);
+	GUI_Layer::add(menu_layer);
+	GUI_Layer::add(MapViewer);
+	MapViewer->m_gui = menu_layer;
+	m_main_layer = menu_layer;
 }
 
 

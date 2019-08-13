@@ -1,4 +1,4 @@
-﻿#include "game/Action.h"
+#include "game/Action.h"
 #include "game/Application.h"
 #include "game/ApplicationGUI.h"
 #include "game/ActionManager.h"
@@ -55,10 +55,10 @@ void Action::interaction_handler(Parameter* arg)
 
 Packer_generic& Action::get_packer()
 {
-	return Packer<Action>::Instance();
+	return Packer<Action>::instance();
 }
 
-std::u16string Packer<Action>::to_json(iSerializable* value, Parser_context& context)
+std::u16string Packer<Action>::to_json(iSerializable* value, SerializationContext& context)
 {
 	auto result = value->to_json(context);
 	if (result.empty())
@@ -73,21 +73,21 @@ std::u16string Packer<Action>::to_json(iSerializable* value, Parser_context& con
 	}
 }
 
-std::string Packer<Action>::to_binary(iSerializable* value, Parser_context& context)
+std::string Packer<Action>::to_binary(iSerializable* value, SerializationContext& context)
 {
 	auto id = value->get_packer().get_type_id() + 1;
 	return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + value->to_binary(context);
 }
 
-iSerializable* Packer<Action>::from_json(scheme_map_t* value, Parser_context& context)
+iSerializable* Packer<Action>::from_json(scheme_map_t* value, SerializationContext& context)
 {
-	return Application::instance().m_actions[Parser::m_json_action_e.get_enum(Parser::UTF16_to_CP1251(Parser::get_value((*value)[u"value"])))];
+	return Application::instance().m_actions[Dictionaries::m_json_action_e.get_enum(utf16_to_cp1251(get_value((*value)[u"value"])))];
 }
 
-iSerializable* Packer<Action>::from_binary(const std::string& value, std::size_t& pos, Parser_context& context)
+iSerializable* Packer<Action>::from_binary(const std::string& value, std::size_t& pos, SerializationContext& context)
 {
 	action_e::type x;
-	Parser::from_binary<action_e::type>(value, x, pos, context);
+	parser_from_binary<action_e::type>(value, x, pos, context);
 	return Application::instance().m_actions[x];
 }
 
@@ -164,7 +164,7 @@ void Action_wrapper::update()
 
 Packer_generic& Action_wrapper::get_packer()
 {
-	return Packer<Action_wrapper>::Instance();
+	return Packer<Action_wrapper>::instance();
 }
 
 ActionClass_Move::ActionClass_Move()
@@ -209,7 +209,7 @@ void ActionClass_Move::interaction_handler(Parameter* parameter)
 		if (temp)
 		{
 			p[1].set(Game_algorithm::step_in_direction(p[0].m_object, Game_algorithm::turn_to_cell(p[0].m_object, temp)));
-			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, u"Выбрана клетка {" + Parser::CP1251_to_UTF16(std::to_string(p[1].m_cell->x)) + u"," + Parser::CP1251_to_UTF16(std::to_string(p[1].m_cell->y)) + u"}"));
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, u"Выбрана клетка {" + cp1251_to_utf16(std::to_string(p[1].m_cell->x)) + u"," + cp1251_to_utf16(std::to_string(p[1].m_cell->y)) + u"}"));
 		}
 		else
 		{
@@ -312,14 +312,16 @@ std::u16string ActionClass_Move::get_description(Parameter * parameter)
 	if (p[1])
 	{
 		s += u" в X:";
-		s += Parser::CP1251_to_UTF16(std::to_string(p[1].m_cell->x));
+		s += cp1251_to_utf16(std::to_string(p[1].m_cell->x));
 		s += u",Y:";
-		s += Parser::CP1251_to_UTF16(std::to_string(p[1].m_cell->y));
+		s += cp1251_to_utf16(std::to_string(p[1].m_cell->y));
+		s += u",Z:";
+		s += cp1251_to_utf16(std::to_string(p[1].m_cell->z));
 	}
 	return s;
 }
 
-ActionClass_Push::ActionClass_Push(void)
+ActionClass_Push::ActionClass_Push()
 {
 	m_kind = action_e::push;
 	m_icon = Application::instance().m_graph->m_actions[1];
@@ -613,7 +615,7 @@ void Action_OpenInventory::interaction_handler(Parameter * parameter)
 		std::u16string a = u"Выбран ";
 		a.append(p[0].m_object->m_name);
 		a = a + u".";
-		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, a));
+		Application::instance().m_game_log.add(game_log_message_t(message_action_interaction, a));
 	}
 	else
 	{
@@ -711,14 +713,14 @@ void action_set_motion_path::interaction_handler(Parameter * parameter)
 	Application::instance().m_UI_mutex.lock();
 	Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_line(object->cell(), object));
 	Application::instance().m_UI_mutex.unlock();
-	auto cell = Application::instance().command_select_location(object);
+	const auto cell = Application::instance().command_select_location(object);
 	if (cell)
 	{
-		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, u"Выбрана клетка {" + Parser::CP1251_to_UTF16(std::to_string(cell->x) + "," + std::to_string(cell->y) + "}")));
+		Application::instance().m_game_log.add(game_log_message_t(message_action_interaction, u"Выбрана клетка {" + cp1251_to_utf16(std::to_string(cell->x) + "," + std::to_string(cell->y) + "}")));
 	}
 	else
 	{
-		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Не выбрана клетка карты")));
+		Application::instance().m_game_log.add(game_log_message_t(message_action_interaction, std::u16string(u"Не выбрана клетка карты")));
 		Application::instance().m_message_queue.m_busy = false;
 		Application::instance().m_UI_mutex.lock();
 		Application::instance().m_gui_controller.m_hints.pop_front();
@@ -730,18 +732,18 @@ void action_set_motion_path::interaction_handler(Parameter * parameter)
 	Application::instance().m_gui_controller.m_hints.pop_front();
 	Application::instance().m_UI_mutex.unlock();
 	Path::instance().map_costing(cell->m_map, object, cell, 40);
-	auto path = Path::instance().get_path_to_cell();
+	const auto path = Path::instance().get_path_to_cell();
 	if (path)
 	{
 		Application::instance().m_UI_mutex.lock();
 		Application::instance().m_gui_controller.m_hints.push_front(new mapviewer_hint_path(path, object));
 		Application::instance().m_UI_mutex.unlock();
-		Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Следовать под данному пути? [Y/N]")));
+		Application::instance().m_game_log.add(game_log_message_t(message_action_interaction, std::u16string(u"Следовать под данному пути? Y/N")));
 		if (Application::instance().command_agreement())
 		{
-			for (int i = 0; i < path->size(); ++i)
+			for (std::size_t i = 0; i < path->size(); ++i)
 			{
-				auto* p = new Parameter(parameter_type_e::position, object, (*path)[(path->size() - 1) - i]);
+				auto* p = new Parameter(parameter_type_e::position, object, (*path)[path->size() - 1 - i]);
 				Application::instance().m_action_manager->add(new GameTask(Application::instance().m_actions[action_e::move_step], p));
 			}
 		}
@@ -1218,7 +1220,7 @@ void action_hit_melee::interaction_handler(Parameter * parameter)
 		if (result)
 		{
 			p[3].set(result);
-			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, u"Выбрана клетка {" + Parser::CP1251_to_UTF16(std::to_string(p[3].m_cell->x) + "," + std::to_string(p[3].m_cell->y) + "}:")));
+			Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, u"Выбрана клетка {" + cp1251_to_utf16(std::to_string(p[3].m_cell->x) + "," + std::to_string(p[3].m_cell->y) + "}:")));
 		}
 		else
 		{
@@ -1333,7 +1335,7 @@ char action_hit_melee::perform(Parameter * parameter)
 		p[1].m_object->event_update(VoidEventArgs());
 		if (sbj_health->m_value - sbj_health_old_value != 0)
 		{
-			msg += u"Здоровье " + p[1].m_object->m_name + u" изменилось на " + Parser::CP1251_to_UTF16(std::to_string(sbj_health->m_value - sbj_health_old_value)) + u".";
+			msg += u"Здоровье " + p[1].m_object->m_name + u" изменилось на " +cp1251_to_utf16(std::to_string(sbj_health->m_value - sbj_health_old_value)) + u".";
 		}
 		if (p[1].m_object->m_active_state->m_state == object_state_e::dead)
 		{
@@ -1617,7 +1619,7 @@ void Action_save::interaction_handler(Parameter * arg)
 	Application::instance().m_message_queue.m_busy = true;
 
 	auto* world = Application::instance().m_world;
-	Parser_context pc(*world);
+	SerializationContext pc(*world);
 	pc.reset();
 	world->reset_serialization_index();
 	auto binary = world->bin_serialize(pc);
@@ -1894,7 +1896,7 @@ void Action_shoot::interaction_handler(Parameter * parameter)
 				p[4].set(result);
 				if (check_cell(out_parameter))
 				{
-					Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, u"Выбрана клетка {" + Parser::CP1251_to_UTF16(std::to_string(p[4].m_cell->x) + "," + std::to_string(p[4].m_cell->y) + "}:")));
+					Application::instance().m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, u"Выбрана клетка {" + cp1251_to_utf16(std::to_string(p[4].m_cell->x) + "," + std::to_string(p[4].m_cell->y) + "}:")));
 					valid = true;
 				}
 				else
@@ -2026,7 +2028,7 @@ std::u16string Action_shoot::get_description(Parameter * parameter)
 		}
 		if (p[4])
 		{
-			s += u" в " + Parser::CP1251_to_UTF16(std::to_string(p[4].m_cell->x)) + u"," + Parser::CP1251_to_UTF16(std::to_string(p[4].m_cell->y));
+			s += u" в " + cp1251_to_utf16(std::to_string(p[4].m_cell->x)) + u"," + cp1251_to_utf16(std::to_string(p[4].m_cell->y));
 		}
 	}
 	return s;

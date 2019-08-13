@@ -26,8 +26,7 @@ class GameMap;
 //	values();
 //};
 
-class FOV
-{
+class FOV{
 public:
 
 	struct cell
@@ -67,14 +66,12 @@ protected:
 	void do_fov(uint x, uint y, uint radius, int start_angle, int end_angle);
 };
 
-class FOV_help : public FOV
-{
-
+class FOV_help : public FOV{
 public:
 	FOV_help();
 
 protected:
-	virtual void calculate(GameObject* unit, GameMap* map, AI_FOV& fov);
+	void calculate(GameObject* unit, GameMap* map, AI_FOV& fov) override;
 
 };
 

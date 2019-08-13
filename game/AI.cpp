@@ -8,12 +8,11 @@ min_heap::min_heap(void)
 
 void min_heap::push(Node* value)
 {
-	std::size_t index, parent;
 	m_items.push_back(value);
-	index = m_items.size() - 1;
+	auto index = m_items.size() - 1;
 	while (index > 0)
 	{
-		parent = (index - 1) >> 1;
+		const auto parent = (index - 1) >> 1;
 		if (m_items[index]->f < m_items[parent]->f)
 		{
 			std::swap(m_items[index], m_items[parent]);
@@ -23,7 +22,7 @@ void min_heap::push(Node* value)
 }
 
 Node* min_heap::pop(){
-	Node* n = m_items[0];
+	const auto n = m_items[0];
 	m_items[0] = m_items[m_items.size() - 1];
 	m_items.pop_back();
 	sort_down(0);
@@ -32,10 +31,9 @@ Node* min_heap::pop(){
 
 void min_heap::sort_down(unsigned int index)
 {
-	int left, right;
-	int size = m_items.size();
-	left = 2 * index + 1;
-	right = 2 * index + 2;
+	const int size = m_items.size();
+	const int left = 2 * index + 1;
+	const int right = 2 * index + 2;
 	if (left < size)
 	{
 		if (m_items[index]->f > m_items[left]->f)
@@ -56,10 +54,9 @@ void min_heap::sort_down(unsigned int index)
 
 void min_heap::sort_up(std::size_t index)
 {
-	std::size_t parent;
 	while (index > 0)
 	{
-		parent = (index - 1) >> 1;
+		const auto parent = (index - 1) >> 1;
 		if (m_items[index]->f < m_items[parent]->f)
 		{
 			std::swap(m_items[index], m_items[parent]);
@@ -68,7 +65,7 @@ void min_heap::sort_up(std::size_t index)
 	}
 }
 
-void min_heap::edit(unsigned int index, int value)
+void min_heap::edit(const unsigned int index, const int value)
 {
 	if (m_items[index]->f != value)
 	{
@@ -89,20 +86,19 @@ Path::Path()
 
 }
 
-void Path::calculate(GameMap* map, GameObject* object, MapCell* gc,GameObject* goal, int radius)
+void Path::calculate(GameMap* map, GameObject* object, MapCell* gc, GameObject* goal, int radius)
 {
 	/*int left_limit = (object->cell()->x - radius < 0) ? 0 : object->cell()->x - radius;
 	int right_limit = (object->cell()->x + radius + 1 > map->m_size.w) ? map->m_size.w : object->cell()->y + radius + 1;
 	int bottom_limit = (object->cell()->y - radius < 0) ? 0 : object->cell()->y - radius;
 	int top_limit = (object->cell()->y + radius + 1 > map->m_size.h) ? map->m_size.h : object->cell()->y + radius + 1;*/
 	m_open = 0;
-	MapCell* c;
-	for (int y = 0; y < map->m_size.dy; y++)
-	{
-		for (int x = 0; x < map->m_size.dx; x++)
-		{
-			c = &map->get(0,y, x);
-			c->m_closed = false;
+	for (auto z = 0; z < map->m_size.dz; z++) {
+		for (auto y = 0; y < map->m_size.dy; y++) {
+			for (auto x = 0; x < map->m_size.dx; x++) {
+				auto& c = map->get(z, y, x);
+				c.m_closed = false;
+			}
 		}
 	}
 	m_game_map = map;
@@ -111,21 +107,19 @@ void Path::calculate(GameMap* map, GameObject* object, MapCell* gc,GameObject* g
 	m_start_size = object->m_active_state->m_size;
 	m_goal_cell = gc;
 	m_goal_size = goal->m_active_state->m_size;
-	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier->predicat;
-	for (int y = 0; y < map->m_size.dy; y++)
-	{
-		for (int x = 0; x < map->m_size.dx; x++)
-		{
-			c = &map->get(0,y, x);
-			c->m_closed = false;
-			c->m_state = 0;
-			c->m_mark = false;
-			for (std::list<GameObject*>::iterator item =c->m_items.begin(); item != c->m_items.end(); ++item)
-			{
-				if (((*item) != object) && ((*item) != goal) && qualifier((*item)))
-				{
-					c->m_state = 1;
-					break;
+	const auto qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier->predicate;
+	for (auto z = 0; z < map->m_size.dz; z++) {
+		for (auto y = 0; y < map->m_size.dy; y++) {
+			for (auto x = 0; x < map->m_size.dx; x++) {
+				auto& c = map->get(z, y, x);
+				c.m_closed = false;
+				c.m_state = 0;
+				c.m_mark = false;
+				for (auto& item : c.m_items) {
+					if (item != object && item != goal && qualifier(item)) {
+						c.m_state = 1;
+						break;
+					}
 				}
 			}
 		}
@@ -138,13 +132,13 @@ void Path::map_costing(GameMap* map, GameObject* object, MapCell* gc, int radius
 	int right_limit = (object->cell()->x + radius + 1 > map->m_size.w) ? map->m_size.w : object->cell()->y + radius + 1;
 	int bottom_limit = (object->cell()->y - radius < 0) ? 0 : object->cell()->y - radius;
 	int top_limit = (object->cell()->y + radius + 1 > map->m_size.h) ? map->m_size.h : object->cell()->y + radius + 1;*/
-	MapCell* c;
-	for (int y = 0; y < map->m_size.dy; y++)
-	{
-		for (int x = 0; x < map->m_size.dx; x++)
-		{
-			c = &map->get(0,y,x);
-			c->m_closed = false;
+
+	for (auto z = 0; z < map->m_size.dz; z++) {
+		for (auto y = 0; y < map->m_size.dy; y++) {
+			for (auto x = 0; x < map->m_size.dx; x++) {
+				auto& c = map->get(z, y, x);
+				c.m_closed = false;
+			}
 		}
 	}
 	m_game_map = map;
@@ -152,20 +146,18 @@ void Path::map_costing(GameMap* map, GameObject* object, MapCell* gc, int radius
 	m_start_cell = object->cell();
 	m_start_size = object->m_active_state->m_size;
 	m_goal_cell = gc;
-	const auto qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier->predicat;
-	for (int y = 0; y < map->m_size.dy; y++)
-	{
-		for (int x = 0; x < map->m_size.dx; x++)
-		{
-			c = &map->get(0,y, x);
-			c->m_closed = false;
-			c->m_state = 0;
-			for (auto item = c->m_items.begin(); item != c->m_items.end(); ++item)
-			{
-				if (((*item) != object) && qualifier((*item)))
-				{
-					c->m_state = 1;
-					break;
+	const auto qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier->predicate;
+	for (auto z = 0; z < map->m_size.dz; z++) {
+		for (auto y = 0; y < map->m_size.dy; y++) {
+			for (auto x = 0; x < map->m_size.dx; x++) {
+				auto& c = map->get(z, y, x);
+				c.m_closed = false;
+				c.m_state = 0;
+				for (auto& item : c.m_items) {
+					if (item != object && qualifier(item)) {
+						c.m_state = 1;
+						break;
+					}
 				}
 			}
 		}
@@ -178,40 +170,12 @@ void Path::map_costing(GameMap* map, GameObject* object, MapCell* gc, int radius
 
 int Path::manhattan(MapCell* a, MapCell* b, MapCell* c)
 {
-	return (abs(a->x - b->x) + abs(a->y - b->y)) * 10;
-
-	/*int dx = abs(a->x - b->x);
-	int dy = abs(a->y - b->y);
-
-	return (dx < dy) ? 4 * dx + 10 * dy : 4 * dy + 10 * dx;*/
-
-	/*return (dx > dy) ? 14 * dy + 10 * (dx - dy) : 14 * dx + 10 * (dy - dx);*/
-
-	//int xdist = a->x - b->x;
-	//int	ydist = a->y - b->y;
-	//float sqrt2 = 1.41421356; //(this should be precomputed and stored as a define somewhere)
-	//float	h = min(xdist, ydist) * sqrt2 + max(xdist, ydist) - min(xdist, ydist);
-	//return h * 10;
-
-	//int h;
-	//int xDistance = abs(a->x - b->x);
-	//int yDistance = abs(a->y - b->y);
-	//if (xDistance > yDistance)
-	//{
-	//	h = 14 * yDistance + 10 * (xDistance - yDistance);
-	//}	
-	//else
-	//{
-	//	h = 14 * xDistance + 10 * (yDistance - xDistance);
-	//}
-	//return h;
-
-	//return (h + abs((a->x - b->x)*(c->y - b->y) - (c->x - b->x)*(a->y - b->y))*0.001)*10;
+	return (abs(a->x - b->x) + abs(a->y - b->y) + abs(a->z - b->z)) * 10;
 }
 
 int Path::is_in_open(MapCell* c)
 {
-	for (int i = 0; i < m_heap.m_items.size();++i)
+	for (std::size_t i = 0; i < m_heap.m_items.size();++i)
 	{
 		if (m_heap.m_items[i]->cell == c)
 		{
@@ -221,27 +185,26 @@ int Path::is_in_open(MapCell* c)
 	return -1;
 }
 
-void Path::insert_into_open(int x, int y, int dg, Node* p)
+void Path::insert_into_open(const int x, const int y, const int z, const int dg, Node* p)
 {
-	for (int i = 0; i < m_start_size.dy; i++)
-	{
-		for (int j = 0; j < m_start_size.dx; j++)
-		{
-			if (x + j >= 0 && y - i >= 0 && x + j < m_game_map->m_size.dx&&y - i <m_game_map->m_size.dy)
-			{
-				if (m_game_map->get(0,y - i,x + j).m_state != 0)
-				{
-					return;
+	for (auto iz = 0; iz < m_start_size.dy; iz++) {
+		for (auto iy = 0; iy < m_start_size.dy; iy++) {
+			for (auto ix = 0; ix < m_start_size.dx; ix++) {
+				if (x + ix >= 0 && y - iy >= 0 && z + iz >= 0 && x + ix < m_game_map->m_size.dx && y - iy < m_game_map->m_size.dy && z + iz < m_game_map->m_size.dz) {
+					if (m_game_map->get(z + iz, y - iy, x + ix).m_state != 0)
+					{
+						return;
+					}
 				}
+				else return;
 			}
-			else return;
 		}
 	}
-	const auto c = &m_game_map->get(0,y, x);
-	if (!c->m_closed)
-	{
+
+	const auto c = &m_game_map->get(z, y, x);
+	if (!c->m_closed) {
 		m_open += 1;
-		m_game_map->get(0,y, x).m_mark = true;
+		c->m_mark = true;
 		const auto n = is_in_open(c);
 		if (n == -1)
 		{
@@ -249,7 +212,7 @@ void Path::insert_into_open(int x, int y, int dg, Node* p)
 		}
 		else {
 			const auto item = m_heap.m_items[n];
-			if (p->g + dg < item->g){
+			if (p->g + dg < item->g) {
 				item->parent = p;
 				item->g = p->g + dg;
 				item->h = manhattan(item->cell, m_goal_cell, m_start_cell);
@@ -281,38 +244,81 @@ std::vector<MapCell*>* Path::get_path(){
 		{
 			return back(current);
 		}
-		current->cell->m_closed = true;
-		insert_into_open(current->cell->x + 1, current->cell->y, 10, current);
-		insert_into_open(current->cell->x - 1, current->cell->y, 10, current);
-		insert_into_open(current->cell->x, current->cell->y + 1, 10, current);
-		insert_into_open(current->cell->x, current->cell->y - 1, 10, current);
-		insert_into_open(current->cell->x + 1, current->cell->y + 1, 14, current);
-		insert_into_open(current->cell->x + 1, current->cell->y - 1, 14, current);
-		insert_into_open(current->cell->x - 1, current->cell->y + 1, 14, current);
-		insert_into_open(current->cell->x - 1, current->cell->y - 1, 14, current);
+		auto cell = *current->cell;
+		cell.m_closed = true;
+
+		insert_into_open(cell.x, cell.y, cell.z - 1, 10, current);
+		insert_into_open(cell.x + 1, cell.y, cell.z-1, 14, current);
+		insert_into_open(cell.x - 1, cell.y, cell.z-1, 14, current);
+		insert_into_open(cell.x, cell.y + 1, cell.z-1, 14, current);
+		insert_into_open(cell.x, cell.y - 1, cell.z-1, 14, current);
+		insert_into_open(cell.x + 1, cell.y + 1, cell.z-1, 17, current);
+		insert_into_open(cell.x + 1, cell.y - 1, cell.z-1, 17, current);
+		insert_into_open(cell.x - 1, cell.y + 1, cell.z-1, 17, current);
+		insert_into_open(cell.x - 1, cell.y - 1, cell.z-1, 17, current);
+
+		insert_into_open(cell.x + 1, cell.y, cell.z, 10, current);
+		insert_into_open(cell.x - 1, cell.y, cell.z, 10, current);
+		insert_into_open(cell.x, cell.y + 1, cell.z, 10, current);
+		insert_into_open(cell.x, cell.y - 1, cell.z, 10, current);
+		insert_into_open(cell.x + 1, cell.y + 1, cell.z, 14, current);
+		insert_into_open(cell.x + 1, cell.y - 1, cell.z, 14, current);
+		insert_into_open(cell.x - 1, cell.y + 1, cell.z, 14, current);
+		insert_into_open(cell.x - 1, cell.y - 1, cell.z, 14, current);
+
+		insert_into_open(cell.x, cell.y, cell.z + 1, 10, current);
+		insert_into_open(cell.x + 1, cell.y, cell.z + 1, 14, current);
+		insert_into_open(cell.x - 1, cell.y, cell.z + 1, 14, current);
+		insert_into_open(cell.x, cell.y + 1, cell.z + 1, 14, current);
+		insert_into_open(cell.x, cell.y - 1, cell.z + 1, 14, current);
+		insert_into_open(cell.x + 1, cell.y + 1, cell.z + 1, 17, current);
+		insert_into_open(cell.x + 1, cell.y - 1, cell.z + 1, 17, current);
+		insert_into_open(cell.x - 1, cell.y + 1, cell.z + 1, 17, current);
+		insert_into_open(cell.x - 1, cell.y - 1, cell.z + 1, 17, current);
 	}
 	return nullptr;
 }
 
 std::vector<MapCell*>* Path::get_path_to_cell() {
-	Node* current;
 	m_heap.push(new Node(m_start_cell, 0, manhattan(m_start_cell, m_goal_cell, m_start_cell)));
 	while (!m_heap.m_items.empty())
 	{
-		current = m_heap.pop();
+		const auto current = m_heap.pop();
 		if ((current->cell->x== m_goal_cell->x)&& (current->cell->y == m_goal_cell->y))
 		{
 			return back(current);
 		}
-		current->cell->m_closed = true;
-		insert_into_open(current->cell->x + 1, current->cell->y, 10, current);
-		insert_into_open(current->cell->x - 1, current->cell->y, 10, current);
-		insert_into_open(current->cell->x, current->cell->y + 1, 10, current);
-		insert_into_open(current->cell->x, current->cell->y - 1, 10, current);
-		insert_into_open(current->cell->x + 1, current->cell->y + 1, 14, current);
-		insert_into_open(current->cell->x + 1, current->cell->y - 1, 14, current);
-		insert_into_open(current->cell->x - 1, current->cell->y + 1, 14, current);
-		insert_into_open(current->cell->x - 1, current->cell->y - 1, 14, current);
+		auto cell = *current->cell;
+		cell.m_closed = true;
+
+		insert_into_open(cell.x, cell.y, cell.z - 1, 10, current);
+		insert_into_open(cell.x + 1, cell.y, cell.z - 1, 14, current);
+		insert_into_open(cell.x - 1, cell.y, cell.z - 1, 14, current);
+		insert_into_open(cell.x, cell.y + 1, cell.z - 1, 14, current);
+		insert_into_open(cell.x, cell.y - 1, cell.z - 1, 14, current);
+		insert_into_open(cell.x + 1, cell.y + 1, cell.z - 1, 17, current);
+		insert_into_open(cell.x + 1, cell.y - 1, cell.z - 1, 17, current);
+		insert_into_open(cell.x - 1, cell.y + 1, cell.z - 1, 17, current);
+		insert_into_open(cell.x - 1, cell.y - 1, cell.z - 1, 17, current);
+
+		insert_into_open(cell.x + 1, cell.y, cell.z, 10, current);
+		insert_into_open(cell.x - 1, cell.y, cell.z, 10, current);
+		insert_into_open(cell.x, cell.y + 1, cell.z, 10, current);
+		insert_into_open(cell.x, cell.y - 1, cell.z, 10, current);
+		insert_into_open(cell.x + 1, cell.y + 1, cell.z, 14, current);
+		insert_into_open(cell.x + 1, cell.y - 1, cell.z, 14, current);
+		insert_into_open(cell.x - 1, cell.y + 1, cell.z, 14, current);
+		insert_into_open(cell.x - 1, cell.y - 1, cell.z, 14, current);
+
+		insert_into_open(cell.x, cell.y, cell.z + 1, 10, current);
+		insert_into_open(cell.x + 1, cell.y, cell.z + 1, 14, current);
+		insert_into_open(cell.x - 1, cell.y, cell.z + 1, 14, current);
+		insert_into_open(cell.x, cell.y + 1, cell.z + 1, 14, current);
+		insert_into_open(cell.x, cell.y - 1, cell.z + 1, 14, current);
+		insert_into_open(cell.x + 1, cell.y + 1, cell.z + 1, 17, current);
+		insert_into_open(cell.x + 1, cell.y - 1, cell.z + 1, 17, current);
+		insert_into_open(cell.x - 1, cell.y + 1, cell.z + 1, 17, current);
+		insert_into_open(cell.x - 1, cell.y - 1, cell.z + 1, 17, current);
 	}
 	return nullptr;
 }
@@ -339,7 +345,7 @@ void Dijkstra_map::calculate_cost(GameMap* map, GameObject* object, GameObject* 
 {
 	m_map = map;
 	MapCell* c;
-	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier->predicat;
+	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier->predicate;
 	for (int y = 0; y < m_map->m_size.dy; y++)
 	{
 		for (int x = 0; x < m_map->m_size.dx; x++)
@@ -347,7 +353,7 @@ void Dijkstra_map::calculate_cost(GameMap* map, GameObject* object, GameObject* 
 			c = &m_map->get(0,y, x);
 			c->m_pathfind_info.opaque = false;
 			c->m_pathfind_info.value = 100000;
-			for (std::list<GameObject*>::iterator item = c->m_items.begin(); item != c->m_items.end(); ++item)
+			for (auto item = c->m_items.begin(); item != c->m_items.end(); ++item)
 			{
 				if ((*item) == goal)
 				{
@@ -370,13 +376,10 @@ void Dijkstra_map::calculate_cost(GameMap* map, GameObject* object, GameObject* 
 void Dijkstra_map::calculate_cost_autoexplore(GameMap* map, GameObject* object)
 {
 	m_map = map;
-	MapCell* c;
-	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier->predicat;
-	for (int y = 0; y < m_map->m_size.dy; y++)
-	{
-		for (int x = 0; x < m_map->m_size.dx; x++)
-		{
-			c = &m_map->get(0,y, x);
+	const auto qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier->predicate;
+	for (auto y = 0; y < m_map->m_size.dy; y++){
+		for (auto x = 0; x < m_map->m_size.dx; x++){
+			auto c = &m_map->get(0, y, x);
 			if (!c->m_notable)
 			{
 				c->m_pathfind_info.opaque = false;
@@ -386,7 +389,7 @@ void Dijkstra_map::calculate_cost_autoexplore(GameMap* map, GameObject* object)
 			{
 				c->m_pathfind_info.opaque = false;
 				c->m_pathfind_info.value = 100000;
-				for (std::list<GameObject*>::iterator item = c->m_items.begin(); item != c->m_items.end(); ++item)
+				for (auto item = c->m_items.begin(); item != c->m_items.end(); ++item)
 				{
 					if (((*item) != object) && qualifier((*item)))
 					{
@@ -495,7 +498,7 @@ AI_enemy::AI_enemy()
 
 AI* AI_enemy::clone()
 {
-	AI_enemy* c = new AI_enemy();
+	auto c = new AI_enemy();
 	c->m_ai_type = m_ai_type;
 	//for (auto current = m_FOVs.begin(); current != m_FOVs.end(); current++)
 	//{
@@ -621,7 +624,7 @@ bool AI_enemy::check_goal()
 	return false;
 }
 
-void AI_enemy::calculate_FOV(GameObject* object,GameMap* map)
+void AI_enemy::calculate_fov(GameObject* object,GameMap* map)
 {
 	m_fov->calculate_FOV(object, map);
 	update(VoidEventArgs());
@@ -632,14 +635,13 @@ void AI_enemy::create()
 	if (m_object->m_active_state->m_ai == nullptr){ return; }
 	if (!m_action_controller->m_action)
 	{
-		calculate_FOV(m_object,m_map);
+		calculate_fov(m_object,m_map);
 		MapCell* c;
-		GameObject* goal;
 		if (m_goal)
 		{
 			if (!check_goal())
 			{
-				goal = find_goal();
+				const auto goal = find_goal();
 				if (goal)
 				{
 					c = m_goal->cell();
@@ -668,21 +670,21 @@ void AI_enemy::create()
 		{
 			std::list<Action_helper_t> attacks;
 			m_object->get_actions_list(attacks);
-			for (auto i = attacks.begin(); i != attacks.end(); ++i)
+			for (auto& attack : attacks)
 			{
-				if (i->action->m_kind == action_e::hit_melee)
+				if (attack.action->m_kind == action_e::hit_melee)
 				{
-					Parameter* p = i->parameter;
+					auto p = attack.parameter;
 					(*p)[1].set(m_goal);
-					area_t attack_area = area_t(position_t(m_object->cell()->x - 1, m_object->cell()->y + 1), position_t(m_object->cell()->x - m_object->m_active_state->m_size.dx, m_object->cell()->y - m_object->m_active_state->m_size.dy));
+					auto attack_area = area_t(position_t(m_object->cell()->x - 1, m_object->cell()->y + 1), position_t(m_object->cell()->x - m_object->m_active_state->m_size.dx, m_object->cell()->y - m_object->m_active_state->m_size.dy));
 					attack_area.p1.x = max(attack_area.p1.x, m_goal->cell()->x);
 					attack_area.p2.x = min(attack_area.p2.x, m_goal->cell()->x + m_goal->m_active_state->m_size.dx - 1);
 					attack_area.p1.y = min(attack_area.p1.y, m_goal->cell()->y);
 					attack_area.p2.y = max(attack_area.p2.y, m_goal->cell()->y - m_goal->m_active_state->m_size.dy + 1);
-					GameMap* map = c->m_map;
+					auto map = c->m_map;
 					(*p)[3].set(&map->get(0,attack_area.p1.y,attack_area.p1.x));
-					Logger::Instance().info("Óäàð ïðîòèâíèêà â òî÷êó [" + std::to_string(attack_area.p1.x) + "," + std::to_string(attack_area.p1.y) + "]");
-					m_action_controller->set((*p)[0].m_object, i->action, p);
+					Logger::instance().info("Ð£Ð´Ð°Ñ€ Ð¿Ñ€Ð¾Ñ‚Ð¸Ð²Ð½Ð¸ÐºÐ° Ð² Ñ‚Ð¾Ñ‡ÐºÑƒ [" + std::to_string(attack_area.p1.x) + "," + std::to_string(attack_area.p1.y) + "]");
+					m_action_controller->set((*p)[0].m_object, attack.action, p);
 					break;
 				}
 			}
@@ -749,26 +751,24 @@ void AI_enemy::create()
 						P->m_map = m_map;
 						m_action_controller->set(P->m_object, Application::instance().m_actions[action_e::move], P);
 			}*/
-			int radius = 0;
-			Vision_list* vl = static_cast<Vision_list*>(m_object->m_active_state->get_list(interaction_e::vision));
-			AI_FOV current;
-			for (auto item = vl->m_items.begin(); item != vl->m_items.end(); ++item)
+		auto radius = 0;
+		auto vl = static_cast<Vision_list*>(m_object->m_active_state->get_list(interaction_e::vision));
+		for (auto& m_item : vl->m_items)
 			{
-				current = static_cast<Vision_component*>(*item)->m_value;
+				auto current = static_cast<Vision_component*>(m_item)->m_value;
 				radius = max(radius, current.radius);
 			}
 			Path::instance().calculate(m_map, m_object, c, m_goal, radius);
-			std::vector<MapCell*>* path;
-			path = Path::instance().get_path();
+		const auto path = Path::instance().get_path();
 			if (path)
 			{
 				if (path->size() >= 2)
 				{
-					Parameter* P=new Parameter(parameter_type_e::position);
-					(*P)[0].set(m_object);
-					(*P)[1].set((*path)[path->size() - 2]);
+					const auto p=new Parameter(parameter_type_e::position);
+					(*p)[0].set(m_object);
+					(*p)[1].set((*path)[path->size() - 2]);
 					//Application::instance().m_action_manager->add(m_object, new GameTask(Application::instance().m_actions[action_e::move], P));
-					m_action_controller->set((*P)[0].m_object, Application::instance().m_actions[action_e::move], P);
+					m_action_controller->set((*p)[0].m_object, Application::instance().m_actions[action_e::move], p);
 				}
 				else
 				{
@@ -802,18 +802,18 @@ GameObject* AI_trap::find_goal(){ return nullptr; };
 void AI_trap::create()
 {
 	m_object->set_state(object_state_e::off);
-	for (auto item = m_object->cell()->m_items.begin(); item != m_object->cell()->m_items.end(); ++item)
+	for (auto& m_item : m_object->cell()->m_items)
 	{
-		if (m_object != (*item) && (*item)->m_name != u"floor")
+		if (m_object != m_item && m_item->m_name != u"floor")
 		{
 			m_object->set_state(object_state_e::on);
 		}
 	}
 	if (m_object->m_active_state->m_state == object_state_e::on)
 	{
-		for (auto item = m_object->cell()->m_items.begin(); item != m_object->cell()->m_items.end(); ++item)
+		for (auto& m_item : m_object->cell()->m_items)
 		{
-			if (m_object != (*item) && (*item)->m_name != u"floor")
+			if (m_object != m_item && m_item->m_name != u"floor")
 			{
 				/*?1? P_unit_interaction* p = new P_unit_interaction();
 				p->m_unit = m_object;
@@ -827,19 +827,19 @@ void AI_trap::create()
 
 Packer_generic& AI_trap::get_packer()
 {
-	return Packer<AI_trap>::Instance();
+	return Packer<AI_trap>::instance();
 }
 
 AI_manager::AI_manager()
 {
-	m_fov_qualifiers.push_back(new predicat_t([](GameObject* object)->bool{return !object->get_stat(object_tag_e::seethrough_able); },0));
-	m_fov_qualifiers.push_back(new predicat_t([](GameObject* object)->bool{return false; },1));
+	m_fov_qualifiers.push_back(new predicate_t([](GameObject* object)->bool{return !object->get_stat(object_tag_e::seethrough_able); },0));
+	m_fov_qualifiers.push_back(new predicate_t([](GameObject* object)->bool{return false; },1));
 
-	m_path_qualifiers.push_back(new predicat_t([](GameObject* object)->bool {return !object->get_stat(object_tag_e::pass_able); }, 0));
-	m_path_qualifiers.push_back(new predicat_t([](GameObject* object)->bool{return !object->get_stat(object_tag_e::pass_able) && object->m_name != u"wall"; },1));
+	m_path_qualifiers.push_back(new predicate_t([](GameObject* object)->bool {return !object->get_stat(object_tag_e::pass_able); }, 0));
+	m_path_qualifiers.push_back(new predicate_t([](GameObject* object)->bool{return !object->get_stat(object_tag_e::pass_able) && object->m_name != u"wall"; },1));
 }
 
 Packer_generic& AI_enemy::get_packer()
 {
-	return Packer<AI_enemy>::Instance();
+	return Packer<AI_enemy>::instance();
 }

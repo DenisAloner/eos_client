@@ -3,12 +3,12 @@
 
 Config* GameObjectManager::m_config = new Config();
 
-void GameObjectManager::init(Parser_context& context)
+void GameObjectManager::init(SerializationContext& context)
 {
 
-	m_effect_prefix_string[effect_prefix_e::physical_damage] = "ôèçè÷åñêèé óðîí";
-	m_effect_prefix_string[effect_prefix_e::poison_damage] = "óðîí îò ÿäà";
-	m_effect_prefix_string[effect_prefix_e::state_change] = "èçìåíèòü ñîñòîÿíèå";
+	m_effect_prefix_string[effect_prefix_e::physical_damage] = "Ñ„Ð¸Ð·Ð¸Ñ‡ÐµÑÐºÐ¸Ð¹ ÑƒÑ€Ð¾Ð½";
+	m_effect_prefix_string[effect_prefix_e::poison_damage] = "ÑƒÑ€Ð¾Ð½ Ð¾Ñ‚ ÑÐ´Ð°";
+	m_effect_prefix_string[effect_prefix_e::state_change] = "Ð¸Ð·Ð¼ÐµÐ½Ð¸Ñ‚ÑŒ ÑÐ¾ÑÑ‚Ð¾ÑÐ½Ð¸Ðµ";
 
 	m_to_effect_prefix_e["physical_damage"] = effect_prefix_e::physical_damage;
 	m_to_effect_prefix_e["poison_damage"] = effect_prefix_e::poison_damage;
@@ -16,30 +16,31 @@ void GameObjectManager::init(Parser_context& context)
 
 	bytearray json;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.json", json);
-	const std::u16string json_config(json);
+	const u8string json_u8(json);
+	const std::u16string json_config(utf8_to_cp1251(json_u8));
 
 
 	auto temp(json_config);
-	const auto s = Parser::read_object(temp);
+	const auto s = read_object(temp);
 	m_config->from_json(s, context);
 	delete s;
 
 	//m_items.insert(m_config->m_items.begin(), m_config->m_items.end());
 };
 
-GameObject* GameObjectManager::new_object(std::string unit_name)
+GameObject* GameObjectManager::new_object(const std::string unit_name)
 {
 	auto& obj = Application::instance().m_world->m_object_manager.m_items.emplace_back();
 	const auto it = m_config->m_items.find(unit_name);
 	if (it == m_config->m_items.end())
 	{
-		Logger::Instance().critical ("Ýëåìåíò `" + unit_name + "` îòñóòñòâóåò â m_items");
+		Logger::instance().critical ("Ð­Ð»ÐµÐ¼ÐµÐ½Ñ‚ `" + unit_name + "` Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚ Ð² m_items");
 	}
 	auto& config = it->second;
 	
 	/*Parser::reset_object_counter();
 	config.reset_serialization_index();
-	std::u16string json_test = Parser::to_json<GameObject>(config);
+	std::u16string json_test = Parser::parser_to_json<GameObject>(config);
 	LOG(FATAL) << Parser::UTF16_to_CP1251(json_test);*/
 
 	obj.m_direction = config.m_direction;
@@ -73,7 +74,7 @@ std::string GameObjectManager::get_effect_prefix_string(effect_prefix_e key)
 	{
 		return value->second;
 	}
-	return "íåèçâåñòíûé òèï";
+	return "Ð½ÐµÐ¸Ð·Ð²ÐµÑÑ‚Ð½Ñ‹Ð¹ Ñ‚Ð¸Ð¿";
 }
 
 
@@ -82,7 +83,7 @@ effect_prefix_e GameObjectManager::get_effect_prefix_e(const std::string& key)
 	auto value = m_to_effect_prefix_e.find(key);
 	if (value == m_to_effect_prefix_e.end())
 	{
-		Logger::Instance().critical("Ýëåìåíò `" + key + "` îòñóòñòâóåò â m_items");
+		Logger::instance().critical("Ð­Ð»ÐµÐ¼ÐµÐ½Ñ‚ `" + key + "` Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚ Ð² m_items");
 	}
 	return value->second;
 }

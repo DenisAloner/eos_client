@@ -96,9 +96,9 @@ void Application::render()
 
 	//OutputDebugString((std::to_string(hasher(this_id)) + " render\n").c_str());
 
-	for (auto current = m_update_in_render_thread.begin(); current != m_update_in_render_thread.end(); ++current)
+	for (auto& current : m_update_in_render_thread)
 	{
-		(*current)();
+		current();
 	}
 	m_update_in_render_thread.clear();
 
@@ -111,7 +111,7 @@ void Application::render()
 	{
 		m_gui_controller.m_GUI->render(m_graph, 0, 0);
 	}
-	const auto mouse = Application::instance().m_mouse->get_mouse_position();
+	const auto mouse = instance().m_mouse->get_mouse_position();
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_2D);
@@ -204,29 +204,28 @@ void Application::initialize(const dimension_t work_area_size, const HDC m_hDC, 
 		m_actions[i]->m_index = i;
 	}
 
-	Parser parser; //TODO костыль, решить как убрать
 	m_ai_manager = new AI_manager();
 	m_game_object_manager = new GameObjectManager();
-	const auto gw = new Game_world; //TODO костыль, продумать исправление
-	Parser_context pc(*gw); //TODO костыль, продумать исправление
+	const auto gw = new Game_world; //TODO РєРѕСЃС‚С‹Р»СЊ, РїСЂРѕРґСѓРјР°С‚СЊ РёСЃРїСЂР°РІР»РµРЅРёРµ
+	SerializationContext pc(*gw); //TODO РєРѕСЃС‚С‹Р»СЊ, РїСЂРѕРґСѓРјР°С‚СЊ РёСЃРїСЂР°РІР»РµРЅРёРµ
 	m_game_object_manager->init(pc);
-	Logger::Instance().info ( "Менеджер игровых объектов успешно инициализирован");
+	Logger::instance().info ( "РњРµРЅРµРґР¶РµСЂ РёРіСЂРѕРІС‹С… РѕР±СЉРµРєС‚РѕРІ СѓСЃРїРµС€РЅРѕ РёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°РЅ");
 
 	m_gui_controller.m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h);
 	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
 	m_gui_controller.m_GUI->add(m_window_manager);
 	m_gui_controller.m_GUI->add(new GUI_Image((m_size.w - 1024) / 2, (m_size.h - 1024) / 2, 1024, 1024, m_graph->m_logo));
 
-	auto main_menu = new GUI_Window(0, 0, 400, 400, u"Главное меню");
+	auto main_menu = new GUI_Window(0, 0, 400, 400, utf8_to_cp1251_2("Р“Р»Р°РІРЅРѕРµ РјРµРЅСЋ"));
 	main_menu->m_position = position_t((m_size.w - main_menu->m_size.w) / 2, (m_size.h - main_menu->m_size.h) / 2);
 	auto menu = new GUI_Button_list(0, 0, 400, 400);
-	auto button = new GUI_Mainmenu_button(0, 0, 396, 47, u"Новая игра", parameter_type_e::new_game);
+	auto button = new GUI_Mainmenu_button(0, 0, 396, 47, u"РќРѕРІР°СЏ РёРіСЂР°", parameter_type_e::new_game);
 	button->mouse_click += std::bind(&GUI_Window::on_close, main_menu, main_menu);
 	menu->add_item_control(button);
-	button = new GUI_Mainmenu_button(0, 0, 396, 47, u"Загрузка игры", parameter_type_e::load_game);
+	button = new GUI_Mainmenu_button(0, 0, 396, 47, u"Р—Р°РіСЂСѓР·РєР° РёРіСЂС‹", parameter_type_e::load_game);
 	button->mouse_click += std::bind(&GUI_Window::on_close, main_menu, main_menu);
 	menu->add_item_control(button);
-	button = new GUI_Mainmenu_button(0, 0, 396, 47, u"Выход", parameter_type_e::game_quit);
+	button = new GUI_Mainmenu_button(0, 0, 396, 47, u"Р’С‹С…РѕРґ", parameter_type_e::game_quit);
 	button->mouse_click += std::bind(&GUI_Window::on_close, main_menu, main_menu);
 	menu->add_item_control(button);
 	main_menu->add(menu);
@@ -241,7 +240,7 @@ void Application::initialize(const dimension_t work_area_size, const HDC m_hDC, 
 void Application::new_game()
 {
 	m_world = new Game_world();
-	auto map = new GameMap(dimension3_t(128, 128, 20));
+	auto map = new GameMap(dimension3_t(128, 128, 10));
 
 	map->generate_room();
 	m_world->m_maps.push_back(map);
@@ -254,9 +253,14 @@ void Application::new_game()
 	m_world->m_player = new Player(obj, map);
 	m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
 
+	//SerializationContext pc(*m_world);
+	//pc.reset();
+	//obj->reset_serialization_index();
+	//const auto json = obj->get_packer().parser_to_json(*obj, pc);
+	//Logger::instance().info(Parser::utf16_to_cp1251(json));
 
 	/*std::u16string json;
-	Parser_context pc(*m_world);
+	SerializationContext pc(*m_world);
 	pc.reset();
 	m_world->reset_serialization_index();
 	json  = m_world->serialize(pc);
@@ -286,7 +290,7 @@ void Application::new_game()
 		b[i] = a[i];
 	}
 	auto* world = new Game_world();
-	Parser_context pc1(*world);
+	SerializationContext pc1(*world);
 	pc.reset();
 	world->reset_serialization_index();
 	world->deserialize(json, pc);*/
@@ -299,7 +303,7 @@ void Application::new_game()
 
 	tmp->reset_serialization_index();
 	Parser::reset_object_counter();
-	json = Parser::UTF16_to_CP1251(Parser::to_json<GameMap*>(tmp));
+	json = Parser::UTF16_to_CP1251(Parser::parser_to_json<GameMap*>(tmp));
 	LOG(INFO) << json;*/
 
 	/*Object_state* m = new Object_state();
@@ -347,17 +351,17 @@ void Application::new_game()
 	Parser::reset_object_counter();
 
 	LOG(INFO) << " | " << std::to_string(m->m_size.x);
-	json = Parser::UTF16_to_CP1251(Parser::to_json<GameObject*>(tmp));
+	json = Parser::UTF16_to_CP1251(Parser::parser_to_json<GameObject*>(tmp));
 	LOG(INFO) << json;*/
 
 	m_gui_controller.m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player, map, m_action_manager, m_game_log);
 
-	auto MiniMap = new GUI_Window(0, 0, 400, 400, u"Мини-карта");
+	auto MiniMap = new GUI_Window(0, 0, 400, 400, u"РњРёРЅРё-РєР°СЂС‚Р°");
 	auto cr = MiniMap->client_rect();
 	auto* mini_map = new GUI_MiniMap(position_t(0, 0), dimension_t(cr.w, cr.h), m_gui_controller.m_GUI->MapViewer);
 	MiniMap->add(mini_map);
 
-	MiniMap = new GUI_Window(300, 0, 400, 400, u"Поле зрения player");
+	MiniMap = new GUI_Window(300, 0, 400, 400, u"РџРѕР»Рµ Р·СЂРµРЅРёСЏ player");
 	cr = MiniMap->client_rect();
 	auto fov = new GUI_FOV(position_t(0, 0), dimension_t(cr.w, cr.h), m_world->m_player->m_object);
 	MiniMap->add(fov);
@@ -411,7 +415,7 @@ void Application::new_game()
 	obj->set_direction(object_direction_e::top);
 	map->add_to_map(obj, map->get(ry + 10,rx + 2));*/
 
-	/*MiniMap = new GUI_Window(500, 0, 400, 400, "Поле зрения bat");
+	/*MiniMap = new GUI_Window(500, 0, 400, 400, "РџРѕР»Рµ Р·СЂРµРЅРёСЏ bat");
 	fov = new GUI_FOV(position_t(5, 30), dimension_t(MiniMap->m_size.w - 10, MiniMap->m_size.h - 35), obj);
 	MiniMap->add(fov);*/
 
@@ -430,7 +434,7 @@ void Application::load_game()
 	file.read(&value[0], size);
 	file.close();
 	auto* world = new Game_world();
-	Parser_context pc(*world);
+	SerializationContext pc(*world);
 	pc.reset();
 	world->reset_serialization_index();
 	world->bin_deserialize(value, pc);
@@ -446,17 +450,17 @@ void Application::update_after_load()
 	//m_update_mutex.lock();
 	m_world->calculate_lighting();
 	m_gui_controller.m_GUI->MapViewer->update();
-	for (auto m = m_world->m_maps.begin(); m != m_world->m_maps.end(); ++m)
+	for (auto& m_map : m_world->m_maps)
 	{
-		(*m)->update(VoidEventArgs());
+		m_map->update(VoidEventArgs());
 	}
 	//m_update_mutex.unlock();
 	//m_update_mutex.lock();
 	if (m_world->m_player->m_object->m_active_state->m_ai)
 	{
-		GameObject* object = m_world->m_player->m_object;
-		GameMap* map = static_cast<MapCell*>(object->m_owner)->m_map;
-		static_cast<AI_enemy*>(m_world->m_player->m_object->m_active_state->m_ai)->calculate_FOV(m_world->m_player->m_object, map);
+		const auto object = m_world->m_player->m_object;
+		const auto map = static_cast<MapCell*>(object->m_owner)->m_map;
+		static_cast<AI_enemy*>(m_world->m_player->m_object->m_active_state->m_ai)->calculate_fov(m_world->m_player->m_object, map);
 	}
 	//m_update_mutex.unlock();
 }
@@ -493,55 +497,13 @@ bool Application::check_action_completion(GameObject*& object)
 
 void Application::update()
 {
-	//if (!m_action_manager->m_items.empty())
-	//{
-	//	std::map<int, std::list<GameTask*> > task_order;
-	//	for (auto current = m_action_manager->m_items.begin(); current != m_action_manager->m_items.end(); current++)
-	//	{
-	//		if (!current->second.empty())
-	//		{
-	//			GameTask* A;
-	//			A = current->second.front();
-	//			task_order[A->m_action->m_decay].push_back(A);
-	//			m_action_manager->remove(current->first);
-	//		}
-	//	}
-	//	//LOG(INFO) << "----------------------";
-	//	//for (auto current = task_order.begin(); current != task_order.end(); current++)
-	//	//{
-	//	//	for (auto task = current->second.begin(); task != current->second.end(); task++)
-	//	//	{
-	//	//		GameTask* A;
-	//	//		A = (*task);
-	//	//		LOG(INFO) << current->first << " - " << A->m_action->m_name;
-	//	//	}
-	//	//}
-	//	for (auto current = task_order.begin(); current != task_order.end(); current++)
-	//	{
-	//		for (auto task = current->second.begin(); task != current->second.end(); task++)
-	//		{
-	//			GameTask* A;
-	//			A = (*task);
-	//			A->m_action->perfom(A->m_parameter);
-	//			if (A->m_action->m_error != "")
-	//			{
-	//				m_GUI->DescriptionBox->add_item_control(new GUI_Text(A->m_action->m_error));
-	//			}
-	//		}
-	//	}
-	//}
-	GameTask* A;
-
-	std::chrono::time_point<std::chrono::steady_clock> start;
-	std::chrono::time_point<std::chrono::steady_clock> end;
-	std::chrono::milliseconds elapsed;
 	while (true)
 	{
-		A = m_action_manager->get_task();
-		if (A)
+		const auto a = m_action_manager->get_task();
+		if (a)
 		{
-			m_world->m_player->m_object->m_active_state->m_ai->m_action_controller->set(m_world->m_player->m_object, A->m_action, A->m_parameter);
-			m_world->m_player->m_object->m_active_state->m_tile_manager->m_animation = A->m_action->m_animation;
+			m_world->m_player->m_object->m_active_state->m_ai->m_action_controller->set(m_world->m_player->m_object, a->m_action, a->m_parameter);
+			m_world->m_player->m_object->m_active_state->m_tile_manager->m_animation = a->m_action->m_animation;
 		}
 		do
 		{
@@ -552,17 +514,15 @@ void Application::update()
 			}
 			//start = std::chrono::high_resolution_clock::now();
 			m_world->m_object_manager.calculate_ai();
-			end = std::chrono::high_resolution_clock::now();
-			elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-			//LOG(INFO) << "Просчет ИИ: " << std::to_string(elapsed.count());
+			//LOG(INFO) << "РџСЂРѕСЃС‡РµС‚ РР: " << std::to_string(elapsed.count());
 			if (m_world->m_player->m_object->m_active_state->m_ai)
 			{
-				GameObject* object = m_world->m_player->m_object;
-				GameMap* map = static_cast<MapCell*>(object->m_owner)->m_map;
+				auto object = m_world->m_player->m_object;
+				auto map = static_cast<MapCell*>(object->m_owner)->m_map;
 
-				AI_enemy* ai = static_cast<AI_enemy*>(object->m_active_state->m_ai);
-				ai->calculate_FOV(object, map);
-				Vision_list* vl = static_cast<Vision_list*>(object->m_active_state->get_list(interaction_e::vision));
+				auto ai = static_cast<AI_enemy*>(object->m_active_state->m_ai);
+				ai->calculate_fov(object, map);
+				auto vl = static_cast<Vision_list*>(object->m_active_state->get_list(interaction_e::vision));
 
 				int radius = vl->m_max_radius;
 
@@ -596,11 +556,11 @@ void Application::update()
 				z_end = max(z_end, 0);
 				z_end = min(z_end, map->m_size.dz - 1);
 
-				for (int z = z_start; z < z_end + 1; z++)
+				for (auto z = z_start; z < z_end + 1; z++)
 				{
-					for (int y = y_start; y < y_end + 1; y++)
+					for (auto y = y_start; y < y_end + 1; y++)
 					{
-						for (int x = x_start; x < x_end + 1; x++)
+						for (auto x = x_start; x < x_end + 1; x++)
 						{
 							if (ai->m_fov->m_map[y - y_start][x - x_start].visible)
 							{
@@ -612,29 +572,26 @@ void Application::update()
 			}
 			//start = std::chrono::high_resolution_clock::now();
 			m_world->m_object_manager.update_buff();
-			end = std::chrono::high_resolution_clock::now();
-			elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-			//LOG(INFO) <<"Просчет баффов: " <<std::to_string(elapsed.count());
+
+			//LOG(INFO) <<"РџСЂРѕСЃС‡РµС‚ Р±Р°С„С„РѕРІ: " <<std::to_string(elapsed.count());
 			//start = std::chrono::high_resolution_clock::now();
 			m_world->calculate_lighting();
-			end = std::chrono::high_resolution_clock::now();
-			elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-			//LOG(INFO) << "Просчет освещения: " << std::to_string(elapsed.count());
+
+			//LOG(INFO) << "РџСЂРѕСЃС‡РµС‚ РѕСЃРІРµС‰РµРЅРёСЏ: " << std::to_string(elapsed.count());
 			//start = std::chrono::high_resolution_clock::now();
 			m_gui_controller.m_GUI->MapViewer->update();
-			end = std::chrono::high_resolution_clock::now();
-			elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-			//LOG(INFO) << "Просчет карты: " << std::to_string(elapsed.count());
-			for (auto m = m_world->m_maps.begin(); m != m_world->m_maps.end(); ++m)
+
+			//LOG(INFO) << "РџСЂРѕСЃС‡РµС‚ РєР°СЂС‚С‹: " << std::to_string(elapsed.count());
+			for (auto& m_map : m_world->m_maps)
 			{
-				(*m)->update(VoidEventArgs());
+				m_map->update(VoidEventArgs());
 			}
 			m_update_mutex.unlock();
-			std::u16string temp = u"Ход - " + Parser::CP1251_to_UTF16(std::to_string(m_game_turn));
-			m_game_log.add(game_log_message_t(game_log_message_type_e::message_time, temp));
+			auto temp = u"РҐРѕРґ - " + cp1251_to_utf16(std::to_string(m_game_turn));
+			m_game_log.add(game_log_message_t(message_time, temp));
 			m_game_turn += 1;
-			std::chrono::milliseconds Duration(1);
-			std::this_thread::sleep_for(Duration);
+			std::chrono::milliseconds duration(1);
+			std::this_thread::sleep_for(duration);
 		} while (!check_action_completion(m_world->m_player->m_object));
 		m_update_mutex.lock();
 		if (m_action_manager->m_is_remove) { m_action_manager->remove(); }
@@ -650,9 +607,9 @@ void Application::update()
 
 void Application::command_main_menu_select()
 {
-	Logger::Instance().info(  "Ожидание выбора в главном меню");
-	bool Exit = false;
-	while (Exit == false)
+	Logger::instance().info(  "РћР¶РёРґР°РЅРёРµ РІС‹Р±РѕСЂР° РІ РіР»Р°РІРЅРѕРј РјРµРЅСЋ");
+	auto exit = false;
+	while (!exit)
 	{
 		std::unique_lock<std::mutex> lk(m_message_queue.m_mutex);
 		m_message_queue.m_reader = true;
@@ -664,28 +621,28 @@ void Application::command_main_menu_select()
 		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::new_game)
 		{
 			new_game();
-			Exit = true;
+			exit = true;
 		}
 		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::load_game)
 		{
 			load_game();
-			Exit = true;
+			exit = true;
 		}
 		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::game_quit)
 		{
 			stop();
-			Exit = true;
+			exit = true;
 		}
 		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::cancel)
 		{
-			Exit = true;
+			exit = true;
 		}
 		m_message_queue.m_read_message = false;
 		lk.unlock();
 		m_message_queue.m_condition_variable.notify_one();
 		m_message_queue.m_reader = false;
 	}
-	Logger::Instance().info ( "Окончание ожидания выбора в главном меню");
+	Logger::instance().info ( "РћРєРѕРЅС‡Р°РЅРёРµ РѕР¶РёРґР°РЅРёСЏ РІС‹Р±РѕСЂР° РІ РіР»Р°РІРЅРѕРј РјРµРЅСЋ");
 }
 
 MapCell* Application::command_select_location(GameObject* object)
@@ -701,7 +658,7 @@ MapCell* Application::command_select_location(GameObject* object)
 		m_GUI->MapViewer->m_cursor_x = 1;
 		m_GUI->MapViewer->m_cursor_y = 1;
 	}*/
-	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Выберите клетку")));
+	m_game_log.add(game_log_message_t(message_action_interaction, std::u16string(u"Р’С‹Р±РµСЂРёС‚Рµ РєР»РµС‚РєСѓ")));
 	auto exit = false;
 	while (!exit)
 	{
@@ -740,7 +697,7 @@ GameObject* Application::command_select_object_on_map()
 	GameObject* result = nullptr;
 	/*m_GUI->MapViewer->m_cursor_x = 1;
 	m_GUI->MapViewer->m_cursor_y = 1;*/
-	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Выберите обьект")));
+	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Р’С‹Р±РµСЂРёС‚Рµ РѕР±СЊРµРєС‚")));
 	auto exit = false;
 	while (!exit)
 	{
@@ -777,9 +734,9 @@ GameObject* Application::command_select_object()
 	GameObject* Result = nullptr;
 	/*m_GUI->MapViewer->m_cursor_x = 1;
 	m_GUI->MapViewer->m_cursor_y = 1;*/
-	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Выберите обьект")));
-	bool Exit = false;
-	while (Exit == false)
+	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Р’С‹Р±РµСЂРёС‚Рµ РѕР±СЊРµРєС‚")));
+	auto exit = false;
+	while (!exit)
 	{
 		std::unique_lock<std::mutex> lk(m_message_queue.m_mutex);
 		m_message_queue.m_reader = true;
@@ -793,7 +750,7 @@ GameObject* Application::command_select_object()
 			Result = (*m_message_queue.m_items.front())[0].m_object;
 			//if (static_cast<P_object*>(Result)->m_object->m_owner->Game_object_owner::m_kind == entity_e::cell)
 			{
-				Exit = true;
+				exit = true;
 			}
 			//else Result = nullptr;
 		}
@@ -807,7 +764,7 @@ GameObject* Application::command_select_object()
 				if (static_cast<Inventory_cell*>((*temp)[0].m_owner)->m_item)
 				{
 					Result = static_cast<Inventory_cell*>((*temp)[0].m_owner)->m_item;
-					Exit = true;
+					exit = true;
 				}
 				else Result = nullptr;
 				break;
@@ -817,7 +774,7 @@ GameObject* Application::command_select_object()
 				if (static_cast<Object_part*>((*temp)[0].m_owner)->m_item)
 				{
 					Result = static_cast<Object_part*>((*temp)[0].m_owner)->m_item;
-					Exit = true;
+					exit = true;
 				}
 				else Result = nullptr;
 				break;
@@ -826,7 +783,7 @@ GameObject* Application::command_select_object()
 		}
 		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::cancel)
 		{
-			Exit = true;
+			exit = true;
 		}
 		m_message_queue.m_read_message = false;
 		lk.unlock();
@@ -838,24 +795,24 @@ GameObject* Application::command_select_object()
 
 bool Application::command_open_body(GameObject*& Object)
 {
-	bool Result = false;
-	Parts_list* Property = static_cast<Parts_list*>(Object->get_effect(interaction_e::body));
-	if (Property != nullptr)
+	auto result = false;
+	const auto property = static_cast<Parts_list*>(Object->get_effect(interaction_e::body));
+	if (property != nullptr)
 	{
-		GUI_body_window* Window = new GUI_body_window(m_size.w / 2 - (192 + 2) / 2, m_size.h / 2 - (4 * 64 + 2) / 2, 192 + 4, 4 * 64 + 27, Object->m_name + u"::body", Object);
+		auto Window = new GUI_body_window(m_size.w / 2 - (192 + 2) / 2, m_size.h / 2 - (4 * 64 + 2) / 2, 192 + 4, 4 * 64 + 27, Object->m_name + u"::body", Object);
 		/*GUI_Body* Inv = new GUI_Body(static_cast<Interaction_feature*>(Object->get_feature(object_feature_e::interaction_feature)));
 		Inv->m_position.x = 2;
 		Inv->m_position.y = Window->m_size.h - Inv->m_size.h - 2;
 		Window->add_item_control(Inv);*/
 		//m_GUI->add_front(Window);
-		Result = true;
+		result = true;
 	}
-	return Result;
+	return result;
 }
 
 void Application::command_gui_show_characterization(GameObject*& object)
 {
-	GUI_Description_window* Window = new GUI_Description_window(m_size.w / 2 - (192 + 2) / 2, m_size.h / 2 - (4 * 64 + 2) / 2, 800 + 4, 8 * 64 + 27, object->m_name + u"::Характеристика", object);
+	GUI_Description_window* Window = new GUI_Description_window(m_size.w / 2 - (192 + 2) / 2, m_size.h / 2 - (4 * 64 + 2) / 2, 800 + 4, 8 * 64 + 27, object->m_name + u"::РҐР°СЂР°РєС‚РµСЂРёСЃС‚РёРєР°", object);
 	//m_GUI->add_front(Window);
 }
 
@@ -881,17 +838,17 @@ void Application::command_set_pickup_item_visibility(bool _Visibility)
 
 bool Application::command_check_position(GameObject*& object, MapCell*& position, GameMap*& map)
 {
-	std::function<bool(GameObject*)> qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier->predicat;
-	for (int z = 0; z < object->m_active_state->m_size.dz; z++)
+	const auto qualifier = static_cast<AI_enemy*>(object->m_active_state->m_ai)->m_path_qualifier->predicate;
+	for (auto z = 0; z < object->m_active_state->m_size.dz; z++)
 	{
-		for (int y = 0; y < object->m_active_state->m_size.dy; y++)
+		for (auto y = 0; y < object->m_active_state->m_size.dy; y++)
 		{
-			for (int x = 0; x < object->m_active_state->m_size.dx; x++)
+			for (auto x = 0; x < object->m_active_state->m_size.dx; x++)
 			{
 				//if (map->get(position->y + i,position->x + j) == nullptr){ return false; }
 				for (auto& m_item : map->get(position->z + z, position->y - y, position->x + x).m_items)
 				{
-					if ((m_item != object) && qualifier(m_item))
+					if (m_item != object && qualifier(m_item))
 					{
 						return false;
 					}
@@ -917,7 +874,7 @@ void Application::process_game()
 		m_turn = false;
 		end = std::chrono::high_resolution_clock::now();
 		elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-		Logger::Instance().info ("Просчет 10 ходов: " + std::to_string(elapsed.count()));
+		Logger::instance().info ("РџСЂРѕСЃС‡РµС‚ 10 С…РѕРґРѕРІ: " + std::to_string(elapsed.count()));
 	}
 }
 
@@ -928,10 +885,10 @@ void Application::on_turn()
 }
 
 Game_object_owner* Application::command_select_transfer(Parameter_destination* parameter) {
-	Game_object_owner* Result = nullptr;
-	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Выберите назначение")));
-	bool Exit = false;
-	while (Exit == false)
+	Game_object_owner* result = nullptr;
+	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Р’С‹Р±РµСЂРёС‚Рµ РЅР°Р·РЅР°С‡РµРЅРёРµ")));
+	auto exit = false;
+	while (!exit)
 	{
 		std::unique_lock<std::mutex> lk(m_message_queue.m_mutex);
 		m_message_queue.m_reader = true;
@@ -942,24 +899,24 @@ Game_object_owner* Application::command_select_transfer(Parameter_destination* p
 		m_message_queue.m_processed_message = true;
 		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::owner)
 		{
-			Result = (*m_message_queue.m_items.front())[0].m_owner;
-			Exit = true;
+			result = (*m_message_queue.m_items.front())[0].m_owner;
+			exit = true;
 		}
 		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::cancel)
 		{
-			Exit = true;
+			exit = true;
 		}
 		m_message_queue.m_read_message = false;
 		lk.unlock();
 		m_message_queue.m_condition_variable.notify_one();
 		m_message_queue.m_reader = false;
 	}
-	return Result;
+	return result;
 }
 
 //Parameter* Application::command_select_transfer_source(Parameter_destination* parameter){
 //	Parameter* Result = nullptr;
-//	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Выберите объект")));
+//	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::string("Р’С‹Р±РµСЂРёС‚Рµ РѕР±СЉРµРєС‚")));
 //	bool Exit = false;
 //	while (Exit == false)
 //	{
@@ -1019,9 +976,9 @@ Game_object_owner* Application::command_select_transfer(Parameter_destination* p
 Object_part* Application::command_select_body_part()
 {
 	Object_part* Result = nullptr;
-	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Выберите слот")));
-	bool Exit = false;
-	while (Exit == false)
+	m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Р’С‹Р±РµСЂРёС‚Рµ СЃР»РѕС‚")));
+	auto exit = false;
+	while (!exit)
 	{
 		std::unique_lock<std::mutex> lk(m_message_queue.m_mutex);
 		m_message_queue.m_reader = true;
@@ -1032,16 +989,16 @@ Object_part* Application::command_select_body_part()
 		m_message_queue.m_processed_message = true;
 		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::owner)
 		{
-			Parameter* p = m_message_queue.m_items.front();
+			const auto p = m_message_queue.m_items.front();
 			if ((*p)[0].m_owner->m_kind == entity_e::body_part)
 			{
 				Result = static_cast<Object_part*>((*p)[0].m_owner);
-				Exit = true;
+				exit = true;
 			}
 		}
 		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::cancel)
 		{
-			Exit = true;
+			exit = true;
 		}
 		m_message_queue.m_read_message = false;
 		lk.unlock();
@@ -1054,8 +1011,8 @@ Object_part* Application::command_select_body_part()
 bool Application::command_agreement()
 {
 	bool result;
-	bool Exit = false;
-	while (Exit == false)
+	auto exit = false;
+	while (exit == false)
 	{
 		std::unique_lock<std::mutex> lk(m_message_queue.m_mutex);
 		m_message_queue.m_reader = true;
@@ -1067,12 +1024,12 @@ bool Application::command_agreement()
 		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::accept)
 		{
 			result = true;
-			Exit = true;
+			exit = true;
 		}
 		if (m_message_queue.m_items.front()->m_kind == parameter_type_e::cancel)
 		{
 			result = false;
-			Exit = true;
+			exit = true;
 		}
 		m_message_queue.m_read_message = false;
 		lk.unlock();
@@ -1084,8 +1041,8 @@ bool Application::command_agreement()
 
 void Application::command_change_owner(Instruction_slot_parameter* parameter)
 {
-	Parameter* p = static_cast<Instruction_slot_parameter*>(parameter)->m_parameter;
-	Object_state* obj_state = (*p)[1].m_object->get_state(object_state_e::equip);
+	auto p = static_cast<Instruction_slot_parameter*>(parameter)->m_parameter;
+	auto obj_state = (*p)[1].m_object->get_state(object_state_e::equip);
 	//if (obj_state)
 	//{
 	//	if (object->m_active_state)
@@ -1102,7 +1059,7 @@ void Application::command_change_owner(Instruction_slot_parameter* parameter)
 	//}
 	if (obj_state)
 	{
-		Object_tag* list = obj_state->get_tag(object_tag_e::equippable);
+		auto list = obj_state->get_tag(object_tag_e::equippable);
 		if (list)
 		{
 			//LOG(INFO) << "step 0  "<<std::to_string((int)static_cast<ObjectTag::Equippable*>(list)->m_value->m_interaction_message_type);

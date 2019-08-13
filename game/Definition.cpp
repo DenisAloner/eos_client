@@ -6,23 +6,22 @@
 
 object_direction_e operator+(object_direction_e lhs, const rotate_direction_e& rhs)
 {
-	int result = static_cast<int>(lhs) + static_cast<int>(rhs);
-	switch (result)
-	{
+	auto result = static_cast<int>(lhs) + static_cast<int>(rhs);
+	switch (result) {
 	case -1: return object_direction_e::downright;
 	case 8: return object_direction_e::down;
 	default: return static_cast<object_direction_e>(result);
 	}
 }
 
-void Parser_context::reset()
+void SerializationContext::reset()
 {
 	m_items.clear();
 	m_object_index = 0;
 }
 
 
-Apply_info::Apply_info(GameObject* unit, Object_interaction* object):m_unit(unit),m_object(object)
+Apply_info::Apply_info(GameObject* unit, Object_interaction* object) :m_unit(unit), m_object(object)
 {
 }
 
@@ -30,25 +29,25 @@ void Object_interaction::apply_visitor(Visitor_generic& visitor)
 {
 }
 
+
 Packer_generic& Object_interaction::get_packer()
 {
-	return Packer<Object_interaction>::Instance();
+	return Packer<Object_interaction>::instance();
 }
 
-iSerializable* Packer<Object_interaction>::from_json(scheme_map_t* value,Parser_context& context)
+iSerializable* Packer<Object_interaction>::from_json(scheme_map_t* value, SerializationContext& context)
 {
 	//LOG(INFO) << Parser::UTF16_to_CP1251(Parser::get_value((*value)[u"value"])) << " :: " << std::to_string(GameObjectManager::m_config.m_templates.size());
-	return GameObjectManager::m_config->m_templates[Parser::UTF16_to_CP1251(Parser::get_value((*value)[u"value"]))]->clone();
+	return GameObjectManager::m_config->m_templates[utf16_to_cp1251(get_value((*value)[u"value"]))]->clone();
 }
 
 
-std::u16string Packer<MapCell>::to_json(iSerializable* value, Parser_context& context)
+std::u16string Packer<MapCell>::to_json(iSerializable* value, SerializationContext& context)
 {
 	if (value)
 	{
-		MapCell& obj = *dynamic_cast<MapCell*>(value);
-		std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\",\"value\":[" + Parser::
-			int_to_u16string(obj.x) + u"," + Parser::int_to_u16string(obj.y) + u"," + Parser::int_to_u16string(obj.z) + u"]}";
+		auto& obj = *dynamic_cast<MapCell*>(value);
+		auto out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\",\"value\":[" + int_to_u16string(obj.x) + u"," + int_to_u16string(obj.y) + u"," + int_to_u16string(obj.z) + u"]}";
 		return out;
 	}
 	else
@@ -58,13 +57,13 @@ std::u16string Packer<MapCell>::to_json(iSerializable* value, Parser_context& co
 	}
 }
 
-std::string Packer<MapCell>::to_binary(iSerializable* value, Parser_context& context)
+std::string Packer<MapCell>::to_binary(iSerializable* value, SerializationContext& context)
 {
 	if (value)
 	{
-		MapCell& obj = *dynamic_cast<MapCell*>(value);
-		std::size_t id = value->get_packer().get_type_id() + 1;
-		return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + Parser::to_binary<int>(obj.x,context) + Parser::to_binary<int>(obj.y,context) + Parser::to_binary<int>(obj.z, context);
+		auto& obj = *dynamic_cast<MapCell*>(value);
+		auto id = value->get_packer().get_type_id() + 1;
+		return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + parser_to_binary<int>(obj.x, context) + parser_to_binary<int>(obj.y, context) + parser_to_binary<int>(obj.z, context);
 	}
 	else
 	{
@@ -73,81 +72,81 @@ std::string Packer<MapCell>::to_binary(iSerializable* value, Parser_context& con
 	}
 }
 
-iSerializable* Packer<MapCell>::from_json(scheme_map_t* value, Parser_context& context)
+iSerializable* Packer<MapCell>::from_json(scheme_map_t* value, SerializationContext& context)
 {
-	scheme_vector_t* s = Parser::read_pair((*value)[u"value"]);
+	const auto s = read_pair((*value)[u"value"]);
 	int x;
 	int y;
 	int z;
-	Parser::from_json<int>((*s)[0], x,context);
-	Parser::from_json<int>((*s)[1], y,context);
-	Parser::from_json<int>((*s)[2], z, context);
-	return &context.m_game_world.m_maps.front()->get(z,y, x);
+	parser_from_json<int>((*s)[0], x, context);
+	parser_from_json<int>((*s)[1], y, context);
+	parser_from_json<int>((*s)[2], z, context);
+	return &context.m_game_world.m_maps.front()->get(z, y, x);
 }
 
-iSerializable* Packer<MapCell>::from_binary(const std::string& value, std::size_t& pos,Parser_context& context)
+iSerializable* Packer<MapCell>::from_binary(const std::string& value, std::size_t& pos, SerializationContext& context)
 {
 	int x;
 	int y;
 	int z;
-	Parser::from_binary<int>(value, x, pos, context);
-	Parser::from_binary<int>(value, y, pos, context);
-	Parser::from_binary<int>(value, z, pos, context);
-	return &context.m_game_world.m_maps.front()->get(z,y, x);
+	parser_from_binary<int>(value, x, pos, context);
+	parser_from_binary<int>(value, y, pos, context);
+	parser_from_binary<int>(value, z, pos, context);
+	return &context.m_game_world.m_maps.front()->get(z, y, x);
 }
 
-iSerializable* Packer<Parser::Link>::from_json(scheme_map_t* value, Parser_context& context)
+iSerializable* Packer<Serialization::Link>::from_json(scheme_map_t* value, SerializationContext& context)
 {
 	std::size_t id;
-	Parser::from_json<std::size_t>((*value)[u"value"], id,context);
+	parser_from_json<std::size_t>((*value)[u"value"], id, context);
 	return context.m_items[id - 1];
 }
 
-iSerializable* Packer<Parser::Link>::from_binary(const std::string& value, std::size_t& pos, Parser_context& context)
+iSerializable* Packer<Serialization::Link>::from_binary(const std::string& value, std::size_t& pos, SerializationContext& context)
 {
 	std::size_t id;
-	Parser::from_binary<std::size_t>(value, id, pos,context);
+	parser_from_binary<std::size_t>(value, id, pos, context);
 	return context.m_items[id - 1];
 }
 
-std::u16string Packer<GameObject>::to_json(iSerializable* value, Parser_context& context)
+std::u16string Packer<GameObject>::to_json(iSerializable* value, SerializationContext& context)
 {
-	std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\",\"value\":" + Parser::int_to_u16string(value->m_serialization_index) + u"}";
+	std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\",\"value\":" + int_to_u16string(value->m_serialization_index) + u"}";
 	return out;
 }
 
-std::string Packer<GameObject>::to_binary(iSerializable* value, Parser_context& context)
+std::string Packer<GameObject>::to_binary(iSerializable* value, SerializationContext& context)
 {
 	std::size_t id = value->get_packer().get_type_id() + 1;
 	std::size_t index = value->m_serialization_index;
 	return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + std::string(reinterpret_cast<const char*>(&index), sizeof(std::size_t));
 }
 
-iSerializable* Packer<GameObject>::from_json(scheme_map_t* value, Parser_context& context)
+iSerializable* Packer<GameObject>::from_json(scheme_map_t* value, SerializationContext& context)
 {
 	//LOG(INFO) << "iSerializable* Packer<GameObject>::from_json(scheme_map_t* value)";
-	const int i = Parser::to_int32((*value)[u"value"]);
+	const auto i = to_int32((*value)[u"value"]);
 	const auto it = std::next(context.m_game_world.m_object_manager.m_items.begin(), i);
 	return &(*it);
 }
 
-iSerializable* Packer<GameObject>::from_binary(const std::string& value, std::size_t& pos, Parser_context& context)
+iSerializable* Packer<GameObject>::from_binary(const std::string& value, std::size_t& pos, SerializationContext& context)
 {
 	std::size_t i;
-	Parser::from_binary<std::size_t>(value, i, pos,context);
+	parser_from_binary<std::size_t>(value, i, pos, context);
 	const auto it = std::next(context.m_game_world.m_object_manager.m_items.begin(), i);
 	return &(*it);
 }
 
-void Packer<GameObject>::from_binary(iSerializable& object, const std::string& value, std::size_t& pos, Parser_context& context)
+void Packer<GameObject>::from_binary(iSerializable& object, const std::string& value, std::size_t& pos, SerializationContext& context)
 {
-	GameObject& obj = dynamic_cast<GameObject&>(object);
+	auto& obj = dynamic_cast<GameObject&>(object);
 	object_from_binary<GameObject>(obj, value, pos, context);
 	obj.set_direction(obj.m_direction);
 	obj.update_interaction();
 }
 
-Dictonary<object_tag_e> Parser::m_json_object_tag = {
+Dictionary<object_tag_e> Dictionaries::m_json_object_tag = {
 	{ object_tag_e::poison_resist,"poison_resist" },
 	{ object_tag_e::purification_from_poison,"purification_from_poison" },
 	{ object_tag_e::mortal,"mortal" },
@@ -164,7 +163,7 @@ Dictonary<object_tag_e> Parser::m_json_object_tag = {
 	{ object_tag_e::footwear,"footwear" }
 };
 
-Dictonary<body_part_e> Parser::m_json_body_part_e = {
+Dictionary<body_part_e> Dictionaries::m_json_body_part_e = {
 	{ body_part_e::mouth,"mouth" },
 	{ body_part_e::wrist,"wrist" },
 	{ body_part_e::finger,"finger" },
@@ -175,12 +174,12 @@ Dictonary<body_part_e> Parser::m_json_body_part_e = {
 	{ body_part_e::container,"container" }
 };
 
-Dictonary<ai_type_e> Parser::m_json_ai_type_e = {
+Dictionary<ai_type_e> Dictionaries::m_json_ai_type_e = {
 	{ ai_type_e::non_humanoid,"non_humanoid" },
 	{ ai_type_e::trap,"trap" }
 };
 
-Dictonary<interaction_e> Parser::m_json_interaction_e = {
+Dictionary<interaction_e> Dictionaries::m_json_interaction_e = {
 	{ interaction_e::total_damage, "total_damage" },
 	{ interaction_e::damage, "damage" },
 	{ interaction_e::buff, "buff" },
@@ -208,7 +207,7 @@ Dictonary<interaction_e> Parser::m_json_interaction_e = {
 	{ interaction_e::equip, "equip" }
 };
 
-Dictonary<feature_list_type_e> Parser::m_json_feature_list_type_e = {
+Dictionary<feature_list_type_e> Dictionaries::m_json_feature_list_type_e = {
 	{ feature_list_type_e::generic,"generic" },
 	{ feature_list_type_e::parameter,"parameter" },
 	{ feature_list_type_e::tag,"tag" },
@@ -218,13 +217,13 @@ Dictonary<feature_list_type_e> Parser::m_json_feature_list_type_e = {
 	{ feature_list_type_e::vision_component,"vision_component" }
 };
 
-Dictonary<entity_e> Parser::m_json_entity_e = {
+Dictionary<entity_e> Dictionaries::m_json_entity_e = {
 	{ entity_e::game_object,"gameobject" },
 	{ entity_e::body_part,"object_part" },
 	{ entity_e::cell,"cell" }
 };
 
-Dictonary<action_e::type> Parser::m_json_action_e = {
+Dictionary<action_e::type> Dictionaries::m_json_action_e = {
 	{action_e::move,"move"},
 	{action_e::move_step,"move_step"},
 	{action_e::push,"push"},
@@ -246,7 +245,7 @@ Dictonary<action_e::type> Parser::m_json_action_e = {
 	{action_e::move_out,"move_out" }
 };
 
-Dictonary<object_state_e> Parser::m_json_object_state_e = {
+Dictionary<object_state_e> Dictionaries::m_json_object_state_e = {
 	{ object_state_e::alive,"alive" },
 	{ object_state_e::dead, "dead" },
 	{ object_state_e::on, "on" },
@@ -254,14 +253,14 @@ Dictonary<object_state_e> Parser::m_json_object_state_e = {
 	{ object_state_e::equip, "equip" }
 };
 
-Dictonary<effect_e> Parser::m_json_effect_e = {
+Dictionary<effect_e> Dictionaries::m_json_effect_e = {
 	{ effect_e::value,"value" },
 	{ effect_e::limit,"limit" },
 	{ effect_e::start_angle,"start_angle" },
 	{ effect_e::end_angle,"end_angle" }
 };
 
-Dictonary<object_direction_e> Parser::m_json_object_direction_e = {
+Dictionary<object_direction_e> Dictionaries::m_json_object_direction_e = {
 	{ object_direction_e::down,"down" },
 	{ object_direction_e::downleft,"downleft" },
 	{ object_direction_e::left,"left" },
@@ -272,60 +271,60 @@ Dictonary<object_direction_e> Parser::m_json_object_direction_e = {
 	{ object_direction_e::downright,"downright" },
 };
 
-std::unordered_map<effect_e, std::u16string>  Parser::m_string_effect_e = {
-	{ effect_e::value,u"модификатор значения" },
-	{ effect_e::limit,u"модификатор лимита" },
-	{ effect_e::start_angle, u"модификатор начального угла обзора" },
-	{ effect_e::end_angle, u"модификатор конечного угла обзора" }
+std::unordered_map<effect_e, std::u16string> Dictionaries::m_string_effect_e = {
+	{ effect_e::value,u"РјРѕРґРёС„РёРєР°С‚РѕСЂ Р·РЅР°С‡РµРЅРёСЏ" },
+	{ effect_e::limit,u"РјРѕРґРёС„РёРєР°С‚РѕСЂ Р»РёРјРёС‚Р°" },
+	{ effect_e::start_angle, u"РјРѕРґРёС„РёРєР°С‚РѕСЂ РЅР°С‡Р°Р»СЊРЅРѕРіРѕ СѓРіР»Р° РѕР±Р·РѕСЂР°" },
+	{ effect_e::end_angle, u"РјРѕРґРёС„РёРєР°С‚РѕСЂ РєРѕРЅРµС‡РЅРѕРіРѕ СѓРіР»Р° РѕР±Р·РѕСЂР°" }
 };
 
 
-std::unordered_map<interaction_e, std::u16string>  Parser::m_string_interaction_e = {
-	{ interaction_e::total_damage, u"общий дополнительный урон" },
-	{ interaction_e::damage, u"урон" },
-	{ interaction_e::buff, u"баффы" },
-	{ interaction_e::use, u"применение" },
-	{ interaction_e::health, u"здоровье" },
-	{ interaction_e::strength, u"сила" },
-	{ interaction_e::intelligence, u"интеллект" },
-	{ interaction_e::dexterity, u"ловкость" },
-	{ interaction_e::hunger,  u"голод" },
-	{ interaction_e::thirst,  u"жажда" },
-	{ interaction_e::poison,  u"яд" },
-	{ interaction_e::action,  u"действия" },
-	{ interaction_e::tag,  u"метки" },
-	{ interaction_e::body,  u"тело" },
-	{ interaction_e::weapon_damage,  u"урон оружия" },
-	{ interaction_e::skill_sword,  u"владение мечом" },
-	{ interaction_e::skill_bow,  u"владение луком" },
-	{ interaction_e::strength_bonus,  u"бонус силы" },
-	{ interaction_e::demand_weapon_skill,  u"требование к владению оружием" },
-	{ interaction_e::evasion_skill, u"навык уклонения" },
-	{ interaction_e::weapon_range,  u"дальность" },
-	{ interaction_e::vision,  u"зрение" },
-	{ interaction_e::vision_component,  u"поле зрения" },
-	{ interaction_e::skill_unarmed_combat,  u"владение безоружным боем" },
-	{ interaction_e::equip,  u"экипировка" }
+std::unordered_map<interaction_e, std::u16string> Dictionaries::m_string_interaction_e = {
+	{ interaction_e::total_damage, u"РѕР±С‰РёР№ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Р№ СѓСЂРѕРЅ" },
+	{ interaction_e::damage, u"СѓСЂРѕРЅ" },
+	{ interaction_e::buff, u"Р±Р°С„С„С‹" },
+	{ interaction_e::use, u"РїСЂРёРјРµРЅРµРЅРёРµ" },
+	{ interaction_e::health, u"Р·РґРѕСЂРѕРІСЊРµ" },
+	{ interaction_e::strength, u"СЃРёР»Р°" },
+	{ interaction_e::intelligence, u"РёРЅС‚РµР»Р»РµРєС‚" },
+	{ interaction_e::dexterity, u"Р»РѕРІРєРѕСЃС‚СЊ" },
+	{ interaction_e::hunger,  u"РіРѕР»РѕРґ" },
+	{ interaction_e::thirst,  u"Р¶Р°Р¶РґР°" },
+	{ interaction_e::poison,  u"СЏРґ" },
+	{ interaction_e::action,  u"РґРµР№СЃС‚РІРёСЏ" },
+	{ interaction_e::tag,  u"РјРµС‚РєРё" },
+	{ interaction_e::body,  u"С‚РµР»Рѕ" },
+	{ interaction_e::weapon_damage,  u"СѓСЂРѕРЅ РѕСЂСѓР¶РёСЏ" },
+	{ interaction_e::skill_sword,  u"РІР»Р°РґРµРЅРёРµ РјРµС‡РѕРј" },
+	{ interaction_e::skill_bow,  u"РІР»Р°РґРµРЅРёРµ Р»СѓРєРѕРј" },
+	{ interaction_e::strength_bonus,  u"Р±РѕРЅСѓСЃ СЃРёР»С‹" },
+	{ interaction_e::demand_weapon_skill,  u"С‚СЂРµР±РѕРІР°РЅРёРµ Рє РІР»Р°РґРµРЅРёСЋ РѕСЂСѓР¶РёРµРј" },
+	{ interaction_e::evasion_skill, u"РЅР°РІС‹Рє СѓРєР»РѕРЅРµРЅРёСЏ" },
+	{ interaction_e::weapon_range,  u"РґР°Р»СЊРЅРѕСЃС‚СЊ" },
+	{ interaction_e::vision,  u"Р·СЂРµРЅРёРµ" },
+	{ interaction_e::vision_component,  u"РїРѕР»Рµ Р·СЂРµРЅРёСЏ" },
+	{ interaction_e::skill_unarmed_combat,  u"РІР»Р°РґРµРЅРёРµ Р±РµР·РѕСЂСѓР¶РЅС‹Рј Р±РѕРµРј" },
+	{ interaction_e::equip,  u"СЌРєРёРїРёСЂРѕРІРєР°" }
 };
 
-std::unordered_map<object_tag_e, std::u16string>  Parser::m_string_object_tag_e = {
-	{ object_tag_e::poison_resist , u"сопротивление к яду" },
-	{ object_tag_e::purification_from_poison , u"очищение от яда" },
-	{ object_tag_e::mortal , u"смертное существо" },
-	{ object_tag_e::pass_able , u"не является преградой" },
-	{ object_tag_e::pick_able , u"можно взять" },
-	{ object_tag_e::seethrough_able , u"не загораживает обзор" },
-	{ object_tag_e::activator , u"активирует/деактивирует механизмы" },
-	{ object_tag_e::fast_move , u"быстрое передвижение" },
-	{ object_tag_e::equippable , u"можно одеть" },
-	{ object_tag_e::ring , u"кольцо" },
-	{ object_tag_e::requirements_to_object , u"требования к предмету" },
-	{ object_tag_e::cursed , u"наложено проклятье" },
-	{ object_tag_e::can_transfer_object , u"может перекладывать предметы" },
-	{ object_tag_e::footwear , u"обувь" }
+std::unordered_map<object_tag_e, std::u16string> Dictionaries::m_string_object_tag_e = {
+	{ object_tag_e::poison_resist , u"СЃРѕРїСЂРѕС‚РёРІР»РµРЅРёРµ Рє СЏРґСѓ" },
+	{ object_tag_e::purification_from_poison , u"РѕС‡РёС‰РµРЅРёРµ РѕС‚ СЏРґР°" },
+	{ object_tag_e::mortal , u"СЃРјРµСЂС‚РЅРѕРµ СЃСѓС‰РµСЃС‚РІРѕ" },
+	{ object_tag_e::pass_able , u"РЅРµ СЏРІР»СЏРµС‚СЃСЏ РїСЂРµРіСЂР°РґРѕР№" },
+	{ object_tag_e::pick_able , u"РјРѕР¶РЅРѕ РІР·СЏС‚СЊ" },
+	{ object_tag_e::seethrough_able , u"РЅРµ Р·Р°РіРѕСЂР°Р¶РёРІР°РµС‚ РѕР±Р·РѕСЂ" },
+	{ object_tag_e::activator , u"Р°РєС‚РёРІРёСЂСѓРµС‚/РґРµР°РєС‚РёРІРёСЂСѓРµС‚ РјРµС…Р°РЅРёР·РјС‹" },
+	{ object_tag_e::fast_move , u"Р±С‹СЃС‚СЂРѕРµ РїРµСЂРµРґРІРёР¶РµРЅРёРµ" },
+	{ object_tag_e::equippable , u"РјРѕР¶РЅРѕ РѕРґРµС‚СЊ" },
+	{ object_tag_e::ring , u"РєРѕР»СЊС†Рѕ" },
+	{ object_tag_e::requirements_to_object , u"С‚СЂРµР±РѕРІР°РЅРёСЏ Рє РїСЂРµРґРјРµС‚Сѓ" },
+	{ object_tag_e::cursed , u"РЅР°Р»РѕР¶РµРЅРѕ РїСЂРѕРєР»СЏС‚СЊРµ" },
+	{ object_tag_e::can_transfer_object , u"РјРѕР¶РµС‚ РїРµСЂРµРєР»Р°РґС‹РІР°С‚СЊ РїСЂРµРґРјРµС‚С‹" },
+	{ object_tag_e::footwear , u"РѕР±СѓРІСЊ" }
 };
 
-Parser::Parser()
+Serialization::Serialization()
 {
 	register_packer<Instruction_arg_extract>(u"instruction_arg_extract");
 	register_packer<TileManager_Single>(u"tilemanager_single");
@@ -370,7 +369,7 @@ Parser::Parser()
 	register_packer <TileManager_Atlas_Rotatable>(u"tilemanager_atlas_rotatable");
 }
 
-Parser::~Parser()
+Serialization::~Serialization()
 {
 }
 
@@ -379,7 +378,7 @@ Parser::~Parser()
 //	if (value)
 //	{
 //		LOG(INFO) << UTF16_to_CP1251((*value).get_packer().get_type_name());
-//		std::u16string result = value->get_packer().to_json(value);
+//		std::u16string result = value->get_packer().parser_to_json(value);
 //		if (result.empty())
 //		{
 //			std::u16string out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\"}";
@@ -397,31 +396,26 @@ Parser::~Parser()
 //	}
 //}
 
-scheme_map_t* Parser::read_object(std::u16string& value)
-{
+scheme_map_t* read_object(std::u16string& value) {
 	const char16_t* opening_symbol = nullptr;
-	int count = 0;
-	for (int i = 0; i < value.size(); ++i)
+	auto count = 0;
+	for (auto& i : value)
 	{
-		switch (value[i])
-		{
-		case u'{':
-		{
+		switch (i) {
+		case u'{': {
 			if (opening_symbol == nullptr)
 			{
-				opening_symbol = &value[i];
+				opening_symbol = &i;
 			}
 			count += 1;
 			break;
 		}
-		case u'}':
-		{
-			if (opening_symbol != nullptr)
-			{
+		case u'}': {
+			if (opening_symbol != nullptr) {
 				count = count - 1;
 				if (count == 0)
 				{
-					std::u16string sub_value(opening_symbol + 1, &value[i] - opening_symbol - 1);
+					std::u16string sub_value(opening_symbol + 1, &i - opening_symbol - 1);
 					//LOG(INFO) << "read_object -> " << UTF16_to_CP1251(sub_value);
 					return parse_object(sub_value);
 				}
@@ -434,31 +428,25 @@ scheme_map_t* Parser::read_object(std::u16string& value)
 	return nullptr;
 }
 
-scheme_list_t* Parser::read_array(std::u16string& value)
-{
+scheme_list_t* read_array(std::u16string& value) {
 	const char16_t* opening_symbol = nullptr;
-	int count = 0;
-	for (int i = 0; i < value.size(); ++i)
+	auto count = 0;
+	for (auto& i : value)
 	{
-		switch (value[i])
-		{
-		case u'[':
-		{
-			if (opening_symbol == nullptr)
-			{
-				opening_symbol = &value[i];
+		switch (i) {
+		case u'[': {
+			if (opening_symbol == nullptr) {
+				opening_symbol = &i;
 			}
 			count += 1;
 			break;
 		}
 		case u']':
 		{
-			if (opening_symbol != nullptr)
-			{
+			if (opening_symbol != nullptr) {
 				count = count - 1;
-				if (count == 0)
-				{
-					std::u16string sub_value(opening_symbol + 1, &value[i] - opening_symbol - 1);
+				if (count == 0) {
+					std::u16string sub_value(opening_symbol + 1, &i - opening_symbol - 1);
 					return parse_array(sub_value);
 				}
 			}
@@ -470,19 +458,19 @@ scheme_list_t* Parser::read_array(std::u16string& value)
 	return nullptr;
 }
 
-scheme_vector_t* Parser::read_pair(std::u16string& value)
+scheme_vector_t* read_pair(std::u16string& value)
 {
 	const char16_t* opening_symbol = nullptr;
-	int count = 0;
-	for (int i = 0; i < value.size(); ++i)
+	auto count = 0;
+	for (auto& i : value)
 	{
-		switch (value[i])
+		switch (i)
 		{
 		case u'[':
 		{
 			if (opening_symbol == nullptr)
 			{
-				opening_symbol = &value[i];
+				opening_symbol = &i;
 			}
 			count += 1;
 			break;
@@ -494,7 +482,7 @@ scheme_vector_t* Parser::read_pair(std::u16string& value)
 				count = count - 1;
 				if (count == 0)
 				{
-					std::u16string sub_value(opening_symbol + 1, &value[i] - opening_symbol - 1);
+					std::u16string sub_value(opening_symbol + 1, &i - opening_symbol - 1);
 					return parse_pair(sub_value);
 				}
 			}
@@ -506,41 +494,32 @@ scheme_vector_t* Parser::read_pair(std::u16string& value)
 	return nullptr;
 }
 
-std::u16string* get_token(std::u16string value, std::size_t& i)
-{
-	std::size_t opening_pos = i;
+std::u16string* get_token(std::u16string value, std::size_t& i) {
+	auto opening_pos = i;
 	std::size_t count = 0;
-	bool expr = false;
+	auto expr = false;
 	for (i; i < value.size(); ++i)
 	{
-		switch (value[i])
-		{
-		case u'{':
-		{
-			if (expr)
-			{
-				if (value[opening_pos] == u'{')
-				{
+		switch (value[i]) {
+		case u'{': {
+			if (expr) {
+				if (value[opening_pos] == u'{') {
 					count += 1;
 				}
 			}
-			else
-			{
+			else {
 				opening_pos = i;
 				count += 1;
 				expr = true;
 			}
 			break;
 		}
-		case u'}':
-		{
-			if (value[opening_pos] == u'{')
-			{
+		case u'}': {
+			if (value[opening_pos] == u'{') {
 				count -= 1;
-				if (count == 0)
-				{
-					std::size_t pos = value.find(u',', i);
-					std::u16string* result = new std::u16string(value.substr(opening_pos, i - opening_pos + 1));
+				if (count == 0) {
+					const auto pos = value.find(u',', i);
+					const auto result = new std::u16string(value.substr(opening_pos, i - opening_pos + 1));
 					if (pos != std::string::npos)
 					{
 						i = pos;
@@ -556,36 +535,28 @@ std::u16string* get_token(std::u16string value, std::size_t& i)
 		}
 		case u'[':
 		{
-			if (expr)
-			{
-				if (value[opening_pos] == u'[')
-				{
+			if (expr) {
+				if (value[opening_pos] == u'[') {
 					count += 1;
 				}
 			}
-			else
-			{
+			else {
 				opening_pos = i;
 				count += 1;
 				expr = true;
 			}
 			break;
 		}
-		case u']':
-		{
-			if (value[opening_pos] == u'[')
-			{
+		case u']': {
+			if (value[opening_pos] == u'[') {
 				count -= 1;
-				if (count == 0)
-				{
-					std::size_t pos = value.find(u',', i);
-					std::u16string* result = new std::u16string(value.substr(opening_pos, i - opening_pos + 1));
-					if (pos != std::string::npos)
-					{
+				if (count == 0) {
+					const auto pos = value.find(u',', i);
+					const auto result = new std::u16string(value.substr(opening_pos, i - opening_pos + 1));
+					if (pos != std::string::npos) {
 						i = pos;
 					}
-					else
-					{
+					else {
 						i = value.size() - 1;
 					}
 					return result;
@@ -593,37 +564,31 @@ std::u16string* get_token(std::u16string value, std::size_t& i)
 			}
 			break;
 		}
-		case u'"':
-		{
-			std::size_t pos = value.find(u'"', i + 1);
-			if (pos == std::string::npos)
-			{
+		case u'"': {
+			const auto pos = value.find(u'"', i + 1);
+			if (pos == std::string::npos) {
 				return nullptr;
 			}
-			else
-			{
+			else {
 				i = pos;
 			}
 			break;
 		}
-		case u',':
-		{
-			if (!expr)
-			{
+		case u',': {
+			if (!expr) {
 				return new std::u16string(value.substr(opening_pos, i - opening_pos));
 			}
 			break;
 		}
 		}
 	}
-	if (!expr)
-	{
+	if (!expr) {
 		return new std::u16string(value.substr(opening_pos, i - opening_pos + 1));
 	}
 	return nullptr;
 }
 
-scheme_map_t* Parser::parse_object(std::u16string& value)
+scheme_map_t* parse_object(std::u16string& value)
 {
 	std::u16string* fname = nullptr;
 	scheme_map_t* result = nullptr;
@@ -653,14 +618,14 @@ scheme_map_t* Parser::parse_object(std::u16string& value)
 				if (sep_pos != std::string::npos)
 				{
 					sep_pos += 1;
-					std::u16string* fvalue = get_token(value, sep_pos);
-					if (!fvalue)
+					const auto token = get_token(value, sep_pos);
+					if (!token)
 					{
 						return result;
 					}
 					if (result == nullptr) { result = new scheme_map_t; }
-					(*result)[*fname] = *fvalue;
-					i = sep_pos-1;
+					(*result)[*fname] = *token;
+					i = sep_pos - 1;
 				}
 				else
 				{
@@ -678,65 +643,63 @@ scheme_map_t* Parser::parse_object(std::u16string& value)
 	return result;
 }
 
-scheme_list_t* Parser::parse_array(std::u16string& value)
+scheme_list_t* parse_array(std::u16string& value)
 {
-	std::u16string* fname = nullptr;
 	scheme_list_t* result = nullptr;
 	for (std::size_t i = 0; i < value.size(); ++i)
 	{
-		std::u16string* fvalue = get_token(value, i);
-		if (!fvalue)
+		const auto token = get_token(value, i);
+		if (!token)
 		{
 			return result;
 		}
 		if (result == nullptr) { result = new scheme_list_t; }
-		result->push_back(*fvalue);
+		result->push_back(*token);
 	}
 	return result;
 }
 
-scheme_vector_t* Parser::parse_pair(std::u16string& value)
+scheme_vector_t* parse_pair(std::u16string& value)
 {
-	std::u16string* fname = nullptr;
 	scheme_vector_t* result = nullptr;
 	for (std::size_t i = 0; i < value.size(); ++i)
 	{
-		std::u16string* fvalue = get_token(value, i);
-		if (!fvalue)
+		const auto token = get_token(value, i);
+		if (!token)
 		{
 			return result;
 		}
 		if (result == nullptr) { result = new scheme_vector_t; }
-		result->push_back(*fvalue);
+		result->push_back(*token);
 	}
 	return result;
 }
 
-bool isalpha(char16_t symbol)
+bool isalpha(const char16_t symbol)
 {
 	return (symbol > 0x3F && symbol < 0x5B) || (symbol > 0x61 && symbol < 0x7B);
 }
 
-std::u16string Parser::get_value(const std::u16string& value)
+std::u16string get_value(const std::u16string& value)
 {
-	std::size_t start_pos = value.find(u'"');
+	const auto start_pos = value.find(u'"');
 	if (start_pos != std::string::npos)
 	{
-		std::size_t end_pos = value.find(u'"', start_pos + 1);
+		const auto end_pos = value.find(u'"', start_pos + 1);
 		if (end_pos != std::string::npos)
 		{
-			std::u16string* result = new std::u16string(value.substr(start_pos + 1, end_pos - start_pos - 1));
+			const auto result = new std::u16string(value.substr(start_pos + 1, end_pos - start_pos - 1));
 			return *result;
 		}
 	}
 	const char16_t* opening_symbol = nullptr;
-	for (std::size_t i = 0; i < value.size(); ++i)
+	for (const auto& i : value)
 	{
-		if (isalpha(value[i]))
+		if (isalpha(i))
 		{
 			if (opening_symbol == nullptr)
 			{
-				opening_symbol = &value[i];
+				opening_symbol = &i;
 			}
 		}
 		else
@@ -756,8 +719,8 @@ std::u16string Parser::get_value(const std::u16string& value)
 	return u"";
 }
 
-std::u16string Parser::int_to_u16string(const int &value) {
-	std::string temp = std::to_string(value);
+std::u16string int_to_u16string(const int& value) {
+	auto temp = std::to_string(value);
 	std::u16string result(temp.size(), 0);
 	for (std::size_t i = 0; i < temp.size(); ++i)
 	{
@@ -766,12 +729,12 @@ std::u16string Parser::int_to_u16string(const int &value) {
 	return result;
 }
 
-std::u16string Parser::float_to_u16string(const float& i)
+std::u16string float_to_u16string(const float& i)
 {
-	return CP1251_to_UTF16(std::to_string(i));
+	return cp1251_to_utf16(std::to_string(i));
 }
 
-int Parser::to_int32(const std::u16string& value)
+int to_int32(const std::u16string& value)
 {
 	int result = 0;
 	const char16_t* opening_symbol = nullptr;
@@ -829,7 +792,7 @@ transform:
 	return result;
 }
 
-float Parser::to_float(const std::u16string& value) {
+float to_float(const std::u16string& value) {
 	float result = 0.0;
 	const char16_t* opening_symbol = nullptr;
 	std::size_t i;
@@ -851,7 +814,7 @@ float Parser::to_float(const std::u16string& value) {
 parse:
 	if (opening_symbol != nullptr)
 	{
-		std::string v = UTF16_to_CP1251(std::u16string(opening_symbol, &value[i - 1] - opening_symbol + 1));
+		auto v = utf16_to_cp1251(std::u16string(opening_symbol, &value[i - 1] - opening_symbol + 1));
 		if (v != "-")
 		{
 			std::replace(v.begin(), v.end(), '.', *localeconv()->decimal_point);
@@ -861,51 +824,99 @@ parse:
 	return result;
 }
 
-std::string Parser::UTF16_to_CP1251(std::u16string const& value)
+std::u16string utf8_to_cp1251(const u8string& value)
+{
+	std::u16string out16(value.length(), '0');
+	std::size_t pos = 0;
+	for (std::size_t i = 0; i < value.size(); ++i) {
+		auto code = value[i];
+		if ((code & 0x80) == 0) {
+			out16[pos] = code;
+			pos += 1;
+		}
+		else if ((code & 0xC0) == 0xC0) {
+			out16[pos] = (static_cast<unsigned short>(code) << 3) & (0x1F & value[i + 1]);
+			pos += 1;
+			i += 1;
+		}
+	}
+	/*std::string out(value.length(), '0');
+	Logger::instance().info(std::to_string(value.size()));
+	for (std::size_t i = 0; i < value.length(); ++i) {
+		auto v = value[i];
+		Logger::instance().info(std::to_string(value[i]));
+		if (value[i] > 0x409 && value[i] < 0x450) {
+			out[i] = value[i] - 0x410 + 0xC0;
+		}
+		else {
+			out[i] = value[i];
+		}
+	}*/
+	return out16;
+}
+
+std::u16string utf8_to_cp1251_2(const char* value)
+{
+	auto length = 0;
+	while (value[length] != '\0') length++;
+	std::u16string out16(length, '0');
+	std::size_t pos = 0;
+	for (std::size_t i = 0; i < length; ++i) {
+		const auto code = unsigned char(value[i]);
+		Logger::instance().info(std::to_string(code));
+		if ((code & 0x80) == 0) {
+			Logger::instance().info("step1");
+			out16[pos] = code;
+			pos += 1;
+		}
+		else if ((code & 0xC0) == 0xC0) {
+			Logger::instance().info("step2 " + std::to_string(unsigned char(value[i + 1])));
+			Logger::instance().info(std::to_string(static_cast<unsigned short>(code) << 6));
+			out16[pos] = (static_cast<unsigned short>(0x1F & code) << 6) | (0x3F & value[i + 1]);
+			pos += 1;
+			i += 1;
+		}
+		Logger::instance().info(std::to_string(out16[pos - 1]));
+	}
+	/*std::string out(value.length(), '0');
+	Logger::instance().info(std::to_string(value.size()));
+	for (std::size_t i = 0; i < value.length(); ++i) {
+		auto v = value[i];
+		Logger::instance().info(std::to_string(value[i]));
+		if (value[i] > 0x409 && value[i] < 0x450) {
+			out[i] = value[i] - 0x410 + 0xC0;
+		}
+		else {
+			out[i] = value[i];
+		}
+	}*/
+	return out16;
+}
+
+std::string utf16_to_cp1251(std::u16string const& value)
 {
 	std::string out(value.length(), '0');
-	for (int i = 0; i<value.length(); ++i)
-	{
-		if (value[i]>0x409 && value[i]<0x450)
-		{/*
-			if (value[i]<0x440)
-			{*/
-				out[i] = value[i] - 0x410 + 0xC0;
-		/*	}
-			else
-			{
-				out[i] = value[i] - 0x440 + 0xE0;
-			}
-*/
+	for (std::size_t i = 0; i < value.length(); ++i){
+		if (value[i] > 0x409 && value[i] < 0x450){
+			out[i] = value[i] - 0x410 + 0xC0;
 		}
-		else
-		{
+		else{
 			out[i] = value[i];
 		}
 	}
 	return out;
 }
 
-std::u16string Parser::CP1251_to_UTF16(std::string const& value)
+std::u16string cp1251_to_utf16(std::string const& value)
 {
 	std::u16string out(value.length(), '0');
-	for (int i = 0; i<value.length(); ++i)
-	{
-		if (value[i]>0x7F && value[i]<0xB0)
-		{
-			if (value[i]<0x440)
-			{
-				out[i] = value[i] - 0x80 + 0x410;
-			}
-			else
-			{
-				out[i] = value[i] - 0xE0 + 0x440;
-			}
-
+	for (std::size_t i = 0; i < value.length(); ++i){
+		const auto symbol= static_cast<unsigned char>(value[i]);
+		if (symbol > 0x7F && symbol < 0xB0){
+			out[i] = symbol - 0xE0 + 0x440;
 		}
-		else
-		{
-			out[i] = value[i];
+		else{
+			out[i] = symbol;
 		}
 	}
 	return out;

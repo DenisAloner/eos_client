@@ -10,45 +10,43 @@ template<class EventArgType>
 class Event
 {
 public:
-	typedef std::function<void(EventArgType const&)> EventSignature;
-	typedef int EventHandle;
+	typedef std::function<void(EventArgType const&)> event_signature;
+	typedef int event_handle;
 
-public:
-	Event(): eventHandle(0) {};
+	Event(): event_handle_(0) {};
 
-	EventHandle AddHandler(EventSignature const& f) {
-		functions.insert(std::make_pair(++eventHandle, f));
-		return eventHandle;
+	event_handle add_handler(event_signature const& f) {
+		functions_.insert(std::make_pair(++event_handle_, f));
+		return event_handle_;
 	}
 
-	void RemoveHandler(EventHandle handle) {
-		functions.erase(handle);
+	void remove_handler(event_handle handle) {
+		functions_.erase(handle);
 	}
 
-	void Clear() {
-		functions.clear();
+	void clear() {
+		functions_.clear();
 	}
 
-	Event& operator+=(EventSignature const& f) {
-		AddHandler(f);
+	Event& operator+=(event_signature const& f) {
+		add_handler(f);
 		return *this;
 	}
 
-	Event& operator-=(EventHandle handle) {
-		RemoveHandler(handle);
+	Event& operator-=(const event_handle handle) {
+		remove_handler(handle);
 		return *this;
 	}
 
 	void operator()(EventArgType const& arg) {
-		//for each(auto const& f in functions) in Visual Studio
-		for(auto const& f : functions) {
+		for(auto const& f : functions_) {
 			f.second(arg);
 		}
 	}
 
 private:
-	EventHandle eventHandle;
-	std::map<int, EventSignature> functions;
+	event_handle event_handle_;
+	std::map<int, event_signature> functions_;
 };
 
 class GUI_connectable_i

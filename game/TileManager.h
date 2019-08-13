@@ -5,7 +5,7 @@
 #include "graphics/gl.hpp"
 #include "Application.h"
 
-class TileManager : public iSerializable, public InstanceDictonaryElement
+class TileManager : public iSerializable, public InstanceDictionaryElement
 {
 public:
 
@@ -27,8 +27,8 @@ public:
 	//	return Packer<Object_interaction>::Instance();
 	//}
 
-	void vector_gl_uint_from_json(const std::u16string& value, std::vector<GLuint>& prop, Parser_context& context);
-	void vector_gl_uint_from_binary(const std::string& value, std::vector<GLuint>& prop, std::size_t& pos, Parser_context& context);
+	void vector_gl_uint_from_json(const std::u16string& value, std::vector<GLuint>& prop, SerializationContext& context);
+	void vector_gl_uint_from_binary(const std::string& value, std::vector<GLuint>& prop, std::size_t& pos, SerializationContext& context);
 
 	constexpr static auto properties() 
 	{

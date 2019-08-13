@@ -8,12 +8,12 @@ GameTask::GameTask(Action* Action = nullptr, Parameter* Parameter = nullptr)
 }
 
 
-ActionManager::ActionManager(void)
+ActionManager::ActionManager()
 {
 }
 
 
-ActionManager::~ActionManager(void)
+ActionManager::~ActionManager()
 {
 }
 
@@ -53,8 +53,7 @@ GameTask* ActionManager::get_task()
 	m_is_remove = true;
 	while (!m_items.empty())
 	{
-		GameTask* parent;
-		parent = m_items.front();
+		auto parent = m_items.front();
 		GameTask* child = nullptr;
 		if (parent->m_action->get_child(child))
 		{

@@ -49,17 +49,17 @@ public:
 	Parameter(parameter_type_e kind);
 
 	template<typename... T> 
-	Parameter(parameter_type_e kind, T... args):Parameter(kind)
+	Parameter(const parameter_type_e kind, T... args):Parameter(kind)
 	{
 		set_helper(0, args...);
 	}
 
-	Parameter_argument_t& operator[](std::size_t i)
+	Parameter_argument_t& operator[](const std::size_t i)
 	{
 		return m_args[i];
 	}
 
-	const Parameter_argument_t& operator[](std::size_t i) const
+	const Parameter_argument_t& operator[](const std::size_t i) const
 	{
 		return m_args[i];
 	}
@@ -79,14 +79,14 @@ public:
 
 private:
 
-	template<typename T, typename... args>
-	void set_helper(int i, T value)
+	template<typename T, typename... Args>
+	void set_helper(const int i, T value)
 	{
 		m_args[i].set(value);
 	};
 
-	template<typename T, typename... args>
-	void set_helper(int i, T value, args... a)
+	template<typename T, typename... Args>
+	void set_helper(const int i, T value, Args... a)
 	{
 		m_args[i].set(value);
 		if (i < m_size) { set_helper(i + 1, a...); }
@@ -118,8 +118,8 @@ public:
 	bool m_result;
 
 	Instruction_result();
-	virtual Instruction_result* clone() { return nullptr; };
-	virtual void apply_effect(GameObject* unit, Object_interaction* object) {};
+	Instruction_result* clone() override { return nullptr; };
+	void apply_effect(GameObject* unit, Object_interaction* object) override {};
 
 	Packer_generic& get_packer() override;
 };

@@ -39,7 +39,7 @@ void FOV_light::calculate(int radius, GameObject* unit, GameMap* map)
 	{
 		if (!((z < 0) || (z > map->m_size.dz - 1)))
 		{
-			//LOG(INFO) <<"Выполнено для уровня: " <<std::to_string(z);
+			//LOG(INFO) <<"Р’С‹РїРѕР»РЅРµРЅРѕ РґР»СЏ СѓСЂРѕРІРЅСЏ: " <<std::to_string(z);
 			for (int y = unit->cell()->y - radius; y < unit->cell()->y + radius + 1; ++y)
 			{
 				if (!((y < 0) || (y > map->m_size.dy - 1)))

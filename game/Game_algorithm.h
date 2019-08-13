@@ -11,11 +11,11 @@ class Game_algorithm
 
 public:
 
-	//Функция проверяет, находятся ли объекты рядом (т.е. расстояние между их ближайшими клетками меньше 2)
+	//Р¤СѓРЅРєС†РёСЏ РїСЂРѕРІРµСЂСЏРµС‚, РЅР°С…РѕРґСЏС‚СЃСЏ Р»Рё РѕР±СЉРµРєС‚С‹ СЂСЏРґРѕРј (С‚.Рµ. СЂР°СЃСЃС‚РѕСЏРЅРёРµ РјРµР¶РґСѓ РёС… Р±Р»РёР¶Р°Р№С€РёРјРё РєР»РµС‚РєР°РјРё РјРµРЅСЊС€Рµ 2)
 	static bool check_distance(MapCell* a_cell, dimension3_t& a_size, MapCell* b_cell, dimension3_t& b_size);
 	//static bool check_distance(position3_t* a_cell, dimension3_t& a_size, position3_t* b_cell, dimension3_t& b_size);
 
-	//функция возвращает направление объекта, которое будет указывать на передаваемый объект
+	//С„СѓРЅРєС†РёСЏ РІРѕР·РІСЂР°С‰Р°РµС‚ РЅР°РїСЂР°РІР»РµРЅРёРµ РѕР±СЉРµРєС‚Р°, РєРѕС‚РѕСЂРѕРµ Р±СѓРґРµС‚ СѓРєР°Р·С‹РІР°С‚СЊ РЅР° РїРµСЂРµРґР°РІР°РµРјС‹Р№ РѕР±СЉРµРєС‚
 	static object_direction_e turn_to_object(GameObject* object, GameObject* turn_to);
 
 	static object_direction_e turn_to_cell(GameObject* object, MapCell* c);
@@ -24,7 +24,7 @@ public:
 
 	static object_direction_e get_direction(object_direction_e direction, int camera_turn);
 
-	//Функция возвращает минимальное количество поворотов между двумя ориентациями с учетов направления (по часовой стрелке для положительного результата)
+	//Р¤СѓРЅРєС†РёСЏ РІРѕР·РІСЂР°С‰Р°РµС‚ РјРёРЅРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕРІРѕСЂРѕС‚РѕРІ РјРµР¶РґСѓ РґРІСѓРјСЏ РѕСЂРёРµРЅС‚Р°С†РёСЏРјРё СЃ СѓС‡РµС‚РѕРІ РЅР°РїСЂР°РІР»РµРЅРёСЏ (РїРѕ С‡Р°СЃРѕРІРѕР№ СЃС‚СЂРµР»РєРµ РґР»СЏ РїРѕР»РѕР¶РёС‚РµР»СЊРЅРѕРіРѕ СЂРµР·СѓР»СЊС‚Р°С‚Р°)
 	//static int get_rotation(object_direction_e start, object_direction_e end);
 	static rotate_direction_e get_rotation(object_direction_e start, object_direction_e end);
 };

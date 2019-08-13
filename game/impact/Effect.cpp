@@ -68,12 +68,12 @@ void Interaction_list::apply_effect(GameObject* unit, Object_interaction* object
 	}
 }
 
-void Interaction_list::do_predicat(Visitor& helper)
+void Interaction_list::do_predicate(Visitor& helper)
 {
 	helper.visit(*this);
 	for (auto item = m_items.begin(); item != m_items.end(); ++item)
 	{
-		(*item)->do_predicat(helper);
+		(*item)->do_predicate(helper);
 	}
 }
 
@@ -93,7 +93,7 @@ void Interaction_list::reset_serialization_index()
 
 Packer_generic& Interaction_list::get_packer()
 {
-	return Packer<Interaction_list>::Instance();
+	return Packer<Interaction_list>::instance();
 }
 
 // Patameter_list
@@ -189,11 +189,11 @@ void Parameter_list::Update_visitor::visit(Object_interaction& value)
 
 bool Parameter_list::update()
 {
-	////LOG(INFO) << "ÒÈÏ ÏÀÐÀÌÅÒÐÀ " << std::to_string((int)m_subtype);
+	////LOG(INFO) << "Ð¢Ð˜ÐŸ ÐŸÐÐ ÐÐœÐ•Ð¢Ð Ð " << std::to_string((int)m_subtype);
 	m_value = m_basic_value;
 	m_limit = m_basic_limit;
 	Update_visitor uh(*this);
-	do_predicat(uh);
+	do_predicate(uh);
 	return false;
 }
 
@@ -219,7 +219,7 @@ void Parameter_list::apply_visitor(Visitor_generic& visitor)
 
 Packer_generic& Parameter_list::get_packer()
 {
-	return Packer<Parameter_list>::Instance();
+	return Packer<Parameter_list>::instance();
 }
 
 // Vision_list
@@ -261,7 +261,7 @@ void Vision_list::update_list(Object_interaction* list)
 
 bool Vision_list::update()
 {
-	//LOG(INFO) << "ÒÈÏ ÏÀÐÀÌÅÒÐÀ " << std::to_string((int)m_subtype);
+	//LOG(INFO) << "Ð¢Ð˜ÐŸ ÐŸÐÐ ÐÐœÐ•Ð¢Ð Ð " << std::to_string((int)m_subtype);
 	m_max_radius = 0;
 	update_list(this);
 	return false;
@@ -359,7 +359,7 @@ void Vision_list::unequip(Object_interaction* item)
 
 Packer_generic& Vision_list::get_packer()
 {
-	return Packer<Vision_list>::Instance();
+	return Packer<Vision_list>::instance();
 }
 
 
@@ -418,7 +418,7 @@ void Vision_component::update_list(Object_interaction* list)
 
 bool Vision_component::update()
 {
-	//LOG(INFO) << "ÒÈÏ ÏÀÐÀÌÅÒÐÀ " << std::to_string((int)m_subtype);
+	//LOG(INFO) << "Ð¢Ð˜ÐŸ ÐŸÐÐ ÐÐœÐ•Ð¢Ð Ð " << std::to_string((int)m_subtype);
 	m_value = m_basic_value;
 	update_list(this);
 	return false;
@@ -443,7 +443,7 @@ void Vision_component::apply_visitor(Visitor_generic& visitor)
 
 Packer_generic& Vision_component::get_packer()
 {
-	return Packer<Vision_component>::Instance();
+	return Packer<Vision_component>::instance();
 }
 
 // Tag_list
@@ -481,13 +481,13 @@ void Tag_list::Update_visitor::visit(Object_interaction& value)
 bool Tag_list::update()
 {
 	Update_visitor uh;
-	do_predicat(uh);
+	do_predicate(uh);
 	return uh.was_changed;
 }
 
 Packer_generic& Tag_list::get_packer()
 {
-	return Packer<Tag_list>::Instance();
+	return Packer<Tag_list>::instance();
 }
 
 // Parts_list
@@ -646,11 +646,11 @@ void Parts_list::Update_visitor::visit(Object_interaction& value)
 bool Parts_list::update()
 {
 	Update_visitor uh(*this);
-	do_predicat(uh);
+	do_predicate(uh);
 	//do
 	//{
 	//	uh.was_changed = false;
-	//	do_predicat(uh);
+	//	do_predicate(uh);
 	//} while (uh.was_changed);
 
 	return uh.was_changed;
@@ -670,7 +670,7 @@ void Parts_list::equip(Object_interaction* item)
 
 Packer_generic& Parts_list::get_packer()
 {
-	return Packer<Parts_list>::Instance();
+	return Packer<Parts_list>::instance();
 };
 
 
@@ -704,7 +704,7 @@ void Action_list::apply_visitor(Visitor_generic& visitor)
 
 Packer_generic& Action_list::get_packer()
 {
-	return Packer<Action_list>::Instance();
+	return Packer<Action_list>::instance();
 }
 
 
@@ -725,7 +725,7 @@ void Slot_set_state::apply_effect(GameObject* unit, Object_interaction* object)
 
 Packer_generic& Slot_set_state::get_packer()
 {
-	return Packer<Slot_set_state>::Instance();
+	return Packer<Slot_set_state>::instance();
 }
 
 // Interaction_slot
@@ -734,10 +734,10 @@ Interaction_slot::Interaction_slot()
 {
 }
 
-void Interaction_slot::do_predicat(Visitor& helper)
+void Interaction_slot::do_predicate(Visitor& helper)
 {
 	helper.visit(*this);
-	m_value->do_predicat(helper);
+	m_value->do_predicate(helper);
 }
 
 void Interaction_slot::reset_serialization_index()
@@ -775,7 +775,7 @@ void Interaction_copyist::apply_effect(GameObject* unit, Object_interaction* obj
 
 Packer_generic& Interaction_copyist::get_packer()
 {
-	return Packer<Interaction_copyist>::Instance();
+	return Packer<Interaction_copyist>::instance();
 }
 
 // Interaction_prefix
@@ -800,13 +800,13 @@ void Interaction_prefix::apply_effect(GameObject* unit, Object_interaction* obje
 			(*item)->apply_effect(unit, this);
 		}
 	}
-	// TODO ñäåëàòü âåðñèþ áåç ïðèìåíåíèÿ è ñ ïðèìåíåíèåì ìîäèôèöèðîâàííîãî ýôôåêòà
+	// TODO ÑÐ´ÐµÐ»Ð°Ñ‚ÑŒ Ð²ÐµÑ€ÑÐ¸ÑŽ Ð±ÐµÐ· Ð¿Ñ€Ð¸Ð¼ÐµÐ½ÐµÐ½Ð¸Ñ Ð¸ Ñ Ð¿Ñ€Ð¸Ð¼ÐµÐ½ÐµÐ½Ð¸ÐµÐ¼ Ð¼Ð¾Ð´Ð¸Ñ„Ð¸Ñ†Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð½Ð¾Ð³Ð¾ ÑÑ„Ñ„ÐµÐºÑ‚Ð°
 	/*if (m_value) { m_value->apply_effect(unit, object); }*/
 }
 
 Packer_generic& Interaction_prefix::get_packer()
 {
-	return Packer<Interaction_prefix>::Instance();
+	return Packer<Interaction_prefix>::instance();
 }
 
 // Interaction_addon
@@ -829,7 +829,7 @@ void Interaction_addon::apply_effect(GameObject* unit, Object_interaction* objec
 
 Packer_generic& Interaction_addon::get_packer()
 {
-	return Packer<Interaction_addon>::Instance();
+	return Packer<Interaction_addon>::instance();
 }
 
 // Interaction_time
@@ -856,7 +856,7 @@ void Interaction_time::apply_effect(GameObject* unit, Object_interaction* object
 
 Packer_generic& Interaction_time::get_packer()
 {
-	return Packer<Interaction_time>::Instance();
+	return Packer<Interaction_time>::instance();
 }
 
 // Interaction_timer
@@ -886,7 +886,7 @@ void Interaction_timer::apply_effect(GameObject* unit, Object_interaction* objec
 
 Packer_generic& Interaction_timer::get_packer()
 {
-	return Packer<Interaction_timer>::Instance();
+	return Packer<Interaction_timer>::instance();
 }
 
 
@@ -937,7 +937,7 @@ void Effect::apply_effect(GameObject* unit, Object_interaction* object)
 
 Packer_generic& Effect::get_packer()
 {
-	return Packer<Effect>::Instance();
+	return Packer<Effect>::instance();
 }
 
 // Object_tag
@@ -972,7 +972,7 @@ void ObjectTag::Poison_resist::apply_effect(GameObject* unit, Object_interaction
 
 Packer_generic& ObjectTag::Poison_resist::get_packer()
 {
-	return Packer<Poison_resist>::Instance();
+	return Packer<Poison_resist>::instance();
 }
 
 // ObjectTag::Mortal
@@ -1049,7 +1049,7 @@ void ObjectTag::Purification_from_poison::apply_effect(GameObject* unit, Object_
 
 Packer_generic& ObjectTag::Purification_from_poison::get_packer()
 {
-	return Packer<Purification_from_poison>::Instance();
+	return Packer<Purification_from_poison>::instance();
 }
 
 // ObjectTag::Activator::Activator
@@ -1097,7 +1097,7 @@ void ObjectTag::Activator::reset_serialization_index()
 
 Packer_generic& ObjectTag::Activator::get_packer()
 {
-	return Packer<Activator>::Instance();
+	return Packer<Activator>::instance();
 }
 
 // ObjectTag::Fast_move
@@ -1135,7 +1135,7 @@ void ObjectTag::Fast_move::apply_effect(GameObject* unit, Object_interaction* ob
 
 Packer_generic& ObjectTag::Fast_move::get_packer()
 {
-	return Packer<Fast_move>::Instance();
+	return Packer<Fast_move>::instance();
 }
 
 // ObjectTag::Label
@@ -1157,7 +1157,7 @@ void ObjectTag::Label::apply_visitor(Visitor_generic& visitor)
 
 Packer_generic& ObjectTag::Label::get_packer()
 {
-	return Packer<Label>::Instance();
+	return Packer<Label>::instance();
 }
 
 Interaction_list* Effect_functions::create_feature_list(feature_list_type_e key, interaction_e name)
@@ -1330,7 +1330,7 @@ void Instruction_slot_link::apply_effect(GameObject* unit, Object_interaction* o
 
 Packer_generic& Instruction_slot_link::get_packer()
 {
-	return Packer<Instruction_slot_link>::Instance();
+	return Packer<Instruction_slot_link>::instance();
 }
 
 
@@ -1370,7 +1370,7 @@ void Instruction_slot_parameter::apply_effect(GameObject* unit, Object_interacti
 
 Packer_generic& Instruction_slot_parameter::get_packer()
 {
-	return Packer<Instruction_slot_parameter>::Instance();
+	return Packer<Instruction_slot_parameter>::instance();
 }
 
 // ObjectTag::Equippable
@@ -1501,7 +1501,7 @@ void ObjectTag::Equippable::reset_serialization_index()
 
 Packer_generic& ObjectTag::Equippable::get_packer()
 {
-	return Packer<Equippable>::Instance();
+	return Packer<Equippable>::instance();
 }
 
 
@@ -1556,7 +1556,7 @@ void ObjectTag::Requirements_to_object::reset_serialization_index()
 
 Packer_generic& ObjectTag::Requirements_to_object::get_packer()
 {
-	return Packer<Requirements_to_object>::Instance();
+	return Packer<Requirements_to_object>::instance();
 }
 
 // ObjectTag::Can_transfer_object
@@ -1605,7 +1605,7 @@ void ObjectTag::Can_transfer_object::reset_serialization_index()
 
 Packer_generic& ObjectTag::Can_transfer_object::get_packer()
 {
-	return Packer<Can_transfer_object>::Instance();
+	return Packer<Can_transfer_object>::instance();
 }
 
 // Instruction_game_owner
@@ -1621,7 +1621,7 @@ Instruction_game_owner::Instruction_game_owner()
 
 Packer_generic& Instruction_game_owner::get_packer()
 {
-	return Packer<Instruction_game_owner>::Instance();
+	return Packer<Instruction_game_owner>::instance();
 }
 
 Instruction_check_tag::Instruction_check_tag()
@@ -1665,7 +1665,7 @@ void Instruction_check_tag::apply_visitor(Visitor_generic& visitor)
 
 Packer_generic& Instruction_check_tag::get_packer()
 {
-	return Packer<Instruction_check_tag>::Instance();
+	return Packer<Instruction_check_tag>::instance();
 };
 
 // Instruction_check_part_type
@@ -1702,7 +1702,7 @@ void Instruction_check_part_type::apply_effect(GameObject* unit, Object_interact
 
 Packer_generic& Instruction_check_part_type::get_packer()
 {
-	return Packer<Instruction_check_part_type>::Instance();
+	return Packer<Instruction_check_part_type>::instance();
 };
 
 // Instruction_arg_extract
@@ -1773,7 +1773,7 @@ void Instruction_arg_extract::reset_serialization_index()
 
 Packer_generic& Instruction_arg_extract::get_packer()
 {
-	return Packer<Instruction_arg_extract>::Instance();
+	return Packer<Instruction_arg_extract>::instance();
 }
 
 // Instruction_get_owner
@@ -1843,7 +1843,7 @@ void Instruction_get_owner::reset_serialization_index()
 
 Packer_generic& Instruction_get_owner::get_packer()
 {
-	return Packer<Instruction_get_owner>::Instance();
+	return Packer<Instruction_get_owner>::instance();
 }
 
 Instruction_get_owner_top::Instruction_get_owner_top()
@@ -1909,7 +1909,7 @@ void Instruction_get_owner_top::apply_effect(GameObject* unit, Object_interactio
 
 Packer_generic& Instruction_get_owner_top::get_packer()
 {
-	return Packer<Instruction_get_owner_top>::Instance();
+	return Packer<Instruction_get_owner_top>::instance();
 };
 
 // Instruction_check_owner_type
@@ -1952,7 +1952,7 @@ void Instruction_check_owner_type::apply_effect(GameObject* unit, Object_interac
 
 Packer_generic& Instruction_check_owner_type::get_packer()
 {
-	return Packer<Instruction_check_owner_type>::Instance();
+	return Packer<Instruction_check_owner_type>::instance();
 };
 
 void ObjectTag::Mortal::apply_visitor(Visitor_generic& visitor)
@@ -1962,5 +1962,5 @@ void ObjectTag::Mortal::apply_visitor(Visitor_generic& visitor)
 
 Packer_generic& ObjectTag::Mortal::get_packer()
 {
-	return Packer<Mortal>::Instance();
+	return Packer<Mortal>::instance();
 }

@@ -19,7 +19,7 @@ void GraphicalController::check_gl_error(const std::string& text)
 		case GL_INVALID_FRAMEBUFFER_OPERATION:  error = "INVALID_FRAMEBUFFER_OPERATION";  break;
 		}
 
-		Logger::Instance().info (text + ": GL_" + error);
+		Logger::instance().info (text + ": GL_" + error);
 		err = glGetError();
 	}
 }
@@ -74,7 +74,7 @@ GraphicalController::GraphicalController(const dimension_t size)
 	}
 	catch(std::logic_error& e)
 	{
-		Logger::Instance().critical("Ошибка при загрузке ресурсов: {}" , e.what());
+		Logger::instance().critical("РћС€РёР±РєР° РїСЂРё Р·Р°РіСЂСѓР·РєРµ СЂРµСЃСѓСЂСЃРѕРІ: {}" , e.what());
 	}
 
 	m_scissors.push_front(frectangle_t(0.0f, 0.0f, (float)m_size.w, (float)m_size.h));
@@ -86,13 +86,13 @@ void GraphicalController::load_font(const std::string& font_filename)
 	m_error = FT_Init_FreeType(&m_library);
 	if (m_error != 0)
 	{
-		Logger::Instance().critical ("Ошибка инициализации FreeType");
+		Logger::instance().critical ("РћС€РёР±РєР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё FreeType");
 	}
 
 	m_error = FT_New_Face(m_library, font_filename.c_str(), 0, &m_face);
 	if (m_error != 0)
 	{
-		Logger::Instance().critical( "Ошибка инициализации шрифта");
+		Logger::instance().critical( "РћС€РёР±РєР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё С€СЂРёС„С‚Р°");
 	}
 
 	m_error = FT_Set_Pixel_Sizes(m_face, font_size_c, 0);
@@ -113,7 +113,7 @@ font_symbol_t& GraphicalController::get_symbol(char16_t value)
 
 		if (m_error != 0)
 		{
-			Logger::Instance().critical( "Ошибка загрузки символа");
+			Logger::instance().critical( "РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё СЃРёРјРІРѕР»Р°");
 			return m_unicode_symbols[u'?'];
 		}
 
@@ -145,21 +145,21 @@ font_symbol_t& GraphicalController::get_symbol(char16_t value)
 	}
 }
 
-bool GraphicalController::CompileSuccessful(int obj)
+bool GraphicalController::compile_successful(int obj)
 {
 	int status;
 	glGetShaderiv(obj, GL_COMPILE_STATUS, &status);
 	return GLboolean(status) == GL_TRUE;
 }
 
-bool GraphicalController::LinkSuccessful(int obj)
+bool GraphicalController::link_successful(int obj)
 {
 	int status;
 	glGetProgramiv(obj, GL_LINK_STATUS, &status);
 	return GLboolean(status) == GL_TRUE;
 }
 
-bool GraphicalController::ValidateSuccessful(int obj)
+bool GraphicalController::validate_successful(int obj)
 {
 	int status;
 	glGetProgramiv(obj, GL_VALIDATE_STATUS, &status);
@@ -171,9 +171,9 @@ void GraphicalController::set_VSync(bool sync)
 	// Function pointer for the wgl extention function we need to enable/disable
 	// vsync
 	typedef BOOL(APIENTRY *PFNWGLSWAPINTERVALPROC)(int);
-	PFNWGLSWAPINTERVALPROC wglSwapIntervalEXT = nullptr;
+	PFNWGLSWAPINTERVALPROC wgl_swap_interval_ext = nullptr;
 
-	const char *extensions = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+	const auto extensions = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
 
 	if (strstr(extensions, "WGL_EXT_swap_control") == nullptr)
 	{
@@ -181,10 +181,10 @@ void GraphicalController::set_VSync(bool sync)
 	}
 	else
 	{
-		wglSwapIntervalEXT = reinterpret_cast<PFNWGLSWAPINTERVALPROC>(wglGetProcAddress("wglSwapIntervalEXT"));
+		wgl_swap_interval_ext = reinterpret_cast<PFNWGLSWAPINTERVALPROC>(wglGetProcAddress("wglSwapIntervalEXT"));
 
-		if (wglSwapIntervalEXT)
-			wglSwapIntervalEXT(sync);
+		if (wgl_swap_interval_ext)
+			wgl_swap_interval_ext(sync);
 	}
 }
 
@@ -229,28 +229,27 @@ void GraphicalController::set_VSync(bool sync)
 //	}
 //}
 
-void GraphicalController::output_text(int x, int y, std::u16string& Text, int sizex, int sizey)
+void GraphicalController::output_text(int x, int y, std::u16string& text, int sizex, int sizey)
 {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glUseProgram(0);
 	glActiveTexture(GL_TEXTURE0);
 	y = y + (m_face->size->metrics.ascender >> 6);
-	int x0, y0, x1, y1, x2, y2, x3, y3;
-	int shift_x = 0;
-	for (int k = 0; k<Text.length(); k++)
+	auto shift_x = 0;
+	for (auto k : text)
 	{
-		font_symbol_t& fs = get_symbol(Text[k]);
-		if (Text[k] != 32)
+		auto& fs = get_symbol(k);
+		if (k != 32)
 		{
 			glBindTexture(GL_TEXTURE_2D, fs.id);
-			x0 = x + shift_x;
-			y0 = y + fs.bearing.h;
-			x1 = x0;
-			y1 = y - fs.size.h + fs.bearing.h + 1;
-			x2 = x + shift_x + fs.size.w - 1;
-			y2 = y1;
-			x3 = x2;
-			y3 = y0;
+			const auto x0 = x + shift_x;
+			const auto y0 = y + fs.bearing.h;
+			const auto x1 = x0;
+			const auto y1 = y - fs.size.h + fs.bearing.h + 1;
+			const auto x2 = x + shift_x + fs.size.w - 1;
+			const auto y2 = y1;
+			const auto x3 = x2;
+			const auto y3 = y0;
 			glBegin(GL_QUADS);
 			glTexCoord2d(0, 1); glVertex2d(x0, y0);
 			glTexCoord2d(0, 0); glVertex2d(x1, y1);
@@ -263,10 +262,10 @@ void GraphicalController::output_text(int x, int y, std::u16string& Text, int si
 }
 
 
-std::size_t GraphicalController::measure_text_width(std::u16string& Text)
+std::size_t GraphicalController::measure_text_width(std::u16string& text)
 {
-	int result = 0;
-	for (char16_t k : Text)
+	auto result = 0;
+	for (auto k : text)
 	{
 		auto& fs = get_symbol(k);
 		result += fs.size.w;
@@ -295,23 +294,23 @@ position_t GraphicalController::center_aling_to_point(int x, int y, std::u16stri
 
 bool GraphicalController::add_scissor(const frectangle_t& rect)
 {
-	frectangle_t GlobalScissor = m_scissors.front();
-	frectangle_t LocalScissor(rect.x, (float)m_size.h - rect.y - rect.h, rect.x + rect.w, (float)m_size.h - rect.y);
-	if ((GlobalScissor.x > LocalScissor.w) || (GlobalScissor.w < LocalScissor.x) || (GlobalScissor.y > LocalScissor.h) || (GlobalScissor.h < LocalScissor.y)) return false;
-	if (LocalScissor.x < GlobalScissor.x) LocalScissor.x = GlobalScissor.x;
-	if (LocalScissor.w > GlobalScissor.w) LocalScissor.w = GlobalScissor.w;
-	if (LocalScissor.y < GlobalScissor.y) LocalScissor.y = GlobalScissor.y;
-	if (LocalScissor.h > GlobalScissor.h) LocalScissor.h = GlobalScissor.h;
-	m_scissors.push_front(LocalScissor);
-	glScissor(LocalScissor.x, LocalScissor.y, LocalScissor.w - LocalScissor.x, LocalScissor.h - LocalScissor.y);
+	const auto global_scissor = m_scissors.front();
+	frectangle_t local_scissor(rect.x, float(m_size.h) - rect.y - rect.h, rect.x + rect.w, float(m_size.h) - rect.y);
+	if ((global_scissor.x > local_scissor.w) || (global_scissor.w < local_scissor.x) || (global_scissor.y > local_scissor.h) || (global_scissor.h < local_scissor.y)) return false;
+	if (local_scissor.x < global_scissor.x) local_scissor.x = global_scissor.x;
+	if (local_scissor.w > global_scissor.w) local_scissor.w = global_scissor.w;
+	if (local_scissor.y < global_scissor.y) local_scissor.y = global_scissor.y;
+	if (local_scissor.h > global_scissor.h) local_scissor.h = global_scissor.h;
+	m_scissors.push_front(local_scissor);
+	glScissor(local_scissor.x, local_scissor.y, local_scissor.w - local_scissor.x, local_scissor.h - local_scissor.y);
 	return true;
 }
 
 void GraphicalController::remove_scissor()
 {
 	m_scissors.pop_front();
-	frectangle_t Scissor = m_scissors.front();
-	glScissor(Scissor.x, Scissor.y, Scissor.w - Scissor.x, Scissor.h - Scissor.y);
+	const auto scissor = m_scissors.front();
+	glScissor(scissor.x, scissor.y, scissor.w - scissor.x, scissor.h - scissor.y);
 }
 
 void GraphicalController::blur_rect(int x, int y, int width, int height)
@@ -342,25 +341,25 @@ void GraphicalController::blur_rect(int x, int y, int width, int height)
 	glColor4f(1.0, 1.0, 1.0, 1.0);
 }
 
-bool GraphicalController::set_uniform_vector(GLuint program, const char * name, const float * value)
+bool GraphicalController::set_uniform_vector(const GLuint program, const char * name, const float * value)
 {
-	GLint loc = glGetUniformLocation(program, name);
-	if (loc < 0)
+	const auto location = glGetUniformLocation(program, name);
+	if (location < 0)
 		return false;
-	glUniform4fv(loc, 1, value);
+	glUniform4fv(location, 1, value);
 	return true;
 }
 
-bool GraphicalController::set_uniform_sampler(GLuint object, const char * name, int index)
+bool GraphicalController::set_uniform_sampler(const GLuint object, const char * name, const int index)
 {
-	GLint loc = glGetUniformLocation(object, name);
-	if (loc < 0)
+	const auto location = glGetUniformLocation(object, name);
+	if (location < 0)
 		return false;
-	glUniform1i(loc, index);
+	glUniform1i(location, index);
 	return true;
 }
 
-bool GraphicalController::set_uniform_ptr(GLuint program, const char * name, const int value)
+bool GraphicalController::set_uniform_ptr(const GLuint program, const char * name, const int value)
 {
 	const auto loc = glGetUniformLocation(program, name);
 	if (loc < 0)
@@ -369,12 +368,12 @@ bool GraphicalController::set_uniform_ptr(GLuint program, const char * name, con
 	return true;
 }
 
-bool GraphicalController::set_uniform_float(GLuint program, const char * name, const float value)
+bool GraphicalController::set_uniform_float(const GLuint program, const char * name, const float value)
 {
-	GLint loc = glGetUniformLocation(program, name);
-	if (loc < 0)
+	const auto location = glGetUniformLocation(program, name);
+	if (location < 0)
 		return false;
-	glUniform1f(loc,value);
+	glUniform1f(location,value);
 	return true;
 }
 
@@ -386,7 +385,7 @@ bool GraphicalController::set_uniform_float(GLuint program, const char * name, c
 int glhInvertMatrixf2(GLdouble* m, GLdouble* out)
 {
 	float wtmp[4][8];
-	float m0, m1, m2, m3, s;
+	float m0, s;
 	float* r0, * r1, * r2, * r3;
 	r0 = wtmp[0], r1 = wtmp[1], r2 = wtmp[2], r3 = wtmp[3];
 	r0[0] = MAT(m, 0, 0), r0[1] = MAT(m, 0, 1),
@@ -411,9 +410,9 @@ int glhInvertMatrixf2(GLdouble* m, GLdouble* out)
 	if (0.0 == r0[0])
 		return 0;
 	/* eliminate first variable */
-	m1 = r1[0] / r0[0];
-	m2 = r2[0] / r0[0];
-	m3 = r3[0] / r0[0];
+	auto m1 = r1[0] / r0[0];
+	auto m2 = r2[0] / r0[0];
+	auto m3 = r3[0] / r0[0];
 	s = r0[1];
 	r1[1] -= m1 * s;
 	r2[1] -= m2 * s;
@@ -629,13 +628,12 @@ position_t glhUnProjectf(float winx, float winy, float winz, GLdouble* modelview
 	in[3] = 1.0;
 	// Objects coordinates
 	multiply_matrix_by_vector4_by4_open_gl_float(out, m, in);
-	if (out[3] == 0.0)
-		return position_t(0, 0);
+	if (out[3] == 0.0) return position_t(0, 0);
 	out[3] = double(1.0) / out[3];
 	return position_t(out[0] * out[3], out[1] * out[3]);
 }
 
-position_t GraphicalController::get_OpenGL_position(float x, float y)
+position_t GraphicalController::get_open_gl_position(float x, float y)
 {
 	GLint viewport[4];
 	GLdouble modelview[16];
@@ -643,7 +641,7 @@ position_t GraphicalController::get_OpenGL_position(float x, float y)
 	GLfloat win_z;
 
 
-	// ВНИМАНИЕ! Нельзя вызывать функции gl вне графического потока!
+	// Р’РќРРњРђРќРР•! РќРµР»СЊР·СЏ РІС‹Р·С‹РІР°С‚СЊ С„СѓРЅРєС†РёРё gl РІРЅРµ РіСЂР°С„РёС‡РµСЃРєРѕРіРѕ РїРѕС‚РѕРєР°!
 	glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
 	glGetDoublev(GL_PROJECTION_MATRIX, projection);
 	glGetIntegerv(GL_VIEWPORT, viewport);
@@ -699,7 +697,7 @@ GLuint GraphicalController::load_texture(const std::string& path)
 	if (!FileSystem::instance().load_from_file(path, buff))
 	{
 		//MessageBox(NULL, path.c_str(), "", MB_OK);
-		throw std::logic_error("Не удалось загрузить файл `" + path + "`");
+		throw std::logic_error("РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ С„Р°Р№Р» `" + path + "`");
 	}
 	auto header = reinterpret_cast<BITMAPFILEHEADER*>(buff.get());
 	auto info = reinterpret_cast<BITMAPINFOHEADER*>(buff.get() + sizeof(*header));
@@ -800,48 +798,45 @@ std::string GraphicalController::load_shader_source(const std::string& path)
 
 GLuint GraphicalController::load_shader(const std::string& vPath, const std::string& fPath)
 {
-	const std::string v_src = load_shader_source(FileSystem::instance().m_resource_path + "Shaders\\" + vPath + ".vsh");
-	const std::string f_src = load_shader_source(FileSystem::instance().m_resource_path + "Shaders\\" + fPath + ".fsh");
-	const char *VertexShaderSource = v_src.c_str();
-	const char *FragmentShaderSource = f_src.c_str();
-	GLuint Program;
-	GLuint VertexShader;
-	GLuint FragmentShader;
-	Program = glCreateProgram();
-	VertexShader = glCreateShader(GL_VERTEX_SHADER);
-	FragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	const auto v_src = load_shader_source(FileSystem::instance().m_resource_path + "Shaders\\" + vPath + ".vsh");
+	const auto f_src = load_shader_source(FileSystem::instance().m_resource_path + "Shaders\\" + fPath + ".fsh");
+	auto vertex_shader_source = v_src.c_str();
+	auto fragment_shader_source = f_src.c_str();
+	const auto program = glCreateProgram();
+	const auto vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+	const auto fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
 
-	glShaderSource(VertexShader, 1, &VertexShaderSource, NULL);
-	glCompileShader(VertexShader);
-	if (!CompileSuccessful(VertexShader))
+	glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL);
+	glCompileShader(vertex_shader);
+	if (!compile_successful(vertex_shader))
 	{
-		GLint maxLength = 0;
-		glGetShaderiv(VertexShader, GL_INFO_LOG_LENGTH, &maxLength);
+		auto max_length = 0;
+		glGetShaderiv(vertex_shader, GL_INFO_LOG_LENGTH, &max_length);
 
 		// The maxLength includes the NULL character
-		std::vector<GLchar> errorLog(maxLength);
-		glGetShaderInfoLog(VertexShader, maxLength, &maxLength, &errorLog[0]);
-		std::string str(errorLog.begin(), errorLog.end());
-		Logger::Instance().critical("Не удалось скомпилировать вершинный шейдер `" + vPath + "` " + str);
+		std::vector<GLchar> error_log(max_length);
+		glGetShaderInfoLog(vertex_shader, max_length, &max_length, &error_log[0]);
+		const std::string str(error_log.begin(), error_log.end());
+		Logger::instance().critical("РќРµ СѓРґР°Р»РѕСЃСЊ СЃРєРѕРјРїРёР»РёСЂРѕРІР°С‚СЊ РІРµСЂС€РёРЅРЅС‹Р№ С€РµР№РґРµСЂ `" + vPath + "` " + str);
 	}
 		
 
 
-	glShaderSource(FragmentShader, 1, &FragmentShaderSource, NULL);
-	glCompileShader(FragmentShader);
-	if (!CompileSuccessful(FragmentShader))
-		Logger::Instance().critical( "Не удалось скомпилировать фрагментный шейдер `" + fPath + "`");
+	glShaderSource(fragment_shader, 1, &fragment_shader_source, nullptr);
+	glCompileShader(fragment_shader);
+	if (!compile_successful(fragment_shader))
+		Logger::instance().critical( "РќРµ СѓРґР°Р»РѕСЃСЊ СЃРєРѕРјРїРёР»РёСЂРѕРІР°С‚СЊ С„СЂР°РіРјРµРЅС‚РЅС‹Р№ С€РµР№РґРµСЂ `" + fPath + "`");
 
-	glAttachShader(Program, VertexShader);
-	glAttachShader(Program, FragmentShader);
-	glLinkProgram(Program);
-	if (!LinkSuccessful(Program))
-		Logger::Instance().critical( "Не удалось слинковать шейдерную программу!");
-	glValidateProgram(Program);
-	if (!ValidateSuccessful(Program))
-		Logger::Instance().critical ("Ошибка при проверке шейдерной программы!");
+	glAttachShader(program, vertex_shader);
+	glAttachShader(program, fragment_shader);
+	glLinkProgram(program);
+	if (!link_successful(program))
+		Logger::instance().critical( "РќРµ СѓРґР°Р»РѕСЃСЊ СЃР»РёРЅРєРѕРІР°С‚СЊ С€РµР№РґРµСЂРЅСѓСЋ РїСЂРѕРіСЂР°РјРјСѓ!");
+	glValidateProgram(program);
+	if (!validate_successful(program))
+		Logger::instance().critical ("РћС€РёР±РєР° РїСЂРё РїСЂРѕРІРµСЂРєРµ С€РµР№РґРµСЂРЅРѕР№ РїСЂРѕРіСЂР°РјРјС‹!");
 
-	return Program;
+	return program;
 }
 
 GLint GraphicalController::create_empty_texture(dimension_t size)
@@ -869,7 +864,7 @@ void GraphicalController::draw_sprite(const rectangle_t &rect)
 	glEnd();
 }
 
-void GraphicalController::draw_rectangle(rectangle_t rect)
+void GraphicalController::draw_rectangle(const rectangle_t rect)
 {
 	//glBegin(GL_LINE_LOOP);
 	//glVertex2d(px, py);
@@ -939,13 +934,47 @@ void GraphicalController::selection_cell(const int x, const int y,const int z, c
 	glEnd();
 }
 
+void GraphicalController::stroke_cube(const int x, const int y, const int z, const int xs, const int ys)
+{
+	const auto x0 = (x - y) * tile_size_x_half + xs;
+	const auto y0 = (x + y - z * 2) * tile_size_y_half + ys;
+	const auto y1 = y0 - tile_size_y;
+	glBegin(GL_LINES);
+	//glVertex2d(x0, y0 - tile_size_y_half);
+	//glVertex2d(x0 + tile_size_x_half, y0 - tile_size_y);
+	//glVertex2d(x0 + tile_size_x_half, y0 - tile_size_y);
+	//glVertex2d(x0 + tile_size_x, y0 - tile_size_y_half);
+	glVertex2d(x0 + tile_size_x, y0 - tile_size_y_half);
+	glVertex2d(x0 + tile_size_x_half, y0);
+	glVertex2d(x0 + tile_size_x_half, y0);
+	glVertex2d(x0, y0 - tile_size_y_half);
+
+	glVertex2d(x0, y1 - tile_size_y_half);
+	glVertex2d(x0 + tile_size_x_half, y1 - tile_size_y);
+	glVertex2d(x0 + tile_size_x_half, y1 - tile_size_y);
+	glVertex2d(x0 + tile_size_x, y1 - tile_size_y_half);
+	glVertex2d(x0 + tile_size_x, y1 - tile_size_y_half);
+	glVertex2d(x0 + tile_size_x_half, y1);
+	glVertex2d(x0 + tile_size_x_half, y1);
+	glVertex2d(x0, y1 - tile_size_y_half);
+
+	glVertex2d(x0, y0 - tile_size_y_half);
+	glVertex2d(x0, y1 - tile_size_y_half);
+	glVertex2d(x0 + tile_size_x_half, y0);
+	glVertex2d(x0 + tile_size_x_half, y1);
+	glVertex2d(x0 + tile_size_x, y0 - tile_size_y_half);
+	glVertex2d(x0 + tile_size_x, y1 - tile_size_y_half);
+
+	glEnd();
+}
+
 void GraphicalController::draw_tile(tile_t& tile, rectangle_t rect)
 {
 	glBegin(GL_QUADS);
-	glTexCoord2d(tile.coordinat[0], tile.coordinat[1]); glVertex2d(rect.a.x, rect.b.y);
-	glTexCoord2d(tile.coordinat[0], tile.coordinat[3]); glVertex2d(rect.a.x, rect.a.y);
-	glTexCoord2d(tile.coordinat[2], tile.coordinat[3]); glVertex2d(rect.b.x, rect.a.y);
-	glTexCoord2d(tile.coordinat[2], tile.coordinat[1]); glVertex2d(rect.b.x, rect.b.y);
+	glTexCoord2d(tile.coordinates[0], tile.coordinates[1]); glVertex2d(rect.a.x, rect.b.y);
+	glTexCoord2d(tile.coordinates[0], tile.coordinates[3]); glVertex2d(rect.a.x, rect.a.y);
+	glTexCoord2d(tile.coordinates[2], tile.coordinates[3]); glVertex2d(rect.b.x, rect.a.y);
+	glTexCoord2d(tile.coordinates[2], tile.coordinates[1]); glVertex2d(rect.b.x, rect.b.y);
 	glEnd();
 }
 

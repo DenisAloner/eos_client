@@ -1,9 +1,9 @@
 #ifndef GAMEOBJECT_H
 #define	GAMEOBJECT_H
 
-#include <stdio.h>
+#include <cstdio>
 #include <windows.h>
-#include <math.h>
+#include <cmath>
 #include <list>
 #include <algorithm>
 #include <Application.h>
@@ -128,7 +128,7 @@ public:
 	Attribute_map();
 	void add_effect(interaction_e key, Object_interaction* item);
 	Interaction_list* create_feature_list(feature_list_type_e key, interaction_e name);
-	Attribute_map* clone();
+	virtual Attribute_map* clone();
 
 	void reset_serialization_index() override;
 	
@@ -138,7 +138,7 @@ public:
 	Object_tag* get_tag(object_tag_e key);
 	virtual void apply_visitor(Visitor_generic& visitor);
 
-	// ƒÎˇ ÔÓ‰‰ÂÊÍË iSerializable
+	// –î–ª—è –ø–æ–¥–¥–µ—Ä–∂–∫–∏ iSerializable
 	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() 
@@ -173,7 +173,7 @@ public:
 	//virtual Action* find_action(action_e kind);
 	virtual void set_tile_size();
 	Object_state();
-	virtual Object_state* clone();
+	Object_state* clone() override;
 	void apply_visitor(Visitor_generic& visitor) override;
 
 	void reset_serialization_index() override;
@@ -181,15 +181,15 @@ public:
 
 	Packer_generic& get_packer() override;
 
-	std::u16string icon_to_json(Icon*& value, Parser_context& context);
-	std::string icon_to_binary(Icon*& value, Parser_context& context);
-	void icon_from_json(const std::u16string& value, Icon*& prop, Parser_context& context);
-	void icon_from_binary(const std::string& value, Icon*& prop, std::size_t& pos, Parser_context& context);
+	std::u16string icon_to_json(Icon*& value, SerializationContext& context);
+	std::string icon_to_binary(Icon*& value, SerializationContext& context);
+	void icon_from_json(const std::u16string& value, Icon*& prop, SerializationContext& context);
+	void icon_from_binary(const std::string& value, Icon*& prop, std::size_t& pos, SerializationContext& context);
 
-	std::u16string tilemanager_to_json(TileManager*& value, Parser_context& context);
-	std::string tilemanager_to_binary(TileManager*& value, Parser_context& context);
-	void tilemanager_from_json(const std::u16string& value, TileManager*& prop, Parser_context& context);
-	void tilemanager_from_binary(const std::string& value, TileManager*& prop, std::size_t& pos, Parser_context& context);
+	std::u16string tilemanager_to_json(TileManager*& value, SerializationContext& context);
+	std::string tilemanager_to_binary(TileManager*& value, SerializationContext& context);
+	void tilemanager_from_json(const std::u16string& value, TileManager*& prop, SerializationContext& context);
+	void tilemanager_from_binary(const std::string& value, TileManager*& prop, std::size_t& pos, SerializationContext& context);
 	
 	constexpr static auto properties() {
 		return make_union(
@@ -255,7 +255,7 @@ public:
 	bool get_stat(object_tag_e key);
 	Object_tag* get_tag(object_tag_e key);
 	Parameter_list* get_parameter(interaction_e key);
-	Parts_list* GameObject::get_parts_list(interaction_e key);
+	Parts_list* get_parts_list(interaction_e key);
 	MapCell* cell();
 	void update_interaction();
 	void add_from(interaction_e key, Interaction_list* feature);
@@ -264,16 +264,16 @@ public:
 	bool is_own(int x, int y, int z);
 	MapCell* get_center(MapCell* c);
 
-	virtual Object_interaction* clone();
-	virtual void do_predicat(predicat func);
+	Object_interaction* clone() override;
+	virtual void do_predicate(predicate func);
 	void apply_visitor(Visitor_generic& visitor) override;
 
 	void reset_serialization_index() override;
 
 
-	virtual void get_actions_list(std::list<Action_helper_t>& value);
+	void get_actions_list(std::list<Action_helper_t>& value) override;
 
-	// ƒÎˇ ÔÓ‰‰ÂÊÍË iJSONSerializable
+	// –î–ª—è –ø–æ–¥–¥–µ—Ä–∂–∫–∏ iJSONSerializable
 	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() 
@@ -309,20 +309,20 @@ public:
 
 	std::map<std::string, Object_interaction*> m_templates;
 	std::map<std::string, GameObject> m_items;
-	InstanceDictonary<TileManager*> m_tile_managers;
-	InstanceDictonary<TileManager*> m_tile_managers_atlas;
-	InstanceDictonary<Icon*> m_icons;
+	InstanceDictionary<TileManager*> m_tile_managers;
+	InstanceDictionary<TileManager*> m_tile_managers_atlas;
+	InstanceDictionary<Icon*> m_icons;
 
 	Packer_generic& get_packer() override;
 
 
-	void instancedictonary_icon_from_json(const std::u16string& value, InstanceDictonary<Icon*>& prop, Parser_context& context);
-	void instancedictonary_icon_from_binary(const std::string& value, InstanceDictonary<Icon*>& prop, std::size_t& pos, Parser_context& context);
+	void instancedictonary_icon_from_json(const std::u16string& value, InstanceDictionary<Icon*>& prop, SerializationContext& context);
+	void instancedictonary_icon_from_binary(const std::string& value, InstanceDictionary<Icon*>& prop, std::size_t& pos, SerializationContext& context);
 
-	void instancedictonary_tilemanager_from_json_atlas(const std::u16string& value, InstanceDictonary<TileManager*>& prop, Parser_context& context);
+	void instancedictonary_tilemanager_from_json_atlas(const std::u16string& value, InstanceDictionary<TileManager*>& prop, SerializationContext& context);
 
-	void instancedictonary_tilemanager_from_json(const std::u16string& value, InstanceDictonary<TileManager*>& prop, Parser_context& context);
-	void instancedictonary_tilemanager_from_binary(const std::string& value, InstanceDictonary<TileManager*>& prop, std::size_t& pos, Parser_context& context);
+	void instancedictonary_tilemanager_from_json(const std::u16string& value, InstanceDictionary<TileManager*>& prop, SerializationContext& context);
+	void instancedictonary_tilemanager_from_binary(const std::string& value, InstanceDictionary<TileManager*>& prop, std::size_t& pos, SerializationContext& context);
 
 	constexpr static auto properties()
 	{
@@ -382,8 +382,8 @@ public:
 	std::u16string m_name;
 
 	Object_part(GameObject* item = nullptr);
-	virtual Object_part* clone();
-	virtual void do_predicat(Visitor& helper);
+	Object_part* clone() override;
+	void do_predicate(Visitor& helper) override;
 	void apply_visitor(Visitor_generic& visitor) override;
 
 	void reset_serialization_index() override;

@@ -11,7 +11,7 @@ FOV::FOV(){}
 
 void FOV::cast_light(uint x, uint y, uint radius, uint row, float start_slope, float end_slope, uint xx, uint xy, uint yx, uint yy)
 {
-	//LOG(INFO) << "    Âûçîâ ôóíêöèè";
+	//LOG(INFO) << "    Ð’Ñ‹Ð·Ð¾Ð² Ñ„ÑƒÐ½ÐºÑ†Ð¸Ð¸";
 	if (start_slope <= end_slope) {
 		return;
 	}
@@ -41,7 +41,7 @@ void FOV::cast_light(uint x, uint y, uint radius, uint row, float start_slope, f
 			}
 
 			uint radius2 = radius * radius;
-			if ((uint)(dx * dx + dy * dy) < radius2)
+			if (uint(dx * dx + dy * dy) < radius2)
 			{
 				m_map[ay][ax].visible = true;
 			}
@@ -320,10 +320,9 @@ void FOV::calculate_FOV(GameObject* object, GameMap* map, object_direction_e dir
 		}
 	}
 
-	AI_FOV current;
-	for (auto item = vl->m_items.begin(); item != vl->m_items.end(); ++item)
+	for (auto& m_item : vl->m_items)
 	{
-		current = static_cast<Vision_component*>(*item)->m_value;
+		auto current = static_cast<Vision_component*>(m_item)->m_value;
 		calculate(object, map, current);
 	}
 
@@ -338,18 +337,18 @@ void FOV::calculate_FOV(GameObject* object, GameMap* map, object_direction_e dir
 
 void FOV::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
 {
-	std::function<bool(GameObject*)> qualifier = fov.qualifier->predicat;
+	const auto qualifier = fov.qualifier->predicate;
 
-	view_t view(min(m_view.l, fov.radius), min(m_view.r, fov.radius), min(m_view.u, fov.radius), min(m_view.d, fov.radius));
+	const view_t view(min(m_view.l, fov.radius), min(m_view.r, fov.radius), min(m_view.u, fov.radius), min(m_view.d, fov.radius));
 
 	for (int y = m_map_center.y - view.d, yf = m_view_center.y - view.d; y < m_map_center.y + view.u + 1; y++, yf++)
 	{
 		for (int x = m_map_center.x - view.l, xf = m_view_center.x - view.l; x < m_map_center.x + view.r + 1; x++, xf++)
 		{
-			for (auto obj = map->get(0,y,x).m_items.begin(); obj != map->get(0,y, x).m_items.end(); ++obj)
+			for (auto& m_item : map->get(0, y, x).m_items)
 			{
 				m_map[yf][xf].opaque = false;
-				if ((*obj) != unit&&qualifier((*obj)))
+				if (m_item != unit&&qualifier(m_item))
 				{
 					m_map[yf][xf].opaque = true;
 				}
@@ -364,9 +363,9 @@ FOV_help::FOV_help(){}
 
 void FOV_help::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
 {
-	std::function<bool(GameObject*)> qualifier = fov.qualifier->predicat;
+	const auto qualifier = fov.qualifier->predicate;
 
-	view_t view(min(m_view.l, fov.radius), min(m_view.r, fov.radius), min(m_view.u, fov.radius), min(m_view.d, fov.radius));
+	const view_t view(min(m_view.l, fov.radius), min(m_view.r, fov.radius), min(m_view.u, fov.radius), min(m_view.d, fov.radius));
 
 	for (int y = m_map_center.y - view.d, yf = m_view_center.y - view.d; y < m_map_center.y + view.u + 1; y++, yf++)
 	{
@@ -375,9 +374,9 @@ void FOV_help::calculate(GameObject* unit, GameMap* map, AI_FOV& fov)
 			m_map[yf][xf].opaque = false;
 			if (map->get(0, y, x).m_notable)
 			{
-				for (auto obj = map->get(0,y, x).m_items.begin(); obj != map->get(0,y, x).m_items.end(); ++obj)
+				for (auto& m_item : map->get(0, y, x).m_items)
 				{
-					if ((*obj) != unit&&qualifier((*obj)))
+					if (m_item != unit&&qualifier(m_item))
 					{
 						m_map[yf][xf].opaque = true;
 					}

@@ -2,7 +2,7 @@
 #include "game/graphics/GUI_ActionButton.h"
 
 
-GUI_ActionButton::GUI_ActionButton(int width, int height)
+GUI_ActionButton::GUI_ActionButton(const int width, const int height)
 {
 	m_size.w = width;
 	m_size.h = height;
@@ -13,12 +13,12 @@ GUI_ActionButton::~GUI_ActionButton()
 {
 }
 
-void GUI_ActionButton::render(GraphicalController* graph, int px, int py)
+void GUI_ActionButton::render(GraphicalController* graph, const int px, const int py)
 {
 	glDisable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	int y_shift = (m_size.h - (Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender >> 6)) / 2;
+	const int y_shift = (m_size.h - (Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender >> 6)) / 2;
 	GraphicalController::rectangle_t rect(px, py, m_size.w, m_size.h);
 	if (focused)
 	{

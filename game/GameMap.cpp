@@ -6,25 +6,24 @@
 
 void Object_manager::update_buff()
 {
-	Interaction_list* list;
 	Interaction_list* e;
 	Visitor_onturn_updater visitor;
 
-	for (auto object = m_items.begin(); object !=m_items.end(); ++object)
+	for (auto& m_item : m_items)
 	{
-		list = static_cast<Interaction_list*>(object->get_effect(interaction_e::buff));
+		auto list = static_cast<Interaction_list*>(m_item.get_effect(interaction_e::buff));
 		if (list)
 		{
 			e = list->clone();
-			e->apply_effect(&(*object), nullptr);
+			e->apply_effect(&m_item, nullptr);
 			visitor.result = false;
 			list->apply_visitor(visitor);
 		}
-		for (auto item = object->m_active_state->m_items.begin(); item != object->m_active_state->m_items.end(); ++item)
+		for (auto& item : m_item.m_active_state->m_items)
 		{
-			if ((*item).second->m_interaction_message_type == interaction_message_type_e::list)
+			if (item.second->m_interaction_message_type == interaction_message_type_e::list)
 			{
-				e = static_cast<Interaction_list*>((*item).second);
+				e = static_cast<Interaction_list*>(item.second);
 				if (e->m_list_type == feature_list_type_e::parameter|| e->m_list_type == feature_list_type_e::parts|| e->m_list_type == feature_list_type_e::tag)
 				{
 					visitor.result = false;
@@ -32,35 +31,33 @@ void Object_manager::update_buff()
 				}
 			}
 		}
-		object->update_interaction();
-		object->event_update(VoidEventArgs());
+		m_item.update_interaction();
+		m_item.event_update(VoidEventArgs());
 	}
 }
 
 void Object_manager::calculate_ai()
 {
-	for (auto object = m_items.begin(); object != m_items.end(); ++object)
+	for (auto& m_item : m_items)
 	{
-		if (object->m_owner->m_kind == entity_e::cell)
+		if (m_item.m_owner->m_kind == entity_e::cell)
 		{
-			if ((object->m_active_state->m_ai) && (&(*object) != Application::instance().m_world->m_player->m_object))
+			if ((m_item.m_active_state->m_ai) && (&m_item != Application::instance().m_world->m_player->m_object))
 			{
-				switch (object->m_active_state->m_ai->m_ai_type)
+				switch (m_item.m_active_state->m_ai->m_ai_type)
 				{
 				case ai_type_e::trap:
 				{
-					AI_trap obj;
-					obj = *static_cast<AI_trap*>(object->m_active_state->m_ai);
-					obj.m_object = &*object;
+					auto obj = *static_cast<AI_trap*>(m_item.m_active_state->m_ai);
+					obj.m_object = &m_item;
 					obj.create();
 					break;
 				}
 				case ai_type_e::non_humanoid:
 				{
-					AI_enemy* obj;
-					obj = static_cast<AI_enemy*>(object->m_active_state->m_ai);
-					obj->m_map = static_cast<MapCell*>(object->m_owner)->m_map;
-					obj->m_object = &*object;
+					auto obj = static_cast<AI_enemy*>(m_item.m_active_state->m_ai);
+					obj->m_map = static_cast<MapCell*>(m_item.m_owner)->m_map;
+					obj->m_object = &m_item;
 					obj->create();
 					break;
 				}
@@ -73,66 +70,66 @@ void Object_manager::calculate_ai()
 void Object_manager::reset_serialization_index()
 {
 	m_serialization_index = 0;
-	for (auto item = m_items.begin(); item != m_items.end(); ++item)
+	for (auto& m_item : m_items)
 	{
-		item->reset_serialization_index();
+		m_item.reset_serialization_index();
 	}
 }
 
 Packer_generic& Object_manager::get_packer()
 {
-	return Packer<Object_manager>::Instance();
+	return Packer<Object_manager>::instance();
 }
 
 
-std::u16string GameMap::vector_mapcell_to_json(std::vector<MapCell>& value, Parser_context& context)
+std::u16string GameMap::vector_mapcell_to_json(std::vector<MapCell>& value, SerializationContext& context)
 {
 	std::u16string result = u"[";
 	for (auto element : (value))
 	{
 		if (result != u"[") { result += u","; }
-		result += Parser::to_json<std::list<GameObject*>>(element.m_items,context);
+		result += parser_to_json<std::list<GameObject*>>(element.m_items,context);
 	}
 	result += u"]";
 	return result;
 }
 
-void GameMap::vector_mapcell_from_json(const std::u16string& value, std::vector<MapCell>& prop, Parser_context& context)
+void GameMap::vector_mapcell_from_json(const std::u16string& value, std::vector<MapCell>& prop, SerializationContext& context)
 {
-	std::u16string temp = value;
-	scheme_list_t* s = Parser::read_array(temp);
+	auto temp = value;
+	const auto s = read_array(temp);
 	if (s)
 	{
 		std::size_t i = 0;
 		prop.resize(s->size());
-		for (auto element : (*s))
+		for (const auto& element : (*s))
 		{
-			Parser::from_json<std::list<GameObject*>>(element, prop[i].m_items,context);
+			parser_from_json<std::list<GameObject*>>(element, prop[i].m_items,context);
 			i += 1;
 		}
 	}
 	delete s;
 }
 
-std::string GameMap::vector_mapcell_to_binary(std::vector<MapCell>& value, Parser_context& context)
+std::string GameMap::vector_mapcell_to_binary(std::vector<MapCell>& value, SerializationContext& context)
 {
-	std::size_t s = value.size();
-	std::string result = std::string(reinterpret_cast<const char*>(&s), sizeof(std::size_t));
-	for (auto element : (value))
+	auto s = value.size();
+	auto result = std::string(reinterpret_cast<const char*>(&s), sizeof(std::size_t));
+	for (auto element : value)
 	{
-		result += Parser::to_binary<std::list<GameObject*>>(element.m_items,context);
+		result += parser_to_binary<std::list<GameObject*>>(element.m_items,context);
 	}
 	return result;
 }
 
-void GameMap::vector_mapcell_from_binary(const std::string& value, std::vector<MapCell>& prop, std::size_t& pos, Parser_context& context)
+void GameMap::vector_mapcell_from_binary(const std::string& value, std::vector<MapCell>& prop, std::size_t& pos, SerializationContext& context)
 {
-	std::size_t s = *reinterpret_cast<const std::size_t*>(&value[pos]);
+	const auto s = *reinterpret_cast<const std::size_t*>(&value[pos]);
 	pos += sizeof(std::size_t);
 	prop.resize(s);
 	for (std::size_t i = 0; i < s; ++i)
 	{
-		Parser::from_binary<std::list<GameObject*>>(value, prop[i].m_items, pos,context);
+		parser_from_binary<std::list<GameObject*>>(value, prop[i].m_items, pos,context);
 	}
 }
 
@@ -149,22 +146,22 @@ GameMap::GameMap()
 
 MapCell& GameMap::get(const int z, const int y, const int x)
 {
-	return m_items[z*(m_size.dy*m_size.dx) + m_size.dy*y + x];
+	return m_items[z * (m_size.dy * m_size.dx) + m_size.dy * y + x];
 }
 
 void GameMap::init(dimension3_t size)
 {
 	m_size = size;
-	Logger::Instance().info("Карта инициализирована с размером: " + std::to_string(m_size.dx) < +"x" + std::to_string(m_size.dy) + "x" + std::to_string(m_size.dz));
-	m_items.resize(m_size.dz*m_size.dy*m_size.dx);
-	int i = 0;
-	for (int z = 0; z < m_size.dz; ++z)
+	Logger::instance().info("РљР°СЂС‚Р° РёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°РЅР° СЃ СЂР°Р·РјРµСЂРѕРј: " + std::to_string(m_size.dx) < +"x" + std::to_string(m_size.dy) + "x" + std::to_string(m_size.dz));
+	m_items.resize(m_size.dz * m_size.dy * m_size.dx);
+	auto i = 0;
+	for (auto z = 0; z < m_size.dz; ++z)
 	{
-		for (int y = 0; y < m_size.dy; ++y)
+		for (auto y = 0; y < m_size.dy; ++y)
 		{
-			for (int x = 0; x < m_size.dx; ++x)
+			for (auto x = 0; x < m_size.dx; ++x)
 			{
-				MapCell& m = m_items[i];
+				auto& m = m_items[i];
 				m.x = x;
 				m.y = y;
 				m.z = z;
@@ -197,15 +194,15 @@ void GameMap::init(dimension3_t size)
 
 void GameMap::generate_room()
 {
-	for (int z = 0; z < 6; ++z)
+	for (auto z = 0; z < 6; ++z)
 	{
-		for (int y = 0; y < m_size.dy; y++)
+		for (auto y = 0; y < m_size.dy; y++)
 		{
-			for (int x = 0; x < m_size.dx; x++)
+			for (auto x = 0; x < m_size.dx; x++)
 			{
 				if(z==0)
 				{
-					auto obj = Application::instance().m_game_object_manager->new_object("floor");
+					const auto obj = Application::instance().m_game_object_manager->new_object("floor");
 					add_object(obj, get(z, y, x));
 				}
 				else {
@@ -213,7 +210,7 @@ void GameMap::generate_room()
 					{
 						if ((x == 0) || (x == m_size.dx - 1) || (y == 0) || (y == m_size.dy - 1))
 						{
-							auto obj = Application::instance().m_game_object_manager->new_object("wall");
+							const auto obj = Application::instance().m_game_object_manager->new_object("wall");
 							add_object(obj, get(z, y, x));
 						}
 					}
@@ -233,7 +230,7 @@ void GameMap::generate_room()
 		}
 	}
 
-	Logger::Instance().info (" -= Всего источников света: " + std::to_string(light_source_count) + "=-");
+	Logger::instance().info (" -= Р’СЃРµРіРѕ РёСЃС‚РѕС‡РЅРёРєРѕРІ СЃРІРµС‚Р°: " + std::to_string(light_source_count) + "=-");
 
 	//GameObject* obj = Application::instance().m_game_object_manager->new_object("torch");
 	//*obj->m_active_state->m_light = light_t(80, 0, 0);
@@ -265,12 +262,12 @@ void GameMap::add_object(GameObject* object, MapCell& cell)
 
 void GameMap::remove_object(GameObject* object)
 {
-	MapCell& cell = *object->cell();
-	for (int z = 0; z<object->m_active_state->m_size.dz; z++)
+	auto& cell = *object->cell();
+	for (auto z = 0; z<object->m_active_state->m_size.dz; z++)
 	{
-		for (int y = 0; y<object->m_active_state->m_size.dy; y++)
+		for (auto y = 0; y<object->m_active_state->m_size.dy; y++)
 		{
-			for (int x = 0; x<object->m_active_state->m_size.dx; x++)
+			for (auto x = 0; x<object->m_active_state->m_size.dx; x++)
 			{
 				get(cell.z + z, cell.y - y, cell.x + x).m_items.remove(object);
 			}
@@ -287,7 +284,7 @@ void GameMap::move_object(GameObject* object, MapCell& cell)
 
 void  GameMap::turn_object(GameObject* object)
 {
-	MapCell* position = object->cell();
+	const auto position = object->cell();
 	remove_object(object);
 	object->turn();
 	add_object(object, *position);
@@ -318,29 +315,29 @@ void GameMap::generate_traps()
 
 }
 
-bool GameMap::divide_block(block_t* block, int Depth, int Current)
+bool GameMap::divide_block(block_t* block, int depth, int current)
 {
-	int choise(rand() % 100);
+	auto choice(rand() % 100);
 	block_t* sub_block;
-	if (choise<50)
+	if (choice<50)
 	{
-		int Range = block->rect.w;
-		if (Range<22){ return true; }
-		choise = rand() % (Range - 6) + 11;
-		if (Range - choise<11)
+		const auto range = block->rect.w;
+		if (range<22){ return true; }
+		choice = rand() % (range - 6) + 11;
+		if (range - choice<11)
 		{
-			choise = 11;
-			if (Range - choise - 11<11){ return true; }
+			choice = 11;
+			if (range - choice - 11<11){ return true; }
 		}
-		if (Current<Depth)
+		if (current<depth)
 		{
-			sub_block = new block_t(block->rect.x, block->rect.y, choise, block->rect.h);
-			if (divide_block(sub_block, Depth, Current + 1))
+			sub_block = new block_t(block->rect.x, block->rect.y, choice, block->rect.h);
+			if (divide_block(sub_block, depth, current + 1))
 			{
 				m_rooms.push_back(sub_block);
 			}
-			sub_block = new block_t(block->rect.x + choise, block->rect.y, block->rect.w - choise, block->rect.h);
-			if (divide_block(sub_block, Depth, Current + 1))
+			sub_block = new block_t(block->rect.x + choice, block->rect.y, block->rect.w - choice, block->rect.h);
+			if (divide_block(sub_block, depth, current + 1))
 			{
 				m_rooms.push_back(sub_block);
 			}
@@ -348,23 +345,23 @@ bool GameMap::divide_block(block_t* block, int Depth, int Current)
 		}
 	}
 	else {
-		int Range = block->rect.h;
-		if (Range<22){ return true; }
-		choise = rand() % (Range - 6) + 11;
-		if (Range - choise<11)
+		const auto range = block->rect.h;
+		if (range<22){ return true; }
+		choice = rand() % (range - 6) + 11;
+		if (range - choice<11)
 		{
-			choise = 11;
-			if (Range - choise - 11<11){ return true; }
+			choice = 11;
+			if (range - choice - 11<11){ return true; }
 		}
-		if (Current<Depth)
+		if (current<depth)
 		{
-			sub_block = new block_t(block->rect.x, block->rect.y, block->rect.w, choise);
-			if (divide_block(sub_block, Depth, Current + 1))
+			sub_block = new block_t(block->rect.x, block->rect.y, block->rect.w, choice);
+			if (divide_block(sub_block, depth, current + 1))
 			{
 				m_rooms.push_back(sub_block);
 			}
-			sub_block = new block_t(block->rect.x, block->rect.y + choise, block->rect.w, block->rect.h - choise);
-			if (divide_block(sub_block, Depth, Current + 1))
+			sub_block = new block_t(block->rect.x, block->rect.y + choice, block->rect.w, block->rect.h - choice);
+			if (divide_block(sub_block, depth, current + 1))
 			{
 				m_rooms.push_back(sub_block);
 			}
@@ -377,8 +374,7 @@ bool GameMap::divide_block(block_t* block, int Depth, int Current)
 void GameMap::random_block(block_t* block)
 {
 	(*block) = block_t(block->rect.x + 1, block->rect.y + 1, block->rect.w - 2, block->rect.h - 2);
-	int len;
-	len = rand() % block->rect.h;
+	auto len = rand() % block->rect.h;
 	if (len > 10)
 	{
 		block->rect.y = block->rect.y + rand() % (block->rect.h - len);
@@ -421,12 +417,11 @@ void GameMap::fill()
 }
 
 void GameMap::connect_room()
-{ 
-	block_t* temp;
+{
 	int index;
 	while (!m_rooms.empty())
 	{
-		temp = m_rooms.front();
+		auto temp = m_rooms.front();
 		if (!m_link_rooms.empty())
 		{
 			index = rand() % m_link_rooms.size();
@@ -927,107 +922,85 @@ void  GameMap::blur_lighting()
 //	return true;
 //}
 
-//TODO Адаптировать для 3D
-//void GameMap::bresenham_line(MapCell* a, MapCell* b, std::function<void(MapCell*)> f)
-//{
-//	int e = 0;
-//	int dx = abs(b->x - a->x);
-//	int dy = abs(b->y - a->y);
-//	int x;
-//	int y;
-//	int k;
-//	if (dx >= dy)
-//	{
-//		y = a->y;
-//		k = (a->y < b->y ? 1 : -1);
-//		if (a->x < b->x)
-//		{
-//			for (x = a->x; x < b->x + 1; x++)
-//			{
-//				f(&get(y,x));
-//				e = e + dy;
-//				if (2 * e >= dx)
-//				{
-//					y = y + k;
-//					e = e - dx;
-//				}
-//			}
-//		}
-//		else
-//		{
-//			for (x = a->x; x > b->x - 1; x--)
-//			{
-//				f(&get(y,x));
-//				e = e + dy;
-//				if (2 * e >= dx)
-//				{
-//					y = y + k;
-//					e = e - dx;
-//				}
-//			}
-//		}
-//	}
-//	else
-//	{
-//		x = a->x;
-//		k = (a->x < b->x ? 1 : -1);
-//		if (a->y < b->y)
-//		{
-//			for (y = a->y; y < b->y + 1; y++)
-//			{
-//				f(&get(y,x));
-//				e = e + dx;
-//				if (2 * e >= dy)
-//				{
-//					x = x + k;
-//					e = e - dy;
-//				}
-//			}
-//		}
-//		else
-//		{
-//			for (y = a->y; y > b->y - 1; y--)
-//			{
-//				f(&get(y, x));
-//				e = e + dx;
-//				if (2 * e >= dy)
-//				{
-//					x = x + k;
-//					e = e - dy;
-//				}
-//			}
-//		}
-//	}
-//}
+void GameMap::bresenham_line(MapCell* a, MapCell* b, const std::function<void(MapCell*)>& fn) {
 
-void GameMap::bresenham_line(MapCell* a, MapCell* b, std::function<void(MapCell*)> f)
-{
-	if (a == b)
-	{
-		f(a); 
-		return;
+	int i, err_1, err_2;
+	int point[3];
+
+	point[0] = a->x;
+	point[1] = a->y;
+	point[2] = a->z;
+	const auto dx = b->x - a->x;
+	const auto dy = b->y - a->y;
+	const auto dz = b->z - a->z;
+	const auto x_inc = (dx < 0) ? -1 : 1;
+	const auto l = abs(dx);
+	const auto y_inc = (dy < 0) ? -1 : 1;
+	const auto m = abs(dy);
+	const auto z_inc = (dz < 0) ? -1 : 1;
+	const auto n = abs(dz);
+	const auto dx2 = l << 1;
+	const auto dy2 = m << 1;
+	const auto dz2 = n << 1;
+
+	if (l >= m && l >= n) {
+		err_1 = dy2 - l;
+		err_2 = dz2 - l;
+		for (i = 0; i < l; i++) {
+			fn(&get(point[2], point[1], point[0]));
+			if (err_1 > 0) {
+				point[1] += y_inc;
+				err_1 -= dx2;
+			}
+			if (err_2 > 0) {
+				point[2] += z_inc;
+				err_2 -= dx2;
+			}
+			err_1 += dy2;
+			err_2 += dz2;
+			point[0] += x_inc;
+		}
 	}
-	float dx = b->x - a->x;
-	float dy = b->y - a->y;
-	float dz = b->z - a->z;
-	float max = abs(dx) > abs(dy) ? abs(dx) : abs(dy);
-	max = max > abs(dz) ? max : abs(dz);
-	dx /= max;
-	dy /= max;
-	dz /= max;
-	float x = a->x;
-	float y = a->y;
-	float z = a->z;
-	for (float i = 0.0; i < max + 1.0; i = i + 1)
-	{
-		f(&get(z, y, x));
-		x += dx;
-		y += dy;
-		z += dz;
+	else if (m >= l && m >= n) {
+		err_1 = dx2 - m;
+		err_2 = dz2 - m;
+		for (i = 0; i < m; i++) {
+			fn(&get(point[2], point[1], point[0]));
+			if (err_1 > 0) {
+				point[0] += x_inc;
+				err_1 -= dy2;
+			}
+			if (err_2 > 0) {
+				point[2] += z_inc;
+				err_2 -= dy2;
+			}
+			err_1 += dx2;
+			err_2 += dz2;
+			point[1] += y_inc;
+		}
 	}
+	else {
+		err_1 = dy2 - n;
+		err_2 = dx2 - n;
+		for (i = 0; i < n; i++) {
+			fn(&get(point[2], point[1], point[0]));
+			if (err_1 > 0) {
+				point[1] += y_inc;
+				err_1 -= dz2;
+			}
+			if (err_2 > 0) {
+				point[0] += x_inc;
+				err_2 -= dz2;
+			}
+			err_1 += dy2;
+			err_2 += dx2;
+			point[2] += z_inc;
+		}
+	}
+	fn(&get(point[2], point[1], point[0]));
 }
 
-//TODO Адаптировать для 3D
+//TODO РђРґР°РїС‚РёСЂРѕРІР°С‚СЊ РґР»СЏ 3D
 //MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, std::function<bool(MapCell*)> f)
 //{
 //	int e = 0;
@@ -1116,7 +1089,7 @@ void GameMap::bresenham_line(MapCell* a, MapCell* b, std::function<void(MapCell*
 //	}
 //}
 
-//TODO Адаптировать для 3D
+//TODO РђРґР°РїС‚РёСЂРѕРІР°С‚СЊ РґР»СЏ 3D
 //MapCell* GameMap::bresenham_line2(MapCell* a, MapCell* b, Parameter* p, std::function<bool(Parameter*, MapCell*)> f)
 //{
 //	int e = 0;
@@ -1276,7 +1249,7 @@ void GameMap::reset_serialization_index()
 
 Packer_generic& GameMap::get_packer()
 {
-	return Packer<GameMap>::Instance();
+	return Packer<GameMap>::instance();
 }
 
 Game_world::Game_world()
@@ -1307,7 +1280,7 @@ void Game_world::reset_serialization_index()
 	}
 }
 
-std::u16string Game_world::serialize(Parser_context& context)
+std::u16string Game_world::serialize(SerializationContext& context)
 {
 	//LOG(INFO) << "std::u16string Object_manager::items_to_json(std::list<GameObject>& value)";
 	std::size_t i = 0;
@@ -1322,56 +1295,56 @@ std::u16string Game_world::serialize(Parser_context& context)
 	for (auto& element : m_maps.front()->m_items)
 	{
 		if (!result.empty()) { result += u","; };
-		result += Parser::to_json<bool>(element.m_notable, context);
+		result += parser_to_json<bool>(element.m_notable, context);
 		result += u",";
-		result += Parser::to_json<std::list<GameObject*>>(element.m_items, context);
+		result += parser_to_json<std::list<GameObject*>>(element.m_items, context);
 	}
-	result = u"{\"map_size\":" + Parser::to_json<dimension3_t>(m_maps.front()->m_size,context) + u",\"manager_size\":" + Parser::to_json<std::size_t>(ms,context) +u",\"cells\":[" + result + u"],\"items\":";
-	result += Parser::to_json<std::list<GameObject>>(m_object_manager.m_items,context);
-	result += u",\"player\":" + Parser::to_json<GameObject*>(m_player->m_object, context);
+	result = u"{\"map_size\":" + parser_to_json<dimension3_t>(m_maps.front()->m_size,context) + u",\"manager_size\":" + parser_to_json<std::size_t>(ms,context) +u",\"cells\":[" + result + u"],\"items\":";
+	result += parser_to_json<std::list<GameObject>>(m_object_manager.m_items,context);
+	result += u",\"player\":" + parser_to_json<GameObject*>(m_player->m_object, context);
 	result += u"}";
 	return result;
 }
 
-void Game_world::deserialize(std::u16string& value, Parser_context& context)
+void Game_world::deserialize(std::u16string& value, SerializationContext& context)
 {
 	//LOG(INFO) << "deserialize -> " << Parser::UTF16_to_CP1251(value);
-	scheme_map_t* s = Parser::read_object(value);
+	scheme_map_t* s = read_object(value);
 	dimension3_t map_size;
 	for (const auto& element : *s)
 	{
 		//LOG(INFO) << "deserialize -> " << Parser::UTF16_to_CP1251(element.first);
 	}
-	Parser::from_json<dimension3_t>((*s)[u"map_size"], map_size,context);
+	parser_from_json<dimension3_t>((*s)[u"map_size"], map_size,context);
 	GameMap* map = new GameMap(map_size);
 	m_maps.push_front(map);
 
 	std::size_t manager_size;
-	Parser::from_json<std::size_t>((*s)[u"manager_size"], manager_size,context);
+	parser_from_json<std::size_t>((*s)[u"manager_size"], manager_size,context);
 	m_object_manager.m_items.resize(manager_size);
 	
-	scheme_list_t* items = Parser::read_array((*s)[u"cells"]);
+	scheme_list_t* items = read_array((*s)[u"cells"]);
 	if (items)
 	{
 		auto it = items->begin();
 		for (auto& element : m_maps.front()->m_items)
 		{
-			Parser::from_json<bool>(*it, element.m_notable, context);
+			parser_from_json<bool>(*it, element.m_notable, context);
 			++it;
-			Parser::from_json<std::list<GameObject*>>(*it, element.m_items,context);
+			parser_from_json<std::list<GameObject*>>(*it, element.m_items,context);
 			++it;
 		}
 		delete items;
 	}
 
-	items = Parser::read_array((*s)[u"items"]);
+	items = read_array((*s)[u"items"]);
 	if (items)
 	{
 		std::size_t i = 0;
 		auto it = m_object_manager.m_items.begin();
 		for (const auto& element : *items)
 		{
-			Parser::from_json<GameObject>(element, *it,context);
+			parser_from_json<GameObject>(element, *it,context);
 			i += 1;
 			++it;
 		}
@@ -1379,13 +1352,13 @@ void Game_world::deserialize(std::u16string& value, Parser_context& context)
 	}
 
 	GameObject* obj;
-	Parser::from_json<GameObject*>((*s)[u"player"], obj, context);
+	parser_from_json<GameObject*>((*s)[u"player"], obj, context);
 	m_player = new Player(obj, map);
 
 	delete s;
 }
 
-std::string Game_world::bin_serialize(Parser_context& context)
+std::string Game_world::bin_serialize(SerializationContext& context)
 {
 	//LOG(INFO) << "std::string Game_world::bin_serialize()";
 	std::size_t i = 0;
@@ -1394,57 +1367,57 @@ std::string Game_world::bin_serialize(Parser_context& context)
 		element.m_serialization_index = i;
 		i += 1;
 	}
-	std::size_t ms = m_object_manager.m_items.size();
+	auto ms = m_object_manager.m_items.size();
 	//LOG(INFO) << "std::string Game_world::bin_serialize() "<<std::to_string(ms);
-	std::string result = Parser::to_binary<dimension3_t>(m_maps.front()->m_size,context) + Parser::to_binary<std::size_t>(ms,context);
+	auto result = parser_to_binary<dimension3_t>(m_maps.front()->m_size,context) + parser_to_binary<std::size_t>(ms,context);
 	for (auto& element : m_maps.front()->m_items)
 	{
-		result += Parser::to_binary<std::list<GameObject*>>(element.m_items,context);
-		result += Parser::to_binary<bool>(element.m_notable, context);
+		result += parser_to_binary<std::list<GameObject*>>(element.m_items,context);
+		result += parser_to_binary<bool>(element.m_notable, context);
 	}
 	for (auto& element : m_object_manager.m_items)
 	{
-		result += Parser::to_binary<GameObject>(element,context);
+		result += parser_to_binary<GameObject>(element,context);
 	}
-	result += Parser::to_binary<GameObject*>(m_player->m_object, context);
+	result += parser_to_binary<GameObject*>(m_player->m_object, context);
 	return result;
 }
 
-void Game_world::bin_deserialize(std::string& value, Parser_context& context)
+void Game_world::bin_deserialize(std::string& value, SerializationContext& context)
 {
 	//LOG(INFO) << "Game_world::bin_deserialize(std::string& value)";
 
 	std::size_t pos = 0;
 	dimension3_t map_size;
-	Parser::from_binary<dimension3_t>(value, map_size,pos,context);
-	GameMap* map = new GameMap(map_size);
+	parser_from_binary<dimension3_t>(value, map_size,pos,context);
+	auto map = new GameMap(map_size);
 	m_maps.push_front(map);
 
 	std::size_t manager_size;
-	Parser::from_binary<std::size_t>(value, manager_size,pos,context);
+	parser_from_binary<std::size_t>(value, manager_size,pos,context);
 	//LOG(INFO) << "void Game_world::bin_deserialize(std::string& value) " << std::to_string(manager_size);
 	m_object_manager.m_items.resize(manager_size);
 
 	for (auto& element : m_maps.front()->m_items)
 	{
-		Parser::from_binary<std::list<GameObject*>>(value,element.m_items,pos,context);
-		Parser::from_binary<bool>(value, element.m_notable, pos, context);
+		parser_from_binary<std::list<GameObject*>>(value,element.m_items,pos,context);
+		parser_from_binary<bool>(value, element.m_notable, pos, context);
 	}
 
 	std::size_t i=0;
 	for (auto& element : m_object_manager.m_items)
 	{
-		Parser::from_binary<GameObject>(value, element, pos,context);
+		parser_from_binary<GameObject>(value, element, pos,context);
 		++i;
 	}
 	GameObject* obj;
-	Parser::from_binary<GameObject*>(value, obj, pos, context);
+	parser_from_binary<GameObject*>(value, obj, pos, context);
 	m_player = new Player(obj, map);
 }
 
 Packer_generic& Game_world::get_packer()
 {
-	return Packer<Game_world>::Instance();
+	return Packer<Game_world>::instance();
 }
 
 

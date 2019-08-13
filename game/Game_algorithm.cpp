@@ -35,7 +35,7 @@ bool Game_algorithm::check_distance(MapCell* a_cell, dimension3_t& a_size, MapCe
 object_direction_e Game_algorithm::turn_to_object(GameObject* object, GameObject* turn_to)
 {
 	f2dvector_t v(turn_to->cell()->x + turn_to->m_active_state->m_size.dx*0.5F - (object->cell()->x + object->m_active_state->m_size.dx*0.5F), turn_to->cell()->y - turn_to->m_active_state->m_size.dy*0.5F - (object->cell()->y - object->m_active_state->m_size.dy*0.5F));
-	float cs = abs(v.y / sqrt(v.x*v.x+v.y*v.y));
+	const auto cs = abs(v.y / sqrt(v.x*v.x+v.y*v.y));
 	if (v.y > 0.0F)
 	{
 		if (v.x > 0.0F)
@@ -178,7 +178,7 @@ object_direction_e Game_algorithm::turn_to_cell(GameObject* object, MapCell* c)
 
 MapCell* Game_algorithm::step_in_direction(GameObject* object, object_direction_e d)
 {
-	MapCell* result = object->cell();
+	auto result = object->cell();
 	switch (d)
 	{
 	case object_direction_e::down:
@@ -271,7 +271,7 @@ int Game_algorithm::get_angle(object_direction_e direction, int angle)
 
 object_direction_e Game_algorithm::get_direction(object_direction_e direction, int camera_turn)
 {
-	int result = static_cast<int>(direction) + camera_turn*2;
+	auto result = static_cast<int>(direction) + camera_turn*2;
 	if(result>8)
 	{
 		result -= 8;
@@ -281,10 +281,10 @@ object_direction_e Game_algorithm::get_direction(object_direction_e direction, i
 
 rotate_direction_e Game_algorithm::get_rotation(object_direction_e start, object_direction_e end)
 {
-	int a = static_cast<int>(start);
-	int b = static_cast<int>(end);
-	int ab = b - a;
-	int ba = 8 - b + a;
+	const auto a = static_cast<int>(start);
+	const auto b = static_cast<int>(end);
+	const auto ab = b - a;
+	const auto ba = 8 - b + a;
 	if (abs(ab) < abs(ba))
 	{
 		if (a < b) { return rotate_direction_e::clockwise; }

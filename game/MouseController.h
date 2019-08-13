@@ -33,7 +33,7 @@ public:
 	inline position_t get_mouse_position() { return m_position; }
 
 private:
-	position_t m_position;		///< текущая позиция указателя относительно окна с учетом видовой матрицы
+	position_t m_position;		///< С‚РµРєСѓС‰Р°СЏ РїРѕР·РёС†РёСЏ СѓРєР°Р·Р°С‚РµР»СЏ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РѕРєРЅР° СЃ СѓС‡РµС‚РѕРј РІРёРґРѕРІРѕР№ РјР°С‚СЂРёС†С‹
 };
 
 #endif //MOUSECONTROLLER_H

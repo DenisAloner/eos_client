@@ -86,9 +86,9 @@ public:
 	bool set_uniform_vector(GLuint program, const char * name, const float * value);
 	bool set_uniform_sampler(GLuint object, const char * name, int index);
 	bool set_uniform_ptr(GLuint program, const char * name, const int value);
-	position_t get_OpenGL_position(float x, float y);
+	position_t get_open_gl_position(float x, float y);
 	GLuint load_texture(const std::string& path);
-	void output_text(int x, int y, std::u16string& Text, int sizex, int sizey);
+	void output_text(int x, int y, std::u16string& text, int sizex, int sizey);
 	void center_text(int x, int y, std::u16string text, int sizex, int sizey);
 	void render_text(double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
 	bool add_scissor(const frectangle_t& rect);
@@ -103,13 +103,14 @@ public:
 	GLuint png_texture_load(const std::string& path);
 	GLuint texture_array_load(const std::vector<std::string>& path);
 
-	std::size_t measure_text_width(std::u16string& Text);
+	std::size_t measure_text_width(std::u16string& text);
 
 	position_t center_aling_to_point(int x, int y, std::u16string text);
 
 	void draw_sprite(const rectangle_t &rect);
 	void draw_rectangle(rectangle_t rect);
 	void stroke_cell(int x, int y, int xs, int ys);
+	void stroke_cube(int x, int y, int z, int xs, int ys);
 	void selection_cell(int x, int y, int z, int xs, int ys);
 	void draw_tile(tile_t& tile, rectangle_t rect);
 	void draw_sprite_fbo(double tex_width, double tex_height, rectangle_t rect);
@@ -118,9 +119,9 @@ public:
 	
 
 private:
-	bool CompileSuccessful(int obj);
-	bool LinkSuccessful(int obj);
-	bool ValidateSuccessful(int obj);
+	bool compile_successful(int obj);
+	bool link_successful(int obj);
+	bool validate_successful(int obj);
 };
 
 #endif //GRAPHICALCONTROLLER_H

@@ -61,7 +61,7 @@ public:
 
 	Action_wrapper();
 
-	virtual std::u16string get_description() { return u"действие"; };
+	virtual std::u16string get_description() { return u"РґРµР№СЃС‚РІРёРµ"; };
 	Action_wrapper* clone() override;
 	//virtual void perfom(Parameter* parameter);
 
@@ -168,7 +168,7 @@ public:
 
 	char perform(Parameter* parameter) override;
 	std::u16string get_description(Parameter* parameter) override;
-	void interaction_handler(Parameter* arg) override;
+	void interaction_handler(Parameter* parameter) override;
 };
 
 

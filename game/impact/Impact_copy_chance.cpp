@@ -21,5 +21,5 @@ Object_interaction* Impact_copy_chance::clone()
 
 Packer_generic& Impact_copy_chance::get_packer()
 {
-	return Packer<Impact_copy_chance>::Instance();
+	return Packer<Impact_copy_chance>::instance();
 }

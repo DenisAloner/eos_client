@@ -10,14 +10,14 @@ class GUI_Text :
 {
 public:
 
-	GUI_Text(std::u16string text);
-	GUI_Text(std::u16string text, GUI_TextFormat* format);
+	GUI_Text(const std::u16string& text);
+	GUI_Text(const std::u16string& text, GUI_TextFormat* format);
 	~GUI_Text();
 
 	GUI_TextFormat* m_format;
 
 	void render(GraphicalController* Graph, int px, int py) override;
-	void set(std::u16string t);
+	void set(const std::u16string& t);
 
 	std::u16string m_text;
 };

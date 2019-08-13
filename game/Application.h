@@ -70,7 +70,7 @@ class game_clipboard
 {
 public:
 
-	std::list<GameObject*>* m_source;
+	std::list<GameObject*>* m_source{};
 	GameObject* m_item;
 	 
 	game_clipboard();
@@ -81,8 +81,8 @@ class Application
 public:
 
 
-	int m_game_turn;
-	bool m_ready;
+	int m_game_turn{};
+	bool m_ready{};
 	bool m_turn;
 
 	dimension_t m_size;
@@ -110,7 +110,7 @@ public:
 
 	Action* m_actions[action_e::max];
 
-	AI_manager* m_ai_manager;
+	AI_manager* m_ai_manager{};
 	
 	Event<WPARAM> key_press;
 
@@ -126,12 +126,12 @@ public:
 
 	Game_world* m_world;
 
-	~Application(void);
+	~Application();
 
 	static Application& instance()
 	{
-		static Application Singleton;
-		return Singleton;
+		static Application singleton;
+		return singleton;
 	}
 
 	void initialize(dimension_t work_area_size, HDC m_hDC, HGLRC hRC);

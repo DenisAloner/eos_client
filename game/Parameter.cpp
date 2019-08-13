@@ -9,7 +9,7 @@ void Parameter_argument_t::set(GameObject* value)
 	}
 	else
 	{
-		Logger::Instance().critical ("Тип аргумента для Parameter не соотвутствует ожидаемому");
+		Logger::instance().critical ("РўРёРї Р°СЂРіСѓРјРµРЅС‚Р° РґР»СЏ Parameter РЅРµ СЃРѕРѕС‚РІСѓС‚СЃС‚РІСѓРµС‚ РѕР¶РёРґР°РµРјРѕРјСѓ");
 	}
 };
 
@@ -49,7 +49,7 @@ void Parameter_argument_t::set(Game_object_owner* value)
 		return;
 	}
 	}
-	Logger::Instance().critical( "Тип аргумента для Parameter не соотвутствует ожидаемому");
+	Logger::instance().critical( "РўРёРї Р°СЂРіСѓРјРµРЅС‚Р° РґР»СЏ Parameter РЅРµ СЃРѕРѕС‚РІСѓС‚СЃС‚РІСѓРµС‚ РѕР¶РёРґР°РµРјРѕРјСѓ");
 };
 
 void Parameter_argument_t::set(object_direction_e value)
@@ -60,7 +60,7 @@ void Parameter_argument_t::set(object_direction_e value)
 	}
 	else
 	{
-		Logger::Instance().critical( "Тип аргумента для Parameter не соотвутствует ожидаемому");
+		Logger::instance().critical( "РўРёРї Р°СЂРіСѓРјРµРЅС‚Р° РґР»СЏ Parameter РЅРµ СЃРѕРѕС‚РІСѓС‚СЃС‚РІСѓРµС‚ РѕР¶РёРґР°РµРјРѕРјСѓ");
 	}
 };
 
@@ -99,7 +99,7 @@ Parameter_argument_t::operator bool()
 	}
 	default:
 	{
-		Logger::Instance().critical("Неверный тип для Parameter_argument_t::operator bool()");
+		Logger::instance().critical("РќРµРІРµСЂРЅС‹Р№ С‚РёРї РґР»СЏ Parameter_argument_t::operator bool()");
 		break;
 	}
 	}
@@ -329,7 +329,7 @@ void Parameter::reset_serialization_index()
 
 Packer_generic& Parameter::get_packer()
 {
-	return Packer<Parameter>::Instance();
+	return Packer<Parameter>::instance();
 }
 
 Parameter* Parameter::clone()
@@ -403,5 +403,5 @@ Instruction_result::Instruction_result()
 
 Packer_generic& Instruction_result::get_packer()
 {
-	return Packer<Instruction_result>::Instance();
+	return Packer<Instruction_result>::instance();
 };

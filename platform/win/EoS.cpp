@@ -13,7 +13,7 @@
 // Function Declarations
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-void EnableGraphics(HWND hWnd, HDC &hDC);
+void enable_graphics(HWND hWnd, HDC &hDC);
 void DisableGraphics(HWND hWnd, HDC hDC);
 BOOL SetClientRect(HWND hWnd, int x, int y);
 
@@ -23,7 +23,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 				   LPSTR lpCmdLine, int iCmdShow)
 {
 	WNDCLASS wc;
-	HWND hWnd;
 	HDC hDC;
 	MSG msg;
 	BOOL quit = FALSE;
@@ -41,11 +40,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = hInstance;
-	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-	wc.lpszMenuName = NULL;
-	wc.lpszClassName = "Explorers of Saarum";
+	wc.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
+	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	wc.hbrBackground = HBRUSH(GetStockObject(BLACK_BRUSH));
+	wc.lpszMenuName = nullptr;
+	wc.lpszClassName = L"Explorers of Saarum";
 	RegisterClass(&wc);
 	
 
@@ -58,8 +57,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	//LOG(INFO) << "Workarea: ["<<std::to_string(workarea.left)<<"," << std::to_string(workarea.top) << "," << std::to_string(workarea.right) << "," << std::to_string(workarea.bottom) << "]";
 	
 	// create main window
-	hWnd = CreateWindow(
-		("Explorers of Saarum"), "Explorers of Saarum", 
+	const auto hWnd = CreateWindow(
+		(L"Explorers of Saarum"), L"Explorers of Saarum",
 		WS_CAPTION | WS_POPUPWINDOW | WS_VISIBLE,
 		10, 10, window_rect.right()-20, window_rect.bottom()-20,
 		NULL, NULL, hInstance, NULL);
@@ -68,7 +67,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	rectangle_t client_rect(0, 0, client_rect_win.right, client_rect_win.bottom);
 	// enable OpenGL for the window
 	SetClientRect(hWnd, client_rect.right(), client_rect.bottom());
-	EnableGraphics(hWnd, hDC);
+	enable_graphics(hWnd, hDC);
 	Renderer renderer(hDC, client_rect);
 
 	//RECT windowRect;
@@ -246,11 +245,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 }
 
-void EnableGraphics(HWND hWnd, HDC &hDC)
+void enable_graphics(HWND hWnd, HDC &hDC)
 {
 	PIXELFORMATDESCRIPTOR pfd;
-	int format;
-	
+
 	// get the device context (DC)
 	hDC = GetDC(hWnd);
 	
@@ -263,7 +261,7 @@ void EnableGraphics(HWND hWnd, HDC &hDC)
 	pfd.cColorBits = 32;
 	pfd.cDepthBits = 16;
 	pfd.iLayerType = PFD_MAIN_PLANE;
-	format = ChoosePixelFormat(hDC, &pfd);
+	const auto format = ChoosePixelFormat(hDC, &pfd);
 	SetPixelFormat(hDC, format, &pfd);
 }
 
@@ -275,7 +273,7 @@ void DisableGraphics(HWND hWnd, HDC hDC)
 BOOL SetClientRect(HWND hWnd, int x, int y)
 {
 	RECT rect = { 0, 0, x, y }, rect2;
-	AdjustWindowRectEx(&rect, GetWindowLong(hWnd, GWL_STYLE), (BOOL)GetMenu(hWnd), GetWindowLong(hWnd, GWL_EXSTYLE));
+	AdjustWindowRectEx(&rect, GetWindowLong(hWnd, GWL_STYLE), BOOL(GetMenu(hWnd)), GetWindowLong(hWnd, GWL_EXSTYLE));
 	GetWindowRect(hWnd, &rect2);
 	return MoveWindow(hWnd, rect2.left, rect2.top, rect.right - rect.left, rect.bottom - rect.top, TRUE);
 }

@@ -9,7 +9,7 @@ class Logger
 {
 
 public:
-	static Logger& Instance()
+	static Logger& instance()
 	{
 		static Logger the_single_instance;
 		return the_single_instance;

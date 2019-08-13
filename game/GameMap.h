@@ -81,7 +81,7 @@ public:
 	void turn_object(GameObject* object);
 
 	void generate_room();
-	bool divide_block(block_t* Block, int Depth, int Current);
+	bool divide_block(block_t* Block, int depth, int current);
 	void generate_level(void);
 
 	void add_to_map(GameObject* object, MapCell& cell);
@@ -95,7 +95,7 @@ public:
 	void generate_traps();
 	//bool line2(int x1, int y1, int x2, int y2);
 	void add_lighting();
-	void bresenham_line(MapCell* a, MapCell* b, std::function<void(MapCell*)> f);
+	void bresenham_line(MapCell* a, MapCell* b, const std::function<void(MapCell*)>& fn);
 	MapCell* bresenham_line2(MapCell* a, MapCell* b, std::function<bool(MapCell*)> f);
 	MapCell* bresenham_line2(MapCell* a, MapCell* b, Parameter* p, std::function<bool(Parameter*,MapCell*)> f);
 	//bool check(int x,int y);
@@ -107,10 +107,10 @@ public:
 
 	Packer_generic& get_packer() override;
 
-	std::u16string vector_mapcell_to_json(std::vector<MapCell>& value, Parser_context& context);
-	void vector_mapcell_from_json(const std::u16string& value, std::vector<MapCell>& prop, Parser_context& context);
-	std::string vector_mapcell_to_binary(std::vector<MapCell>& value, Parser_context& context);
-	void vector_mapcell_from_binary(const std::string& value, std::vector<MapCell>& prop, std::size_t& pos, Parser_context& context);
+	std::u16string vector_mapcell_to_json(std::vector<MapCell>& value, SerializationContext& context);
+	void vector_mapcell_from_json(const std::u16string& value, std::vector<MapCell>& prop, SerializationContext& context);
+	std::string vector_mapcell_to_binary(std::vector<MapCell>& value, SerializationContext& context);
+	void vector_mapcell_from_binary(const std::string& value, std::vector<MapCell>& prop, std::size_t& pos, SerializationContext& context);
 
 	constexpr static auto properties()
 	{
@@ -138,11 +138,11 @@ public:
 	void calculate_lighting();
 	void reset_serialization_index() override;
 
-	std::u16string serialize(Parser_context& context);
-	void deserialize(std::u16string& value, Parser_context& context);
+	std::u16string serialize(SerializationContext& context);
+	void deserialize(std::u16string& value, SerializationContext& context);
 
-	std::string bin_serialize(Parser_context& context);
-	void bin_deserialize(std::string& value, Parser_context& context);
+	std::string bin_serialize(SerializationContext& context);
+	void bin_deserialize(std::string& value, SerializationContext& context);
 
 	Packer_generic& get_packer() override;
 

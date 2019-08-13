@@ -87,7 +87,7 @@ void GUI_Container::render(GraphicalController* Graph, int px, int py)
 
 void GUI_Container::on_mouse_wheel(MouseEventArgs const& e)
 {
-//#warning FIXME Создать дефайн или лучше статическую константу для значения 30, обозвать понятным образом
+//#warning FIXME РЎРѕР·РґР°С‚СЊ РґРµС„Р°Р№РЅ РёР»Рё Р»СѓС‡С€Рµ СЃС‚Р°С‚РёС‡РµСЃРєСѓСЋ РєРѕРЅСЃС‚Р°РЅС‚Сѓ РґР»СЏ Р·РЅР°С‡РµРЅРёСЏ 30, РѕР±РѕР·РІР°С‚СЊ РїРѕРЅСЏС‚РЅС‹Рј РѕР±СЂР°Р·РѕРј
 	set_scroll(e.value / 30);
 }
 
@@ -383,7 +383,7 @@ void GUI_Scrollable_container::resize(int width, int height)
 
 void GUI_Scrollable_container::on_mouse_wheel(MouseEventArgs const& e)
 {
-	//#warning FIXME Что за магическое 30?
+	//#warning FIXME Р§С‚Рѕ Р·Р° РјР°РіРёС‡РµСЃРєРѕРµ 30?
 	set_scroll(e.value / 5);
 }
 

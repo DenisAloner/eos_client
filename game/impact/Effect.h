@@ -16,20 +16,20 @@ public:
 
 	Interaction_list();
 	virtual bool update();
-	virtual Interaction_list* clone();
-	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	Interaction_list* clone() override;
+	void apply_effect(GameObject* unit, Object_interaction* object) override;
 
 	virtual void add(Object_interaction* item) { m_items.push_back(item); };
 	virtual void remove(Object_interaction* item) { m_items.remove(item); };
 	virtual void equip(Object_interaction* item) { m_items.push_back(item); };
 	virtual void unequip(Object_interaction* item) { m_items.remove(item); };
 
-	virtual void do_predicat(Visitor& helper);
+	void do_predicate(Visitor& helper) override;
 	void apply_visitor(Visitor_generic& visitor) override;
 
 	void reset_serialization_index() override;
 
-	// ƒÎˇ ÔÓ‰‰ÂÊÍË iJSONSerializable
+	// –î–ª—è –ø–æ–¥–¥–µ—Ä–∂–∫–∏ iJSONSerializable
 	Packer_generic& get_packer() override;
 
 	constexpr static auto properties() 
@@ -55,8 +55,8 @@ public:
 
 	Parameter_list(interaction_e subtype);
 	Parameter_list();
-	virtual bool update();
-	virtual Parameter_list* clone();
+	bool update() override;
+	Parameter_list* clone() override;
 	void apply_visitor(Visitor_generic& visitor) override;
 
 	Packer_generic& get_packer() override;
@@ -93,12 +93,12 @@ public:
 	int m_max_radius;
 
 	Vision_list();
-	virtual bool update();
-	virtual Vision_list* clone();
+	bool update() override;
+	Vision_list* clone() override;
 	void apply_visitor(Visitor_generic& visitor) override;
 
-	virtual void equip(Object_interaction* item);
-	virtual void unequip(Object_interaction* item);
+	void equip(Object_interaction* item) override;
+	void unequip(Object_interaction* item) override;
 
 	Packer_generic& get_packer() override;
 
@@ -141,9 +141,9 @@ public:
 
 	void apply_visitor(Visitor_generic& visitor) override;
 
-	virtual Tag_list* clone();
+	Tag_list* clone() override;
 
-	virtual bool update();
+	bool update() override;
 
 	Packer_generic& get_packer() override;
 
@@ -169,11 +169,11 @@ class Parts_list: public Interaction_list
 public:
 
 	Parts_list();
-	virtual Parts_list* clone();
-	virtual bool update();
+	Parts_list* clone() override;
+	bool update() override;
 
 	void apply_visitor(Visitor_generic& visitor) override;
-	virtual void equip(Object_interaction* item);
+	void equip(Object_interaction* item) override;
 
 	Packer_generic& get_packer() override;
 
@@ -200,7 +200,7 @@ class Action_list :public Interaction_list
 public:
 
 	Action_list();
-	virtual Interaction_list* clone();
+	Interaction_list* clone() override;
 
 	void apply_visitor(Visitor_generic& visitor) override;
 
@@ -215,9 +215,9 @@ public:
 
 	object_state_e m_value;
 	Slot_set_state() { m_interaction_message_type = interaction_message_type_e::set_attribute_map; };
-	virtual void apply_effect(GameObject* unit, Object_interaction* object);
-	virtual Slot_set_state* clone();
-	virtual void do_predicat(predicat func) { func(this); };
+	void apply_effect(GameObject* unit, Object_interaction* object) override;
+	Slot_set_state* clone() override;
+	virtual void do_predicate(predicate func) { func(this); };
 
 	Packer_generic& get_packer() override;
 };
@@ -228,7 +228,7 @@ public:
 
 	Object_interaction* m_value;
 	Interaction_slot();
-	virtual void do_predicat(Visitor& helper);
+	void do_predicate(Visitor& helper) override;
 	void reset_serialization_index() override;
 
 	Packer_generic& get_packer() override = 0;
@@ -251,7 +251,7 @@ public:
 
 	interaction_e m_subtype;
 	Interaction_copyist();
-	virtual Object_interaction* clone();
+	Object_interaction* clone() override;
 	void apply_effect(GameObject* unit, Object_interaction* object) override;
 
 	Packer_generic& get_packer() override;
@@ -264,8 +264,8 @@ public:
 
 	effect_prefix_e m_subtype;
 	Interaction_prefix();
-	virtual Interaction_prefix* clone();
-	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	Interaction_prefix* clone() override;
+	void apply_effect(GameObject* unit, Object_interaction* object) override;
 
 	Packer_generic& get_packer() override;
 };
@@ -276,8 +276,8 @@ public:
 
 	interaction_e m_subtype;
 	Interaction_addon();
-	virtual Object_interaction* clone();
-	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	Object_interaction* clone() override;
+	void apply_effect(GameObject* unit, Object_interaction* object) override;
 
 	Packer_generic& get_packer() override;
 };
@@ -324,7 +324,7 @@ public:
 	effect_e m_subtype;
 	Effect();
 	Effect* clone() override;
-	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	void apply_effect(GameObject* unit, Object_interaction* object) override;
 
 	Packer_generic& get_packer() override;
 
@@ -343,7 +343,7 @@ public:
 
 	object_tag_e m_type;
 	Object_tag(object_tag_e key);
-	virtual Object_tag* clone() = 0;
+	Object_tag* clone() override = 0;
 
 	constexpr static auto properties() { return std::make_tuple(make_property(&Object_tag::m_type, u"type")); }
 };
@@ -354,8 +354,8 @@ namespace ObjectTag
 	{
 	public:
 		Poison_resist();
-		virtual Poison_resist* clone();
-		virtual void apply_effect(GameObject* unit, Object_interaction* object);
+		Poison_resist* clone() override;
+		void apply_effect(GameObject* unit, Object_interaction* object) override;
 
 		Packer_generic& get_packer() override;
 	};
@@ -364,12 +364,12 @@ namespace ObjectTag
 	{
 	public:
 		Mortal();
-		virtual Mortal* clone();
-		virtual void apply_effect(GameObject* unit, Object_interaction* object);
+		Mortal* clone() override;
+		void apply_effect(GameObject* unit, Object_interaction* object) override;
 
 		void apply_visitor(Visitor_generic& visitor) override;
 
-		// ƒÎˇ ÔÓ‰‰ÂÊÍË iSerializable
+		// –î–ª—è –ø–æ–¥–¥–µ—Ä–∂–∫–∏ iSerializable
 		Packer_generic& get_packer() override;
 
 		/*constexpr static auto properties() { return Object_tag::properties(); }*/
@@ -418,7 +418,7 @@ namespace ObjectTag
 
 		void apply_visitor(Visitor_generic& visitor) override;
 
-		// ƒÎˇ ÔÓ‰‰ÂÊÍË iSerializable
+		// –î–ª—è –ø–æ–¥–¥–µ—Ä–∂–∫–∏ iSerializable
 		Packer_generic& get_packer() override;
 
 		constexpr static auto properties() { return Object_tag::properties(); }
@@ -436,7 +436,7 @@ namespace ObjectTag
 		virtual void apply_effect(GameObject* unit, Object_interaction* object);
 		void reset_serialization_index() override;
 
-		// ƒÎˇ ÔÓ‰‰ÂÊÍË iSerializable
+		// –î–ª—è –ø–æ–¥–¥–µ—Ä–∂–∫–∏ iSerializable
 		Packer_generic& get_packer() override;
 
 		constexpr static auto properties()
@@ -632,8 +632,8 @@ public:
 	bool m_result;
 
 	Instruction_get_owner();
-	virtual Instruction_get_owner* clone();
-	virtual void apply_effect(GameObject* unit, Object_interaction* object) ;
+	Instruction_get_owner* clone() override;
+	void apply_effect(GameObject* unit, Object_interaction* object) override;
 	void reset_serialization_index() override;
 
 	Packer_generic& get_packer() override;
@@ -666,8 +666,8 @@ public:
 	entity_e m_value;
 
 	Instruction_check_owner_type();
-	virtual Instruction_check_owner_type* clone();
-	virtual void apply_effect(GameObject* unit, Object_interaction* object);
+	Instruction_check_owner_type* clone() override;
+	void apply_effect(GameObject* unit, Object_interaction* object) override;
 
 	Packer_generic& get_packer() override;
 
