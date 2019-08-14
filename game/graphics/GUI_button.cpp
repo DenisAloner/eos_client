@@ -17,13 +17,13 @@ GUI_button::~GUI_button()
 void GUI_button::render(GraphicalController* Graph, int px, int py)
 {
 	glEnable(GL_SCISSOR_TEST);
-	if (Graph->add_scissor(frectangle_t((float)px, (float)py, (float)m_size.w, (float)m_size.h)))
+	if (Graph->add_scissor(rectangle<float>(float(px), float(py), float(m_size.w), float(m_size.h))))
 	{
 		Graph->blur_rect(px, py, m_size.w, m_size.h);
 		glEnable(GL_BLEND);
 		glDisable(GL_TEXTURE_2D);
 		glColor4d(0.0, 0.0, 0.0, 0.5);
-		GraphicalController::rectangle_t rect(px, py, m_size.w, m_size.h);
+		const GraphicalController::rectangle_t rect(px, py, m_size.w, m_size.h);
 		Graph->draw_sprite(rect);
 		glEnable(GL_TEXTURE_2D);
 		glColor4d(1.0, 1.0, 1.0, 1.0);

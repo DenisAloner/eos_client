@@ -83,8 +83,8 @@ public:
 
 	unsigned int m_path_info;
 
-	light_t m_light;
-	light_t m_light_blur;
+	rgb_t<int> m_light;
+	rgb_t<int> m_light_blur;
 
 	MapCell();
 	MapCell(int x, int y,int z, GameMap* map);
@@ -160,7 +160,7 @@ public:
 	dimension3_t m_size;
 	Icon* m_icon;
 	float m_weight;
-	light_t* m_light;
+	rgb_t<int>* m_light;
 	optical_properties_t* m_optical;
 
 	float* m_visibility;

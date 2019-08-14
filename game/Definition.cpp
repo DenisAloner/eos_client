@@ -95,14 +95,14 @@ iSerializable* Packer<MapCell>::from_binary(const std::string& value, std::size_
 	return &context.m_game_world.m_maps.front()->get(z, y, x);
 }
 
-iSerializable* Packer<Serialization::Link>::from_json(scheme_map_t* value, SerializationContext& context)
+iSerializable* Packer<SerializationLink>::from_json(scheme_map_t* value, SerializationContext& context)
 {
 	std::size_t id;
 	parser_from_json<std::size_t>((*value)[u"value"], id, context);
 	return context.m_items[id - 1];
 }
 
-iSerializable* Packer<Serialization::Link>::from_binary(const std::string& value, std::size_t& pos, SerializationContext& context)
+iSerializable* Packer<SerializationLink>::from_binary(const std::string& value, std::size_t& pos, SerializationContext& context)
 {
 	std::size_t id;
 	parser_from_binary<std::size_t>(value, id, pos, context);
@@ -326,6 +326,7 @@ std::unordered_map<object_tag_e, std::u16string> Dictionaries::m_string_object_t
 
 Serialization::Serialization()
 {
+	Logger::instance().info("Start register packer");
 	register_packer<Instruction_arg_extract>(u"instruction_arg_extract");
 	register_packer<TileManager_Single>(u"tilemanager_single");
 	register_packer<TileManager_rotate8_animate>(u"tilemanager_rotate8_animate");
@@ -364,7 +365,7 @@ Serialization::Serialization()
 	register_packer<Object_interaction>(u"template");
 	register_packer<Object_manager>(u"object_manager");
 	register_packer<Game_world>(u"game_world");
-	register_packer<Link>(u"link");
+	register_packer<SerializationLink>(u"link");
 	register_packer <TileManager_Single_Atlas>(u"tilemanager_single_atlas");
 	register_packer <TileManager_Atlas_Rotatable>(u"tilemanager_atlas_rotatable");
 }

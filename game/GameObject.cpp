@@ -286,7 +286,7 @@ Object_state* Object_state::clone()
 	state->m_weight = m_weight;
 	if (m_light)
 	{
-		state->m_light = new light_t(*m_light);
+		state->m_light = new rgb_t<int>(*m_light);
 	}
 	if (m_ai)
 	{

@@ -51,7 +51,7 @@ public:
 
 	int m_z_level;
 
-	fposition_t m_shift;
+	position<float> m_shift;
 
 	Player* m_player;
 	GameMap* m_map;

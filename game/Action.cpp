@@ -1284,8 +1284,8 @@ char action_hit_melee::perform(Parameter * parameter)
 				sb = 100;
 			}
 			auto accuracy = (ms->m_value - dws);
-			auto light = (p[3].m_cell->m_light.R > p[3].m_cell->m_light.G ? p[3].m_cell->m_light.R : p[3].m_cell->m_light.G);
-			light = (light > p[3].m_cell->m_light.B ? light : p[3].m_cell->m_light.B);
+			auto light = (p[3].m_cell->m_light.r > p[3].m_cell->m_light.g ? p[3].m_cell->m_light.r : p[3].m_cell->m_light.g);
+			light = (light > p[3].m_cell->m_light.b ? light : p[3].m_cell->m_light.b);
 			if (light > 100) { light = 100; };
 			if (accuracy > 0)
 			{

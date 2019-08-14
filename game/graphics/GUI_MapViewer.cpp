@@ -1018,9 +1018,9 @@ void GUI_MapViewer::render(GraphicalController* graph, int px, int py)
 					auto& cell = m_map->get(z, y, x);
 					for (auto current = cell.m_items.begin(); current != cell.m_items.end(); ++current)
 					{
-						light[0] = cell.m_light.R * 0.01F;
-						light[1] = cell.m_light.G * 0.01F;
-						light[2] = cell.m_light.B * 0.01F;
+						light[0] = cell.m_light.r * 0.01F;
+						light[1] = cell.m_light.g * 0.01F;
+						light[2] = cell.m_light.b * 0.01F;
 						light[3] = 0.0;
 						/*	light[0] = 1.0;
 							light[1] = 1.0;

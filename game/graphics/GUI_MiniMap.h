@@ -23,10 +23,10 @@ public:
 
 	GLint m_canvas;
 
-	fdimension_t m_cell_size;
+	dimension<float> m_cell_size;
 
-	virtual void render(GraphicalController* Graph, int px, int py);
-	void render_on_canvas();
+	void render(GraphicalController* graph, int px, int py) override;
+	void render_on_canvas() override;
 	void on_update();
 
 private:
@@ -43,14 +43,14 @@ public:
 	GameObject* m_object;
 	FOV* m_fov;
 	int m_radius;
-	fdimension_t m_cell_size;
+	dimension<float> m_cell_size;
 
 	GLint m_canvas;
 	AI_enemy* m_AI;
 	Vision_list* m_vision_list;
 
-	virtual void render(GraphicalController* Graph, int px, int py);
-	void render_on_canvas();
+	void render(GraphicalController* graph, int px, int py) override;
+	void render_on_canvas() override;
 	void on_update();
 
 private:

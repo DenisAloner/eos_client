@@ -620,7 +620,7 @@ void GUI_TreeView::bind_tree(Tree<std::u16string>& value, std::list<GUI_Object*>
 void GUI_TreeView::render(GraphicalController* Graph, int px, int py)
 {
 	glEnable(GL_SCISSOR_TEST);
-	if (Graph->add_scissor(frectangle_t((float)px, (float)py, (float)m_size.w, (float)m_size.h)))
+	if (Graph->add_scissor(rectangle<float>(float(px), float(py), float(m_size.w), float(m_size.h))))
 	{
 		Graph->blur_rect(px, py, m_size.w, m_size.h);
 		glEnable(GL_BLEND);

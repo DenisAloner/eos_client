@@ -169,14 +169,16 @@ public:
 	void console(std::string text);
 
 	void on_turn();
-
+	
+	Application(const Application& root) = delete;
+	Application& operator=(const Application&) = delete;
+	
 private:
 	std::shared_ptr<std::thread> m_game_thread;
 	std::shared_ptr<std::thread> m_animation_thread;
 
 	Application();
-	Application(const Application& root);
-	Application& operator=(const Application&);
+
 
 	void process_game();
 

@@ -74,7 +74,7 @@ public:
 	dimension_t m_size;
 
 	
-	std::list<frectangle_t> m_scissors;
+	std::list<rectangle<float>> m_scissors;
 	std::unordered_map<char16_t, font_symbol_t> m_unicode_symbols;
 
 	GLuint m_FBO;
@@ -91,7 +91,7 @@ public:
 	void output_text(int x, int y, std::u16string& text, int sizex, int sizey);
 	void center_text(int x, int y, std::u16string text, int sizex, int sizey);
 	void render_text(double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
-	bool add_scissor(const frectangle_t& rect);
+	bool add_scissor(const rectangle<float>& rect);
 	void remove_scissor();
 	void blur_rect(int x, int y, int width, int height);
 	void set_VSync(bool sync);

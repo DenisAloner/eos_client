@@ -1439,7 +1439,7 @@ void Game_world::calculate_lighting()
 			{
 				for (int x = 0; x < map.m_size.dx; ++x)
 				{
-					map.get(z, y, x).m_light = light_t();
+					map.get(z, y, x).m_light = rgb_t<int>();
 				}
 			}
 		}
@@ -1462,15 +1462,15 @@ void Game_world::calculate_lighting()
 						lx = abs(x - 20);
 						ly = abs(y - 20);
 						lz = abs(z - 20);
-						c = (l->m_active_state->m_light->R * m_coefficient[lz][ly][lx]);// *fl.m_map[y][x].damping.R;
+						c = (l->m_active_state->m_light->r * m_coefficient[lz][ly][lx]);// *fl.m_map[y][x].damping.R;
 						if (c < 0) { c = 0; }
-						fl.get(z, y, x).light.R = c;
-						c = (l->m_active_state->m_light->G * m_coefficient[lz][ly][lx]);// *fl.m_map[y][x].damping.G;
+						fl.get(z, y, x).light.r = c;
+						c = (l->m_active_state->m_light->g * m_coefficient[lz][ly][lx]);// *fl.m_map[y][x].damping.G;
 						if (c < 0) { c = 0; }
-						fl.get(z, y, x).light.G = c;
-						c = (l->m_active_state->m_light->B * m_coefficient[lz][ly][lx]);// *fl.m_map[y][x].damping.B;
+						fl.get(z, y, x).light.g = c;
+						c = (l->m_active_state->m_light->b * m_coefficient[lz][ly][lx]);// *fl.m_map[y][x].damping.B;
 						if (c < 0) { c = 0; }
-						fl.get(z, y, x).light.B = c;
+						fl.get(z, y, x).light.b = c;
 				/*	}
 					else
 					{
@@ -1496,9 +1496,9 @@ void Game_world::calculate_lighting()
 							lx = l->cell()->x + x - 20;
 							if (!((lx < 0) || (lx > map->m_size.dx - 1)))
 							{
-								map->get(lz, ly, lx).m_light.R += fl.get(z, y, x).light.R;
-								map->get(lz, ly, lx).m_light.G += fl.get(z, y, x).light.G;
-								map->get(lz, ly, lx).m_light.B += fl.get(z, y, x).light.B;
+								map->get(lz, ly, lx).m_light.r += fl.get(z, y, x).light.r;
+								map->get(lz, ly, lx).m_light.g += fl.get(z, y, x).light.g;
+								map->get(lz, ly, lx).m_light.b += fl.get(z, y, x).light.b;
 							}
 						}
 					}

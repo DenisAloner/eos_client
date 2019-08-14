@@ -6,7 +6,7 @@ GUI_MiniMap::GUI_MiniMap(position_t position, dimension_t size, GUI_MapViewer* m
 	m_position = position;
 	m_size = size;
 	dimension_t cr = Application::instance().m_size;
-	m_cell_size = fdimension_t(static_cast<float>(cr.w) / static_cast<float>(m_map_viewer->m_map->m_size.dx), static_cast<float>(cr.h) / static_cast<float>(m_map_viewer->m_map->m_size.dy));
+	m_cell_size = dimension<float>(static_cast<float>(cr.w) / static_cast<float>(m_map_viewer->m_map->m_size.dx), static_cast<float>(cr.h) / static_cast<float>(m_map_viewer->m_map->m_size.dy));
 	m_canvas_create = false;
 	m_map_viewer->m_map->update += std::bind(&GUI_MiniMap::on_update, this);
 }
@@ -106,7 +106,7 @@ void GUI_MiniMap::render_on_canvas()
 }
 
 
-void GUI_MiniMap::render(GraphicalController* Graph, int px, int py)
+void GUI_MiniMap::render(GraphicalController* graph, int px, int py)
 { 
 	if (m_canvas_create)
 	{
@@ -120,7 +120,7 @@ void GUI_MiniMap::render(GraphicalController* Graph, int px, int py)
 		glColor4d(1.0, 1.0, 1.0, 1.0);
 		glBindTexture(GL_TEXTURE_2D, m_canvas);
 		GraphicalController::rectangle_t rect(px, py, m_size.w, m_size.h);
-		Graph->draw_sprite(rect);
+		graph->draw_sprite(rect);
 		glDisable(GL_TEXTURE_2D);
 		double x0, y0, x1, y1;
 		x0 = px + (m_map_viewer->m_center.x - m_map_viewer->m_tile_count_x / 2)*m_size.w / static_cast<float>(m_map_viewer->m_map->m_size.dx);
@@ -136,7 +136,7 @@ void GUI_MiniMap::render(GraphicalController* Graph, int px, int py)
 		if (y1 < py) { y1 = py; }
 		if (y1 > py + m_size.h) { y1 = py + m_size.h; }
 		glColor4d(0.0, 1.0, 0.5, 0.3);
-		Graph->draw_sprite(rect);
+		graph->draw_sprite(rect);
 	}
 }
 
@@ -160,7 +160,7 @@ void GUI_FOV::on_update()
 }
 
 
-void GUI_FOV::render(GraphicalController* Graph, int px, int py)
+void GUI_FOV::render(GraphicalController* graph, int px, int py)
 {
 	if (m_canvas_create)
 	{
@@ -174,7 +174,7 @@ void GUI_FOV::render(GraphicalController* Graph, int px, int py)
 		glColor4d(1.0, 1.0, 1.0, 1.0);
 		glBindTexture(GL_TEXTURE_2D, m_canvas);
 		GraphicalController::rectangle_t rect(px, py, m_size.w, m_size.h);
-		Graph->draw_sprite(rect);
+		graph->draw_sprite(rect);
 	}
 }
 
@@ -187,7 +187,7 @@ void GUI_FOV::render_on_canvas()
 		m_canvas_create = true;
 	};
 	m_radius = m_vision_list->m_max_radius;
-	m_cell_size = fdimension_t(static_cast<float>(cr.w) / static_cast<float>(m_fov->m_view.l + m_fov->m_view.r + 1), static_cast<float>(cr.h) / static_cast<float>(m_fov->m_view.d + m_fov->m_view.u + 1));
+	m_cell_size = dimension<float>(static_cast<float>(cr.w) / static_cast<float>(m_fov->m_view.l + m_fov->m_view.r + 1), static_cast<float>(cr.h) / static_cast<float>(m_fov->m_view.d + m_fov->m_view.u + 1));
 	double x0, y0, x1, y1, x2, y2, x3, y3;
 	glDisable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);

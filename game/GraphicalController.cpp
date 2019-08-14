@@ -77,7 +77,7 @@ GraphicalController::GraphicalController(const dimension_t size)
 		Logger::instance().critical("Ошибка при загрузке ресурсов: {}" , e.what());
 	}
 
-	m_scissors.push_front(frectangle_t(0.0f, 0.0f, (float)m_size.w, (float)m_size.h));
+	m_scissors.push_front(rectangle<float>(0.0f, 0.0f, float(m_size.w), float(m_size.h)));
 	glGenFramebuffers(1, &m_FBO);
 }
 
@@ -292,10 +292,10 @@ position_t GraphicalController::center_aling_to_point(int x, int y, std::u16stri
 	return position_t(x - (measure_text_width(text) / 2), y);
 }
 
-bool GraphicalController::add_scissor(const frectangle_t& rect)
+bool GraphicalController::add_scissor(const rectangle<float>& rect)
 {
 	const auto global_scissor = m_scissors.front();
-	frectangle_t local_scissor(rect.x, float(m_size.h) - rect.y - rect.h, rect.x + rect.w, float(m_size.h) - rect.y);
+	rectangle<float> local_scissor(rect.x, float(m_size.h) - rect.y - rect.h, rect.x + rect.w, float(m_size.h) - rect.y);
 	if ((global_scissor.x > local_scissor.w) || (global_scissor.w < local_scissor.x) || (global_scissor.y > local_scissor.h) || (global_scissor.h < local_scissor.y)) return false;
 	if (local_scissor.x < global_scissor.x) local_scissor.x = global_scissor.x;
 	if (local_scissor.w > global_scissor.w) local_scissor.w = global_scissor.w;

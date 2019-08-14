@@ -17,7 +17,7 @@ public:
 	{
 		bool opaque;
 		bool visible;
-		light_t light;
+		rgb_t<int> light;
 	};
 
 	static const int m_max_size = 41;

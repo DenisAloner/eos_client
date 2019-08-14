@@ -13,6 +13,7 @@
 #include <codecvt>
 #include <unordered_map>
 #include <optional>
+#include <utility>
 
 typedef std::basic_string<char8_t> u8string;
 
@@ -60,8 +61,7 @@ struct position_t
 {
 	int x;
 	int y;
-
-	position_t(int x, int y) : x(x), y(y) {}
+	position_t(const int x, const int y) : x(x), y(y) {}
 	position_t() : x(0), y(0) {}
 };
 
@@ -70,7 +70,7 @@ struct dimension_t
 	int w;
 	int h;
 
-	dimension_t(int w, int h) : w(w), h(h) {}
+	dimension_t(const int w, const int h) : w(w), h(h) {}
 	dimension_t() : w(0), h(0) {}
 };
 
@@ -130,29 +130,31 @@ struct area_t
 	area_t(position_t p1, position_t p2) :p1(p1), p2(p2) {}
 };
 
-struct fposition_t
+template<typename T>
+struct position
 {
-	float x;
-	float y;
-
-	fposition_t(float x, float y) : x(x), y(y) {}
-	fposition_t() : x(0.0f), y(0.0f) {}
+	T x;
+	T y;
+	position(const T x, const T y) : x(x), y(y) {}
+	position() : x(0), y(0) {}
 };
 
-struct fdimension_t
+template<typename T>
+struct dimension
 {
-	float w;
-	float h;
-
-	fdimension_t(float w, float h) : w(w), h(h) {}
-	fdimension_t() : w(0.0f), h(0.0f) {}
+	T w;
+	T h;
+	
+	dimension(const T w, const T h) : w(w), h(h) {}
+	dimension() : w(0), h(0) {}
 };
 
-struct frectangle_t : public fposition_t, public fdimension_t
+template<typename T>
+struct rectangle : position<T>, dimension<T>
 {
-	frectangle_t(float x, float y, float w, float h) : fposition_t(x, y), fdimension_t(w, h) {}
-	frectangle_t(float x, float y, const fdimension_t &dimension) : fposition_t(x, y), fdimension_t(dimension) {}
-	frectangle_t() {}
+	rectangle(const float x, const float y, const float w, const float h) : position<T>(x, y), dimension<T>(w, h) {}
+	rectangle(const float x, const  float y, const dimension<T>& dimension) : position<T>(x, y), dimension<T>(dimension) {}
+	rectangle() {}
 };
 
 struct MouseEventArgs
@@ -291,11 +293,14 @@ struct RGBA_t
 	}
 };
 
-struct RGB_t
+template<typename T>
+struct rgb_t
 {
-	float R, G, B;
-	RGB_t(float R, float G, float B) : R(R), G(G), B(B) {};
-	RGB_t() : R(0.0), G(0.0), B(0.0) {};
+	using type = T;
+	
+	T r, g, b;
+	rgb_t(const T r, const T g, const T b) : r(r), g(g), b(b) {};
+	rgb_t() : r(0), g(0), b(0) {};
 };
 
 typedef std::map<std::u16string, std::u16string> scheme_map_t;
@@ -304,18 +309,10 @@ typedef std::vector<std::u16string> scheme_vector_t;
 
 struct optical_properties_t
 {
-	RGB_t attenuation;
-	optical_properties_t(RGB_t attenuation) : attenuation(attenuation) {};
-	optical_properties_t() : attenuation(RGB_t(1.0, 1.0, 1.0)) {};
+	rgb_t<float> attenuation;
+	optical_properties_t(rgb_t<float> attenuation) : attenuation(attenuation) {};
+	optical_properties_t() : attenuation(rgb_t<float>(1.0, 1.0, 1.0)) {};
 	//optical_properties_t(const optical_properties_t& value) :seethrough(value.seethrough),attenuation(value.attenuation){};
-};
-
-struct light_t
-{
-	int R, G, B;
-
-	light_t(int R, int G, int B) : R(R), G(G), B(B) {};
-	light_t() : R(0), G(0), B(0) {};
 };
 
 enum class interaction_message_type_e
@@ -488,7 +485,7 @@ struct predicate_t
 	size_t index;
 
 	predicate_t() : index(0) {};
-	predicate_t(const std::function<bool(GameObject*)>& predicate, const size_t index) :predicate(predicate), index(index) {};
+	predicate_t(std::function<bool(GameObject*)> predicate, const size_t index) :predicate(std::move(predicate)), index(index) {};
 };
 
 struct cell_t
@@ -776,8 +773,39 @@ public:
 
 };
 
-static inline std::map<std::u16string, Packer_generic*> t_constructors_from_json = {};
-static inline std::vector<Packer_generic*> t_constructors_from_binary = {};
+
+template<typename T> class Packer;
+
+class Serialization
+{
+public:
+
+	std::map<std::u16string, Packer_generic*> t_constructors_from_json = {};
+	std::vector<Packer_generic*> t_constructors_from_binary = {};
+
+	static Serialization& instance()
+	{
+		static Serialization singleton;
+		return singleton;
+	}
+	
+	template<typename T> void register_packer(std::u16string class_name)
+	{
+		//Packer_generic* packer = &Packer<T>::Instance();
+		t_constructors_from_json[class_name] = &Packer<T>::instance();
+		t_constructors_from_binary.push_back(&Packer<T>::instance());
+		Packer<T>::instance().m_type_name = class_name;
+		Packer<T>::instance().m_type_id = t_constructors_from_binary.size() - 1;
+		//m_type_id_counter += 1;
+	}
+
+	
+	~Serialization();
+private:
+	Serialization();
+	//static std::u16string serialize_object(const iSerializable* value);
+
+};
 
 
 scheme_map_t* read_object(std::u16string& value);
@@ -794,6 +822,7 @@ std::u16string utf8_to_cp1251(const u8string& value);
 std::u16string utf8_to_cp1251_2(const char* value);
 std::string utf16_to_cp1251(std::u16string const& value);
 std::u16string cp1251_to_utf16(std::string const& value);
+std::u16string int_to_u16string(int const& value);
 
 template<class T> struct always_false : std::false_type {};
 
@@ -861,6 +890,16 @@ struct is_list<std::list<Value>> {
 };
 
 template <class T>
+struct is_rgb {
+	static constexpr bool value = false;
+};
+
+template<class Value>
+struct is_rgb<rgb_t<Value>> {
+	static constexpr bool value = true;
+};
+
+template <class T>
 struct is_instance_dictionary {
 	static constexpr bool value = false;
 };
@@ -902,7 +941,7 @@ template<typename T> void parser_from_json(const std::u16string& value, T& prop,
 			auto s = read_object(temp);
 			if (s)
 			{
-				prop = dynamic_cast<T>(t_constructors_from_json[get_value((*s)[u"$type"])]->from_json(s, context));
+				prop = dynamic_cast<T>(Serialization::instance().t_constructors_from_json[get_value((*s)[u"$type"])]->from_json(s, context));
 				//LOG(INFO) << UTF16_to_CP1251(prop->get_packer().get_type_name());
 				delete s;
 				return;
@@ -1080,22 +1119,23 @@ template<typename T> void parser_from_json(const std::u16string& value, T& prop,
 		auto result = to_int32(value);
 		prop = *Application::instance().m_ai_manager->m_path_qualifiers[result];
 	}
-	else if constexpr (std::is_same<T, light_t>::value)
+	else if constexpr (is_rgb<T>::value)
 	{
 		auto temp = value;
 		auto s = read_pair(temp);
-		parser_from_json<int>((*s)[0], prop.R, context);
-		parser_from_json<int>((*s)[1], prop.G, context);
-		parser_from_json<int>((*s)[2], prop.B, context);
+		using type = typename T::type;
+		parser_from_json<type>((*s)[0], prop.r, context);
+		parser_from_json<type>((*s)[1], prop.g, context);
+		parser_from_json<type>((*s)[2], prop.b, context);
 	}
 	else if constexpr (std::is_same<T, optical_properties_t>::value)
 	{
 		//LOG(INFO) << Parser::UTF16_to_CP1251(get_value(value)) << Parser::UTF16_to_CP1251(value);
 		auto temp = value;
 		auto s = read_pair(temp);
-		parser_from_json<float>((*s)[0], prop.attenuation.R, context);
-		parser_from_json<float>((*s)[1], prop.attenuation.G, context);
-		parser_from_json<float>((*s)[2], prop.attenuation.B, context);
+		parser_from_json<float>((*s)[0], prop.attenuation.r, context);
+		parser_from_json<float>((*s)[1], prop.attenuation.g, context);
+		parser_from_json<float>((*s)[2], prop.attenuation.b, context);
 	}
 	else if constexpr (std::is_same<T, dimension_t>::value)
 	{
@@ -1235,9 +1275,10 @@ template<typename T> std::u16string parser_to_json(T& value, SerializationContex
 		std::u16string out = int_to_u16string(value);
 		return out;
 	}
-	else if constexpr (std::is_same<T, light_t>::value)
+	else if constexpr (is_rgb<T>::value)
 	{
-		std::u16string result = u"[" + parser_to_json<int>(value.R, context) + u"," + parser_to_json<int>(value.G, context) + u"," + parser_to_json<int>(value.B, context) + u"]";
+	using type = typename T::type;
+		std::u16string result = u"[" + parser_to_json<type>(value.r, context) + u"," + parser_to_json<type>(value.g, context) + u"," + parser_to_json<type>(value.b, context) + u"]";
 		return result;
 	}
 	else if constexpr (std::is_same<T, float>::value)
@@ -1247,7 +1288,7 @@ template<typename T> std::u16string parser_to_json(T& value, SerializationContex
 	}
 	else if constexpr (std::is_same<T, optical_properties_t>::value)
 	{
-		std::u16string result = u"[" + parser_to_json<float>(value.attenuation.R, context) + u"," + parser_to_json<float>(value.attenuation.G, context) + u"," + parser_to_json<float>(value.attenuation.B, context) + u"]";
+		std::u16string result = u"[" + parser_to_json<float>(value.attenuation.r, context) + u"," + parser_to_json<float>(value.attenuation.g, context) + u"," + parser_to_json<float>(value.attenuation.b, context) + u"]";
 		return result;
 	}
 	else if constexpr (std::is_same<T, AI_FOV>::value)
@@ -1308,7 +1349,7 @@ template<typename T> void parser_from_binary(const std::string& value, T& prop, 
 			default:
 			{
 				//LOG(INFO) << "from binaryyyyyyyyyyyy " << typeid(T).name();
-				prop = dynamic_cast<T>(t_constructors_from_binary[id - 1]->from_binary(value, pos, context));
+				prop = dynamic_cast<T>(Serialization::instance().t_constructors_from_binary[id - 1]->from_binary(value, pos, context));
 				//LOG(INFO) << std::to_string(prop==nullptr);
 				break;
 			}
@@ -1316,7 +1357,7 @@ template<typename T> void parser_from_binary(const std::string& value, T& prop, 
 		}
 		else
 		{
-			auto id = *reinterpret_cast<const char*>(&value[pos]);
+			const auto id = *reinterpret_cast<const char*>(&value[pos]);
 			pos += sizeof(char);
 			switch (id)
 			{
@@ -1399,17 +1440,18 @@ template<typename T> void parser_from_binary(const std::string& value, T& prop, 
 		pos += s * 2;
 		//LOG(INFO) << "NAME: " << Parser::UTF16_to_CP1251(prop);
 	}
-	else if constexpr (std::is_same<T, light_t>::value)
+	else if constexpr (is_rgb<T>::value)
 	{
-		parser_from_binary<int>(value, prop.R, pos, context);
-		parser_from_binary<int>(value, prop.G, pos, context);
-		parser_from_binary<int>(value, prop.B, pos, context);
+		using type = typename T::type;
+		parser_from_binary<type>(value, prop.r, pos, context);
+		parser_from_binary<type>(value, prop.g, pos, context);
+		parser_from_binary<type>(value, prop.b, pos, context);
 	}
 	else if constexpr (std::is_same<T, optical_properties_t>::value)
 	{
-		parser_from_binary<float>(value, prop.attenuation.R, pos, context);
-		parser_from_binary<float>(value, prop.attenuation.G, pos, context);
-		parser_from_binary<float>(value, prop.attenuation.B, pos, context);
+		parser_from_binary<float>(value, prop.attenuation.r, pos, context);
+		parser_from_binary<float>(value, prop.attenuation.g, pos, context);
+		parser_from_binary<float>(value, prop.attenuation.b, pos, context);
 	}
 	else if constexpr (std::is_same<T, AI_FOV>::value)
 	{
@@ -1516,13 +1558,14 @@ template<typename T> std::string parser_to_binary(T& value, SerializationContext
 	{
 		return value;
 	}
-	else if constexpr (std::is_same<T, light_t>::value)
+	else if constexpr (is_rgb<T>::value)
 	{
-		return parser_to_binary<int>(value.R, context) + parser_to_binary<int>(value.G, context) + parser_to_binary<int>(value.B, context);
+		using type = typename T::type;
+		return parser_to_binary<type>(value.r, context) + parser_to_binary<type>(value.g, context) + parser_to_binary<type>(value.b, context);
 	}
 	else if constexpr (std::is_same<T, optical_properties_t>::value)
 	{
-		return parser_to_binary<float>(value.attenuation.R, context) + parser_to_binary<float>(value.attenuation.G, context) + parser_to_binary<float>(value.attenuation.B, context);
+		return parser_to_binary<float>(value.attenuation.r, context) + parser_to_binary<float>(value.attenuation.g, context) + parser_to_binary<float>(value.attenuation.b, context);
 	}
 	else if constexpr (std::is_same<T, AI_FOV>::value)
 	{
@@ -1650,7 +1693,14 @@ public:
 
 };
 
-std::u16string int_to_u16string(int const& value);
+class SerializationLink : public iSerializable
+{
+public:
+	constexpr static auto properties()
+	{
+		return std::make_tuple();
+	}
+};
 
 template<typename T>
 class Packer :public Packer_generic
@@ -1777,7 +1827,7 @@ public:
 			{
 				Logger::instance().critical (std::to_string(context.m_object_index) + " | " + std::to_string(value->m_serialization_index) + " | " + typeid(value).name() + " | " + utf16_to_cp1251(value->get_packer().get_type_name()));
 			}
-			auto id = t_constructors_from_json[u"link"]->get_type_id() + 1;
+			auto id = Serialization::instance().t_constructors_from_json[u"link"]->get_type_id() + 1;
 			return std::string(reinterpret_cast<const char*>(&id), sizeof(std::size_t)) + std::string(reinterpret_cast<const char*>(&(value->m_serialization_index)), sizeof(std::size_t));
 		}
 		}
@@ -1785,37 +1835,6 @@ public:
 
 	Packer()
 	= default;
-};
-
-class Serialization
-{
-public:
-
-	class Link : public iSerializable
-	{
-	public:
-		constexpr static auto properties()
-		{
-			return std::make_tuple();
-		}
-	};
-
-	template<typename T>
-	static void register_packer(std::u16string class_name)
-	{
-		//Packer_generic* packer = &Packer<T>::Instance();
-		t_constructors_from_json[class_name] = &Packer<T>::instance();
-		t_constructors_from_binary.push_back(&Packer<T>::instance());
-		Packer<T>::instance().m_type_name = class_name;
-		Packer<T>::instance().m_type_id = t_constructors_from_binary.size() - 1;
-		//m_type_id_counter += 1;
-	}
-
-	Serialization();
-	~Serialization();
-
-	//static std::u16string serialize_object(const iSerializable* value);
-
 };
 
 template <typename T>
