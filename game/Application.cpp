@@ -10,6 +10,9 @@
 #include "game/graphics/GUI_Timer.h"
 #include <chrono>
 #include <graphics/GUI_Description_window.h>
+#include <string>
+
+using namespace std::string_literals;
 
 gui_MessageQueue::gui_MessageQueue()
 {
@@ -216,7 +219,7 @@ void Application::initialize(const dimension_t work_area_size, const HDC m_hDC, 
 	m_gui_controller.m_GUI->add(m_window_manager);
 	m_gui_controller.m_GUI->add(new GUI_Image((m_size.w - 1024) / 2, (m_size.h - 1024) / 2, 1024, 1024, m_graph->m_logo));
 
-	auto main_menu = new GUI_Window(0, 0, 400, 400, utf8_to_cp1251_2("Главное меню"));
+	auto main_menu = new GUI_Window(0, 0, 400, 400, utf8_to_utf16(u8"Главное меню"s));
 	main_menu->m_position = position_t((m_size.w - main_menu->m_size.w) / 2, (m_size.h - main_menu->m_size.h) / 2);
 	auto menu = new GUI_Button_list(0, 0, 400, 400);
 	auto button = new GUI_Mainmenu_button(0, 0, 396, 47, u"Новая игра", parameter_type_e::new_game);

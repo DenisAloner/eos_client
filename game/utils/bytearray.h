@@ -1,6 +1,8 @@
 #ifndef UTILS_BYTEARRAY_H
 #define	UTILS_BYTEARRAY_H
-typedef std::basic_string<char8_t> u8string;
+#include <string>
+using namespace std::string_literals;
+
 struct bytearray
 {
 	typedef unsigned char value_type;
@@ -51,7 +53,7 @@ struct bytearray
 
 	explicit inline operator std::u16string() const { return std::u16string(reinterpret_cast<const char16_t*>(get()), size()/2); };
 
-	explicit inline operator u8string() const { return u8string(reinterpret_cast<const char8_t*>(get()), size()); };
+	explicit inline operator std::u8string() const { return std::u8string(reinterpret_cast<const char8_t*>(get()), size()); };
 
 private:
 	std::shared_ptr<value_type> m_ptr;

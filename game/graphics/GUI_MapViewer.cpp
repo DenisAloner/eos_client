@@ -880,7 +880,7 @@ struct rgb
 
 void GUI_MapViewer::render(GraphicalController* graph, int px, int py)
 {
-	graph->check_gl_error("test");
+	//graph->check_gl_error("test");
 	float light[4];
 	glBindFramebuffer(GL_FRAMEBUFFER, graph->m_FBO);
 	glEnable(GL_TEXTURE_2D);
@@ -1622,7 +1622,7 @@ void GUI_MapViewer::on_key_press(WPARAM w)
 	{
 		if (Application::instance().m_message_queue.m_reader)
 		{
-			Parameter* p = new Parameter(parameter_type_e::accept);
+			auto p = new Parameter(parameter_type_e::accept);
 			Application::instance().m_message_queue.push(p);
 		}
 		return;
@@ -1631,7 +1631,7 @@ void GUI_MapViewer::on_key_press(WPARAM w)
 	{
 		if (Application::instance().m_message_queue.m_reader)
 		{
-			Parameter* p = new Parameter(parameter_type_e::cancel);
+			auto p = new Parameter(parameter_type_e::cancel);
 			Application::instance().m_message_queue.push(p);
 		}
 		return;

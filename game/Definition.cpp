@@ -737,7 +737,7 @@ std::u16string float_to_u16string(const float& i)
 
 int to_int32(const std::u16string& value)
 {
-	int result = 0;
+	auto result = 0;
 	const char16_t* opening_symbol = nullptr;
 	std::size_t i;
 	for (i = 0; i < value.size(); ++i)
@@ -771,7 +771,7 @@ transform:
 			case 4:     result -= (opening_symbol[len - 4] - u'0') * 1000;
 			case 3:     result -= (opening_symbol[len - 3] - u'0') * 100;
 			case 2:     result -= (opening_symbol[len - 2] - u'0') * 10;
-			case 1:     result -= (opening_symbol[len - 1] - u'0');
+			case 1:     result -= opening_symbol[len - 1] - u'0';
 			}
 		}
 		else
@@ -786,7 +786,7 @@ transform:
 			case 4:     result += (opening_symbol[len - 4] - u'0') * 1000;
 			case 3:     result += (opening_symbol[len - 3] - u'0') * 100;
 			case 2:     result += (opening_symbol[len - 2] - u'0') * 10;
-			case 1:     result += (opening_symbol[len - 1] - u'0');
+			case 1:     result += opening_symbol[len - 1] - u'0';
 			}
 		}
 	}
@@ -825,73 +825,38 @@ parse:
 	return result;
 }
 
-std::u16string utf8_to_cp1251(const u8string& value)
+std::size_t get_u8_string_length(const std::u8string& value)
 {
-	std::u16string out16(value.length(), '0');
-	std::size_t pos = 0;
-	for (std::size_t i = 0; i < value.size(); ++i) {
-		auto code = value[i];
-		if ((code & 0x80) == 0) {
-			out16[pos] = code;
-			pos += 1;
-		}
-		else if ((code & 0xC0) == 0xC0) {
-			out16[pos] = (static_cast<unsigned short>(code) << 3) & (0x1F & value[i + 1]);
-			pos += 1;
-			i += 1;
-		}
+	std::size_t index, bytes_number, length;
+	for (length = 0, index = 0, bytes_number = value.length(); index < bytes_number; index++, length++)
+	{
+		const auto symbol = value[index];
+		if (symbol >= 0 && symbol <= 127) continue;
+		if ((symbol & 0xE0) == 0xC0) index += 1;
+		else if ((symbol & 0xF0) == 0xE0) index += 2;
+		else if ((symbol & 0xF8) == 0xF0) index += 3;
+		else return 0;
 	}
-	/*std::string out(value.length(), '0');
-	Logger::instance().info(std::to_string(value.size()));
-	for (std::size_t i = 0; i < value.length(); ++i) {
-		auto v = value[i];
-		Logger::instance().info(std::to_string(value[i]));
-		if (value[i] > 0x409 && value[i] < 0x450) {
-			out[i] = value[i] - 0x410 + 0xC0;
-		}
-		else {
-			out[i] = value[i];
-		}
-	}*/
-	return out16;
+	return length;
 }
 
-std::u16string utf8_to_cp1251_2(const char* value)
+std::u16string utf8_to_utf16(const std::u8string& value)
 {
-	auto length = 0;
-	while (value[length] != '\0') length++;
-	std::u16string out16(length, '0');
+	std::u16string result(get_u8_string_length(value), '0');
 	std::size_t pos = 0;
-	for (std::size_t i = 0; i < length; ++i) {
-		const auto code = unsigned char(value[i]);
-		Logger::instance().info(std::to_string(code));
+	for (std::size_t i = 0; i < value.size(); ++i) {
+		const auto code = value[i];
 		if ((code & 0x80) == 0) {
-			Logger::instance().info("step1");
-			out16[pos] = code;
+			result[pos] = code;
 			pos += 1;
 		}
 		else if ((code & 0xC0) == 0xC0) {
-			Logger::instance().info("step2 " + std::to_string(unsigned char(value[i + 1])));
-			Logger::instance().info(std::to_string(static_cast<unsigned short>(code) << 6));
-			out16[pos] = (static_cast<unsigned short>(0x1F & code) << 6) | (0x3F & value[i + 1]);
+			result[pos] = static_cast<unsigned short>(0x1F & code) << 6 | 0x3F & value[i + 1];
 			pos += 1;
 			i += 1;
 		}
-		Logger::instance().info(std::to_string(out16[pos - 1]));
 	}
-	/*std::string out(value.length(), '0');
-	Logger::instance().info(std::to_string(value.size()));
-	for (std::size_t i = 0; i < value.length(); ++i) {
-		auto v = value[i];
-		Logger::instance().info(std::to_string(value[i]));
-		if (value[i] > 0x409 && value[i] < 0x450) {
-			out[i] = value[i] - 0x410 + 0xC0;
-		}
-		else {
-			out[i] = value[i];
-		}
-	}*/
-	return out16;
+	return result;
 }
 
 std::string utf16_to_cp1251(std::u16string const& value)

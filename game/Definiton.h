@@ -14,9 +14,9 @@
 #include <unordered_map>
 #include <optional>
 #include <utility>
+#include <string>
 
-typedef std::basic_string<char8_t> u8string;
-
+using namespace std::string_literals;
 using namespace gl;
 
 struct vertex_t
@@ -818,8 +818,7 @@ std::u16string get_value(const std::u16string& value);
 std::u16string float_to_u16string(const float& i);
 int to_int32(const std::u16string& value);
 float to_float(const std::u16string& value);
-std::u16string utf8_to_cp1251(const u8string& value);
-std::u16string utf8_to_cp1251_2(const char* value);
+std::u16string utf8_to_utf16(const std::u8string& value);
 std::string utf16_to_cp1251(std::u16string const& value);
 std::u16string cp1251_to_utf16(std::string const& value);
 std::u16string int_to_u16string(int const& value);

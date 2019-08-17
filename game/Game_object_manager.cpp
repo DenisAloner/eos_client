@@ -16,8 +16,8 @@ void GameObjectManager::init(SerializationContext& context)
 
 	bytearray json;
 	FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\Objects.json", json);
-	const u8string json_u8(json);
-	const std::u16string json_config(utf8_to_cp1251(json_u8));
+	const std::u8string json_u8(json);
+	const auto json_config(utf8_to_utf16(json_u8));
 
 
 	auto temp(json_config);

@@ -34,14 +34,16 @@ public:
 	{
 		logger_->info(msg);
 	}
+
+	Logger(const Logger& root) = delete;
+	Logger& operator=(const Logger&) = delete;
+	
 private:
 
 	std::shared_ptr<spdlog::sinks::msvc_sink_mt> sink_;
 	std::shared_ptr<spdlog::logger> logger_;
-
 	Logger();
-	Logger(const Logger& root) = delete;
-	Logger& operator=(const Logger&) = delete;
+
 };
 
 #endif // LOGGER_H
