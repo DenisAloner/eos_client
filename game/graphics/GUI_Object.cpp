@@ -22,7 +22,7 @@ GUI_Object::~GUI_Object(void)
 {
 }
 
-void GUI_Object::render(GraphicalController* Graph, int px, int py)
+void GUI_Object::render(GraphicalController* graph, int px, int py)
 {
 }
 
@@ -102,12 +102,12 @@ void GUI_Object::on_lose_focus(GUI_Object* sender)
 
 GUI_Image::GUI_Image(int x, int y, int width, int height, GLuint texture)
 {
-	m_position = position_t(x, y);
-	m_size = dimension_t(width, height);
+	m_position = position_t<int>(x, y);
+	m_size = dimension_t<int>(width, height);
 	m_texture = texture;
 }
 
-void GUI_Image::render(GraphicalController* Graph, int px, int py)
+void GUI_Image::render(GraphicalController* graph, int px, int py)
 {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -118,6 +118,6 @@ void GUI_Image::render(GraphicalController* Graph, int px, int py)
 	//glGenerateMipmap(GL_TEXTURE_2D);
 	glColor4d(1.0, 1.0, 1.0, 1.0);
 	glBindTexture(GL_TEXTURE_2D, m_texture);
-	GraphicalController::rectangle_t rect(px, py, m_size.w, m_size.h);
-	Graph->draw_sprite(rect);
+	rectangle_t<int> rect(px, py, m_size.w, m_size.h);
+	graph->draw_sprite(rect);
 }

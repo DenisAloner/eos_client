@@ -2,7 +2,6 @@
 #define	ACTIONMANAGER_H
 
 #include <list>
-#include <map>
 #include "Event.h"
 
 class Parameter;
@@ -11,7 +10,7 @@ class Action;
 class GameTask
 {
 public:
-	GameTask(Action* Action, Parameter* Parameter);
+	GameTask(Action* action, Parameter* parameter);
 
 	Action* m_action;
 	Parameter* m_parameter;
@@ -25,8 +24,8 @@ public:
 
 	std::list<GameTask*> m_items;
 
-	ActionManager(void);
-	~ActionManager(void);
+	ActionManager();
+	~ActionManager();
 
 	Event<tag_t> add_item_event;
 	Event<tag_t> remove_item_event;

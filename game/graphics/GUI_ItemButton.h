@@ -1,19 +1,16 @@
 #ifndef GUI_ITEMBUTTON_H
-#define	GUI_ITEMBUTTON_H
+#define GUI_ITEMBUTTON_H
 
 #include "GUI_Object.h"
 
-
-class GUI_ItemButton :
-	public GUI_Object
-{
+class GUI_ItemButton : public GUI_Object {
 public:
-	GUI_ItemButton();
-	~GUI_ItemButton();
+    GUI_ItemButton();
+    ~GUI_ItemButton();
 
-	virtual bool check_region(MouseEventArgs const& e);
-	virtual void render(GraphicalController* Graph, int px, int py);
-	virtual void on_mouse_move(MouseEventArgs const& e);
+    bool check_region(MouseEventArgs const& e) override;
+    void render(GraphicalController* graph, int px, int py) override;
+    void on_mouse_move(MouseEventArgs const& e) override;
 };
 
 #endif GUI_ITEMBUTTON_H

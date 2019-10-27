@@ -1,9 +1,7 @@
 #ifndef FOV_LIGHT_H
 #define	FOV_LIGHT_H
+#include "Definiton.h"
 
-#include <cmath>
-#include "GameObject.h"
-#include "GameMap.h"
 typedef unsigned int uint;
 
 class GameObject;

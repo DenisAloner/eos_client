@@ -3,7 +3,6 @@
 
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/msvc_sink.h"
-#include <iostream>
 
 class Logger
 {

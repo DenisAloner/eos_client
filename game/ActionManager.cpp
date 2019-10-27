@@ -1,10 +1,10 @@
 #include "ActionManager.h"
 #include "Action.h"
 
-GameTask::GameTask(Action* Action = nullptr, Parameter* Parameter = nullptr)
+GameTask::GameTask(Action* action = nullptr, Parameter* parameter = nullptr)
 {
-	m_action=Action;
-	m_parameter=Parameter;
+	m_action=action;
+	m_parameter=parameter;
 }
 
 

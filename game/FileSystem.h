@@ -1,39 +1,29 @@
 #ifndef FILESYSTEM_H
-#define	FILESYSTEM_H
+#define FILESYSTEM_H
 
-#include <string>
-#include <fstream>
-#include <iostream>
-#include <memory>
 #include "utils/bytearray.h"
-#include "Definiton.h"
-#include <vector>
+#include <string>
 
-class AI;
-class GameMap;
-class Game_world;
-
-class FileSystem
-{
+class FileSystem {
 public:
+    std::string m_resource_path;
 
-	std::string m_resource_path;
+    static FileSystem& instance()
+    {
+        static FileSystem singleton;
+        return singleton;
+    }
 
-	static FileSystem& instance()
-	{
-		static FileSystem Singleton;
-		return Singleton;
-	}
+    ~FileSystem();
 
-	~FileSystem();
+    bool load_from_file(const std::string& path, bytearray& data);
+    bool save_to_file(const std::string& path, bytearray& data);
 
-	bool load_from_file(const std::string& path, bytearray& data);
-	bool save_to_file(const std::string& path, bytearray& data);
+    FileSystem(const FileSystem& root) = delete;
+    FileSystem& operator=(const FileSystem&) = delete;
 
 private:
-	FileSystem();
-	FileSystem(const FileSystem& root);
-	FileSystem& operator=(const FileSystem&);
+    FileSystem();
 };
 
 #endif //FILESYSTEM_H

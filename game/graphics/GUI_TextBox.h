@@ -1,30 +1,24 @@
 #ifndef GUI_TEXTBOX_H
-#define	GUI_TEXTBOX_H
+#define GUI_TEXTBOX_H
 
-#include "GUI_Container.h"
-#include <list>
-#include "GUI_Text.h"
 #include "Definiton.h"
+#include "GUI_Container.h"
+#include "GUI_Text.h"
 #include "game/Game_log.h"
 
-class GUI_TextBox :
-	public GUI_Scrollable_container
-{
+class GUI_TextBox : public GUI_Scrollable_container {
 public:
-	GUI_TextBox();
+    GUI_TextBox();
 };
 
-class GUI_game_console :
-	public GUI_TextBox
-{
+class GUI_game_console : public GUI_TextBox {
 public:
+    std::vector<GUI_TextFormat> m_styles;
 
-	std::vector<GUI_TextFormat> m_styles;
+    Game_log& m_log;
+    GUI_game_console(Game_log& log);
 
-	Game_log& m_log;
-	GUI_game_console(Game_log& log);
-
-	virtual void on_log_add_item(game_log_message_t& e);
+    virtual void on_log_add_item(game_log_message_t& e);
 };
 
 #endif //GUI_TEXTBOX_H
