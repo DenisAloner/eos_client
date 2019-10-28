@@ -269,7 +269,7 @@ void Parameter::reset_serialization_index()
     }
 }
 
-Packer_generic& Parameter::get_packer()
+iPacker& Parameter::get_packer()
 {
     return Packer<Parameter>::instance();
 }
@@ -338,11 +338,15 @@ Parameter* Parameter::clone()
 
 Instruction_result::Instruction_result()
 {
-    m_interaction_message_type = interaction_message_type_e::instruction_result;
-    m_result = false;
+	m_result = false;
 }
 
-Packer_generic& Instruction_result::get_packer()
+iPacker& Instruction_result::get_packer()
 {
     return Packer<Instruction_result>::instance();
+}
+
+interaction_message_type_e Instruction_result::get_interaction_message_type()
+{
+    return interaction_message_type_e::instruction_result;
 };

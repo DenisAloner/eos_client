@@ -65,7 +65,7 @@ public:
 
     void reset_serialization_index() override;
 
-    Packer_generic& get_packer() override;
+    iPacker& get_packer() override;
 
     constexpr static auto properties()
     {
@@ -115,7 +115,8 @@ public:
     Instruction_result* clone() override { return nullptr; };
     void apply_effect(GameObject* unit, Object_interaction* object) override {};
 
-    Packer_generic& get_packer() override;
+    iPacker& get_packer() override;
+    interaction_message_type_e get_interaction_message_type() override;
 };
 
 #endif //PARAMETER_H

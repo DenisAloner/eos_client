@@ -349,21 +349,32 @@ struct optical_properties_t {
 };
 
 enum class interaction_message_type_e {
-    single,
     list,
     action,
     part,
-    set_attribute_map,
+    slot_set_state,
     select_location,
     mover,
     allocator,
-    slot_time,
+    interaction_timer,
     tag,
     instruction_slot_parameter,
     instruction_game_owner,
     game_object,
     instruction_result,
-    effect
+    effect,
+	action_wrapper,
+    instruction_check_tag,
+    instruction_check_part_type,
+    instruction_arg_extract,
+    instruction_get_owner,
+    instruction_check_owner_type,
+    interaction_copyist,
+    interaction_prefix,
+    interaction_addon,
+    interaction_time,
+    instruction_slot_link,
+    impact_copy_chance
 };
 
 enum class interaction_e {
@@ -806,7 +817,7 @@ for_sequence(std::integer_sequence<T, S...>, F&& f)
         0 };
 }
 
-class Packer_generic {
+class iPacker {
 public:
     virtual void from_json(iSerializable& object,
         scheme_map_t* value,
@@ -845,8 +856,8 @@ class Packer;
 
 class Serialization {
 public:
-    std::map<std::u16string, Packer_generic*> t_constructors_from_json = {};
-    std::vector<Packer_generic*> t_constructors_from_binary = {};
+    std::map<std::u16string, iPacker*> t_constructors_from_json = {};
+    std::vector<iPacker*> t_constructors_from_binary = {};
 
     static Serialization& instance()
     {
@@ -1579,7 +1590,7 @@ public:
 
     virtual void reset_serialization_index() { m_serialization_index = 0; };
 
-    virtual Packer_generic& get_packer() = 0;
+    virtual iPacker& get_packer() = 0;
 
     virtual void from_binary(const std::string& value,
         std::size_t& pos,
@@ -1610,7 +1621,7 @@ public:
 };
 
 template <typename T>
-class Packer : public Packer_generic {
+class Packer : public iPacker {
 public:
     static Packer& instance()
     {
@@ -1794,22 +1805,18 @@ public:
     typedef std::function<void(Object_interaction*)> predicate;
     typedef std::function<void(Object_interaction*, bool)> predicate_ex;
 
-    interaction_message_type_e m_interaction_message_type;
-    std::u16string m_namename;
-    Object_interaction() { m_namename = u"base"; };
+    virtual interaction_message_type_e get_interaction_message_type() = 0;
+
     virtual void apply_effect(GameObject* unit, Object_interaction* object) {};
 
     virtual void apply(Apply_info& value) {};
-    virtual Object_interaction* clone() { return nullptr; };
+    virtual Object_interaction* clone() = 0;
     virtual void do_predicate(Visitor& helper) { helper.visit(*this); };
     virtual void apply_visitor(Visitor_generic& visitor);
 
-    Packer_generic& get_packer() override;
-
     constexpr static auto properties()
     {
-        return std::make_tuple(
-            make_property(&Object_interaction::m_namename, u"m_value"));
+        return std::make_tuple();
     }
 };
 

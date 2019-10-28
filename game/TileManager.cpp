@@ -63,7 +63,7 @@ void TileManager_Single_Atlas::set_tile(quad_t& quad, GameObject* obj, int pos, 
     quad.vertex[3].texture_coordinates[2] = static_cast<double>(m_layer);
 }
 
-Packer_generic& TileManager_Single_Atlas::get_packer()
+iPacker& TileManager_Single_Atlas::get_packer()
 {
     return Packer<TileManager_Single_Atlas>::instance();
 }
@@ -107,7 +107,7 @@ void TileManager_Atlas_Rotatable::set_tile(quad_t& quad, GameObject* obj, int po
     quad.vertex[3].texture_coordinates[2] = static_cast<double>(m_layer);
 }
 
-Packer_generic& TileManager_Atlas_Rotatable::get_packer()
+iPacker& TileManager_Atlas_Rotatable::get_packer()
 {
     return Packer<TileManager_Atlas_Rotatable>::instance();
 }
@@ -151,7 +151,7 @@ int TileManager_Single::get_tile_index(const object_direction_e& direction, cons
     return 0;
 }
 
-Packer_generic& TileManager_Single::get_packer()
+iPacker& TileManager_Single::get_packer()
 {
     return Packer<TileManager_Single>::instance();
 }
@@ -196,7 +196,7 @@ void TileManager_rotate8_animate::set_tile(tile_t& tile, GameObject* obj, int fr
     tile.coordinates[3] = 1.0 - ((iy + 1) * dy);
 }
 
-Packer_generic& TileManager_rotate8_animate::get_packer()
+iPacker& TileManager_rotate8_animate::get_packer()
 {
     return Packer<TileManager_rotate8_animate>::instance();
 }
@@ -229,7 +229,7 @@ void TileManager_equilateral_animate::set_tile(tile_t& tile, GameObject* obj, in
     tile.coordinates[3] = 0.0;
 }
 
-Packer_generic& TileManager_equilateral_animate::get_packer()
+iPacker& TileManager_equilateral_animate::get_packer()
 {
     return Packer<TileManager_equilateral_animate>::instance();
 }

@@ -10,12 +10,11 @@
 
 Action::Action()
 {
-    m_interaction_message_type = interaction_message_type_e::action;
-    m_kind = action_e::move;
-    m_name = u"Нет";
-    m_error = u"";
-    m_decay = 10;
-    m_animation = animation_e::idle;
+	m_kind = action_e::move;
+	m_name = u"Нет";
+	m_error = u"";
+	m_decay = 10;
+	m_animation = animation_e::idle;
 }
 
 Action::~Action()
@@ -50,7 +49,7 @@ void Action::interaction_handler(Parameter* arg)
     }
 }
 
-Packer_generic& Action::get_packer()
+iPacker& Action::get_packer()
 {
     return Packer<Action>::instance();
 }
@@ -87,13 +86,12 @@ iSerializable* Packer<Action>::from_binary(const std::string& value, std::size_t
 
 Action_wrapper::Action_wrapper()
 {
-    m_action = nullptr;
-    m_parameter = nullptr;
-    m_decay = 0;
-    m_prefix = new Interaction_prefix();
-    m_prefix->m_interaction_message_type = interaction_message_type_e::single;
-    m_prefix->m_subtype = effect_prefix_e::action;
-    m_prefix->m_value = this;
+	m_action = nullptr;
+	m_parameter = nullptr;
+	m_decay = 0;
+	m_prefix = new Interaction_prefix();
+	m_prefix->m_subtype = effect_prefix_e::action;
+	m_prefix->m_value = this;
 }
 
 Action_wrapper* Action_wrapper::clone()
@@ -148,9 +146,14 @@ void Action_wrapper::update()
     }
 }
 
-Packer_generic& Action_wrapper::get_packer()
+iPacker& Action_wrapper::get_packer()
 {
     return Packer<Action_wrapper>::instance();
+}
+
+interaction_message_type_e Action_wrapper::get_interaction_message_type()
+{
+	return interaction_message_type_e::action_wrapper;
 }
 
 ActionClass_Move::ActionClass_Move()
@@ -1187,12 +1190,10 @@ char action_hit_melee::perform(Parameter* parameter)
             }
             if (accuracy > 0) {
                 auto* item = new Effect();
-                item->m_interaction_message_type = interaction_message_type_e::single;
                 item->m_subtype = effect_e::value;
                 item->m_value = -accuracy * 0.0000001 * sb * 0.01 * wd * str->m_value;
                 //???Application::instance().m_GUI->DescriptionBox->add_item_control(new GUI_Text("Урон: " + std::to_string(item->m_value)));
                 auto item1 = new Interaction_copyist();
-                item1->m_interaction_message_type = interaction_message_type_e::single;
                 item1->m_subtype = interaction_e::health;
                 item1->m_value = item;
                 item1->apply_effect(p[1].m_object, nullptr);

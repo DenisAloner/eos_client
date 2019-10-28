@@ -11,7 +11,8 @@ public:
 
     Object_interaction* clone() override;
 
-    Packer_generic& get_packer() override;
+    iPacker& get_packer() override;
+    interaction_message_type_e get_interaction_message_type() override;
 };
 
 #endif // IMPACT_COPY_CHANCE_H

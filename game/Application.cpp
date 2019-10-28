@@ -996,7 +996,7 @@ void Application::command_change_owner(Instruction_slot_parameter* parameter)
     if (obj_state) {
         auto list = obj_state->get_tag(object_tag_e::equippable);
         if (list) {
-            //LOG(INFO) << "step 0  "<<std::to_string((int)static_cast<ObjectTag::Equippable*>(list)->m_value->m_interaction_message_type);
+            //LOG(INFO) << "step 0  "<<std::to_string((int)static_cast<ObjectTag::Equippable*>(list)->m_value->get_interaction_message_type);
             list->apply_effect((*p)[0].m_object, parameter);
         }
         //if (object->m_active_state)

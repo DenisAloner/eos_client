@@ -106,7 +106,7 @@ public:
     virtual AI* clone() = 0;
     virtual void calculate_fov(GameObject* object, GameMap* map) = 0;
 
-    Packer_generic& get_packer() override = 0;
+    iPacker& get_packer() override = 0;
 
     constexpr static auto properties() { return std::make_tuple(make_property(&AI::m_ai_type, u"ai_type")); }
 };
@@ -131,7 +131,7 @@ public:
 
     void calculate_fov(GameObject* object, GameMap* map) override;
 
-    Packer_generic& get_packer() override;
+    iPacker& get_packer() override;
 
     constexpr static auto properties()
     {
@@ -148,7 +148,7 @@ public:
     void create() override;
     AI* clone() override { return nullptr; };
 
-    Packer_generic& get_packer() override;
+    iPacker& get_packer() override;
 
     void calculate_fov(GameObject* object, GameMap* map) override {};
 };

@@ -748,7 +748,7 @@ void AI_trap::create()
     }
 };
 
-Packer_generic& AI_trap::get_packer()
+iPacker& AI_trap::get_packer()
 {
     return Packer<AI_trap>::instance();
 }
@@ -762,7 +762,7 @@ AI_manager::AI_manager()
     m_path_qualifiers.push_back(new predicate_t([](GameObject* object) -> bool { return !object->get_stat(object_tag_e::pass_able) && object->m_name != u"wall"; }, 1));
 }
 
-Packer_generic& AI_enemy::get_packer()
+iPacker& AI_enemy::get_packer()
 {
     return Packer<AI_enemy>::instance();
 }

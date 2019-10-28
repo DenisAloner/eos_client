@@ -39,9 +39,10 @@ public:
 
     virtual bool get_child(GameTask*& task) { return false; };
 
-    Packer_generic& get_packer() final;
+    iPacker& get_packer() final;
 
     constexpr static auto properties() { return std::make_tuple(make_property(&Action::m_kind, u"value")); }
+    interaction_message_type_e get_interaction_message_type() override { return interaction_message_type_e::action; };
 };
 
 class Action_wrapper : public Object_interaction {
@@ -62,7 +63,9 @@ public:
     void set(GameObject* unit, Action* action, Parameter* parameter);
     void update();
 
-    Packer_generic& get_packer() override;
+    iPacker& get_packer() override;
+
+    interaction_message_type_e get_interaction_message_type() override;;
 
 private:
     Interaction_prefix* m_prefix;

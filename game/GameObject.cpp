@@ -67,7 +67,7 @@ void MapCell::reset_serialization_index()
     }
 }
 
-Packer_generic& MapCell::get_packer()
+iPacker& MapCell::get_packer()
 {
     return Packer<MapCell>::instance();
 }
@@ -122,7 +122,7 @@ Tag_getter::Tag_getter(object_tag_e key)
 void Tag_getter::visit(Object_interaction& value)
 {
     if (!m_result) {
-        if (value.m_interaction_message_type == interaction_message_type_e::tag) {
+        if (value.get_interaction_message_type() == interaction_message_type_e::tag) {
             if (static_cast<Object_tag&>(value).m_type == m_key) {
                 m_result = static_cast<Object_tag*>(&value);
             }
@@ -159,7 +159,7 @@ void Attribute_map::apply_visitor(Visitor_generic& visitor)
     visitor.visit(*this);
 }
 
-Packer_generic& Attribute_map::get_packer()
+iPacker& Attribute_map::get_packer()
 {
     return Packer<Attribute_map>::instance();
 }
@@ -320,7 +320,7 @@ Object_state* Object_state_equip::clone()
     return state;
 }
 
-Packer_generic& Object_state_equip::get_packer()
+iPacker& Object_state_equip::get_packer()
 {
     return Packer<Object_state_equip>::instance();
 }
@@ -352,7 +352,7 @@ void Object_state::reset_serialization_index()
     }
 }
 
-Packer_generic& Object_state::get_packer()
+iPacker& Object_state::get_packer()
 {
     return Packer<Object_state>::instance();
 }
@@ -376,14 +376,13 @@ Packer_generic& Object_state::get_packer()
 
 GameObject::GameObject()
 {
-    m_interaction_message_type = interaction_message_type_e::game_object;
-    m_kind = entity_e::game_object;
-    m_owner = nullptr;
-    m_direction = object_direction_e::down;
-    m_selected = false;
-    m_active_state = nullptr;
-    m_owner = nullptr;
-    //rendering_necessary = false;
+	m_kind = entity_e::game_object;
+	m_owner = nullptr;
+	m_direction = object_direction_e::down;
+	m_selected = false;
+	m_active_state = nullptr;
+	m_owner = nullptr;
+	//rendering_necessary = false;
 }
 
 Object_interaction* GameObject::clone()
@@ -618,7 +617,7 @@ GameObject::Action_getter::Action_getter(GameObject* object, std::list<Action_he
 
 void GameObject::Action_getter::visit(Object_interaction& value)
 {
-    switch (value.m_interaction_message_type) {
+    switch (value.get_interaction_message_type()) {
     /*case interaction_message_type_e::action:
 	{
 		m_list.push_back(Action_helper_t(static_cast<Action*>(&value)));
@@ -729,7 +728,7 @@ void GameObject::get_actions_list(std::list<Action_helper_t>& value)
     parts->do_predicate(ag);
 }
 
-Packer_generic& GameObject::get_packer()
+iPacker& GameObject::get_packer()
 {
     return Packer<GameObject>::instance();
 }
@@ -838,7 +837,7 @@ void Inventory_cell::reset_serialization_index()
     }
 }
 
-Packer_generic& Inventory_cell::get_packer()
+iPacker& Inventory_cell::get_packer()
 {
     return Packer<Inventory_cell>::instance();
 }
@@ -846,11 +845,10 @@ Packer_generic& Inventory_cell::get_packer()
 Object_part::Object_part(GameObject* item)
     : Inventory_cell(item)
 {
-    m_interaction_message_type = interaction_message_type_e::part;
-    m_kind = entity_e::body_part;
-    m_part_kind = body_part_e::container;
-    m_owner = nullptr;
-    m_attributes.create_feature_list(feature_list_type_e::parts, interaction_e::body);
+	m_kind = entity_e::body_part;
+	m_part_kind = body_part_e::container;
+	m_owner = nullptr;
+	m_attributes.create_feature_list(feature_list_type_e::parts, interaction_e::body);
 };
 
 Object_part* Object_part::clone()
@@ -889,12 +887,17 @@ void Object_part::reset_serialization_index()
     }
 }
 
-Packer_generic& Object_part::get_packer()
+iPacker& Object_part::get_packer()
 {
     return Packer<Object_part>::instance();
 }
 
-Packer_generic& Config::get_packer()
+interaction_message_type_e Object_part::get_interaction_message_type()
+{
+    return interaction_message_type_e::part;
+}
+
+iPacker& Config::get_packer()
 {
     return Packer<Config>::instance();
 }

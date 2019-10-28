@@ -35,7 +35,7 @@ public:
     Game_object_owner* get_owner();
     Game_object_owner* get_owner(entity_e kind);
 
-    Packer_generic& get_packer() override = 0;
+    iPacker& get_packer() override = 0;
     /*{
 		return Packer<Game_object_owner>::Instance();
 	}*/
@@ -84,7 +84,7 @@ public:
 
     void reset_serialization_index() override;
 
-    Packer_generic& get_packer() override;
+    iPacker& get_packer() override;
 
     constexpr static auto properties()
     {
@@ -121,7 +121,7 @@ public:
     virtual void apply_visitor(Visitor_generic& visitor);
 
     // Для поддержки iSerializable
-    Packer_generic& get_packer() override;
+    iPacker& get_packer() override;
 
     constexpr static auto properties()
     {
@@ -155,7 +155,7 @@ public:
 
     void reset_serialization_index() override;
 
-    Packer_generic& get_packer() override;
+    iPacker& get_packer() override;
 
     std::u16string icon_to_json(Icon*& value, SerializationContext& context);
     std::string icon_to_binary(Icon*& value, SerializationContext& context);
@@ -190,7 +190,7 @@ public:
     Object_state_equip();
     virtual Object_state* clone();
 
-    Packer_generic& get_packer() override;
+    iPacker& get_packer() override;
 
     constexpr static auto properties()
     {
@@ -243,7 +243,7 @@ public:
     void get_actions_list(std::list<Action_helper_t>& value) override;
 
     // Для поддержки iJSONSerializable
-    Packer_generic& get_packer() override;
+    iPacker& get_packer() override;
 
     constexpr static auto properties()
     {
@@ -254,6 +254,8 @@ public:
             make_property(&GameObject::m_state, u"state"),
             make_property(&GameObject::m_active_state, u"active_state"));
     }
+
+    interaction_message_type_e get_interaction_message_type() override { return interaction_message_type_e::game_object; };
 
 private:
     class Action_getter : public Visitor {
@@ -274,7 +276,7 @@ public:
     InstanceDictionary<TileManager*> m_tile_managers_atlas;
     InstanceDictionary<Icon*> m_icons;
 
-    Packer_generic& get_packer() override;
+    iPacker& get_packer() override;
 
     void instancedictonary_icon_from_json(const std::u16string& value, InstanceDictionary<Icon*>& prop, SerializationContext& context);
     void instancedictonary_icon_from_binary(const std::string& value, InstanceDictionary<Icon*>& prop, std::size_t& pos, SerializationContext& context);
@@ -314,7 +316,7 @@ public:
 
     void reset_serialization_index() override;
 
-    Packer_generic& get_packer() override;
+    iPacker& get_packer() override;
 
     constexpr static auto properties()
     {
@@ -338,7 +340,7 @@ public:
 
     void reset_serialization_index() override;
 
-    Packer_generic& get_packer() override;
+    iPacker& get_packer() override;
 
     constexpr static auto properties()
     {
@@ -349,6 +351,8 @@ public:
                 make_property(&Object_part::m_name, u"name"),
                 make_property(&Object_part::m_attributes, u"attributes")));
     }
+
+    interaction_message_type_e get_interaction_message_type() override;
 };
 
 #endif //GAMEOBJECT_H

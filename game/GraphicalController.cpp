@@ -107,7 +107,7 @@ void GraphicalController::load_font(const std::string& font_filename)
     m_unicode_symbols[u' '] = m_unicode_symbols[u'?'];
 }
 
-font_symbol_t& GraphicalController::get_symbol(char16_t value)
+font_symbol_t& GraphicalController::get_symbol(const char16_t value)
 {
     std::u16string temp { value };
     auto symbol = m_unicode_symbols.find(value);

@@ -29,7 +29,7 @@ public:
 
     void reset_serialization_index() override;
 
-    Packer_generic& get_packer() override;
+    iPacker& get_packer() override;
 
     constexpr static auto properties()
     {
@@ -97,7 +97,7 @@ public:
 
     void reset_serialization_index() override;
 
-    Packer_generic& get_packer() override;
+    iPacker& get_packer() override;
 
     std::u16string vector_mapcell_to_json(std::vector<MapCell>& value, SerializationContext& context);
     void vector_mapcell_from_json(const std::u16string& value, std::vector<MapCell>& prop, SerializationContext& context);
@@ -132,7 +132,7 @@ public:
     std::string bin_serialize(SerializationContext& context);
     void bin_deserialize(std::string& value, SerializationContext& context);
 
-    Packer_generic& get_packer() override;
+    iPacker& get_packer() override;
 
     constexpr static auto properties()
     {

@@ -30,12 +30,13 @@ Apply_info::Apply_info(GameObject* unit, Object_interaction* object)
 {
 }
 
+
 void Object_interaction::apply_visitor(Visitor_generic& visitor) {}
 
-Packer_generic& Object_interaction::get_packer()
-{
-    return Packer<Object_interaction>::instance();
-}
+//iPacker& Object_interaction::get_packer()
+//{
+//    return Packer<Object_interaction>::instance();
+//}
 
 iSerializable*
 Packer<Object_interaction>::from_json(scheme_map_t* value,

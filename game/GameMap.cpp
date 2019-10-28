@@ -18,7 +18,7 @@ void Object_manager::update_buff()
             list->apply_visitor(visitor);
         }
         for (auto& item : m_item.m_active_state->m_items) {
-            if (item.second->m_interaction_message_type == interaction_message_type_e::list) {
+            if (item.second->get_interaction_message_type() == interaction_message_type_e::list) {
                 e = static_cast<Interaction_list*>(item.second);
                 if (e->m_list_type == feature_list_type_e::parameter || e->m_list_type == feature_list_type_e::parts || e->m_list_type == feature_list_type_e::tag) {
                     visitor.result = false;
@@ -64,7 +64,7 @@ void Object_manager::reset_serialization_index()
     }
 }
 
-Packer_generic& Object_manager::get_packer()
+iPacker& Object_manager::get_packer()
 {
     return Packer<Object_manager>::instance();
 }
@@ -1196,7 +1196,7 @@ void GameMap::reset_serialization_index()
     }
 }
 
-Packer_generic& GameMap::get_packer()
+iPacker& GameMap::get_packer()
 {
     return Packer<GameMap>::instance();
 }
@@ -1352,7 +1352,7 @@ void Game_world::bin_deserialize(std::string& value, SerializationContext& conte
     m_player = new Player(obj, map);
 }
 
-Packer_generic& Game_world::get_packer()
+iPacker& Game_world::get_packer()
 {
     return Packer<Game_world>::instance();
 }
