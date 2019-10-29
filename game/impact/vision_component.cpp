@@ -1,6 +1,5 @@
 #include "vision_component.h"
-#include "interaction_time.h"
-#include "effect.h"
+#include "Application.h"
 
 Vision_component::Vision_component()
 {

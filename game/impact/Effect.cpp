@@ -1,4 +1,7 @@
 #include "effect.h"
+#include "parameter_list.h"
+#include "interaction_copyist.h"
+#include "interaction_prefix.h"
 
 Effect::Effect()
     : m_value(0)

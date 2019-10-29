@@ -1,7 +1,7 @@
 #ifndef EFFECT_H
 #define EFFECT_H
 
-#include "GameObject.h"
+#include "Definiton.h"
 
 class Effect : public Object_interaction {
 public:

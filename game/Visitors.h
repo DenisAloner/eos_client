@@ -113,4 +113,4 @@ public:
     void visit(Interaction_timer& value) override;
 };
 
-#endif VISITORS_H
+#endif //VISITORS_H

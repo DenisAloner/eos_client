@@ -29,6 +29,7 @@
 #include "can_transfer_object.h"
 #include "instruction_slot_link.h"
 #include "instruction_slot_parameter.h"
+#include "instruction_result.h"
 #include "instruction_game_owner.h"
 #include "instruction_check_tag.h"
 #include "instruction_check_part_type.h"
@@ -37,5 +38,7 @@
 #include "instruction_get_owner_top.h"
 #include "instruction_check_owner_type.h"
 #include "effect.h"
+#include "Impact_copy_chance.h"
+#include "Impact_random_value.h"
 
 #endif //ALL_EFFECTS_H
