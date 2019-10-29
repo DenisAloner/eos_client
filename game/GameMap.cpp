@@ -1,6 +1,6 @@
 #include "game/GameMap.h"
 #include "AI.h"
-#include "Effect.h"
+#include "all_effects.h"
 #include "game/Application.h"
 #include "game/GameObject.h"
 

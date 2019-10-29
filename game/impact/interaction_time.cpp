@@ -6,7 +6,7 @@ Interaction_time::Interaction_time()
 
 Object_interaction* Interaction_time::clone()
 {
-    auto effect = new Interaction_time();
+	const auto effect = new Interaction_time();
     effect->m_turn = m_turn;
     effect->m_value = m_value->clone();
     return effect;

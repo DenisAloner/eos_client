@@ -15,7 +15,7 @@ Object_interaction* Interaction_copyist::clone()
 
 void Interaction_copyist::apply_effect(GameObject* unit, Object_interaction* object)
 {
-    auto i = unit->get_effect(m_subtype);
+	const auto i = unit->get_effect(m_subtype);
     if (i) {
         m_value->apply_effect(unit, i);
     }

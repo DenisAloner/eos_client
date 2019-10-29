@@ -2,7 +2,7 @@
 #define GAMEOBJECT_H
 
 #include "Action.h"
-#include "Effect.h"
+#include "all_effects.h"
 #include <Application.h>
 #include <list>
 #include <map>
@@ -24,6 +24,10 @@ class AI;
 class Object_tag;
 class Icon;
 class GameMap;
+
+namespace Effect_functions {
+Interaction_list* create_feature_list(feature_list_type_e key, interaction_e name);
+}
 
 class Game_object_owner : public virtual iSerializable {
 public:

@@ -1,7 +1,7 @@
 #ifndef IMPACT_RANDOM_VALUE_H
 #define IMPACT_RANDOM_VALUE_H
 
-#include "Effect.h"
+#include "all_effects.h"
 
 class Impact_random_value : public Effect {
 public:

@@ -1,6 +1,42 @@
 #include "game/GameObject.h"
 #include <algorithm>
 
+Interaction_list* Effect_functions::create_feature_list(feature_list_type_e key, interaction_e name)
+{
+    Interaction_list* result;
+    switch (key) {
+    case feature_list_type_e::generic: {
+        result = new Interaction_list();
+        break;
+    }
+    case feature_list_type_e::tag: {
+        result = new Tag_list();
+        break;
+    }
+    case feature_list_type_e::action: {
+        result = new Action_list();
+        break;
+    }
+    case feature_list_type_e::parameter: {
+        result = new Parameter_list(name);
+        break;
+    }
+    case feature_list_type_e::parts: {
+        result = new Parts_list();
+        break;
+    }
+    case feature_list_type_e::vision: {
+        result = new Vision_list();
+        break;
+    }
+    case feature_list_type_e::vision_component: {
+        result = new Vision_component();
+        break;
+    }
+    }
+    return result;
+}
+
 Game_object_owner* Game_object_owner::get_owner(entity_e kind)
 {
     if (m_owner) {

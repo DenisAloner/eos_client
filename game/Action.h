@@ -3,7 +3,7 @@
 
 #include "Definiton.h"
 #include "GameObject.h"
-#include "impact/Effect.h"
+#include "impact/all_effects.h"
 #include <string>
 
 class Application;

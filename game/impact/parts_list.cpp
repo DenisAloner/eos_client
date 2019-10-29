@@ -1,5 +1,5 @@
 #include "parts_list.h"
-#include "Application.h"
+#include "GameObject.h"
 
 Parts_list::Parts_list()
 {
@@ -8,9 +8,10 @@ Parts_list::Parts_list()
 
 Parts_list* Parts_list::clone()
 {
-    Parts_list* result = new Parts_list();
-    for (auto item = m_items.begin(); item != m_items.end(); ++item) {
-        result->m_items.push_back((*item)->clone());
+	auto result = new Parts_list();
+    for (auto& m_item : m_items)
+    {
+        result->m_items.push_back(m_item->clone());
     }
     return result;
 }
@@ -98,16 +99,16 @@ void Parts_list::Update_visitor::visit(Object_interaction& value)
     }
     switch (value.get_interaction_message_type()) {
     case interaction_message_type_e::part: {
-        Object_part& part = dynamic_cast<Object_part&>(value);
+	    auto& part = dynamic_cast<Object_part&>(value);
         if (part.m_item) {
-            ObjectTag::Equippable* tag_equippable = static_cast<ObjectTag::Equippable*>(part.m_item->get_tag(object_tag_e::equippable));
+	        auto tag_equippable = static_cast<ObjectTag::Equippable*>(part.m_item->get_tag(object_tag_e::equippable));
             if (tag_equippable) {
                 auto i = new Instruction_game_owner();
                 i->m_value = &part;
                 tag_equippable->m_condition->apply_effect(nullptr, i);
                 if (!i->m_result) {
-                    GameObject* obj = part.m_item;
-                    MapCell* cell = static_cast<MapCell*>(part.get_owner(entity_e::cell));
+	                auto obj = part.m_item;
+	                auto cell = static_cast<MapCell*>(part.get_owner(entity_e::cell));
                     part.m_item = nullptr;
                     i->m_value = &part;
                     tag_equippable->m_value->apply_effect(nullptr, i);
@@ -117,18 +118,18 @@ void Parts_list::Update_visitor::visit(Object_interaction& value)
                     return;
                 };
 
-                Object_tag* tag_requirements = part.m_attributes.get_tag(object_tag_e::requirements_to_object);
+                auto tag_requirements = part.m_attributes.get_tag(object_tag_e::requirements_to_object);
                 if (tag_requirements) {
                     i->m_result = false;
                     i->m_value = part.m_item;
                     tag_requirements->apply_effect(nullptr, i);
                     if (!i->m_result) {
-                        GameObject* obj = part.m_item;
-                        MapCell* cell = static_cast<MapCell*>(part.get_owner(entity_e::cell));
+	                    auto obj = part.m_item;
+	                    auto cell = static_cast<MapCell*>(part.get_owner(entity_e::cell));
                         part.m_item = nullptr;
                         i->m_value = &part;
-                        Parameter* p = new Parameter(parameter_type_e::destination, obj, obj, cell, &part);
-                        Instruction_slot_parameter* ip = new Instruction_slot_parameter();
+	                    auto p = new Parameter(parameter_type_e::destination, obj, obj, cell, &part);
+	                    auto ip = new Instruction_slot_parameter();
                         ip->m_parameter = p;
                         tag_equippable->m_value->apply_effect(nullptr, ip);
                         cell->m_map->add_object(obj, *cell);

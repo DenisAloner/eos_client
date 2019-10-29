@@ -1,5 +1,6 @@
 #include "parameter_list.h"
-#include "Application.h"
+#include "Visitors.h"
+#include "effect.h"
 
 Parameter_list::Parameter_list(interaction_e subtype)
     : m_subtype(subtype)

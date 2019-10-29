@@ -1,5 +1,6 @@
 #include "vision_component.h"
-#include "Application.h"
+#include "interaction_time.h"
+#include "effect.h"
 
 Vision_component::Vision_component()
 {
@@ -19,12 +20,12 @@ void Vision_component::update_list(Object_interaction* list)
         break;
     }
     case interaction_message_type_e::interaction_timer: {
-	    auto item = static_cast<Interaction_time*>(list);
+	    const auto item = static_cast<Interaction_time*>(list);
         update_list(item->m_value);
         break;
     }
     default: {
-	    auto item = static_cast<Effect*>(list);
+	    const auto item = static_cast<Effect*>(list);
         switch (item->m_subtype) {
         case effect_e::limit: {
             m_value.radius += item->m_value;
@@ -53,7 +54,7 @@ bool Vision_component::update()
 
 Vision_component* Vision_component::clone()
 {
-    Vision_component* result = new Vision_component();
+	auto result = new Vision_component();
     result->m_basic_value = AI_FOV(m_basic_value.radius, m_basic_value.qualifier, m_basic_value.start_angle, m_basic_value.end_angle);
     result->m_value = AI_FOV(m_value.radius, m_value.qualifier, m_value.start_angle, m_value.end_angle);
     for (auto& m_item : m_items)

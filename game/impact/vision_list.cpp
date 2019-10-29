@@ -1,5 +1,6 @@
 #include "vision_list.h"
-#include "Application.h"
+#include "Visitors.h"
+#include "vision_component.h"
 
 Vision_list::Vision_list()
 {

@@ -1,7 +1,7 @@
 #ifndef IMPACT_COPY_CHANCE_H
 #define IMPACT_COPY_CHANCE_H
 
-#include "Effect.h"
+#include "all_effects.h"
 class Impact_copy_chance : public Interaction_slot {
 public:
     int m_chance;

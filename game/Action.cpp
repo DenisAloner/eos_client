@@ -5,7 +5,7 @@
 #include "game/GameObject.h"
 #include "game/Parameter.h"
 #include "game/graphics/GUI_MapViewer.h"
-#include "impact/Effect.h"
+#include "impact/all_effects.h"
 #include <fstream>
 
 Action::Action()
