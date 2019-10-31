@@ -39,7 +39,7 @@ void Renderer::work()
     // Создаем render context (RC)
     const auto hRC = wglCreateContext(m_hDC);
     const bool is_ok = wglMakeCurrent(m_hDC, hRC);
-    Logger::instance().info("Создание контекста OpenGL {}", (is_ok ? "ok" : "err"));
+    Logger::instance().info("Create context OpenGL {}", (is_ok ? "ok" : "err"));
     // Инициализируем графику
     glbinding::initialize(nullptr);
     glMatrixMode(GL_PROJECTION);

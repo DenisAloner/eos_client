@@ -32,6 +32,8 @@ public:
 
     bool m_just_focused;
 
+	bool m_init;
+
     GUI_MapViewer(Application* app);
     ~GUI_MapViewer();
 

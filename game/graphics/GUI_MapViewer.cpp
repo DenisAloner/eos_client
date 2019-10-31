@@ -774,8 +774,7 @@ GUI_MapViewer::GUI_MapViewer(Application* app)
     m_shift.y = float(m_size.h) / 2 - m_tile_count_y * tile_size_y_half - tile_size_y_half; // 1024 * 0.5 - (m_tile_count_y + 6) * 18 * 0.5;
 
     m_vao = 0;
-    glGenVertexArrays(1, &m_vao);
-    glGenBuffers(1, &m_vertex_buffer);
+    m_init = false;
     //glGenBuffers(1, &m_textcoor_buffer);
     //glGenBuffers(1, &m_light_buffer);
 
@@ -838,7 +837,17 @@ struct rgb {
 
 void GUI_MapViewer::render(GraphicalController* graph, int px, int py)
 {
-    //graph->check_gl_error("test");
+    if (!m_init) {
+        m_init = true;
+        Logger::instance().info("Current context: " + (wglGetCurrentContext() == nullptr ? "null"s : "okay"s));
+        glGenVertexArrays(1, &m_vao);
+        glGenBuffers(1, &m_vertex_buffer);
+        Logger::instance().info(position_offset);
+        Logger::instance().info(texture_coordinates_offset);
+        Logger::instance().info(light_offset);
+        Logger::instance().info(sizeof(vertex_t));
+    }
+
     float light[4];
     glBindFramebuffer(GL_FRAMEBUFFER, graph->m_FBO);
     glEnable(GL_TEXTURE_2D);
