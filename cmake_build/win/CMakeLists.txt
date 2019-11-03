@@ -4,6 +4,7 @@ project(eos_client)
 add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>)
 add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/std:c++latest>)
 add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/bigobj>)
+add_compile_options($<$<C_COMPILER_ID:MSVC>:/utf-8>)
 add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/utf-8>)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -94,3 +95,5 @@ set_target_properties(${PROJECT_NAME}
 	PROPERTIES
 	COMPILE_DEFINITIONS "${GAME_DEFINES}"
 )
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE -D_UNICODE -DUNICODE)
