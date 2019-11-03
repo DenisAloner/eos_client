@@ -6,7 +6,7 @@ GUI_button::GUI_button(int x, int y, int width, int height, std::u16string text)
     m_position = position_t<int>(x, y);
     m_size = dimension_t<int>(width, height);
     m_text = new GUI_Text(text);
-    m_text->m_position = Application::instance().m_graph->center_aling_to_point(m_size.w * 0.5, (m_size.h - m_text->m_size.h) * 0.5, m_text->m_text);
+    m_text->m_position = Application::instance().m_graph->center_align_to_point(m_size.w * 0.5, (m_size.h - m_text->m_size.h) * 0.5, m_text->m_text);
 }
 
 GUI_button::~GUI_button()
@@ -17,7 +17,6 @@ void GUI_button::render(GraphicalController* graph, int px, int py)
 {
     glEnable(GL_SCISSOR_TEST);
     if (graph->add_scissor(rectangle_t<float>(float(px), float(py), float(m_size.w), float(m_size.h)))) {
-        graph->blur_rect(px, py, m_size.w, m_size.h);
         glEnable(GL_BLEND);
         glDisable(GL_TEXTURE_2D);
         glColor4d(0.0, 0.0, 0.0, 0.5);

@@ -1,8 +1,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "GraphicalController.h"
 #include "TileManager.h"
-#include <stb_image.h>
 #include <fstream>
+#include <stb_image.h>
 using namespace gl;
 
 void GraphicalController::check_gl_error(const std::string& text)
@@ -60,13 +60,43 @@ GraphicalController::GraphicalController(const dimension_t<int> size)
         m_actions[16] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_15.bmp");
         m_actions[17] = png_texture_load(FileSystem::instance().m_resource_path + "Tiles\\up_z_level.png");
 
-        m_horizontal_shader = load_shader("EoS_blur", "EoS_blur_horizontal");
-        m_vertical_shader = load_shader("EoS_blur", "EoS_blur_vertical");
-        m_mask_shader = load_shader("EoS_mask", "EoS_mask");
-        m_mask_shader2 = load_shader("EoS_mask", "EoS_mask2");
-        m_tile_shader = load_shader("EoS_tile", "EoS_tile");
-        m_tile_shader_hide = load_shader("EoS_tile", "EoS_tile_hide");
-        m_atlas_shader = load_shader("EoS_Tile_atlas", "EoS_Tile_atlas");
+        float transform_matrix[16];
+
+        auto a = dimension_t<GLfloat>(static_cast<GLfloat>(size.w), static_cast<GLfloat>(size.h));
+
+        transform_matrix[0] = 2.0f / a.w;
+        transform_matrix[1] = 0.0f;
+        transform_matrix[2] = 0.0f;
+        transform_matrix[3] = 0.0f;
+
+        transform_matrix[4] = 0.0f;
+        transform_matrix[5] = 2.0f / -a.h;
+        transform_matrix[6] = 0.0f;
+        transform_matrix[7] = 0.0f;
+
+        transform_matrix[8] = 0.0f;
+        transform_matrix[9] = 0.0f;
+        transform_matrix[10] = -1.0f;
+        transform_matrix[11] = 0.0f;
+
+        transform_matrix[12] = -1.0f;
+        transform_matrix[13] = 1.0f;
+        transform_matrix[14] = 0.0f;
+        transform_matrix[15] = 1.0f;
+
+        //m_horizontal_shader = load_shader("blur", "blur_x");
+        //m_vertical_shader = load_shader("blur", "blur_y");
+        //m_mask_shader = load_shader("mask", "mask1");
+        //m_mask_shader2 = load_shader("mask", "mask2");
+        //m_tile_shader = load_shader("tile", "tile");
+        //m_tile_shader_hide = load_shader("tile", "tile_hide");
+        m_atlas_shader = load_shader("tile_atlas", "tile_atlas");
+
+        glUseProgram(m_atlas_shader);
+        const auto transform_location = glGetUniformLocation(m_atlas_shader, "transform");
+        glUniformMatrix4fv(transform_location, 1, GL_FALSE, transform_matrix);
+        glUseProgram(0);
+
         m_empty_01 = create_empty_texture(m_size);
         m_empty_02 = create_empty_texture(m_size);
         m_empty_03 = create_empty_texture(m_size);
@@ -283,7 +313,7 @@ void GraphicalController::center_text(int x, int y, std::u16string text, int siz
     output_text(cx, cy, text, sizex, sizey);
 }
 
-position_t<int> GraphicalController::center_aling_to_point(int x, int y, std::u16string text)
+position_t<int> GraphicalController::center_align_to_point(int x, int y, std::u16string text)
 {
     return position_t<int>(x - (measure_text_width(text) / 2), y);
 }
@@ -312,34 +342,6 @@ void GraphicalController::remove_scissor()
     m_scissors.pop_front();
     const auto scissor = m_scissors.front();
     glScissor(scissor.x, scissor.y, scissor.w - scissor.x, scissor.h - scissor.y);
-}
-
-void GraphicalController::blur_rect(int x, int y, int width, int height)
-{
-    glColor4f(1.0, 1.0, 1.0, 1.0);
-    glDisable(GL_SCISSOR_TEST);
-    glDisable(GL_BLEND);
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, m_empty_01);
-    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, x, m_size.h - y - height, width, height);
-    double Tx = width / (float)m_size.w;
-    double Ty = height / (float)m_size.h;
-    glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_empty_02, 0);
-    glUseProgram(m_horizontal_shader);
-    set_uniform_sampler(m_horizontal_shader, "Map", 0);
-    draw_sprite_fbo(Tx, Ty, rectangle_t(0, m_size.h, width, -height));
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_empty_01, 0);
-    glUseProgram(m_vertical_shader);
-    set_uniform_sampler(m_vertical_shader, "Map", 0);
-    glBindTexture(GL_TEXTURE_2D, m_empty_02);
-    draw_sprite_fbo(Tx, Ty, rectangle_t(0, m_size.h, width, -height));
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glUseProgram(0);
-    glEnable(GL_SCISSOR_TEST);
-    glBindTexture(GL_TEXTURE_2D, m_empty_01);
-    draw_sprite_fbo(Tx, Ty, rectangle_t(x, y + height, width, -height));
-    glColor4f(1.0, 1.0, 1.0, 1.0);
 }
 
 bool GraphicalController::set_uniform_vector(const GLuint program, const char* name, const float* value)
@@ -758,8 +760,8 @@ std::string GraphicalController::load_shader_source(const std::string& path)
 
 GLuint GraphicalController::load_shader(const std::string& vPath, const std::string& fPath)
 {
-    const auto v_src = load_shader_source(FileSystem::instance().m_resource_path + "Shaders\\" + vPath + ".vsh");
-    const auto f_src = load_shader_source(FileSystem::instance().m_resource_path + "Shaders\\" + fPath + ".fsh");
+    const auto v_src = load_shader_source(FileSystem::instance().m_resource_path + "Shaders\\" + vPath + "_vertex.glsl");
+    const auto f_src = load_shader_source(FileSystem::instance().m_resource_path + "Shaders\\" + fPath + "_fragment.glsl");
     auto vertex_shader_source = v_src.c_str();
     auto fragment_shader_source = f_src.c_str();
     const auto program = glCreateProgram();

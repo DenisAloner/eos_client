@@ -561,11 +561,10 @@ void GUI_TreeView::render(GraphicalController* graph, int px, int py)
 {
     glEnable(GL_SCISSOR_TEST);
     if (graph->add_scissor(rectangle_t<float>(float(px), float(py), float(m_size.w), float(m_size.h)))) {
-        graph->blur_rect(px, py, m_size.w, m_size.h);
         glEnable(GL_BLEND);
         glDisable(GL_TEXTURE_2D);
         glColor4d(0.0, 0.0, 0.0, 0.5);
-        rectangle_t<int> rect(px, py, m_size.w, m_size.h);
+        const rectangle_t<int> rect(px, py, m_size.w, m_size.h);
         graph->draw_sprite(rect);
         glEnable(GL_TEXTURE_2D);
         glColor4d(1.0, 1.0, 1.0, 1.0);

@@ -73,7 +73,7 @@ public:
 
     GLuint m_FBO;
 
-    GraphicalController(dimension_t<int> size);
+   explicit GraphicalController(dimension_t<int> size);
 
     GLuint load_shader(const std::string& vPath, const std::string& fPath);
     std::string load_shader_source(const std::string& path);
@@ -87,7 +87,8 @@ public:
     void render_text(double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
     bool add_scissor(const rectangle_t<float>& rect);
     void remove_scissor();
-    void blur_rect(int x, int y, int width, int height);
+	
+  
     void set_VSync(bool sync);
     bool set_uniform_float(GLuint program, const char* name, const float value);
     GLint create_empty_texture(dimension_t<int> size);
@@ -99,7 +100,7 @@ public:
 
     std::size_t measure_text_width(std::u16string& text);
 
-    position_t<int> center_aling_to_point(int x, int y, std::u16string text);
+    position_t<int> center_align_to_point(int x, int y, std::u16string text);
 
     void draw_sprite(const rectangle_t<int>& rect);
     void draw_rectangle(const rectangle_t<int>& rect);

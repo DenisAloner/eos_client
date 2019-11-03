@@ -47,6 +47,7 @@ void Renderer::work()
     glOrtho(0, m_size.w, m_size.h, 0, -1, 1);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    //glViewport(0, 0, m_size.w, m_size.h);
 
     // Инициализируем приложение
     Application::instance().initialize(m_size, m_hDC, hRC);

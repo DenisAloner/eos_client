@@ -4,7 +4,6 @@
 #include "Definiton.h"
 #include "Event.h"
 #include "GraphicalController.h"
-#include <string>
 
 class GraphicalController;
 
@@ -53,7 +52,7 @@ class GUI_Image : public GUI_Object {
 public:
     GLuint m_texture;
     GUI_Image(int x, int y, int width, int height, GLuint texture);
-    virtual void render(GraphicalController* graph, int px, int py);
+    void render(GraphicalController* graph, int px, int py) override;
 };
 
 #endif //GUI_OBJECT_H

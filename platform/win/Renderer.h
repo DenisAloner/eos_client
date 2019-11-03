@@ -24,7 +24,7 @@ public:
     /** \brief Остановить графический поток
 	 */
     void stop();
-
+	
 private:
     HDC m_hDC; ///< идентификатор поверхности отрисовки (device context)
     dimension_t<int> m_size; ///< размеры поверхности отображения

@@ -3,7 +3,6 @@
 #include "game/graphics/GUI_Layer.h"
 #include "game/graphics/GUI_PopMenu.h"
 #include "game/utils/Logger.h"
-#include <algorithm>
 
 gui_mapviewer_hint::gui_mapviewer_hint() { m_top = false; }
 mapviewer_hint_path::mapviewer_hint_path(std::vector<MapCell*>* path, GameObject* object)
@@ -1380,7 +1379,7 @@ void GUI_MapViewer::render(GraphicalController* graph, int px, int py)
     glBufferData(GL_ARRAY_BUFFER, sizeof(quad_t) * count, &m_quads[0], GL_DYNAMIC_DRAW);
     glVertexAttribPointer(0, 2, GL_INT, GL_FALSE, sizeof(vertex_t), position_offset);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_DOUBLE, GL_FALSE, sizeof(vertex_t), texture_coordinates_offset);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), texture_coordinates_offset);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), light_offset);
     glEnableVertexAttribArray(2);
@@ -1467,11 +1466,11 @@ void GUI_MapViewer::render(GraphicalController* graph, int px, int py)
         auto xp = m_tile_count_y - y;
         rect = rectangle_t<int>((xp - yp) * tile_size_x_half + m_shift.x, (xp + yp - m_z_level * 2) * tile_size_y_half + m_shift.y, tile_size_x, -tile_size_y);
         glUseProgram(0);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, graph->m_empty_01, 0);
+        //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, graph->m_empty_01, 0);
         glEnable(GL_BLEND);
         glDisable(GL_TEXTURE_2D);
         glColor4f(0.0, 1.0, 0.0, 0.75);
-        Application::instance().m_graph->selection_cell(xp, yp, m_z_level, int(m_shift.x), int(m_shift.y));
+        graph->selection_cell(xp, yp, m_z_level, int(m_shift.x), int(m_shift.y));
         glEnable(GL_TEXTURE_2D);
         glColor4f(1.0, 1.0, 1.0, 1.0);
     }

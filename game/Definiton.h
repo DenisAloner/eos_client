@@ -17,7 +17,7 @@ using namespace gl;
 
 struct vertex_t {
     GLint position[2] {};
-    GLdouble texture_coordinates[3] {};
+    GLfloat texture_coordinates[3] {};
     GLfloat light[3] {};
 
     /*inline const static void* position_offset =
@@ -700,6 +700,7 @@ public:
 
 class iSerializable;
 class Game_world;
+
 class SerializationContext {
 public:
     Game_world& m_game_world;
@@ -1208,16 +1209,14 @@ parser_to_json(T& value, SerializationContext& context)
                 // LOG(INFO) << "parser_to_json iSerializable*: " <<
                 // UTF16_to_CP1251(value->get_packer().get_type_name());
                 return value->get_packer().to_json(value, context);
-            } else {
-                return u"null";
             }
+            return u"null";
         } else {
             if (value == nullptr) {
                 return u"null";
-            } else {
-                using Type = std::remove_pointer_t<T>;
-                return parser_to_json<Type>(*value, context);
             }
+            using Type = std::remove_pointer_t<T>;
+            return parser_to_json<Type>(*value, context);
         }
     } else if constexpr (std::is_base_of<iSerializable, T>::value) {
         // LOG(INFO) << UTF16_to_CP1251(value.get_packer().get_type_name());
@@ -1692,10 +1691,9 @@ public:
             if (result.empty()) {
                 auto out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\",\"$link_id\":" + int_to_u16string(value->m_serialization_index) + u"}";
                 return out;
-            } else {
-                auto out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\",\"$link_id\":" + int_to_u16string(value->m_serialization_index) + u"," + result + u"}";
-                return out;
             }
+            auto out = u"{\"$type\":\"" + value->get_packer().get_type_name() + u"\",\"$link_id\":" + int_to_u16string(value->m_serialization_index) + u"," + result + u"}";
+            return out;
         }
         default: {
             if (context.m_object_index < value->m_serialization_index) {

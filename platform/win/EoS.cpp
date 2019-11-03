@@ -62,7 +62,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         NULL, NULL, hInstance, NULL);
     RECT client_rect_win;
     GetClientRect(hWnd, &client_rect_win);
-    rectangle_t<int> client_rect(0, 0, client_rect_win.right, client_rect_win.bottom);
+    const rectangle_t<int> client_rect(0, 0, client_rect_win.right, client_rect_win.bottom);
     // enable OpenGL for the window
     set_client_rect(hWnd, client_rect.right(), client_rect.bottom());
     enable_graphics(hWnd, hDC);
