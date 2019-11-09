@@ -559,7 +559,7 @@ void GUI_TreeView::bind_tree(Tree<std::u16string>& value, std::list<GUI_Object*>
 
 void GUI_TreeView::render(GraphicalController* graph, int px, int py)
 {
-    glEnable(GL_SCISSOR_TEST);
+   /* glEnable(GL_SCISSOR_TEST);
     if (graph->add_scissor(rectangle_t<float>(float(px), float(py), float(m_size.w), float(m_size.h)))) {
         glEnable(GL_BLEND);
         glDisable(GL_TEXTURE_2D);
@@ -589,7 +589,7 @@ void GUI_TreeView::render(GraphicalController* graph, int px, int py)
             glColor4f(1.0, 1.0, 1.0, 1.0);
             graph->draw_rectangle(rectangle_t<int>(px, py, m_size.w, m_size.h));
         }
-    }
+    }*/
 }
 
 GUI_Description_window::GUI_Description_window(int x, int y, int width, int height, std::u16string name, GameObject*& object)

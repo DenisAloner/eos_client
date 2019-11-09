@@ -1,0 +1,11 @@
+[
+    "atlas_tiles", [
+        "gui", [
+            "background", [0, 64, 280, 280],
+            "corner", [0, 32, 32, 32],
+            "close", [32, 32, 32, 32],
+            "border", [64, 52, 64, 12],
+            "border_vertical", [128, 0, 12, 64]
+        ]
+    ]
+]

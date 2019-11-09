@@ -1,9 +1,9 @@
 #ifndef TILEMANAGER_H
 #define TILEMANAGER_H
 
-#include "Application.h"
 #include "graphics/gl.hpp"
 #include <string>
+#include "Definiton.h"
 
 class TileManager : public iSerializable, public InstanceDictionaryElement {
 public:

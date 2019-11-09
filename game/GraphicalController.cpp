@@ -1,5 +1,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "GraphicalController.h"
+#include "Application.h"
 #include "TileManager.h"
 #include <fstream>
 #include <stb_image.h>
@@ -34,8 +35,221 @@ void GraphicalController::check_gl_error(const std::string& text)
     }
 }
 
+vao_quad_t<gui_vertex_t>& GraphicalController::get_gui_quad(int x, int y, int w, int h)
+{
+    auto& quad = m_gui_quads[quads_count_to_render];
+
+    quad.vertex[0].position[0] = x;
+    quad.vertex[0].position[1] = y + h;
+
+    quad.vertex[1].position[0] = x;
+    quad.vertex[1].position[1] = y;
+
+    quad.vertex[2].position[0] = x + w;
+    quad.vertex[2].position[1] = y;
+
+    quad.vertex[3].position[0] = x + w;
+    quad.vertex[3].position[1] = y + h;
+
+    const auto clip = m_scissors.front();
+
+    quad.vertex[0].clip[0] = clip.x;
+    quad.vertex[0].clip[1] = clip.y;
+    quad.vertex[0].clip[2] = clip.w;
+    quad.vertex[0].clip[3] = clip.h;
+    quad.vertex[1].clip[0] = clip.x;
+    quad.vertex[1].clip[1] = clip.y;
+    quad.vertex[1].clip[2] = clip.w;
+    quad.vertex[1].clip[3] = clip.h;
+    quad.vertex[2].clip[0] = clip.x;
+    quad.vertex[2].clip[1] = clip.y;
+    quad.vertex[2].clip[2] = clip.w;
+    quad.vertex[2].clip[3] = clip.h;
+    quad.vertex[3].clip[0] = clip.x;
+    quad.vertex[3].clip[1] = clip.y;
+    quad.vertex[3].clip[2] = clip.w;
+    quad.vertex[3].clip[3] = clip.h;
+
+	quad.vertex[0].color[0] = 1.0f;
+    quad.vertex[0].color[1] = 1.0f;
+    quad.vertex[0].color[2] = 1.0f;
+    quad.vertex[0].color[3] = 1.0f;
+    quad.vertex[1].color[0] = 1.0f;
+    quad.vertex[1].color[1] = 1.0f;
+    quad.vertex[1].color[2] = 1.0f;
+    quad.vertex[1].color[3] = 1.0f;
+    quad.vertex[2].color[0] = 1.0f;
+    quad.vertex[2].color[1] = 1.0f;
+    quad.vertex[2].color[2] = 1.0f;
+    quad.vertex[2].color[3] = 1.0f;
+    quad.vertex[3].color[0] = 1.0f;
+    quad.vertex[3].color[1] = 1.0f;
+    quad.vertex[3].color[2] = 1.0f;
+    quad.vertex[3].color[3] = 1.0f;
+
+    //quad.vertex[0].texture[0] = 0;
+    //quad.vertex[0].texture[1] = 0;
+    //quad.vertex[0].texture[2] = float(1);
+
+    //quad.vertex[1].texture[0] = 0;
+    //quad.vertex[1].texture[1] = 1;
+    //quad.vertex[1].texture[2] = float(1);
+
+    //quad.vertex[2].texture[0] = 1;
+    //quad.vertex[2].texture[1] = 1;
+    //quad.vertex[2].texture[2] = float(1);
+
+    //quad.vertex[3].texture[0] = 1;
+    //quad.vertex[3].texture[1] = 0;
+    //quad.vertex[3].texture[2] = float(1);
+
+    quads_count_to_render++;
+    return quad;
+}
+
+vao_quad_t<gui_vertex_t>& GraphicalController::get_gui_quad(int x, int y, int w, int h, const atlas_tile_t& tile, const tile_options_e options)
+{
+    auto& quad = m_gui_quads[quads_count_to_render];
+
+    quad.vertex[0].position[0] = x;
+    quad.vertex[0].position[1] = y + h;
+
+    quad.vertex[1].position[0] = x;
+    quad.vertex[1].position[1] = y;
+
+    quad.vertex[2].position[0] = x + w;
+    quad.vertex[2].position[1] = y;
+
+    quad.vertex[3].position[0] = x + w;
+    quad.vertex[3].position[1] = y + h;
+
+    const auto clip = m_scissors.front();
+
+    quad.vertex[0].clip[0] = clip.x;
+    quad.vertex[0].clip[1] = clip.y;
+    quad.vertex[0].clip[2] = clip.w;
+    quad.vertex[0].clip[3] = clip.h;
+    quad.vertex[1].clip[0] = clip.x;
+    quad.vertex[1].clip[1] = clip.y;
+    quad.vertex[1].clip[2] = clip.w;
+    quad.vertex[1].clip[3] = clip.h;
+    quad.vertex[2].clip[0] = clip.x;
+    quad.vertex[2].clip[1] = clip.y;
+    quad.vertex[2].clip[2] = clip.w;
+    quad.vertex[2].clip[3] = clip.h;
+    quad.vertex[3].clip[0] = clip.x;
+    quad.vertex[3].clip[1] = clip.y;
+    quad.vertex[3].clip[2] = clip.w;
+    quad.vertex[3].clip[3] = clip.h;
+
+    auto& texture = tile.texture;
+
+    quad.vertex[0].texture[2] = tile.layer;
+    quad.vertex[1].texture[2] = tile.layer;
+    quad.vertex[2].texture[2] = tile.layer;
+    quad.vertex[3].texture[2] = tile.layer;
+
+    if ((options & tile_options_e::FLIP_X) == tile_options_e::FLIP_X) {
+        quad.vertex[0].texture[0] = texture.right();
+        quad.vertex[1].texture[0] = texture.right();
+        quad.vertex[2].texture[0] = texture.x;
+        quad.vertex[3].texture[0] = texture.x;
+    } else {
+        quad.vertex[0].texture[0] = texture.x;
+        quad.vertex[1].texture[0] = texture.x;
+        quad.vertex[2].texture[0] = texture.right();
+        quad.vertex[3].texture[0] = texture.right();
+    }
+
+    if ((options & tile_options_e::FLIP_Y) == tile_options_e::FLIP_Y) {
+        quad.vertex[0].texture[1] = texture.bottom();
+        quad.vertex[1].texture[1] = texture.y;
+        quad.vertex[2].texture[1] = texture.y;
+        quad.vertex[3].texture[1] = texture.bottom();
+
+    } else {
+        quad.vertex[0].texture[1] = texture.y;
+        quad.vertex[1].texture[1] = texture.bottom();
+        quad.vertex[2].texture[1] = texture.bottom();
+        quad.vertex[3].texture[1] = texture.y;
+    }
+
+	quad.vertex[0].color[0] = 1.0f;
+    quad.vertex[0].color[1] = 1.0f;
+    quad.vertex[0].color[2] = 1.0f;
+    quad.vertex[0].color[3] = 1.0f;
+    quad.vertex[1].color[0] = 1.0f;
+    quad.vertex[1].color[1] = 1.0f;
+    quad.vertex[1].color[2] = 1.0f;
+    quad.vertex[1].color[3] = 1.0f;
+    quad.vertex[2].color[0] = 1.0f;
+    quad.vertex[2].color[1] = 1.0f;
+    quad.vertex[2].color[2] = 1.0f;
+    quad.vertex[2].color[3] = 1.0f;
+    quad.vertex[3].color[0] = 1.0f;
+    quad.vertex[3].color[1] = 1.0f;
+    quad.vertex[3].color[2] = 1.0f;
+    quad.vertex[3].color[3] = 1.0f;
+	
+    quads_count_to_render++;
+    return quad;
+}
+
+void GuiAtlasReader::read(const std::u16string_view& json, std::map<std::u16string, atlas_tile_t>& ref)
+{
+    const auto property_atlases = read_json_pair(json);
+    const auto property = read_json_pair((*property_atlases)[1]);
+    if (property) {
+        std::u16string k;
+        glGenTextures(1, &graph_.m_gui_atlas);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, graph_.m_gui_atlas);
+        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, graph_.m_font_atlas_size, graph_.m_font_atlas_size, property->size() / 2 + 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        for (std::size_t image_index = 0; image_index < property->size(); image_index += 2) {
+            std::u16string name;
+            read((*property)[image_index], name);
+            const auto file_name = (FileSystem::instance().m_resource_path + "Tiles/gui/" + utf16_to_cp1251(name) + ".png").c_str();
+            int width, height, channels;
+            const auto image_data = stbi_load(file_name, &width, &height, &channels, STBI_rgb_alpha);
+            Logger::instance().info("texture name: {} {} {}", file_name, width, height);
+            glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, image_index / 2 + 2, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+            stbi_image_free(image_data);
+            const auto p = read_json_pair((*property)[image_index + 1]);
+            for (std::size_t j = 0; j < p->size(); j += 2) {
+                read((*p)[j], k);
+                auto& v = ref[k];
+                read((*p)[j + 1], v);
+                v.texture.x /= float(graph_.m_font_atlas_size);
+                v.texture.y /= float(graph_.m_font_atlas_size);
+                v.texture.w /= float(graph_.m_font_atlas_size);
+                v.texture.h /= float(graph_.m_font_atlas_size);
+                v.layer = image_index / 2 + 2;
+            }
+            delete p;
+        }
+        delete property;
+    }
+}
+
+tile_options_e operator&(const tile_options_e& lhs, const tile_options_e& rhs)
+{
+	return static_cast<tile_options_e>(static_cast<unsigned char>(lhs) & static_cast<unsigned char>(rhs));
+}
+
+tile_options_e operator|(const tile_options_e& lhs, const tile_options_e& rhs)
+{
+	return static_cast<tile_options_e>(static_cast<unsigned char>(lhs) | static_cast<unsigned char>(rhs));
+}
+
 GraphicalController::GraphicalController(const dimension_t<int> size)
 {
+
+    m_id = std::this_thread::get_id();
+    m_gui_quads.resize(10000);
     m_size = size;
 
     load_font(FileSystem::instance().m_resource_path + "Fonts\\augusta_modern.ttf");
@@ -90,17 +304,22 @@ GraphicalController::GraphicalController(const dimension_t<int> size)
         //m_mask_shader2 = load_shader("mask", "mask2");
         //m_tile_shader = load_shader("tile", "tile");
         //m_tile_shader_hide = load_shader("tile", "tile_hide");
+        m_ui_shader = load_shader("ui", "ui");
         m_atlas_shader = load_shader("tile_atlas", "tile_atlas");
 
+        glUseProgram(m_ui_shader);
+        auto transform_location = glGetUniformLocation(m_ui_shader, "transform");
+        glUniformMatrix4fv(transform_location, 1, GL_FALSE, transform_matrix);
+        glUseProgram(0);
+
         glUseProgram(m_atlas_shader);
-        const auto transform_location = glGetUniformLocation(m_atlas_shader, "transform");
+        transform_location = glGetUniformLocation(m_atlas_shader, "transform");
         glUniformMatrix4fv(transform_location, 1, GL_FALSE, transform_matrix);
         glUseProgram(0);
 
         m_empty_01 = create_empty_texture(m_size);
         m_empty_02 = create_empty_texture(m_size);
         m_empty_03 = create_empty_texture(m_size);
-        m_blur = create_empty_texture(dimension_t<int>(m_size.w / 4, m_size.h / 4));
 
         m_close = load_texture(FileSystem::instance().m_resource_path + "Tiles\\EoS_Close.bmp");
         m_preselect = load_texture(FileSystem::instance().m_resource_path + "Tiles\\preselection.bmp");
@@ -110,11 +329,37 @@ GraphicalController::GraphicalController(const dimension_t<int> size)
         m_visible = load_texture(FileSystem::instance().m_resource_path + "Tiles\\visible.bmp");
         m_dir = load_texture(FileSystem::instance().m_resource_path + "Tiles\\directions.bmp");
         m_logo = load_texture(FileSystem::instance().m_resource_path + "Tiles\\logo.bmp");
+
+        glEnable(GL_CLIP_DISTANCE0);
+        glEnable(GL_CLIP_DISTANCE1);
+        glEnable(GL_CLIP_DISTANCE2);
+        glEnable(GL_CLIP_DISTANCE3);
+
+       /* glGenTextures(1, &m_gui_atlas);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, m_gui_atlas);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, m_font_atlas_size, m_font_atlas_size, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);*/
+
+    	bytearray json;
+        FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\gui.json", json);
+        const std::u8string json_u8(json);
+        const auto json_config(utf8_to_utf16(json_u8));
+
+    	GuiAtlasReader reader(*this);
+        reader.read(json_config,atlas_tiles);
+
+        glGenVertexArrays(1, &m_gui_vao);
+        glGenBuffers(1, &m_gui_vertex_buffer);
+
     } catch (std::logic_error& e) {
         Logger::instance().critical("Ошибка при загрузке ресурсов: {}", e.what());
     }
 
-    m_scissors.push_front(rectangle_t<float>(0.0f, 0.0f, float(m_size.w), float(m_size.h)));
+    m_scissors.push_front(rectangle_t<int>(0, 0, m_size.w, m_size.h));
     glGenFramebuffers(1, &m_FBO);
 }
 
@@ -137,7 +382,42 @@ void GraphicalController::load_font(const std::string& font_filename)
     m_unicode_symbols[u' '] = m_unicode_symbols[u'?'];
 }
 
-font_symbol_t& GraphicalController::get_symbol(const char16_t value)
+void GraphicalController::generate_symbol(atlas_symbol_t* symbol, GLint x_offset, GLint y_offset, unsigned char* buffer)
+{
+    auto& s = *symbol;
+    /*std::u16string a { s.value };
+    Logger::instance().info("Generate font symbol opengl: {} {} {}", utf16_to_cp1251(a), s.size.w, s.size.h);*/
+    glEnable(GL_TEXTURE_2D);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, m_gui_atlas);
+    const auto rgba = new unsigned char[s.size.w * s.size.h * int(4)];
+    auto p = 0;
+    for (auto i = 0; i < s.size.w * s.size.h; ++i) {
+        p = i * 4;
+        rgba[p] = 255;
+        rgba[p + 1] = 255;
+        rgba[p + 2] = 255;
+        rgba[p + 3] = buffer[i];
+    }
+    glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
+        0,
+        x_offset,
+        y_offset,
+        1,
+        s.size.w,
+        s.size.h,
+        1,
+        GL_RGBA,
+        GL_UNSIGNED_BYTE,
+        rgba);
+    s.texture.x = x_offset / float(m_font_atlas_size);
+    s.texture.y = y_offset / float(m_font_atlas_size);
+    s.texture.w = float(s.size.w) / float(m_font_atlas_size);
+    s.texture.h = float(s.size.h) / float(m_font_atlas_size);
+    delete[] rgba;
+}
+
+atlas_symbol_t& GraphicalController::get_symbol(const char16_t value)
 {
     std::u16string temp { value };
     auto symbol = m_unicode_symbols.find(value);
@@ -150,30 +430,36 @@ font_symbol_t& GraphicalController::get_symbol(const char16_t value)
             return m_unicode_symbols[u'?'];
         }
 
-        bool is_ok = wglMakeCurrent(Application::instance().m_hDC, Application::instance().subhRC);
-        GLenum err;
+        if (m_font_atlas_x_offset + m_slot->bitmap.width > m_font_atlas_size) {
+            m_font_atlas_y_offset += m_font_atlas_row_symbol_max_height;
+            m_font_atlas_row_symbol_max_height = m_slot->bitmap.rows;
+            m_font_atlas_x_offset = 0;
+        }
 
-        GLuint texture;
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, m_slot->bitmap.width, m_slot->bitmap.rows, 0, GL_ALPHA, GL_UNSIGNED_BYTE, m_slot->bitmap.buffer);
-        font_symbol_t s;
-        s.id = texture;
-        s.size.w = int(m_slot->bitmap.width);
-        s.size.h = int(m_slot->bitmap.rows);
-        s.bearing.w = m_slot->bitmap_left;
-        s.bearing.h = s.size.h - m_slot->bitmap_top;
-        m_unicode_symbols[value] = s;
-        wglMakeCurrent(Application::instance().m_hDC, Application::instance().m_hRC);
+        auto& font_symbol = m_unicode_symbols[value];
+        font_symbol.value = value;
+        font_symbol.size.w = int(m_slot->bitmap.width);
+        font_symbol.size.h = int(m_slot->bitmap.rows);
+        font_symbol.bearing.w = m_slot->bitmap_left;
+        font_symbol.bearing.h = font_symbol.size.h - m_slot->bitmap_top;
+
+        const auto buffer_size = font_symbol.size.w * font_symbol.size.h;
+        const auto buffer = new unsigned char[buffer_size];
+
+        for (auto i = 0; i < buffer_size; ++i) {
+            buffer[i] = m_slot->bitmap.buffer[i];
+        }
+
+        auto b = &m_unicode_symbols[value];
+        if (m_id == std::this_thread::get_id()) {
+            generate_symbol(b, m_font_atlas_x_offset, m_font_atlas_y_offset, buffer);
+        } else {
+            Application::instance().m_update_in_render_thread.emplace_back(std::bind(&GraphicalController::generate_symbol, this, b, m_font_atlas_x_offset, m_font_atlas_y_offset, buffer));
+        }
+        m_font_atlas_x_offset += m_slot->bitmap.width;
         return m_unicode_symbols[value];
-    } else {
-        return symbol->second;
     }
+    return symbol->second;
 }
 
 bool GraphicalController::compile_successful(int obj)
@@ -216,76 +502,33 @@ void GraphicalController::set_VSync(bool sync)
     }
 }
 
-//void GraphicalController::output_text(int x, int y, std::string& Text, int sizex, int sizey)
-//{
-//	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//	glUseProgram(0);
-//	glActiveTexture(GL_TEXTURE0);
-//	glBindTexture(GL_TEXTURE_2D, m_font);
-//	int x0, y0, x1, y1, x2, y2, x3, y3;
-//	double xt0, yt0, xt1, yt1, xt2, yt2, xt3, yt3;
-//	unsigned char  i, j;
-//	unsigned char ASCII;
-//	for (int k = 0; k<Text.length(); k++)
-//	{
-//		ASCII = (unsigned char)Text[k];
-//		j = ASCII / 16;
-//		i = ASCII - j * 16;
-//		j = 15 - j;
-//		x0 = x + k*(sizex + 1);
-//		y0 = y;
-//		x1 = x + k*(sizex + 1);
-//		y1 = y + sizey;
-//		x2 = x + sizex + k*(sizex + 1);
-//		y2 = y + sizey;
-//		x3 = x + sizex + k*(sizex + 1);
-//		y3 = y;
-//		xt0 = i*0.0625;
-//		yt0 = (j + 1)*0.0625;
-//		xt1 = i*0.0625;
-//		yt1 = j*0.0625;
-//		xt2 = (i + 1)*0.0625;
-//		yt2 = j*0.0625;
-//		xt3 = (i + 1)*0.0625;
-//		yt3 = (j + 1)*0.0625;
-//		glBegin(GL_QUADS);
-//		glTexCoord2d(xt0, yt0); glVertex2d(x0, y0);
-//		glTexCoord2d(xt1, yt1); glVertex2d(x1, y1);
-//		glTexCoord2d(xt2, yt2); glVertex2d(x2, y2);
-//		glTexCoord2d(xt3, yt3); glVertex2d(x3, y3);
-//		glEnd();
-//	}
-//}
-
 void GraphicalController::output_text(int x, int y, std::u16string& text, int sizex, int sizey)
 {
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glUseProgram(0);
-    glActiveTexture(GL_TEXTURE0);
     y = y + (m_face->size->metrics.ascender >> 6);
     auto shift_x = 0;
+	
     for (auto k : text) {
         auto& fs = get_symbol(k);
         if (k != 32) {
-            glBindTexture(GL_TEXTURE_2D, fs.id);
-            const auto x0 = x + shift_x;
-            const auto y0 = y + fs.bearing.h;
-            const auto x1 = x0;
-            const auto y1 = y - fs.size.h + fs.bearing.h + 1;
-            const auto x2 = x + shift_x + fs.size.w - 1;
-            const auto y2 = y1;
-            const auto x3 = x2;
-            const auto y3 = y0;
-            glBegin(GL_QUADS);
-            glTexCoord2d(0, 1);
-            glVertex2d(x0, y0);
-            glTexCoord2d(0, 0);
-            glVertex2d(x1, y1);
-            glTexCoord2d(1, 0);
-            glVertex2d(x2, y2);
-            glTexCoord2d(1, 1);
-            glVertex2d(x3, y3);
-            glEnd();
+           
+            auto& t = fs.texture;
+            auto& quad = get_gui_quad(x + shift_x, y + fs.bearing.h, fs.size.w - 1, -fs.size.h + 1);
+
+            quad.vertex[0].texture[0] = t.x;
+            quad.vertex[0].texture[1] = t.y;
+            quad.vertex[0].texture[2] = float(1);
+
+            quad.vertex[1].texture[0] = t.x;
+            quad.vertex[1].texture[1] = t.bottom();
+            quad.vertex[1].texture[2] = float(1);
+
+            quad.vertex[2].texture[0] = t.right();
+            quad.vertex[2].texture[1] = t.bottom();
+            quad.vertex[2].texture[2] = float(1);
+
+            quad.vertex[3].texture[0] = t.right();
+            quad.vertex[3].texture[1] = t.y;
+            quad.vertex[3].texture[2] = float(1);
         }
         shift_x += fs.size.w;
     }
@@ -318,11 +561,11 @@ position_t<int> GraphicalController::center_align_to_point(int x, int y, std::u1
     return position_t<int>(x - (measure_text_width(text) / 2), y);
 }
 
-bool GraphicalController::add_scissor(const rectangle_t<float>& rect)
+bool GraphicalController::add_scissor(int x, int y, int w, int h)
 {
     const auto global_scissor = m_scissors.front();
-    rectangle_t<float> local_scissor(rect.x, float(m_size.h) - rect.y - rect.h, rect.x + rect.w, float(m_size.h) - rect.y);
-    if ((global_scissor.x > local_scissor.w) || (global_scissor.w < local_scissor.x) || (global_scissor.y > local_scissor.h) || (global_scissor.h < local_scissor.y))
+    rectangle_t<int> local_scissor(x, y, x + w, y + h);
+    if (global_scissor.x > local_scissor.w || global_scissor.w < local_scissor.x || global_scissor.y > local_scissor.h || global_scissor.h < local_scissor.y)
         return false;
     if (local_scissor.x < global_scissor.x)
         local_scissor.x = global_scissor.x;
@@ -333,7 +576,7 @@ bool GraphicalController::add_scissor(const rectangle_t<float>& rect)
     if (local_scissor.h > global_scissor.h)
         local_scissor.h = global_scissor.h;
     m_scissors.push_front(local_scissor);
-    glScissor(local_scissor.x, local_scissor.y, local_scissor.w - local_scissor.x, local_scissor.h - local_scissor.y);
+    //glScissor(local_scissor.x, local_scissor.y, local_scissor.w - local_scissor.x, local_scissor.h - local_scissor.y);
     return true;
 }
 
@@ -342,6 +585,33 @@ void GraphicalController::remove_scissor()
     m_scissors.pop_front();
     const auto scissor = m_scissors.front();
     glScissor(scissor.x, scissor.y, scissor.w - scissor.x, scissor.h - scissor.y);
+}
+
+void GraphicalController::render_gui()
+{
+    glEnable(GL_BLEND);
+    glEnable(GL_TEXTURE_2D);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glUseProgram(m_ui_shader);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, m_gui_atlas);
+    set_uniform_sampler(m_ui_shader, "atlas", 0);
+    glBindVertexArray(m_gui_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, m_gui_vertex_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vao_quad_t<gui_vertex_t>) * quads_count_to_render, &m_gui_quads[0], GL_DYNAMIC_DRAW);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(gui_vertex_t), gui_position_offset);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(gui_vertex_t), gui_texture_offset);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(gui_vertex_t), gui_color_offset);
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(gui_vertex_t), gui_clip_offset);
+    glEnableVertexAttribArray(3);
+    glDrawArrays(GL_QUADS, 0, 4 * quads_count_to_render);
+    glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(2);
+    glBindVertexArray(0);
 }
 
 bool GraphicalController::set_uniform_vector(const GLuint program, const char* name, const float* value)
@@ -614,45 +884,6 @@ position_t<int> GraphicalController::get_open_gl_position(float x, float y)
     glReadPixels(x, int(win_y), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &win_z);
     return glhUnProjectf(win_x, win_y, win_z, modelview, projection, viewport);
 }
-
-//GLuint GraphicalController::load_texture(const char * filename)
-//{
-//	GLuint texture;
-//	char* data;
-//	FILE* file;
-//	BITMAPFILEHEADER header;
-//	BITMAPINFOHEADER info;
-//	fopen_s(&file, filename, "rb");
-//	fread(&header, sizeof(header), 1, file);
-//	fread(&info, sizeof(info), 1, file);
-//	data = new char[info.biWidth * info.biHeight * 4];
-//	fread(data, info.biWidth * info.biHeight * sizeof(GLuint), 1, file);
-//	fclose(file);
-//	for (GLuint i = 0; i<info.biWidth * info.biHeight * 4; i += 4)
-//	{
-//		int r, g, b, a;
-//		b = data[i];
-//		g = data[i + 1];
-//		r = data[i + 2];
-//		a = data[i + 3];
-//		data[i] = r;
-//		data[i + 1] = g;
-//		data[i + 2] = b;
-//		data[i + 3] = a;
-//	}
-//	glGenTextures(1, &texture);
-//	glBindTexture(GL_TEXTURE_2D, texture);
-//	//glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-//	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-//	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-//	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-//	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-//	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-//	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, info.biWidth, info.biHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-//	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, info.biWidth, info.biHeight, GL_RGBA, GL_UNSIGNED_BYTE, data);
-//	delete data;
-//	return texture;
-//}
 
 GLuint GraphicalController::load_texture(const std::string& path)
 {

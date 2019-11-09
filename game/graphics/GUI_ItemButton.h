@@ -8,9 +8,9 @@ public:
     GUI_ItemButton();
     ~GUI_ItemButton();
 
-    bool check_region(MouseEventArgs const& e) override;
+    //bool check_region(MouseEventArgs const& e) override;
     void render(GraphicalController* graph, int px, int py) override;
     void on_mouse_move(MouseEventArgs const& e) override;
 };
 
-#endif GUI_ITEMBUTTON_H
+#endif //GUI_ITEMBUTTON_H

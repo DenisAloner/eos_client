@@ -20,21 +20,37 @@ struct vertex_t {
     GLfloat texture_coordinates[3] {};
     GLfloat light[3] {};
 
-    /*inline const static void* position_offset =
-     reinterpret_cast<void*>(offsetof(vertex_t, position)); inline const static
-     void* texture_coordinates_offset =
-     reinterpret_cast<void*>(offsetof(vertex_t, texture_coordinates)); inline
-     const static void* light_offset =
-     reinterpret_cast<void*>(offsetof(vertex_t, light));*/
+    /*inline const static void* position_offset = reinterpret_cast<void*>(offsetof(vertex_t, position));
+    inline const static void* texture_coordinates_offset = reinterpret_cast<void*>(offsetof(vertex_t, texture_coordinates));
+    inline const static void* light_offset = reinterpret_cast<void*>(offsetof(vertex_t, light));*/
 };
 
 const auto position_offset = reinterpret_cast<const void*>(offsetof(vertex_t, position));
 const auto texture_coordinates_offset = reinterpret_cast<const void*>(offsetof(vertex_t, texture_coordinates));
 const auto light_offset = reinterpret_cast<const void*>(offsetof(vertex_t, light));
 
-struct quad_t {
-    vertex_t vertex[4];
+struct gui_vertex_t {
+    GLfloat position[2] {};
+    GLfloat texture[3] {};
+    GLfloat color[4] {};
+    GLfloat clip[4] {};
 };
+
+const auto gui_position_offset = reinterpret_cast<void*>(offsetof(gui_vertex_t, position));
+const auto gui_texture_offset = reinterpret_cast<void*>(offsetof(gui_vertex_t, texture));
+const auto gui_color_offset = reinterpret_cast<void*>(offsetof(gui_vertex_t, color));
+const auto gui_clip_offset = reinterpret_cast<void*>(offsetof(gui_vertex_t, clip));
+
+
+
+template <typename T>
+struct vao_quad_t {
+    T vertex[4];
+};
+
+struct quad_t : vao_quad_t <vertex_t> {
+};
+
 
 const float Pi = 3.14159265F;
 const float cos22_5 = cos(22.5F * Pi / 180.0F);
@@ -291,6 +307,11 @@ operator+(object_direction_e lhs, const rotate_direction_e& rhs);
 struct tile_t {
     GLuint unit;
     GLdouble coordinates[4];
+};
+
+struct atlas_tile_t {
+    unsigned char layer;
+    rectangle_t<GLfloat> texture;
 };
 
 struct RGBA_t {
@@ -574,15 +595,10 @@ struct Action_helper_t {
         };
 };
 
-struct font_symbol_t {
-    GLuint id;
+struct atlas_symbol_t: atlas_tile_t {
+    char16_t value;
     dimension_t<int> size;
     dimension_t<int> bearing;
-
-    explicit font_symbol_t(const GLuint id = 0,
-        const dimension_t<int> size = dimension_t<int>())
-        : id(id)
-        , size(size) {};
 };
 
 enum game_log_message_type_e {
@@ -1188,6 +1204,14 @@ void parser_from_json(const std::u16string& value,
         parser_from_json<int>((*s)[1], prop.y, context);
         parser_from_json<int>((*s)[2], prop.w, context);
         parser_from_json<int>((*s)[3], prop.h, context);
+    } else if constexpr (std::is_same<T, atlas_tile_t>::value) {
+        auto temp = value;
+        auto s = read_pair(temp);
+        auto& texture = prop.texture;
+        parser_from_json<GLfloat>((*s)[0], texture.x, context);
+        parser_from_json<GLfloat>((*s)[1], texture.y, context);
+        parser_from_json<GLfloat>((*s)[2], texture.w, context);
+        parser_from_json<GLfloat>((*s)[3], texture.h, context);
     } else if constexpr (std::is_same<T, Icon>::value || std::is_same<T, TileManager>::value || is_instance_dictionary<T>::value) {
         Logger::instance().critical("<from_json> type error: {}",
             typeid(value).name());
@@ -1291,6 +1315,9 @@ parser_to_json(T& value, SerializationContext& context)
         return result;
     } else if constexpr (std::is_same<T, rectangle_t<int>>::value) {
         std::u16string result = u"[" + parser_to_json<int>(value.x, context) + u"," + parser_to_json<int>(value.y, context) + u"," + parser_to_json<int>(value.w, context) + u"," + parser_to_json<int>(value.h, context) + u"]";
+        return result;
+    } else if constexpr (std::is_same<T, atlas_tile_t>::value) {
+        std::u16string result = u"";
         return result;
     } else {
         // LOG(FATAL) << "<parser_to_json> type error: " << typeid(value).name();

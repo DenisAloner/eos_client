@@ -11,31 +11,24 @@
 #include <list>
 #include <string>
 #include <vector>
+#include "reader.h"
+
+enum class tile_options_e : unsigned char {
+	NONE = 0,
+    FLIP_X = 1,
+    FLIP_Y = 2
+};
+
+tile_options_e operator&(const tile_options_e& lhs, const tile_options_e& rhs);
+
+tile_options_e operator|(const tile_options_e& lhs, const tile_options_e& rhs);
 
 class TileManager;
-
 const int font_size_c = 26;
 
 class GraphicalController {
 public:
-   /* struct rectangle_t {
-        position_t<int> a;
-        position_t<int> b;
-        rectangle_t()
-            : a(0, 0)
-            , b(0, 0) {};
-        rectangle_t(int x, int y, int w, int h)
-            : a(x, y)
-            , b(x + w, y + h) {};
-        void set(int x, int y, int w, int h)
-        {
-            a.x = x;
-            a.y = y;
-            b.x = x + w;
-            b.y = y + h;
-        };
-    };*/
-
+	
     GLuint m_actions[18];
 
     GLuint m_horizontal_shader;
@@ -45,6 +38,7 @@ public:
     GLuint m_mask_shader;
     GLuint m_mask_shader2;
     GLuint m_atlas_shader;
+    GLuint m_ui_shader;
 
     GLuint m_empty_01;
     GLuint m_empty_02;
@@ -57,9 +51,17 @@ public:
     GLuint m_logo;
     GLuint m_no_image;
     GLuint m_visible;
-    GLuint m_blur;
-
+   
     GLuint m_atlas;
+	
+	GLuint m_gui_vao;
+	GLuint m_gui_vertex_buffer;
+    GLuint m_gui_atlas;
+
+	GLsizei m_font_atlas_size = 1024;
+	GLint m_font_atlas_x_offset;
+    GLint m_font_atlas_y_offset;
+    GLint m_font_atlas_row_symbol_max_height;
 
     FT_Library m_library;
     FT_Error m_error;
@@ -68,12 +70,17 @@ public:
 
     dimension_t<int> m_size;
 
-    std::list<rectangle_t<float>> m_scissors;
-    std::unordered_map<char16_t, font_symbol_t> m_unicode_symbols;
+    std::list<rectangle_t<int>> m_scissors;
+    std::unordered_map<char16_t, atlas_symbol_t> m_unicode_symbols;
+	
 
     GLuint m_FBO;
 
-   explicit GraphicalController(dimension_t<int> size);
+	std::thread::id m_id;
+
+	GraphicalController() {};
+
+	explicit GraphicalController(dimension_t<int> size);
 
     GLuint load_shader(const std::string& vPath, const std::string& fPath);
     std::string load_shader_source(const std::string& path);
@@ -84,16 +91,19 @@ public:
     GLuint load_texture(const std::string& path);
     void output_text(int x, int y, std::u16string& text, int sizex, int sizey);
     void center_text(int x, int y, std::u16string text, int sizex, int sizey);
-    void render_text(double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3);
-    bool add_scissor(const rectangle_t<float>& rect);
+    bool add_scissor(int x, int y, int w, int h);
     void remove_scissor();
+    void render_gui();
 	
   
     void set_VSync(bool sync);
     bool set_uniform_float(GLuint program, const char* name, const float value);
     GLint create_empty_texture(dimension_t<int> size);
     void load_font(const std::string& font_filename);
-    font_symbol_t& get_symbol(char16_t value);
+
+	void generate_symbol(atlas_symbol_t* symbol, GLint x_offset, GLint y_offset, unsigned char* buffer);
+	
+    atlas_symbol_t& get_symbol(char16_t value);
 
     GLuint png_texture_load(const std::string& path);
     GLuint texture_array_load(const std::vector<std::string>& path);
@@ -112,10 +122,32 @@ public:
     void draw_tile_fbo(double tx1, double ty1, double tx2, double ty2,const rectangle_t<int>& rect);
     void check_gl_error(const std::string& text);
 
+	vao_quad_t<gui_vertex_t>& get_gui_quad(int x, int y, int w, int h);
+    vao_quad_t<gui_vertex_t>& get_gui_quad(int x, int y, int w, int h, const atlas_tile_t& tile, tile_options_e options = tile_options_e::NONE);
+	std::vector<vao_quad_t<gui_vertex_t>> m_gui_quads;
+    int quads_count_to_render;
+   
+	std::map<std::u16string, atlas_tile_t> atlas_tiles;
+	
 private:
     bool compile_successful(int obj);
     bool link_successful(int obj);
     bool validate_successful(int obj);
 };
+
+class GuiAtlasReader : public JsonReader {
+public:
+
+	using JsonReader::read;
+	explicit GuiAtlasReader(GraphicalController& graph);
+    void read(const std::u16string_view& json, std::map<std::u16string, atlas_tile_t>& ref);
+
+private:
+    GraphicalController& graph_;
+};
+
+inline GuiAtlasReader::GuiAtlasReader(GraphicalController& graph): graph_(graph)
+{
+}
 
 #endif //GRAPHICALCONTROLLER_H

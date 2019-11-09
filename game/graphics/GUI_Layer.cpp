@@ -82,7 +82,7 @@ void GUI_Layer::on_mouse_wheel(MouseEventArgs const& e)
 
 void GUI_Layer::render(GraphicalController* graph, int px, int py)
 {
-    glEnable(GL_TEXTURE_2D);
+    /*glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glUseProgram(0);
@@ -90,7 +90,11 @@ void GUI_Layer::render(GraphicalController* graph, int px, int py)
         (*current)->render(graph, px + (*current)->m_position.x, py + (*current)->m_position.y);
     }
     glDisable(GL_BLEND);
-    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_TEXTURE_2D);*/
+
+    for (auto current = m_items.rbegin(); current != m_items.rend(); ++current) {
+        (*current)->render(graph, px + (*current)->m_position.x, py + (*current)->m_position.y);
+    }
 }
 
 void GUI_Layer::on_key_press(WPARAM w)

@@ -35,7 +35,7 @@ public:
     void on_mouse_wheel(MouseEventArgs const& e) override;
     void add(GUI_Object* object) override;
     virtual rectangle_t<int> client_rect();
-
+    void render(GraphicalController* graph, int px, int py) override;
 private:
     GUI_Header* m_header;
 };

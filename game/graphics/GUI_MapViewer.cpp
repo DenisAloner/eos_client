@@ -783,7 +783,7 @@ GUI_MapViewer::GUI_MapViewer(Application* app)
 	m_shift.y = 0;*/
 }
 
-GUI_MapViewer::~GUI_MapViewer(void)
+GUI_MapViewer::~GUI_MapViewer()
 {
 }
 
@@ -1337,19 +1337,19 @@ void GUI_MapViewer::render(GraphicalController* graph, int px, int py)
                             const auto y2 = (220 + 44) / 352.0;
                             vb.vertex[0].texture_coordinates[0] = x1;
                             vb.vertex[0].texture_coordinates[1] = y2;
-                            vb.vertex[0].texture_coordinates[2] = static_cast<double>(1);
+                            vb.vertex[0].texture_coordinates[2] = static_cast<GLfloat>(1);
 
                             vb.vertex[1].texture_coordinates[0] = x1;
                             vb.vertex[1].texture_coordinates[1] = y1;
-                            vb.vertex[1].texture_coordinates[2] = static_cast<double>(1);
+                            vb.vertex[1].texture_coordinates[2] = static_cast<GLfloat>(1);
 
                             vb.vertex[2].texture_coordinates[0] = x2;
                             vb.vertex[2].texture_coordinates[1] = y1;
-                            vb.vertex[2].texture_coordinates[2] = static_cast<double>(1);
+                            vb.vertex[2].texture_coordinates[2] = static_cast<GLfloat>(1);
 
                             vb.vertex[3].texture_coordinates[0] = x2;
                             vb.vertex[3].texture_coordinates[1] = y2;
-                            vb.vertex[3].texture_coordinates[2] = static_cast<double>(1);
+                            vb.vertex[3].texture_coordinates[2] = static_cast<GLfloat>(1);
 
                             count += 1;
                         }

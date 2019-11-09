@@ -1,4 +1,5 @@
 #include "game/TileManager.h"
+#include "Application.h"
 
 void TileManager::vector_gl_uint_from_json(const std::u16string& value, std::vector<GLuint>& prop, SerializationContext& context)
 {
@@ -7,7 +8,7 @@ void TileManager::vector_gl_uint_from_json(const std::u16string& value, std::vec
     if (s) {
         prop.resize(s->size());
         auto i = 0;
-        for (const auto& element : (*s)) {
+        for (const auto& element : *s) {
             auto&& name = utf16_to_cp1251(get_value(element));
             prop[i] = Application::instance().m_graph->png_texture_load(
                 FileSystem::instance().m_resource_path + "Tiles\\" + name + ".png");

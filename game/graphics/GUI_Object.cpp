@@ -2,7 +2,7 @@
 #include "Application.h"
 
 
-GUI_Object::GUI_Object(void)
+GUI_Object::GUI_Object()
 {
 	focused=false;
 	key_press += std::bind(&GUI_Object::on_key_press, this, std::placeholders::_1);
@@ -17,16 +17,12 @@ GUI_Object::GUI_Object(void)
 	lose_focus+=std::bind(&GUI_Object::on_lose_focus,this,std::placeholders::_1);
 }
 
-
-GUI_Object::~GUI_Object(void)
+GUI_Object::~GUI_Object()
 {
 }
 
-void GUI_Object::render(GraphicalController* graph, int px, int py)
-{
-}
 
-void GUI_Object::resize(int width, int height)
+void GUI_Object::resize(const int width, const int height)
 {
 	m_size.w = width;
 	m_size.h = height;
@@ -37,6 +33,10 @@ void GUI_Object::execute_in_render_thread(std::function<void()>&& func)
 	Application::instance().m_update_in_render_thread.push_back(func);
 }
 
+
+void GUI_Object::render_on_canvas()
+{
+}
 
 void GUI_Object::on_mouse_click(MouseEventArgs const& e)
 {
@@ -98,26 +98,4 @@ void GUI_Object::on_get_focus(GUI_Object* sender)
 
 void GUI_Object::on_lose_focus(GUI_Object* sender)
 {
-}
-
-GUI_Image::GUI_Image(int x, int y, int width, int height, GLuint texture)
-{
-	m_position = position_t<int>(x, y);
-	m_size = dimension_t<int>(width, height);
-	m_texture = texture;
-}
-
-void GUI_Image::render(GraphicalController* graph, int px, int py)
-{
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_TEXTURE_2D);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glUseProgram(0);
-	//glBindTexture(GL_TEXTURE_2D, Application::instance().m_graph->m_empty_01);
-	//glGenerateMipmap(GL_TEXTURE_2D);
-	glColor4d(1.0, 1.0, 1.0, 1.0);
-	glBindTexture(GL_TEXTURE_2D, m_texture);
-	rectangle_t<int> rect(px, py, m_size.w, m_size.h);
-	graph->draw_sprite(rect);
 }

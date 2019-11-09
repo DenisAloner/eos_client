@@ -1,12 +1,13 @@
-#include "game/Application.h"
+#include "Application.h"
 #include "ApplicationGUI.h"
 #include "GUI_Button_list.h"
 #include "GUI_button.h"
 #include "game/ActionManager.h"
 #include "game/GameObject.h"
 #include "game/MouseController.h"
-#include "game/graphics/GUI_MapViewer.h"
-#include "game/graphics/GUI_Window.h"
+#include "graphics/GUI_MapViewer.h"
+#include "graphics/GUI_Window.h"
+#include "graphics/GuiImage.h"
 #include <algorithm>
 #include <chrono>
 #include <fstream>
@@ -113,20 +114,28 @@ void Application::render()
     //	Application::instance().m_GUI->MapViewer->m_map->update(VoidEventArgs());
     //	Application::instance().m_GUI->MapViewer->m_map->m_update = false;
     //}
+    //
+    //
+   
+    m_graph->quads_count_to_render = 0;
     if (m_gui_controller.m_GUI) {
         m_gui_controller.m_GUI->render(m_graph, 0, 0);
     }
+    m_graph->render_gui();
+	
     const auto mouse = instance().m_mouse->get_mouse_position();
+   
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_TEXTURE_2D);
     glActiveTexture(GL_TEXTURE0);
+    glUseProgram(0);
     if (m_mouse->m_show_cursor) {
         if (m_clipboard.m_item) {
             glColor4d(1.0, 1.0, 1.0, 1.0);
             glBindTexture(GL_TEXTURE_2D, m_clipboard.m_item->m_active_state->m_icon->m_value);
             //m_graph->draw_sprite(mouse.x - 32, mouse.y - 32, mouse.x - 32, mouse.y + 32, mouse.x + 32, mouse.y + 32, mouse.x + 32, mouse.y - 32);
-            rectangle_t<int> rect(mouse.x - 32, mouse.y - 32, 64, 64);
+            const rectangle_t<int> rect(mouse.x - 32, mouse.y - 32, 64, 64);
             m_graph->draw_sprite(rect);
             glDisable(GL_TEXTURE_2D);
             glDisable(GL_BLEND);
@@ -216,7 +225,7 @@ void Application::initialize(const dimension_t<int> work_area_size, const HDC m_
     m_gui_controller.m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h);
     m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
     m_gui_controller.m_GUI->add(m_window_manager);
-    m_gui_controller.m_GUI->add(new GUI_Image((m_size.w - 1024) / 2, (m_size.h - 1024) / 2, 1024, 1024, m_graph->m_logo));
+    m_gui_controller.m_GUI->add(new GuiImage((m_size.w - 1024) / 2, (m_size.h - 1024) / 2, 1024, 1024, m_graph->m_logo));
 
     auto main_menu = new GUI_Window(0, 0, 400, 400, utf8_to_utf16(u8"Главное меню"s));
     main_menu->m_position = position_t<int>((m_size.w - main_menu->m_size.w) / 2, (m_size.h - main_menu->m_size.h) / 2);
@@ -677,7 +686,7 @@ GameObject* Application::command_select_object_on_map()
         }
         m_message_queue.m_processed_message = true;
         if (m_message_queue.m_items.front()->m_kind == parameter_type_e::object) {
-	        const auto p = m_message_queue.m_items.front();
+            const auto p = m_message_queue.m_items.front();
             if ((*p)[0].m_object->m_owner->Game_object_owner::m_kind == entity_e::cell) {
                 result = (*p)[0].m_object;
                 exit = true;
@@ -717,7 +726,7 @@ GameObject* Application::command_select_object()
             //else Result = nullptr;
         }
         if (m_message_queue.m_items.front()->m_kind == parameter_type_e::owner) {
-	        auto temp = m_message_queue.m_items.front();
+            auto temp = m_message_queue.m_items.front();
             switch ((*temp)[0].m_owner->m_kind) {
             case entity_e::inventory_cell: {
                 if (static_cast<Inventory_cell*>((*temp)[0].m_owner)->m_item) {
@@ -766,7 +775,7 @@ bool Application::command_open_body(GameObject*& Object)
 
 void Application::command_gui_show_characterization(GameObject*& object)
 {
-	auto window = new GUI_Description_window(m_size.w / 2 - (192 + 2) / 2, m_size.h / 2 - (4 * 64 + 2) / 2, 800 + 4, 8 * 64 + 27, object->m_name + u"::Характеристика", object);
+    auto window = new GUI_Description_window(m_size.w / 2 - (192 + 2) / 2, m_size.h / 2 - (4 * 64 + 2) / 2, 800 + 4, 8 * 64 + 27, object->m_name + u"::Характеристика", object);
     //m_GUI->add_front(Window);
 }
 
@@ -977,7 +986,7 @@ bool Application::command_agreement()
 
 void Application::command_change_owner(Instruction_slot_parameter* parameter)
 {
-	const auto p = static_cast<Instruction_slot_parameter*>(parameter)->m_parameter;
+    const auto p = static_cast<Instruction_slot_parameter*>(parameter)->m_parameter;
     auto obj_state = (*p)[1].m_object->get_state(object_state_e::equip);
     //if (obj_state)
     //{

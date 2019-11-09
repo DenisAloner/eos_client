@@ -29,8 +29,8 @@ public:
     Event<GUI_Object*> get_focus;
     Event<GUI_Object*> lose_focus;
 
-    virtual void render(GraphicalController* graph, int px, int py);
-    virtual void render_on_canvas() {};
+    virtual void render(GraphicalController* graph, int px, int py) = 0;
+    virtual void render_on_canvas();
     virtual void on_mouse_click(MouseEventArgs const& e);
     virtual void on_mouse_start_drag(MouseEventArgs const& e);
     virtual void on_mouse_drag(MouseEventArgs const& e);
@@ -45,14 +45,6 @@ public:
     virtual void set_focus(bool state);
     virtual void resize(int width, int height);
     void execute_in_render_thread(std::function<void()>&& func);
-};
-
-class GUI_Image : public GUI_Object {
-
-public:
-    GLuint m_texture;
-    GUI_Image(int x, int y, int width, int height, GLuint texture);
-    void render(GraphicalController* graph, int px, int py) override;
 };
 
 #endif //GUI_OBJECT_H
