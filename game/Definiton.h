@@ -311,7 +311,7 @@ struct tile_t {
 
 struct atlas_tile_t {
     unsigned char layer;
-    rectangle_t<GLfloat> texture;
+    rectangle_t<GLint> texture;
 };
 
 struct RGBA_t {

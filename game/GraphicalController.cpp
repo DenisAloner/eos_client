@@ -5,6 +5,7 @@
 #include <fstream>
 #include <stb_image.h>
 using namespace gl;
+using namespace std::literals::string_view_literals;
 
 void GraphicalController::check_gl_error(const std::string& text)
 {
@@ -70,7 +71,7 @@ vao_quad_t<gui_vertex_t>& GraphicalController::get_gui_quad(int x, int y, int w,
     quad.vertex[3].clip[2] = clip.w;
     quad.vertex[3].clip[3] = clip.h;
 
-	quad.vertex[0].color[0] = 1.0f;
+    quad.vertex[0].color[0] = 1.0f;
     quad.vertex[0].color[1] = 1.0f;
     quad.vertex[0].color[2] = 1.0f;
     quad.vertex[0].color[3] = 1.0f;
@@ -174,7 +175,7 @@ vao_quad_t<gui_vertex_t>& GraphicalController::get_gui_quad(int x, int y, int w,
         quad.vertex[3].texture[1] = texture.y;
     }
 
-	quad.vertex[0].color[0] = 1.0f;
+    quad.vertex[0].color[0] = 1.0f;
     quad.vertex[0].color[1] = 1.0f;
     quad.vertex[0].color[2] = 1.0f;
     quad.vertex[0].color[3] = 1.0f;
@@ -190,15 +191,78 @@ vao_quad_t<gui_vertex_t>& GraphicalController::get_gui_quad(int x, int y, int w,
     quad.vertex[3].color[1] = 1.0f;
     quad.vertex[3].color[2] = 1.0f;
     quad.vertex[3].color[3] = 1.0f;
-	
+
     quads_count_to_render++;
     return quad;
 }
 
-void GuiAtlasReader::read(const std::u16string_view& json, std::map<std::u16string, atlas_tile_t>& ref)
+void GraphicalController::render_background(int x, int y, int w, int h, const gui_style_t& style)
 {
-    const auto property_atlases = read_json_pair(json);
-    const auto property = read_json_pair((*property_atlases)[1]);
+    auto& background = *style.background_tile;
+    for (auto dy = 0; dy < h; dy += background.texture.h) {
+        for (auto dx = 0; dx < w; dx += background.texture.w) {
+            auto& tile = get_gui_quad(
+                x + dx,
+                y + dy,
+                background.texture.h,
+                background.texture.w,
+                background);
+
+            tile.vertex[0].color[3] = 0.5f;
+            tile.vertex[1].color[3] = 0.5f;
+            tile.vertex[2].color[3] = 0.5f;
+            tile.vertex[3].color[3] = 0.5f;
+        }
+    }
+}
+
+void GraphicalController::render_border(int x, int y, int w, int h, const gui_style_t& style)
+{
+    auto& corner = *style.corner_tile;
+
+    auto& border_x_tile = *style.border_x_tile;
+    if (add_scissor(x + corner.texture.w, y, w - corner.texture.w * 2, h)) {
+        for (auto i = x + corner.texture.w; i < x + w - corner.texture.w; i += border_x_tile.texture.w) {
+            get_gui_quad(i, y, border_x_tile.texture.w, border_x_tile.texture.h, border_x_tile);
+            get_gui_quad(i, y + h - border_x_tile.texture.h, border_x_tile.texture.w, border_x_tile.texture.h, border_x_tile, tile_options_e::FLIP_Y);
+
+            //graph->get_gui_quad(i, py + 36, 64, 12, border_x_tile, tile_options_e::FLIP_Y);
+        }
+        remove_scissor();
+    }
+    auto& border_y = *style.border_y_tile;
+    if (add_scissor(x, y + corner.texture.h, w, h - corner.texture.h * 2)) {
+        for (auto i = y + corner.texture.h; i < y + h - corner.texture.h; i += border_y.texture.h) {
+            get_gui_quad(x, i, border_y.texture.w, border_y.texture.h, border_y);
+            get_gui_quad(x + w - border_y.texture.w, i, border_y.texture.w, border_y.texture.h, border_y, tile_options_e::FLIP_X);
+        }
+        remove_scissor();
+    }
+
+    get_gui_quad(x, y, corner.texture.w, corner.texture.h, corner);
+    get_gui_quad(x + w - corner.texture.w, y, corner.texture.w, corner.texture.h, corner, tile_options_e::FLIP_X);
+    get_gui_quad(x, y + h - corner.texture.h, corner.texture.w, corner.texture.h, corner, tile_options_e::FLIP_Y);
+    get_gui_quad(x + w - corner.texture.w, y + h - corner.texture.h, corner.texture.w, corner.texture.h, corner, tile_options_e::FLIP_X | tile_options_e::FLIP_Y);
+
+    /*graph->get_gui_quad(px, py + 16, 32, 32, corner_tile);
+        graph->get_gui_quad(px + m_size.w - 32, py + 16, 32, 32, corner_tile, tile_options_e::FLIP_X);*/
+}
+
+void GuiAtlasReader::load()
+{
+    bytearray json;
+    FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\gui.json", json);
+    const std::u8string json_u8(json);
+    const auto json_config(utf8_to_utf16(json_u8));
+    const auto properties = read_json_object(json_config);
+    read((*properties)[u"tiles"sv], graph_.atlas_tiles);
+    JsonReader::read((*properties)[u"styles"sv], graph_.gui_styles);
+    delete properties;
+}
+
+void GuiAtlasReader::read(const std::u16string_view& json, std::unordered_map<std::u16string, atlas_tile_t>& ref)
+{
+    const auto property = read_json_array(json);
     if (property) {
         std::u16string k;
         glGenTextures(1, &graph_.m_gui_atlas);
@@ -207,8 +271,8 @@ void GuiAtlasReader::read(const std::u16string_view& json, std::map<std::u16stri
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP);
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP);
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         for (std::size_t image_index = 0; image_index < property->size(); image_index += 2) {
             std::u16string name;
             read((*property)[image_index], name);
@@ -218,15 +282,11 @@ void GuiAtlasReader::read(const std::u16string_view& json, std::map<std::u16stri
             Logger::instance().info("texture name: {} {} {}", file_name, width, height);
             glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, image_index / 2 + 2, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
             stbi_image_free(image_data);
-            const auto p = read_json_pair((*property)[image_index + 1]);
+            const auto p = read_json_array((*property)[image_index + 1]);
             for (std::size_t j = 0; j < p->size(); j += 2) {
                 read((*p)[j], k);
                 auto& v = ref[k];
                 read((*p)[j + 1], v);
-                v.texture.x /= float(graph_.m_font_atlas_size);
-                v.texture.y /= float(graph_.m_font_atlas_size);
-                v.texture.w /= float(graph_.m_font_atlas_size);
-                v.texture.h /= float(graph_.m_font_atlas_size);
                 v.layer = image_index / 2 + 2;
             }
             delete p;
@@ -235,14 +295,35 @@ void GuiAtlasReader::read(const std::u16string_view& json, std::map<std::u16stri
     }
 }
 
+void GuiAtlasReader::read(const std::u16string_view& json, gui_style_t& ref)
+{
+    const auto properties = read_json_object(json);
+    if (properties) {
+        auto& prop = *properties;
+        std::u16string background;
+        read(prop[u"background"sv], background);
+        std::u16string border_x;
+        read(prop[u"border_x"sv], border_x);
+        std::u16string border_y;
+        read(prop[u"border_y"sv], border_y);
+        std::u16string corner;
+        read(prop[u"corner"sv], corner);
+        ref.background_tile = &graph_.atlas_tiles[background];
+        ref.border_x_tile = &graph_.atlas_tiles[border_x];
+        ref.border_y_tile = &graph_.atlas_tiles[border_y];
+        ref.corner_tile = &graph_.atlas_tiles[corner];
+        delete properties;
+    }
+}
+
 tile_options_e operator&(const tile_options_e& lhs, const tile_options_e& rhs)
 {
-	return static_cast<tile_options_e>(static_cast<unsigned char>(lhs) & static_cast<unsigned char>(rhs));
+    return static_cast<tile_options_e>(static_cast<unsigned char>(lhs) & static_cast<unsigned char>(rhs));
 }
 
 tile_options_e operator|(const tile_options_e& lhs, const tile_options_e& rhs)
 {
-	return static_cast<tile_options_e>(static_cast<unsigned char>(lhs) | static_cast<unsigned char>(rhs));
+    return static_cast<tile_options_e>(static_cast<unsigned char>(lhs) | static_cast<unsigned char>(rhs));
 }
 
 GraphicalController::GraphicalController(const dimension_t<int> size)
@@ -335,7 +416,7 @@ GraphicalController::GraphicalController(const dimension_t<int> size)
         glEnable(GL_CLIP_DISTANCE2);
         glEnable(GL_CLIP_DISTANCE3);
 
-       /* glGenTextures(1, &m_gui_atlas);
+        /* glGenTextures(1, &m_gui_atlas);
         glBindTexture(GL_TEXTURE_2D_ARRAY, m_gui_atlas);
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -344,13 +425,8 @@ GraphicalController::GraphicalController(const dimension_t<int> size)
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, m_font_atlas_size, m_font_atlas_size, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);*/
 
-    	bytearray json;
-        FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\gui.json", json);
-        const std::u8string json_u8(json);
-        const auto json_config(utf8_to_utf16(json_u8));
-
-    	GuiAtlasReader reader(*this);
-        reader.read(json_config,atlas_tiles);
+        GuiAtlasReader reader(*this);
+        reader.load();
 
         glGenVertexArrays(1, &m_gui_vao);
         glGenBuffers(1, &m_gui_vertex_buffer);
@@ -410,10 +486,10 @@ void GraphicalController::generate_symbol(atlas_symbol_t* symbol, GLint x_offset
         GL_RGBA,
         GL_UNSIGNED_BYTE,
         rgba);
-    s.texture.x = x_offset / float(m_font_atlas_size);
-    s.texture.y = y_offset / float(m_font_atlas_size);
-    s.texture.w = float(s.size.w) / float(m_font_atlas_size);
-    s.texture.h = float(s.size.h) / float(m_font_atlas_size);
+    s.texture.x = x_offset;
+    s.texture.y = y_offset;
+    s.texture.w = float(s.size.w);
+    s.texture.h = float(s.size.h);
     delete[] rgba;
 }
 
@@ -506,11 +582,11 @@ void GraphicalController::output_text(int x, int y, std::u16string& text, int si
 {
     y = y + (m_face->size->metrics.ascender >> 6);
     auto shift_x = 0;
-	
+
     for (auto k : text) {
         auto& fs = get_symbol(k);
         if (k != 32) {
-           
+
             auto& t = fs.texture;
             auto& quad = get_gui_quad(x + shift_x, y + fs.bearing.h, fs.size.w - 1, -fs.size.h + 1);
 
@@ -991,10 +1067,10 @@ std::string GraphicalController::load_shader_source(const std::string& path)
 
 GLuint GraphicalController::load_shader(const std::string& vPath, const std::string& fPath)
 {
-    const auto v_src = load_shader_source(FileSystem::instance().m_resource_path + "Shaders\\" + vPath + "_vertex.glsl");
-    const auto f_src = load_shader_source(FileSystem::instance().m_resource_path + "Shaders\\" + fPath + "_fragment.glsl");
-    auto vertex_shader_source = v_src.c_str();
-    auto fragment_shader_source = f_src.c_str();
+    const auto vertex_shader_text = load_shader_source(FileSystem::instance().m_resource_path + "Shaders\\" + vPath + ".vert");
+    const auto fragment_shader_text = load_shader_source(FileSystem::instance().m_resource_path + "Shaders\\" + fPath + ".frag");
+    auto vertex_shader_source = vertex_shader_text.c_str();
+    auto fragment_shader_source = fragment_shader_text.c_str();
     const auto program = glCreateProgram();
     const auto vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     const auto fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);

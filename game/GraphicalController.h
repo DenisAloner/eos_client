@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include "reader.h"
+#include "gui_style.h"
 
 enum class tile_options_e : unsigned char {
 	NONE = 0,
@@ -72,6 +73,11 @@ public:
 
     std::list<rectangle_t<int>> m_scissors;
     std::unordered_map<char16_t, atlas_symbol_t> m_unicode_symbols;
+
+	std::vector<vao_quad_t<gui_vertex_t>> m_gui_quads;
+    int quads_count_to_render;
+    std::unordered_map<std::u16string, atlas_tile_t> atlas_tiles;
+    std::unordered_map<std::u16string, gui_style_t> gui_styles;
 	
 
     GLuint m_FBO;
@@ -124,10 +130,10 @@ public:
 
 	vao_quad_t<gui_vertex_t>& get_gui_quad(int x, int y, int w, int h);
     vao_quad_t<gui_vertex_t>& get_gui_quad(int x, int y, int w, int h, const atlas_tile_t& tile, tile_options_e options = tile_options_e::NONE);
-	std::vector<vao_quad_t<gui_vertex_t>> m_gui_quads;
-    int quads_count_to_render;
-   
-	std::map<std::u16string, atlas_tile_t> atlas_tiles;
+
+	void render_background(int x, int y, int w, int h, const gui_style_t& style);
+	void render_border(int x, int y, int w, int h, const gui_style_t& style);
+	
 	
 private:
     bool compile_successful(int obj);
@@ -137,10 +143,11 @@ private:
 
 class GuiAtlasReader : public JsonReader {
 public:
-
-	using JsonReader::read;
-	explicit GuiAtlasReader(GraphicalController& graph);
-    void read(const std::u16string_view& json, std::map<std::u16string, atlas_tile_t>& ref);
+    using JsonReader::read;
+    explicit GuiAtlasReader(GraphicalController& graph);
+    void load();
+    void read(const std::u16string_view& json, std::unordered_map<std::u16string, atlas_tile_t>& ref);
+    void read(const std::u16string_view& json, gui_style_t& ref) override;
 
 private:
     GraphicalController& graph_;

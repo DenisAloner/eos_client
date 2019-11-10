@@ -12,19 +12,19 @@
           </childs>
      </node>
      <node typeid="1" id="2" ownerId="-1">
-          <params filename="g6.png" filepath="E:\GIT\eos_client\resources\Tiles\gui\" relativepath="">
+          <params filename="border_x.png" filepath="E:\GIT\eos_client\resources\Tiles\gui\" relativepath="">
           </params>
           <childs>
           </childs>
      </node>
      <node typeid="1" id="3" ownerId="-1">
-          <params filename="border.png" filepath="E:\GIT\eos_client\resources\Tiles\gui\" relativepath="">
+          <params filename="border_y.png" filepath="E:\GIT\eos_client\resources\Tiles\gui\" relativepath="">
           </params>
           <childs>
           </childs>
      </node>
      <node typeid="1" id="4" ownerId="-1">
-          <params filename="border_vertical.png" filepath="E:\GIT\eos_client\resources\Tiles\gui\" relativepath="">
+          <params filename="box_button.png" filepath="E:\GIT\eos_client\resources\Tiles\gui\" relativepath="">
           </params>
           <childs>
           </childs>

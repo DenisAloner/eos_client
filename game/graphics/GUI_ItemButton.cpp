@@ -22,7 +22,7 @@ GUI_ItemButton::~GUI_ItemButton()
 void GUI_ItemButton::render(GraphicalController* graph, int px, int py)
 {
     auto& quad = graph->get_gui_quad(px, py, m_size.w, m_size.h);
-    auto& tile = graph->atlas_tiles[u"close"];
+    auto& tile = graph->atlas_tiles[u"box_button"];
     auto& t = tile.texture;
     quad.vertex[0].texture[0] = t.x;
     quad.vertex[0].texture[1] = t.y;

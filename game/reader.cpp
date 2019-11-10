@@ -1,5 +1,42 @@
 #include <reader.h>
 
+int json_to_int(const std::u16string_view& value)
+{
+	auto result = 0;
+    auto opening = std::string::npos;
+    std::size_t i;
+    for (i = 0; i < value.size(); ++i) {
+        switch (value[i]) {
+        case u'0':
+        case u'1':
+        case u'2':
+        case u'3':
+        case u'4':
+        case u'5':
+        case u'6':
+        case u'7':
+        case u'8':
+        case u'9':
+        case u'.':
+        case u'-': {
+            if (opening == std::string::npos) {
+                opening = i;
+            }
+            break;
+        }
+        default:
+            if (opening != std::string::npos)
+                goto parse;
+        }
+    }
+parse:
+    if (opening != std::string::npos) {
+        const auto v = utf16_to_cp1251(std::u16string(value.substr(opening, i - opening)));
+        result = std::stoi(v);
+    }
+    return result;
+}
+
 float json_to_float(const std::u16string_view& value)
 {
     float result = 0.0;
@@ -125,7 +162,7 @@ std::u16string_view json_token(const std::u16string_view& value, std::size_t& i)
     return {};
 }
 
-json_vector_t* json_pair(const std::u16string_view& value)
+json_vector_t* parse_json_array(const std::u16string_view& value)
 {
     json_vector_t* result = nullptr;
     for (std::size_t i = 0; i < value.size(); ++i) {
@@ -141,11 +178,11 @@ json_vector_t* json_pair(const std::u16string_view& value)
     return result;
 }
 
-json_vector_t* read_json_pair(const std::u16string_view& value)
+json_vector_t* read_json_array(const std::u16string_view& value)
 {
     auto count = 0;
     auto position_opening_symbol = std::u16string::npos;
-    for (long index = 0; index < value.size(); ++index) {
+    for (auto index = 0; index < value.size(); ++index) {
         switch (value[index]) {
         case u'[': {
             if (position_opening_symbol == std::u16string::npos) {
@@ -158,7 +195,7 @@ json_vector_t* read_json_pair(const std::u16string_view& value)
             if (position_opening_symbol != std::u16string::npos) {
                 count -= 1;
                 if (count == 0) {
-                    return json_pair(value.substr(position_opening_symbol + 1, index - position_opening_symbol - 1));
+                    return parse_json_array(value.substr(position_opening_symbol + 1, index - position_opening_symbol - 1));
                 }
             }
             break;
@@ -169,6 +206,80 @@ json_vector_t* read_json_pair(const std::u16string_view& value)
     return nullptr;
 }
 
+json_map_t* parse_json_object(const std::u16string_view& value)
+{
+    std::u16string_view property_name;
+    json_map_t* result = nullptr;
+    for (std::size_t i = 0; i < value.size(); ++i) {
+        switch (value[i]) {
+        case u'"': {
+            std::size_t j;
+            for (j = i + 1; j < value.size(); ++j) {
+                if (value[j] == u'"') {
+                    property_name = value.substr(i + 1, j - i - 1);
+                    break;
+                }
+            }
+            i = j + 1;
+            if (!property_name.empty()) {
+                auto sep_pos = value.find(u':', i);
+                if (sep_pos != std::string::npos) {
+                    sep_pos += 1;
+                    const auto token = json_token(value, sep_pos);
+                    if (token.empty()) {
+                        return result;
+                    }
+                    if (result == nullptr) {
+                        result = new json_map_t;
+                    }
+                    (*result)[property_name] = token;
+                    i = sep_pos - 1;
+                } else {
+                    return result;
+                }
+            } else {
+                return result;
+            }
+            break;
+        }
+        }
+    }
+    return result;
+}
+
+json_map_t* read_json_object(const std::u16string_view& value)
+{
+    auto count = 0;
+    auto position_opening_symbol = std::u16string::npos;
+    for (auto index = 0; index < value.size(); ++index) {
+        switch (value[index]) {
+        case u'{': {
+            if (position_opening_symbol == std::u16string::npos) {
+                position_opening_symbol = index;
+            }
+            count += 1;
+            break;
+        }
+        case u'}': {
+            if (position_opening_symbol != std::u16string::npos) {
+                count -= 1;
+                if (count == 0) {
+                    return parse_json_object(value.substr(position_opening_symbol + 1, index - position_opening_symbol - 1));
+                }
+            }
+            break;
+        }
+        default:;
+        }
+    }
+    return nullptr;
+}
+
+void JsonReader::read(const std::u16string_view& json, int& ref)
+{
+    ref = json_to_int(json);
+}
+
 void JsonReader::read(const std::u16string_view& json, float& ref)
 {
     ref = json_to_float(json);
@@ -176,14 +287,12 @@ void JsonReader::read(const std::u16string_view& json, float& ref)
 
 void JsonReader::read(const std::u16string_view& json, atlas_tile_t& ref)
 {
-    const auto s = read_json_pair(json);
+    const auto s = read_json_array(json);
     auto& texture = ref.texture;
-    Logger::instance().info("pair size: {} {}", s->size(),utf16_to_cp1251(std::u16string(json)));
     read((*s)[0], texture.x);
     read((*s)[1], texture.y);
     read((*s)[2], texture.w);
     read((*s)[3], texture.h);
-    Logger::instance().info("floooooaaat: {}", texture.h);
     delete s;
 }
 

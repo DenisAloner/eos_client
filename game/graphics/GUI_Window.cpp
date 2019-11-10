@@ -5,16 +5,16 @@
 GUI_Header::GUI_Header(int x, int y, int width, int height, const std::u16string& text)
     : GUI_Container(x, y, width, height)
 {
-	const auto m_text = new GUI_Text(text);
+    const auto m_text = new GUI_Text(text);
     m_text->m_position.x = 18;
     m_text->m_position.y = 6;
     m_size.h = m_text->m_size.h + m_text->m_position.y + 2;
     GUI_Layer::add(m_text);
     auto m_button = new GUI_ItemButton();
-    m_button->m_position.x = m_size.w - (m_size.h - 8) - 4;
-    m_button->m_position.y = 4;
-    m_button->m_size.w = m_size.h - 8;
-    m_button->m_size.h = m_size.h - 8;
+    m_button->m_position.x = m_size.w - m_size.h;
+    m_button->m_position.y = 0;
+    m_button->m_size.w = m_size.h;
+    m_button->m_size.h = m_size.h;
     GUI_Layer::add_front(m_button);
     m_button->mouse_click += std::bind(&GUI_Header::on_close_button_click, this);
 }
@@ -32,16 +32,17 @@ void GUI_Header::resize(int width, int height)
 {
     m_size.w = width;
     m_size.h = m_items.back()->m_size.h + m_items.back()->m_position.y + 2;
-    m_items.front()->m_position.x = m_size.w - (m_size.h - 8) - 4;
-    m_items.front()->m_position.y = 4;
-    m_items.front()->m_size.w = m_size.h - 8;
-    m_items.front()->m_size.h = m_size.h - 8;
+    m_items.front()->m_position.x = m_size.w - m_size.h;
+    m_items.front()->m_position.y = 0;
+    m_items.front()->m_size.w = m_size.h;
+    m_items.front()->m_size.h = m_size.h;
 }
 
-GUI_Window::GUI_Window(int x, int y, int width, int height, const std::u16string& name)
+GUI_Window::GUI_Window(int x, int y, int width, int height, const std::u16string& name, gui_style_t& style)
     : GUI_Container(x, y, width, height)
+    , m_style(style)
 {
-    m_header = new GUI_Header(2, 2, m_size.w - 4, 0, name);
+    m_header = new GUI_Header(0, 0, m_size.w , 32, name);
     m_header->close += std::bind(&GUI_Window::on_header_close, this);
     GUI_Layer::add(m_header);
     close += std::bind(&GUI_Window::on_close, this, std::placeholders::_1);
@@ -56,57 +57,19 @@ rectangle_t<int> GUI_Window::client_rect()
 void GUI_Window::render(GraphicalController* graph, int px, int py)
 {
     if (graph->add_scissor(px, py, m_size.w, m_size.h)) {
-        auto& background = graph->atlas_tiles[u"background"];
-        for (int y = 0; y < m_size.h; y += 280) {
-            for (int x = 0; x < m_size.w; x += 280) {
-               auto& tile =  graph->get_gui_quad(px + x, py + y, 280, 280, background);
-                tile.vertex[0].color[3] = 0.5f;
-                tile.vertex[1].color[3] = 0.5f;
-                tile.vertex[2].color[3] = 0.5f;
-                tile.vertex[3].color[3] = 0.5f;
-            }
+        graph->render_background(px, py, m_size.w, m_size.h, m_style);
+        for (auto& current : m_items) {
+            if (current == m_header) continue;
+            current->render(graph, px + current->m_position.x + m_scroll.x, py + current->m_position.y + m_scroll.y);
         }
-
-        for (auto current : m_items) {
-            (current)->render(graph, px + current->m_position.x + m_scroll.x, py + current->m_position.y + m_scroll.y);
-        }
-
-        auto& border_tile = graph->atlas_tiles[u"border"];
-        if (graph->add_scissor(px + 32, py, m_size.w - 64, m_size.h)) {
-            for (int i = px + 32; i < px + m_size.w - 32; i += 64) {
-                graph->get_gui_quad(i, py, 64, 12, border_tile);
-                graph->get_gui_quad(i, py + m_size.h - 12, 64, 12, border_tile, tile_options_e::FLIP_Y);
-
-            	graph->get_gui_quad(i, py + 36, 64, 12, border_tile, tile_options_e::FLIP_Y);
-                
-            }
-            graph->remove_scissor();
-        }
-        auto& border_vertical_tile = graph->atlas_tiles[u"border_vertical"];
-        if (graph->add_scissor(px, py + 32, m_size.w, m_size.h - 64)) {
-            for (int i = py + 32; i < py + m_size.h - 32; i += 64) {
-                graph->get_gui_quad(px, i, 12, 64, border_vertical_tile);
-                graph->get_gui_quad(px + m_size.w - 12, i, 12, 64, border_vertical_tile, tile_options_e::FLIP_X);
-            }
-            graph->remove_scissor();
-        }
-
-        auto& corner_tile = graph->atlas_tiles[u"corner"];
-        graph->get_gui_quad(px, py + m_size.h - 32, 32, 32, corner_tile);
-        graph->get_gui_quad(px + m_size.w - 32, py + m_size.h - 32, 32, 32, corner_tile, tile_options_e::FLIP_X);
-
-        graph->get_gui_quad(px, py + 16, 32, 32, corner_tile);
-        graph->get_gui_quad(px + m_size.w - 32, py + 16, 32, 32, corner_tile, tile_options_e::FLIP_X);
-
-        graph->get_gui_quad(px, py, 32, 32, corner_tile, tile_options_e::FLIP_Y);
-        graph->get_gui_quad(px + m_size.w - 32, py, 32, 32, corner_tile, tile_options_e::FLIP_X | tile_options_e::FLIP_Y);
-
+        graph->render_border(px, py, m_size.w, m_size.h, m_style);
+        m_header->render(graph, px + m_header->m_position.x + m_scroll.x, py + m_header->m_position.y + m_scroll.y);
         graph->remove_scissor();
     }
 }
 
-GUI_body_window::GUI_body_window(int x, int y, int width, int height, const std::u16string& name, GameObject*& object)
-    : GUI_Window(x, y, width, height, name)
+GUI_body_window::GUI_body_window(int x, int y, int width, int height, const std::u16string& name, gui_style_t& style, GameObject*& object)
+    : GUI_Window(x, y, width, height, name, style)
     , m_object(object)
 {
     m_item = new GUI_Body(m_object->m_active_state);

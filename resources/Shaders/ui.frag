@@ -7,6 +7,4 @@ in vec4 fragmentColor;
 
 out vec4 fragColor;
 
-void main (void) {
- fragColor = texture(atlas,fragmentTexture)*fragmentColor;
-}
+void main(void) { fragColor = texture(atlas, fragmentTexture) * fragmentColor; }

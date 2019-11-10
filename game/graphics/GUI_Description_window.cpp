@@ -592,8 +592,8 @@ void GUI_TreeView::render(GraphicalController* graph, int px, int py)
     }*/
 }
 
-GUI_Description_window::GUI_Description_window(int x, int y, int width, int height, std::u16string name, GameObject*& object)
-    : GUI_Window(x, y, width, height, std::move(name))
+GUI_Description_window::GUI_Description_window(int x, int y, int width, int height, std::u16string name,gui_style_t& style, GameObject*& object)
+    : GUI_Window(x, y, width, height, std::move(name),style)
     , m_object(object)
 {
     m_textbox = new GUI_TreeView(0, 0, 0, 0, object);

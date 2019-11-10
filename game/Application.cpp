@@ -227,7 +227,8 @@ void Application::initialize(const dimension_t<int> work_area_size, const HDC m_
     m_gui_controller.m_GUI->add(m_window_manager);
     m_gui_controller.m_GUI->add(new GuiImage((m_size.w - 1024) / 2, (m_size.h - 1024) / 2, 1024, 1024, m_graph->m_logo));
 
-    auto main_menu = new GUI_Window(0, 0, 400, 400, utf8_to_utf16(u8"Главное меню"s));
+	auto& style=m_graph->gui_styles[u"default"];
+    auto main_menu = new GUI_Window(0, 0, 400, 400, utf8_to_utf16(u8"Главное меню"s), style);
     main_menu->m_position = position_t<int>((m_size.w - main_menu->m_size.w) / 2, (m_size.h - main_menu->m_size.h) / 2);
     auto menu = new GUI_Button_list(0, 0, 400, 400);
     auto button = new GUI_Mainmenu_button(0, 0, 396, 47, u"Новая игра", parameter_type_e::new_game);
@@ -363,13 +364,14 @@ void Application::new_game()
 	LOG(INFO) << json;*/
 
     m_gui_controller.m_GUI = new ApplicationGUI(0, 0, m_size.w, m_size.h, m_world->m_player, map, m_action_manager, m_game_log);
-
-    auto MiniMap = new GUI_Window(0, 0, 400, 400, u"Мини-карта");
+    auto& style = m_graph->gui_styles[u"default"];
+	
+    auto MiniMap = new GUI_Window(0, 0, 400, 400, u"Мини-карта",style);
     auto cr = MiniMap->client_rect();
     auto* mini_map = new GUI_MiniMap(position_t<int>(0, 0), dimension_t<int>(cr.w, cr.h), m_gui_controller.m_GUI->map_viewer);
     MiniMap->add(mini_map);
 
-    MiniMap = new GUI_Window(300, 0, 400, 400, u"Поле зрения player");
+    MiniMap = new GUI_Window(300, 0, 400, 400, u"Поле зрения player",style);
     cr = MiniMap->client_rect();
     const auto fov = new GUI_FOV(position_t<int>(0, 0), dimension_t<int>(cr.w, cr.h), m_world->m_player->m_object);
     MiniMap->add(fov);
@@ -762,7 +764,7 @@ bool Application::command_open_body(GameObject*& Object)
     auto result = false;
     const auto property = static_cast<Parts_list*>(Object->get_effect(interaction_e::body));
     if (property != nullptr) {
-        auto window = new GUI_body_window(m_size.w / 2 - (192 + 2) / 2, m_size.h / 2 - (4 * 64 + 2) / 2, 192 + 4, 4 * 64 + 27, Object->m_name + u"::body", Object);
+        auto window = new GUI_body_window(m_size.w / 2 - (192 + 2) / 2, m_size.h / 2 - (4 * 64 + 2) / 2, 192 + 4, 4 * 64 + 27, Object->m_name + u"::body",m_graph->gui_styles[u"default"], Object);
         /*GUI_Body* Inv = new GUI_Body(static_cast<Interaction_feature*>(Object->get_feature(object_feature_e::interaction_feature)));
 		Inv->m_position.x = 2;
 		Inv->m_position.y = Window->m_size.h - Inv->m_size.h - 2;
@@ -775,7 +777,7 @@ bool Application::command_open_body(GameObject*& Object)
 
 void Application::command_gui_show_characterization(GameObject*& object)
 {
-    auto window = new GUI_Description_window(m_size.w / 2 - (192 + 2) / 2, m_size.h / 2 - (4 * 64 + 2) / 2, 800 + 4, 8 * 64 + 27, object->m_name + u"::Характеристика", object);
+    auto window = new GUI_Description_window(m_size.w / 2 - (192 + 2) / 2, m_size.h / 2 - (4 * 64 + 2) / 2, 800 + 4, 8 * 64 + 27, object->m_name + u"::Характеристика",m_graph->gui_styles[u"default"], object);
     //m_GUI->add_front(Window);
 }
 

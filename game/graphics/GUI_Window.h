@@ -4,6 +4,7 @@
 #include "GUI_Container.h"
 #include "GUI_Item.h"
 #include <list>
+#include <gui_style.h>
 
 class GUI_Header : public GUI_Container {
 public:
@@ -17,9 +18,12 @@ public:
 
 class GUI_Window : public GUI_Container {
 public:
+
+	gui_style_t& m_style;
+	
     Event<GUI_Object*> close;
 
-    GUI_Window(int x, int y, int width, int height, const std::u16string& name);
+    GUI_Window(int x, int y, int width, int height, const std::u16string& name, gui_style_t& style);
     ~GUI_Window();
 
     position_t<int> m_initial_position;
@@ -46,7 +50,7 @@ class GUI_body_window : public GUI_Window {
 public:
     GameObject* m_object;
     GUI_Body* m_item;
-    GUI_body_window(int x, int y, int width, int height, const std::u16string& name, GameObject*& object);
+    GUI_body_window(int x, int y, int width, int height, const std::u16string& name, gui_style_t& style, GameObject*& object);
     std::list<std::u16string> m_text;
     void update_info();
 };
