@@ -1,4 +1,4 @@
-#include "GuiImage.h"
+#include "gui_image.h"
 
 GuiImage::GuiImage(const int x, const int y, const int width, const int height, const GLuint texture)
 {

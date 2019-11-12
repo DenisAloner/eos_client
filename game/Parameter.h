@@ -90,20 +90,4 @@ private:
     };
 };
 
-//class Parameter_MoveObjectByUnit : public Parameter
-//{
-//public:
-//	GameObject* m_unit;
-//	GameObject* m_object;
-//	MapCell* m_place;
-//	GameMap* m_map;
-//Packer_generic& get_packer()
-//	Parameter_MoveObjectByUnit(void);
-//	~Parameter_MoveObjectByUnit(void);
-//
-//	virtual void reset_serialization_index();
-//	virtual void save();
-//	virtual void load();
-//};
-
 #endif //PARAMETER_H

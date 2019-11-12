@@ -11,13 +11,13 @@
 class GameObject;
 class Application;
 
-template <typename _val>
+template <typename T>
 class GUI_PopMenu : public GUI_Container {
 public:
     class Item : public GUI_Object {
     public:
         std::u16string m_text;
-        _val m_object;
+        T m_object;
 
         GUI_PopMenu* m_owner;
 
@@ -62,7 +62,7 @@ public:
     }
     ~GUI_PopMenu();
 
-    virtual void add_item(std::u16string text, _val tag)
+    virtual void add_item(std::u16string text, T tag)
     {
         Item* object = new Item();
         object->m_text = text;

@@ -41,7 +41,7 @@ void TileManager_Single_Atlas::set_tile(tile_t& tile, GameObject* obj, int frame
 	tile.coordinates[3] = (m_frame.y + m_frame.h) / 264.0;*/
 }
 
-void TileManager_Single_Atlas::set_tile(quad_t& quad, GameObject* obj, int pos, const object_direction_e& direction)
+void TileManager_Single_Atlas::set_tile(vao_quad_t<vertex_t>& quad, GameObject* obj, int pos, const object_direction_e& direction)
 {
     const auto x1 = m_frame.x / 950.0;
     const auto y1 = m_frame.y / 352.0;
@@ -84,7 +84,7 @@ void TileManager_Atlas_Rotatable::set_tile(tile_t& tile, GameObject* obj, int fr
 {
 }
 
-void TileManager_Atlas_Rotatable::set_tile(quad_t& quad, GameObject* obj, int pos,
+void TileManager_Atlas_Rotatable::set_tile(vao_quad_t<vertex_t>& quad, GameObject* obj, int pos,
     const object_direction_e& direction)
 {
     const GLdouble x1 = (m_frame.x + pos * 38) / 950.0;
@@ -139,7 +139,7 @@ void TileManager::set_tile(tile_t& tile, GameObject* obj, int frame, const objec
     tile.coordinates[3] = 0.0;
 }
 
-void TileManager::set_tile(quad_t& quad, GameObject* obj, int pos, const object_direction_e& direction)
+void TileManager::set_tile(vao_quad_t<vertex_t>& quad, GameObject* obj, int pos, const object_direction_e& direction)
 {
 }
 

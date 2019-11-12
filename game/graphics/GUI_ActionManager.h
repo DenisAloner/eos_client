@@ -2,8 +2,8 @@
 #define GUI_ACTIONMANAGER_H
 
 #include "ActionManager.h"
-#include "GUI_Container.h"
 #include "GUI_Item.h"
+#include "gui_scrollable_container.h"
 
 class Application;
 class ActionManager;

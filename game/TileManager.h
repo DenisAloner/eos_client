@@ -4,6 +4,7 @@
 #include "graphics/gl.hpp"
 #include <string>
 #include "Definiton.h"
+#include "vao.h"
 
 class TileManager : public iSerializable, public InstanceDictionaryElement {
 public:
@@ -18,7 +19,7 @@ public:
 
     virtual void set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction);
     virtual int get_tile_index(const object_direction_e& direction, const int& frame) = 0;
-    virtual void set_tile(quad_t& quad, GameObject* obj, int pos, const object_direction_e& direction);
+    virtual void set_tile(vao_quad_t<vertex_t>& quad, GameObject* obj, int pos, const object_direction_e& direction);
 
     //Packer_generic& get_packer() override
     //{
@@ -43,7 +44,7 @@ public:
     //bool init(const std::string& filename, object_direction_e direction, int frame) override;
     int get_tile_index(const object_direction_e& direction, const int& frame) override;
     void set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction) override;
-    void set_tile(quad_t& quad, GameObject* obj, int pos, const object_direction_e& direction) override;
+    void set_tile(vao_quad_t<vertex_t>& quad, GameObject* obj, int pos, const object_direction_e& direction) override;
 
     iPacker& get_packer() override;
 
@@ -62,7 +63,7 @@ public:
     //bool init(const std::string& filename, object_direction_e direction, int frame) override;
     int get_tile_index(const object_direction_e& direction, const int& frame) override;
     void set_tile(tile_t& tile, GameObject* obj, int frame, const object_direction_e& direction) override;
-    void set_tile(quad_t& quad, GameObject* obj, int pos, const object_direction_e& direction) override;
+    void set_tile(vao_quad_t<vertex_t>& quad, GameObject* obj, int pos, const object_direction_e& direction) override;
 
     iPacker& get_packer() override;
 

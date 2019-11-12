@@ -15,43 +15,6 @@
 using namespace std::string_literals;
 using namespace gl;
 
-struct vertex_t {
-    GLint position[2] {};
-    GLfloat texture_coordinates[3] {};
-    GLfloat light[3] {};
-
-    /*inline const static void* position_offset = reinterpret_cast<void*>(offsetof(vertex_t, position));
-    inline const static void* texture_coordinates_offset = reinterpret_cast<void*>(offsetof(vertex_t, texture_coordinates));
-    inline const static void* light_offset = reinterpret_cast<void*>(offsetof(vertex_t, light));*/
-};
-
-const auto position_offset = reinterpret_cast<const void*>(offsetof(vertex_t, position));
-const auto texture_coordinates_offset = reinterpret_cast<const void*>(offsetof(vertex_t, texture_coordinates));
-const auto light_offset = reinterpret_cast<const void*>(offsetof(vertex_t, light));
-
-struct gui_vertex_t {
-    GLfloat position[2] {};
-    GLfloat texture[3] {};
-    GLfloat color[4] {};
-    GLfloat clip[4] {};
-};
-
-const auto gui_position_offset = reinterpret_cast<void*>(offsetof(gui_vertex_t, position));
-const auto gui_texture_offset = reinterpret_cast<void*>(offsetof(gui_vertex_t, texture));
-const auto gui_color_offset = reinterpret_cast<void*>(offsetof(gui_vertex_t, color));
-const auto gui_clip_offset = reinterpret_cast<void*>(offsetof(gui_vertex_t, clip));
-
-
-
-template <typename T>
-struct vao_quad_t {
-    T vertex[4];
-};
-
-struct quad_t : vao_quad_t <vertex_t> {
-};
-
-
 const float Pi = 3.14159265F;
 const float cos22_5 = cos(22.5F * Pi / 180.0F);
 const float cos67_5 = cos(67.5F * Pi / 180.0F);

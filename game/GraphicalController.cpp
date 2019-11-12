@@ -287,6 +287,7 @@ void GuiAtlasReader::read(const std::u16string_view& json, std::unordered_map<st
                 read((*p)[j], k);
                 auto& v = ref[k];
                 read((*p)[j + 1], v);
+                v.texture.y = height - v.texture.bottom();
                 v.layer = image_index / 2 + 2;
             }
             delete p;
@@ -308,10 +309,16 @@ void GuiAtlasReader::read(const std::u16string_view& json, gui_style_t& ref)
         read(prop[u"border_y"sv], border_y);
         std::u16string corner;
         read(prop[u"corner"sv], corner);
+        std::u16string scroll_y_head;
+        read(prop[u"scroll_y_head"sv], scroll_y_head);
+        std::u16string scroll_y_body;
+        read(prop[u"scroll_y_body"sv], scroll_y_body);
         ref.background_tile = &graph_.atlas_tiles[background];
         ref.border_x_tile = &graph_.atlas_tiles[border_x];
         ref.border_y_tile = &graph_.atlas_tiles[border_y];
         ref.corner_tile = &graph_.atlas_tiles[corner];
+        ref.scroll_y_head_tile = &graph_.atlas_tiles[scroll_y_head];
+        ref.scroll_y_body_tile = &graph_.atlas_tiles[scroll_y_body];
         delete properties;
     }
 }
@@ -430,7 +437,19 @@ GraphicalController::GraphicalController(const dimension_t<int> size)
 
         glGenVertexArrays(1, &m_gui_vao);
         glGenBuffers(1, &m_gui_vertex_buffer);
-
+    	glBindVertexArray(m_gui_vao);
+        glBindBuffer(GL_ARRAY_BUFFER, m_gui_vertex_buffer);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vao_quad_t<gui_vertex_t>) * m_gui_quads.size(), nullptr, GL_DYNAMIC_DRAW);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(gui_vertex_t), gui_position_offset);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(gui_vertex_t), gui_texture_offset);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(gui_vertex_t), gui_color_offset);
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(gui_vertex_t), gui_clip_offset);
+        glEnableVertexAttribArray(3);
+        glBindVertexArray(0);
+    	
     } catch (std::logic_error& e) {
         Logger::instance().critical("Ошибка при загрузке ресурсов: {}", e.what());
     }
@@ -672,22 +691,20 @@ void GraphicalController::render_gui()
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, m_gui_atlas);
     set_uniform_sampler(m_ui_shader, "atlas", 0);
-    glBindVertexArray(m_gui_vao);
+
+	glBindVertexArray(m_gui_vao);
     glBindBuffer(GL_ARRAY_BUFFER, m_gui_vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vao_quad_t<gui_vertex_t>) * quads_count_to_render, &m_gui_quads[0], GL_DYNAMIC_DRAW);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(gui_vertex_t), gui_position_offset);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(gui_vertex_t), gui_texture_offset);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(gui_vertex_t), gui_color_offset);
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(gui_vertex_t), gui_clip_offset);
-    glEnableVertexAttribArray(3);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vao_quad_t<gui_vertex_t>) * quads_count_to_render, &m_gui_quads[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDrawArrays(GL_QUADS, 0, 4 * quads_count_to_render);
-    glDisableVertexAttribArray(0);
-    glDisableVertexAttribArray(1);
-    glDisableVertexAttribArray(2);
     glBindVertexArray(0);
+
+	
+
+  /*  glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(2);*/
+
 }
 
 bool GraphicalController::set_uniform_vector(const GLuint program, const char* name, const float* value)

@@ -1,12 +1,38 @@
 {
     "tiles": [
         "gui", [
-            "background", [0, 127, 280, 280],
-            "corner", [0, 63, 64, 64],
-            "close", [32, 32, 32, 32],
-            "border_x", [64, 115, 127, 12],
-            "border_y", [191, 0, 12, 127],
-            "box_button", [0, 31, 32, 32]
+            "background", {
+                "x": 0,
+                "y": 0,
+                "w": 280,
+                "h": 280
+            },
+            "corner", {
+                "x": 0,
+                "y": 280,
+                "w": 64,
+                "h": 64
+            },
+            "border_x", {
+                "x": 0,
+                "y": 344,
+                "w": 127,
+                "h": 12
+            },
+            "border_y", {
+                "x": 127,
+                "y": 280,
+                "w": 12,
+                "h": 127
+            },
+            "box_button", {
+                "x": 64,
+                "y": 280,
+                "w": 32,
+                "h": 32
+            },
+            "scroll_y_head",  {"x":96,"y":280,"w":28,"h":48},
+            "scroll_y_body", {"x":0,"y":356,"w":28,"h":127}
         ]
     ],
     "styles": [
@@ -14,7 +40,9 @@
             "background": "background",
             "corner": "corner",
             "border_x": "border_x",
-            "border_y": "border_y"
+            "border_y": "border_y",
+            "scroll_y_head": "scroll_y_head",
+            "scroll_y_body": "scroll_y_body"
         }
     ]
 }

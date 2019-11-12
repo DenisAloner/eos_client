@@ -9,6 +9,8 @@ struct gui_style_t {
     atlas_tile_t* border_x_tile;
     atlas_tile_t* border_y_tile;
     atlas_tile_t* corner_tile;
+    atlas_tile_t* scroll_y_head_tile;
+    atlas_tile_t* scroll_y_body_tile;
 	
     gui_style_t() = default;
 	

@@ -1,10 +1,10 @@
 #ifndef GUI_INVENTORY_H
 #define GUI_INVENTORY_H
 
-#include "GUI_Container.h"
 #include "GameObject.h"
 #include "Visitors.h"
 #include <list>
+#include "gui_scrollable_container.h"
 
 class Property_Container;
 class Parts_list;

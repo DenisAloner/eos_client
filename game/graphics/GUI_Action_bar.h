@@ -2,7 +2,7 @@
 #define GUI_ACTION_BAR_H
 
 #include "GUI_ActionButton.h"
-#include "GUI_Container.h"
+#include "gui_scrollable_container.h"
 
 class GUI_Action_bar : public GUI_Scrollable_container {
 public:

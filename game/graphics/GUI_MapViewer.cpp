@@ -841,6 +841,23 @@ void GUI_MapViewer::render(GraphicalController* graph, int px, int py)
         Logger::instance().info("Current context: " + (wglGetCurrentContext() == nullptr ? "null"s : "okay"s));
         glGenVertexArrays(1, &m_vao);
         glGenBuffers(1, &m_vertex_buffer);
+
+		glBindVertexArray(m_vao);
+        glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vao_quad_t<vertex_t>) * m_quads.size(),nullptr, GL_DYNAMIC_DRAW);
+        glVertexAttribPointer(0, 2, GL_INT, GL_FALSE, sizeof(vertex_t), position_offset);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), texture_coordinates_offset);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), light_offset);
+        glEnableVertexAttribArray(2);
+       /* glDrawArrays(GL_QUADS, 0, 4 * count);*/
+        //glDisableVertexAttribArray(0);
+        //glDisableVertexAttribArray(1);
+        //glDisableVertexAttribArray(2);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+    	
         Logger::instance().info(position_offset);
         Logger::instance().info(texture_coordinates_offset);
         Logger::instance().info(light_offset);
@@ -1369,14 +1386,23 @@ void GUI_MapViewer::render(GraphicalController* graph, int px, int py)
         m_max_count = count;
         Logger::instance().info("m_max_count : " + std::to_string(m_max_count));
     }
+	
     glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
     glUseProgram(graph->m_atlas_shader);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, graph->m_atlas);
     graph->set_uniform_sampler(graph->m_atlas_shader, "atlas", 0);
-    glBindVertexArray(m_vao);
+
+	glBindVertexArray(m_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vao_quad_t<vertex_t>) * count, &m_quads[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glDrawArrays(GL_QUADS, 0, 4 * count);
+    glBindVertexArray(0);
+	
+  /*  glBindVertexArray(m_vao);
     glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quad_t) * count, &m_quads[0], GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vao_quad_t<vertex_t>) * count, &m_quads[0], GL_DYNAMIC_DRAW);
     glVertexAttribPointer(0, 2, GL_INT, GL_FALSE, sizeof(vertex_t), position_offset);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), texture_coordinates_offset);
@@ -1387,7 +1413,9 @@ void GUI_MapViewer::render(GraphicalController* graph, int px, int py)
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(2);
-    glBindVertexArray(0);
+    glBindVertexArray(0);*/
+
+	
     /*Application::instance().m_UI_mutex.lock();
 	if (r == 0)
 	{

@@ -1,4 +1,5 @@
 #include <reader.h>
+using namespace std::literals::string_view_literals;
 
 int json_to_int(const std::u16string_view& value)
 {
@@ -287,13 +288,15 @@ void JsonReader::read(const std::u16string_view& json, float& ref)
 
 void JsonReader::read(const std::u16string_view& json, atlas_tile_t& ref)
 {
-    const auto s = read_json_array(json);
-    auto& texture = ref.texture;
-    read((*s)[0], texture.x);
-    read((*s)[1], texture.y);
-    read((*s)[2], texture.w);
-    read((*s)[3], texture.h);
-    delete s;
+    const auto properties = read_json_object(json);
+    if (properties) {
+        auto& prop = *properties;
+        read(prop[u"x"sv], ref.texture.x);
+        read(prop[u"y"sv], ref.texture.y);
+        read(prop[u"w"sv], ref.texture.w);
+        read(prop[u"h"sv], ref.texture.h);
+        delete properties;
+    }
 }
 
 void JsonReader::read(const std::u16string_view& json, std::u16string& ref)

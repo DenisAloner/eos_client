@@ -58,7 +58,7 @@ public:
     position_t<int> m_initial_position;
     int m_rotate;
 
-    std::vector<quad_t> m_quads;
+    std::vector<vao_quad_t<vertex_t>> m_quads;
 
     int m_max_count;
 

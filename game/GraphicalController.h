@@ -13,6 +13,7 @@
 #include <vector>
 #include "reader.h"
 #include "gui_style.h"
+#include "vao.h"
 
 enum class tile_options_e : unsigned char {
 	NONE = 0,

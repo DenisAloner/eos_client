@@ -2,8 +2,7 @@
 #define GUI_TEXTBOX_H
 
 #include "Definiton.h"
-#include "GUI_Container.h"
-#include "GUI_Text.h"
+#include "gui_scrollable_container.h"
 #include "game/Game_log.h"
 
 class GUI_TextBox : public GUI_Scrollable_container {
@@ -16,7 +15,7 @@ public:
     std::vector<GUI_TextFormat> m_styles;
 
     Game_log& m_log;
-    GUI_game_console(Game_log& log);
+    explicit GUI_game_console(Game_log& log);
 
     virtual void on_log_add_item(game_log_message_t& e);
 };

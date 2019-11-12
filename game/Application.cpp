@@ -7,7 +7,7 @@
 #include "game/MouseController.h"
 #include "graphics/GUI_MapViewer.h"
 #include "graphics/GUI_Window.h"
-#include "graphics/GuiImage.h"
+#include "graphics/gui_image.h"
 #include <algorithm>
 #include <chrono>
 #include <fstream>
