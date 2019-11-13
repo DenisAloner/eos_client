@@ -54,12 +54,13 @@ void Visitor_object_description_getter::visit(Object_state& value)
 {
     handle_complex(u"Характеристики: ");
     Tree<std::u16string>* item = nullptr;
-    for (auto current = value.m_items.begin(); current != value.m_items.end(); ++current) {
-        current->second->apply_visitor(*this);
+    for (auto& m_item : value.m_items)
+    {
+	    m_item.second->apply_visitor(*this);
         auto& node = m_active.front()->m_nodes;
         if (!node.empty() && item != &node.back()) {
             item = &node.back();
-            node.back().m_value = Dictionaries::m_string_interaction_e[current->first] + u": " + node.back().m_value;
+            node.back().m_value = Dictionaries::m_string_interaction_e[m_item.first] + u": " + node.back().m_value;
         }
     }
     m_active.pop_front();
@@ -98,12 +99,13 @@ void Visitor_object_description_getter::visit(Attribute_map& value)
 {
     handle_complex(u"Характеристики: ");
     Tree<std::u16string>* item = nullptr;
-    for (auto current = value.m_items.begin(); current != value.m_items.end(); ++current) {
-        current->second->apply_visitor(*this);
+    for (auto& m_item : value.m_items)
+    {
+	    m_item.second->apply_visitor(*this);
         auto& node = m_active.front()->m_nodes;
         if (!node.empty() && item != &node.back()) {
             item = &node.back();
-            node.back().m_value = Dictionaries::m_string_interaction_e[current->first] + u": " + node.back().m_value;
+            node.back().m_value = Dictionaries::m_string_interaction_e[m_item.first] + u": " + node.back().m_value;
         }
     }
     m_active.pop_front();
@@ -420,10 +422,10 @@ void GUI_TreeView::on_mouse_click(MouseEventArgs const& e)
         if ((*current)->check_region(local_mouse_event_args)) {
             (*current)->mouse_click(local_mouse_event_args);
             {
-                const auto temp = static_cast<GUI_TreeElement*>(*current);
+                const auto temp = dynamic_cast<GUI_TreeElement*>(*current);
                 if (temp->m_kind == GUI_TreeElement::kind_e::node) {
                     temp->m_hide = !temp->m_hide;
-                    static_cast<GUI_TreeElement*>(*m_items.begin())->m_element_position = GUI_TreeElement::element_position_e::single;
+                    dynamic_cast<GUI_TreeElement*>(*m_items.begin())->m_element_position = GUI_TreeElement::element_position_e::single;
                     change_node();
                     update();
                     m_scrollbar.content_update();
@@ -447,7 +449,7 @@ void GUI_TreeView::update_info()
     }
     add_tree(*info.m_value, 0, nullptr);
     bind_tree(*info.m_value, m_items.begin());
-    static_cast<GUI_TreeElement*>(*m_items.begin())->m_element_position = GUI_TreeElement::element_position_e::single;
+    dynamic_cast<GUI_TreeElement*>(*m_items.begin())->m_element_position = GUI_TreeElement::element_position_e::single;
     change_node();
     update();
     m_scrollbar.content_update();
@@ -464,11 +466,11 @@ void GUI_TreeView::update()
     start_render = m_items.begin();
     end_render = m_items.end();
     for (auto i = m_items.begin(); i != m_items.end(); ++i) {
-        auto temp = static_cast<GUI_TreeElement*>(*i);
+        auto temp = dynamic_cast<GUI_TreeElement*>(*i);
         if (temp->m_position.y + temp->m_size.h + m_scroll.y + 2 > 0) {
             start_render = i;
             for (auto j = i; j != m_items.end(); ++j) {
-                temp = static_cast<GUI_TreeElement*>(*j);
+                temp = dynamic_cast<GUI_TreeElement*>(*j);
                 if (temp->m_position.y + temp->m_size.h + 2 + m_scroll.y > m_size.h) {
                     if (temp->m_hide) {
                         end_render = temp->m_next;
@@ -498,11 +500,9 @@ void GUI_TreeView::update()
 
 void GUI_TreeView::change_node()
 {
-    GUI_TreeElement* current = nullptr;
-    GUI_TreeElement* previous = nullptr;
-    auto y = 2;
+	auto y = 2;
     for (auto i = m_items.begin(); i != m_items.end(); ++i) {
-        current = static_cast<GUI_TreeElement*>(*i);
+	    const auto current = dynamic_cast<GUI_TreeElement*>(*i);
         current->m_position.y = y;
         y += current->m_size.h + 2;
         if (current->m_hide) {
@@ -527,19 +527,20 @@ void GUI_TreeView::add_tree(Tree<std::u16string>& value, int level, GUI_TreeElem
         result->m_kind = GUI_TreeElement::kind_e::element;
     } else {
         result->m_kind = GUI_TreeElement::kind_e::node;
-        for (auto item = value.m_nodes.begin(); item != value.m_nodes.end(); ++item) {
-            add_tree(*item, level + 1, result);
+        for (auto& m_node : value.m_nodes)
+        {
+            add_tree(m_node, level + 1, result);
         }
     }
 }
 
 void GUI_TreeView::bind_tree(Tree<std::u16string>& value, std::list<GUI_Object*>::iterator& pos)
 {
-    auto result = static_cast<GUI_TreeElement*>(*pos);
+    auto result = dynamic_cast<GUI_TreeElement*>(*pos);
     ++pos;
     if (!value.m_nodes.empty()) {
         for (auto item = value.m_nodes.begin(); item != value.m_nodes.end(); ++item) {
-            auto temp = static_cast<GUI_TreeElement*>(*pos);
+            auto temp = dynamic_cast<GUI_TreeElement*>(*pos);
             if (item == value.m_nodes.begin()) {
                 if (value.m_nodes.size() == 1) {
                     temp->m_element_position = GUI_TreeElement::element_position_e::single;
@@ -559,17 +560,10 @@ void GUI_TreeView::bind_tree(Tree<std::u16string>& value, std::list<GUI_Object*>
 
 void GUI_TreeView::render(GraphicalController* graph, int px, int py)
 {
-   /* glEnable(GL_SCISSOR_TEST);
-    if (graph->add_scissor(rectangle_t<float>(float(px), float(py), float(m_size.w), float(m_size.h)))) {
-        glEnable(GL_BLEND);
-        glDisable(GL_TEXTURE_2D);
-        glColor4d(0.0, 0.0, 0.0, 0.5);
-        const rectangle_t<int> rect(px, py, m_size.w, m_size.h);
-        graph->draw_sprite(rect);
-        glEnable(GL_TEXTURE_2D);
-        glColor4d(1.0, 1.0, 1.0, 1.0);
+
+    if (graph->add_scissor(px, py, m_size.w, m_size.h)) {
         for (auto i = start_render; i != end_render; ++i) {
-            auto temp = static_cast<GUI_TreeElement*>(*i);
+            auto temp = dynamic_cast<GUI_TreeElement*>(*i);
             const auto element_px = px + temp->m_position.x + m_scroll.x;
             const auto element_py = py + temp->m_position.y + m_scroll.y;
             temp->render(graph, element_px, element_py);
@@ -583,17 +577,11 @@ void GUI_TreeView::render(GraphicalController* graph, int px, int py)
         }
         m_scrollbar.render(graph, px + m_scrollbar.m_position.x, py + m_scrollbar.m_position.y);
         graph->remove_scissor();
-        if (m_border_visible) {
-            glDisable(GL_BLEND);
-            glDisable(GL_TEXTURE_2D);
-            glColor4f(1.0, 1.0, 1.0, 1.0);
-            graph->draw_rectangle(rectangle_t<int>(px, py, m_size.w, m_size.h));
-        }
-    }*/
+    }
 }
 
-GUI_Description_window::GUI_Description_window(int x, int y, int width, int height, std::u16string name,gui_style_t& style, GameObject*& object)
-    : GUI_Window(x, y, width, height, std::move(name),style)
+GUI_Description_window::GUI_Description_window(int x, int y, int width, int height, const std::u16string& name,gui_style_t& style, GameObject*& object)
+    : GUI_Window(x, y, width, height, name,style)
     , m_object(object)
 {
     m_textbox = new GUI_TreeView(0, 0, 0, 0, object);

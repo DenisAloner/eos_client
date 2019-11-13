@@ -548,6 +548,9 @@ atlas_symbol_t& GraphicalController::get_symbol(const char16_t value)
         font_symbol.bearing.w = m_slot->bitmap_left;
         font_symbol.bearing.h = font_symbol.size.h - m_slot->bitmap_top;
 
+		if (font_symbol.size.h > m_font_atlas_row_symbol_max_height)
+            m_font_atlas_row_symbol_max_height = font_symbol.size.h;
+    	
         const auto buffer_size = font_symbol.size.w * font_symbol.size.h;
         const auto buffer = new unsigned char[buffer_size];
 

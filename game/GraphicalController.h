@@ -8,15 +8,15 @@
 #include <freetype/ftoutln.h>
 #include <freetype/fttrigon.h>
 
+#include "gui_style.h"
+#include "reader.h"
+#include "vao.h"
 #include <list>
 #include <string>
 #include <vector>
-#include "reader.h"
-#include "gui_style.h"
-#include "vao.h"
 
 enum class tile_options_e : unsigned char {
-	NONE = 0,
+    NONE = 0,
     FLIP_X = 1,
     FLIP_Y = 2
 };
@@ -30,7 +30,6 @@ const int font_size_c = 26;
 
 class GraphicalController {
 public:
-	
     GLuint m_actions[18];
 
     GLuint m_horizontal_shader;
@@ -53,15 +52,15 @@ public:
     GLuint m_logo;
     GLuint m_no_image;
     GLuint m_visible;
-   
+
     GLuint m_atlas;
-	
-	GLuint m_gui_vao;
-	GLuint m_gui_vertex_buffer;
+
+    GLuint m_gui_vao;
+    GLuint m_gui_vertex_buffer;
     GLuint m_gui_atlas;
 
-	GLsizei m_font_atlas_size = 1024;
-	GLint m_font_atlas_x_offset;
+    GLsizei m_font_atlas_size = 1024;
+    GLint m_font_atlas_x_offset;
     GLint m_font_atlas_y_offset;
     GLint m_font_atlas_row_symbol_max_height;
 
@@ -70,16 +69,16 @@ public:
     std::list<rectangle_t<int>> m_scissors;
     std::unordered_map<char16_t, atlas_symbol_t> m_unicode_symbols;
 
-	std::vector<vao_quad_t<gui_vertex_t>> m_gui_quads;
+    std::vector<vao_quad_t<gui_vertex_t>> m_gui_quads;
     int quads_count_to_render;
     std::unordered_map<std::u16string, atlas_tile_t> atlas_tiles;
     std::unordered_map<std::u16string, gui_style_t> gui_styles;
-	
+
     GLuint m_FBO;
 
-	std::thread::id m_id;
+    std::thread::id m_id;
 
-	explicit GraphicalController(dimension_t<int> size);
+    explicit GraphicalController(dimension_t<int> size);
 
     GLuint load_shader(const std::string& vPath, const std::string& fPath);
     std::string load_shader_source(const std::string& path);
@@ -93,15 +92,14 @@ public:
     bool add_scissor(int x, int y, int w, int h);
     void remove_scissor();
     void render_gui();
-	
-  
+
     void set_VSync(bool sync);
     bool set_uniform_float(GLuint program, const char* name, const float value);
     GLint create_empty_texture(dimension_t<int> size);
     void load_font(const std::string& font_filename);
 
-	void generate_symbol(atlas_symbol_t* symbol, GLint x_offset, GLint y_offset, unsigned char* buffer);
-	
+    void generate_symbol(atlas_symbol_t* symbol, GLint x_offset, GLint y_offset, unsigned char* buffer);
+
     atlas_symbol_t& get_symbol(char16_t value);
 
     GLuint png_texture_load(const std::string& path);
@@ -116,28 +114,26 @@ public:
     void stroke_cell(int x, int y, int xs, int ys);
     void stroke_cube(int x, int y, int z, int xs, int ys);
     void selection_cell(int x, int y, int z, int xs, int ys);
-    void draw_tile(tile_t& tile,const rectangle_t<int>& rect);
+    void draw_tile(tile_t& tile, const rectangle_t<int>& rect);
     void draw_sprite_fbo(double tex_width, double tex_height, const rectangle_t<int>& rect);
-    void draw_tile_fbo(double tx1, double ty1, double tx2, double ty2,const rectangle_t<int>& rect);
+    void draw_tile_fbo(double tx1, double ty1, double tx2, double ty2, const rectangle_t<int>& rect);
     void check_gl_error(const std::string& text);
 
-	vao_quad_t<gui_vertex_t>& get_gui_quad(int x, int y, int w, int h);
+    vao_quad_t<gui_vertex_t>& get_gui_quad(int x, int y, int w, int h);
     vao_quad_t<gui_vertex_t>& get_gui_quad(int x, int y, int w, int h, const atlas_tile_t& tile, tile_options_e options = tile_options_e::NONE);
 
-	void render_background(int x, int y, int w, int h, const gui_style_t& style);
-	void render_border(int x, int y, int w, int h, const gui_style_t& style);
+    void render_background(int x, int y, int w, int h, const gui_style_t& style);
+    void render_border(int x, int y, int w, int h, const gui_style_t& style);
 
     FT_Pos max_symbol_height_for_current_font() const;
-        FT_Pos ascender_for_current_font() const;
-	
-	
-private:
+    FT_Pos ascender_for_current_font() const;
 
-	FT_Library m_library;
+private:
+    FT_Library m_library;
     FT_Error m_error;
     FT_Face m_face;
     FT_GlyphSlot m_slot;
-	
+
     bool compile_successful(int obj);
     bool link_successful(int obj);
     bool validate_successful(int obj);
@@ -155,7 +151,8 @@ private:
     GraphicalController& graph_;
 };
 
-inline GuiAtlasReader::GuiAtlasReader(GraphicalController& graph): graph_(graph)
+inline GuiAtlasReader::GuiAtlasReader(GraphicalController& graph)
+    : graph_(graph)
 {
 }
 

@@ -99,7 +99,7 @@ class GUI_Description_window : public GUI_Window {
 public:
     GameObject* m_object;
     GUI_TreeView* m_textbox;
-    GUI_Description_window(int x, int y, int width, int height, std::u16string name,gui_style_t& style, GameObject*& object);
+    GUI_Description_window(int x, int y, int width, int height,const std::u16string& name,gui_style_t& style, GameObject*& object);
     void update_info();
 };
 
