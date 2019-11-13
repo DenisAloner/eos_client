@@ -21,7 +21,7 @@ void GUI_Text::render(GraphicalController* graph, int px, int py)
 {
     auto x = px;
 	auto y = py;
-    y = y + (graph->m_face->size->metrics.ascender >> 6);
+    y = y + graph->ascender_for_current_font();
     for (auto k : m_text) {
         auto& fs = graph->get_symbol(k);
         if (k != 32) {
@@ -66,5 +66,5 @@ void GUI_Text::set(const std::u16string& t)
 {
     m_text = t;
     m_size.w = Application::instance().m_graph->measure_text_width(m_text);
-    m_size.h = (Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender) >> 6;
+    m_size.h = Application::instance().m_graph->max_symbol_height_for_current_font();
 }

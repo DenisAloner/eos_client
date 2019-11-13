@@ -65,11 +65,6 @@ public:
     GLint m_font_atlas_y_offset;
     GLint m_font_atlas_row_symbol_max_height;
 
-    FT_Library m_library;
-    FT_Error m_error;
-    FT_Face m_face;
-    FT_GlyphSlot m_slot;
-
     dimension_t<int> m_size;
 
     std::list<rectangle_t<int>> m_scissors;
@@ -80,12 +75,9 @@ public:
     std::unordered_map<std::u16string, atlas_tile_t> atlas_tiles;
     std::unordered_map<std::u16string, gui_style_t> gui_styles;
 	
-
     GLuint m_FBO;
 
 	std::thread::id m_id;
-
-	GraphicalController() {};
 
 	explicit GraphicalController(dimension_t<int> size);
 
@@ -134,9 +126,18 @@ public:
 
 	void render_background(int x, int y, int w, int h, const gui_style_t& style);
 	void render_border(int x, int y, int w, int h, const gui_style_t& style);
+
+    FT_Pos max_symbol_height_for_current_font() const;
+        FT_Pos ascender_for_current_font() const;
 	
 	
 private:
+
+	FT_Library m_library;
+    FT_Error m_error;
+    FT_Face m_face;
+    FT_GlyphSlot m_slot;
+	
     bool compile_successful(int obj);
     bool link_successful(int obj);
     bool validate_successful(int obj);

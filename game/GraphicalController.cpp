@@ -248,6 +248,16 @@ void GraphicalController::render_border(int x, int y, int w, int h, const gui_st
         graph->get_gui_quad(px + m_size.w - 32, py + 16, 32, 32, corner_tile, tile_options_e::FLIP_X);*/
 }
 
+FT_Pos GraphicalController::max_symbol_height_for_current_font() const
+{
+    return m_face->size->metrics.ascender - m_face->size->metrics.descender >> 6;
+}
+
+FT_Pos GraphicalController::ascender_for_current_font() const
+{
+    return m_face->size->metrics.ascender >> 6;
+}
+
 void GuiAtlasReader::load()
 {
     bytearray json;

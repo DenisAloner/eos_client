@@ -16,7 +16,7 @@ void GUI_ActionButton::render(GraphicalController* graph, const int px, const in
     glDisable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    const int y_shift = (m_size.h - (Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender >> 6)) / 2;
+    const int y_shift = (m_size.h - Application::instance().m_graph->max_symbol_height_for_current_font()) / 2;
     auto rect = rectangle_t<int>(px, py, m_size.w, m_size.h);
     if (focused) {
         glColor4d(1.0, 1.0, 1.0, 0.75);

@@ -21,7 +21,7 @@ public:
 
         GUI_PopMenu* m_owner;
 
-        Item() { m_size.h = (Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender) >> 6; }
+        Item() { m_size.h = Application::instance().m_graph->max_symbol_height_for_current_font(); }
         ~Item();
 
         void on_mouse_click(MouseEventArgs const& e) override
@@ -83,7 +83,7 @@ public:
             object = static_cast<Item*>(current);
             max_length = std::max<std::size_t>(Application::instance().m_graph->measure_text_width(object->m_text), max_length);
         }
-        resize(max_length + 8, m_items.size() * ((Application::instance().m_graph->m_face->size->metrics.ascender - Application::instance().m_graph->m_face->size->metrics.descender) >> 6));
+        resize(max_length + 8, m_items.size() * Application::instance().m_graph->max_symbol_height_for_current_font());
         for (auto& current : m_items) {
             current->m_size.w = m_size.w - 1;
         }
