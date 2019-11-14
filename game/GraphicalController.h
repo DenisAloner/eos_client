@@ -8,6 +8,11 @@
 #include <freetype/ftoutln.h>
 #include <freetype/fttrigon.h>
 
+#include "msdfgen.h"
+#include "msdfgen-ext.h"
+
+using namespace msdfgen;
+
 #include "gui_style.h"
 #include "reader.h"
 #include "vao.h"
@@ -98,7 +103,7 @@ public:
     GLint create_empty_texture(dimension_t<int> size);
     void load_font(const std::string& font_filename);
 
-    void generate_symbol(atlas_symbol_t* symbol, GLint x_offset, GLint y_offset, unsigned char* buffer);
+    void generate_symbol(atlas_symbol_t* symbol, GLint x_offset, GLint y_offset, float* buffer);
 
     atlas_symbol_t& get_symbol(char16_t value);
 
@@ -129,6 +134,10 @@ public:
     FT_Pos ascender_for_current_font() const;
 
 private:
+
+	FreetypeHandle* m_freetype_handle;
+    FontHandle* m_font_handle;
+	
     FT_Library m_library;
     FT_Error m_error;
     FT_Face m_face;

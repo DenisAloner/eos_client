@@ -19,15 +19,16 @@ GUI_Text::~GUI_Text()
 
 void GUI_Text::render(GraphicalController* graph, int px, int py)
 {
+    const auto m = 1.0f;
     auto x = px;
 	auto y = py;
-    y = y + graph->ascender_for_current_font();
+  //  y = y + graph->ascender_for_current_font();
     for (auto k : m_text) {
         auto& fs = graph->get_symbol(k);
         if (k != 32) {
 
             auto& t = fs.texture;
-            auto& quad = graph->get_gui_quad(x, y + fs.bearing.h, fs.size.w - 1, -fs.size.h + 1);
+            auto& quad = graph->get_gui_quad(x, y, 32 * m, 32 * m);
 
             quad.vertex[0].texture[0] = t.x;
             quad.vertex[0].texture[1] = t.y;
@@ -58,7 +59,7 @@ void GUI_Text::render(GraphicalController* graph, int px, int py)
             quad.vertex[3].color[1] = m_format->m_color.g;
             quad.vertex[3].color[2] = m_format->m_color.b;
         }
-        x += fs.size.w;
+        x += fs.bearing.w * m;
     }
 }
 

@@ -62,6 +62,16 @@ find_library(FREETYPE_LIB_RELEASE freetype
        DOC "freetype libraries"
 )
 
+find_library(MSDFGEN_LIB_DEBUG msdfgen
+       PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/debug
+       DOC "msdfgen libraries"
+)
+
+find_library(MSDFGEN_LIB_RELEASE msdfgen
+       $PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}/release
+       DOC "msdfgen libraries"
+)
+
 include_directories(
 	${PROJECT_DIR}
 	${PROJECT_DIR}/game
@@ -75,6 +85,7 @@ set(EXT_LIBRARIES
 	${OGL_LIB}
     $<$<CONFIG:Debug>:${GLBINDING_LIB_DEBUG}>$<$<CONFIG:Release>:${GLBINDING_LIB_RELEASE}>
 	$<$<CONFIG:Debug>:${FREETYPE_LIB_DEBUG}>$<$<CONFIG:Release>:${FREETYPE_LIB_RELEASE}>
+	$<$<CONFIG:Debug>:${MSDFGEN_LIB_DEBUG}>$<$<CONFIG:Release>:${MSDFGEN_LIB_RELEASE}>
 )
 
 include(${PROJECT_DIR}/cmake_build/common/game.cmake)

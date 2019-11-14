@@ -250,12 +250,12 @@ void GraphicalController::render_border(int x, int y, int w, int h, const gui_st
 
 FT_Pos GraphicalController::max_symbol_height_for_current_font() const
 {
-    return m_face->size->metrics.ascender - m_face->size->metrics.descender >> 6;
+    return 32; //m_face->size->metrics.ascender - m_face->size->metrics.descender >> 6;
 }
 
 FT_Pos GraphicalController::ascender_for_current_font() const
 {
-    return m_face->size->metrics.ascender >> 6;
+    return 32; //m_face->size->metrics.ascender >> 6;
 }
 
 void GuiAtlasReader::load()
@@ -350,7 +350,7 @@ GraphicalController::GraphicalController(const dimension_t<int> size)
     m_gui_quads.resize(10000);
     m_size = size;
 
-    load_font(FileSystem::instance().m_resource_path + "Fonts\\augusta_modern.ttf");
+    load_font(FileSystem::instance().m_resource_path + "Fonts\\16250+.ttf");
 
     try {
         m_actions[0] = load_texture(FileSystem::instance().m_resource_path + "Tiles\\Action_0.bmp");
@@ -470,7 +470,10 @@ GraphicalController::GraphicalController(const dimension_t<int> size)
 
 void GraphicalController::load_font(const std::string& font_filename)
 {
-    m_error = FT_Init_FreeType(&m_library);
+    m_freetype_handle = initializeFreetype();
+	m_font_handle = loadFont(m_freetype_handle, font_filename.c_str());
+	
+   /* m_error = FT_Init_FreeType(&m_library);
     if (m_error != 0) {
         Logger::instance().critical("Ошибка инициализации FreeType");
     }
@@ -480,45 +483,46 @@ void GraphicalController::load_font(const std::string& font_filename)
         Logger::instance().critical("Ошибка инициализации шрифта");
     }
 
-    m_error = FT_Set_Pixel_Sizes(m_face, font_size_c, 0);
-    m_slot = m_face->glyph;
+    m_error = FT_Set_Pixel_Sizes(m_face, 32, 0);
+    m_slot = m_face->glyph;*/
     get_symbol(u'?');
     get_symbol(u' ');
     m_unicode_symbols[u' '] = m_unicode_symbols[u'?'];
 }
 
-void GraphicalController::generate_symbol(atlas_symbol_t* symbol, GLint x_offset, GLint y_offset, unsigned char* buffer)
+void GraphicalController::generate_symbol(atlas_symbol_t* symbol, GLint x_offset, GLint y_offset, float* buffer)
 {
     auto& s = *symbol;
-    /*std::u16string a { s.value };
-    Logger::instance().info("Generate font symbol opengl: {} {} {}", utf16_to_cp1251(a), s.size.w, s.size.h);*/
     glEnable(GL_TEXTURE_2D);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, m_gui_atlas);
-    const auto rgba = new unsigned char[s.size.w * s.size.h * int(4)];
-    auto p = 0;
-    for (auto i = 0; i < s.size.w * s.size.h; ++i) {
-        p = i * 4;
-        rgba[p] = 255;
-        rgba[p + 1] = 255;
-        rgba[p + 2] = 255;
-        rgba[p + 3] = buffer[i];
+    const auto rgba = new float[32 * 32 * int(4)];
+    auto position_new = 0;
+    auto position_buffer = 0;
+    for (auto i = 0; i < 32 * 32; ++i) {
+        position_buffer = i * 3;
+        position_new = i * 4;
+        rgba[position_new] = buffer[position_buffer];
+        rgba[position_new + 1] = buffer[position_buffer+1];
+        rgba[position_new + 2] = buffer[position_buffer+2];
+        rgba[position_new + 3] = 1.0f;
     }
     glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
         0,
         x_offset,
         y_offset,
         1,
-        s.size.w,
-        s.size.h,
+        32,
+        32,
         1,
         GL_RGBA,
-        GL_UNSIGNED_BYTE,
+        GL_FLOAT,
         rgba);
     s.texture.x = x_offset;
     s.texture.y = y_offset;
     s.texture.w = float(s.size.w);
     s.texture.h = float(s.size.h);
+    delete[] buffer;
     delete[] rgba;
 }
 
@@ -528,43 +532,59 @@ atlas_symbol_t& GraphicalController::get_symbol(const char16_t value)
     auto symbol = m_unicode_symbols.find(value);
     if (symbol == m_unicode_symbols.end()) {
 
-        m_error = FT_Load_Char(m_face, value, FT_LOAD_RENDER);
+     
+
+	   Bitmap<float, 3> bitmap(32, 32);
+       auto& font_symbol = m_unicode_symbols[value];
+       font_symbol.value = value;
+    	
+        Shape shape;
+        double l, t, r, b,adv;
+    	if (loadGlyph(shape, m_font_handle, value,&adv)) {
+           shape.normalize();
+           edgeColoringSimple(shape, 3.0);
+    	   generateMSDF(bitmap, shape, 2.25f, 2.0, Vector2(2.0, 2.0));
+           shape.bounds(l, b, r, t);
+           Logger::instance().info("symbol {}: {} {} {} {}", utf16_to_cp1251(std::u16string { value }), l, r, b, t,adv);
+       }
+
+        if (m_font_atlas_x_offset + bitmap.width() > m_font_atlas_size) {
+            m_font_atlas_y_offset += m_font_atlas_row_symbol_max_height;
+            m_font_atlas_row_symbol_max_height = bitmap.height();
+            m_font_atlas_x_offset = 0;
+        }
+
+    	 /*  m_error = FT_Load_Char(m_face, value, FT_LOAD_RENDER);
 
         if (m_error != 0) {
             Logger::instance().critical("Ошибка загрузки символа");
             return m_unicode_symbols[u'?'];
-        }
+        }*/
+      
+      
+        font_symbol.size.w = 32;
+        font_symbol.size.h =32;
+        font_symbol.bearing.w = adv*2;
+        font_symbol.bearing.h = (t-b)*1;
 
-        if (m_font_atlas_x_offset + m_slot->bitmap.width > m_font_atlas_size) {
-            m_font_atlas_y_offset += m_font_atlas_row_symbol_max_height;
-            m_font_atlas_row_symbol_max_height = m_slot->bitmap.rows;
-            m_font_atlas_x_offset = 0;
-        }
-
-        auto& font_symbol = m_unicode_symbols[value];
-        font_symbol.value = value;
-        font_symbol.size.w = int(m_slot->bitmap.width);
-        font_symbol.size.h = int(m_slot->bitmap.rows);
-        font_symbol.bearing.w = m_slot->bitmap_left;
-        font_symbol.bearing.h = font_symbol.size.h - m_slot->bitmap_top;
-
-		if (font_symbol.size.h > m_font_atlas_row_symbol_max_height)
-            m_font_atlas_row_symbol_max_height = font_symbol.size.h;
     	
-        const auto buffer_size = font_symbol.size.w * font_symbol.size.h;
-        const auto buffer = new unsigned char[buffer_size];
+		if (32 > m_font_atlas_row_symbol_max_height)
+            m_font_atlas_row_symbol_max_height = 32;
+    	
+        const auto buffer_size =32 * 32 * 3;
+        const auto buffer = new float[buffer_size];
 
         for (auto i = 0; i < buffer_size; ++i) {
-            buffer[i] = m_slot->bitmap.buffer[i];
+            buffer[i] = bitmap.operator float*()[i];
         }
 
-        auto b = &m_unicode_symbols[value];
+        auto b1 = &m_unicode_symbols[value];
         if (m_id == std::this_thread::get_id()) {
-            generate_symbol(b, m_font_atlas_x_offset, m_font_atlas_y_offset, buffer);
+            generate_symbol(b1, m_font_atlas_x_offset, m_font_atlas_y_offset, buffer);
         } else {
-            Application::instance().m_update_in_render_thread.emplace_back(std::bind(&GraphicalController::generate_symbol, this, b, m_font_atlas_x_offset, m_font_atlas_y_offset, buffer));
+            Application::instance().m_update_in_render_thread.emplace_back(std::bind(&GraphicalController::generate_symbol, this, b1, m_font_atlas_x_offset, m_font_atlas_y_offset, buffer));
         }
-        m_font_atlas_x_offset += m_slot->bitmap.width;
+        m_font_atlas_x_offset += font_symbol.size.w;
         return m_unicode_symbols[value];
     }
     return symbol->second;
@@ -612,15 +632,17 @@ void GraphicalController::set_VSync(bool sync)
 
 void GraphicalController::output_text(int x, int y, std::u16string& text, int sizex, int sizey)
 {
-    y = y + (m_face->size->metrics.ascender >> 6);
-    auto shift_x = 0;
+	const auto m = 1.0f;
+	
+    //y = y + 32;
+    auto dx = x;
 
     for (auto k : text) {
         auto& fs = get_symbol(k);
         if (k != 32) {
 
             auto& t = fs.texture;
-            auto& quad = get_gui_quad(x + shift_x, y + fs.bearing.h, fs.size.w - 1, -fs.size.h + 1);
+            auto& quad = get_gui_quad(dx, y  , 32*m, 32*m);
 
             quad.vertex[0].texture[0] = t.x;
             quad.vertex[0].texture[1] = t.y;
@@ -638,7 +660,7 @@ void GraphicalController::output_text(int x, int y, std::u16string& text, int si
             quad.vertex[3].texture[1] = t.y;
             quad.vertex[3].texture[2] = float(1);
         }
-        shift_x += fs.size.w;
+        dx += fs.bearing.w*m;
     }
 }
 
@@ -660,7 +682,7 @@ void GraphicalController::center_text(int x, int y, std::u16string text, int siz
         width += fs.size.w;
     }
     const auto cx = x - (width / 2);
-    const auto cy = y - ((m_face->size->metrics.ascender - m_face->size->metrics.descender) >> 7);
+    const auto cy = y - (max_symbol_height_for_current_font()>>1);
     output_text(cx, cy, text, sizex, sizey);
 }
 
