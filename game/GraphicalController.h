@@ -87,8 +87,8 @@ public:
     bool set_uniform_ptr(GLuint program, const char* name, const int value);
     position_t<int> get_open_gl_position(float x, float y);
     GLuint load_texture(const std::string& path);
-    void output_text(int x, int y, std::u16string& text, int sizex, int sizey);
-    void center_text(int x, int y, std::u16string text, int sizex, int sizey);
+    void output_text(int x, int y, const std::u16string& text, int sizex, int sizey);
+    void center_text(int x, int y, const std::u16string& text, int sizex, int sizey);
     bool add_scissor(int x, int y, int w, int h);
     void remove_scissor();
     void render_gui();
@@ -105,7 +105,7 @@ public:
     GLuint png_texture_load(const std::string& path);
     GLuint texture_array_load(const std::vector<std::string>& path);
 
-    std::size_t measure_text_width(std::u16string& text);
+    std::size_t measure_text_width(const std::u16string& text);
 
     position_t<int> center_align_to_point(int x, int y, std::u16string text);
 

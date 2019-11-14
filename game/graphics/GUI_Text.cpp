@@ -27,23 +27,23 @@ void GUI_Text::render(GraphicalController* graph, int px, int py)
         if (k != 32) {
 
             auto& t = fs.texture;
-            auto& quad = graph->get_gui_quad(x, y + fs.bearing.h, fs.size.w - 1, -fs.size.h + 1);
+            auto& quad = graph->get_gui_quad(x, y + fs.bearing.h - fs.size.h, fs.size.w, fs.size.h);
 
             quad.vertex[0].texture[0] = t.x;
-            quad.vertex[0].texture[1] = t.y;
-            quad.vertex[0].texture[2] = float(1);
+            quad.vertex[0].texture[1] = t.bottom();
+            quad.vertex[0].texture[2] = fs.layer;
 
             quad.vertex[1].texture[0] = t.x;
-            quad.vertex[1].texture[1] = t.bottom();
-            quad.vertex[1].texture[2] = float(1);
+            quad.vertex[1].texture[1] = t.y;
+            quad.vertex[1].texture[2] = fs.layer;
 
             quad.vertex[2].texture[0] = t.right();
-            quad.vertex[2].texture[1] = t.bottom();
-            quad.vertex[2].texture[2] = float(1);
+            quad.vertex[2].texture[1] = t.y;
+            quad.vertex[2].texture[2] = fs.layer;
 
             quad.vertex[3].texture[0] = t.right();
-            quad.vertex[3].texture[1] = t.y;
-            quad.vertex[3].texture[2] = float(1);
+            quad.vertex[3].texture[1] = t.bottom();
+            quad.vertex[3].texture[2] = fs.layer;
         	
         	quad.vertex[0].color[0] = m_format->m_color.r;
             quad.vertex[0].color[1] = m_format->m_color.g;
@@ -58,7 +58,7 @@ void GUI_Text::render(GraphicalController* graph, int px, int py)
             quad.vertex[3].color[1] = m_format->m_color.g;
             quad.vertex[3].color[2] = m_format->m_color.b;
         }
-        x += fs.size.w;
+        x += fs.bearing.w + 1;
     }
 }
 

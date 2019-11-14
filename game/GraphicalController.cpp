@@ -519,6 +519,7 @@ void GraphicalController::generate_symbol(atlas_symbol_t* symbol, GLint x_offset
     s.texture.y = y_offset;
     s.texture.w = float(s.size.w);
     s.texture.h = float(s.size.h);
+    s.layer = 1;
     delete[] rgba;
 }
 
@@ -545,7 +546,7 @@ atlas_symbol_t& GraphicalController::get_symbol(const char16_t value)
         font_symbol.value = value;
         font_symbol.size.w = int(m_slot->bitmap.width);
         font_symbol.size.h = int(m_slot->bitmap.rows);
-        font_symbol.bearing.w = m_slot->bitmap_left;
+        font_symbol.bearing.w = m_slot->advance.x >> 6;
         font_symbol.bearing.h = font_symbol.size.h - m_slot->bitmap_top;
 
 		if (font_symbol.size.h > m_font_atlas_row_symbol_max_height)
@@ -610,55 +611,46 @@ void GraphicalController::set_VSync(bool sync)
     }
 }
 
-void GraphicalController::output_text(int x, int y, std::u16string& text, int sizex, int sizey)
+void GraphicalController::output_text(int x, int y,const std::u16string& text, int sizex, int sizey)
 {
     y = y + (m_face->size->metrics.ascender >> 6);
-    auto shift_x = 0;
+    auto dx = 0;
 
     for (auto k : text) {
         auto& fs = get_symbol(k);
         if (k != 32) {
-
             auto& t = fs.texture;
-            auto& quad = get_gui_quad(x + shift_x, y + fs.bearing.h, fs.size.w - 1, -fs.size.h + 1);
-
+			auto& quad = get_gui_quad(x + dx, y + fs.bearing.h - fs.size.h, fs.size.w, fs.size.h);
             quad.vertex[0].texture[0] = t.x;
-            quad.vertex[0].texture[1] = t.y;
-            quad.vertex[0].texture[2] = float(1);
-
+            quad.vertex[0].texture[1] = t.bottom();
+            quad.vertex[0].texture[2] = fs.layer;
             quad.vertex[1].texture[0] = t.x;
-            quad.vertex[1].texture[1] = t.bottom();
-            quad.vertex[1].texture[2] = float(1);
-
+            quad.vertex[1].texture[1] = t.y;
+            quad.vertex[1].texture[2] = fs.layer;
             quad.vertex[2].texture[0] = t.right();
-            quad.vertex[2].texture[1] = t.bottom();
-            quad.vertex[2].texture[2] = float(1);
-
+            quad.vertex[2].texture[1] = t.y;
+            quad.vertex[2].texture[2] = fs.layer;
             quad.vertex[3].texture[0] = t.right();
-            quad.vertex[3].texture[1] = t.y;
-            quad.vertex[3].texture[2] = float(1);
+            quad.vertex[3].texture[1] = t.bottom();
+            quad.vertex[3].texture[2] = fs.layer;
         }
-        shift_x += fs.size.w;
+        dx += fs.bearing.w + 1;
     }
 }
 
-std::size_t GraphicalController::measure_text_width(std::u16string& text)
+std::size_t GraphicalController::measure_text_width(const std::u16string& text)
 {
     auto result = 0;
     for (auto k : text) {
         auto& fs = get_symbol(k);
-        result += fs.size.w;
+        result += fs.bearing.w + 1;
     }
     return result;
 }
 
-void GraphicalController::center_text(int x, int y, std::u16string text, int sizex, int sizey)
+void GraphicalController::center_text(int x, int y, const std::u16string& text, int sizex, int sizey)
 {
-    auto width = 0;
-    for (auto k : text) {
-        auto& fs = get_symbol(k);
-        width += fs.size.w;
-    }
+	const auto width = measure_text_width(text);
     const auto cx = x - (width / 2);
     const auto cy = y - ((m_face->size->metrics.ascender - m_face->size->metrics.descender) >> 7);
     output_text(cx, cy, text, sizex, sizey);
