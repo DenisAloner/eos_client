@@ -1,5 +1,6 @@
 #include "interaction_list.h"
 #include "instruction_game_owner.h"
+#include "writer.h"
 
 Interaction_list::Interaction_list()
 {
@@ -106,4 +107,9 @@ iPacker& Interaction_list::get_packer()
 interaction_message_type_e Interaction_list::get_interaction_message_type()
 {
     return interaction_message_type_e::list;
+}
+
+std::u16string Interaction_list::serialize_to_json(JsonWriter& value)
+{
+    return value.write(*this);
 }

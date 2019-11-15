@@ -1,2 +1,25 @@
-{"frames":  {"background":{    "rotated": false,    "trimmed": false,    "frame": {"x":0,"y":0,"w":280,"h":280},    "spriteSourceSize": {"x":0,"y":0,"w":280,"h":280},    "sourceSize": {"w":280,"h":280},    "pivot": {"x":0.5,"y":0.5}},"corner":{    "rotated": false,    "trimmed": false,    "frame": {"x":0,"y":280,"w":64,"h":64},    "spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},    "sourceSize": {"w":64,"h":64},    "pivot": {"x":0.5,"y":0.5}},"border_x":{    "rotated": false,    "trimmed": false,    "frame": {"x":0,"y":344,"w":127,"h":12},    "spriteSourceSize": {"x":0,"y":0,"w":127,"h":12},    "sourceSize": {"w":127,"h":12},    "pivot": {"x":0.5,"y":0.5}},"border_y":{    "rotated": false,    "trimmed": false,    "frame": {"x":127,"y":280,"w":12,"h":127},    "spriteSourceSize": {"x":0,"y":0,"w":12,"h":127},    "sourceSize": {"w":12,"h":127},    "pivot": {"x":0.5,"y":0.5}},"box_button":{    "rotated": false,    "trimmed": false,    "frame": {"x":64,"y":280,"w":32,"h":32},    "spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},    "sourceSize": {"w":32,"h":32},    "pivot": {"x":0.5,"y":0.5}},"scroll_y_head":{    "rotated": false,    "trimmed": false,    "frame": {"x":96,"y":280,"w":28,"h":48},    "spriteSourceSize": {"x":0,"y":0,"w":28,"h":48},    "sourceSize": {"w":28,"h":48},    "pivot": {"x":0.5,"y":0.5}}"scroll_y_body":{    "rotated": false,    "trimmed": false,    "frame": {"x":0,"y":356,"w":28,"h":127},    "spriteSourceSize": {"x":0,"y":0,"w":28,"h":127},    "sourceSize": {"w":28,"h":127},    "pivot": {"x":0.5,"y":0.5}}},
-"meta": {    "app": "http://spritepacker.com/",    "version": "1.0",    "image": "gui.png",    "format": "RGBA8888",    "size": {"w":2048,"h":2048},    "scale": "1"}}
+{
+    "$link": 1,
+    "name": "human",
+    "direction": "down",
+    "owner": {
+        "$link": 2,
+        "x": 8,
+        "y": 8,
+        "items": [{
+            "$type": link,
+            "$link": 1
+        }]
+    },
+    "state": [{
+        "$link": 3,
+        "state": "alive"
+    }, {
+        "$link": 4,
+        "state": "dead"
+    }],
+    "active_state": {
+        "$type": link,
+        "$link": 3
+    }
+}

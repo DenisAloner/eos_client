@@ -28,7 +28,7 @@ void GameObjectManager::init(SerializationContext& context)
 
 GameObject* GameObjectManager::new_object(const std::string unit_name)
 {
-    auto& obj = Application::instance().m_world->m_object_manager.m_items.emplace_back();
+    auto& obj = Application::instance().m_world->m_objects.emplace_back();
     const auto it = m_config->m_items.find(unit_name);
     if (it == m_config->m_items.end()) {
         Logger::instance().critical("Элемент `" + unit_name + "` отсутствует в m_items");

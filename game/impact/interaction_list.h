@@ -2,8 +2,9 @@
 #define INTERACTION_LIST_H
 
 #include "Definiton.h"
+#include "i_json_serializable.h"
 
-class Interaction_list : public Object_interaction {
+class Interaction_list : public Object_interaction,public iJsonSerializable {
 public:
     feature_list_type_e m_list_type;
     std::list<Object_interaction*> m_items;
@@ -33,6 +34,7 @@ public:
     }
 
     interaction_message_type_e get_interaction_message_type() override;
+    std::u16string serialize_to_json(JsonWriter& value) override;
 };
 
 #endif //INTERACTION_LIST_H

@@ -1,5 +1,6 @@
 #include "game/GameObject.h"
 #include <algorithm>
+#include <writer.h>
 
 Interaction_list* Effect_functions::create_feature_list(feature_list_type_e key, interaction_e name)
 {
@@ -108,6 +109,11 @@ iPacker& MapCell::get_packer()
     return Packer<MapCell>::instance();
 }
 
+std::u16string MapCell::serialize_to_json(JsonWriter& value)
+{
+    return value.write(*this);
+}
+
 Attribute_map::Attribute_map() {};
 
 Interaction_list* Attribute_map::create_feature_list(feature_list_type_e key, interaction_e name)
@@ -200,6 +206,11 @@ iPacker& Attribute_map::get_packer()
     return Packer<Attribute_map>::instance();
 }
 
+std::u16string Attribute_map::serialize_to_json(JsonWriter& value)
+{
+    return value.write(*this);
+}
+
 std::u16string Object_state::icon_to_json(Icon*& value, SerializationContext& context)
 {
     if (value) {
@@ -276,6 +287,11 @@ void Object_state::tilemanager_from_binary(const std::string& value, TileManager
         //LOG(INFO) << "Tile manager" << std::to_string(s);
         prop = Application::instance().m_game_object_manager->m_config->m_tile_managers.m_by_index[s - 1];
     }
+}
+
+std::u16string Object_state::serialize_to_json(JsonWriter& value)
+{
+    return value.write(*this);
 }
 
 Object_state::Object_state()
@@ -769,6 +785,11 @@ iPacker& GameObject::get_packer()
     return Packer<GameObject>::instance();
 }
 
+std::u16string GameObject::serialize_to_json(JsonWriter& value)
+{
+    return value.write(*this);
+}
+
 void GameObject::reset_serialization_index()
 {
     m_serialization_index = 0;
@@ -878,6 +899,11 @@ iPacker& Inventory_cell::get_packer()
     return Packer<Inventory_cell>::instance();
 }
 
+std::u16string Inventory_cell::serialize_to_json(JsonWriter& value)
+{
+    return value.write(*this);
+}
+
 Object_part::Object_part(GameObject* item)
     : Inventory_cell(item)
 {
@@ -931,6 +957,11 @@ iPacker& Object_part::get_packer()
 interaction_message_type_e Object_part::get_interaction_message_type()
 {
     return interaction_message_type_e::part;
+}
+
+std::u16string Object_part::serialize_to_json(JsonWriter& value)
+{
+    return value.write(*this);
 }
 
 iPacker& Config::get_packer()

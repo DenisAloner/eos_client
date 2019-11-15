@@ -6,6 +6,7 @@
 #include <Application.h>
 #include <list>
 #include <map>
+#include <i_json_serializable.h>
 
 class Object_feature;
 class Application;
@@ -29,7 +30,7 @@ namespace Effect_functions {
 Interaction_list* create_feature_list(feature_list_type_e key, interaction_e name);
 }
 
-class Game_object_owner : public virtual iSerializable {
+class Game_object_owner : public virtual iSerializable, public iJsonSerializable {
 public:
     entity_e m_kind;
     Game_object_owner* m_owner;
@@ -53,9 +54,6 @@ public:
 
     void reset_serialization_index() override;
 };
-
-//template<>
-//class Packer<MapCell>;
 
 class MapCell : public Game_object_owner {
 public:
@@ -97,6 +95,8 @@ public:
             make_property(&MapCell::y, u"y"),
             make_property(&MapCell::m_items, u"items"));
     }
+
+    std::u16string serialize_to_json(JsonWriter& value) override;
 };
 
 class Tag_getter : public Visitor {
@@ -105,11 +105,12 @@ public:
     Object_tag* m_result;
 
     Tag_getter(object_tag_e key);
-    virtual void visit(Object_interaction& value);
+    void visit(Object_interaction& value) override;
 };
 
-class Attribute_map : public iSerializable {
+class Attribute_map : public iSerializable, public iJsonSerializable {
 public:
+	
     std::map<interaction_e, Interaction_list*> m_items;
 
     Attribute_map();
@@ -132,10 +133,13 @@ public:
         return std::make_tuple(
             make_property(&Attribute_map::m_items, u"item"));
     }
+
+	std::u16string serialize_to_json(JsonWriter& value) override;
 };
 
 class Object_state : public Attribute_map {
 public:
+
     object_state_e m_state;
     int m_layer;
     dimension3_t m_size;
@@ -185,6 +189,8 @@ public:
                 make_property(&Object_state::m_light, u"light"),
                 make_property(&Object_state::m_optical, u"optical")));
     }
+
+    std::u16string serialize_to_json(JsonWriter& value) override;
 };
 
 class Object_state_equip : public Object_state {
@@ -208,8 +214,8 @@ public:
 
 class GameObject : public Object_interaction, public GUI_connectable_i, public Game_object_owner {
 public:
+	
     std::u16string m_name;
-
     object_direction_e m_direction;
     bool m_selected;
 
@@ -256,10 +262,12 @@ public:
             make_property(&GameObject::m_direction, u"direction"),
             make_property(&GameObject::m_owner, u"owner"),
             make_property(&GameObject::m_state, u"state"),
-            make_property(&GameObject::m_active_state, u"active_state"));
+            make_property(&GameObject::m_active_state, u"active_state")
+		);
     }
 
-    interaction_message_type_e get_interaction_message_type() override { return interaction_message_type_e::game_object; };
+    interaction_message_type_e get_interaction_message_type() override { return interaction_message_type_e::game_object; }
+    std::u16string serialize_to_json(JsonWriter& value) override;
 
 private:
     class Action_getter : public Visitor {
@@ -329,6 +337,8 @@ public:
             std::make_tuple(
                 make_property(&Inventory_cell::m_item, u"item")));
     }
+
+    std::u16string serialize_to_json(JsonWriter& value) override;
 };
 
 class Object_part : public Inventory_cell, virtual public Object_interaction {
@@ -357,6 +367,7 @@ public:
     }
 
     interaction_message_type_e get_interaction_message_type() override;
+    std::u16string serialize_to_json(JsonWriter& value) override;
 };
 
 #endif //GAMEOBJECT_H

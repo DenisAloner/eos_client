@@ -18,27 +18,7 @@ class Player;
 
 const int max_light_radius = 20;
 
-class Object_manager : public iSerializable {
-
-public:
-    std::list<GameObject> m_items;
-    Object_manager() {};
-
-    void update_buff();
-    void calculate_ai();
-
-    void reset_serialization_index() override;
-
-    iPacker& get_packer() override;
-
-    constexpr static auto properties()
-    {
-        return std::make_tuple(
-            make_property(&Object_manager::m_items, u"items"));
-    }
-};
-
-class GameMap : public iSerializable {
+class GameMap : public iSerializable, public iJsonSerializable {
 public:
     Event<VoidEventArgs> update;
 
@@ -110,13 +90,15 @@ public:
             make_property(&GameMap::m_size, u"size"),
             make_property(&GameMap::m_items, u"item", &GameMap::vector_mapcell_to_json, &GameMap::vector_mapcell_from_json, &GameMap::vector_mapcell_to_binary, &GameMap::vector_mapcell_from_binary));
     }
+
+    std::u16string serialize_to_json(JsonWriter& value) override;
 };
 
-class Game_world : public iSerializable {
+class Game_world : public iSerializable,public iJsonSerializable {
 public:
     float m_coefficient[21][21][21];
 
-    Object_manager m_object_manager;
+    std::list<GameObject> m_objects;
 
     std::list<GameMap*> m_maps;
 
@@ -124,6 +106,8 @@ public:
 
     Game_world();
     void calculate_lighting();
+    void update_buff();
+    void calculate_ai();
     void reset_serialization_index() override;
 
     std::u16string serialize(SerializationContext& context);
@@ -137,11 +121,13 @@ public:
     constexpr static auto properties()
     {
         return std::make_tuple(
-            make_property(&Game_world::m_object_manager, u"object_manager"),
+            make_property(&Game_world::m_objects, u"objects"),
             make_property(&Game_world::m_maps, u"maps")
 
         );
     }
+
+    std::u16string serialize_to_json(JsonWriter& value) override;
 };
 
 #endif //GAMEMAP_H

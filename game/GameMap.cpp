@@ -3,71 +3,8 @@
 #include "all_effects.h"
 #include "game/Application.h"
 #include "game/GameObject.h"
+#include "writer.h"
 
-void Object_manager::update_buff()
-{
-    Interaction_list* e;
-    Visitor_onturn_updater visitor;
-
-    for (auto& m_item : m_items) {
-        auto list = static_cast<Interaction_list*>(m_item.get_effect(interaction_e::buff));
-        if (list) {
-            e = list->clone();
-            e->apply_effect(&m_item, nullptr);
-            visitor.result = false;
-            list->apply_visitor(visitor);
-        }
-        for (auto& item : m_item.m_active_state->m_items) {
-            if (item.second->get_interaction_message_type() == interaction_message_type_e::list) {
-                e = static_cast<Interaction_list*>(item.second);
-                if (e->m_list_type == feature_list_type_e::parameter || e->m_list_type == feature_list_type_e::parts || e->m_list_type == feature_list_type_e::tag) {
-                    visitor.result = false;
-                    e->apply_visitor(visitor);
-                }
-            }
-        }
-        m_item.update_interaction();
-        m_item.event_update(VoidEventArgs());
-    }
-}
-
-void Object_manager::calculate_ai()
-{
-    for (auto& m_item : m_items) {
-        if (m_item.m_owner->m_kind == entity_e::cell) {
-            if ((m_item.m_active_state->m_ai) && (&m_item != Application::instance().m_world->m_player->m_object)) {
-                switch (m_item.m_active_state->m_ai->m_ai_type) {
-                case ai_type_e::trap: {
-                    auto obj = *static_cast<AI_trap*>(m_item.m_active_state->m_ai);
-                    obj.m_object = &m_item;
-                    obj.create();
-                    break;
-                }
-                case ai_type_e::non_humanoid: {
-                    auto obj = static_cast<AI_enemy*>(m_item.m_active_state->m_ai);
-                    obj->m_map = static_cast<MapCell*>(m_item.m_owner)->m_map;
-                    obj->m_object = &m_item;
-                    obj->create();
-                    break;
-                }
-                }
-            }
-        }
-    }
-}
-
-void Object_manager::reset_serialization_index()
-{
-    m_serialization_index = 0;
-    for (auto& m_item : m_items) {
-        m_item.reset_serialization_index();
-    }
-}
-
-iPacker& Object_manager::get_packer()
-{
-    return Packer<Object_manager>::instance();
-}
 
 std::u16string GameMap::vector_mapcell_to_json(std::vector<MapCell>& value, SerializationContext& context)
 {
@@ -115,6 +52,11 @@ void GameMap::vector_mapcell_from_binary(const std::string& value, std::vector<M
     for (std::size_t i = 0; i < s; ++i) {
         parser_from_binary<std::list<GameObject*>>(value, prop[i].m_items, pos, context);
     }
+}
+
+std::u16string GameMap::serialize_to_json(JsonWriter& value)
+{
+    return value.write(*this);
 }
 
 GameMap::GameMap(dimension3_t size)
@@ -1221,9 +1163,11 @@ Game_world::Game_world()
 void Game_world::reset_serialization_index()
 {
     m_serialization_index = 0;
-    m_object_manager.reset_serialization_index();
-    for (auto m_map : m_maps) {
-        m_map->reset_serialization_index();
+    for (auto& object : m_objects) {
+        object.reset_serialization_index();
+    }
+    for (auto& map : m_maps) {
+        map->reset_serialization_index();
     }
 }
 
@@ -1231,11 +1175,11 @@ std::u16string Game_world::serialize(SerializationContext& context)
 {
     //LOG(INFO) << "std::u16string Object_manager::items_to_json(std::list<GameObject>& value)";
     std::size_t i = 0;
-    for (auto& element : m_object_manager.m_items) {
+    for (auto& element : m_objects) {
         element.m_serialization_index = i;
         i += 1;
     }
-    std::size_t ms = m_object_manager.m_items.size();
+    std::size_t ms = m_objects.size();
     //LOG(INFO) << "std::u16string Game_world::serialize() " << std::to_string(ms);
     std::u16string result;
     for (auto& element : m_maps.front()->m_items) {
@@ -1247,7 +1191,7 @@ std::u16string Game_world::serialize(SerializationContext& context)
         result += parser_to_json<std::list<GameObject*>>(element.m_items, context);
     }
     result = u"{\"map_size\":" + parser_to_json<dimension3_t>(m_maps.front()->m_size, context) + u",\"manager_size\":" + parser_to_json<std::size_t>(ms, context) + u",\"cells\":[" + result + u"],\"items\":";
-    result += parser_to_json<std::list<GameObject>>(m_object_manager.m_items, context);
+    result += parser_to_json<std::list<GameObject>>(m_objects, context);
     result += u",\"player\":" + parser_to_json<GameObject*>(m_player->m_object, context);
     result += u"}";
     return result;
@@ -1262,12 +1206,12 @@ void Game_world::deserialize(std::u16string& value, SerializationContext& contex
         //LOG(INFO) << "deserialize -> " << Parser::UTF16_to_CP1251(element.first);
     }
     parser_from_json<dimension3_t>((*s)[u"map_size"], map_size, context);
-    GameMap* map = new GameMap(map_size);
+    auto map = new GameMap(map_size);
     m_maps.push_front(map);
 
     std::size_t manager_size;
     parser_from_json<std::size_t>((*s)[u"manager_size"], manager_size, context);
-    m_object_manager.m_items.resize(manager_size);
+    m_objects.resize(manager_size);
 
     scheme_list_t* items = read_array((*s)[u"cells"]);
     if (items) {
@@ -1284,7 +1228,7 @@ void Game_world::deserialize(std::u16string& value, SerializationContext& contex
     items = read_array((*s)[u"items"]);
     if (items) {
         std::size_t i = 0;
-        auto it = m_object_manager.m_items.begin();
+        auto it = m_objects.begin();
         for (const auto& element : *items) {
             parser_from_json<GameObject>(element, *it, context);
             i += 1;
@@ -1304,18 +1248,18 @@ std::string Game_world::bin_serialize(SerializationContext& context)
 {
     //LOG(INFO) << "std::string Game_world::bin_serialize()";
     std::size_t i = 0;
-    for (auto& element : m_object_manager.m_items) {
+    for (auto& element : m_objects) {
         element.m_serialization_index = i;
         i += 1;
     }
-    auto ms = m_object_manager.m_items.size();
+    auto ms = m_objects.size();
     //LOG(INFO) << "std::string Game_world::bin_serialize() "<<std::to_string(ms);
     auto result = parser_to_binary<dimension3_t>(m_maps.front()->m_size, context) + parser_to_binary<std::size_t>(ms, context);
     for (auto& element : m_maps.front()->m_items) {
         result += parser_to_binary<std::list<GameObject*>>(element.m_items, context);
         result += parser_to_binary<bool>(element.m_notable, context);
     }
-    for (auto& element : m_object_manager.m_items) {
+    for (auto& element : m_objects) {
         result += parser_to_binary<GameObject>(element, context);
     }
     result += parser_to_binary<GameObject*>(m_player->m_object, context);
@@ -1335,7 +1279,7 @@ void Game_world::bin_deserialize(std::string& value, SerializationContext& conte
     std::size_t manager_size;
     parser_from_binary<std::size_t>(value, manager_size, pos, context);
     //LOG(INFO) << "void Game_world::bin_deserialize(std::string& value) " << std::to_string(manager_size);
-    m_object_manager.m_items.resize(manager_size);
+    m_objects.resize(manager_size);
 
     for (auto& element : m_maps.front()->m_items) {
         parser_from_binary<std::list<GameObject*>>(value, element.m_items, pos, context);
@@ -1343,7 +1287,7 @@ void Game_world::bin_deserialize(std::string& value, SerializationContext& conte
     }
 
     std::size_t i = 0;
-    for (auto& element : m_object_manager.m_items) {
+    for (auto& element : m_objects) {
         parser_from_binary<GameObject>(value, element, pos, context);
         ++i;
     }
@@ -1357,6 +1301,11 @@ iPacker& Game_world::get_packer()
     return Packer<Game_world>::instance();
 }
 
+std::u16string Game_world::serialize_to_json(JsonWriter& value)
+{
+    return value.write(*this);
+}
+
 void Game_world::calculate_lighting()
 {
     int lx;
@@ -1365,8 +1314,9 @@ void Game_world::calculate_lighting()
     int c;
     FOV_light fl;
 
-    for (auto m = m_maps.begin(); m != m_maps.end(); ++m) {
-        GameMap& map = *(*m);
+    for (auto& m_map : m_maps)
+    {
+        GameMap& map = *m_map;
         for (int z = 0; z < map.m_size.dz; ++z) {
             for (int y = 0; y < map.m_size.dy; ++y) {
                 for (int x = 0; x < map.m_size.dx; ++x) {
@@ -1375,8 +1325,9 @@ void Game_world::calculate_lighting()
             }
         }
     }
-    for (auto l = m_object_manager.m_items.begin(); l != m_object_manager.m_items.end(); ++l) {
-        GameObject& object = (*l);
+    for (auto& m_object : m_objects)
+    {
+        GameObject& object = m_object;
         if (!object.m_active_state->m_light) {
             continue;
         }
@@ -1384,7 +1335,7 @@ void Game_world::calculate_lighting()
             continue;
         }
         GameMap* map = dynamic_cast<MapCell*>(object.m_owner)->m_map;
-        fl.calculate(20, &*l, map);
+        fl.calculate(20, &m_object, map);
         for (int z = 0; z < 41; ++z) {
             for (int y = 0; y < 41; ++y) {
                 for (int x = 0; x < 41; ++x) {
@@ -1393,17 +1344,17 @@ void Game_world::calculate_lighting()
                     lx = abs(x - 20);
                     ly = abs(y - 20);
                     lz = abs(z - 20);
-                    c = (l->m_active_state->m_light->r * m_coefficient[lz][ly][lx]); // *fl.m_map[y][x].damping.R;
+                    c = (m_object.m_active_state->m_light->r * m_coefficient[lz][ly][lx]); // *fl.m_map[y][x].damping.R;
                     if (c < 0) {
                         c = 0;
                     }
                     fl.get(z, y, x).light.r = c;
-                    c = (l->m_active_state->m_light->g * m_coefficient[lz][ly][lx]); // *fl.m_map[y][x].damping.G;
+                    c = (m_object.m_active_state->m_light->g * m_coefficient[lz][ly][lx]); // *fl.m_map[y][x].damping.G;
                     if (c < 0) {
                         c = 0;
                     }
                     fl.get(z, y, x).light.g = c;
-                    c = (l->m_active_state->m_light->b * m_coefficient[lz][ly][lx]); // *fl.m_map[y][x].damping.B;
+                    c = (m_object.m_active_state->m_light->b * m_coefficient[lz][ly][lx]); // *fl.m_map[y][x].damping.B;
                     if (c < 0) {
                         c = 0;
                     }
@@ -1419,13 +1370,13 @@ void Game_world::calculate_lighting()
             }
         }
         for (int z = 0; z < 41; ++z) {
-            lz = l->cell()->z + z - 20;
+            lz = m_object.cell()->z + z - 20;
             if (!((lz < 0) || (lz > map->m_size.dz - 1))) {
                 for (int y = 0; y < 41; y++) {
-                    ly = l->cell()->y + y - 20;
+                    ly = m_object.cell()->y + y - 20;
                     if (!((ly < 0) || (ly > map->m_size.dy - 1))) {
                         for (int x = 0; x < 41; x++) {
-                            lx = l->cell()->x + x - 20;
+                            lx = m_object.cell()->x + x - 20;
                             if (!((lx < 0) || (lx > map->m_size.dx - 1))) {
                                 map->get(lz, ly, lx).m_light.r += fl.get(z, y, x).light.r;
                                 map->get(lz, ly, lx).m_light.g += fl.get(z, y, x).light.g;
@@ -1437,7 +1388,60 @@ void Game_world::calculate_lighting()
             }
         }
     }
-    for (auto m = m_maps.begin(); m != m_maps.end(); ++m) {
-        (*m)->blur_lighting();
+    for (auto& m_map : m_maps)
+    {
+	    m_map->blur_lighting();
+    }
+}
+
+void Game_world::update_buff()
+{
+    Interaction_list* e;
+    Visitor_onturn_updater visitor;
+
+    for (auto& m_item : m_objects) {
+        auto list = static_cast<Interaction_list*>(m_item.get_effect(interaction_e::buff));
+        if (list) {
+            e = list->clone();
+            e->apply_effect(&m_item, nullptr);
+            visitor.result = false;
+            list->apply_visitor(visitor);
+        }
+        for (auto& item : m_item.m_active_state->m_items) {
+            if (item.second->get_interaction_message_type() == interaction_message_type_e::list) {
+                e = static_cast<Interaction_list*>(item.second);
+                if (e->m_list_type == feature_list_type_e::parameter || e->m_list_type == feature_list_type_e::parts || e->m_list_type == feature_list_type_e::tag) {
+                    visitor.result = false;
+                    e->apply_visitor(visitor);
+                }
+            }
+        }
+        m_item.update_interaction();
+        m_item.event_update(VoidEventArgs());
+    }
+}
+
+void Game_world::calculate_ai()
+{
+    for (auto& m_item : m_objects) {
+        if (m_item.m_owner->m_kind == entity_e::cell) {
+            if ((m_item.m_active_state->m_ai) && (&m_item != Application::instance().m_world->m_player->m_object)) {
+                switch (m_item.m_active_state->m_ai->m_ai_type) {
+                case ai_type_e::trap: {
+                    auto obj = *static_cast<AI_trap*>(m_item.m_active_state->m_ai);
+                    obj.m_object = &m_item;
+                    obj.create();
+                    break;
+                }
+                case ai_type_e::non_humanoid: {
+                    auto obj = static_cast<AI_enemy*>(m_item.m_active_state->m_ai);
+                    obj->m_map = static_cast<MapCell*>(m_item.m_owner)->m_map;
+                    obj->m_object = &m_item;
+                    obj->create();
+                    break;
+                }
+                }
+            }
+        }
     }
 }

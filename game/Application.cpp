@@ -13,6 +13,7 @@
 #include <fstream>
 #include <graphics/GUI_Description_window.h>
 #include <string>
+#include "json_game_saver.h"
 
 using namespace std::string_literals;
 
@@ -251,7 +252,7 @@ void Application::initialize(const dimension_t<int> work_area_size, const HDC m_
 void Application::new_game()
 {
     m_world = new Game_world();
-    auto map = new GameMap(dimension3_t(128, 128, 10));
+    auto map = new GameMap(dimension3_t(10, 10, 10));
 
     map->generate_room();
     m_world->m_maps.push_back(map);
@@ -261,6 +262,10 @@ void Application::new_game()
     auto obj = m_game_object_manager->new_object("human");
     obj->set_direction(object_direction_e::down);
     map->add_to_map(obj, map->get(1, ry, rx));
+	
+	JsonGameSaver j;
+    Logger::instance().info("Serialize: {}", utf16_to_cp1251(j.write(m_world)));
+
     m_world->m_player = new Player(obj, map);
     m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
 
@@ -510,7 +515,7 @@ void Application::update()
                 m_world->m_player->m_object->m_active_state->m_ai->m_action_controller->update();
             }
             //start = std::chrono::high_resolution_clock::now();
-            m_world->m_object_manager.calculate_ai();
+            m_world->calculate_ai();
             //LOG(INFO) << "Просчет ИИ: " << std::to_string(elapsed.count());
             if (m_world->m_player->m_object->m_active_state->m_ai) {
                 auto object = m_world->m_player->m_object;
@@ -563,7 +568,7 @@ void Application::update()
                 }
             }
             //start = std::chrono::high_resolution_clock::now();
-            m_world->m_object_manager.update_buff();
+            m_world->update_buff();
 
             //LOG(INFO) <<"Просчет баффов: " <<std::to_string(elapsed.count());
             //start = std::chrono::high_resolution_clock::now();
