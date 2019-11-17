@@ -22,7 +22,7 @@ void Parameter_argument_t::set(Game_object_owner* value)
     }
     case ::type_e::object_part: {
         if (value->m_kind == entity_e::body_part) {
-            m_part = static_cast<Object_part*>(value);
+            m_part = static_cast<ObjectPart*>(value);
             return;
         }
         break;

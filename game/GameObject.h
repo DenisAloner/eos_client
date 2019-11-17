@@ -1,17 +1,18 @@
-#ifndef GAMEOBJECT_H
-#define GAMEOBJECT_H
+#ifndef GAME_OBJECT_H
+#define GAME_OBJECT_H
 
 #include "Action.h"
 #include "all_effects.h"
+#include "attribute_map.h"
+#include "game_object_owner.h"
 #include <Application.h>
+#include <i_json_serializable.h>
 #include <list>
 #include <map>
-#include <i_json_serializable.h>
 
 class Object_feature;
 class Application;
 class TileManager;
-class GameObject;
 class Effect;
 class Object_interaction;
 class Interaction_list;
@@ -25,79 +26,9 @@ class AI;
 class Object_tag;
 class Icon;
 class GameMap;
-
-namespace Effect_functions {
-Interaction_list* create_feature_list(feature_list_type_e key, interaction_e name);
-}
-
-class Game_object_owner : public virtual iSerializable, public iJsonSerializable {
-public:
-    entity_e m_kind;
-    Game_object_owner* m_owner;
-
-    Game_object_owner();
-
-    Game_object_owner* get_owner();
-    Game_object_owner* get_owner(entity_e kind);
-
-    iPacker& get_packer() override = 0;
-    /*{
-		return Packer<Game_object_owner>::Instance();
-	}*/
-
-    constexpr static auto properties()
-    {
-        return std::make_tuple(
-            make_property(&Game_object_owner::m_kind, u"kind"),
-            make_property(&Game_object_owner::m_owner, u"owner"));
-    }
-
-    void reset_serialization_index() override;
-};
-
-class MapCell : public Game_object_owner {
-public:
-    GameMap* m_map;
-
-    bool m_closed;
-    int m_state;
-
-    bool m_notable;
-    bool m_mark;
-
-    int x;
-    int y;
-    int z;
-
-    cell_t m_pathfind_info;
-
-    std::list<GameObject*> m_items;
-
-    unsigned int m_path_info;
-
-    rgb_t<int> m_light;
-    rgb_t<int> m_light_blur;
-
-    MapCell();
-    MapCell(int x, int y, int z, GameMap* map);
-
-    void add_object(GameObject* object);
-    //virtual Object_feature* find_property(property_e kind, GameObject* excluded);
-
-    void reset_serialization_index() override;
-
-    iPacker& get_packer() override;
-
-    constexpr static auto properties()
-    {
-        return std::make_tuple(
-            make_property(&MapCell::x, u"x"),
-            make_property(&MapCell::y, u"y"),
-            make_property(&MapCell::m_items, u"items"));
-    }
-
-    std::u16string serialize_to_json(JsonWriter& value) override;
-};
+class ObjectPart;
+class MapCell;
+class InventoryCell;
 
 class Tag_getter : public Visitor {
 public:
@@ -108,38 +39,8 @@ public:
     void visit(Object_interaction& value) override;
 };
 
-class Attribute_map : public iSerializable, public iJsonSerializable {
-public:
-	
-    std::map<interaction_e, Interaction_list*> m_items;
-
-    Attribute_map();
-    void add_effect(interaction_e key, Object_interaction* item);
-    Interaction_list* create_feature_list(feature_list_type_e key, interaction_e name);
-    virtual Attribute_map* clone();
-
-    void reset_serialization_index() override;
-
-    Interaction_list* get_list(interaction_e key);
-    bool get_stat(object_tag_e key);
-    Object_tag* get_tag(object_tag_e key);
-    virtual void apply_visitor(Visitor_generic& visitor);
-
-    // Для поддержки iSerializable
-    iPacker& get_packer() override;
-
-    constexpr static auto properties()
-    {
-        return std::make_tuple(
-            make_property(&Attribute_map::m_items, u"item"));
-    }
-
-	std::u16string serialize_to_json(JsonWriter& value) override;
-};
-
 class Object_state : public Attribute_map {
 public:
-
     object_state_e m_state;
     int m_layer;
     dimension3_t m_size;
@@ -184,13 +85,17 @@ public:
                 make_property(&Object_state::m_size, u"size"),
                 make_property(&Object_state::m_layer, u"layer"),
                 make_property(&Object_state::m_ai, u"AI"),
-                make_property(&Object_state::m_tile_manager, u"tile_manager", &Object_state::tilemanager_to_json, &Object_state::tilemanager_from_json, &Object_state::tilemanager_to_binary, &Object_state::tilemanager_from_binary),
-                make_property(&Object_state::m_icon, u"icon", &Object_state::icon_to_json, &Object_state::icon_from_json, &Object_state::icon_to_binary, &Object_state::icon_from_binary),
+                make_property(&Object_state::m_tile_manager, u"tile_manager", &Object_state::tilemanager_to_json,
+                    &Object_state::tilemanager_from_json, &Object_state::tilemanager_to_binary,
+                    &Object_state::tilemanager_from_binary),
+                make_property(&Object_state::m_icon, u"icon", &Object_state::icon_to_json, &Object_state::icon_from_json,
+                    &Object_state::icon_to_binary, &Object_state::icon_from_binary),
                 make_property(&Object_state::m_light, u"light"),
                 make_property(&Object_state::m_optical, u"optical")));
     }
 
-    std::u16string serialize_to_json(JsonWriter& value) override;
+    std::u16string serialize_to_json_reference(JsonWriter& value) override;
+    std::u16string serialize_to_json_pointer(JsonWriter& value) override;
 };
 
 class Object_state_equip : public Object_state {
@@ -198,7 +103,7 @@ public:
     body_part_e m_body_part;
     Attribute_map m_equip;
     Object_state_equip();
-    virtual Object_state* clone();
+    Object_state* clone() override;
 
     iPacker& get_packer() override;
 
@@ -214,7 +119,6 @@ public:
 
 class GameObject : public Object_interaction, public GUI_connectable_i, public Game_object_owner {
 public:
-	
     std::u16string m_name;
     object_direction_e m_direction;
     bool m_selected;
@@ -262,12 +166,12 @@ public:
             make_property(&GameObject::m_direction, u"direction"),
             make_property(&GameObject::m_owner, u"owner"),
             make_property(&GameObject::m_state, u"state"),
-            make_property(&GameObject::m_active_state, u"active_state")
-		);
+            make_property(&GameObject::m_active_state, u"active_state"));
     }
 
-    interaction_message_type_e get_interaction_message_type() override { return interaction_message_type_e::game_object; }
-    std::u16string serialize_to_json(JsonWriter& value) override;
+    interaction_message_type_e get_interaction_message_type() override;
+    std::u16string serialize_to_json_reference(JsonWriter& value) override;
+    std::u16string serialize_to_json_pointer(JsonWriter& value) override;
 
 private:
     class Action_getter : public Visitor {
@@ -303,7 +207,10 @@ public:
         return std::make_tuple(
             make_property(&Config::m_icons, u"icons").from_json(&Config::instancedictonary_icon_from_json).from_binary(&Config::instancedictonary_icon_from_binary),
             make_property(&Config::m_tile_managers_atlas, u"atlases").from_json(&Config::instancedictonary_tilemanager_from_json_atlas),
-            make_property(&Config::m_tile_managers, u"tile_managers").from_json(&Config::instancedictonary_tilemanager_from_json).from_binary(&Config::instancedictonary_tilemanager_from_binary),
+            make_property(&Config::m_tile_managers, u"tile_managers")
+                .from_json(&Config::instancedictonary_tilemanager_from_json)
+                .from_binary(
+                    &Config::instancedictonary_tilemanager_from_binary),
             make_property(&Config::m_templates, u"templates"),
             make_property(&Config::m_items, u"items"));
     }
@@ -316,58 +223,7 @@ public:
     GameMap* m_map;
     Player(GameObject* object, GameMap* map);
 
-    virtual void get_actions_list(std::list<Action_helper_t>& value);
+    void get_actions_list(std::list<Action_helper_t>& value) override;
 };
 
-class Inventory_cell : public Game_object_owner {
-public:
-    GameObject* m_item;
-
-    //Inventory_cell();
-    Inventory_cell(GameObject* item = nullptr);
-
-    void reset_serialization_index() override;
-
-    iPacker& get_packer() override;
-
-    constexpr static auto properties()
-    {
-        return make_union(
-            Game_object_owner::properties(),
-            std::make_tuple(
-                make_property(&Inventory_cell::m_item, u"item")));
-    }
-
-    std::u16string serialize_to_json(JsonWriter& value) override;
-};
-
-class Object_part : public Inventory_cell, virtual public Object_interaction {
-public:
-    Attribute_map m_attributes;
-    body_part_e m_part_kind;
-    std::u16string m_name;
-
-    Object_part(GameObject* item = nullptr);
-    Object_part* clone() override;
-    void do_predicate(Visitor& helper) override;
-    void apply_visitor(Visitor_generic& visitor) override;
-
-    void reset_serialization_index() override;
-
-    iPacker& get_packer() override;
-
-    constexpr static auto properties()
-    {
-        return make_union(
-            Inventory_cell::properties(),
-            std::make_tuple(
-                make_property(&Object_part::m_part_kind, u"part_kind"),
-                make_property(&Object_part::m_name, u"name"),
-                make_property(&Object_part::m_attributes, u"attributes")));
-    }
-
-    interaction_message_type_e get_interaction_message_type() override;
-    std::u16string serialize_to_json(JsonWriter& value) override;
-};
-
-#endif //GAMEOBJECT_H
+#endif

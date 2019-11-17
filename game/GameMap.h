@@ -1,20 +1,19 @@
-#ifndef GAMEMAP_H
-#define GAMEMAP_H
+#ifndef GAME_MAP_H
+#define GAME_MAP_H
 
 #include "AI.h"
 #include "Event.h"
 #include "FOV_light.h"
-#include "GraphicalController.h"
 #include <functional>
 #include <list>
+#include "map_cell.h"
 
-class Application;
-class GameObject;
-class Object_feature;
-class MapCell;
-class AI;
+//class GameObject;
+//class Object_feature;
+//class MapCell;
+//class AI;
 class Dijkstra_map;
-class Player;
+//class Player;
 
 const int max_light_radius = 20;
 
@@ -41,7 +40,7 @@ public:
     std::list<block_t*> m_rooms;
     std::list<block_t*> m_link_rooms;
 
-    GameMap(dimension3_t size);
+    explicit GameMap(dimension3_t size);
     GameMap();
 
     MapCell& get(int z, int y, int x);
@@ -91,43 +90,8 @@ public:
             make_property(&GameMap::m_items, u"item", &GameMap::vector_mapcell_to_json, &GameMap::vector_mapcell_from_json, &GameMap::vector_mapcell_to_binary, &GameMap::vector_mapcell_from_binary));
     }
 
-    std::u16string serialize_to_json(JsonWriter& value) override;
+    std::u16string serialize_to_json_reference(JsonWriter& value) override;
+    std::u16string serialize_to_json_pointer(JsonWriter& value) override;
 };
 
-class Game_world : public iSerializable,public iJsonSerializable {
-public:
-    float m_coefficient[21][21][21];
-
-    std::list<GameObject> m_objects;
-
-    std::list<GameMap*> m_maps;
-
-    Player* m_player;
-
-    Game_world();
-    void calculate_lighting();
-    void update_buff();
-    void calculate_ai();
-    void reset_serialization_index() override;
-
-    std::u16string serialize(SerializationContext& context);
-    void deserialize(std::u16string& value, SerializationContext& context);
-
-    std::string bin_serialize(SerializationContext& context);
-    void bin_deserialize(std::string& value, SerializationContext& context);
-
-    iPacker& get_packer() override;
-
-    constexpr static auto properties()
-    {
-        return std::make_tuple(
-            make_property(&Game_world::m_objects, u"objects"),
-            make_property(&Game_world::m_maps, u"maps")
-
-        );
-    }
-
-    std::u16string serialize_to_json(JsonWriter& value) override;
-};
-
-#endif //GAMEMAP_H
+#endif

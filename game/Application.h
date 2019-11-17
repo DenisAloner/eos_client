@@ -38,10 +38,9 @@ class GUI_MiniMap;
 class Parameter_destination;
 class AI_manager;
 class GameObjectManager;
-class Object_part;
+class ObjectPart;
 class Object_interaction;
 class GUI_Window_manager;
-class Game_world;
 class Instruction_slot_parameter;
 
 class gui_MessageQueue {
@@ -113,7 +112,7 @@ public:
 
     Game_log m_game_log;
 
-    Game_world* m_world;
+    GameWorld* m_world;
 
     ~Application();
 
@@ -153,7 +152,7 @@ public:
     void command_change_owner(Instruction_slot_parameter* parameter);
     /*Parameter* command_select_transfer_source(Parameter_destination* parameter);*/
     Game_object_owner* command_select_transfer(Parameter_destination* parameter);
-    Object_part* command_select_body_part();
+    ObjectPart* command_select_body_part();
     bool command_agreement();
     void console(std::string text);
 

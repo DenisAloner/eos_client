@@ -1,6 +1,6 @@
 #include "GUI_Inventory.h"
 
-GUI_Part_slot::GUI_Part_slot(int width, int height, Object_part* item, GUI_Body* owner)
+GUI_Part_slot::GUI_Part_slot(int width, int height, ObjectPart* item, GUI_Body* owner)
     : m_item(item)
     , m_owner(owner)
 {
@@ -62,7 +62,7 @@ Visitor_container_hierarchy_getter::Visitor_container_hierarchy_getter(GUI_Body*
 {
 }
 
-void Visitor_container_hierarchy_getter::visit(Object_part& value)
+void Visitor_container_hierarchy_getter::visit(ObjectPart& value)
 {
     m_active.push_front(value.m_name);
     std::u16string name = u"";

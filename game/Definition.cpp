@@ -3,8 +3,8 @@
 
 #include "Application.h"
 #include "Definiton.h"
-
-
+#include "map_cell.h"
+#include "inventory_cell.h"
 
 void SerializationContext::reset()
 {
@@ -171,8 +171,8 @@ Serialization::Serialization()
     register_packer<Instruction_check_owner_type>(
         u"instruction_check_owner_type");
     register_packer<GameObject>(u"game_object");
-    register_packer<Inventory_cell>(u"inventory_cell");
-    register_packer<Object_part>(u"object_part");
+    register_packer<InventoryCell>(u"inventory_cell");
+    register_packer<ObjectPart>(u"object_part");
     register_packer<Attribute_map>(u"attribute_map");
     register_packer<Object_state>(u"object_state");
     register_packer<Object_state_equip>(u"object_state_equip");
@@ -196,7 +196,7 @@ Serialization::Serialization()
     register_packer<MapCell>(u"map_cell");
     register_packer<Action>(u"action");
     register_packer<Object_interaction>(u"template");
-    register_packer<Game_world>(u"game_world");
+    register_packer<GameWorld>(u"game_world");
     register_packer<SerializationLink>(u"link");
     register_packer<TileManager_Single_Atlas>(u"tilemanager_single_atlas");
     register_packer<TileManager_Atlas_Rotatable>(u"tilemanager_atlas_rotatable");

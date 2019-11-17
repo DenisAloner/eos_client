@@ -5,23 +5,24 @@
 #include "Visitors.h"
 #include <list>
 #include "gui_scrollable_container.h"
+#include "object_part.h"
 
 class Property_Container;
 class Parts_list;
-class Inventory_cell;
-class GameObject;
-class Object_part;
+class InventoryCell;
+//class GameObject;
+//class ObjectPart;
 class Attribute_map;
 
 class GUI_Body;
 
 class GUI_Part_slot : public GUI_Object {
 public:
-    Object_part* m_item;
+    ObjectPart* m_item;
     GUI_Body* m_owner;
     std::u16string m_name;
 
-    GUI_Part_slot(int width, int height, Object_part* item, GUI_Body* owner);
+    GUI_Part_slot(int width, int height, ObjectPart* item, GUI_Body* owner);
 
     void render(GraphicalController* graph, int px, int py) override;
     void on_mouse_move(MouseEventArgs const& e) override;
@@ -49,7 +50,7 @@ public:
 
     Visitor_container_hierarchy_getter(GUI_Body* owner);
 
-    void visit(Object_part& value) override;
+    void visit(ObjectPart& value) override;
 };
 
 #endif //GUI_INVENTORY_H

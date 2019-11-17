@@ -21,7 +21,7 @@ void Instruction_slot_parameter::apply_effect(GameObject* unit, Object_interacti
 	}
 	else
 	{
-		Object_part* o = static_cast<Object_part*>(object);
+		ObjectPart* o = static_cast<ObjectPart*>(object);
 		if (o->m_object_state.get_stat(m_subtype))
 		{
 			m_value->apply_effect(unit, object);

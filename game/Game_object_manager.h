@@ -7,7 +7,7 @@
 
 class Game_object_owner;
 class Config;
-class Object_part;
+class ObjectPart;
 
 class GameObjectManager {
 public:
@@ -33,7 +33,7 @@ class Visitor_part_hierarchy_setter : public Visitor_simple {
 public:
     std::list<Game_object_owner*> m_game_object_owner_stack;
 
-    void visit(Object_part& value) override;
+    void visit(ObjectPart& value) override;
 };
 
 #endif //GAME_OBJECT_MANAGER_H

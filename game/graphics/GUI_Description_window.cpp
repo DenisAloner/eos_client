@@ -146,7 +146,7 @@ void Visitor_object_description_getter::visit(Parts_list& value)
     m_active.pop_front();
 }
 
-void Visitor_object_description_getter::visit(Object_part& value)
+void Visitor_object_description_getter::visit(ObjectPart& value)
 {
     handle_complex(value.m_name + u": ");
     Visitor_simple::visit(value);

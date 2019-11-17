@@ -35,17 +35,28 @@ public:
         return result + u'}';
     }
 
-    std::u16string write(Game_world& value) override;
+    std::u16string write(GameWorld& value) override;
     std::u16string write(GameMap& value) override;
     std::u16string write(GameObject& value) override;
     std::u16string write(Attribute_map& value) override;
     std::u16string write(Object_state& value) override;
     std::u16string write(Interaction_list& value) override;
     std::u16string write(MapCell& value) override;
-    std::u16string write(Inventory_cell& value) override;
-    std::u16string write(Object_part& value) override;
+    std::u16string write(InventoryCell& value) override;
+    std::u16string write(ObjectPart& value) override;
 
-    std::u16string map_cell_save(std::vector<MapCell>& value);
+    std::u16string write(Game_object_owner* value) override;
+    std::u16string write(MapCell* value) override;
+    std::u16string write(GameWorld* value) override;
+    std::u16string write(GameMap* value) override;
+    std::u16string write(GameObject* value) override;
+    std::u16string write(Attribute_map* value) override;
+    std::u16string write(Object_state* value) override;
+    std::u16string write(Interaction_list* value) override;
+    std::u16string write(InventoryCell* value) override;
+    std::u16string write(ObjectPart* value) override;
+
+	std::u16string map_cell_owner_save(GameMap* value);
 };
 
 #endif

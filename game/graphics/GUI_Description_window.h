@@ -33,7 +33,7 @@ public:
     void visit(Vision_list& value) override;
     void visit(Vision_component& value) override;
     void visit(Parts_list& value) override;
-    void visit(Object_part& value) override;
+    void visit(ObjectPart& value) override;
     void visit(Tag_list& value) override;
     void visit(Action_list& value) override;
     void visit(Instruction_check_tag& value) override;

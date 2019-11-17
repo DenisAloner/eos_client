@@ -6,7 +6,7 @@
 class Game_object_owner;
 class GameObject;
 class MapCell;
-class Object_part;
+class ObjectPart;
 
 struct Parameter_argument_t {
     type_e kind;
@@ -15,7 +15,7 @@ struct Parameter_argument_t {
         GameObject* m_object;
         MapCell* m_cell;
         Game_object_owner* m_owner;
-        Object_part* m_part;
+        ObjectPart* m_part;
         object_direction_e m_direction;
     };
 

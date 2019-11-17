@@ -1,25 +1,4805 @@
-{
-    "$link": 1,
-    "name": "human",
-    "direction": "down",
-    "owner": {
-        "$link": 2,
-        "x": 8,
-        "y": 8,
-        "items": [{
-            "$type": link,
-            "$link": 1
-        }]
-    },
-    "state": [{
-        "$link": 3,
-        "state": "alive"
-    }, {
-        "$link": 4,
-        "state": "dead"
-    }],
-    "active_state": {
-        "$type": link,
-        "$link": 3
-    }
-}
+ {
+     "$link": 1,
+     "maps": [{
+         "$link": 2,
+         "size": [10, 10, 10]
+     }],
+     "objects": [{
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 0,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 3,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 3
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 1,
+             "y": 0,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 4,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 4
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 2,
+             "y": 0,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 5,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 5
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 3,
+             "y": 0,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 6,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 6
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 4,
+             "y": 0,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 7,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 7
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 5,
+             "y": 0,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 8,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 8
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 6,
+             "y": 0,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 9,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 9
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 7,
+             "y": 0,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 10,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 10
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 8,
+             "y": 0,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 11,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 11
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 0,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 12,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 12
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 1,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 13,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 13
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 1,
+             "y": 1,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 14,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 14
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 2,
+             "y": 1,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 15,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 15
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 3,
+             "y": 1,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 16,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 16
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 4,
+             "y": 1,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 17,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 17
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 5,
+             "y": 1,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 18,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 18
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 6,
+             "y": 1,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 19,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 19
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 7,
+             "y": 1,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 20,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 20
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 8,
+             "y": 1,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 21,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 21
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 1,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 22,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 22
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 2,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 23,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 23
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 1,
+             "y": 2,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 24,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 24
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 2,
+             "y": 2,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 25,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 25
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 3,
+             "y": 2,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 26,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 26
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 4,
+             "y": 2,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 27,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 27
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 5,
+             "y": 2,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 28,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 28
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 6,
+             "y": 2,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 29,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 29
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 7,
+             "y": 2,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 30,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 30
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 8,
+             "y": 2,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 31,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 31
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 2,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 32,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 32
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 3,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 33,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 33
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 1,
+             "y": 3,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 34,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 34
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 2,
+             "y": 3,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 35,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 35
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 3,
+             "y": 3,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 36,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 36
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 4,
+             "y": 3,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 37,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 37
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 5,
+             "y": 3,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 38,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 38
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 6,
+             "y": 3,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 39,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 39
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 7,
+             "y": 3,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 40,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 40
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 8,
+             "y": 3,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 41,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 41
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 3,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 42,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 42
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 4,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 43,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 43
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 1,
+             "y": 4,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 44,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 44
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 2,
+             "y": 4,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 45,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 45
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 3,
+             "y": 4,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 46,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 46
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 4,
+             "y": 4,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 47,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 47
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 5,
+             "y": 4,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 48,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 48
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 6,
+             "y": 4,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 49,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 49
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 7,
+             "y": 4,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 50,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 50
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 8,
+             "y": 4,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 51,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 51
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 4,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 52,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 52
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 5,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 53,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 53
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 1,
+             "y": 5,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 54,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 54
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 2,
+             "y": 5,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 55,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 55
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 3,
+             "y": 5,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 56,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 56
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 4,
+             "y": 5,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 57,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 57
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 5,
+             "y": 5,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 58,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 58
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 6,
+             "y": 5,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 59,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 59
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 7,
+             "y": 5,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 60,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 60
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 8,
+             "y": 5,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 61,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 61
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 5,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 62,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 62
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 6,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 63,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 63
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 1,
+             "y": 6,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 64,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 64
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 2,
+             "y": 6,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 65,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 65
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 3,
+             "y": 6,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 66,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 66
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 4,
+             "y": 6,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 67,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 67
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 5,
+             "y": 6,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 68,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 68
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 6,
+             "y": 6,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 69,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 69
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 7,
+             "y": 6,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 70,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 70
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 8,
+             "y": 6,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 71,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 71
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 6,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 72,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 72
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 7,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 73,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 73
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 1,
+             "y": 7,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 74,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 74
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 2,
+             "y": 7,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 75,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 75
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 3,
+             "y": 7,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 76,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 76
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 4,
+             "y": 7,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 77,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 77
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 5,
+             "y": 7,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 78,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 78
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 6,
+             "y": 7,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 79,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 79
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 7,
+             "y": 7,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 80,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 80
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 8,
+             "y": 7,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 81,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 81
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 7,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 82,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 82
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 8,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 83,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 83
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 1,
+             "y": 8,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 84,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 84
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 2,
+             "y": 8,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 85,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 85
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 3,
+             "y": 8,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 86,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 86
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 4,
+             "y": 8,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 87,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 87
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 5,
+             "y": 8,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 88,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 88
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 6,
+             "y": 8,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 89,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 89
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 7,
+             "y": 8,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 90,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 90
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 8,
+             "y": 8,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 91,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 91
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 8,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 92,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 92
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 9,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 93,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 93
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 1,
+             "y": 9,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 94,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 94
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 2,
+             "y": 9,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 95,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 95
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 3,
+             "y": 9,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 96,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 96
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 4,
+             "y": 9,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 97,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 97
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 5,
+             "y": 9,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 98,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 98
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 6,
+             "y": 9,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 99,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 99
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 7,
+             "y": 9,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 100,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 100
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 8,
+             "y": 9,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 101,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 101
+         }
+     }, {
+         "name": "floor",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 9,
+             "z": 0,
+             "map": 0
+         },
+         "state": [{
+             "$link": 102,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 102
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 0,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 103,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 103
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 1,
+             "y": 0,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 104,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 104
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 2,
+             "y": 0,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 105,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 105
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 3,
+             "y": 0,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 106,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 106
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 4,
+             "y": 0,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 107,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 107
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 5,
+             "y": 0,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 108,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 108
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 6,
+             "y": 0,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 109,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 109
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 7,
+             "y": 0,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 110,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 110
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 8,
+             "y": 0,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 111,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 111
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 0,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 112,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 112
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 1,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 113,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 113
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 1,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 114,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 114
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 2,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 115,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 115
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 2,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 116,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 116
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 3,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 117,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 117
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 3,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 118,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 118
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 4,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 119,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 119
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 4,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 120,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 120
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 5,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 121,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 121
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 5,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 122,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 122
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 6,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 123,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 123
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 6,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 124,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 124
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 7,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 125,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 125
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 7,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 126,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 126
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 8,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 127,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 127
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 8,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 128,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 128
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 9,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 129,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 129
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 1,
+             "y": 9,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 130,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 130
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 2,
+             "y": 9,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 131,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 131
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 3,
+             "y": 9,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 132,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 132
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 4,
+             "y": 9,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 133,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 133
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 5,
+             "y": 9,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 134,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 134
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 6,
+             "y": 9,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 135,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 135
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 7,
+             "y": 9,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 136,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 136
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 8,
+             "y": 9,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 137,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 137
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 9,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 138,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 138
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 0,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 139,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 139
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 1,
+             "y": 0,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 140,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 140
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 2,
+             "y": 0,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 141,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 141
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 3,
+             "y": 0,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 142,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 142
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 4,
+             "y": 0,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 143,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 143
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 5,
+             "y": 0,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 144,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 144
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 6,
+             "y": 0,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 145,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 145
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 7,
+             "y": 0,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 146,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 146
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 8,
+             "y": 0,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 147,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 147
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 0,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 148,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 148
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 1,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 149,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 149
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 1,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 150,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 150
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 2,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 151,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 151
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 2,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 152,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 152
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 3,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 153,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 153
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 3,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 154,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 154
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 4,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 155,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 155
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 4,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 156,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 156
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 5,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 157,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 157
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 5,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 158,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 158
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 6,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 159,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 159
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 6,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 160,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 160
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 7,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 161,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 161
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 7,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 162,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 162
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 8,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 163,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 163
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 8,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 164,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 164
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 9,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 165,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 165
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 1,
+             "y": 9,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 166,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 166
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 2,
+             "y": 9,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 167,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 167
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 3,
+             "y": 9,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 168,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 168
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 4,
+             "y": 9,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 169,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 169
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 5,
+             "y": 9,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 170,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 170
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 6,
+             "y": 9,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 171,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 171
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 7,
+             "y": 9,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 172,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 172
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 8,
+             "y": 9,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 173,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 173
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 9,
+             "z": 2,
+             "map": 0
+         },
+         "state": [{
+             "$link": 174,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 174
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 0,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 175,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 175
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 1,
+             "y": 0,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 176,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 176
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 2,
+             "y": 0,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 177,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 177
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 3,
+             "y": 0,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 178,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 178
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 4,
+             "y": 0,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 179,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 179
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 5,
+             "y": 0,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 180,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 180
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 6,
+             "y": 0,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 181,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 181
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 7,
+             "y": 0,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 182,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 182
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 8,
+             "y": 0,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 183,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 183
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 0,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 184,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 184
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 1,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 185,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 185
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 1,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 186,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 186
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 2,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 187,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 187
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 2,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 188,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 188
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 3,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 189,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 189
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 3,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 190,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 190
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 4,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 191,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 191
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 4,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 192,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 192
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 5,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 193,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 193
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 5,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 194,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 194
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 6,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 195,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 195
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 6,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 196,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 196
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 7,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 197,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 197
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 7,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 198,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 198
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 8,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 199,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 199
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 8,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 200,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 200
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 9,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 201,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 201
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 1,
+             "y": 9,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 202,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 202
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 2,
+             "y": 9,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 203,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 203
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 3,
+             "y": 9,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 204,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 204
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 4,
+             "y": 9,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 205,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 205
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 5,
+             "y": 9,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 206,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 206
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 6,
+             "y": 9,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 207,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 207
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 7,
+             "y": 9,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 208,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 208
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 8,
+             "y": 9,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 209,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 209
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 9,
+             "z": 3,
+             "map": 0
+         },
+         "state": [{
+             "$link": 210,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 210
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 0,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 211,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 211
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 1,
+             "y": 0,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 212,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 212
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 2,
+             "y": 0,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 213,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 213
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 3,
+             "y": 0,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 214,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 214
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 4,
+             "y": 0,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 215,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 215
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 5,
+             "y": 0,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 216,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 216
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 6,
+             "y": 0,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 217,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 217
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 7,
+             "y": 0,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 218,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 218
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 8,
+             "y": 0,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 219,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 219
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 0,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 220,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 220
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 1,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 221,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 221
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 1,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 222,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 222
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 2,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 223,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 223
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 2,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 224,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 224
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 3,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 225,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 225
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 3,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 226,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 226
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 4,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 227,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 227
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 4,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 228,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 228
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 5,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 229,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 229
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 5,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 230,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 230
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 6,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 231,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 231
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 6,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 232,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 232
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 7,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 233,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 233
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 7,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 234,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 234
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 8,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 235,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 235
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 8,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 236,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 236
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 9,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 237,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 237
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 1,
+             "y": 9,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 238,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 238
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 2,
+             "y": 9,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 239,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 239
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 3,
+             "y": 9,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 240,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 240
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 4,
+             "y": 9,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 241,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 241
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 5,
+             "y": 9,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 242,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 242
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 6,
+             "y": 9,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 243,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 243
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 7,
+             "y": 9,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 244,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 244
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 8,
+             "y": 9,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 245,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 245
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 9,
+             "z": 4,
+             "map": 0
+         },
+         "state": [{
+             "$link": 246,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 246
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 0,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 247,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 247
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 1,
+             "y": 0,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 248,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 248
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 2,
+             "y": 0,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 249,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 249
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 3,
+             "y": 0,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 250,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 250
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 4,
+             "y": 0,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 251,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 251
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 5,
+             "y": 0,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 252,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 252
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 6,
+             "y": 0,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 253,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 253
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 7,
+             "y": 0,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 254,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 254
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 8,
+             "y": 0,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 255,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 255
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 0,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 256,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 256
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 1,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 257,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 257
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 1,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 258,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 258
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 2,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 259,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 259
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 2,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 260,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 260
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 3,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 261,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 261
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 3,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 262,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 262
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 4,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 263,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 263
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 4,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 264,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 264
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 5,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 265,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 265
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 5,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 266,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 266
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 6,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 267,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 267
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 6,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 268,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 268
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 7,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 269,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 269
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 7,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 270,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 270
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 8,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 271,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 271
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 8,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 272,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 272
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 0,
+             "y": 9,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 273,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 273
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 1,
+             "y": 9,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 274,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 274
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 2,
+             "y": 9,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 275,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 275
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 3,
+             "y": 9,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 276,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 276
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 4,
+             "y": 9,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 277,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 277
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 5,
+             "y": 9,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 278,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 278
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 6,
+             "y": 9,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 279,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 279
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 7,
+             "y": 9,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 280,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 280
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 8,
+             "y": 9,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 281,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 281
+         }
+     }, {
+         "name": "wall",
+         "direction": "down",
+         "owner": {
+             "x": 9,
+             "y": 9,
+             "z": 5,
+             "map": 0
+         },
+         "state": [{
+             "$link": 282,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 282
+         }
+     }, {
+         "name": "torch",
+         "direction": "down",
+         "owner": {
+             "x": 1,
+             "y": 1,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 283,
+             "state": "alive"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 283
+         }
+     }, {
+         "name": "human",
+         "direction": "down",
+         "owner": {
+             "x": 8,
+             "y": 8,
+             "z": 1,
+             "map": 0
+         },
+         "state": [{
+             "$link": 284,
+             "state": "alive"
+         }, {
+             "$link": 285,
+             "state": "dead"
+         }],
+         "active_state": {
+             "$type": link,
+             "$link": 284
+         }
+     }]
+ }

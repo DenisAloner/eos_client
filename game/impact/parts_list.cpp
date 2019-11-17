@@ -39,7 +39,7 @@ Parts_list* Parts_list::clone()
 //	}
 //	case interaction_message_type_e::part:
 //	{
-//		Object_part* part = static_cast<Object_part*>(list);
+//		ObjectPart* part = static_cast<ObjectPart*>(list);
 //		LOG(INFO) << part->m_name;
 //		if (part->m_items)
 //		{
@@ -99,7 +99,7 @@ void Parts_list::Update_visitor::visit(Object_interaction& value)
     }
     switch (value.get_interaction_message_type()) {
     case interaction_message_type_e::part: {
-	    auto& part = dynamic_cast<Object_part&>(value);
+	    auto& part = dynamic_cast<ObjectPart&>(value);
         if (part.m_item) {
 	        auto tag_equippable = static_cast<ObjectTag::Equippable*>(part.m_item->get_tag(object_tag_e::equippable));
             if (tag_equippable) {
@@ -167,7 +167,7 @@ void Parts_list::equip(Object_interaction* item)
 
     //for (auto current = m_items.begin(); current != m_items.end(); ++current)
     //{
-    //	//Object_part* a = dynamic_cast<Object_part*>(*current);
+    //	//ObjectPart* a = dynamic_cast<ObjectPart*>(*current);
     //	LOG(INFO) <<std::to_string((int)((*current)->get_interaction_message_type));
     //
     //}

@@ -1,5 +1,6 @@
 #include "Game_object_manager.h"
 #include "GameObject.h"
+#include "object_part.h"
 
 Config* GameObjectManager::m_config = new Config();
 
@@ -93,7 +94,7 @@ void GameObjectManager::bind_body(GameObject* object)
     }
 }
 
-void Visitor_part_hierarchy_setter::visit(Object_part& value)
+void Visitor_part_hierarchy_setter::visit(ObjectPart& value)
 {
     value.m_owner = m_game_object_owner_stack.front();
     m_game_object_owner_stack.push_front(&value);

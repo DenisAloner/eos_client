@@ -1,7 +1,9 @@
 #ifndef WRITER_H
 #define WRITER_H
 
-#include "GameObject.h"
+
+#include "game_world.h"
+#include "object_part.h"
 #include "i_json_serializable.h"
 
 class iJsonSerializable;
@@ -9,7 +11,7 @@ class iJsonSerializable;
 template <typename Class, typename T, typename W>
 struct JsonProperty {
 
-    typedef std::u16string (W::*custom_function_t)(T&);
+    typedef std::u16string (W::*custom_function_t)(T);
 
     constexpr JsonProperty(T Class::*member,
         const char16_t* name,
@@ -18,10 +20,12 @@ struct JsonProperty {
         , name { name }
         , custom_function { custom_function } {};
 
-	 constexpr JsonProperty(T Class::*member,
+    constexpr JsonProperty(T Class::*member,
         const char16_t* name)
         : member { member }
         , name { name } {};
+
+    using type = T;
 
     T Class::*member;
     const char16_t* name;
@@ -30,9 +34,9 @@ struct JsonProperty {
 
 template <typename Class, typename T, typename W>
 constexpr auto
-json_property(T Class::*member, const char16_t* name, std::u16string (W::*fn)(T&))
+json_property(T Class::*member, const char16_t* name, std::u16string (W::*fn_ref)(T))
 {
-    return JsonProperty<Class, T, W> { member, name, fn };
+    return JsonProperty<Class, T, W> { member, name, fn_ref };
 }
 
 template <typename Class, typename T>
@@ -47,8 +51,7 @@ constexpr void
 for_sequence_json(std::integer_sequence<T, S...>, F&& f)
 {
     using unpack_t = int[];
-    (void)unpack_t { (static_cast<void>(f(std::integral_constant<T, S> {})), 0)...,
-        0 };
+    (void)unpack_t { (static_cast<void>(f(std::integral_constant<T, S> {})), 0)..., 0 };
 }
 
 class JsonWriter {
@@ -63,15 +66,26 @@ public:
     virtual std::u16string write(dimension3_t& value);
     virtual std::u16string write(const dimension3_t& value);
 
-    virtual std::u16string write(Game_world& value) = 0;
+    virtual std::u16string write(GameWorld& value) = 0;
     virtual std::u16string write(GameMap& value) = 0;
     virtual std::u16string write(GameObject& value) = 0;
     virtual std::u16string write(Attribute_map& value) = 0;
     virtual std::u16string write(Object_state& value) = 0;
     virtual std::u16string write(Interaction_list& value) = 0;
     virtual std::u16string write(MapCell& value) = 0;
-    virtual std::u16string write(Inventory_cell& value) = 0;
-    virtual std::u16string write(Object_part& value) = 0;
+    virtual std::u16string write(InventoryCell& value) = 0;
+    virtual std::u16string write(ObjectPart& value) = 0;
+
+	virtual std::u16string write(Game_object_owner* value) = 0;
+	virtual std::u16string write(GameWorld* value) = 0;
+    virtual std::u16string write(GameMap* value) = 0;
+    virtual std::u16string write(GameObject* value) = 0;
+    virtual std::u16string write(Attribute_map* value) = 0;
+    virtual std::u16string write(Object_state* value) = 0;
+    virtual std::u16string write(Interaction_list* value) = 0;
+    virtual std::u16string write(MapCell* value) = 0;
+    virtual std::u16string write(InventoryCell* value) = 0;
+    virtual std::u16string write(ObjectPart* value) = 0;
 
     template <typename T, class = typename std::enable_if<std::is_enum<T>::value, T>::type>
     std::u16string write(const T& value)
@@ -132,7 +146,7 @@ public:
     }
 
     template <typename T>
-    std::u16string write(T* value)
+    std::u16string write_pointer(T* value)
     {
         if (!value)
             return u"null";
@@ -140,7 +154,7 @@ public:
         if (ref == objects.end()) {
             counter += 1;
             objects[value] = counter;
-            return value->serialize_to_json(*this);
+            return value->serialize_to_json_reference(*this);
         }
         return u"{\"$type\":link,\"$link\":" + cp1251_to_utf16(std::to_string(ref->second)) + u"}";
     }

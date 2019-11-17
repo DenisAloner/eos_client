@@ -40,7 +40,7 @@ void ObjectTag::Equippable::apply_effect(GameObject* unit, Object_interaction* o
                 return;
             };
             if (p[2].m_owner->m_kind == entity_e::body_part) {
-	            auto part = static_cast<Object_part*>(p[2].m_owner);
+	            auto part = static_cast<ObjectPart*>(p[2].m_owner);
 	            auto t = part->m_attributes.get_tag(object_tag_e::requirements_to_object);
                 if (t) {
                     i->m_result = false;
@@ -62,11 +62,11 @@ void ObjectTag::Equippable::apply_effect(GameObject* unit, Object_interaction* o
             break;
         }
         case entity_e::inventory_cell: {
-            static_cast<Inventory_cell*>(p[1].m_object->m_owner)->m_item = nullptr;
+            static_cast<InventoryCell*>(p[1].m_object->m_owner)->m_item = nullptr;
             break;
         }
         case entity_e::body_part: {
-	        auto part = static_cast<Object_part*>(p[1].m_object->m_owner);
+	        auto part = static_cast<ObjectPart*>(p[1].m_object->m_owner);
             part->m_item = nullptr;
             part = nullptr;
             m_value->apply_effect(unit, object);
@@ -82,12 +82,12 @@ void ObjectTag::Equippable::apply_effect(GameObject* unit, Object_interaction* o
             break;
         }
         case entity_e::inventory_cell: {
-            static_cast<Inventory_cell*>(p[2].m_owner)->m_item = p[1].m_object;
+            static_cast<InventoryCell*>(p[2].m_owner)->m_item = p[1].m_object;
             p[1].m_object->m_owner = p[2].m_owner;
             break;
         }
         case entity_e::body_part: {
-	        const auto part = static_cast<Object_part*>(p[2].m_owner);
+	        const auto part = static_cast<ObjectPart*>(p[2].m_owner);
             part->m_item = p[1].m_object;
             p[1].m_object->m_owner = part;
             if (m_value) {

@@ -218,7 +218,7 @@ void Application::initialize(const dimension_t<int> work_area_size, const HDC m_
 
     m_ai_manager = new AI_manager();
     m_game_object_manager = new GameObjectManager();
-    const auto gw = new Game_world; //TODO костыль, продумать исправление
+    const auto gw = new GameWorld; //TODO костыль, продумать исправление
     SerializationContext pc(*gw); //TODO костыль, продумать исправление
     m_game_object_manager->init(pc);
     Logger::instance().info("Менеджер игровых объектов успешно инициализирован");
@@ -251,7 +251,7 @@ void Application::initialize(const dimension_t<int> work_area_size, const HDC m_
 
 void Application::new_game()
 {
-    m_world = new Game_world();
+    m_world = new GameWorld();
     auto map = new GameMap(dimension3_t(10, 10, 10));
 
     map->generate_room();
@@ -304,7 +304,7 @@ void Application::new_game()
 	{
 		b[i] = a[i];
 	}
-	auto* world = new Game_world();
+	auto* world = new GameWorld();
 	SerializationContext pc1(*world);
 	pc.reset();
 	world->reset_serialization_index();
@@ -446,7 +446,7 @@ void Application::load_game()
     file.seekg(0);
     file.read(&value[0], size);
     file.close();
-    auto* world = new Game_world();
+    auto* world = new GameWorld();
     SerializationContext pc(*world);
     pc.reset();
     world->reset_serialization_index();
@@ -736,16 +736,16 @@ GameObject* Application::command_select_object()
             auto temp = m_message_queue.m_items.front();
             switch ((*temp)[0].m_owner->m_kind) {
             case entity_e::inventory_cell: {
-                if (static_cast<Inventory_cell*>((*temp)[0].m_owner)->m_item) {
-                    Result = static_cast<Inventory_cell*>((*temp)[0].m_owner)->m_item;
+                if (static_cast<InventoryCell*>((*temp)[0].m_owner)->m_item) {
+                    Result = static_cast<InventoryCell*>((*temp)[0].m_owner)->m_item;
                     exit = true;
                 } else
                     Result = nullptr;
                 break;
             }
             case entity_e::body_part: {
-                if (static_cast<Object_part*>((*temp)[0].m_owner)->m_item) {
-                    Result = static_cast<Object_part*>((*temp)[0].m_owner)->m_item;
+                if (static_cast<ObjectPart*>((*temp)[0].m_owner)->m_item) {
+                    Result = static_cast<ObjectPart*>((*temp)[0].m_owner)->m_item;
                     exit = true;
                 } else
                     Result = nullptr;
@@ -911,10 +911,10 @@ Game_object_owner* Application::command_select_transfer(Parameter_destination* p
 //				}
 //			case entity_e::body_part:
 //			{
-//				if (static_cast<Object_part*>(temp->m_cell)->m_items)
+//				if (static_cast<ObjectPart*>(temp->m_cell)->m_items)
 //				{
 //					Result = new P_object();
-//					Result->m_object = static_cast<Object_part*>(temp->m_cell)->m_items;
+//					Result->m_object = static_cast<ObjectPart*>(temp->m_cell)->m_items;
 //					Exit = true;
 //				}
 //				else Result = nullptr;
@@ -934,9 +934,9 @@ Game_object_owner* Application::command_select_transfer(Parameter_destination* p
 //	return Result;
 //}
 
-Object_part* Application::command_select_body_part()
+ObjectPart* Application::command_select_body_part()
 {
-    Object_part* result = nullptr;
+    ObjectPart* result = nullptr;
     m_game_log.add(game_log_message_t(game_log_message_type_e::message_action_interaction, std::u16string(u"Выберите слот")));
     auto exit = false;
     while (!exit) {
@@ -949,7 +949,7 @@ Object_part* Application::command_select_body_part()
         if (m_message_queue.m_items.front()->m_kind == parameter_type_e::owner) {
             const auto p = m_message_queue.m_items.front();
             if ((*p)[0].m_owner->m_kind == entity_e::body_part) {
-                result = static_cast<Object_part*>((*p)[0].m_owner);
+                result = static_cast<ObjectPart*>((*p)[0].m_owner);
                 exit = true;
             }
         }

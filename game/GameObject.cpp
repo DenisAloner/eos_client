@@ -1,215 +1,9 @@
-#include "game/GameObject.h"
+#include "GameObject.h"
 #include <algorithm>
 #include <writer.h>
+#include "map_cell.h"
+#include "object_part.h"
 
-Interaction_list* Effect_functions::create_feature_list(feature_list_type_e key, interaction_e name)
-{
-    Interaction_list* result;
-    switch (key) {
-    case feature_list_type_e::generic: {
-        result = new Interaction_list();
-        break;
-    }
-    case feature_list_type_e::tag: {
-        result = new Tag_list();
-        break;
-    }
-    case feature_list_type_e::action: {
-        result = new Action_list();
-        break;
-    }
-    case feature_list_type_e::parameter: {
-        result = new Parameter_list(name);
-        break;
-    }
-    case feature_list_type_e::parts: {
-        result = new Parts_list();
-        break;
-    }
-    case feature_list_type_e::vision: {
-        result = new Vision_list();
-        break;
-    }
-    case feature_list_type_e::vision_component: {
-        result = new Vision_component();
-        break;
-    }
-    }
-    return result;
-}
-
-Game_object_owner* Game_object_owner::get_owner(entity_e kind)
-{
-    if (m_owner) {
-        if (m_owner->m_kind == kind) {
-            return m_owner;
-        } else {
-            return m_owner->get_owner(kind);
-        }
-    }
-    return nullptr;
-}
-
-void Game_object_owner::reset_serialization_index()
-{
-    m_serialization_index = 0;
-    if (m_owner) {
-        m_owner->reset_serialization_index();
-    }
-}
-
-Game_object_owner::Game_object_owner()
-    : m_owner(nullptr)
-{
-}
-
-Game_object_owner* Game_object_owner::get_owner()
-{
-    if (m_owner) {
-        return m_owner->get_owner();
-    }
-    return this;
-}
-
-MapCell::MapCell()
-{
-    m_kind = entity_e::cell;
-    m_notable = false;
-    m_owner = nullptr;
-}
-
-MapCell::MapCell(int x, int y, int z, GameMap* map)
-    : m_map(map)
-    , x(x)
-    , y(y)
-    , z(z)
-{
-    m_kind = entity_e::cell;
-    m_notable = false;
-    m_owner = nullptr;
-}
-
-void MapCell::add_object(GameObject* object)
-{
-    m_items.push_back(object);
-}
-
-void MapCell::reset_serialization_index()
-{
-    m_serialization_index = 0;
-    for (auto obj : m_items) {
-        if (obj->m_serialization_index != 0) {
-            obj->reset_serialization_index();
-        }
-    }
-}
-
-iPacker& MapCell::get_packer()
-{
-    return Packer<MapCell>::instance();
-}
-
-std::u16string MapCell::serialize_to_json(JsonWriter& value)
-{
-    return value.write(*this);
-}
-
-Attribute_map::Attribute_map() {};
-
-Interaction_list* Attribute_map::create_feature_list(feature_list_type_e key, interaction_e name)
-{
-    const auto result = Effect_functions::create_feature_list(key, name);
-    m_items[name] = result;
-    return result;
-}
-
-void Attribute_map::add_effect(interaction_e key, Object_interaction* item)
-{
-    if (m_items.find(key) != m_items.end()) {
-        m_items[key]->add(item);
-    }
-}
-
-Interaction_list* Attribute_map::get_list(interaction_e key)
-{
-	const auto value = m_items.find(key);
-    if (value != m_items.end()) {
-        return value->second;
-    }
-    return nullptr;
-}
-
-Attribute_map* Attribute_map::clone()
-{
-	auto result = new Attribute_map();
-    for (auto& m_item : m_items)
-    {
-        result->m_items[m_item.first] = m_item.second->clone();
-    }
-    return result;
-}
-
-void Attribute_map::reset_serialization_index()
-{
-    m_serialization_index = 0;
-    for (auto m_item : m_items) {
-        m_item.second->reset_serialization_index();
-    }
-}
-
-Tag_getter::Tag_getter(object_tag_e key)
-    : m_key(key)
-    , m_result(nullptr) {};
-
-void Tag_getter::visit(Object_interaction& value)
-{
-    if (!m_result) {
-        if (value.get_interaction_message_type() == interaction_message_type_e::tag) {
-            if (static_cast<Object_tag&>(value).m_type == m_key) {
-                m_result = static_cast<Object_tag*>(&value);
-            }
-        }
-    }
-}
-
-bool Attribute_map::get_stat(const object_tag_e key)
-{
-    const auto list = m_items.find(interaction_e::tag);
-    if (list != m_items.end()) {
-        auto taglist = static_cast<Tag_list*>(list->second);
-        Tag_getter tg(key);
-        taglist->do_predicate(tg);
-        return tg.m_result;
-    }
-    return false;
-}
-
-Object_tag* Attribute_map::get_tag(const object_tag_e key)
-{
-    const auto list = m_items.find(interaction_e::tag);
-    if (list != m_items.end()) {
-        auto taglist = static_cast<Tag_list*>(list->second);
-        Tag_getter tg(key);
-        taglist->do_predicate(tg);
-        return tg.m_result;
-    }
-    return nullptr;
-}
-
-void Attribute_map::apply_visitor(Visitor_generic& visitor)
-{
-    visitor.visit(*this);
-}
-
-iPacker& Attribute_map::get_packer()
-{
-    return Packer<Attribute_map>::instance();
-}
-
-std::u16string Attribute_map::serialize_to_json(JsonWriter& value)
-{
-    return value.write(*this);
-}
 
 std::u16string Object_state::icon_to_json(Icon*& value, SerializationContext& context)
 {
@@ -289,9 +83,14 @@ void Object_state::tilemanager_from_binary(const std::string& value, TileManager
     }
 }
 
-std::u16string Object_state::serialize_to_json(JsonWriter& value)
+std::u16string Object_state::serialize_to_json_reference(JsonWriter& value)
 {
     return value.write(*this);
+}
+
+std::u16string Object_state::serialize_to_json_pointer(JsonWriter& value)
+{
+    return value.write(this);
 }
 
 Object_state::Object_state()
@@ -676,7 +475,7 @@ void GameObject::Action_getter::visit(Object_interaction& value)
 		break;
 	}*/
     case interaction_message_type_e::part: {
-        auto& op = dynamic_cast<Object_part&>(value);
+        auto& op = dynamic_cast<ObjectPart&>(value);
         auto tl = static_cast<Tag_list*>(op.m_attributes.get_list(interaction_e::tag));
         if (tl) {
             for (auto& m_item : tl->m_items) {
@@ -785,9 +584,19 @@ iPacker& GameObject::get_packer()
     return Packer<GameObject>::instance();
 }
 
-std::u16string GameObject::serialize_to_json(JsonWriter& value)
+interaction_message_type_e GameObject::get_interaction_message_type()
+{
+	return interaction_message_type_e::game_object;
+}
+
+std::u16string GameObject::serialize_to_json_reference(JsonWriter& value)
 {
     return value.write(*this);
+}
+
+std::u16string GameObject::serialize_to_json_pointer(JsonWriter& value)
+{
+    return value.write(this);
 }
 
 void GameObject::reset_serialization_index()
@@ -800,6 +609,7 @@ void GameObject::reset_serialization_index()
         item->reset_serialization_index();
     }
 }
+
 
 Player::Player(GameObject* object, GameMap* map)
     : m_object(object)
@@ -877,92 +687,7 @@ void Player::get_actions_list(std::list<Action_helper_t>& value)
 //{
 //}
 
-Inventory_cell::Inventory_cell(GameObject* item)
-    : m_item(item)
-{
-    m_kind = entity_e::inventory_cell;
-}
 
-void Inventory_cell::reset_serialization_index()
-{
-    m_serialization_index = 0;
-    if (m_item) {
-        // ??? исправить, временная заглушка, необходимо добавить свойство, которое показывает был ли сброшен объект для сохранения уже
-        if (m_item->m_serialization_index != 0) {
-            m_item->reset_serialization_index();
-        }
-    }
-}
-
-iPacker& Inventory_cell::get_packer()
-{
-    return Packer<Inventory_cell>::instance();
-}
-
-std::u16string Inventory_cell::serialize_to_json(JsonWriter& value)
-{
-    return value.write(*this);
-}
-
-Object_part::Object_part(GameObject* item)
-    : Inventory_cell(item)
-{
-	m_kind = entity_e::body_part;
-	m_part_kind = body_part_e::container;
-	m_owner = nullptr;
-	m_attributes.create_feature_list(feature_list_type_e::parts, interaction_e::body);
-};
-
-Object_part* Object_part::clone()
-{
-    auto result = new Object_part();
-    result->m_kind = m_kind;
-    result->m_name = m_name;
-    result->m_part_kind = m_part_kind;
-    result->m_item = nullptr;
-    result->m_attributes = *m_attributes.clone();
-    return result;
-}
-
-void Object_part::do_predicate(Visitor& helper)
-{
-    helper.visit(*this);
-    for (auto& m_item : m_attributes.m_items) {
-        m_item.second->do_predicate(helper);
-    }
-}
-
-void Object_part::apply_visitor(Visitor_generic& visitor)
-{
-    visitor.visit(*this);
-}
-
-void Object_part::reset_serialization_index()
-{
-    m_serialization_index = 0;
-    m_attributes.reset_serialization_index();
-    if (m_item) {
-        // ??? исправить, временная заглушка, необходимо добавить свойство, которое показывает был ли сброшен объект для сохранения уже
-        if (m_item->m_serialization_index != 0) {
-            m_item->reset_serialization_index();
-        }
-    }
-}
-
-iPacker& Object_part::get_packer()
-{
-    return Packer<Object_part>::instance();
-}
-
-interaction_message_type_e Object_part::get_interaction_message_type()
-{
-    return interaction_message_type_e::part;
-}
-
-std::u16string Object_part::serialize_to_json(JsonWriter& value)
-{
-    return value.write(*this);
-}
 
 iPacker& Config::get_packer()
 {

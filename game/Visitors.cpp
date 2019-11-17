@@ -1,5 +1,6 @@
 #include "Visitors.h"
 #include "GameObject.h"
+#include "object_part.h"
 
 void Visitor_simple::visit(GameObject& value)
 {
@@ -57,7 +58,7 @@ void Visitor_simple::visit(Parts_list& value)
     }
 }
 
-void Visitor_simple::visit(Object_part& value)
+void Visitor_simple::visit(ObjectPart& value)
 {
     value.m_attributes.apply_visitor(*this);
 }
@@ -235,7 +236,7 @@ void Visitor_generic_updater::visit(Parts_list& value)
     result = false;
 }
 
-void Visitor_generic_updater::visit(Object_part& value)
+void Visitor_generic_updater::visit(ObjectPart& value)
 {
     value.m_attributes.apply_visitor(*this);
 }

@@ -3,7 +3,7 @@
 
 #include "Application.h"
 #include "FOV.h"
-#include "GameMap.h"
+#include "game_world.h"
 #include "Game_algorithm.h"
 #include <vector>
 

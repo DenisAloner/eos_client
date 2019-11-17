@@ -9,7 +9,7 @@ class Parameter_list;
 class Vision_list;
 class Vision_component;
 class Parts_list;
-class Object_part;
+class ObjectPart;
 class Tag_list;
 class Action_list;
 class Action_pick;
@@ -41,7 +41,7 @@ public:
     virtual void visit(Vision_list& value) {};
     virtual void visit(Vision_component& value) {};
     virtual void visit(Parts_list& value) {};
-    virtual void visit(Object_part& value) {};
+    virtual void visit(ObjectPart& value) {};
     virtual void visit(ObjectTag::Label& value) {};
     virtual void visit(ObjectTag::Requirements_to_object& value) {};
     virtual void visit(ObjectTag::Mortal& value) {};
@@ -69,7 +69,7 @@ public:
     void visit(Vision_list& value) override;
     void visit(Vision_component& value) override;
     void visit(Parts_list& value) override;
-    void visit(Object_part& value) override;
+    void visit(ObjectPart& value) override;
     void visit(Tag_list& value) override;
     void visit(Action_list& value) override;
     void visit(ObjectTag::Requirements_to_object& value) override;
@@ -96,7 +96,7 @@ public:
     void visit(Parts_list& value) override;
     void visit(Tag_list& value) override;
     void visit(Action_list& value) override;
-    void visit(Object_part& value) override;
+    void visit(ObjectPart& value) override;
     void visit(ObjectTag::Requirements_to_object& value) override;
     void visit(Instruction_slot_link& value) override;
     void visit(Interaction_copyist& value) override;

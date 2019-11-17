@@ -17,7 +17,7 @@ void Instruction_check_part_type::apply_effect(GameObject* unit, Object_interact
     }
     default: {
 	    const auto i = static_cast<Instruction_game_owner*>(object);
-	    const auto op = static_cast<Object_part*>(i->m_value);
+	    const auto op = static_cast<ObjectPart*>(i->m_value);
         i->m_result = (op->m_part_kind == m_value);
         break;
     }

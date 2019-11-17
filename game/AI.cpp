@@ -1,5 +1,6 @@
 #include "AI.h"
 #include "GameObject.h"
+#include "map_cell.h"
 #include <spdlog/spdlog.h>
 #include <algorithm>
 

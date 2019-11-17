@@ -20,7 +20,7 @@ void Instruction_slot_link::apply_effect(GameObject* unit, Object_interaction* o
     switch (object->get_interaction_message_type()) {
     case interaction_message_type_e::instruction_game_owner: {
 	    const auto parameter = static_cast<Instruction_game_owner*>(object);
-	    auto part = static_cast<Object_part*>(parameter->m_value);
+	    auto part = static_cast<ObjectPart*>(parameter->m_value);
         auto i = part->m_attributes.get_list(m_subtype);
         if (i) {
             if (m_enable) {
@@ -54,7 +54,7 @@ void Instruction_slot_link::apply_effect(GameObject* unit, Object_interaction* o
             Interaction_list* i = nullptr;
             switch (a.m_owner->m_kind) {
             case entity_e::body_part: {
-                i = static_cast<Object_part*>(a.m_owner)->m_attributes.get_list(m_subtype);
+                i = static_cast<ObjectPart*>(a.m_owner)->m_attributes.get_list(m_subtype);
                 break;
             }
             case entity_e::game_object: {
@@ -79,7 +79,7 @@ void Instruction_slot_link::apply_effect(GameObject* unit, Object_interaction* o
     default: {
 	    const auto parameter = static_cast<Instruction_slot_parameter*>(object);
 	    auto& p(*(parameter->m_parameter));
-	    auto part = static_cast<Object_part*>(p[1].m_object->m_owner);
+	    auto part = static_cast<ObjectPart*>(p[1].m_object->m_owner);
         auto i = part->m_attributes.get_list(m_subtype);
         if (i) {
             if (m_enable) {

@@ -7,6 +7,7 @@
 #include "game/graphics/GUI_MapViewer.h"
 #include "impact/all_effects.h"
 #include <fstream>
+#include "object_part.h"
 
 Action::Action()
 {
@@ -823,7 +824,7 @@ std::u16string Action_pick::get_description(Parameter* parameter)
                 break;
             }
             case entity_e::body_part: {
-                s += u" в " + static_cast<Object_part*>(p[2].m_owner)->m_name;
+                s += u" в " + static_cast<ObjectPart*>(p[2].m_owner)->m_name;
                 break;
             }
             }
@@ -867,7 +868,7 @@ std::u16string Action_move_out::get_description(Parameter* parameter)
                 break;
             }
             case entity_e::body_part: {
-                s += u" из " + static_cast<Object_part*>(p[1].m_object->m_owner)->m_name;
+                s += u" из " + static_cast<ObjectPart*>(p[1].m_object->m_owner)->m_name;
                 break;
             }
             }
@@ -884,7 +885,7 @@ std::u16string Action_move_out::get_description(Parameter* parameter)
                 break;
             }
             case entity_e::body_part: {
-                s += u" в " + static_cast<Object_part*>(p[2].m_owner)->m_name;
+                s += u" в " + static_cast<ObjectPart*>(p[2].m_owner)->m_name;
                 break;
             }
             }
@@ -985,7 +986,7 @@ void Action_hit::interaction_handler(Parameter* arg)
 	result = Application::instance().command_select_body_part();
 	if (result)
 	{
-		p->m_unit_body_part = static_cast<Object_part*>(static_cast<P_object_owner*>(result)->m_cell);
+		p->m_unit_body_part = static_cast<ObjectPart*>(static_cast<P_object_owner*>(result)->m_cell);
 	}
 	else
 	{
@@ -1436,7 +1437,7 @@ char Action_use::perform(Parameter* parameter)
     //	}
     //	case entity_e::body_part:
     //	{
-    //		Application::instance().command_unequip(p[0].m_object, static_cast<Object_part*>(p[1].m_object->m_owner), p[1].m_object);
+    //		Application::instance().command_unequip(p[0].m_object, static_cast<ObjectPart*>(p[1].m_object->m_owner), p[1].m_object);
     //		break;
     //	}
     //	}
@@ -1683,7 +1684,7 @@ void Action_shoot::interaction_handler(Parameter* parameter)
 		result = Application::instance().command_select_body_part();
 		if (result)
 		{
-			p->m_ammo_owner.push_back(static_cast<Object_part*>(static_cast<P_object_owner*>(result)->m_cell));
+			p->m_ammo_owner.push_back(static_cast<ObjectPart*>(static_cast<P_object_owner*>(result)->m_cell));
 		}
 		else
 		{
@@ -1813,7 +1814,7 @@ char Action_shoot::perform(Parameter* parameter)
         //}
         //case entity_e::body_part:
         //{
-        //	Application::instance().command_equip(p->m_unit, static_cast<Object_part*>(p->m_owner), p->m_object);
+        //	Application::instance().command_equip(p->m_unit, static_cast<ObjectPart*>(p->m_owner), p->m_object);
         //	break;
         //}
         //}

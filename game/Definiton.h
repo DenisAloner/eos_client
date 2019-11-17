@@ -494,15 +494,15 @@ public:
 };
 
 class iSerializable;
-class Game_world;
+class GameWorld;
 
 class SerializationContext {
 public:
-    Game_world& m_game_world;
+    GameWorld& m_game_world;
     std::size_t m_object_index;
     std::vector<iSerializable*> m_items;
 
-    explicit SerializationContext(Game_world& game_world)
+    explicit SerializationContext(GameWorld& game_world)
         : m_game_world(game_world)
         , m_object_index(0)
     {
