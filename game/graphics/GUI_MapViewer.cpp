@@ -1,8 +1,4 @@
 #include "game/graphics/GUI_MapViewer.h"
-#include "game/ActionManager.h"
-#include "game/graphics/GUI_Layer.h"
-#include "game/graphics/GUI_PopMenu.h"
-#include "game/utils/Logger.h"
 
 gui_mapviewer_hint::gui_mapviewer_hint() { m_top = false; }
 mapviewer_hint_path::mapviewer_hint_path(std::vector<MapCell*>* path, GameObject* object)

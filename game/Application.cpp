@@ -2,17 +2,10 @@
 #include "ApplicationGUI.h"
 #include "GUI_Button_list.h"
 #include "GUI_button.h"
-#include "game/ActionManager.h"
-#include "game/GameObject.h"
 #include "game/MouseController.h"
-#include "graphics/GUI_MapViewer.h"
-#include "graphics/GUI_Window.h"
 #include "graphics/gui_image.h"
-#include <algorithm>
-#include <chrono>
 #include <fstream>
 #include <graphics/GUI_Description_window.h>
-#include <string>
 #include "json_game_saver.h"
 
 using namespace std::string_literals;

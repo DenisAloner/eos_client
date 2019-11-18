@@ -1,5 +1,5 @@
-#ifndef ACTIONMANAGER_H
-#define	ACTIONMANAGER_H
+#ifndef ACTION_MANAGER_H
+#define	ACTION_MANAGER_H
 
 #include <list>
 #include "Event.h"
@@ -37,4 +37,4 @@ public:
 	GameTask* get_task();
 };
 
-#endif //ACTIONMANAGER_H
+#endif

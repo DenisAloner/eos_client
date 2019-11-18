@@ -1,13 +1,6 @@
 #include "game/Action.h"
-#include "game/ActionManager.h"
-#include "game/Application.h"
 #include "game/ApplicationGUI.h"
-#include "game/GameObject.h"
-#include "game/Parameter.h"
-#include "game/graphics/GUI_MapViewer.h"
-#include "impact/all_effects.h"
 #include <fstream>
-#include "object_part.h"
 
 Action::Action()
 {

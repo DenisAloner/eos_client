@@ -1,5 +1,4 @@
 #include "game/graphics/GUI_ActionButton.h"
-#include <thread>
 
 GUI_ActionButton::GUI_ActionButton(const int width, const int height)
 {

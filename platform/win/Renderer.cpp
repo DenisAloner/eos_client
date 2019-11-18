@@ -1,8 +1,5 @@
 #include "Renderer.h"
 #include "game/Application.h"
-#include "game/graphics/gl.hpp"
-#include "game/utils/Logger.h"
-#include <chrono>
 
 Renderer::Renderer(HDC hDC, const dimension_t<int>& size)
     : m_hDC(hDC)

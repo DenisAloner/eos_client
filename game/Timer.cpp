@@ -1,5 +1,4 @@
 #include "Timer.h"
-#include <chrono>
 #include <thread>
 
 Timer::Timer(int l, int s)

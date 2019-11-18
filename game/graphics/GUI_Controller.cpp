@@ -1,6 +1,5 @@
 #include "GUI_controller.h"
 #include <ApplicationGUI.h>
-#include <spdlog/spdlog.h>
 
 GUI_Controller::GUI_Controller()
     : m_dragged(false)

@@ -1,7 +1,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "GraphicalController.h"
 #include "Application.h"
-#include "TileManager.h"
 #include <fstream>
 #include <stb_image.h>
 using namespace gl;

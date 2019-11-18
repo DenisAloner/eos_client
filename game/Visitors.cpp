@@ -1,6 +1,5 @@
 #include "Visitors.h"
 #include "GameObject.h"
-#include "object_part.h"
 
 void Visitor_simple::visit(GameObject& value)
 {

@@ -1,7 +1,5 @@
 #include "json_game_saver.h"
-#include "map_cell.h"
-#include "inventory_cell.h"
-#include "object_part.h"
+#include "json_helpers.h"
 
 template <typename T>
 constexpr auto JsonGameSaver::object_properties()

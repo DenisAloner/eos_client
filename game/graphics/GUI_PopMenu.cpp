@@ -1,5 +1,4 @@
 #include "game/graphics/GUI_PopMenu.h"
-#include "game/Parameter.h"
 
 void Select_object_popmenu::on_item_click(Item* sender)
 {

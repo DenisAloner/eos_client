@@ -1,5 +1,4 @@
 #include "FOV.h"
-#include <algorithm>
 static int multipliers1[4][8] = {
     { 1, 0, 0, 1, -1, 0, 0, -1 },
     { 0, 1, 1, 0, 0, -1, -1, 0 },

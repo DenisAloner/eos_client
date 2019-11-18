@@ -1,5 +1,4 @@
 #include "GUI_ActionManager.h"
-#include "Action.h"
 
 GUI_ActionManager::GUI_ActionManager(int x, int y, int width, int height, ActionManager* ActionManager)
     : GUI_Scrollable_container(x, y, width, height)

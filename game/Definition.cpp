@@ -1,3 +1,4 @@
+
 #ifndef DEFINITION_CPP
 #define DEFINITION_CPP
 
@@ -5,6 +6,7 @@
 #include "Definiton.h"
 #include "map_cell.h"
 #include "inventory_cell.h"
+#include "object_state_equip.h"
 
 void SerializationContext::reset()
 {

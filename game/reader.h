@@ -3,7 +3,6 @@
 
 #include "Definiton.h"
 #include "gui_style.h"
-#include <pattern_visitor.h>
 #include <string>
 
 typedef std::vector<std::u16string_view> json_vector_t;
@@ -17,7 +16,10 @@ json_vector_t* read_json_array(const std::u16string_view& value);
 json_map_t* parse_json_object(const std::u16string_view& value);
 json_map_t* read_json_object(const std::u16string_view& value);
 
-class JsonReader : public iVisitor {
+
+
+
+class JsonReader {
 public:
     template <typename Key, typename Value>
     void read(const std::u16string_view& json, std::unordered_map<Key, Value>& ref)

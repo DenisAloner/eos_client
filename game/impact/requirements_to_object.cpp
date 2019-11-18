@@ -1,5 +1,4 @@
 #include "requirements_to_object.h"
-#include "Visitors.h"
 #include "instruction_game_owner.h"
 
 ObjectTag::Requirements_to_object::Requirements_to_object()

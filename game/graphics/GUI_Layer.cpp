@@ -1,5 +1,4 @@
 #include "GUI_Layer.h"
-#include <Windows.h>
 
 GUI_Layer::GUI_Layer(int x, int y, int width, int height)
 {

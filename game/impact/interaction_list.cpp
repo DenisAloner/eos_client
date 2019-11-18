@@ -1,6 +1,5 @@
 #include "interaction_list.h"
 #include "instruction_game_owner.h"
-#include "writer.h"
 
 Interaction_list::Interaction_list()
 {

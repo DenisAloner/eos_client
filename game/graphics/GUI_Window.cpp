@@ -1,5 +1,4 @@
 #include "GUI_Window.h"
-#include "Application.h"
 #include "GUI_Text.h"
 
 GUI_Header::GUI_Header(int x, int y, int width, int height, const std::u16string& text)

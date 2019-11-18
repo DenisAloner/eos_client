@@ -7,12 +7,11 @@
 #include "Game_algorithm.h"
 #include <vector>
 
-class GameMap;
-class GameObject;
-class MapCell;
+//class GameMap;
+//class GameObject;
 class FOV;
 class Action_wrapper;
-class MapCell;
+//class MapCell;
 
 struct Node {
     MapCell* cell;

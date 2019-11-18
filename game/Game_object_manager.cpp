@@ -1,6 +1,5 @@
 #include "Game_object_manager.h"
 #include "GameObject.h"
-#include "object_part.h"
 
 Config* GameObjectManager::m_config = new Config();
 

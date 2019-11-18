@@ -1,7 +1,5 @@
 #include "mortal.h"
 #include "GameObject.h"
-#include "interaction_copyist.h"
-#include "interaction_prefix.h"
 
 ObjectTag::Mortal::Mortal()
     : Object_tag(object_tag_e::mortal) {};

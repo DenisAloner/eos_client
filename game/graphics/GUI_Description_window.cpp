@@ -1,5 +1,4 @@
 #include "GUI_Description_window.h"
-#include <utility>
 
 Visitor_object_description_getter::Visitor_object_description_getter()
     : m_value(nullptr)

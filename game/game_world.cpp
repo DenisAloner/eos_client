@@ -1,6 +1,4 @@
 #include "game_world.h"
-#include "writer.h"
-#include "map_cell.h"
 
 GameWorld::GameWorld()
 {

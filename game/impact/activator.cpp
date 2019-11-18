@@ -1,7 +1,5 @@
 #include "activator.h"
 #include "GameObject.h"
-#include "interaction_prefix.h"
-#include "slot_set_state.h"
 
 ObjectTag::Activator::Activator()
     : Object_tag(object_tag_e::activator) {};
