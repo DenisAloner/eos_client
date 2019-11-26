@@ -5,6 +5,7 @@ MapCell::MapCell()
     m_kind = entity_e::cell;
     m_notable = false;
     m_owner = nullptr;
+    m_map = nullptr;
 }
 
 MapCell::MapCell(int x, int y, int z, GameMap* map)

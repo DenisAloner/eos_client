@@ -66,7 +66,7 @@ GameMap::GameMap(dimension3_t size)
 
 GameMap::GameMap()
 {
-    m_dijkstra_map = new Dijkstra_map();
+	m_dijkstra_map = new Dijkstra_map();
 }
 
 MapCell& GameMap::get(const int z, const int y, const int x)

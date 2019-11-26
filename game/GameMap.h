@@ -21,7 +21,7 @@ class GameMap : public iSerializable, public iJsonSerializable {
 public:
     Event<VoidEventArgs> update;
 
-    std::size_t m_index;
+    std::size_t m_index{};
 
     Dijkstra_map* m_dijkstra_map;
 

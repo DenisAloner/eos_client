@@ -2,53 +2,37 @@
 #define JSON_HELPERS_H
 
 #include <type_traits>
-#include <string>
-#include <optional>
 
-template <typename Class, typename T, typename W>
+template <typename Class, typename T>
 struct JsonProperty {
-
-    typedef std::u16string (W::*custom_function_t)(T);
-
-    constexpr JsonProperty(T Class::*member,
-        const char16_t* name,
-        custom_function_t custom_function)
-        : member { member }
-        , name { name }
-        , custom_function { custom_function } {};
-
     constexpr JsonProperty(T Class::*member,
         const char16_t* name)
         : member { member }
         , name { name } {};
 
-    using type = T;
-
     T Class::*member;
     const char16_t* name;
-    std::optional<custom_function_t> custom_function;
 };
 
-template <typename Class, typename T, typename W>
-constexpr auto
-json_property(T Class::*member, const char16_t* name, std::u16string (W::*fn_ref)(T))
+template <typename F, std::size_t... S>
+constexpr void static_for_impl(F&& function, std::index_sequence<S...>)
 {
-    return JsonProperty<Class, T, W> { member, name, fn_ref };
+    int unpack[] = { 0,
+        (void(function(std::integral_constant<std::size_t, S> {})), 0)... };
+
+    (void)unpack;
 }
 
-template <typename Class, typename T>
-constexpr auto
-json_property(T Class::*member, const char16_t* name)
+template <typename Tuple>
+constexpr std::size_t tuple_size(const Tuple&)
 {
-    return JsonProperty<Class, T, Class> { member, name };
+    return std::tuple_size<Tuple>::value;
 }
 
-template <typename T, T... S, typename F>
-constexpr void
-for_sequence_json(std::integer_sequence<T, S...>, F&& f)
+template <auto N, typename F>
+constexpr void static_for(F&& function)
 {
-    using unpack_t = int[];
-    (void)unpack_t { (static_cast<void>(f(std::integral_constant<T, S> {})), 0)..., 0 };
+    static_for_impl(std::forward<F>(function), std::make_index_sequence<tuple_size(N())>());
 }
 
 #endif

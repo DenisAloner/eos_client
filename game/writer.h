@@ -3,6 +3,7 @@
 
 #include "game_world.h"
 #include "i_json_serializable.h"
+#include "json_helpers.h"
 #include "object_part.h"
 #include "object_state.h"
 

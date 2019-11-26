@@ -3,13 +3,11 @@
 
 #include "writer.h"
 #include <string>
+#include "member_map.h"
 
 class JsonGameSaver : public JsonWriter {
 public:
     using JsonWriter::write;
-
-    template <typename T>
-    constexpr static auto object_properties();
 
     template <typename T>
     constexpr std::u16string
@@ -21,16 +19,15 @@ public:
             result = u"{";
         } else
             result = u"{\"$link\":" + cp1251_to_utf16(std::to_string(ref->second)) + u",";
-        constexpr auto props = std::tuple_size<decltype(object_properties<T>())>::value;
-        for_sequence_json(std::make_index_sequence<props> {}, [&](auto i) {
-            constexpr auto property = std::get<i>(object_properties<T>());
+        static_for<object_properties<T>>([&](auto i) {
+            constexpr auto item = std::get<i>(object_properties<T>());
             if (i != 0) {
                 result += u",";
             }
-            if constexpr (property.custom_function) {
-                result += u"\"" + std::u16string { property.name } + u"\":" + (*this.*(property.custom_function.value()))(object.*(property.member));
+            if constexpr (std::is_base_of_v<iCustomHandler, decltype(item)>) {
+                result += u"\"" + std::u16string { item.property.name } + u"\":" + (*this.*(item.custom_function))(object.*(item.property.member));
             } else
-                result += u"\"" + std::u16string { property.name } + u"\":" + write(object.*(property.member));
+                result += u"\"" + std::u16string { item.name } + u"\":" + write(object.*(item.member));
         });
         return result + u'}';
     }
@@ -56,7 +53,10 @@ public:
     std::u16string write(InventoryCell* value) override;
     std::u16string write(ObjectPart* value) override;
 
-	std::u16string map_cell_owner_save(GameMap* value);
+    std::u16string map_cell_owner_save(GameMap* value);
+
+	template <typename T>
+    constexpr static auto object_properties();
 };
 
 #endif
