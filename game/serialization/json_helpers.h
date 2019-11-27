@@ -2,6 +2,7 @@
 #define JSON_HELPERS_H
 
 #include <type_traits>
+#include <tuple>
 
 template <typename Class, typename T>
 struct JsonProperty {

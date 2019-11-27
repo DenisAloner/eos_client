@@ -90,7 +90,7 @@ public:
     MapCell* next(GameObject* object);
 };
 
-class AI : public iSerializable {
+class AI : public iSerializable, public iJsonSerializable {
 public:
     ai_type_e m_ai_type;
     GameObject* m_object;
@@ -108,6 +108,8 @@ public:
     iPacker& get_packer() override = 0;
 
     constexpr static auto properties() { return std::make_tuple(make_property(&AI::m_ai_type, u"ai_type")); }
+    std::u16string serialize_to_json_reference(JsonWriter& value) override;
+    std::u16string serialize_to_json_pointer(JsonWriter& value) override;
 };
 
 class AI_enemy : public AI {
@@ -138,6 +140,9 @@ public:
             std::make_tuple(
                 make_property(&AI_enemy::m_path_qualifier, u"path_qualifier")));
     }
+
+    std::u16string serialize_to_json_reference(JsonWriter& value) override;
+    std::u16string serialize_to_json_pointer(JsonWriter& value) override;
 };
 
 class AI_trap : public AI {

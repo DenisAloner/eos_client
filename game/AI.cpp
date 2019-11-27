@@ -444,6 +444,16 @@ MapCell* Dijkstra_map::next(GameObject* object)
     return c;
 }
 
+std::u16string AI::serialize_to_json_reference(JsonWriter& value)
+{
+    return value.write(*this);
+}
+
+std::u16string AI::serialize_to_json_pointer(JsonWriter& value)
+{
+    return value.write(this);
+}
+
 AI_enemy::AI_enemy()
 {
     m_ai_type = ai_type_e::non_humanoid;
@@ -762,4 +772,14 @@ AI_manager::AI_manager()
 iPacker& AI_enemy::get_packer()
 {
     return Packer<AI_enemy>::instance();
+}
+
+std::u16string AI_enemy::serialize_to_json_reference(JsonWriter& value)
+{
+    return value.write(*this);
+}
+
+std::u16string AI_enemy::serialize_to_json_pointer(JsonWriter& value)
+{
+    return value.write(this);
 }

@@ -26,7 +26,10 @@ constexpr auto JsonGameSaver::object_properties()
     }
     if constexpr (std::is_same_v<T, Object_state>) {
         return std::tuple(
-            MemberMap::get<&Object_state::m_state>);
+            MemberMap::get<&Object_state::m_state>,
+            MemberMap::get<&Object_state::m_size>,
+            MemberMap::get<&Object_state::m_layer>,
+            MemberMap::get<&Object_state::m_ai>);
     }
     if constexpr (std::is_same_v<T, Interaction_list>) {
         return std::tuple(
@@ -48,6 +51,15 @@ constexpr auto JsonGameSaver::object_properties()
             MemberMap::get<&ObjectPart::m_part_kind>,
             MemberMap::get<&ObjectPart::m_name>,
             MemberMap::get<&ObjectPart::m_attributes>);
+    }
+    if constexpr (std::is_same_v<T, AI>) {
+        return std::tuple(
+            MemberMap::get<&AI::m_ai_type>);
+    }
+    if constexpr (std::is_same_v<T, AI_enemy>) {
+        return std::tuple_cat(object_properties<AI>(),
+            std::make_tuple(
+                MemberMap::get<&AI_enemy::m_path_qualifier>));
     }
 }
 
@@ -147,7 +159,37 @@ std::u16string JsonGameSaver::write(ObjectPart* value)
     return write_pointer(value);
 }
 
+std::u16string JsonGameSaver::write(AI& value)
+{
+    return write_object(value);
+}
+
+std::u16string JsonGameSaver::write(AI* value)
+{
+    return write_pointer(value);
+}
+
+std::u16string JsonGameSaver::write(AI_enemy& value)
+{
+    return write_object(value);
+}
+
+std::u16string JsonGameSaver::write(AI_enemy* value)
+{
+    return write_pointer(value);
+}
+
+std::u16string JsonGameSaver::write(predicate_t& value)
+{
+    return write(value.index);
+}
+
+std::u16string JsonGameSaver::write(predicate_t* value)
+{
+    return write(value->index);
+}
+
 std::u16string JsonGameSaver::map_cell_owner_save(GameMap* value)
 {
-	return cp1251_to_utf16(std::to_string(value->m_index));
+    return cp1251_to_utf16(std::to_string(value->m_index));
 }

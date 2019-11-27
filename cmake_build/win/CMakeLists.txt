@@ -17,6 +17,7 @@ file(GLOB SRC_GAME ${PROJECT_DIR}/game/*.h ${PROJECT_DIR}/game/*.cpp)
 file(GLOB SRC_GAME_GRAPHICS ${PROJECT_DIR}/game/graphics/*.h ${PROJECT_DIR}/game/graphics/*.cpp)
 file(GLOB SRC_GAME_UTILS ${PROJECT_DIR}/game/utils/*.h ${PROJECT_DIR}/game/utils/*.cpp)
 file(GLOB SRC_GAME_IMPACT ${PROJECT_DIR}/game/impact/*.h ${PROJECT_DIR}/game/impact/*.cpp)
+file(GLOB SRC_GAME_SERIALIZATION ${PROJECT_DIR}/game/serialization/*.h ${PROJECT_DIR}/game/serialization/*.cpp)
 
 set(SOURCE_FILES
 	${SRC_PLATFORM}
@@ -25,6 +26,7 @@ set(SOURCE_FILES
 	${SRC_GAME_GRAPHICS}
 	${SRC_GAME_UTILS}
 	${SRC_GAME_IMPACT}
+	${SRC_GAME_SERIALIZATION}
 )
 
 source_group("platform" FILES ${SRC_PLATFORM})
@@ -33,6 +35,7 @@ source_group("game" FILES ${SRC_GAME})
 source_group("game\\graphics" FILES ${SRC_GAME_GRAPHICS})
 source_group("game\\utils" FILES ${SRC_GAME_UTILS})
 source_group("game\\impact" FILES ${SRC_GAME_IMPACT})
+source_group("game\\serialization" FILES ${SRC_GAME_SERIALIZATION})
 
 find_package(OpenGL REQUIRED)
 if (OPENGL_FOUND)
@@ -68,6 +71,7 @@ include_directories(
 	${PROJECT_DIR}/game/graphics
 	${PROJECT_DIR}/game/utils
 	${PROJECT_DIR}/game/impact
+	${PROJECT_DIR}/game/serialization
 	${PROJECT_DIR}/include
 )
 

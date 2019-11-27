@@ -44,7 +44,6 @@ struct CustomWriter : iCustomHandler {
     }
 };
 
-
 template <>
 constexpr auto MemberMap::get<&GameWorld::m_maps> = JsonProperty(&GameWorld::m_maps, u"maps");
 
@@ -76,6 +75,15 @@ template <>
 constexpr auto MemberMap::get<&Object_state::m_state> = JsonProperty(&Object_state::m_state, u"state");
 
 template <>
+constexpr auto MemberMap::get<&Object_state::m_size> = JsonProperty(&Object_state::m_size, u"size");
+
+template <>
+constexpr auto MemberMap::get<&Object_state::m_layer> = JsonProperty(&Object_state::m_layer, u"layer");
+
+template <>
+constexpr auto MemberMap::get<&Object_state::m_ai> = JsonProperty(&Object_state::m_ai, u"AI");
+
+template <>
 constexpr auto MemberMap::get<&Interaction_list::m_list_type> = JsonProperty(&Interaction_list::m_list_type, u"list_type");
 
 template <>
@@ -101,6 +109,12 @@ constexpr auto MemberMap::get<&ObjectPart::m_name> = JsonProperty(&ObjectPart::m
 
 template <>
 constexpr auto MemberMap::get<&ObjectPart::m_attributes> = JsonProperty(&ObjectPart::m_attributes, u"attributes");
+
+template <>
+constexpr auto MemberMap::get<&AI::m_ai_type> = JsonProperty(&AI::m_ai_type, u"ai_type");
+
+template <>
+constexpr auto MemberMap::get<&AI_enemy::m_path_qualifier> = JsonProperty(&AI_enemy::m_path_qualifier, u"path_qualifier");
 
 
 #endif

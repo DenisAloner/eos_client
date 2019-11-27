@@ -33,26 +33,33 @@ public:
     }
 
     std::u16string write(GameWorld& value) override;
-    std::u16string write(GameMap& value) override;
-    std::u16string write(GameObject& value) override;
-    std::u16string write(Attribute_map& value) override;
-    std::u16string write(Object_state& value) override;
-    std::u16string write(Interaction_list& value) override;
-    std::u16string write(MapCell& value) override;
-    std::u16string write(InventoryCell& value) override;
-    std::u16string write(ObjectPart& value) override;
-
-    std::u16string write(Game_object_owner* value) override;
-    std::u16string write(MapCell* value) override;
     std::u16string write(GameWorld* value) override;
+  
+    std::u16string write(GameMap& value) override;
     std::u16string write(GameMap* value) override;
+    std::u16string write(GameObject& value) override;
     std::u16string write(GameObject* value) override;
+    std::u16string write(Attribute_map& value) override;
     std::u16string write(Attribute_map* value) override;
+    std::u16string write(Object_state& value) override;
     std::u16string write(Object_state* value) override;
+    std::u16string write(Interaction_list& value) override;
     std::u16string write(Interaction_list* value) override;
+    std::u16string write(MapCell& value) override;
+    std::u16string write(MapCell* value) override;
+    std::u16string write(InventoryCell& value) override;
     std::u16string write(InventoryCell* value) override;
+    std::u16string write(ObjectPart& value) override;
     std::u16string write(ObjectPart* value) override;
+    std::u16string write(AI& value) override;
+    std::u16string write(AI* value) override;
+    std::u16string write(AI_enemy& value) override;
+    std::u16string write(AI_enemy* value) override;
+    std::u16string write(predicate_t& value) override;
+    std::u16string write(predicate_t* value) override;
 
+	std::u16string write(Game_object_owner* value) override;
+	
     std::u16string map_cell_owner_save(GameMap* value);
 
 	template <typename T>

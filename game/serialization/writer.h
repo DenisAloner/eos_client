@@ -9,6 +9,8 @@
 
 class iJsonSerializable;
 class Object_state;
+class AI;
+class AI_enemy;
 
 class JsonWriter {
 public:
@@ -22,26 +24,32 @@ public:
     virtual std::u16string write(dimension3_t& value);
     virtual std::u16string write(const dimension3_t& value);
 
-    virtual std::u16string write(GameWorld& value) = 0;
-    virtual std::u16string write(GameMap& value) = 0;
-    virtual std::u16string write(GameObject& value) = 0;
-    virtual std::u16string write(Attribute_map& value) = 0;
-    virtual std::u16string write(Object_state& value) = 0;
-    virtual std::u16string write(Interaction_list& value) = 0;
-    virtual std::u16string write(MapCell& value) = 0;
-    virtual std::u16string write(InventoryCell& value) = 0;
-    virtual std::u16string write(ObjectPart& value) = 0;
-
     virtual std::u16string write(Game_object_owner* value) = 0;
+	
+    virtual std::u16string write(GameWorld& value) = 0;
     virtual std::u16string write(GameWorld* value) = 0;
+    virtual std::u16string write(GameMap& value) = 0;
     virtual std::u16string write(GameMap* value) = 0;
+    virtual std::u16string write(GameObject& value) = 0;
     virtual std::u16string write(GameObject* value) = 0;
+    virtual std::u16string write(Attribute_map& value) = 0;
     virtual std::u16string write(Attribute_map* value) = 0;
+    virtual std::u16string write(Object_state& value) = 0;
     virtual std::u16string write(Object_state* value) = 0;
+    virtual std::u16string write(Interaction_list& value) = 0;
     virtual std::u16string write(Interaction_list* value) = 0;
+    virtual std::u16string write(MapCell& value) = 0;
     virtual std::u16string write(MapCell* value) = 0;
+    virtual std::u16string write(InventoryCell& value) = 0;
     virtual std::u16string write(InventoryCell* value) = 0;
+    virtual std::u16string write(ObjectPart& value) = 0;
     virtual std::u16string write(ObjectPart* value) = 0;
+    virtual std::u16string write(AI& value) = 0;
+    virtual std::u16string write(AI* value) = 0;
+    virtual std::u16string write(AI_enemy& value) = 0;
+    virtual std::u16string write(AI_enemy* value) = 0;
+    virtual std::u16string write(predicate_t& value) = 0;
+    virtual std::u16string write(predicate_t* value) = 0;
 
     template <typename T, class = typename std::enable_if<std::is_enum<T>::value, T>::type>
     std::u16string write(const T& value)
