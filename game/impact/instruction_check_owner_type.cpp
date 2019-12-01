@@ -31,14 +31,15 @@ void Instruction_check_owner_type::apply_effect(GameObject* unit, Object_interac
 iPacker& Instruction_check_owner_type::get_packer()
 {
     return Packer<Instruction_check_owner_type>::instance();
+}
+
+std::u16string Instruction_check_owner_type::serialize_to_json_reference(JsonWriter& value)
+{
+    return value.write(*this);
+}
+
+std::u16string Instruction_check_owner_type::serialize_to_json_pointer(JsonWriter& value)
+{
+    return value.write(this);
 };
 
-void ObjectTag::Mortal::apply_visitor(Visitor_generic& visitor)
-{
-    visitor.visit(*this);
-}
-
-iPacker& ObjectTag::Mortal::get_packer()
-{
-    return Packer<Mortal>::instance();
-}

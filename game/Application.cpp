@@ -244,20 +244,31 @@ void Application::initialize(const dimension_t<int> work_area_size, const HDC m_
 
 void Application::new_game()
 {
+    Logger::instance().info("Application::new_game()");
     m_world = new GameWorld();
     auto map = new GameMap(dimension3_t(10, 10, 10));
-
+    Logger::instance().info("map->generate_room() {}", m_game_object_manager==nullptr);
     map->generate_room();
     m_world->m_maps.push_back(map);
     int rx = 8;
     int ry = 8;
 
+	Logger::instance().info("Create human");
     auto obj = m_game_object_manager->new_object("human");
     obj->set_direction(object_direction_e::down);
     map->add_to_map(obj, map->get(1, ry, rx));
-	
+
+
+	Logger::instance().info("Start saving to json");
 	JsonGameSaver j;
-    Logger::instance().info("Serialize: {}", utf16_to_cp1251(j.write(m_world)));
+	char16_t marker = 0xFEFF;
+    std::ofstream in_file(FileSystem::instance().m_resource_path + "Saves\\test.json", std::ios::binary);
+    auto json = j.write(m_world);
+	in_file.write(reinterpret_cast<const char*>(&marker), sizeof(marker));
+	in_file.write(reinterpret_cast<const char*>(&json[0]), json.size() * 2);
+	in_file.close();
+    Logger::instance().info("End saving to json");
+    
 
     m_world->m_player = new Player(obj, map);
     m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);

@@ -22,6 +22,16 @@ void TileManager::vector_gl_uint_from_binary(const std::string& value, std::vect
 {
 }
 
+std::u16string TileManager::serialize_to_json_reference(JsonWriter& value)
+{
+    return value.write(*this);
+}
+
+std::u16string TileManager::serialize_to_json_pointer(JsonWriter& value)
+{
+    return value.write(this);
+}
+
 TileManager_Single_Atlas::TileManager_Single_Atlas()
 {
     m_tiles.resize(1);

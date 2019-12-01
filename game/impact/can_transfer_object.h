@@ -11,7 +11,7 @@ public:
     bool m_result;
 
     Can_transfer_object();
-    virtual Can_transfer_object* clone();
+    Can_transfer_object* clone() override;
     void apply_effect(GameObject* unit, Object_interaction* object) override;
     void reset_serialization_index() override;
 
@@ -24,6 +24,9 @@ public:
             std::make_tuple(
                 make_property(&Can_transfer_object::m_value, u"value")));
     }
+
+    std::u16string serialize_to_json_reference(JsonWriter& value) override;
+    std::u16string serialize_to_json_pointer(JsonWriter& value) override;
 };
 
 }

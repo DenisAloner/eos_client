@@ -28,3 +28,23 @@ void ObjectTag::Mortal::apply_effect(GameObject* unit, Object_interaction* objec
     }
     }
 }
+
+void ObjectTag::Mortal::apply_visitor(Visitor_generic& visitor)
+{
+    visitor.visit(*this);
+}
+
+iPacker& ObjectTag::Mortal::get_packer()
+{
+    return Packer<Mortal>::instance();
+}
+
+std::u16string ObjectTag::Mortal::serialize_to_json_reference(JsonWriter& value)
+{
+    return value.write(*this);
+}
+
+std::u16string ObjectTag::Mortal::serialize_to_json_pointer(JsonWriter& value)
+{
+    return value.write(this);
+}

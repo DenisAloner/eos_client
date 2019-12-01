@@ -21,7 +21,7 @@ public:
     effect_prefix_e get_effect_prefix_e(const std::string& key);
 
     void init(SerializationContext& context);
-    GameObject* new_object(std::string unit_name);
+    GameObject* new_object(const std::string& unit_name);
     //void register_object(GameObject*& object);
 
     std::string get_effect_prefix_string(effect_prefix_e key);

@@ -17,7 +17,7 @@ class Dijkstra_map;
 
 const int max_light_radius = 20;
 
-class GameMap : public iSerializable, public iJsonSerializable {
+class GameMap : public iSerializable {
 public:
     Event<VoidEventArgs> update;
 

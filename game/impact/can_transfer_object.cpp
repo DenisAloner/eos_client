@@ -1,4 +1,5 @@
 #include "can_transfer_object.h"
+#include "writer.h"
 
 ObjectTag::Can_transfer_object::Can_transfer_object()
     : Object_tag(object_tag_e::can_transfer_object)
@@ -41,4 +42,14 @@ void ObjectTag::Can_transfer_object::reset_serialization_index()
 iPacker& ObjectTag::Can_transfer_object::get_packer()
 {
     return Packer<Can_transfer_object>::instance();
+}
+
+std::u16string ObjectTag::Can_transfer_object::serialize_to_json_reference(JsonWriter& value)
+{
+    return value.write(*this);
+}
+
+std::u16string ObjectTag::Can_transfer_object::serialize_to_json_pointer(JsonWriter& value)
+{
+    return value.write(this);
 }

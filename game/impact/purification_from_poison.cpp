@@ -35,3 +35,13 @@ iPacker& ObjectTag::Purification_from_poison::get_packer()
 {
     return Packer<Purification_from_poison>::instance();
 }
+
+std::u16string ObjectTag::Purification_from_poison::serialize_to_json_reference(JsonWriter& value)
+{
+    return value.write(*this);
+}
+
+std::u16string ObjectTag::Purification_from_poison::serialize_to_json_pointer(JsonWriter& value)
+{
+    return value.write(this);
+}

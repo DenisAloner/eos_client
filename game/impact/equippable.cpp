@@ -117,3 +117,13 @@ iPacker& ObjectTag::Equippable::get_packer()
 {
     return Packer<Equippable>::instance();
 }
+
+std::u16string ObjectTag::Equippable::serialize_to_json_reference(JsonWriter& value)
+{
+    return value.write(*this);
+}
+
+std::u16string ObjectTag::Equippable::serialize_to_json_pointer(JsonWriter& value)
+{
+    return value.write(this);
+}

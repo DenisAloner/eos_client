@@ -20,7 +20,6 @@
 class Action;
 class ActionManager;
 class GameObject;
-class Game_object_owner;
 class GameMap;
 class MapCell;
 class Parameter;

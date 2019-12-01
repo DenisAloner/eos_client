@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <utility>
 #include "dictionaries.h"
+#include "i_json_serializable.h"
 
 using namespace std::string_literals;
 using namespace gl;
@@ -1342,7 +1343,7 @@ object_to_binary(T& object, SerializationContext& context)
     return result;
 }
 
-class iSerializable {
+class iSerializable: public iJsonSerializable {
 public:
     size_t m_serialization_index;
 

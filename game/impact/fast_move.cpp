@@ -32,3 +32,13 @@ iPacker& ObjectTag::Fast_move::get_packer()
 {
     return Packer<Fast_move>::instance();
 }
+
+std::u16string ObjectTag::Fast_move::serialize_to_json_reference(JsonWriter& value)
+{
+    return value.write(*this);
+}
+
+std::u16string ObjectTag::Fast_move::serialize_to_json_pointer(JsonWriter& value)
+{
+    return value.write(this);
+}

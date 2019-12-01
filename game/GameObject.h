@@ -138,6 +138,9 @@ public:
             make_property(&Config::m_templates, u"templates"),
             make_property(&Config::m_items, u"items"));
     }
+
+    std::u16string serialize_to_json_reference(JsonWriter& value) override;
+    std::u16string serialize_to_json_pointer(JsonWriter& value) override;
 };
 
 class Player : public GUI_connectable_i {

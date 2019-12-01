@@ -558,3 +558,13 @@ void Config::instancedictonary_tilemanager_from_json(const std::u16string& value
 void Config::instancedictonary_tilemanager_from_binary(const std::string& value, InstanceDictionary<TileManager*>& prop, std::size_t& pos, SerializationContext& context)
 {
 }
+
+std::u16string Config::serialize_to_json_reference(JsonWriter& value)
+{
+    return value.write(*this);
+}
+
+std::u16string Config::serialize_to_json_pointer(JsonWriter& value)
+{
+    return value.write(this);
+}

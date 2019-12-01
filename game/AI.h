@@ -90,7 +90,7 @@ public:
     MapCell* next(GameObject* object);
 };
 
-class AI : public iSerializable, public iJsonSerializable {
+class AI : public iSerializable {
 public:
     ai_type_e m_ai_type;
     GameObject* m_object;

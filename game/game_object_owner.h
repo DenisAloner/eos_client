@@ -2,9 +2,8 @@
 #define GAME_OBJECT_OWNER_H
 
 #include "Definiton.h"
-#include "i_json_serializable.h"
 
-class Game_object_owner : public virtual iSerializable, public iJsonSerializable {
+class Game_object_owner : public virtual iSerializable {
 public:
     entity_e m_kind;
     Game_object_owner* m_owner;
@@ -24,6 +23,8 @@ public:
     }
 
     void reset_serialization_index() override;
+    std::u16string serialize_to_json_reference(JsonWriter& value) override;
+    std::u16string serialize_to_json_pointer(JsonWriter& value) override;
 };
 
 #endif

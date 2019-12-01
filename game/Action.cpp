@@ -48,6 +48,16 @@ iPacker& Action::get_packer()
     return Packer<Action>::instance();
 }
 
+std::u16string Action::serialize_to_json_reference(JsonWriter& value)
+{
+    return value.write(*this);
+}
+
+std::u16string Action::serialize_to_json_pointer(JsonWriter& value)
+{
+    return value.write(this);
+}
+
 std::u16string Packer<Action>::to_json(iSerializable* value, SerializationContext& context)
 {
     auto result = value->to_json(context);
@@ -148,6 +158,16 @@ iPacker& Action_wrapper::get_packer()
 interaction_message_type_e Action_wrapper::get_interaction_message_type()
 {
 	return interaction_message_type_e::action_wrapper;
+}
+
+std::u16string Action_wrapper::serialize_to_json_reference(JsonWriter& value)
+{
+    return u"действие";
+}
+
+std::u16string Action_wrapper::serialize_to_json_pointer(JsonWriter& value)
+{
+    return u"действие";
 }
 
 ActionClass_Move::ActionClass_Move()

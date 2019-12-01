@@ -1,6 +1,5 @@
 #include "parameter_list.h"
-#include "Visitors.h"
-#include "effect.h"
+#include "writer.h"
 
 Parameter_list::Parameter_list(interaction_e subtype)
     : m_subtype(subtype)
@@ -76,4 +75,14 @@ void Parameter_list::apply_visitor(Visitor_generic& visitor)
 iPacker& Parameter_list::get_packer()
 {
     return Packer<Parameter_list>::instance();
+}
+
+std::u16string Parameter_list::serialize_to_json_reference(JsonWriter& value)
+{
+    return value.write(*this);
+}
+
+std::u16string Parameter_list::serialize_to_json_pointer(JsonWriter& value)
+{
+    return value.write(this);
 }

@@ -11,7 +11,7 @@ Interaction_list* create_feature_list(feature_list_type_e key, interaction_e nam
 }
 
 
-class Attribute_map : public iSerializable, public iJsonSerializable {
+class Attribute_map : public iSerializable {
 public:
     std::map<interaction_e, Interaction_list*> m_items;
 

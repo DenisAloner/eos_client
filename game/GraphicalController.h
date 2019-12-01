@@ -1,5 +1,5 @@
-#ifndef GRAPHICALCONTROLLER_H
-#define GRAPHICALCONTROLLER_H
+#ifndef GRAPHICAL_CONTROLLER_H
+#define GRAPHICAL_CONTROLLER_H
 
 #include "Definiton.h"
 #include <ft2build.h>
@@ -156,4 +156,4 @@ inline GuiAtlasReader::GuiAtlasReader(GraphicalController& graph)
 {
 }
 
-#endif //GRAPHICALCONTROLLER_H
+#endif

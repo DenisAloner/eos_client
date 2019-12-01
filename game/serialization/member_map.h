@@ -1,10 +1,10 @@
 #ifndef MEMBER_MAP_H
 #define MEMBER_MAP_H
 
+#include "game_world.h"
+#include "json_helpers.h"
 #include <string>
 #include <type_traits>
-#include "json_helpers.h"
-#include "game_world.h"
 
 template <typename>
 struct dependent_false : std::false_type {
@@ -14,8 +14,9 @@ class MemberMap {
     template <auto T>
     constexpr static auto not_found()
     {
-       static_assert(dependent_false<decltype(T)>::value, "Not found");
+        static_assert(dependent_false<decltype(T)>::value, "Not found");
     }
+
 public:
     template <auto PointerToMember>
     constexpr static auto get = not_found<PointerToMember>();
@@ -44,77 +45,53 @@ struct CustomWriter : iCustomHandler {
     }
 };
 
-template <>
-constexpr auto MemberMap::get<&GameWorld::m_maps> = JsonProperty(&GameWorld::m_maps, u"maps");
+#define PROPERTY(Pointer_to_member, name) template <> \
+                                          constexpr auto MemberMap::get<##Pointer_to_member> = JsonProperty(##Pointer_to_member, ##name)
 
-template <>
-constexpr auto MemberMap::get<&GameWorld::m_objects> = JsonProperty(&GameWorld::m_objects, u"objects");
-
-template <>
-constexpr auto MemberMap::get<&GameMap::m_size> = JsonProperty(&GameMap::m_size, u"size");
-
-template <>
-constexpr auto MemberMap::get<&GameObject::m_name> = JsonProperty(&GameObject::m_name, u"name");
-
-template <>
-constexpr auto MemberMap::get<&GameObject::m_direction> = JsonProperty(&GameObject::m_direction, u"direction");
-
-template <>
-constexpr auto MemberMap::get<&GameObject::m_owner> = JsonProperty(&GameObject::m_owner, u"owner");
-
-template <>
-constexpr auto MemberMap::get<&GameObject::m_state> = JsonProperty(&GameObject::m_state, u"state");
-
-template <>
-constexpr auto MemberMap::get<&GameObject::m_active_state> = JsonProperty(&GameObject::m_active_state, u"active_state");
-
-template <>
-constexpr auto MemberMap::get<&Attribute_map::m_items> = JsonProperty(&Attribute_map::m_items, u"items");
-
-template <>
-constexpr auto MemberMap::get<&Object_state::m_state> = JsonProperty(&Object_state::m_state, u"state");
-
-template <>
-constexpr auto MemberMap::get<&Object_state::m_size> = JsonProperty(&Object_state::m_size, u"size");
-
-template <>
-constexpr auto MemberMap::get<&Object_state::m_layer> = JsonProperty(&Object_state::m_layer, u"layer");
-
-template <>
-constexpr auto MemberMap::get<&Object_state::m_ai> = JsonProperty(&Object_state::m_ai, u"AI");
-
-template <>
-constexpr auto MemberMap::get<&Interaction_list::m_list_type> = JsonProperty(&Interaction_list::m_list_type, u"list_type");
-
-template <>
-constexpr auto MemberMap::get<&MapCell::x> = JsonProperty(&MapCell::x, u"x");
-
-template <>
-constexpr auto MemberMap::get<&MapCell::y> = JsonProperty(&MapCell::y, u"y");
-
-template <>
-constexpr auto MemberMap::get<&MapCell::z> = JsonProperty(&MapCell::z, u"z");
-
-template <>
-constexpr auto MemberMap::get<&MapCell::m_map> = JsonProperty(&MapCell::m_map, u"map");
-
-template <>
-constexpr auto MemberMap::get<&InventoryCell::m_item> = JsonProperty(&InventoryCell::m_item, u"item");
-
-template <>
-constexpr auto MemberMap::get<&ObjectPart::m_part_kind> = JsonProperty(&ObjectPart::m_part_kind, u"part_kind");
-
-template <>
-constexpr auto MemberMap::get<&ObjectPart::m_name> = JsonProperty(&ObjectPart::m_name, u"name");
-
-template <>
-constexpr auto MemberMap::get<&ObjectPart::m_attributes> = JsonProperty(&ObjectPart::m_attributes, u"attributes");
-
-template <>
-constexpr auto MemberMap::get<&AI::m_ai_type> = JsonProperty(&AI::m_ai_type, u"ai_type");
-
-template <>
-constexpr auto MemberMap::get<&AI_enemy::m_path_qualifier> = JsonProperty(&AI_enemy::m_path_qualifier, u"path_qualifier");
-
-
+// Game_object_owner
+PROPERTY(&Game_object_owner::m_kind, u"kind");
+PROPERTY(&Game_object_owner::m_owner, u"owner");
+// GameWorld
+PROPERTY(&GameWorld::m_maps, u"maps");
+PROPERTY(&GameWorld::m_objects, u"objects");
+PROPERTY(&GameMap::m_size, u"size");
+PROPERTY(&GameObject::m_name, u"name");
+PROPERTY(&GameObject::m_direction, u"direction");
+PROPERTY(&GameObject::m_state, u"state");
+PROPERTY(&GameObject::m_active_state, u"active_state");
+PROPERTY(&Attribute_map::m_items, u"items");
+PROPERTY(&Object_state::m_state, u"state");
+PROPERTY(&Object_state::m_size, u"size");
+PROPERTY(&Object_state::m_layer, u"layer");
+PROPERTY(&Object_state::m_ai, u"AI");
+PROPERTY(&Object_state::m_tile_manager, u"tile_manager");
+PROPERTY(&Object_state::m_icon, u"icon");
+PROPERTY(&Object_state::m_light, u"light");
+PROPERTY(&Object_state::m_optical, u"optical");
+PROPERTY(&Interaction_list::m_list_type, u"list_type");
+PROPERTY(&Interaction_list::m_items, u"items");
+PROPERTY(&MapCell::x, u"x");
+PROPERTY(&MapCell::y, u"y");
+PROPERTY(&MapCell::z, u"z");
+PROPERTY(&MapCell::m_map, u"map");
+// InventoryCell
+PROPERTY(&InventoryCell::m_item, u"item");
+// ObjectPart
+PROPERTY(&ObjectPart::m_part_kind, u"part_kind");
+PROPERTY(&ObjectPart::m_name, u"name");
+PROPERTY(&ObjectPart::m_attributes, u"attributes");
+// AI
+PROPERTY(&AI::m_ai_type, u"ai_type");
+PROPERTY(&AI_enemy::m_path_qualifier, u"path_qualifier");
+PROPERTY(&Effect::m_value, u"value");
+PROPERTY(&Effect::m_subtype, u"subtype");
+PROPERTY(&Instruction_arg_extract::m_value, u"value");
+PROPERTY(&Instruction_arg_extract::m_index, u"index");
+PROPERTY(&Instruction_check_owner_type::m_value, u"value");
+PROPERTY(&Instruction_check_part_type::m_value, u"value");
+PROPERTY(&Parameter_list::m_subtype, u"subtype");
+PROPERTY(&Parameter_list::m_basic_value, u"basic_value");
+PROPERTY(&Parameter_list::m_basic_limit, u"basic_limit");
+PROPERTY(&Object_tag::m_type, u"type");
+PROPERTY(&ObjectTag::Can_transfer_object::m_value, u"value");
 #endif

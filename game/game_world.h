@@ -6,7 +6,7 @@
 class Player;
 class GameMap;
 
-class GameWorld : public iSerializable, public iJsonSerializable {
+class GameWorld : public iSerializable {
 public:
     float m_coefficient[21][21][21];
 

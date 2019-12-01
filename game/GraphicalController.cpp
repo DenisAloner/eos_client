@@ -285,9 +285,9 @@ void GuiAtlasReader::read(const std::u16string_view& json, std::unordered_map<st
         for (std::size_t image_index = 0; image_index < property->size(); image_index += 2) {
             std::u16string name;
             read((*property)[image_index], name);
-            const auto file_name = (FileSystem::instance().m_resource_path + "Tiles/gui/" + utf16_to_cp1251(name) + ".png").c_str();
+            const auto file_name = FileSystem::instance().m_resource_path + "Tiles/gui/" + utf16_to_cp1251(name) + ".png";
             int width, height, channels;
-            const auto image_data = stbi_load(file_name, &width, &height, &channels, STBI_rgb_alpha);
+            const auto image_data = stbi_load(file_name.c_str(), &width, &height, &channels, STBI_rgb_alpha);
             Logger::instance().info("texture name: {} {} {}", file_name, width, height);
             glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, image_index / 2 + 2, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
             stbi_image_free(image_data);
@@ -344,7 +344,9 @@ tile_options_e operator|(const tile_options_e& lhs, const tile_options_e& rhs)
 
 GraphicalController::GraphicalController(const dimension_t<int> size)
 {
-
+    m_font_atlas_x_offset = 0;
+    m_font_atlas_y_offset = 0;
+    m_font_atlas_row_symbol_max_height = 0;
     m_id = std::this_thread::get_id();
     m_gui_quads.resize(10000);
     m_size = size;
@@ -446,7 +448,7 @@ GraphicalController::GraphicalController(const dimension_t<int> size)
 
         glGenVertexArrays(1, &m_gui_vao);
         glGenBuffers(1, &m_gui_vertex_buffer);
-    	glBindVertexArray(m_gui_vao);
+        glBindVertexArray(m_gui_vao);
         glBindBuffer(GL_ARRAY_BUFFER, m_gui_vertex_buffer);
         glBufferData(GL_ARRAY_BUFFER, sizeof(vao_quad_t<gui_vertex_t>) * m_gui_quads.size(), nullptr, GL_DYNAMIC_DRAW);
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(gui_vertex_t), gui_position_offset);
@@ -458,7 +460,7 @@ GraphicalController::GraphicalController(const dimension_t<int> size)
         glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(gui_vertex_t), gui_clip_offset);
         glEnableVertexAttribArray(3);
         glBindVertexArray(0);
-    	
+
     } catch (std::logic_error& e) {
         Logger::instance().critical("Ошибка при загрузке ресурсов: {}", e.what());
     }
@@ -471,12 +473,13 @@ void GraphicalController::load_font(const std::string& font_filename)
 {
     m_error = FT_Init_FreeType(&m_library);
     if (m_error != 0) {
-        Logger::instance().critical("Ошибка инициализации FreeType");
+        Logger::instance().critical(utf16_to_cp1251(u"Ошибка инициализации FreeType"));
     }
 
+	Logger::instance().info("Font load: {}", font_filename.c_str());
     m_error = FT_New_Face(m_library, font_filename.c_str(), 0, &m_face);
     if (m_error != 0) {
-        Logger::instance().critical("Ошибка инициализации шрифта");
+        Logger::instance().critical(utf16_to_cp1251(u"Ошибка инициализации шрифта"));
     }
 
     m_error = FT_Set_Pixel_Sizes(m_face, font_size_c, 0);
@@ -489,8 +492,8 @@ void GraphicalController::load_font(const std::string& font_filename)
 void GraphicalController::generate_symbol(atlas_symbol_t* symbol, GLint x_offset, GLint y_offset, unsigned char* buffer)
 {
     auto& s = *symbol;
-    /*std::u16string a { s.value };
-    Logger::instance().info("Generate font symbol opengl: {} {} {}", utf16_to_cp1251(a), s.size.w, s.size.h);*/
+    //std::u16string a { s.value };
+    //Logger::instance().info("Generate font symbol opengl: {} {} {}", utf16_to_cp1251(a), s.size.w, s.size.h);
     glEnable(GL_TEXTURE_2D);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, m_gui_atlas);
@@ -548,9 +551,9 @@ atlas_symbol_t& GraphicalController::get_symbol(const char16_t value)
         font_symbol.bearing.w = m_slot->advance.x >> 6;
         font_symbol.bearing.h = font_symbol.size.h - m_slot->bitmap_top;
 
-		if (font_symbol.size.h > m_font_atlas_row_symbol_max_height)
+        if (font_symbol.size.h > m_font_atlas_row_symbol_max_height)
             m_font_atlas_row_symbol_max_height = font_symbol.size.h;
-    	
+
         const auto buffer_size = font_symbol.size.w * font_symbol.size.h;
         const auto buffer = new unsigned char[buffer_size];
 
@@ -610,7 +613,7 @@ void GraphicalController::set_VSync(bool sync)
     }
 }
 
-void GraphicalController::output_text(int x, int y,const std::u16string& text, int sizex, int sizey)
+void GraphicalController::output_text(int x, int y, const std::u16string& text, int sizex, int sizey)
 {
     y = y + (m_face->size->metrics.ascender >> 6);
     auto dx = 0;
@@ -619,7 +622,7 @@ void GraphicalController::output_text(int x, int y,const std::u16string& text, i
         auto& fs = get_symbol(k);
         if (k != 32) {
             auto& t = fs.texture;
-			auto& quad = get_gui_quad(x + dx, y + fs.bearing.h - fs.size.h, fs.size.w, fs.size.h);
+            auto& quad = get_gui_quad(x + dx, y + fs.bearing.h - fs.size.h, fs.size.w, fs.size.h);
             quad.vertex[0].texture[0] = t.x;
             quad.vertex[0].texture[1] = t.bottom();
             quad.vertex[0].texture[2] = fs.layer;
@@ -649,7 +652,7 @@ std::size_t GraphicalController::measure_text_width(const std::u16string& text)
 
 void GraphicalController::center_text(int x, int y, const std::u16string& text, int sizex, int sizey)
 {
-	const auto width = measure_text_width(text);
+    const auto width = measure_text_width(text);
     const auto cx = x - (width / 2);
     const auto cy = y - ((m_face->size->metrics.ascender - m_face->size->metrics.descender) >> 7);
     output_text(cx, cy, text, sizex, sizey);
@@ -696,19 +699,16 @@ void GraphicalController::render_gui()
     glBindTexture(GL_TEXTURE_2D_ARRAY, m_gui_atlas);
     set_uniform_sampler(m_ui_shader, "atlas", 0);
 
-	glBindVertexArray(m_gui_vao);
+    glBindVertexArray(m_gui_vao);
     glBindBuffer(GL_ARRAY_BUFFER, m_gui_vertex_buffer);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vao_quad_t<gui_vertex_t>) * quads_count_to_render, &m_gui_quads[0]);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDrawArrays(GL_QUADS, 0, 4 * quads_count_to_render);
     glBindVertexArray(0);
 
-	
-
-  /*  glDisableVertexAttribArray(0);
+    /*  glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(2);*/
-
 }
 
 bool GraphicalController::set_uniform_vector(const GLuint program, const char* name, const float* value)
@@ -987,7 +987,6 @@ GLuint GraphicalController::load_texture(const std::string& path)
     GLuint texture;
     bytearray buff;
     if (!FileSystem::instance().load_from_file(path, buff)) {
-        //MessageBox(NULL, path.c_str(), "", MB_OK);
         throw std::logic_error("Не удалось загрузить файл `" + path + "`");
     }
     auto header = reinterpret_cast<BITMAPFILEHEADER*>(buff.get());
@@ -1008,8 +1007,7 @@ GLuint GraphicalController::png_texture_load(const std::string& path)
 {
     int width, height, channels;
     stbi_set_flip_vertically_on_load(true);
-    const auto file_name = path.c_str();
-    const auto image_data = stbi_load(file_name,
+    const auto image_data = stbi_load(path.c_str(),
         &width,
         &height,
         &channels,
@@ -1053,9 +1051,9 @@ GLuint GraphicalController::texture_array_load(const std::vector<std::string>& p
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
     for (std::size_t index = 0; index < path.size(); ++index) {
-        const auto file_name = path[index].c_str();
+
         int width, height, channels;
-        const auto image_data = stbi_load(file_name, &width, &height, &channels, STBI_rgb_alpha);
+        const auto image_data = stbi_load(path[index].c_str(), &width, &height, &channels, STBI_rgb_alpha);
         if (index == 0) {
             glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, width, height, path.size(), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
         }
@@ -1096,7 +1094,7 @@ GLuint GraphicalController::load_shader(const std::string& vPath, const std::str
     const auto vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     const auto fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
 
-    glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL);
+    glShaderSource(vertex_shader, 1, &vertex_shader_source, nullptr);
     glCompileShader(vertex_shader);
     if (!compile_successful(vertex_shader)) {
         auto max_length = 0;

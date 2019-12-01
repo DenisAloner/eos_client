@@ -1,4 +1,5 @@
 #include "interaction_timer.h"
+#include "writer.h"
 
 Interaction_timer::Interaction_timer()
 {
@@ -28,4 +29,14 @@ iPacker& Interaction_timer::get_packer()
 interaction_message_type_e Interaction_timer::get_interaction_message_type()
 {
     return interaction_message_type_e::interaction_timer;
+}
+
+std::u16string Interaction_timer::serialize_to_json_reference(JsonWriter& value)
+{
+    return value.write(*this);
+}
+
+std::u16string Interaction_timer::serialize_to_json_pointer(JsonWriter& value)
+{
+    return value.write(this);
 }

@@ -14,7 +14,6 @@ GUI_Controller::~GUI_Controller()
 void GUI_Controller::key_press(WPARAM w)
 {
     if (m_GUI) {
-        Logger::instance().info("yes");
         m_GUI->key_press(w);
     }
 }

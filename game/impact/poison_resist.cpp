@@ -1,6 +1,5 @@
 #include "poison_resist.h"
-#include "interaction_prefix.h"
-#include "effect.h"
+#include "writer.h"
 
 ObjectTag::Poison_resist::Poison_resist()
     : Object_tag(object_tag_e::poison_resist) {};
@@ -25,4 +24,14 @@ void ObjectTag::Poison_resist::apply_effect(GameObject* unit, Object_interaction
 iPacker& ObjectTag::Poison_resist::get_packer()
 {
     return Packer<Poison_resist>::instance();
+}
+
+std::u16string ObjectTag::Poison_resist::serialize_to_json_reference(JsonWriter& value)
+{
+    return value.write(*this);
+}
+
+std::u16string ObjectTag::Poison_resist::serialize_to_json_pointer(JsonWriter& value)
+{
+    return value.write(this);
 }

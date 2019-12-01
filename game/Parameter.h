@@ -73,6 +73,9 @@ public:
             make_property(&Parameter::m_size, u"size"));
     }
 
+	std::u16string serialize_to_json_reference(JsonWriter& value) override;
+    std::u16string serialize_to_json_pointer(JsonWriter& value) override;
+
 private:
     template <typename T, typename... Args>
     void set_helper(const int i, T value)
@@ -87,7 +90,7 @@ private:
         if (i < m_size) {
             set_helper(i + 1, a...);
         }
-    };
+    }
 };
 
 #endif //PARAMETER_H

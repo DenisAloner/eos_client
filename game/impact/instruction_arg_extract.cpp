@@ -65,3 +65,13 @@ interaction_message_type_e Instruction_arg_extract::get_interaction_message_type
 {
     return interaction_message_type_e::instruction_arg_extract;
 }
+
+std::u16string Instruction_arg_extract::serialize_to_json_reference(JsonWriter& value)
+{
+    return value.write(*this);
+}
+
+std::u16string Instruction_arg_extract::serialize_to_json_pointer(JsonWriter& value)
+{
+    return value.write(this);
+}

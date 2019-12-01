@@ -1,5 +1,5 @@
 #include "label.h"
-#include "Visitors.h"
+#include "writer.h"
 
 ObjectTag::Label::Label(object_tag_e type)
     : Object_tag(type) {};
@@ -20,4 +20,14 @@ void ObjectTag::Label::apply_visitor(Visitor_generic& visitor)
 iPacker& ObjectTag::Label::get_packer()
 {
     return Packer<Label>::instance();
+}
+
+std::u16string ObjectTag::Label::serialize_to_json_reference(JsonWriter& value)
+{
+    return value.write(*this);
+}
+
+std::u16string ObjectTag::Label::serialize_to_json_pointer(JsonWriter& value)
+{
+    return value.write(this);
 }

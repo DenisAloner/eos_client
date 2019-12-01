@@ -4,7 +4,7 @@
 #include "Definiton.h"
 #include "i_json_serializable.h"
 
-class Interaction_list : public Object_interaction,public iJsonSerializable {
+class Interaction_list : public Object_interaction {
 public:
     feature_list_type_e m_list_type;
     std::list<Object_interaction*> m_items;
