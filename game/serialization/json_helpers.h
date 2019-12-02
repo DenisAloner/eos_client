@@ -1,8 +1,8 @@
 #ifndef JSON_HELPERS_H
 #define JSON_HELPERS_H
 
-#include <type_traits>
 #include <tuple>
+#include <type_traits>
 
 template <typename Class, typename T>
 struct JsonProperty {
@@ -11,6 +11,7 @@ struct JsonProperty {
         : member { member }
         , name { name } {};
 
+    using type = T;
     T Class::*member;
     const char16_t* name;
 };

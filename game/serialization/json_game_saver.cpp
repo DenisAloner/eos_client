@@ -1,5 +1,9 @@
 #include "json_game_saver.h"
 
+#define VISIT_IMPL(Visitor, Class)                                              \
+    std::u16string Visitor::write(Class& value) { return write_object(value); } \
+    std::u16string Visitor::write(Class* value) { return write_pointer(value); }
+
 template <typename T>
 constexpr auto JsonGameSaver::object_properties()
 {
@@ -113,77 +117,26 @@ constexpr auto JsonGameSaver::object_properties()
     }
 }
 
-std::u16string JsonGameSaver::write(GameWorld& value)
-{
-    //Logger::instance().info("GameWorld&");
-	return write_object(value);
-}
+VISIT_IMPL(JsonGameSaver, GameWorld);
+VISIT_IMPL(JsonGameSaver, GameMap);
+VISIT_IMPL(JsonGameSaver, GameObject);
+VISIT_IMPL(JsonGameSaver, Attribute_map);
+VISIT_IMPL(JsonGameSaver, Object_state);
+VISIT_IMPL(JsonGameSaver, Interaction_list);
+VISIT_IMPL(JsonGameSaver, InventoryCell);
+VISIT_IMPL(JsonGameSaver, ObjectPart);
 
-std::u16string JsonGameSaver::write(GameWorld* value)
-{
-    //Logger::instance().info("GameWorld*");
-    return write_pointer(value);
-}
-
-std::u16string JsonGameSaver::write(GameMap& value)
-{
-    return write_object(value);
-}
-
-std::u16string JsonGameSaver::write(GameObject& value)
-{
-    return write_object(value);
-}
-
-std::u16string JsonGameSaver::write(Attribute_map& value)
-{
-    return write_object(value);
-}
-
-std::u16string JsonGameSaver::write(Object_state& value)
-{
-    return write_object(value);
-}
-
-std::u16string JsonGameSaver::write(Interaction_list& value)
-{
-    return write_object(value);
-}
 
 std::u16string JsonGameSaver::write(MapCell& value)
 {
     return write_object(value);
 }
 
-std::u16string JsonGameSaver::write(InventoryCell& value)
+std::u16string JsonGameSaver::write(MapCell* value)
 {
-    return write_object(value);
+    return value ? write(*value) : u"null";
 }
 
-std::u16string JsonGameSaver::write(ObjectPart& value)
-{
-    return write_object(value);
-}
-
-std::u16string JsonGameSaver::write(iSerializable& value)
-{
-    return value.serialize_to_json_reference(*this);
-}
-
-std::u16string JsonGameSaver::write(iSerializable* value)
-{
-    return value ? value->serialize_to_json_pointer(*this) : u"null";
-}
-
-std::u16string JsonGameSaver::write(Object_interaction& value)
-{
-    return value.serialize_to_json_reference(*this);
-}
-
-std::u16string JsonGameSaver::write(Object_interaction* value)
-{
-    return value ? value->serialize_to_json_pointer(*this) : u"null";
-}
 
 std::u16string JsonGameSaver::write(Action& value)
 {
@@ -193,78 +146,6 @@ std::u16string JsonGameSaver::write(Action& value)
 std::u16string JsonGameSaver::write(Action* value)
 {
     return value ? write(*value) : u"null";
-}
-
-std::u16string JsonGameSaver::write(Game_object_owner& value)
-{
-    return value.serialize_to_json_reference(*this);
-}
-
-std::u16string JsonGameSaver::write(Game_object_owner* value)
-{
-	return value ? value->serialize_to_json_pointer(*this) : u"null";
-}
-
-std::u16string JsonGameSaver::write(MapCell* value)
-{
-	return value ? value->serialize_to_json_reference(*this) : u"null";
-}
-
-std::u16string JsonGameSaver::write(GameMap* value)
-{
-    //Logger::instance().info("GameMap*");
-    return write_pointer(value);
-}
-
-std::u16string JsonGameSaver::write(GameObject* value)
-{
-    //Logger::instance().info("GameObject*");
-    return write_pointer(value);
-}
-
-std::u16string JsonGameSaver::write(Attribute_map* value)
-{
-    return write_pointer(value);
-}
-
-std::u16string JsonGameSaver::write(Object_state* value)
-{
-    return write_pointer(value);
-}
-
-std::u16string JsonGameSaver::write(Interaction_list* value)
-{
-    return write_pointer(value);
-}
-
-std::u16string JsonGameSaver::write(InventoryCell* value)
-{
-    return write_pointer(value);
-}
-
-std::u16string JsonGameSaver::write(ObjectPart* value)
-{
-    return write_pointer(value);
-}
-
-std::u16string JsonGameSaver::write(AI& value)
-{
-    return write_object(value);
-}
-
-std::u16string JsonGameSaver::write(AI* value)
-{
-    return write_pointer(value);
-}
-
-std::u16string JsonGameSaver::write(AI_enemy& value)
-{
-    return write_object(value);
-}
-
-std::u16string JsonGameSaver::write(AI_enemy* value)
-{
-    return write_pointer(value);
 }
 
 std::u16string JsonGameSaver::write(predicate_t& value)
@@ -297,65 +178,14 @@ std::u16string JsonGameSaver::write(Icon* value)
     return value ? write(*value) : u"null";
 }
 
-std::u16string JsonGameSaver::write(Effect& value)
-{
-    return write_object(value);
-}
-
-std::u16string JsonGameSaver::write(Effect* value)
-{
-    return write_pointer(value);
-}
-
-std::u16string JsonGameSaver::write(Instruction_arg_extract& value)
-{
-    return write_object(value);
-}
-
-std::u16string JsonGameSaver::write(Instruction_arg_extract* value)
-{
-    return write_pointer(value);
-}
-
-std::u16string JsonGameSaver::write(Instruction_check_owner_type& value)
-{
-    return write_object(value);
-}
-
-std::u16string JsonGameSaver::write(Instruction_check_owner_type* value)
-{
-    return write_pointer(value);
-}
-
-std::u16string JsonGameSaver::write(Instruction_check_part_type& value)
-{
-    return write_object(value);
-}
-
-std::u16string JsonGameSaver::write(Instruction_check_part_type* value)
-{
-    return write_pointer(value);
-}
-
-std::u16string JsonGameSaver::write(Instruction_result& value)
-{
-    return write_object(value);
-}
-
-std::u16string JsonGameSaver::write(Instruction_result* value)
-{
-    return write_pointer(value);
-}
-
-std::u16string JsonGameSaver::write(Parameter_list& value)
-{
-    return write_object(value);
-}
-
-std::u16string JsonGameSaver::write(Parameter_list* value)
-{
-    return write_pointer(value);
-}
+VISIT_IMPL(JsonGameSaver, AI_enemy);
+VISIT_IMPL(JsonGameSaver, Effect);
+VISIT_IMPL(JsonGameSaver, Instruction_arg_extract);
+VISIT_IMPL(JsonGameSaver, Instruction_check_owner_type);
+VISIT_IMPL(JsonGameSaver, Instruction_check_part_type);
+VISIT_IMPL(JsonGameSaver, Instruction_result);
+VISIT_IMPL(JsonGameSaver, Parameter_list);
+VISIT_IMPL(JsonGameSaver, ObjectTag::Can_transfer_object);
 
 std::u16string JsonGameSaver::write(Instruction_check_tag& value)
 {
@@ -507,16 +337,6 @@ std::u16string JsonGameSaver::write(ObjectTag::Requirements_to_object* value)
     return u"";
 }
 
-std::u16string JsonGameSaver::write(Object_tag& value)
-{
-    return value.serialize_to_json_reference(*this);
-}
-
-std::u16string JsonGameSaver::write(Object_tag* value)
-{
-    return value ? value->serialize_to_json_pointer(*this) : u"null";
-}
-
 std::u16string JsonGameSaver::write(Interaction_time& value)
 {
     return u"";
@@ -557,22 +377,23 @@ std::u16string JsonGameSaver::write(Config* value)
     return u"";
 }
 
-std::u16string JsonGameSaver::write(ObjectTag::Can_transfer_object& value)
-{
-    return write_object(value);
-}
-
-std::u16string JsonGameSaver::write(ObjectTag::Can_transfer_object* value)
-{
-    return write_pointer(value);
-}
-
 std::u16string JsonGameSaver::write(ObjectTag::Poison_resist& value)
 {
     return u"";
 }
 
 std::u16string JsonGameSaver::write(ObjectTag::Poison_resist* value)
+{
+    return u"";
+}
+
+
+std::u16string JsonGameSaver::write(AI_trap& value)
+{
+    return u"";
+}
+
+std::u16string JsonGameSaver::write(AI_trap* value)
 {
     return u"";
 }

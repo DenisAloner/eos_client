@@ -1,15 +1,12 @@
 #ifndef JSON_GAME_SAVER_H
 #define JSON_GAME_SAVER_H
 
+#include "member_map.h"
 #include "writer.h"
 #include <string>
-#include "member_map.h"
-
-class Game_object_owner;
 
 class JsonGameSaver : public JsonWriter {
 public:
-	
     using JsonWriter::write;
 
     template <typename T>
@@ -27,24 +24,29 @@ public:
             if (i != 0) {
                 result += u",";
             }
-            if constexpr (std::is_base_of_v<iCustomHandler, decltype(item)>) {
+			using property_type = decltype(item);
+            if constexpr (std::is_base_of_v<iCustomHandler, property_type>) {
                 result += u"\"" + std::u16string { item.property.name } + u"\":" + (*this.*(item.custom_function))(object.*(item.property.member));
+            } else if constexpr (std::is_pointer_v<typename property_type::type>) {
+                if constexpr (std::is_base_of_v<iJsonSerializable, std::remove_pointer_t<typename property_type::type>>) {
+                    auto value = object.*(item.member);
+                    result += u"\"" + std::u16string { item.name } + u"\":" + (value ? value->serialize_to_json_pointer(*this) : u"null");
+                } else
+                    result += u"\"" + std::u16string { item.name } + u"\":" + write(object.*(item.member));
+            } else if constexpr (std::is_reference_v<typename property_type::type>) {
+                if constexpr (std::is_base_of_v<iJsonSerializable, std::remove_reference_t<typename property_type::type>>) {
+                    auto value = object.*(item.member);
+                    result += u"\"" + std::u16string { item.name } + u"\":" + value.serialize_to_json_reference(*this);
+                } else
+                    result += u"\"" + std::u16string { item.name } + u"\":" + write(object.*(item.member));
             } else
                 result += u"\"" + std::u16string { item.name } + u"\":" + write(object.*(item.member));
         });
         return result + u'}';
     }
 
-    std::u16string write(iSerializable& value) override;
-    std::u16string write(iSerializable* value) override;
-    //std::u16string write(const iSerializable& value) override;
-    //std::u16string write(const iSerializable* value) override;
-	std::u16string write(Object_interaction& value) override;
-    std::u16string write(Object_interaction* value) override;
     std::u16string write(Action& value) override;
     std::u16string write(Action* value) override;
-	std::u16string write(Game_object_owner& value) override;
-	std::u16string write(Game_object_owner* value) override;
     std::u16string write(GameWorld& value) override;
     std::u16string write(GameWorld* value) override;
     std::u16string write(GameMap& value) override;
@@ -63,10 +65,10 @@ public:
     std::u16string write(InventoryCell* value) override;
     std::u16string write(ObjectPart& value) override;
     std::u16string write(ObjectPart* value) override;
-    std::u16string write(AI& value) override;
-    std::u16string write(AI* value) override;
     std::u16string write(AI_enemy& value) override;
     std::u16string write(AI_enemy* value) override;
+    std::u16string write(AI_trap& value) override;
+    std::u16string write(AI_trap* value) override;
     std::u16string write(predicate_t& value) override;
     std::u16string write(predicate_t* value) override;
     std::u16string write(TileManager& value) override;
@@ -85,7 +87,7 @@ public:
     std::u16string write(Instruction_result* value) override;
     std::u16string write(Parameter_list& value) override;
     std::u16string write(Parameter_list* value) override;
-	
+
     std::u16string write(Instruction_check_tag& value) override;
     std::u16string write(Instruction_check_tag* value) override;
     std::u16string write(Instruction_game_owner& value) override;
@@ -116,8 +118,6 @@ public:
     std::u16string write(ObjectTag::Purification_from_poison* value) override;
     std::u16string write(ObjectTag::Requirements_to_object& value) override;
     std::u16string write(ObjectTag::Requirements_to_object* value) override;
-    std::u16string write(Object_tag& value) override;
-    std::u16string write(Object_tag* value) override;
     std::u16string write(Interaction_time& value) override;
     std::u16string write(Interaction_time* value) override;
     std::u16string write(Slot_set_state& value) override;
@@ -130,13 +130,11 @@ public:
     std::u16string write(ObjectTag::Can_transfer_object* value) override;
     std::u16string write(ObjectTag::Poison_resist& value) override;
     std::u16string write(ObjectTag::Poison_resist* value) override;
-	
+
     std::u16string map_cell_owner_save(GameMap* value);
 
-	template <typename T>
+    template <typename T>
     constexpr static auto object_properties();
-
-
 };
 
 #endif

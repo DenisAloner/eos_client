@@ -8,7 +8,7 @@
 #include "object_part.h"
 #include "object_state.h"
 
-#define WRITE(Type)                             \
+#define WRITE(Type)                                  \
     virtual std::u16string write(##Type& value) = 0; \
     virtual std::u16string write(##Type* value) = 0
 
@@ -16,6 +16,7 @@ class iJsonSerializable;
 class Object_state;
 class AI;
 class AI_enemy;
+class AI_trap;
 class Config;
 class Instruction_arg_extract;
 class Instruction_check_owner_type;
@@ -99,10 +100,7 @@ public:
     virtual std::u16string write(optical_properties_t& value);
     virtual std::u16string write(optical_properties_t* value);
 
-	WRITE(iSerializable);
-    WRITE(Object_interaction);
     WRITE(Action);
-    WRITE(Game_object_owner);
     WRITE(GameWorld);
     WRITE(GameMap);
     WRITE(GameObject);
@@ -113,8 +111,8 @@ public:
     WRITE(MapCell);
     WRITE(InventoryCell);
     WRITE(ObjectPart);
-    WRITE(AI);
     WRITE(AI_enemy);
+    WRITE(AI_trap);
     WRITE(predicate_t);
     WRITE(TileManager);
     WRITE(Icon);
@@ -140,12 +138,11 @@ public:
     WRITE(ObjectTag::Requirements_to_object);
     WRITE(ObjectTag::Can_transfer_object);
     WRITE(ObjectTag::Poison_resist);
-    WRITE(Object_tag);
     WRITE(Interaction_time);
     WRITE(Slot_set_state);
     WRITE(Parameter);
     WRITE(Config);
-	
+
     template <typename T, class = typename std::enable_if<std::is_enum<T>::value, T>::type>
     std::u16string write(const T& value)
     {
@@ -158,9 +155,14 @@ public:
         if (ref.empty())
             return u"[]";
         std::u16string result = u"[";
-        for (auto& current : ref) {
-            result += write(current) + u",";
-        }
+        if constexpr (std::is_pointer_v<T> && std::is_base_of_v<iJsonSerializable, std::remove_pointer_t<T>>) {
+            for (auto& current : ref) {
+                result += (current ? current->serialize_to_json_pointer(*this) : u"null") + u",";
+            }
+        } else
+            for (auto& current : ref) {
+                result += write(current) + u",";
+            }
         result[result.length() - 1] = u']';
         return result;
     }
@@ -171,7 +173,12 @@ public:
         if (ref.empty())
             return u"[]";
         std::u16string result = u"[";
-        for (auto& current : ref) {
+        if constexpr (std::is_pointer_v<T> && std::is_base_of_v<iJsonSerializable,std::remove_pointer_t<T>>) {
+            for (auto& current : ref) {
+                result += (current ? current->serialize_to_json_pointer(*this) : u"null") + u",";
+            }
+        }
+        else for (auto& current : ref) {
             result += write(current) + u",";
         }
         result[result.length() - 1] = u']';
@@ -225,9 +232,9 @@ public:
         if (ref == objects.end()) {
             counter += 1;
             objects[value] = counter;
-            return value->serialize_to_json_reference(*this);
+            return write(*value);
         }
-        return u"{\"$type\":link,\"$link\":" + cp1251_to_utf16(std::to_string(ref->second)) + u"}";
+        return u"{\"$type\":\"link\",\"$link\":" + cp1251_to_utf16(std::to_string(ref->second)) + u"}";
     }
 };
 
