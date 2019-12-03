@@ -94,4 +94,12 @@ PROPERTY(&Parameter_list::m_basic_value, u"basic_value");
 PROPERTY(&Parameter_list::m_basic_limit, u"basic_limit");
 PROPERTY(&Object_tag::m_type, u"type");
 PROPERTY(&ObjectTag::Can_transfer_object::m_value, u"value");
+PROPERTY(&Instruction_check_tag::m_value, u"value");
+// Interaction_slot
+PROPERTY(&Interaction_slot::m_value, u"value");
+// Interaction_timer
+PROPERTY(&Interaction_time::m_turn, u"turn");
+// Interaction_timer
+PROPERTY(&Interaction_timer::m_turn, u"turn");
+PROPERTY(&Interaction_timer::m_period, u"period");
 #endif

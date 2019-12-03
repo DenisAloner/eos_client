@@ -9,8 +9,8 @@
 #include "object_state.h"
 
 #define WRITE(Type)                                  \
-    virtual std::u16string write(##Type& value) = 0; \
-    virtual std::u16string write(##Type* value) = 0
+    virtual std::u16string write(Type& value) = 0; \
+    virtual std::u16string write(Type* value) = 0
 
 class iJsonSerializable;
 class Object_state;
@@ -23,64 +23,6 @@ class Instruction_check_owner_type;
 class Instruction_check_part_type;
 class Instruction_game_owner;
 class Instruction_game_owner;
-
-//template <typename Type, typename... Rest>
-//class IVisitor : public IVisitor<Type>, public IVisitor<Rest...> {
-//public:
-//    //using IVisitor<Type>::write;
-//    //using Visitor<Rest...>::write;
-//};
-//
-//template <typename Type>
-//class IVisitor<Type> {
-//public:
-//    virtual std::u16string write(Type& value) = 0;
-//    virtual std::u16string write(Type* value) = 0;
-//};
-//
-//class IJsonWriter : IVisitor<int,
-//                        const int,
-//                        std::u16string,
-//                        const std::u16string,
-//                        dimension3_t,
-//                        optical_properties_t,
-//                        Object_interaction,
-//                        Action,
-//                        Game_object_owner,
-//                        GameWorld,
-//                        GameMap,
-//                        GameObject,
-//                        Attribute_map,
-//                        Object_state,
-//                        Interaction_list,
-//                        MapCell,
-//                        InventoryCell,
-//                        ObjectPart,
-//                        AI,
-//                        AI_enemy,
-//                        predicate_t,
-//                        TileManager,
-//                        Icon,
-//                        Effect,
-//                        Instruction_arg_extract,
-//                        Instruction_check_owner_type,
-//                        Instruction_check_part_type,
-//                        Instruction_result,
-//                        Instruction_check_tag,
-//                        Instruction_game_owner,
-//                        Instruction_get_owner,
-//                        Instruction_slot_link,
-//                        Interaction_addon,
-//                        Interaction_copyist,
-//                        Interaction_prefix,
-//                        Interaction_slot,
-//                        ObjectTag::Activator,
-//                        ObjectTag::Equippable,
-//                        ObjectTag::Fast_move,
-//                        ObjectTag::Mortal,
-//                        ObjectTag::Purification_from_poison,
-//                        ObjectTag::Requirements_to_object> {
-//};
 
 class JsonWriter {
 public:
@@ -125,10 +67,10 @@ public:
     WRITE(Instruction_game_owner);
     WRITE(Instruction_get_owner);
     WRITE(Instruction_slot_link);
+    WRITE(Instruction_slot_parameter);
     WRITE(Interaction_addon);
     WRITE(Interaction_copyist);
     WRITE(Interaction_prefix);
-    WRITE(Interaction_slot);
     WRITE(ObjectTag::Activator);
     WRITE(ObjectTag::Label);
     WRITE(ObjectTag::Equippable);
@@ -139,6 +81,7 @@ public:
     WRITE(ObjectTag::Can_transfer_object);
     WRITE(ObjectTag::Poison_resist);
     WRITE(Interaction_time);
+    WRITE(Interaction_timer);
     WRITE(Slot_set_state);
     WRITE(Parameter);
     WRITE(Config);
@@ -173,14 +116,14 @@ public:
         if (ref.empty())
             return u"[]";
         std::u16string result = u"[";
-        if constexpr (std::is_pointer_v<T> && std::is_base_of_v<iJsonSerializable,std::remove_pointer_t<T>>) {
+        if constexpr (std::is_pointer_v<T> && std::is_base_of_v<iJsonSerializable, std::remove_pointer_t<T>>) {
             for (auto& current : ref) {
                 result += (current ? current->serialize_to_json_pointer(*this) : u"null") + u",";
             }
-        }
-        else for (auto& current : ref) {
-            result += write(current) + u",";
-        }
+        } else
+            for (auto& current : ref) {
+                result += write(current) + u",";
+            }
         result[result.length() - 1] = u']';
         return result;
     }
@@ -191,9 +134,14 @@ public:
         if (ref.empty())
             return u"[]";
         std::u16string result = u"[";
-        for (auto& current : ref) {
-            result += write(current.first) + u"," + write(current.second) + u",";
-        }
+        if constexpr (std::is_pointer_v<Value> && std::is_base_of_v<iJsonSerializable, std::remove_pointer_t<Value>>) {
+            for (auto& current : ref) {
+                result += write(current.first) + u"," + (current.second ? current.second->serialize_to_json_pointer(*this) : u"null") + u",";
+            }
+        } else
+            for (auto& current : ref) {
+                result += write(current.first) + u"," + write(current.second) + u",";
+            }
         result[result.length() - 1] = u']';
         return result;
     }
@@ -204,9 +152,14 @@ public:
         if (ref.empty())
             return u"[]";
         std::u16string result = u"[";
-        for (auto& current : ref) {
-            result += write(current.first) + u"," + write(current.second) + u",";
-        }
+        if constexpr (std::is_pointer_v<Value> && std::is_base_of_v<iJsonSerializable, std::remove_pointer_t<Value>>) {
+            for (auto& current : ref) {
+                result += write(current.first) + u"," + (current.second ? current.second->serialize_to_json_pointer(*this) : u"null") + u",";
+            }
+        } else
+            for (auto& current : ref) {
+                result += write(current.first) + u"," + write(current.second) + u",";
+            }
         result[result.length() - 1] = u']';
         return result;
     }

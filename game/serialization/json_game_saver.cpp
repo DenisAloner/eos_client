@@ -22,7 +22,7 @@ constexpr auto JsonGameSaver::object_properties()
             MemberMap::get<&GameObject::m_direction>,
             MemberMap::get<&Game_object_owner::m_owner>,
             MemberMap::get<&GameObject::m_state>,
-            MemberMap::get<&GameObject::m_active_state>);
+            CustomWriter(MemberMap::get<&GameObject::m_active_state>, &JsonGameSaver::active_object_state_save));
     }
     if constexpr (std::is_same_v<T, Attribute_map>) {
         return std::tuple(
@@ -115,6 +115,28 @@ constexpr auto JsonGameSaver::object_properties()
             std::make_tuple(
                 MemberMap::get<&ObjectTag::Can_transfer_object::m_value>));
     }
+    if constexpr (std::is_same_v<T, Instruction_check_tag>) {
+        return std::tuple(
+            MemberMap::get<&Instruction_check_tag::m_value>);
+    }
+    if constexpr (std::is_same_v<T, ObjectTag::Label>) {
+        return object_properties<Object_tag>();
+    }
+    if constexpr (std::is_same_v<T, Interaction_slot>) {
+        return std::tuple(
+            MemberMap::get<&Interaction_slot::m_value>);
+    }
+    if constexpr (std::is_same_v<T, Interaction_time>) {
+        return std::tuple_cat(object_properties<Interaction_slot>(),
+            std::make_tuple(
+                MemberMap::get<&Interaction_time::m_turn>));
+    }
+    if constexpr (std::is_same_v<T, Interaction_timer>) {
+        return std::tuple_cat(object_properties<Interaction_slot>(),
+            std::make_tuple(
+                MemberMap::get<&Interaction_timer::m_turn>,
+                MemberMap::get<&Interaction_timer::m_period>));
+    }
 }
 
 VISIT_IMPL(JsonGameSaver, GameWorld);
@@ -125,7 +147,6 @@ VISIT_IMPL(JsonGameSaver, Object_state);
 VISIT_IMPL(JsonGameSaver, Interaction_list);
 VISIT_IMPL(JsonGameSaver, InventoryCell);
 VISIT_IMPL(JsonGameSaver, ObjectPart);
-
 
 std::u16string JsonGameSaver::write(MapCell& value)
 {
@@ -186,16 +207,10 @@ VISIT_IMPL(JsonGameSaver, Instruction_check_part_type);
 VISIT_IMPL(JsonGameSaver, Instruction_result);
 VISIT_IMPL(JsonGameSaver, Parameter_list);
 VISIT_IMPL(JsonGameSaver, ObjectTag::Can_transfer_object);
-
-std::u16string JsonGameSaver::write(Instruction_check_tag& value)
-{
-    return u"";
-}
-
-std::u16string JsonGameSaver::write(Instruction_check_tag* value)
-{
-    return u"";
-}
+VISIT_IMPL(JsonGameSaver, Instruction_check_tag);
+VISIT_IMPL(JsonGameSaver, ObjectTag::Label);
+VISIT_IMPL(JsonGameSaver, Interaction_time);
+VISIT_IMPL(JsonGameSaver, Interaction_timer);
 
 std::u16string JsonGameSaver::write(Instruction_game_owner& value)
 {
@@ -257,32 +272,12 @@ std::u16string JsonGameSaver::write(Interaction_prefix* value)
     return u"";
 }
 
-std::u16string JsonGameSaver::write(Interaction_slot& value)
-{
-    return u"";
-}
-
-std::u16string JsonGameSaver::write(Interaction_slot* value)
-{
-    return u"";
-}
-
 std::u16string JsonGameSaver::write(ObjectTag::Activator& value)
 {
     return u"";
 }
 
 std::u16string JsonGameSaver::write(ObjectTag::Activator* value)
-{
-    return u"";
-}
-
-std::u16string JsonGameSaver::write(ObjectTag::Label& value)
-{
-    return u"";
-}
-
-std::u16string JsonGameSaver::write(ObjectTag::Label* value)
 {
     return u"";
 }
@@ -337,16 +332,6 @@ std::u16string JsonGameSaver::write(ObjectTag::Requirements_to_object* value)
     return u"";
 }
 
-std::u16string JsonGameSaver::write(Interaction_time& value)
-{
-    return u"";
-}
-
-std::u16string JsonGameSaver::write(Interaction_time* value)
-{
-    return u"";
-}
-
 std::u16string JsonGameSaver::write(Slot_set_state& value)
 {
     return u"";
@@ -387,7 +372,6 @@ std::u16string JsonGameSaver::write(ObjectTag::Poison_resist* value)
     return u"";
 }
 
-
 std::u16string JsonGameSaver::write(AI_trap& value)
 {
     return u"";
@@ -398,7 +382,22 @@ std::u16string JsonGameSaver::write(AI_trap* value)
     return u"";
 }
 
+std::u16string JsonGameSaver::write(Instruction_slot_parameter& value)
+{
+    return u"";
+}
+
+std::u16string JsonGameSaver::write(Instruction_slot_parameter* value)
+{
+    return u"";
+}
+
 std::u16string JsonGameSaver::map_cell_owner_save(GameMap* value)
 {
-    return value ? cp1251_to_utf16(std::to_string(value->m_index)) : u"null";
+    return value ? write(value->m_index) : u"null";
+}
+
+std::u16string JsonGameSaver::active_object_state_save(Object_state* value)
+{
+    return value ? write(value->m_state) : u"null";
 }

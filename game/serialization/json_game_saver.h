@@ -102,8 +102,6 @@ public:
     std::u16string write(Interaction_copyist* value) override;
     std::u16string write(Interaction_prefix& value) override;
     std::u16string write(Interaction_prefix* value) override;
-    std::u16string write(Interaction_slot& value) override;
-    std::u16string write(Interaction_slot* value) override;
     std::u16string write(ObjectTag::Activator& value) override;
     std::u16string write(ObjectTag::Activator* value) override;
     std::u16string write(ObjectTag::Label& value) override;
@@ -130,8 +128,13 @@ public:
     std::u16string write(ObjectTag::Can_transfer_object* value) override;
     std::u16string write(ObjectTag::Poison_resist& value) override;
     std::u16string write(ObjectTag::Poison_resist* value) override;
+    std::u16string write(Interaction_timer& value) override;
+    std::u16string write(Interaction_timer* value) override;
+    std::u16string write(Instruction_slot_parameter& value) override;
+    std::u16string write(Instruction_slot_parameter* value) override;
 
     std::u16string map_cell_owner_save(GameMap* value);
+    std::u16string active_object_state_save(Object_state* value);
 
     template <typename T>
     constexpr static auto object_properties();
