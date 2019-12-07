@@ -269,12 +269,13 @@ void Visitor_generic_updater::visit(Action_list& value)
 void Visitor_generic_updater::visit(ObjectTag::Requirements_to_object& value)
 {
     if (value.m_value) {
+        result = false;
         value.m_value->apply_visitor(*this);
         if (result) {
             value.m_value = nullptr;
         }
     }
-    result = value.m_value;
+    result = value.m_value == nullptr;
 }
 
 void Visitor_generic_updater::visit(Instruction_slot_link& value)
@@ -285,7 +286,7 @@ void Visitor_generic_updater::visit(Instruction_slot_link& value)
             value.m_value = nullptr;
         }
     }
-    result = value.m_value;
+    result = value.m_value == nullptr;
 }
 
 void Visitor_generic_updater::visit(Interaction_copyist& value)
@@ -296,7 +297,7 @@ void Visitor_generic_updater::visit(Interaction_copyist& value)
             value.m_value = nullptr;
         }
     }
-    result = value.m_value;
+    result = value.m_value == nullptr;
 }
 
 void Visitor_generic_updater::visit(Interaction_prefix& value)
@@ -307,7 +308,7 @@ void Visitor_generic_updater::visit(Interaction_prefix& value)
             value.m_value = nullptr;
         }
     }
-    result = value.m_value;
+    result = value.m_value == nullptr;
 }
 
 void Visitor_generic_updater::visit(Interaction_addon& value)
@@ -318,7 +319,7 @@ void Visitor_generic_updater::visit(Interaction_addon& value)
             value.m_value = nullptr;
         }
     }
-    result = value.m_value;
+    result = value.m_value == nullptr;
 }
 
 void Visitor_generic_updater::visit(Interaction_time& value)
@@ -329,7 +330,7 @@ void Visitor_generic_updater::visit(Interaction_time& value)
             value.m_value = nullptr;
         }
     }
-    result = value.m_value;
+    result = value.m_value == nullptr;
 }
 
 void Visitor_generic_updater::visit(Interaction_timer& value)
@@ -340,7 +341,7 @@ void Visitor_generic_updater::visit(Interaction_timer& value)
             value.m_value = nullptr;
         }
     }
-    result = value.m_value;
+    result = value.m_value == nullptr;
 }
 
 void Visitor_generic_updater::visit(Instruction_slot_parameter& value)
@@ -351,7 +352,7 @@ void Visitor_generic_updater::visit(Instruction_slot_parameter& value)
             value.m_value = nullptr;
         }
     }
-    result = value.m_value;
+    result = value.m_value == nullptr;
 }
 
 void Visitor_onturn_updater::visit(Interaction_time& value)
@@ -367,7 +368,7 @@ void Visitor_onturn_updater::visit(Interaction_time& value)
             value.m_value = nullptr;
         }
     }
-    result = value.m_value;
+    result = value.m_value == nullptr;
 }
 
 void Visitor_onturn_updater::visit(Interaction_timer& value)
@@ -379,5 +380,5 @@ void Visitor_onturn_updater::visit(Interaction_timer& value)
     if (value.m_value) {
         value.m_value->apply_visitor(*this);
     }
-    result = value.m_value;
+    result = value.m_value == nullptr;
 }

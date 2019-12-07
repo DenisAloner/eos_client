@@ -1,6 +1,7 @@
 #include "game/Action.h"
 #include "game/ApplicationGUI.h"
 #include <fstream>
+#include "json_game_saver.h"
 
 Action::Action()
 {
@@ -1159,7 +1160,7 @@ char action_hit_melee::perform(Parameter* parameter)
     auto sbj_health_old_value = sbj_health->m_value;
     if (check(parameter)) {
         auto msg = p[0].m_object->m_name + u" атакует " + p[1].m_object->m_name + u". ";
-        srand(time(NULL));
+        srand(time(nullptr));
         auto dexterity_subject = p[0].m_object->get_parameter(interaction_e::dexterity);
         auto dexterity_object = p[1].m_object->get_parameter(interaction_e::dexterity);
         auto evasion_skill_object = p[1].m_object->get_parameter(interaction_e::evasion_skill);
@@ -1481,14 +1482,25 @@ void Action_save::interaction_handler(Parameter* arg)
     Action::interaction_handler(nullptr);
     Application::instance().m_message_queue.m_busy = true;
 
-    auto* world = Application::instance().m_world;
+    /*auto* world = Application::instance().m_world;
     SerializationContext pc(*world);
     pc.reset();
     world->reset_serialization_index();
     auto binary = world->bin_serialize(pc);
     std::ofstream file(FileSystem::instance().m_resource_path + "Saves\\save.bin", std::ios::binary);
     file.write(&binary[0], binary.size());
-    file.close();
+    file.close();*/
+
+	Logger::instance().info("Start saving to json");
+    JsonGameSaver j;
+    char16_t marker = 0xFEFF;
+    std::ofstream in_file(FileSystem::instance().m_resource_path + "Saves\\save.json", std::ios::binary);
+    auto json = j.write(Application::instance().m_world);
+    in_file.write(reinterpret_cast<const char*>(&marker), sizeof(marker));
+    in_file.write(reinterpret_cast<const char*>(&json[0]), json.size() * 2);
+    in_file.close();
+    Logger::instance().info("End saving to json");
+	
     Application::instance().m_message_queue.m_busy = false;
 }
 

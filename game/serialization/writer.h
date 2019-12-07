@@ -50,6 +50,7 @@ public:
     WRITE(Object_state);
     WRITE(Interaction_list);
     WRITE(Parameter_list);
+    WRITE(Action_list);
     WRITE(MapCell);
     WRITE(InventoryCell);
     WRITE(ObjectPart);

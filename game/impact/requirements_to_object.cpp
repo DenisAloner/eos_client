@@ -49,12 +49,4 @@ iPacker& ObjectTag::Requirements_to_object::get_packer()
     return Packer<Requirements_to_object>::instance();
 }
 
-std::u16string ObjectTag::Requirements_to_object::serialize_to_json_reference(JsonWriter& value)
-{
-    return value.write(*this);
-}
-
-std::u16string ObjectTag::Requirements_to_object::serialize_to_json_pointer(JsonWriter& value)
-{
-    return value.write(this);
-}
+IJSONSERIALIZABLE_IMPL(ObjectTag::Requirements_to_object);

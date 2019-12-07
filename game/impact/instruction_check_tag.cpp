@@ -42,12 +42,5 @@ interaction_message_type_e Instruction_check_tag::get_interaction_message_type()
     return interaction_message_type_e::instruction_check_tag;
 }
 
-std::u16string Instruction_check_tag::serialize_to_json_reference(JsonWriter& value)
-{
-    return value.write(*this);
-}
+IJSONSERIALIZABLE_IMPL(Instruction_check_tag);
 
-std::u16string Instruction_check_tag::serialize_to_json_pointer(JsonWriter& value)
-{
-    return value.write(this);
-};

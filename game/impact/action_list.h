@@ -13,6 +13,8 @@ public:
     iPacker& get_packer() override;
 
     constexpr static auto properties() { return Interaction_list::properties(); }
+
+	IJSONSERIALIZABLE();
 };
 
 #endif //ACTION_LIST_H

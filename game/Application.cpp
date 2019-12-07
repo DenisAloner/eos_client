@@ -473,8 +473,8 @@ void Application::update_after_load()
     //m_update_mutex.lock();
     if (m_world->m_player->m_object->m_active_state->m_ai) {
         const auto object = m_world->m_player->m_object;
-        const auto map = static_cast<MapCell*>(object->m_owner)->m_map;
-        static_cast<AI_enemy*>(m_world->m_player->m_object->m_active_state->m_ai)->calculate_fov(m_world->m_player->m_object, map);
+        const auto map = dynamic_cast<MapCell*>(object->m_owner)->m_map;
+        dynamic_cast<AI_enemy*>(m_world->m_player->m_object->m_active_state->m_ai)->calculate_fov(m_world->m_player->m_object, map);
     }
     //m_update_mutex.unlock();
 }
@@ -523,11 +523,11 @@ void Application::update()
             //LOG(INFO) << "Просчет ИИ: " << std::to_string(elapsed.count());
             if (m_world->m_player->m_object->m_active_state->m_ai) {
                 auto object = m_world->m_player->m_object;
-                auto map = static_cast<MapCell*>(object->m_owner)->m_map;
+                auto map = dynamic_cast<MapCell*>(object->m_owner)->m_map;
 
-                auto ai = static_cast<AI_enemy*>(object->m_active_state->m_ai);
+                auto ai = dynamic_cast<AI_enemy*>(object->m_active_state->m_ai);
                 ai->calculate_fov(object, map);
-                auto vl = static_cast<Vision_list*>(object->m_active_state->get_list(interaction_e::vision));
+                auto vl = dynamic_cast<Vision_list*>(object->m_active_state->get_list(interaction_e::vision));
 
                 int radius = vl->m_max_radius;
 

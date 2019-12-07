@@ -16,9 +16,9 @@ public:
         std::u16string result;
         auto ref = objects.find(&object);
         if (ref == objects.end()) {
-            result = u"{";
+            result = u"{\"$type\":" + write(MemberMap::type<T>) + u",";
         } else
-            result = u"{\"$link\":" + cp1251_to_utf16(std::to_string(ref->second)) + u",";
+            result = u"{\"$type\":" + write(MemberMap::type<T>) + u",\"$link\":" + cp1251_to_utf16(std::to_string(ref->second)) + u",";
         static_for<object_properties<T>>([&](auto i) {
             constexpr auto item = std::get<i>(object_properties<T>());
             if (i != 0) {
@@ -87,7 +87,8 @@ public:
     std::u16string write(Instruction_result* value) override;
     std::u16string write(Parameter_list& value) override;
     std::u16string write(Parameter_list* value) override;
-
+    std::u16string write(Action_list& value) override;
+    std::u16string write(Action_list* value) override;
     std::u16string write(Instruction_check_tag& value) override;
     std::u16string write(Instruction_check_tag* value) override;
     std::u16string write(Instruction_game_owner& value) override;
