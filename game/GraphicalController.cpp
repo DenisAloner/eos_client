@@ -3,6 +3,8 @@
 #include "Application.h"
 #include <fstream>
 #include <stb_image.h>
+#include "gui_atlas_reader.h"
+
 using namespace gl;
 using namespace std::literals::string_view_literals;
 
@@ -255,81 +257,6 @@ FT_Pos GraphicalController::max_symbol_height_for_current_font() const
 FT_Pos GraphicalController::ascender_for_current_font() const
 {
     return m_face->size->metrics.ascender >> 6;
-}
-
-void GuiAtlasReader::load()
-{
-    bytearray json;
-    FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\gui.json", json);
-    const std::u8string json_u8(json);
-    const auto json_config(utf8_to_utf16(json_u8));
-    const auto properties = read_json_object(json_config);
-    read((*properties)[u"tiles"sv], graph_.atlas_tiles);
-    JsonReader::read((*properties)[u"styles"sv], graph_.gui_styles);
-    delete properties;
-}
-
-void GuiAtlasReader::read(const std::u16string_view& json, std::unordered_map<std::u16string, atlas_tile_t>& ref)
-{
-    const auto property = read_json_array(json);
-    if (property) {
-        std::u16string k;
-        glGenTextures(1, &graph_.m_gui_atlas);
-        glBindTexture(GL_TEXTURE_2D_ARRAY, graph_.m_gui_atlas);
-        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, graph_.m_font_atlas_size, graph_.m_font_atlas_size, property->size() / 2 + 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP);
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        for (std::size_t image_index = 0; image_index < property->size(); image_index += 2) {
-            std::u16string name;
-            read((*property)[image_index], name);
-            const auto file_name = FileSystem::instance().m_resource_path + "Tiles/gui/" + utf16_to_cp1251(name) + ".png";
-            int width, height, channels;
-            const auto image_data = stbi_load(file_name.c_str(), &width, &height, &channels, STBI_rgb_alpha);
-            Logger::instance().info("texture name: {} {} {}", file_name, width, height);
-            glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, image_index / 2 + 2, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
-            stbi_image_free(image_data);
-            const auto p = read_json_array((*property)[image_index + 1]);
-            for (std::size_t j = 0; j < p->size(); j += 2) {
-                read((*p)[j], k);
-                auto& v = ref[k];
-                read((*p)[j + 1], v);
-                v.texture.y = height - v.texture.bottom();
-                v.layer = image_index / 2 + 2;
-            }
-            delete p;
-        }
-        delete property;
-    }
-}
-
-void GuiAtlasReader::read(const std::u16string_view& json, gui_style_t& ref)
-{
-    const auto properties = read_json_object(json);
-    if (properties) {
-        auto& prop = *properties;
-        std::u16string background;
-        read(prop[u"background"sv], background);
-        std::u16string border_x;
-        read(prop[u"border_x"sv], border_x);
-        std::u16string border_y;
-        read(prop[u"border_y"sv], border_y);
-        std::u16string corner;
-        read(prop[u"corner"sv], corner);
-        std::u16string scroll_y_head;
-        read(prop[u"scroll_y_head"sv], scroll_y_head);
-        std::u16string scroll_y_body;
-        read(prop[u"scroll_y_body"sv], scroll_y_body);
-        ref.background_tile = &graph_.atlas_tiles[background];
-        ref.border_x_tile = &graph_.atlas_tiles[border_x];
-        ref.border_y_tile = &graph_.atlas_tiles[border_y];
-        ref.corner_tile = &graph_.atlas_tiles[corner];
-        ref.scroll_y_head_tile = &graph_.atlas_tiles[scroll_y_head];
-        ref.scroll_y_body_tile = &graph_.atlas_tiles[scroll_y_body];
-        delete properties;
-    }
 }
 
 tile_options_e operator&(const tile_options_e& lhs, const tile_options_e& rhs)
@@ -1302,3 +1229,5 @@ void GraphicalController::draw_tile_fbo(double tx1, double ty1, double tx2, doub
     glVertex2d(rect.right(), rect.bottom());
     glEnd();
 }
+
+IJSONDESERIALIZABLE_IMPL(GraphicalController);

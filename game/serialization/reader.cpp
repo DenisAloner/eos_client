@@ -3,7 +3,7 @@ using namespace std::literals::string_view_literals;
 
 int json_to_int(const std::u16string_view& value)
 {
-	auto result = 0;
+    auto result = 0;
     auto opening = std::string::npos;
     std::size_t i;
     for (i = 0; i < value.size(); ++i) {
@@ -276,30 +276,39 @@ json_map_t* read_json_object(const std::u16string_view& value)
     return nullptr;
 }
 
-void JsonReader::read(const std::u16string_view& json, int& ref)
+void JsonReader::read(int& ref, const std::u16string_view& json)
 {
     ref = json_to_int(json);
 }
 
-void JsonReader::read(const std::u16string_view& json, float& ref)
+void JsonReader::read(int*& ref, const std::u16string_view& json)
+{
+    if (json != u"null"sv) {
+        *ref = json_to_int(json);
+        return;
+    } else
+        ref = nullptr;
+}
+
+void JsonReader::read(float& ref, const std::u16string_view& json)
 {
     ref = json_to_float(json);
 }
 
-void JsonReader::read(const std::u16string_view& json, atlas_tile_t& ref)
+void JsonReader::read(atlas_tile_t& ref, const std::u16string_view& json)
 {
     const auto properties = read_json_object(json);
     if (properties) {
         auto& prop = *properties;
-        read(prop[u"x"sv], ref.texture.x);
-        read(prop[u"y"sv], ref.texture.y);
-        read(prop[u"w"sv], ref.texture.w);
-        read(prop[u"h"sv], ref.texture.h);
+        read(ref.texture.x, prop[u"x"sv]);
+        read(ref.texture.y, prop[u"y"sv]);
+        read(ref.texture.w, prop[u"w"sv]);
+        read(ref.texture.h, prop[u"h"sv]);
         delete properties;
     }
 }
 
-void JsonReader::read(const std::u16string_view& json, std::u16string& ref)
+void JsonReader::read(std::u16string& ref, const std::u16string_view& json)
 {
     const auto start_pos = json.find(u'"');
     if (start_pos != std::string::npos) {

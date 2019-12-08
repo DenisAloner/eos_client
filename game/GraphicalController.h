@@ -14,6 +14,7 @@
 #include <list>
 #include <string>
 #include <vector>
+#include "i_json_deserializable.h";
 
 enum class tile_options_e : unsigned char {
     NONE = 0,
@@ -28,7 +29,7 @@ tile_options_e operator|(const tile_options_e& lhs, const tile_options_e& rhs);
 class TileManager;
 const int font_size_c = 26;
 
-class GraphicalController {
+class GraphicalController: public iJsonDeserializable {
 public:
     GLuint m_actions[18];
 
@@ -128,6 +129,8 @@ public:
     FT_Pos max_symbol_height_for_current_font() const;
     FT_Pos ascender_for_current_font() const;
 
+    IJSONDESERIALIZABLE();
+	
 private:
     FT_Library m_library;
     FT_Error m_error;
@@ -138,22 +141,5 @@ private:
     bool link_successful(int obj);
     bool validate_successful(int obj);
 };
-
-class GuiAtlasReader : public JsonReader {
-public:
-    using JsonReader::read;
-    explicit GuiAtlasReader(GraphicalController& graph);
-    void load();
-    void read(const std::u16string_view& json, std::unordered_map<std::u16string, atlas_tile_t>& ref);
-    void read(const std::u16string_view& json, gui_style_t& ref) override;
-
-private:
-    GraphicalController& graph_;
-};
-
-inline GuiAtlasReader::GuiAtlasReader(GraphicalController& graph)
-    : graph_(graph)
-{
-}
 
 #endif
