@@ -48,15 +48,7 @@ void GameMap::vector_mapcell_from_binary(const std::string& value, std::vector<M
     }
 }
 
-std::u16string GameMap::serialize_to_json_reference(JsonWriter& value)
-{
-    return value.write(*this);
-}
-
-std::u16string GameMap::serialize_to_json_pointer(JsonWriter& value)
-{
-    return value.write(this);
-}
+IJSONSERIALIZABLE_IMPL(GameMap);
 
 GameMap::GameMap(dimension3_t size)
 {

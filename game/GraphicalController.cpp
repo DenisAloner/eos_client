@@ -1230,4 +1230,4 @@ void GraphicalController::draw_tile_fbo(double tx1, double ty1, double tx2, doub
     glEnd();
 }
 
-IJSONDESERIALIZABLE_IMPL(GraphicalController);
+IJSONSERIALIZABLE_IMPL(GraphicalController);

@@ -36,8 +36,7 @@ public:
             make_property(&TileManager::m_tiles, u"tiles").from_json(&TileManager::vector_gl_uint_from_json).from_binary(&TileManager::vector_gl_uint_from_binary));
     }
 
-    std::u16string serialize_to_json_reference(JsonWriter& value) override;
-    std::u16string serialize_to_json_pointer(JsonWriter& value) override;
+    IJSONSERIALIZABLE();
 };
 
 class TileManager_Single_Atlas : public TileManager {

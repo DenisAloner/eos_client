@@ -11,17 +11,17 @@ constexpr auto GuiAtlasReader::object_properties()
 {
     if constexpr (std::is_same_v<T, GraphicalController>) {
         return std::tuple(
-            CustomReader(MemberMap::get<&GraphicalController::atlas_tiles>, &GuiAtlasReader::load_tiles),
+            CustomWriter(MemberMap::get<&GraphicalController::atlas_tiles>, &GuiAtlasReader::load_tiles),
             MemberMap::get<&GraphicalController::gui_styles>);
     }
     if constexpr (std::is_same_v<T, gui_style_t>) {
         return std::tuple(
-            CustomReader(MemberMap::get<&gui_style_t::background_tile>, &GuiAtlasReader::load_tile_ref),
-            CustomReader(MemberMap::get<&gui_style_t::border_x_tile>, &GuiAtlasReader::load_tile_ref),
-            CustomReader(MemberMap::get<&gui_style_t::border_y_tile>, &GuiAtlasReader::load_tile_ref),
-            CustomReader(MemberMap::get<&gui_style_t::corner_tile>, &GuiAtlasReader::load_tile_ref),
-            CustomReader(MemberMap::get<&gui_style_t::scroll_y_head_tile>, &GuiAtlasReader::load_tile_ref),
-            CustomReader(MemberMap::get<&gui_style_t::scroll_y_body_tile>, &GuiAtlasReader::load_tile_ref));
+            CustomWriter(MemberMap::get<&gui_style_t::background_tile>, &GuiAtlasReader::load_tile_ref),
+            CustomWriter(MemberMap::get<&gui_style_t::border_x_tile>, &GuiAtlasReader::load_tile_ref),
+            CustomWriter(MemberMap::get<&gui_style_t::border_y_tile>, &GuiAtlasReader::load_tile_ref),
+            CustomWriter(MemberMap::get<&gui_style_t::corner_tile>, &GuiAtlasReader::load_tile_ref),
+            CustomWriter(MemberMap::get<&gui_style_t::scroll_y_head_tile>, &GuiAtlasReader::load_tile_ref),
+            CustomWriter(MemberMap::get<&gui_style_t::scroll_y_body_tile>, &GuiAtlasReader::load_tile_ref));
     }
 }
 
@@ -36,17 +36,20 @@ void GuiAtlasReader::load()
     FileSystem::instance().load_from_file(FileSystem::instance().m_resource_path + "Configs\\gui.json", json);
     const std::u8string json_u8(json);
     const auto json_config(utf8_to_utf16(json_u8));
-    graph_.deserialize_to_json_reference(*this, json_config);
+    Logger::instance().info("load()");
+    m_json = json_config;
+    graph_.accept_reference(*this);
 }
 
-void GuiAtlasReader::read(gui_style_t& ref, const std::u16string_view& json)
+void GuiAtlasReader::visit(gui_style_t& ref)
 {
-    read_object(ref, json);
+    read_object(ref);
 }
 
-void GuiAtlasReader::load_tiles(std::unordered_map<std::u16string, atlas_tile_t>& ref, const std::u16string_view& json)
+void GuiAtlasReader::load_tiles(std::unordered_map<std::u16string, atlas_tile_t>& ref)
 {
-    const auto property = read_json_array(json);
+    Logger::instance().info("GuiAtlasReader::load_tiles");
+    const auto property = read_json_array(m_json);
     if (property) {
         std::u16string k;
         glGenTextures(1, &graph_.m_gui_atlas);
@@ -59,7 +62,8 @@ void GuiAtlasReader::load_tiles(std::unordered_map<std::u16string, atlas_tile_t>
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         for (std::size_t image_index = 0; image_index < property->size(); image_index += 2) {
             std::u16string name;
-            read(name, (*property)[image_index]);
+            m_json = (*property)[image_index];
+            visit(name);
             const auto file_name = FileSystem::instance().m_resource_path + "Tiles/gui/" + utf16_to_cp1251(name) + ".png";
             int width, height, channels;
             const auto image_data = stbi_load(file_name.c_str(), &width, &height, &channels, STBI_rgb_alpha);
@@ -68,9 +72,11 @@ void GuiAtlasReader::load_tiles(std::unordered_map<std::u16string, atlas_tile_t>
             stbi_image_free(image_data);
             const auto p = read_json_array((*property)[image_index + 1]);
             for (std::size_t j = 0; j < p->size(); j += 2) {
-                read(k, (*p)[j]);
+                m_json = (*p)[j];
+                visit(k);
                 auto& v = ref[k];
-                read(v, (*p)[j + 1]);
+                m_json = (*p)[j + 1];
+                visit(v);
                 v.texture.y = height - v.texture.bottom();
                 v.layer = image_index / 2 + 2;
             }
@@ -80,19 +86,21 @@ void GuiAtlasReader::load_tiles(std::unordered_map<std::u16string, atlas_tile_t>
     }
 }
 
-void GuiAtlasReader::load_tile_ref(atlas_tile_t*& ref, const std::u16string_view& json)
+void GuiAtlasReader::load_tile_ref(atlas_tile_t*& ref)
 {
     std::u16string value;
-    read(value, json);
+    visit(value);
     ref = &graph_.atlas_tiles[value];
 }
 
-void GuiAtlasReader::read(GraphicalController& ref, const std::u16string_view& json)
+void GuiAtlasReader::visit(GraphicalController& ref)
 {
-    read_object(ref, json);
+    Logger::instance().info("GuiAtlasReader::read&");
+    read_object(ref);
 }
 
-void GuiAtlasReader::read(GraphicalController* ref, const std::u16string_view& json)
+void GuiAtlasReader::visit(GraphicalController*& ref)
 {
-    read_object(*ref, json);
+    Logger::instance().info("GuiAtlasReader::read*&");
+    read_object(*ref);
 }

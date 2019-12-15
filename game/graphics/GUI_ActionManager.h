@@ -1,5 +1,5 @@
-#ifndef GUI_ACTIONMANAGER_H
-#define GUI_ACTIONMANAGER_H
+#ifndef GUI_ACTION_MANAGER_H
+#define GUI_ACTION_MANAGER_H
 
 #include "ActionManager.h"
 #include "GUI_Item.h"

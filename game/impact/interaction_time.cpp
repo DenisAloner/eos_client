@@ -28,12 +28,4 @@ interaction_message_type_e Interaction_time::get_interaction_message_type()
     return interaction_message_type_e::interaction_time;
 }
 
-std::u16string Interaction_time::serialize_to_json_reference(JsonWriter& value)
-{
-    return value.write(*this);
-}
-
-std::u16string Interaction_time::serialize_to_json_pointer(JsonWriter& value)
-{
-    return value.write(this);
-}
+IJSONSERIALIZABLE_IMPL(Interaction_time);

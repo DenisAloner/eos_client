@@ -1343,7 +1343,7 @@ object_to_binary(T& object, SerializationContext& context)
     return result;
 }
 
-class iSerializable: public iJsonSerializable {
+class iSerializable : public iJsonSerializable {
 public:
     size_t m_serialization_index;
 

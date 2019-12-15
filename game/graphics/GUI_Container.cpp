@@ -1,4 +1,5 @@
 #include "GUI_Container.h"
+#include "GraphicalController.h"
 
 GUI_Container::GUI_Container(int x, int y, int width, int height, bool border_visible)
     : GUI_Layer(x, y, width, height)

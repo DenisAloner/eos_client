@@ -1,8 +1,8 @@
 #include "json_game_saver.h"
 
-#define VISIT_IMPL(Visitor, Class)                                              \
-    std::u16string Visitor::write(Class& value) { return write_object(value); } \
-    std::u16string Visitor::write(Class* value) { return write_pointer(value); }
+#define VISIT_IMPL(Visitor, Class)                             \
+    void Visitor::visit(Class& value) { write_object(value); } \
+    void Visitor::visit(Class* value) { write_pointer(value); }
 
 template <typename T>
 constexpr auto JsonGameSaver::object_properties()
@@ -171,54 +171,74 @@ VISIT_IMPL(JsonGameSaver, Interaction_list);
 VISIT_IMPL(JsonGameSaver, InventoryCell);
 VISIT_IMPL(JsonGameSaver, ObjectPart);
 
-std::u16string JsonGameSaver::write(MapCell& value)
+void JsonGameSaver::visit(MapCell& value)
 {
-    return write_object(value);
+    write_object(value);
 }
 
-std::u16string JsonGameSaver::write(MapCell* value)
+void JsonGameSaver::visit(MapCell* value)
 {
-    return value ? write(*value) : u"null";
+    if (!value) {
+        m_result = u"null";
+        return;
+    }
+    visit(*value);
 }
 
-std::u16string JsonGameSaver::write(Action& value)
+void JsonGameSaver::visit(Action& value)
 {
-    return write(value.m_kind);
+    visit(value.m_kind);
 }
 
-std::u16string JsonGameSaver::write(Action* value)
+void JsonGameSaver::visit(Action* value)
 {
-    return value ? write(*value) : u"null";
+    if (!value) {
+        m_result = u"null";
+        return;
+    }
+    visit(*value);
 }
 
-std::u16string JsonGameSaver::write(predicate_t& value)
+void JsonGameSaver::visit(predicate_t& value)
 {
-    return write(value.index);
+    visit(value.index);
 }
 
-std::u16string JsonGameSaver::write(predicate_t* value)
+void JsonGameSaver::visit(predicate_t* value)
 {
-    return value ? write(*value) : u"null";
+    if (!value) {
+        m_result = u"null";
+        return;
+    }
+    visit(*value);
 }
 
-std::u16string JsonGameSaver::write(TileManager& value)
+void JsonGameSaver::visit(TileManager& value)
 {
-    return u"\"" + cp1251_to_utf16(value.m_json_string) + u"\"";
+    m_result = u"\"" + cp1251_to_utf16(value.m_json_string) + u"\"";
 }
 
-std::u16string JsonGameSaver::write(TileManager* value)
+void JsonGameSaver::visit(TileManager* value)
 {
-    return value ? write(*value) : u"null";
+    if (!value) {
+        m_result = u"null";
+        return;
+    }
+    visit(*value);
 }
 
-std::u16string JsonGameSaver::write(Icon& value)
+void JsonGameSaver::visit(Icon& value)
 {
-    return u"\"" + cp1251_to_utf16(value.m_json_string) + u"\"";
+    m_result = u"\"" + cp1251_to_utf16(value.m_json_string) + u"\"";
 }
 
-std::u16string JsonGameSaver::write(Icon* value)
+void JsonGameSaver::visit(Icon* value)
 {
-    return value ? write(*value) : u"null";
+    if (!value) {
+        m_result = u"null";
+        return;
+    }
+    visit(*value);
 }
 
 VISIT_IMPL(JsonGameSaver, AI_enemy);
@@ -239,152 +259,180 @@ VISIT_IMPL(JsonGameSaver, ObjectTag::Equippable);
 VISIT_IMPL(JsonGameSaver, ObjectTag::Can_transfer_object);
 VISIT_IMPL(JsonGameSaver, ObjectTag::Requirements_to_object);
 
-std::u16string JsonGameSaver::write(Instruction_game_owner& value)
+void JsonGameSaver::visit(Instruction_game_owner& value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(Instruction_game_owner* value)
+void JsonGameSaver::visit(Instruction_game_owner* value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(Interaction_addon& value)
+void JsonGameSaver::visit(Interaction_addon& value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(Interaction_addon* value)
+void JsonGameSaver::visit(Interaction_addon* value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(Interaction_copyist& value)
+void JsonGameSaver::visit(Interaction_copyist& value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(Interaction_copyist* value)
+void JsonGameSaver::visit(Interaction_copyist* value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(Interaction_prefix& value)
+void JsonGameSaver::visit(Interaction_prefix& value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(Interaction_prefix* value)
+void JsonGameSaver::visit(Interaction_prefix* value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(ObjectTag::Activator& value)
+void JsonGameSaver::visit(ObjectTag::Activator& value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(ObjectTag::Activator* value)
+void JsonGameSaver::visit(ObjectTag::Activator* value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(ObjectTag::Fast_move& value)
+void JsonGameSaver::visit(ObjectTag::Fast_move& value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(ObjectTag::Fast_move* value)
+void JsonGameSaver::visit(ObjectTag::Fast_move* value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(ObjectTag::Mortal& value)
+void JsonGameSaver::visit(ObjectTag::Mortal& value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(ObjectTag::Mortal* value)
+void JsonGameSaver::visit(ObjectTag::Mortal* value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(ObjectTag::Purification_from_poison& value)
+void JsonGameSaver::visit(ObjectTag::Purification_from_poison& value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(ObjectTag::Purification_from_poison* value)
+void JsonGameSaver::visit(ObjectTag::Purification_from_poison* value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(Slot_set_state& value)
+void JsonGameSaver::visit(Slot_set_state& value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(Slot_set_state* value)
+void JsonGameSaver::visit(Slot_set_state* value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(Parameter& value)
+void JsonGameSaver::visit(Parameter& value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(Parameter* value)
+void JsonGameSaver::visit(Parameter* value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(Config& value)
+void JsonGameSaver::visit(Config& value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(Config* value)
+void JsonGameSaver::visit(Config* value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(ObjectTag::Poison_resist& value)
+void JsonGameSaver::visit(ObjectTag::Poison_resist& value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(ObjectTag::Poison_resist* value)
+void JsonGameSaver::visit(ObjectTag::Poison_resist* value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(AI_trap& value)
+void JsonGameSaver::visit(AI_trap& value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(AI_trap* value)
+void JsonGameSaver::visit(AI_trap* value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(Instruction_slot_parameter& value)
+void JsonGameSaver::visit(Instruction_slot_parameter& value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::write(Instruction_slot_parameter* value)
+void JsonGameSaver::visit(Instruction_slot_parameter* value)
 {
-    return u"";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::map_cell_owner_save(GameMap* value)
+void JsonGameSaver::visit(GraphicalController& value)
 {
-    return value ? write(value->m_index) : u"null";
+    m_result = u"";
 }
 
-std::u16string JsonGameSaver::active_object_state_save(Object_state* value)
+void JsonGameSaver::visit(GraphicalController* value)
 {
-    return value ? write(value->m_state) : u"null";
+    m_result = u"";
+}
+
+void JsonGameSaver::visit(Action_wrapper& value)
+{
+    m_result = u"";
+}
+
+void JsonGameSaver::visit(Action_wrapper* value)
+{
+    m_result = u"";
+}
+
+void JsonGameSaver::map_cell_owner_save(GameMap* value)
+{
+    if (!value) {
+        m_result = u"null";
+        return;
+    }
+    visit(value->m_index);
+}
+
+void JsonGameSaver::active_object_state_save(Object_state* value)
+{
+    if (!value) {
+        m_result = u"null";
+        return;
+    }
+    visit(value->m_state);
 }

@@ -73,8 +73,7 @@ public:
             make_property(&Parameter::m_size, u"size"));
     }
 
-	std::u16string serialize_to_json_reference(JsonWriter& value) override;
-    std::u16string serialize_to_json_pointer(JsonWriter& value) override;
+	IJSONSERIALIZABLE();
 
 private:
     template <typename T, typename... Args>

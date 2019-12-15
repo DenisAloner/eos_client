@@ -384,15 +384,7 @@ interaction_message_type_e GameObject::get_interaction_message_type()
 	return interaction_message_type_e::game_object;
 }
 
-std::u16string GameObject::serialize_to_json_reference(JsonWriter& value)
-{
-    return value.write(*this);
-}
-
-std::u16string GameObject::serialize_to_json_pointer(JsonWriter& value)
-{
-    return value.write(this);
-}
+IJSONSERIALIZABLE_IMPL(GameObject);
 
 void GameObject::reset_serialization_index()
 {
@@ -559,12 +551,4 @@ void Config::instancedictonary_tilemanager_from_binary(const std::string& value,
 {
 }
 
-std::u16string Config::serialize_to_json_reference(JsonWriter& value)
-{
-    return value.write(*this);
-}
-
-std::u16string Config::serialize_to_json_pointer(JsonWriter& value)
-{
-    return value.write(this);
-}
+IJSONSERIALIZABLE_IMPL(Config);

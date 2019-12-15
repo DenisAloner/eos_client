@@ -7,8 +7,9 @@
 #include <fstream>
 #include <graphics/GUI_Description_window.h>
 #include "json_game_saver.h"
+#include "json_game_loader.h"
 
-using namespace std::string_literals;
+using namespace std::literals::string_view_literals;
 
 gui_MessageQueue::gui_MessageQueue()
 {
@@ -244,32 +245,31 @@ void Application::initialize(const dimension_t<int> work_area_size, const HDC m_
 
 void Application::new_game()
 {
-    Logger::instance().info("Application::new_game()");
     m_world = new GameWorld();
     auto map = new GameMap(dimension3_t(10, 10, 10));
-    Logger::instance().info("map->generate_room() {}", m_game_object_manager==nullptr);
     map->generate_room();
     m_world->m_maps.push_back(map);
     int rx = 8;
     int ry = 8;
 
-	Logger::instance().info("Create human");
     auto obj = m_game_object_manager->new_object("human");
     obj->set_direction(object_direction_e::down);
     map->add_to_map(obj, map->get(1, ry, rx));
 
-
 	Logger::instance().info("Start saving to json");
 	JsonGameSaver j;
 	char16_t marker = 0xFEFF;
-    std::ofstream in_file(FileSystem::instance().m_resource_path + "Saves\\test.json", std::ios::binary);
-    auto json = j.write(m_world);
+    std::ofstream in_file(FileSystem::instance().m_resource_path + "Saves\\test.json", std::ios::binary); 
+    j.visit(m_world);
 	in_file.write(reinterpret_cast<const char*>(&marker), sizeof(marker));
-	in_file.write(reinterpret_cast<const char*>(&json[0]), json.size() * 2);
+    in_file.write(reinterpret_cast<const char*>(&j.m_result[0]), j.m_result.size() * 2);
 	in_file.close();
     Logger::instance().info("End saving to json");
-    
 
+	/*JsonGameLoader jgl(*m_world);
+    GameObject test;
+        test.deserialize_to_json(jgl, u"{\"name\":\"test\",\"active_state\":\"test\"}"sv);
+	*/
     m_world->m_player = new Player(obj, map);
     m_window_manager = new GUI_Window_manager(0, 0, m_size.w, m_size.h);
 

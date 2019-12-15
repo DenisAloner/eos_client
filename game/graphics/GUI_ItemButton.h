@@ -1,5 +1,5 @@
-#ifndef GUI_ITEMBUTTON_H
-#define GUI_ITEMBUTTON_H
+#ifndef GUI_ITEM_BUTTON_H
+#define GUI_ITEM_BUTTON_H
 
 #include "GUI_Object.h"
 
@@ -13,4 +13,4 @@ public:
     void on_mouse_move(MouseEventArgs const& e) override;
 };
 
-#endif //GUI_ITEMBUTTON_H
+#endif

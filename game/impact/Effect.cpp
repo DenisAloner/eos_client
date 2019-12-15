@@ -1,5 +1,8 @@
 #include "effect.h"
 #include "writer.h"
+#include "parameter_list.h"
+#include "interaction_copyist.h"
+#include "interaction_prefix.h"
 
 Effect::Effect()
     : m_value(0)
@@ -51,12 +54,4 @@ interaction_message_type_e Effect::get_interaction_message_type()
     return interaction_message_type_e::effect;
 }
 
-std::u16string Effect::serialize_to_json_reference(JsonWriter& value)
-{
-    return value.write(*this);
-}
-
-std::u16string Effect::serialize_to_json_pointer(JsonWriter& value)
-{
-    return value.write(this);
-}
+IJSONSERIALIZABLE_IMPL(Effect);

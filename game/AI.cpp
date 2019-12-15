@@ -750,15 +750,7 @@ iPacker& AI_trap::get_packer()
     return Packer<AI_trap>::instance();
 }
 
-std::u16string AI_trap::serialize_to_json_reference(JsonWriter& value)
-{
-    return value.write(*this);
-}
-
-std::u16string AI_trap::serialize_to_json_pointer(JsonWriter& value)
-{
-    return value.write(this);
-}
+IJSONSERIALIZABLE_IMPL(AI_trap);
 
 AI_manager::AI_manager()
 {
@@ -774,12 +766,4 @@ iPacker& AI_enemy::get_packer()
     return Packer<AI_enemy>::instance();
 }
 
-std::u16string AI_enemy::serialize_to_json_reference(JsonWriter& value)
-{
-    return value.write(*this);
-}
-
-std::u16string AI_enemy::serialize_to_json_pointer(JsonWriter& value)
-{
-    return value.write(this);
-}
+IJSONSERIALIZABLE_IMPL(AI_enemy);

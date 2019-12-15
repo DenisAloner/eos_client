@@ -3,10 +3,7 @@
 
 #include "Event.h"
 #include "GUI_Object.h"
-#include "GraphicalController.h"
 #include <list>
-
-class GraphicalController;
 
 class GUI_Layer : public GUI_Object {
 public:

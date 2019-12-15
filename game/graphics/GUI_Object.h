@@ -3,7 +3,6 @@
 
 #include "Definiton.h"
 #include "Event.h"
-#include "GraphicalController.h"
 
 class GraphicalController;
 

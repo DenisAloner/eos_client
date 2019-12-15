@@ -78,15 +78,7 @@ void Object_state::tilemanager_from_binary(const std::string& value, TileManager
     }
 }
 
-std::u16string Object_state::serialize_to_json_reference(JsonWriter& value)
-{
-    return value.write(*this);
-}
-
-std::u16string Object_state::serialize_to_json_pointer(JsonWriter& value)
-{
-    return value.write(this);
-}
+IJSONSERIALIZABLE_IMPL(Object_state);
 
 Object_state::Object_state()
 {

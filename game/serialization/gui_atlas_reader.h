@@ -10,37 +10,43 @@ using namespace std::literals::string_view_literals;
 
 class GuiAtlasReader : public JsonReader {
 public:
-    using JsonReader::read;
+	
+    using JsonReader::visit;
 
     template <typename T>
     constexpr void
-    read_object(T& object, const std::u16string_view& json)
+    read_object(T& object)
     {
-        const auto properties = read_json_object(json);
+        const auto properties = read_json_object(m_json);
         if (properties) {
             static_for<object_properties<T>>([&](auto i) {
                 constexpr auto item = std::get<i>(object_properties<T>());
                 using property_type = decltype(item);
                 if constexpr (std::is_base_of_v<iCustomHandler, property_type>) {
-                    (*this.*(item.custom_function))(object.*(item.property.member), (*properties)[item.property.name]);
+                    m_json = (*properties)[item.property.name];
+                    (*this.*(item.custom_function))(object.*(item.property.member));
                 } else if constexpr (std::is_pointer_v<typename property_type::type>) {
+                    m_json = (*properties)[item.name];
                     if constexpr (std::is_base_of_v<iJsonSerializable, std::remove_pointer_t<typename property_type::type>>) {
                         auto value = object.*(item.member);
-                        if ((*properties)[item.name] != u"null") {
-                            value->deserialize_to_json_pointer(*this, (*properties)[item.name]);
+                        if (m_json != u"null") {
+                            value->accept_pointer(*this);
                         } else {
                             value = nullptr;
                         }
                     } else
-                        read(object.*(item.member), (*properties)[item.name]);
+                        visit(object.*(item.member));
                 } else if constexpr (std::is_reference_v<typename property_type::type>) {
+                    m_json = (*properties)[item.property.name];
                     if constexpr (std::is_base_of_v<iJsonSerializable, std::remove_reference_t<typename property_type::type>>) {
                         auto value = object.*(item.member);
-                        value.deserialize_to_json_reference(*this, (*properties)[item.name]);
+                        value.accept_reference(*this);
                     } else
-                        read(object.*(item.member), (*properties)[item.name]);
-                } else
-                    read(object.*(item.member), (*properties)[item.name]);
+                        visit(object.*(item.member));
+                } else {
+                    m_json = (*properties)[item.name];
+                    visit(object.*(item.member));
+                }
             });
             delete properties;
         }
@@ -48,14 +54,14 @@ public:
 
     explicit GuiAtlasReader(GraphicalController& graph);
     void load();
-	
-    void read(gui_style_t& ref, const std::u16string_view& json) override;
-    void read(GraphicalController& ref, const std::u16string_view& json) override;
-    void read(GraphicalController* ref, const std::u16string_view& json) override;
 
-    void load_tiles(std::unordered_map<std::u16string, atlas_tile_t>& ref, const std::u16string_view& json);
-    void load_tile_ref(atlas_tile_t*& ref, const std::u16string_view& json);
-	
+    void visit(gui_style_t& ref) override;
+    void visit(GraphicalController& ref) override;
+    void visit(GraphicalController*& ref) override;
+
+    void load_tiles(std::unordered_map<std::u16string, atlas_tile_t>& ref);
+    void load_tile_ref(atlas_tile_t*& ref);
+
     template <typename T>
     constexpr static auto object_properties();
 

@@ -32,12 +32,4 @@ interaction_message_type_e Slot_set_state::get_interaction_message_type()
     return interaction_message_type_e::slot_set_state;
 }
 
-std::u16string Slot_set_state::serialize_to_json_reference(JsonWriter& value)
-{
-    return value.write(*this);
-}
-
-std::u16string Slot_set_state::serialize_to_json_pointer(JsonWriter& value)
-{
-    return value.write(this);
-}
+IJSONSERIALIZABLE_IMPL(Slot_set_state);

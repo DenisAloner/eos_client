@@ -9,13 +9,12 @@ public:
     bool m_result;
 
     Instruction_result();
-    Instruction_result* clone() override { return nullptr; };
+    Instruction_result* clone() override;;
     void apply_effect(GameObject* unit, Object_interaction* object) override {};
 
     iPacker& get_packer() override;
     interaction_message_type_e get_interaction_message_type() override;
-    std::u16string serialize_to_json_reference(JsonWriter& value) override;
-    std::u16string serialize_to_json_pointer(JsonWriter& value) override;
+    IJSONSERIALIZABLE();
 };
 
 #endif //INSTRUCTION_RESULT_H

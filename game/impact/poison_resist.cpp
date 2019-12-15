@@ -1,5 +1,7 @@
 #include "poison_resist.h"
 #include "writer.h"
+#include "interaction_prefix.h"
+#include "effect.h"
 
 ObjectTag::Poison_resist::Poison_resist()
     : Object_tag(object_tag_e::poison_resist) {};
@@ -26,12 +28,4 @@ iPacker& ObjectTag::Poison_resist::get_packer()
     return Packer<Poison_resist>::instance();
 }
 
-std::u16string ObjectTag::Poison_resist::serialize_to_json_reference(JsonWriter& value)
-{
-    return value.write(*this);
-}
-
-std::u16string ObjectTag::Poison_resist::serialize_to_json_pointer(JsonWriter& value)
-{
-    return value.write(this);
-}
+IJSONSERIALIZABLE_IMPL(ObjectTag::Poison_resist);

@@ -41,12 +41,4 @@ interaction_message_type_e Instruction_slot_parameter::get_interaction_message_t
     return interaction_message_type_e::instruction_slot_parameter;
 }
 
-std::u16string Instruction_slot_parameter::serialize_to_json_reference(JsonWriter& value)
-{
-    return value.write(*this);
-}
-
-std::u16string Instruction_slot_parameter::serialize_to_json_pointer(JsonWriter& value)
-{
-    return value.write(this);
-}
+IJSONSERIALIZABLE_IMPL(Instruction_slot_parameter);

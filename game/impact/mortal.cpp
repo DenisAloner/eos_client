@@ -39,12 +39,4 @@ iPacker& ObjectTag::Mortal::get_packer()
     return Packer<Mortal>::instance();
 }
 
-std::u16string ObjectTag::Mortal::serialize_to_json_reference(JsonWriter& value)
-{
-    return value.write(*this);
-}
-
-std::u16string ObjectTag::Mortal::serialize_to_json_pointer(JsonWriter& value)
-{
-    return value.write(this);
-}
+IJSONSERIALIZABLE_IMPL(ObjectTag::Mortal);

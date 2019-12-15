@@ -1,4 +1,5 @@
 #include "GUI_Layer.h"
+#include "GraphicalController.h"
 
 GUI_Layer::GUI_Layer(int x, int y, int width, int height)
 {

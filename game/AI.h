@@ -139,8 +139,7 @@ public:
                 make_property(&AI_enemy::m_path_qualifier, u"path_qualifier")));
     }
 
-    std::u16string serialize_to_json_reference(JsonWriter& value) override;
-    std::u16string serialize_to_json_pointer(JsonWriter& value) override;
+    IJSONSERIALIZABLE();
 };
 
 class AI_trap : public AI {
@@ -153,8 +152,7 @@ public:
     iPacker& get_packer() override;
 
     void calculate_fov(GameObject* object, GameMap* map) override {}
-    std::u16string serialize_to_json_reference(JsonWriter& value) override;
-    std::u16string serialize_to_json_pointer(JsonWriter& value) override;
+    IJSONSERIALIZABLE();
 };
 
 class AI_manager {

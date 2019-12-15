@@ -1,61 +1,106 @@
 #include "writer.h"
 
-std::u16string JsonWriter::write(int& value)
+void JsonWriter::visit(int& value)
 {
-    return cp1251_to_utf16(std::to_string(value));
+    m_result = cp1251_to_utf16(std::to_string(value));
 }
 
-std::u16string JsonWriter::write(int* value)
+void JsonWriter::visit(int* value)
 {
-    return value ? write(*value) : u"null";
+    if (!value) {
+        m_result = u"null";
+        return;
+    }
+    visit(*value);
 }
 
-std::u16string JsonWriter::write(const int& value)
+void JsonWriter::visit(const int& value)
 {
-    return cp1251_to_utf16(std::to_string(value));
+    m_result = cp1251_to_utf16(std::to_string(value));
 }
 
-std::u16string JsonWriter::write(const int* value)
+void JsonWriter::visit(const int* value)
 {
-    return value ? write(*value) : u"null";
+    if (!value) {
+        m_result = u"null";
+        return;
+    }
+    visit(*value);
 }
 
-std::u16string JsonWriter::write(std::u16string& value)
+void JsonWriter::visit(float& value)
 {
-    return u"\"" + value + u"\"";
+    m_result = cp1251_to_utf16(std::to_string(value));
 }
 
-std::u16string JsonWriter::write(std::u16string* value)
+void JsonWriter::visit(float* value)
 {
-    return value ? write(*value) : u"null";
+    if (!value) {
+        m_result = u"null";
+        return;
+    }
+    visit(*value);
 }
 
-std::u16string JsonWriter::write(const std::u16string& value)
+void JsonWriter::visit(std::u16string& value)
 {
-    return u"\"" + value + u"\"";
+    m_result = u"\"" + value + u"\"";
 }
 
-std::u16string JsonWriter::write(const std::u16string* value)
+void JsonWriter::visit(std::u16string* value)
 {
-    return value ? write(*value) : u"null";
+    if (!value) {
+        m_result = u"null";
+        return;
+    }
+    visit(*value);
 }
 
-std::u16string JsonWriter::write(dimension3_t& value)
+void JsonWriter::visit(const std::u16string& value)
 {
-    return u"[" + write(value.dx) + u"," + write(value.dy) + u"," + write(value.dz) + u"]";
+    m_result = u"\"" + value + u"\"";
 }
 
-std::u16string JsonWriter::write(dimension3_t* value)
+void JsonWriter::visit(const std::u16string* value)
 {
-    return value ? write(*value) : u"null";
+    if (!value) {
+        m_result = u"null";
+        return;
+    }
+    visit(*value);
 }
 
-std::u16string JsonWriter::write(optical_properties_t& value)
+void JsonWriter::visit(dimension3_t& value)
 {
-    return u"[" + write(value.attenuation.r) + u"," + write(value.attenuation.g) + u"," + write(value.attenuation.b) + u"]";
+    auto result = u"["s;
+    visit(value.dx);
+    result += m_result;
+    visit(value.dy);
+    result += m_result;
+    visit(value.dz);
+    result += m_result;
+    m_result = result + u"]"s;
 }
 
-std::u16string JsonWriter::write(optical_properties_t* value)
+void JsonWriter::visit(dimension3_t* value)
 {
-    return value ? write(*value) : u"null";
+    if (!value) {
+        m_result = u"null";
+        return;
+    }
+    visit(*value);
+}
+
+void JsonWriter::visit(optical_properties_t& value)
+{
+	visit(value.attenuation);
+}
+
+void JsonWriter::visit(optical_properties_t* value)
+{
+    if (!value) {
+        m_result = u"null";
+        return;
+    }
+    visit(*value);
 }

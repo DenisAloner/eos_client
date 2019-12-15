@@ -49,15 +49,7 @@ iPacker& Action::get_packer()
     return Packer<Action>::instance();
 }
 
-std::u16string Action::serialize_to_json_reference(JsonWriter& value)
-{
-    return value.write(*this);
-}
-
-std::u16string Action::serialize_to_json_pointer(JsonWriter& value)
-{
-    return value.write(this);
-}
+IJSONSERIALIZABLE_IMPL(Action);
 
 std::u16string Packer<Action>::to_json(iSerializable* value, SerializationContext& context)
 {
@@ -161,15 +153,7 @@ interaction_message_type_e Action_wrapper::get_interaction_message_type()
 	return interaction_message_type_e::action_wrapper;
 }
 
-std::u16string Action_wrapper::serialize_to_json_reference(JsonWriter& value)
-{
-    return u"действие";
-}
-
-std::u16string Action_wrapper::serialize_to_json_pointer(JsonWriter& value)
-{
-    return u"действие";
-}
+IJSONSERIALIZABLE_IMPL(Action_wrapper);
 
 ActionClass_Move::ActionClass_Move()
 {
@@ -1495,9 +1479,9 @@ void Action_save::interaction_handler(Parameter* arg)
     JsonGameSaver j;
     char16_t marker = 0xFEFF;
     std::ofstream in_file(FileSystem::instance().m_resource_path + "Saves\\save.json", std::ios::binary);
-    auto json = j.write(Application::instance().m_world);
+    j.visit(Application::instance().m_world);
     in_file.write(reinterpret_cast<const char*>(&marker), sizeof(marker));
-    in_file.write(reinterpret_cast<const char*>(&json[0]), json.size() * 2);
+    in_file.write(reinterpret_cast<const char*>(&j.m_result[0]), j.m_result.size() * 2);
     in_file.close();
     Logger::instance().info("End saving to json");
 	

@@ -14,7 +14,6 @@
 #include <list>
 #include <string>
 #include <vector>
-#include "i_json_deserializable.h";
 
 enum class tile_options_e : unsigned char {
     NONE = 0,
@@ -29,7 +28,7 @@ tile_options_e operator|(const tile_options_e& lhs, const tile_options_e& rhs);
 class TileManager;
 const int font_size_c = 26;
 
-class GraphicalController: public iJsonDeserializable {
+class GraphicalController: public iJsonSerializable {
 public:
     GLuint m_actions[18];
 
@@ -129,7 +128,7 @@ public:
     FT_Pos max_symbol_height_for_current_font() const;
     FT_Pos ascender_for_current_font() const;
 
-    IJSONDESERIALIZABLE();
+    IJSONSERIALIZABLE();
 	
 private:
     FT_Library m_library;

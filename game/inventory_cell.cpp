@@ -1,5 +1,6 @@
 #include "inventory_cell.h"
 #include "writer.h"
+#include "GameObject.h"
 
 InventoryCell::InventoryCell(GameObject* item)
     : m_item(item)
@@ -23,12 +24,4 @@ iPacker& InventoryCell::get_packer()
     return Packer<InventoryCell>::instance();
 }
 
-std::u16string InventoryCell::serialize_to_json_reference(JsonWriter& value)
-{
-    return value.write(*this);
-}
-
-std::u16string InventoryCell::serialize_to_json_pointer(JsonWriter& value)
-{
-    return value.write(this);
-}
+IJSONSERIALIZABLE_IMPL(InventoryCell);

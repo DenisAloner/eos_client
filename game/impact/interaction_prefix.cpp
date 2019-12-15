@@ -33,12 +33,4 @@ interaction_message_type_e Interaction_prefix::get_interaction_message_type()
     return interaction_message_type_e::interaction_prefix;
 }
 
-std::u16string Interaction_prefix::serialize_to_json_reference(JsonWriter& value)
-{
-    return value.write(*this);
-}
-
-std::u16string Interaction_prefix::serialize_to_json_pointer(JsonWriter& value)
-{
-    return value.write(this);
-}
+IJSONSERIALIZABLE_IMPL(Interaction_prefix);

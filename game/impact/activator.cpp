@@ -42,12 +42,4 @@ iPacker& ObjectTag::Activator::get_packer()
     return Packer<Activator>::instance();
 }
 
-std::u16string ObjectTag::Activator::serialize_to_json_reference(JsonWriter& value)
-{
-    return value.write(*this);
-}
-
-std::u16string ObjectTag::Activator::serialize_to_json_pointer(JsonWriter& value)
-{
-    return value.write(this);
-}
+IJSONSERIALIZABLE_IMPL(ObjectTag::Activator);

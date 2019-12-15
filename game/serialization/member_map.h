@@ -21,8 +21,17 @@ public:
     template <auto PointerToMember>
     constexpr static auto get = not_found<PointerToMember>();
 
+    inline static std::unordered_map<std::u16string, iJsonSerializable*(*)> registered_types {};
+	
     template <typename Type>
     constexpr static const char16_t* type = u"undefined"; //not_found<Type>();
+
+	template <typename Type>
+    constexpr static const char16_t* create(const char16_t* type_name)
+    {
+        //registered_types[type_name] = []() { return new Type; };
+        return type_name;
+    }
 };
 
 struct iCustomHandler {
@@ -31,15 +40,16 @@ struct iCustomHandler {
 template <template <typename, typename> typename Property,
     typename Class,
     typename T,
-    typename F>
+    typename F,
+    typename MemberType = std::remove_reference_t<T>>
 struct CustomWriter : iCustomHandler {
-    typedef std::u16string (F::*custom_function_t)(T);
-    typedef const Property<Class, T> PropertyType;
+    typedef void (F::*custom_function_t)(T);
+    typedef const Property<Class, MemberType> PropertyType;
 
     PropertyType property;
 
     custom_function_t custom_function;
-
+	
     constexpr CustomWriter(PropertyType& property,
         custom_function_t custom_function)
         : property(property)
@@ -48,32 +58,34 @@ struct CustomWriter : iCustomHandler {
     }
 };
 
-template <template <typename, typename> typename Property,
-    typename Class,
-    typename T,
-    typename F,
-    typename MemberType = std::remove_reference_t<T>>
-struct CustomReader : iCustomHandler {
-    typedef void (F::*custom_function_t)(T, const std::u16string_view&);
-    typedef const Property<Class, MemberType> PropertyType;
+//template <template <typename, typename> typename Property,
+//    typename Class,
+//    typename T,
+//    typename F,
+//    typename MemberType = std::remove_reference_t<T>>
+//struct CustomReader : iCustomHandler {
+//    typedef void (F::*custom_function_t)(T, const std::u16string_view&);
+//    typedef const Property<Class, MemberType> PropertyType;
+//
+//    PropertyType property;
+//
+//    custom_function_t custom_function;
+//
+//    constexpr CustomReader(PropertyType& property,
+//        custom_function_t custom_function)
+//        : property(property)
+//        , custom_function(custom_function)
+//    {
+//    }
+//};
 
-    PropertyType property;
+#define TYPENAME(Type, Name) \
+    template <>              \
+    constexpr const char16_t* MemberMap::type<Type> = create<Type>(Name);
 
-    custom_function_t custom_function;
-
-    constexpr CustomReader(PropertyType& property,
-        custom_function_t custom_function)
-        : property(property)
-        , custom_function(custom_function)
-    {
-    }
-};
-
-#define TYPENAME(Type, name) template <> \
-                             constexpr const char16_t* MemberMap::type<Type> = name
-
-#define PROPERTY(Pointer_to_member, name) template <> \
-                                          constexpr auto MemberMap::get<Pointer_to_member> = JsonProperty(Pointer_to_member, name)
+#define PROPERTY(Pointer_to_member, name) \
+    template <>                           \
+    constexpr auto MemberMap::get<Pointer_to_member> = JsonProperty(Pointer_to_member, name)
 
 // Game_object_owner
 PROPERTY(&Game_object_owner::m_kind, u"kind");

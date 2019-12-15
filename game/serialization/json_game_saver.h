@@ -7,135 +7,155 @@
 
 class JsonGameSaver : public JsonWriter {
 public:
-    using JsonWriter::write;
+	
+    using JsonWriter::visit;
 
     template <typename T>
-    constexpr std::u16string
+    constexpr void
     write_object(T& object)
     {
         std::u16string result;
         auto ref = objects.find(&object);
+        visit(MemberMap::type<T>);
         if (ref == objects.end()) {
-            result = u"{\"$type\":" + write(MemberMap::type<T>) + u",";
+            result = u"{\"$type\":" + m_result + u",";
         } else
-            result = u"{\"$type\":" + write(MemberMap::type<T>) + u",\"$link\":" + cp1251_to_utf16(std::to_string(ref->second)) + u",";
+            result = u"{\"$type\":" + m_result + u",\"$link\":" + cp1251_to_utf16(std::to_string(ref->second)) + u",";
         static_for<object_properties<T>>([&](auto i) {
             constexpr auto item = std::get<i>(object_properties<T>());
             if (i != 0) {
                 result += u",";
             }
-			using property_type = decltype(item);
+            using property_type = decltype(item);
             if constexpr (std::is_base_of_v<iCustomHandler, property_type>) {
-                result += u"\"" + std::u16string { item.property.name } + u"\":" + (*this.*(item.custom_function))(object.*(item.property.member));
+                (*this.*(item.custom_function))(object.*(item.property.member));
+                result += u"\"" + std::u16string { item.property.name } + u"\":" + m_result;
             } else if constexpr (std::is_pointer_v<typename property_type::type>) {
+                result += u"\"" + std::u16string { item.name } + u"\":";
                 if constexpr (std::is_base_of_v<iJsonSerializable, std::remove_pointer_t<typename property_type::type>>) {
                     auto value = object.*(item.member);
-                    result += u"\"" + std::u16string { item.name } + u"\":" + (value ? value->serialize_to_json_pointer(*this) : u"null");
-                } else
-                    result += u"\"" + std::u16string { item.name } + u"\":" + write(object.*(item.member));
+                    if (value) {
+                        value->accept_pointer(*this);
+                        result += m_result;
+                    } else
+                        result += u"null";
+                } else {
+                    visit(object.*(item.member));
+                    result += m_result;
+                }
             } else if constexpr (std::is_reference_v<typename property_type::type>) {
+                result += u"\"" + std::u16string { item.name } + u"\":";
                 if constexpr (std::is_base_of_v<iJsonSerializable, std::remove_reference_t<typename property_type::type>>) {
                     auto value = object.*(item.member);
-                    result += u"\"" + std::u16string { item.name } + u"\":" + value.serialize_to_json_reference(*this);
-                } else
-                    result += u"\"" + std::u16string { item.name } + u"\":" + write(object.*(item.member));
-            } else
-                result += u"\"" + std::u16string { item.name } + u"\":" + write(object.*(item.member));
+                    value.accept_reference(*this);
+                    result += m_result;
+                } else {
+                    visit(object.*(item.member));
+                    result += m_result;
+                }
+            } else {
+                visit(object.*(item.member));
+                result += u"\"" + std::u16string { item.name } + u"\":" + m_result;
+            }
         });
-        return result + u'}';
+        m_result = result + u'}';
     }
 
-    std::u16string write(Action& value) override;
-    std::u16string write(Action* value) override;
-    std::u16string write(GameWorld& value) override;
-    std::u16string write(GameWorld* value) override;
-    std::u16string write(GameMap& value) override;
-    std::u16string write(GameMap* value) override;
-    std::u16string write(GameObject& value) override;
-    std::u16string write(GameObject* value) override;
-    std::u16string write(Attribute_map& value) override;
-    std::u16string write(Attribute_map* value) override;
-    std::u16string write(Object_state& value) override;
-    std::u16string write(Object_state* value) override;
-    std::u16string write(Interaction_list& value) override;
-    std::u16string write(Interaction_list* value) override;
-    std::u16string write(MapCell& value) override;
-    std::u16string write(MapCell* value) override;
-    std::u16string write(InventoryCell& value) override;
-    std::u16string write(InventoryCell* value) override;
-    std::u16string write(ObjectPart& value) override;
-    std::u16string write(ObjectPart* value) override;
-    std::u16string write(AI_enemy& value) override;
-    std::u16string write(AI_enemy* value) override;
-    std::u16string write(AI_trap& value) override;
-    std::u16string write(AI_trap* value) override;
-    std::u16string write(predicate_t& value) override;
-    std::u16string write(predicate_t* value) override;
-    std::u16string write(TileManager& value) override;
-    std::u16string write(TileManager* value) override;
-    std::u16string write(Icon& value) override;
-    std::u16string write(Icon* value) override;
-    std::u16string write(Effect& value) override;
-    std::u16string write(Effect* value) override;
-    std::u16string write(Instruction_arg_extract& value) override;
-    std::u16string write(Instruction_arg_extract* value) override;
-    std::u16string write(Instruction_check_owner_type& value) override;
-    std::u16string write(Instruction_check_owner_type* value) override;
-    std::u16string write(Instruction_check_part_type& value) override;
-    std::u16string write(Instruction_check_part_type* value) override;
-    std::u16string write(Instruction_result& value) override;
-    std::u16string write(Instruction_result* value) override;
-    std::u16string write(Parameter_list& value) override;
-    std::u16string write(Parameter_list* value) override;
-    std::u16string write(Action_list& value) override;
-    std::u16string write(Action_list* value) override;
-    std::u16string write(Instruction_check_tag& value) override;
-    std::u16string write(Instruction_check_tag* value) override;
-    std::u16string write(Instruction_game_owner& value) override;
-    std::u16string write(Instruction_game_owner* value) override;
-    std::u16string write(Instruction_get_owner& value) override;
-    std::u16string write(Instruction_get_owner* value) override;
-    std::u16string write(Instruction_slot_link& value) override;
-    std::u16string write(Instruction_slot_link* value) override;
-    std::u16string write(Interaction_addon& value) override;
-    std::u16string write(Interaction_addon* value) override;
-    std::u16string write(Interaction_copyist& value) override;
-    std::u16string write(Interaction_copyist* value) override;
-    std::u16string write(Interaction_prefix& value) override;
-    std::u16string write(Interaction_prefix* value) override;
-    std::u16string write(ObjectTag::Activator& value) override;
-    std::u16string write(ObjectTag::Activator* value) override;
-    std::u16string write(ObjectTag::Label& value) override;
-    std::u16string write(ObjectTag::Label* value) override;
-    std::u16string write(ObjectTag::Equippable& value) override;
-    std::u16string write(ObjectTag::Equippable* value) override;
-    std::u16string write(ObjectTag::Fast_move& value) override;
-    std::u16string write(ObjectTag::Fast_move* value) override;
-    std::u16string write(ObjectTag::Mortal& value) override;
-    std::u16string write(ObjectTag::Mortal* value) override;
-    std::u16string write(ObjectTag::Purification_from_poison& value) override;
-    std::u16string write(ObjectTag::Purification_from_poison* value) override;
-    std::u16string write(ObjectTag::Requirements_to_object& value) override;
-    std::u16string write(ObjectTag::Requirements_to_object* value) override;
-    std::u16string write(Interaction_time& value) override;
-    std::u16string write(Interaction_time* value) override;
-    std::u16string write(Slot_set_state& value) override;
-    std::u16string write(Slot_set_state* value) override;
-    std::u16string write(Parameter& value) override;
-    std::u16string write(Parameter* value) override;
-    std::u16string write(Config& value) override;
-    std::u16string write(Config* value) override;
-    std::u16string write(ObjectTag::Can_transfer_object& value) override;
-    std::u16string write(ObjectTag::Can_transfer_object* value) override;
-    std::u16string write(ObjectTag::Poison_resist& value) override;
-    std::u16string write(ObjectTag::Poison_resist* value) override;
-    std::u16string write(Interaction_timer& value) override;
-    std::u16string write(Interaction_timer* value) override;
-    std::u16string write(Instruction_slot_parameter& value) override;
-    std::u16string write(Instruction_slot_parameter* value) override;
+    void visit(Action& value) override;
+    void visit(Action* value) override;
+    void visit(GameWorld& value) override;
+    void visit(GameWorld* value) override;
+    void visit(GameMap& value) override;
+    void visit(GameMap* value) override;
+    void visit(GameObject& value) override;
+    void visit(GameObject* value) override;
+    void visit(Attribute_map& value) override;
+    void visit(Attribute_map* value) override;
+    void visit(Object_state& value) override;
+    void visit(Object_state* value) override;
+    void visit(Interaction_list& value) override;
+    void visit(Interaction_list* value) override;
+    void visit(MapCell& value) override;
+    void visit(MapCell* value) override;
+    void visit(InventoryCell& value) override;
+    void visit(InventoryCell* value) override;
+    void visit(ObjectPart& value) override;
+    void visit(ObjectPart* value) override;
+    void visit(AI_enemy& value) override;
+    void visit(AI_enemy* value) override;
+    void visit(AI_trap& value) override;
+    void visit(AI_trap* value) override;
+    void visit(predicate_t& value) override;
+    void visit(predicate_t* value) override;
+    void visit(TileManager& value) override;
+    void visit(TileManager* value) override;
+    void visit(Icon& value) override;
+    void visit(Icon* value) override;
+    void visit(Effect& value) override;
+    void visit(Effect* value) override;
+    void visit(Instruction_arg_extract& value) override;
+    void visit(Instruction_arg_extract* value) override;
+    void visit(Instruction_check_owner_type& value) override;
+    void visit(Instruction_check_owner_type* value) override;
+    void visit(Instruction_check_part_type& value) override;
+    void visit(Instruction_check_part_type* value) override;
+    void visit(Instruction_result& value) override;
+    void visit(Instruction_result* value) override;
+    void visit(Parameter_list& value) override;
+    void visit(Parameter_list* value) override;
+    void visit(Action_list& value) override;
+    void visit(Action_list* value) override;
+    void visit(Instruction_check_tag& value) override;
+    void visit(Instruction_check_tag* value) override;
+    void visit(Instruction_game_owner& value) override;
+    void visit(Instruction_game_owner* value) override;
+    void visit(Instruction_get_owner& value) override;
+    void visit(Instruction_get_owner* value) override;
+    void visit(Instruction_slot_link& value) override;
+    void visit(Instruction_slot_link* value) override;
+    void visit(Interaction_addon& value) override;
+    void visit(Interaction_addon* value) override;
+    void visit(Interaction_copyist& value) override;
+    void visit(Interaction_copyist* value) override;
+    void visit(Interaction_prefix& value) override;
+    void visit(Interaction_prefix* value) override;
+    void visit(ObjectTag::Activator& value) override;
+    void visit(ObjectTag::Activator* value) override;
+    void visit(ObjectTag::Label& value) override;
+    void visit(ObjectTag::Label* value) override;
+    void visit(ObjectTag::Equippable& value) override;
+    void visit(ObjectTag::Equippable* value) override;
+    void visit(ObjectTag::Fast_move& value) override;
+    void visit(ObjectTag::Fast_move* value) override;
+    void visit(ObjectTag::Mortal& value) override;
+    void visit(ObjectTag::Mortal* value) override;
+    void visit(ObjectTag::Purification_from_poison& value) override;
+    void visit(ObjectTag::Purification_from_poison* value) override;
+    void visit(ObjectTag::Requirements_to_object& value) override;
+    void visit(ObjectTag::Requirements_to_object* value) override;
+    void visit(Interaction_time& value) override;
+    void visit(Interaction_time* value) override;
+    void visit(Slot_set_state& value) override;
+    void visit(Slot_set_state* value) override;
+    void visit(Parameter& value) override;
+    void visit(Parameter* value) override;
+    void visit(Config& value) override;
+    void visit(Config* value) override;
+    void visit(ObjectTag::Can_transfer_object& value) override;
+    void visit(ObjectTag::Can_transfer_object* value) override;
+    void visit(ObjectTag::Poison_resist& value) override;
+    void visit(ObjectTag::Poison_resist* value) override;
+    void visit(Interaction_timer& value) override;
+    void visit(Interaction_timer* value) override;
+    void visit(Instruction_slot_parameter& value) override;
+    void visit(Instruction_slot_parameter* value) override;
+    void visit(GraphicalController& value) override;
+    void visit(GraphicalController* value) override;
+    void visit(Action_wrapper& value) override;
+    void visit(Action_wrapper* value) override;
 
-    std::u16string map_cell_owner_save(GameMap* value);
-    std::u16string active_object_state_save(Object_state* value);
+    void map_cell_owner_save(GameMap* value);
+    void active_object_state_save(Object_state* value);
 
     template <typename T>
     constexpr static auto object_properties();

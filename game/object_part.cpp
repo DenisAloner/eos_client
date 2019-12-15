@@ -1,5 +1,6 @@
 #include "object_part.h"
 #include "writer.h"
+#include "GameObject.h"
 
 ObjectPart::ObjectPart(GameObject* item)
     : InventoryCell(item)
@@ -56,12 +57,4 @@ interaction_message_type_e ObjectPart::get_interaction_message_type()
     return interaction_message_type_e::part;
 }
 
-std::u16string ObjectPart::serialize_to_json_reference(JsonWriter& value)
-{
-    return value.write(*this);
-}
-
-std::u16string ObjectPart::serialize_to_json_pointer(JsonWriter& value)
-{
-    return value.write(this);
-}
+IJSONSERIALIZABLE_IMPL(ObjectPart);

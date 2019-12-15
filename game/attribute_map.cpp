@@ -1,5 +1,7 @@
 #include "attribute_map.h"
 #include "writer.h"
+#include "tag_list.h"
+#include "Action.h"
 
 Interaction_list* Effect_functions::create_feature_list(feature_list_type_e key, interaction_e name)
 {
@@ -128,12 +130,4 @@ iPacker& Attribute_map::get_packer()
     return Packer<Attribute_map>::instance();
 }
 
-std::u16string Attribute_map::serialize_to_json_reference(JsonWriter& value)
-{
-    return value.write(*this);
-}
-
-std::u16string Attribute_map::serialize_to_json_pointer(JsonWriter& value)
-{
-    return value.write(this);
-}
+IJSONSERIALIZABLE_IMPL(Attribute_map);

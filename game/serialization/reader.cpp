@@ -276,45 +276,105 @@ json_map_t* read_json_object(const std::u16string_view& value)
     return nullptr;
 }
 
-void JsonReader::read(int& ref, const std::u16string_view& json)
+void JsonReader::visit(int& ref)
 {
-    ref = json_to_int(json);
+	
+    ref = json_to_int(m_json);
 }
 
-void JsonReader::read(int*& ref, const std::u16string_view& json)
+void JsonReader::visit(int*& ref)
 {
-    if (json != u"null"sv) {
-        *ref = json_to_int(json);
+    if (m_json != u"null"sv) {
+        *ref = json_to_int(m_json);
         return;
     } else
         ref = nullptr;
 }
 
-void JsonReader::read(float& ref, const std::u16string_view& json)
+void JsonReader::visit(float& ref)
 {
-    ref = json_to_float(json);
+    ref = json_to_float(m_json);
 }
 
-void JsonReader::read(atlas_tile_t& ref, const std::u16string_view& json)
+void JsonReader::visit(std::u16string& ref)
 {
-    const auto properties = read_json_object(json);
+    const auto start_pos = m_json.find(u'"');
+    if (start_pos != std::string::npos) {
+        const auto end_pos = m_json.find(u'"', start_pos + 1);
+        if (end_pos != std::string::npos) {
+            ref = std::u16string(m_json.substr(start_pos + 1, end_pos - start_pos - 1));
+        }
+    }
+}
+
+void JsonReader::visit(atlas_tile_t& ref)
+{
+    const auto properties = read_json_object(m_json);
     if (properties) {
         auto& prop = *properties;
-        read(ref.texture.x, prop[u"x"sv]);
-        read(ref.texture.y, prop[u"y"sv]);
-        read(ref.texture.w, prop[u"w"sv]);
-        read(ref.texture.h, prop[u"h"sv]);
+        m_json = prop[u"x"sv];
+        visit(ref.texture.x);
+        m_json = prop[u"y"sv];
+        visit(ref.texture.y);
+        m_json = prop[u"w"sv];
+        visit(ref.texture.w);
+        m_json = prop[u"h"sv];
+        visit(ref.texture.h);
         delete properties;
     }
 }
 
-void JsonReader::read(std::u16string& ref, const std::u16string_view& json)
+void JsonReader::visit(gui_style_t& ref)
 {
-    const auto start_pos = json.find(u'"');
-    if (start_pos != std::string::npos) {
-        const auto end_pos = json.find(u'"', start_pos + 1);
-        if (end_pos != std::string::npos) {
-            ref = std::u16string(json.substr(start_pos + 1, end_pos - start_pos - 1));
-        }
-    }
+    assert(false);
+}
+
+void JsonReader::visit(GraphicalController& ref)
+{
+    assert(false);
+}
+
+void JsonReader::visit(GraphicalController*& ref)
+{
+    assert(false);
+}
+
+//void JsonReader::read(GameWorld& ref, const std::u16string_view& json)
+//{
+//    assert(false);
+//}
+//
+//void JsonReader::read(GameWorld*& ref, const std::u16string_view& json)
+//{
+//    assert(false);
+//}
+
+//void JsonReader::read(GameMap& ref, const std::u16string_view& json)
+//{
+//    assert(false);
+//}
+//
+//void JsonReader::read(GameMap*& ref, const std::u16string_view& json)
+//{
+//    assert(false);
+//}
+
+void JsonReader::visit(GameObject& ref)
+{
+    assert(false);
+}
+
+void JsonReader::visit(GameObject*& ref)
+{
+    assert(false);
+}
+
+void JsonReader::visit(Object_state& ref)
+{
+    assert(false);
+}
+
+void JsonReader::visit(Object_state*& ref)
+{
+    assert(false);
 }

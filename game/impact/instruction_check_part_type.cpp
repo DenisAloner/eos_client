@@ -34,13 +34,4 @@ interaction_message_type_e Instruction_check_part_type::get_interaction_message_
     return interaction_message_type_e::instruction_check_part_type;
 }
 
-std::u16string Instruction_check_part_type::serialize_to_json_reference(JsonWriter& value)
-{
-    return value.write(*this);
-}
-
-std::u16string Instruction_check_part_type::serialize_to_json_pointer(JsonWriter& value)
-{
-    return value.write(this);
-};
-
+IJSONSERIALIZABLE_IMPL(Instruction_check_part_type);

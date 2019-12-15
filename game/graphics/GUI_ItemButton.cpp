@@ -1,4 +1,5 @@
 #include "GUI_ItemButton.h"
+#include "GraphicalController.h"
 
 GUI_ItemButton::GUI_ItemButton()
 {

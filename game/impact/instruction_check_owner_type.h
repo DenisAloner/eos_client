@@ -19,9 +19,8 @@ public:
             make_property(&Instruction_check_owner_type::m_value, u"value"));
     }
 
-    interaction_message_type_e get_interaction_message_type() override { return interaction_message_type_e::instruction_check_owner_type; }
-    std::u16string serialize_to_json_reference(JsonWriter& value) override;
-    std::u16string serialize_to_json_pointer(JsonWriter& value) override;;
+    interaction_message_type_e get_interaction_message_type() override;
+    IJSONSERIALIZABLE();
 };
 
 #endif //INSTRUCTION_CHECK_OWNER_TYPE_H
