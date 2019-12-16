@@ -1,5 +1,4 @@
 #include "gui_scrollbar.h"
-#include "gui_scrollable_container.h"
 #include "GraphicalController.h"
 
 GUI_Scrollbar_vertical::GUI_Scrollbar_vertical(GUI_Scrollable_container* owner)

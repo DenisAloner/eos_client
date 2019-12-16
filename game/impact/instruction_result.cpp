@@ -1,5 +1,4 @@
 #include "instruction_result.h"
-#include "writer.h"
 
 Instruction_result::Instruction_result()
 {
@@ -21,4 +20,4 @@ interaction_message_type_e Instruction_result::get_interaction_message_type()
     return interaction_message_type_e::instruction_result;
 }
 
-IJSONSERIALIZABLE_IMPL(Instruction_result);
+IVISITABLE_IMPL(Instruction_result);

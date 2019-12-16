@@ -750,7 +750,7 @@ iPacker& AI_trap::get_packer()
     return Packer<AI_trap>::instance();
 }
 
-IJSONSERIALIZABLE_IMPL(AI_trap);
+IVISITABLE_IMPL(AI_trap);
 
 AI_manager::AI_manager()
 {
@@ -766,4 +766,4 @@ iPacker& AI_enemy::get_packer()
     return Packer<AI_enemy>::instance();
 }
 
-IJSONSERIALIZABLE_IMPL(AI_enemy);
+IVISITABLE_IMPL(AI_enemy);

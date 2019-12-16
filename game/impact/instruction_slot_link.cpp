@@ -105,4 +105,4 @@ interaction_message_type_e Instruction_slot_link::get_interaction_message_type()
     return interaction_message_type_e::instruction_slot_link;
 }
 
-IJSONSERIALIZABLE_IMPL(Instruction_slot_link);
+IVISITABLE_IMPL(Instruction_slot_link);

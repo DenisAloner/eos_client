@@ -73,7 +73,7 @@ public:
             make_property(&Parameter::m_size, u"size"));
     }
 
-	IJSONSERIALIZABLE();
+	IVISITABLE();
 
 private:
     template <typename T, typename... Args>

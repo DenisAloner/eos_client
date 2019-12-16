@@ -27,7 +27,7 @@ public:
     void visit(Action_pick& value) override;
 
     void visit(GameObject& value) override;
-    void visit(Attribute_map& value) override;
+    void visit(AttributeMap& value) override;
     void visit(Interaction_list& value) override;
     void visit(Parameter_list& value) override;
     void visit(Vision_list& value) override;

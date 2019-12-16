@@ -42,4 +42,4 @@ iPacker& ObjectTag::Activator::get_packer()
     return Packer<Activator>::instance();
 }
 
-IJSONSERIALIZABLE_IMPL(ObjectTag::Activator);
+IVISITABLE_IMPL(ObjectTag::Activator);

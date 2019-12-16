@@ -49,7 +49,7 @@ iPacker& Action::get_packer()
     return Packer<Action>::instance();
 }
 
-IJSONSERIALIZABLE_IMPL(Action);
+IVISITABLE_IMPL(Action);
 
 std::u16string Packer<Action>::to_json(iSerializable* value, SerializationContext& context)
 {
@@ -153,7 +153,7 @@ interaction_message_type_e Action_wrapper::get_interaction_message_type()
 	return interaction_message_type_e::action_wrapper;
 }
 
-IJSONSERIALIZABLE_IMPL(Action_wrapper);
+IVISITABLE_IMPL(Action_wrapper);
 
 ActionClass_Move::ActionClass_Move()
 {

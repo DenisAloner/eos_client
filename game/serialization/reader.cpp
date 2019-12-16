@@ -1,4 +1,5 @@
 #include <reader.h>
+
 using namespace std::literals::string_view_literals;
 
 int json_to_int(const std::u16string_view& value)
@@ -278,7 +279,6 @@ json_map_t* read_json_object(const std::u16string_view& value)
 
 void JsonReader::visit(int& ref)
 {
-	
     ref = json_to_int(m_json);
 }
 
@@ -286,7 +286,6 @@ void JsonReader::visit(int*& ref)
 {
     if (m_json != u"null"sv) {
         *ref = json_to_int(m_json);
-        return;
     } else
         ref = nullptr;
 }
@@ -322,59 +321,4 @@ void JsonReader::visit(atlas_tile_t& ref)
         visit(ref.texture.h);
         delete properties;
     }
-}
-
-void JsonReader::visit(gui_style_t& ref)
-{
-    assert(false);
-}
-
-void JsonReader::visit(GraphicalController& ref)
-{
-    assert(false);
-}
-
-void JsonReader::visit(GraphicalController*& ref)
-{
-    assert(false);
-}
-
-//void JsonReader::read(GameWorld& ref, const std::u16string_view& json)
-//{
-//    assert(false);
-//}
-//
-//void JsonReader::read(GameWorld*& ref, const std::u16string_view& json)
-//{
-//    assert(false);
-//}
-
-//void JsonReader::read(GameMap& ref, const std::u16string_view& json)
-//{
-//    assert(false);
-//}
-//
-//void JsonReader::read(GameMap*& ref, const std::u16string_view& json)
-//{
-//    assert(false);
-//}
-
-void JsonReader::visit(GameObject& ref)
-{
-    assert(false);
-}
-
-void JsonReader::visit(GameObject*& ref)
-{
-    assert(false);
-}
-
-void JsonReader::visit(Object_state& ref)
-{
-    assert(false);
-}
-
-void JsonReader::visit(Object_state*& ref)
-{
-    assert(false);
 }

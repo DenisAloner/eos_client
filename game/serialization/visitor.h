@@ -31,7 +31,7 @@ class GameWorld;
 class Action;
 class GameMap;
 class GameObject;
-class Attribute_map;
+class AttributeMap;
 class Parameter_list;
 class Interaction_list;
 class Action_list;
@@ -67,7 +67,7 @@ class Parameter;
 class GraphicalController;
 class Action_wrapper;
 
-class iVisitor {
+class IVisitor {
 public:
     VISIT(int);
     VISIT(const int);
@@ -82,7 +82,7 @@ public:
     VISIT(GameWorld);
     VISIT(GameMap);
     VISIT(GameObject);
-    VISIT(Attribute_map);
+    VISIT(AttributeMap);
     VISIT(Object_state);
     VISIT(Interaction_list);
     VISIT(Parameter_list);
@@ -126,19 +126,19 @@ public:
     VISIT(Action_wrapper);
 };
 
-#define IJSONSERIALIZABLE()                          \
-    void accept_reference(iVisitor& value) override; \
-    void accept_pointer(iVisitor& value) override;
+#define IVISITABLE()                          \
+    void accept_reference(IVisitor& value) override; \
+    void accept_pointer(IVisitor& value) override;
 
-#define IJSONSERIALIZABLE_IMPL(Class)                                     \
-    void Class::accept_reference(iVisitor& value) { value.visit(*this); } \
-    void Class::accept_pointer(iVisitor& value) { value.visit(this); }
+#define IVISITABLE_IMPL(Class)                                     \
+    void Class::accept_reference(IVisitor& value) { value.visit(*this); } \
+    void Class::accept_pointer(IVisitor& value) { value.visit(this); }
 
-class iJsonSerializable {
+class IVisitable {
 public:
-    virtual ~iJsonSerializable() = default;
-    virtual void accept_reference(iVisitor& value) = 0;
-    virtual void accept_pointer(iVisitor& value) = 0;
+    virtual ~IVisitable() = default;
+    virtual void accept_reference(IVisitor& value) = 0;
+    virtual void accept_pointer(IVisitor& value) = 0;
 };
 
 #endif

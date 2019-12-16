@@ -8,7 +8,7 @@ void Visitor_simple::visit(GameObject& value)
     }
 }
 
-void Visitor_simple::visit(Attribute_map& value)
+void Visitor_simple::visit(AttributeMap& value)
 {
     for (auto& m_item : value.m_items) {
         m_item.second->apply_visitor(*this);
@@ -143,7 +143,7 @@ void Visitor_generic_updater::visit(GameObject& value)
     result = false;
 }
 
-void Visitor_generic_updater::visit(Attribute_map& value)
+void Visitor_generic_updater::visit(AttributeMap& value)
 {
     for (auto current = value.m_items.begin(); current != value.m_items.end();) {
         result = false;

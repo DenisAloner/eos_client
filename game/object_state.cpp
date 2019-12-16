@@ -78,7 +78,7 @@ void Object_state::tilemanager_from_binary(const std::string& value, TileManager
     }
 }
 
-IJSONSERIALIZABLE_IMPL(Object_state);
+IVISITABLE_IMPL(Object_state);
 
 Object_state::Object_state()
 {
@@ -130,7 +130,7 @@ void Object_state::apply_visitor(Visitor_generic& visitor)
 void Object_state::reset_serialization_index()
 {
     m_serialization_index = 0;
-    Attribute_map::reset_serialization_index();
+    AttributeMap::reset_serialization_index();
     if (m_ai) {
         m_ai->reset_serialization_index();
     }

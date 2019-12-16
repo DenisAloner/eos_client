@@ -18,7 +18,7 @@ public:
     iPacker& get_packer() override;
 
     constexpr static auto properties() { return Object_tag::properties(); }
-    IJSONSERIALIZABLE();
+    IVISITABLE();
 };
 
 }

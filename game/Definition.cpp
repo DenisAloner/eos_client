@@ -175,7 +175,7 @@ Serialization::Serialization()
     register_packer<GameObject>(u"game_object");
     register_packer<InventoryCell>(u"inventory_cell");
     register_packer<ObjectPart>(u"object_part");
-    register_packer<Attribute_map>(u"attribute_map");
+    register_packer<AttributeMap>(u"attribute_map");
     register_packer<Object_state>(u"object_state");
     register_packer<Object_state_equip>(u"object_state_equip");
     register_packer<Interaction_list>(u"interaction_list");

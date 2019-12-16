@@ -1,5 +1,4 @@
 #include "instruction_slot_parameter.h"
-#include "writer.h"
 
 Instruction_slot_parameter::Instruction_slot_parameter()
 {
@@ -41,4 +40,4 @@ interaction_message_type_e Instruction_slot_parameter::get_interaction_message_t
     return interaction_message_type_e::instruction_slot_parameter;
 }
 
-IJSONSERIALIZABLE_IMPL(Instruction_slot_parameter);
+IVISITABLE_IMPL(Instruction_slot_parameter);

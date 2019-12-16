@@ -49,4 +49,4 @@ iPacker& ObjectTag::Requirements_to_object::get_packer()
     return Packer<Requirements_to_object>::instance();
 }
 
-IJSONSERIALIZABLE_IMPL(ObjectTag::Requirements_to_object);
+IVISITABLE_IMPL(ObjectTag::Requirements_to_object);

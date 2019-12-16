@@ -261,7 +261,7 @@ Parameter::Parameter(parameter_type_e kind)
     }
 }
 
-IJSONSERIALIZABLE_IMPL(Parameter);
+IVISITABLE_IMPL(Parameter);
 
 void Parameter::reset_serialization_index()
 {

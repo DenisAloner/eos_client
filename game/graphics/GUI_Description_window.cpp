@@ -1,5 +1,4 @@
 #include "GUI_Description_window.h"
-#include "GraphicalController.h"
 
 Visitor_object_description_getter::Visitor_object_description_getter()
     : m_value(nullptr)
@@ -95,7 +94,7 @@ void Visitor_object_description_getter::visit(GameObject& value)
     m_active.pop_front();
 }
 
-void Visitor_object_description_getter::visit(Attribute_map& value)
+void Visitor_object_description_getter::visit(AttributeMap& value)
 {
     handle_complex(u"Характеристики: ");
     Tree<std::u16string>* item = nullptr;

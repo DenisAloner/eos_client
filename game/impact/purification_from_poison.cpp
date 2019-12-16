@@ -36,4 +36,4 @@ iPacker& ObjectTag::Purification_from_poison::get_packer()
     return Packer<Purification_from_poison>::instance();
 }
 
-IJSONSERIALIZABLE_IMPL(ObjectTag::Purification_from_poison);
+IVISITABLE_IMPL(ObjectTag::Purification_from_poison);

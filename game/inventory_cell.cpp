@@ -1,5 +1,4 @@
 #include "inventory_cell.h"
-#include "writer.h"
 #include "GameObject.h"
 
 InventoryCell::InventoryCell(GameObject* item)
@@ -24,4 +23,4 @@ iPacker& InventoryCell::get_packer()
     return Packer<InventoryCell>::instance();
 }
 
-IJSONSERIALIZABLE_IMPL(InventoryCell);
+IVISITABLE_IMPL(InventoryCell);

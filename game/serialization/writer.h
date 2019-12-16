@@ -1,13 +1,14 @@
 #ifndef WRITER_H
 #define WRITER_H
 
-#include "i_json_serializable.h"
+#include "visitor.h"
 #include <unordered_map>
 #include "Definiton.h"
 
-class JsonWriter : public iVisitor {
+class JsonWriter : public IVisitor {
 public:
-    using iVisitor::visit;
+	
+    using IVisitor::visit;
     unsigned long counter = 0;
     std::unordered_map<iSerializable*, long> objects;
 
@@ -35,7 +36,7 @@ public:
             return;
         }
         auto result = u"["s;
-        if constexpr (std::is_pointer_v<T> && std::is_base_of_v<iJsonSerializable, std::remove_pointer_t<T>>) {
+        if constexpr (std::is_pointer_v<T> && std::is_base_of_v<IVisitable, std::remove_pointer_t<T>>) {
             for (auto& current : ref) {
                 if (current) {
                     current->accept_pointer(*this);
@@ -61,7 +62,7 @@ public:
             return;
         }
         auto result = u"["s;
-        if constexpr (std::is_pointer_v<T> && std::is_base_of_v<iJsonSerializable, std::remove_pointer_t<T>>) {
+        if constexpr (std::is_pointer_v<T> && std::is_base_of_v<IVisitable, std::remove_pointer_t<T>>) {
             for (auto& current : ref) {
                 if (current) {
                     current->accept_pointer(*this);
@@ -87,7 +88,7 @@ public:
             return;
         }
         auto result = u"["s;
-        if constexpr (std::is_pointer_v<Value> && std::is_base_of_v<iJsonSerializable, std::remove_pointer_t<Value>>) {
+        if constexpr (std::is_pointer_v<Value> && std::is_base_of_v<IVisitable, std::remove_pointer_t<Value>>) {
             for (auto& current : ref) {
                 visit(current.first);
                 result += m_result + u","s;
@@ -117,7 +118,7 @@ public:
             return;
         }
         auto result = u"["s;
-        if constexpr (std::is_pointer_v<Value> && std::is_base_of_v<iJsonSerializable, std::remove_pointer_t<Value>>) {
+        if constexpr (std::is_pointer_v<Value> && std::is_base_of_v<IVisitable, std::remove_pointer_t<Value>>) {
             for (auto& current : ref) {
                 visit(current.first);
                 result += m_result + u","s;

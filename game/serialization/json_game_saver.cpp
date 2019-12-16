@@ -22,14 +22,14 @@ constexpr auto JsonGameSaver::object_properties()
             MemberMap::get<&GameObject::m_direction>,
             MemberMap::get<&Game_object_owner::m_owner>,
             MemberMap::get<&GameObject::m_state>,
-            CustomWriter(MemberMap::get<&GameObject::m_active_state>, &JsonGameSaver::active_object_state_save));
+            CustomHandler(MemberMap::get<&GameObject::m_active_state>, &JsonGameSaver::active_object_state_save));
     }
-    if constexpr (std::is_same_v<T, Attribute_map>) {
+    if constexpr (std::is_same_v<T, AttributeMap>) {
         return std::tuple(
-            MemberMap::get<&Attribute_map::m_items>);
+            MemberMap::get<&AttributeMap::m_items>);
     }
     if constexpr (std::is_same_v<T, Object_state>) {
-        return std::tuple_cat(object_properties<Attribute_map>(),
+        return std::tuple_cat(object_properties<AttributeMap>(),
             std::make_tuple(
                 MemberMap::get<&Object_state::m_state>,
                 MemberMap::get<&Object_state::m_size>,
@@ -60,7 +60,7 @@ constexpr auto JsonGameSaver::object_properties()
             MemberMap::get<&MapCell::x>,
             MemberMap::get<&MapCell::y>,
             MemberMap::get<&MapCell::z>,
-            CustomWriter(MemberMap::get<&MapCell::m_map>, &JsonGameSaver::map_cell_owner_save));
+            CustomHandler(MemberMap::get<&MapCell::m_map>, &JsonGameSaver::map_cell_owner_save));
     }
     if constexpr (std::is_same_v<T, Game_object_owner>) {
         return std::tuple(
@@ -165,7 +165,7 @@ constexpr auto JsonGameSaver::object_properties()
 VISIT_IMPL(JsonGameSaver, GameWorld);
 VISIT_IMPL(JsonGameSaver, GameMap);
 VISIT_IMPL(JsonGameSaver, GameObject);
-VISIT_IMPL(JsonGameSaver, Attribute_map);
+VISIT_IMPL(JsonGameSaver, AttributeMap);
 VISIT_IMPL(JsonGameSaver, Object_state);
 VISIT_IMPL(JsonGameSaver, Interaction_list);
 VISIT_IMPL(JsonGameSaver, InventoryCell);

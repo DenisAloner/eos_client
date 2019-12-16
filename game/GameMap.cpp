@@ -48,7 +48,7 @@ void GameMap::vector_mapcell_from_binary(const std::string& value, std::vector<M
     }
 }
 
-IJSONSERIALIZABLE_IMPL(GameMap);
+IVISITABLE_IMPL(GameMap);
 
 GameMap::GameMap(dimension3_t size)
 {

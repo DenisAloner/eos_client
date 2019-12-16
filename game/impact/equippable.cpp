@@ -118,4 +118,4 @@ iPacker& ObjectTag::Equippable::get_packer()
     return Packer<Equippable>::instance();
 }
 
-IJSONSERIALIZABLE_IMPL(ObjectTag::Equippable);
+IVISITABLE_IMPL(ObjectTag::Equippable);

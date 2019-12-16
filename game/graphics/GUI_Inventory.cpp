@@ -81,7 +81,7 @@ void Visitor_container_hierarchy_getter::visit(ObjectPart& value)
     m_active.pop_front();
 }
 
-void GUI_Body::update(Attribute_map* feature)
+void GUI_Body::update(AttributeMap* feature)
 {
     while (m_items.begin() != m_items.end()) {
         remove(*m_items.begin());
@@ -112,7 +112,7 @@ void GUI_Body::update(Attribute_map* feature)
     resize(m_max_item_name + 2 + 20, h);
 }
 
-GUI_Body::GUI_Body(Attribute_map* feature)
+GUI_Body::GUI_Body(AttributeMap* feature)
     : GUI_Scrollable_container(0, 0, 0, 0)
 {
     m_already_active = false;

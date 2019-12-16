@@ -66,4 +66,4 @@ interaction_message_type_e Instruction_arg_extract::get_interaction_message_type
     return interaction_message_type_e::instruction_arg_extract;
 }
 
- IJSONSERIALIZABLE_IMPL(Instruction_arg_extract);
+ IVISITABLE_IMPL(Instruction_arg_extract);

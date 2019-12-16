@@ -39,4 +39,4 @@ iPacker& ObjectTag::Mortal::get_packer()
     return Packer<Mortal>::instance();
 }
 
-IJSONSERIALIZABLE_IMPL(ObjectTag::Mortal);
+IVISITABLE_IMPL(ObjectTag::Mortal);

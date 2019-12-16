@@ -21,7 +21,7 @@ public:
     template <auto PointerToMember>
     constexpr static auto get = not_found<PointerToMember>();
 
-    inline static std::unordered_map<std::u16string, iJsonSerializable*(*)> registered_types {};
+    inline static std::unordered_map<std::u16string, IVisitable*(*)> registered_types {};
 	
     template <typename Type>
     constexpr static const char16_t* type = u"undefined"; //not_found<Type>();
@@ -42,7 +42,7 @@ template <template <typename, typename> typename Property,
     typename T,
     typename F,
     typename MemberType = std::remove_reference_t<T>>
-struct CustomWriter : iCustomHandler {
+struct CustomHandler : iCustomHandler {
     typedef void (F::*custom_function_t)(T);
     typedef const Property<Class, MemberType> PropertyType;
 
@@ -50,7 +50,7 @@ struct CustomWriter : iCustomHandler {
 
     custom_function_t custom_function;
 	
-    constexpr CustomWriter(PropertyType& property,
+    constexpr CustomHandler(PropertyType& property,
         custom_function_t custom_function)
         : property(property)
         , custom_function(custom_function)
@@ -103,9 +103,9 @@ PROPERTY(&GameObject::m_name, u"name");
 PROPERTY(&GameObject::m_direction, u"direction");
 PROPERTY(&GameObject::m_state, u"state");
 PROPERTY(&GameObject::m_active_state, u"active_state");
-// Attribute_map
-TYPENAME(Attribute_map, u"attribute_map");
-PROPERTY(&Attribute_map::m_items, u"items");
+// AttributeMap
+TYPENAME(AttributeMap, u"attribute_map");
+PROPERTY(&AttributeMap::m_items, u"items");
 // Object_state
 TYPENAME(Object_state, u"object_state");
 PROPERTY(&Object_state::m_state, u"state");

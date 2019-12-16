@@ -25,4 +25,4 @@ interaction_message_type_e Instruction_game_owner::get_interaction_message_type(
 	return interaction_message_type_e::instruction_game_owner;
 }
 
-IJSONSERIALIZABLE_IMPL(Instruction_game_owner);
+IVISITABLE_IMPL(Instruction_game_owner);

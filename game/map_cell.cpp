@@ -39,4 +39,4 @@ iPacker& MapCell::get_packer()
     return Packer<MapCell>::instance();
 }
 
-IJSONSERIALIZABLE_IMPL(MapCell);
+IVISITABLE_IMPL(MapCell);

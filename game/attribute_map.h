@@ -2,7 +2,7 @@
 #define ATTRIBUTE_MAP_H
 
 #include "Definiton.h"
-#include "i_json_serializable.h"
+#include "visitor.h"
 #include "interaction_list.h"
 #include "object_tag.h"
 
@@ -11,14 +11,14 @@ Interaction_list* create_feature_list(feature_list_type_e key, interaction_e nam
 }
 
 
-class Attribute_map : public iSerializable {
+class AttributeMap : public iSerializable {
 public:
     std::map<interaction_e, Interaction_list*> m_items;
 
-    Attribute_map();
+    AttributeMap();
     void add_effect(interaction_e key, Object_interaction* item);
     Interaction_list* create_feature_list(feature_list_type_e key, interaction_e name);
-    virtual Attribute_map* clone();
+    virtual AttributeMap* clone();
 
     void reset_serialization_index() override;
 
@@ -33,10 +33,10 @@ public:
     constexpr static auto properties()
     {
         return std::make_tuple(
-            make_property(&Attribute_map::m_items, u"item"));
+            make_property(&AttributeMap::m_items, u"item"));
     }
 
-   IJSONSERIALIZABLE();
+   IVISITABLE();
 };
 
 #endif

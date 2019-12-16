@@ -25,7 +25,7 @@ public:
                 make_property(&Can_transfer_object::m_value, u"value")));
     }
 
-    IJSONSERIALIZABLE();
+    IVISITABLE();
 };
 
 }

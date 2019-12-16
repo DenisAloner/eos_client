@@ -1,6 +1,4 @@
 #include "attribute_map.h"
-#include "writer.h"
-#include "tag_list.h"
 #include "Action.h"
 
 Interaction_list* Effect_functions::create_feature_list(feature_list_type_e key, interaction_e name)
@@ -39,23 +37,23 @@ Interaction_list* Effect_functions::create_feature_list(feature_list_type_e key,
     return result;
 }
 
-Attribute_map::Attribute_map() = default;
+AttributeMap::AttributeMap() = default;
 
-Interaction_list* Attribute_map::create_feature_list(feature_list_type_e key, interaction_e name)
+Interaction_list* AttributeMap::create_feature_list(feature_list_type_e key, interaction_e name)
 {
     const auto result = Effect_functions::create_feature_list(key, name);
     m_items[name] = result;
     return result;
 }
 
-void Attribute_map::add_effect(interaction_e key, Object_interaction* item)
+void AttributeMap::add_effect(interaction_e key, Object_interaction* item)
 {
     if (m_items.find(key) != m_items.end()) {
         m_items[key]->add(item);
     }
 }
 
-Interaction_list* Attribute_map::get_list(interaction_e key)
+Interaction_list* AttributeMap::get_list(interaction_e key)
 {
     const auto value = m_items.find(key);
     if (value != m_items.end()) {
@@ -64,16 +62,16 @@ Interaction_list* Attribute_map::get_list(interaction_e key)
     return nullptr;
 }
 
-Attribute_map* Attribute_map::clone()
+AttributeMap* AttributeMap::clone()
 {
-    auto result = new Attribute_map();
+    auto result = new AttributeMap();
     for (auto& m_item : m_items) {
         result->m_items[m_item.first] = m_item.second->clone();
     }
     return result;
 }
 
-void Attribute_map::reset_serialization_index()
+void AttributeMap::reset_serialization_index()
 {
     m_serialization_index = 0;
     for (auto m_item : m_items) {
@@ -96,7 +94,7 @@ void Tag_getter::visit(Object_interaction& value)
     }
 }
 
-bool Attribute_map::get_stat(const object_tag_e key)
+bool AttributeMap::get_stat(const object_tag_e key)
 {
     const auto list = m_items.find(interaction_e::tag);
     if (list != m_items.end()) {
@@ -108,7 +106,7 @@ bool Attribute_map::get_stat(const object_tag_e key)
     return false;
 }
 
-Object_tag* Attribute_map::get_tag(const object_tag_e key)
+Object_tag* AttributeMap::get_tag(const object_tag_e key)
 {
     const auto list = m_items.find(interaction_e::tag);
     if (list != m_items.end()) {
@@ -120,14 +118,14 @@ Object_tag* Attribute_map::get_tag(const object_tag_e key)
     return nullptr;
 }
 
-void Attribute_map::apply_visitor(Visitor_generic& visitor)
+void AttributeMap::apply_visitor(Visitor_generic& visitor)
 {
     visitor.visit(*this);
 }
 
-iPacker& Attribute_map::get_packer()
+iPacker& AttributeMap::get_packer()
 {
-    return Packer<Attribute_map>::instance();
+    return Packer<AttributeMap>::instance();
 }
 
-IJSONSERIALIZABLE_IMPL(Attribute_map);
+IVISITABLE_IMPL(AttributeMap);

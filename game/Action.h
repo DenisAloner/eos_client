@@ -43,7 +43,7 @@ public:
 
     constexpr static auto properties() { return std::make_tuple(make_property(&Action::m_kind, u"value")); }
     interaction_message_type_e get_interaction_message_type() override { return interaction_message_type_e::action; }
-    IJSONSERIALIZABLE();
+    IVISITABLE();
 };
 
 class Action_wrapper : public Object_interaction {
@@ -67,7 +67,7 @@ public:
     iPacker& get_packer() override;
 
     interaction_message_type_e get_interaction_message_type() override;
-    IJSONSERIALIZABLE();
+    IVISITABLE();
 
 private:
     Interaction_prefix* m_prefix;

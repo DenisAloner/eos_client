@@ -22,7 +22,7 @@ void TileManager::vector_gl_uint_from_binary(const std::string& value, std::vect
 {
 }
 
-IJSONSERIALIZABLE_IMPL(TileManager);
+IVISITABLE_IMPL(TileManager);
 
 TileManager_Single_Atlas::TileManager_Single_Atlas()
 {

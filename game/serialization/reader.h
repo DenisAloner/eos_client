@@ -16,10 +16,10 @@ json_vector_t* read_json_array(const std::u16string_view& value);
 json_map_t* parse_json_object(const std::u16string_view& value);
 json_map_t* read_json_object(const std::u16string_view& value);
 
-class JsonReader:public iVisitor {
+class JsonReader:public IVisitor {
 public:
 
-    using iVisitor::visit;
+    using IVisitor::visit;
     std::u16string_view m_json;
 	
     //template <typename T>
@@ -27,7 +27,7 @@ public:
     //{
     //    const auto array = read_json_array(m_json);
     //    if (array) {
-    //        if constexpr (std::is_pointer_v<T> && std::is_base_of_v<iJsonSerializable, std::remove_pointer_t<T>>) {
+    //        if constexpr (std::is_pointer_v<T> && std::is_base_of_v<IVisitable, std::remove_pointer_t<T>>) {
     //            for (auto& current : ref) {
     //                result += (current ? current->deserialize_to_json_pointer(*this) : u"null") + u",";
     //            }
@@ -44,7 +44,7 @@ public:
     {
         const auto array = read_json_array(m_json);
         if (array) {
-            if constexpr (std::is_pointer_v<Value> && std::is_base_of_v<iJsonSerializable, std::remove_pointer_t<Value>>) {
+            if constexpr (std::is_pointer_v<Value> && std::is_base_of_v<IVisitable, std::remove_pointer_t<Value>>) {
                 for (auto& current : ref) {
                     for (std::size_t index = 0; index < array->size(); index += 2) {
                         Key key;
@@ -72,19 +72,7 @@ public:
     virtual void visit(int*& ref);
     void visit(float& ref) override;
     void visit(std::u16string& ref) override;
-    virtual void visit(atlas_tile_t& ref);
-
-    void visit(gui_style_t& ref) override;
-    void visit(GraphicalController& ref) override;
-    virtual void visit(GraphicalController*& ref);
-    /*virtual void read(GameWorld& ref, const std::u16string_view& json);
-    virtual void read(GameWorld*& ref, const std::u16string_view& json);*/
-    /*virtual void read(GameMap& ref, const std::u16string_view& json);
-    virtual void read(GameMap*& ref, const std::u16string_view& json);*/
-    void visit(GameObject& ref) override;
-    virtual void visit(GameObject*& ref);
-    void visit(Object_state& ref) override;
-    virtual void visit(Object_state*& ref);
+    void visit(atlas_tile_t& ref) override;
 };
 
 #endif

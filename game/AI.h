@@ -139,7 +139,7 @@ public:
                 make_property(&AI_enemy::m_path_qualifier, u"path_qualifier")));
     }
 
-    IJSONSERIALIZABLE();
+    IVISITABLE();
 };
 
 class AI_trap : public AI {
@@ -152,7 +152,7 @@ public:
     iPacker& get_packer() override;
 
     void calculate_fov(GameObject* object, GameMap* map) override {}
-    IJSONSERIALIZABLE();
+    IVISITABLE();
 };
 
 class AI_manager {

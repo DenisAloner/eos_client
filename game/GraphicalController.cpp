@@ -1,6 +1,5 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "GraphicalController.h"
-#include "Application.h"
 #include <fstream>
 #include <stb_image.h>
 #include "gui_atlas_reader.h"
@@ -1230,4 +1229,4 @@ void GraphicalController::draw_tile_fbo(double tx1, double ty1, double tx2, doub
     glEnd();
 }
 
-IJSONSERIALIZABLE_IMPL(GraphicalController);
+IVISITABLE_IMPL(GraphicalController);

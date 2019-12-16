@@ -42,5 +42,5 @@ interaction_message_type_e Instruction_check_tag::get_interaction_message_type()
     return interaction_message_type_e::instruction_check_tag;
 }
 
-IJSONSERIALIZABLE_IMPL(Instruction_check_tag);
+IVISITABLE_IMPL(Instruction_check_tag);
 

@@ -13,7 +13,7 @@ public:
 
     iPacker& get_packer() override;
     interaction_message_type_e get_interaction_message_type() override;
-    IJSONSERIALIZABLE();
+    IVISITABLE();
 };
 
 #endif //INTERACTION_TIMER_H

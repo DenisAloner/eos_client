@@ -1,5 +1,4 @@
 #include "poison_resist.h"
-#include "writer.h"
 #include "interaction_prefix.h"
 #include "effect.h"
 
@@ -28,4 +27,4 @@ iPacker& ObjectTag::Poison_resist::get_packer()
     return Packer<Poison_resist>::instance();
 }
 
-IJSONSERIALIZABLE_IMPL(ObjectTag::Poison_resist);
+IVISITABLE_IMPL(ObjectTag::Poison_resist);

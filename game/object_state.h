@@ -7,7 +7,7 @@
 
 class AI;
 
-class Object_state : public Attribute_map {
+class Object_state : public AttributeMap {
 public:
     object_state_e m_state;
     int m_layer;
@@ -47,7 +47,7 @@ public:
     constexpr static auto properties()
     {
         return make_union(
-            Attribute_map::properties(),
+            AttributeMap::properties(),
             std::make_tuple(
                 make_property(&Object_state::m_state, u"state"),
                 make_property(&Object_state::m_size, u"size"),
@@ -62,7 +62,7 @@ public:
                 make_property(&Object_state::m_optical, u"optical")));
     }
 
-    IJSONSERIALIZABLE();
+    IVISITABLE();
 };
 
 

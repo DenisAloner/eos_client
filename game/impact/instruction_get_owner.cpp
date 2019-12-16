@@ -65,4 +65,4 @@ interaction_message_type_e Instruction_get_owner::get_interaction_message_type()
     return interaction_message_type_e::instruction_get_owner;
 }
 
-IJSONSERIALIZABLE_IMPL(Instruction_get_owner);
+IVISITABLE_IMPL(Instruction_get_owner);

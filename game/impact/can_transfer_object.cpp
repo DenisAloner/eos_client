@@ -1,5 +1,4 @@
 #include "can_transfer_object.h"
-#include "writer.h"
 
 ObjectTag::Can_transfer_object::Can_transfer_object()
     : Object_tag(object_tag_e::can_transfer_object)
@@ -44,4 +43,4 @@ iPacker& ObjectTag::Can_transfer_object::get_packer()
     return Packer<Can_transfer_object>::instance();
 }
 
-IJSONSERIALIZABLE_IMPL(ObjectTag::Can_transfer_object);
+IVISITABLE_IMPL(ObjectTag::Can_transfer_object);

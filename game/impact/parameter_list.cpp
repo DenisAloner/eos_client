@@ -1,5 +1,4 @@
 #include "parameter_list.h"
-#include "writer.h"
 #include "effect.h"
 #include "Visitors.h"
 
@@ -79,4 +78,4 @@ iPacker& Parameter_list::get_packer()
     return Packer<Parameter_list>::instance();
 }
 
-IJSONSERIALIZABLE_IMPL(Parameter_list);
+IVISITABLE_IMPL(Parameter_list);

@@ -20,7 +20,7 @@ public:
     }
 
     interaction_message_type_e get_interaction_message_type() override;
-    IJSONSERIALIZABLE();
+    IVISITABLE();
 };
 
 #endif //INSTRUCTION_CHECK_OWNER_TYPE_H

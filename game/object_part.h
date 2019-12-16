@@ -8,7 +8,7 @@
 class ObjectPart : virtual public Object_interaction, public InventoryCell {
 
 public:
-    Attribute_map m_attributes;
+    AttributeMap m_attributes;
     body_part_e m_part_kind;
     std::u16string m_name;
 
@@ -33,6 +33,6 @@ public:
     }
 
     interaction_message_type_e get_interaction_message_type() override;
-    IJSONSERIALIZABLE();
+    IVISITABLE();
 };
 #endif

@@ -14,7 +14,7 @@ public:
 
     constexpr static auto properties() { return Interaction_list::properties(); }
 
-	IJSONSERIALIZABLE();
+	IVISITABLE();
 };
 
 #endif //ACTION_LIST_H

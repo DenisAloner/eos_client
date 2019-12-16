@@ -12,7 +12,7 @@ public:
     void apply_effect(GameObject* unit, Object_interaction* object) override;
 
     iPacker& get_packer() override;
-    IJSONSERIALIZABLE();
+    IVISITABLE();
 };
 
 }

@@ -38,4 +38,4 @@ interaction_message_type_e Instruction_check_owner_type::get_interaction_message
 	return interaction_message_type_e::instruction_check_owner_type;
 }
 
-IJSONSERIALIZABLE_IMPL(Instruction_check_owner_type);
+IVISITABLE_IMPL(Instruction_check_owner_type);

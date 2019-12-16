@@ -2,7 +2,7 @@
 #define INTERACTION_LIST_H
 
 #include "Definiton.h"
-#include "i_json_serializable.h"
+#include "visitor.h"
 
 class Interaction_list : public Object_interaction {
 public:
@@ -35,7 +35,7 @@ public:
 
     interaction_message_type_e get_interaction_message_type() override;
 
-	IJSONSERIALIZABLE();
+	IVISITABLE();
 };
 
 #endif //INTERACTION_LIST_H

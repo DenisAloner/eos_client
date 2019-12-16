@@ -22,7 +22,7 @@ public:
             make_property(&InventoryCell::m_item, u"item"));
     }
 
-    IJSONSERIALIZABLE();
+    IVISITABLE();
 };
 
 

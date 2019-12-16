@@ -6,7 +6,7 @@
 class Object_state_equip : public Object_state {
 public:
     body_part_e m_body_part;
-    Attribute_map m_equip;
+    AttributeMap m_equip;
     Object_state_equip();
     Object_state* clone() override;
 

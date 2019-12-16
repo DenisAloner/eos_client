@@ -90,7 +90,7 @@ public:
             make_property(&GameMap::m_items, u"item", &GameMap::vector_mapcell_to_json, &GameMap::vector_mapcell_from_json, &GameMap::vector_mapcell_to_binary, &GameMap::vector_mapcell_from_binary));
     }
 
-    IJSONSERIALIZABLE();
+    IVISITABLE();
 };
 
 #endif

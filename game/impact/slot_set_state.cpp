@@ -32,4 +32,4 @@ interaction_message_type_e Slot_set_state::get_interaction_message_type()
     return interaction_message_type_e::slot_set_state;
 }
 
-IJSONSERIALIZABLE_IMPL(Slot_set_state);
+IVISITABLE_IMPL(Slot_set_state);

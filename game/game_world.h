@@ -38,7 +38,7 @@ public:
         );
     }
 
-   IJSONSERIALIZABLE();
+   IVISITABLE();
 };
 
 #endif

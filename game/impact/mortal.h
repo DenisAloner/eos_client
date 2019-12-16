@@ -15,7 +15,7 @@ public:
 
     iPacker& get_packer() override;
 
-    IJSONSERIALIZABLE();
+    IVISITABLE();
     /*constexpr static auto properties() { return Object_tag::properties(); }*/
 };
 

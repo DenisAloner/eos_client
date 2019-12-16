@@ -1,5 +1,4 @@
 #include "label.h"
-#include "writer.h"
 #include "Visitors.h"
 
 ObjectTag::Label::Label(object_tag_e type)
@@ -23,4 +22,4 @@ iPacker& ObjectTag::Label::get_packer()
     return Packer<Label>::instance();
 }
 
-IJSONSERIALIZABLE_IMPL(ObjectTag::Label);
+IVISITABLE_IMPL(ObjectTag::Label);

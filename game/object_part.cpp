@@ -1,5 +1,4 @@
 #include "object_part.h"
-#include "writer.h"
 #include "GameObject.h"
 
 ObjectPart::ObjectPart(GameObject* item)
@@ -57,4 +56,4 @@ interaction_message_type_e ObjectPart::get_interaction_message_type()
     return interaction_message_type_e::part;
 }
 
-IJSONSERIALIZABLE_IMPL(ObjectPart);
+IVISITABLE_IMPL(ObjectPart);

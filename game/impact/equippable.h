@@ -27,7 +27,7 @@ public:
                 make_property(&Equippable::m_condition, u"condition")));
     }
 
-    IJSONSERIALIZABLE();
+    IVISITABLE();
 };
 
 }

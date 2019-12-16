@@ -33,4 +33,4 @@ iPacker& ObjectTag::Fast_move::get_packer()
     return Packer<Fast_move>::instance();
 }
 
-IJSONSERIALIZABLE_IMPL(ObjectTag::Fast_move);
+IVISITABLE_IMPL(ObjectTag::Fast_move);

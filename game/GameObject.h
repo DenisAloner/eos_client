@@ -5,7 +5,7 @@
 #include "all_effects.h"
 #include "game_object_owner.h"
 #include <Application.h>
-#include <i_json_serializable.h>
+#include <visitor.h>
 #include <list>
 #include <map>
 #include "object_state.h"
@@ -94,7 +94,7 @@ public:
     }
 
     interaction_message_type_e get_interaction_message_type() override;
-    IJSONSERIALIZABLE();
+    IVISITABLE();
 	
 private:
     class Action_getter : public Visitor {
@@ -138,7 +138,7 @@ public:
             make_property(&Config::m_items, u"items"));
     }
 
-   IJSONSERIALIZABLE();
+   IVISITABLE();
 };
 
 class Player : public GUI_connectable_i {

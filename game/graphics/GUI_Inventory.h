@@ -12,7 +12,7 @@ class Parts_list;
 class InventoryCell;
 //class GameObject;
 //class ObjectPart;
-class Attribute_map;
+class AttributeMap;
 
 class GUI_Body;
 
@@ -32,13 +32,13 @@ public:
 class GUI_Body : public GUI_Scrollable_container {
 public:
     bool m_already_active;
-    GUI_Body(Attribute_map* feature);
+    GUI_Body(AttributeMap* feature);
 
     std::size_t m_max_item_name;
 
     void on_mouse_down(MouseEventArgs const& e) override;
     void set_focus(bool state) override;
-    void update(Attribute_map* feature);
+    void update(AttributeMap* feature);
 };
 
 class Visitor_container_hierarchy_getter : public Visitor_simple {

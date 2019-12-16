@@ -384,7 +384,7 @@ interaction_message_type_e GameObject::get_interaction_message_type()
 	return interaction_message_type_e::game_object;
 }
 
-IJSONSERIALIZABLE_IMPL(GameObject);
+IVISITABLE_IMPL(GameObject);
 
 void GameObject::reset_serialization_index()
 {
@@ -551,4 +551,4 @@ void Config::instancedictonary_tilemanager_from_binary(const std::string& value,
 {
 }
 
-IJSONSERIALIZABLE_IMPL(Config);
+IVISITABLE_IMPL(Config);

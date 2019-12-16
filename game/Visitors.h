@@ -1,7 +1,7 @@
 #ifndef VISITORS_H
 #define VISITORS_H
 
-class Attribute_map;
+class AttributeMap;
 class Object_state;
 class GameObject;
 class Interaction_list;
@@ -33,7 +33,7 @@ class Mortal;
 class Visitor_generic {
 public:
     virtual void visit(GameObject& value) {};
-    virtual void visit(Attribute_map& value) {};
+    virtual void visit(AttributeMap& value) {};
     virtual void visit(Object_state& value) {};
     virtual void visit(Interaction_list& value) {};
     virtual void visit(Parameter_list& value) {};
@@ -62,7 +62,7 @@ public:
 class Visitor_simple : public Visitor_generic {
 public:
     void visit(GameObject& value) override;
-    void visit(Attribute_map& value) override;
+    void visit(AttributeMap& value) override;
     void visit(Object_state& value) override;
     void visit(Interaction_list& value) override;
     void visit(Parameter_list& value) override;
@@ -87,7 +87,7 @@ public:
     bool result;
 
     void visit(GameObject& value) override;
-    void visit(Attribute_map& value) override;
+    void visit(AttributeMap& value) override;
     void visit(Object_state& value) override;
     void visit(Interaction_list& value) override;
     void visit(Parameter_list& value) override;

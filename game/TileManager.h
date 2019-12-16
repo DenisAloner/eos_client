@@ -5,7 +5,7 @@
 #include <string>
 #include "Definiton.h"
 #include "vao.h"
-#include "i_json_serializable.h"
+#include "visitor.h"
 
 class TileManager : public iSerializable, public InstanceDictionaryElement {
 public:
@@ -36,7 +36,7 @@ public:
             make_property(&TileManager::m_tiles, u"tiles").from_json(&TileManager::vector_gl_uint_from_json).from_binary(&TileManager::vector_gl_uint_from_binary));
     }
 
-    IJSONSERIALIZABLE();
+    IVISITABLE();
 };
 
 class TileManager_Single_Atlas : public TileManager {

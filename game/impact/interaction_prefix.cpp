@@ -33,4 +33,4 @@ interaction_message_type_e Interaction_prefix::get_interaction_message_type()
     return interaction_message_type_e::interaction_prefix;
 }
 
-IJSONSERIALIZABLE_IMPL(Interaction_prefix);
+IVISITABLE_IMPL(Interaction_prefix);

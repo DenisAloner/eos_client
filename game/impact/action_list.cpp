@@ -1,6 +1,5 @@
 #include "action_list.h"
 #include "Visitors.h"
-#include "writer.h"
 
 Action_list::Action_list()
 {
@@ -26,4 +25,4 @@ iPacker& Action_list::get_packer()
     return Packer<Action_list>::instance();
 }
 
-IJSONSERIALIZABLE_IMPL(Action_list);
+IVISITABLE_IMPL(Action_list);

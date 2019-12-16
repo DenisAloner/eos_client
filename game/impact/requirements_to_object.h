@@ -27,7 +27,7 @@ public:
                 make_property(&Requirements_to_object::m_value, u"value")));
     }
 
-    IJSONSERIALIZABLE();
+    IVISITABLE();
 };
 
 }

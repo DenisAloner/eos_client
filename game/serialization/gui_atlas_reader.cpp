@@ -1,7 +1,4 @@
 #include "gui_atlas_reader.h"
-#include "bytearray.h"
-#include "FileSystem.h"
-#include "GraphicalController.h"
 #include <stb_image.h>
 
 using namespace std::literals::string_view_literals;
@@ -11,17 +8,17 @@ constexpr auto GuiAtlasReader::object_properties()
 {
     if constexpr (std::is_same_v<T, GraphicalController>) {
         return std::tuple(
-            CustomWriter(MemberMap::get<&GraphicalController::atlas_tiles>, &GuiAtlasReader::load_tiles),
+            CustomHandler(MemberMap::get<&GraphicalController::atlas_tiles>, &GuiAtlasReader::load_tiles),
             MemberMap::get<&GraphicalController::gui_styles>);
     }
     if constexpr (std::is_same_v<T, gui_style_t>) {
         return std::tuple(
-            CustomWriter(MemberMap::get<&gui_style_t::background_tile>, &GuiAtlasReader::load_tile_ref),
-            CustomWriter(MemberMap::get<&gui_style_t::border_x_tile>, &GuiAtlasReader::load_tile_ref),
-            CustomWriter(MemberMap::get<&gui_style_t::border_y_tile>, &GuiAtlasReader::load_tile_ref),
-            CustomWriter(MemberMap::get<&gui_style_t::corner_tile>, &GuiAtlasReader::load_tile_ref),
-            CustomWriter(MemberMap::get<&gui_style_t::scroll_y_head_tile>, &GuiAtlasReader::load_tile_ref),
-            CustomWriter(MemberMap::get<&gui_style_t::scroll_y_body_tile>, &GuiAtlasReader::load_tile_ref));
+            CustomHandler(MemberMap::get<&gui_style_t::background_tile>, &GuiAtlasReader::load_tile_ref),
+            CustomHandler(MemberMap::get<&gui_style_t::border_x_tile>, &GuiAtlasReader::load_tile_ref),
+            CustomHandler(MemberMap::get<&gui_style_t::border_y_tile>, &GuiAtlasReader::load_tile_ref),
+            CustomHandler(MemberMap::get<&gui_style_t::corner_tile>, &GuiAtlasReader::load_tile_ref),
+            CustomHandler(MemberMap::get<&gui_style_t::scroll_y_head_tile>, &GuiAtlasReader::load_tile_ref),
+            CustomHandler(MemberMap::get<&gui_style_t::scroll_y_body_tile>, &GuiAtlasReader::load_tile_ref));
     }
 }
 
@@ -95,12 +92,10 @@ void GuiAtlasReader::load_tile_ref(atlas_tile_t*& ref)
 
 void GuiAtlasReader::visit(GraphicalController& ref)
 {
-    Logger::instance().info("GuiAtlasReader::read&");
     read_object(ref);
 }
 
 void GuiAtlasReader::visit(GraphicalController*& ref)
 {
-    Logger::instance().info("GuiAtlasReader::read*&");
     read_object(*ref);
 }

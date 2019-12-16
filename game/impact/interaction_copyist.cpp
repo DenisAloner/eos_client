@@ -31,4 +31,4 @@ interaction_message_type_e Interaction_copyist::get_interaction_message_type()
     return interaction_message_type_e::interaction_copyist;
 }
 
-IJSONSERIALIZABLE_IMPL(Interaction_copyist);
+IVISITABLE_IMPL(Interaction_copyist);

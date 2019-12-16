@@ -1,5 +1,4 @@
 #include "interaction_timer.h"
-#include "writer.h"
 
 Interaction_timer::Interaction_timer()
 {
@@ -31,4 +30,4 @@ interaction_message_type_e Interaction_timer::get_interaction_message_type()
     return interaction_message_type_e::interaction_timer;
 }
 
-IJSONSERIALIZABLE_IMPL(Interaction_timer);
+IVISITABLE_IMPL(Interaction_timer);

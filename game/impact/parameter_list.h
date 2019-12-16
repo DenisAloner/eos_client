@@ -30,7 +30,7 @@ public:
                 make_property(&Parameter_list::m_basic_limit, u"basic_limit")));
     }
 
-    IJSONSERIALIZABLE();
+    IVISITABLE();
 
 private:
     class Update_visitor : public Visitor {

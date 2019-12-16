@@ -26,4 +26,4 @@ interaction_message_type_e Interaction_addon::get_interaction_message_type()
     return interaction_message_type_e::interaction_addon;
 }
 
- IJSONSERIALIZABLE_IMPL(Interaction_addon);
+ IVISITABLE_IMPL(Interaction_addon);

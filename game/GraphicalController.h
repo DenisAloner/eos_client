@@ -28,7 +28,7 @@ tile_options_e operator|(const tile_options_e& lhs, const tile_options_e& rhs);
 class TileManager;
 const int font_size_c = 26;
 
-class GraphicalController: public iJsonSerializable {
+class GraphicalController: public IVisitable {
 public:
     GLuint m_actions[18];
 
@@ -128,7 +128,7 @@ public:
     FT_Pos max_symbol_height_for_current_font() const;
     FT_Pos ascender_for_current_font() const;
 
-    IJSONSERIALIZABLE();
+    IVISITABLE();
 	
 private:
     FT_Library m_library;

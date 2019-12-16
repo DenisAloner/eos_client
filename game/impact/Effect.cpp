@@ -1,5 +1,4 @@
 #include "effect.h"
-#include "writer.h"
 #include "parameter_list.h"
 #include "interaction_copyist.h"
 #include "interaction_prefix.h"
@@ -54,4 +53,4 @@ interaction_message_type_e Effect::get_interaction_message_type()
     return interaction_message_type_e::effect;
 }
 
-IJSONSERIALIZABLE_IMPL(Effect);
+IVISITABLE_IMPL(Effect);

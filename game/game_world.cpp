@@ -158,7 +158,7 @@ iPacker& GameWorld::get_packer()
     return Packer<GameWorld>::instance();
 }
 
-IJSONSERIALIZABLE_IMPL(GameWorld);
+IVISITABLE_IMPL(GameWorld);
 
 void GameWorld::calculate_lighting()
 {

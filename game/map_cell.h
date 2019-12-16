@@ -46,7 +46,7 @@ public:
             make_property(&MapCell::m_items, u"items"));
     }
 
-    IJSONSERIALIZABLE();
+    IVISITABLE();
 };
 
 #endif

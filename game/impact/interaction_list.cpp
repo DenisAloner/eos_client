@@ -108,4 +108,4 @@ interaction_message_type_e Interaction_list::get_interaction_message_type()
     return interaction_message_type_e::list;
 }
 
-IJSONSERIALIZABLE_IMPL(Interaction_list);
+IVISITABLE_IMPL(Interaction_list);

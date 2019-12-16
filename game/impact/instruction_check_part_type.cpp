@@ -34,4 +34,4 @@ interaction_message_type_e Instruction_check_part_type::get_interaction_message_
     return interaction_message_type_e::instruction_check_part_type;
 }
 
-IJSONSERIALIZABLE_IMPL(Instruction_check_part_type);
+IVISITABLE_IMPL(Instruction_check_part_type);

@@ -15,7 +15,7 @@ public:
     void reset_serialization_index() override;
 
     iPacker& get_packer() override;
-    IJSONSERIALIZABLE();
+    IVISITABLE();
 };
 
 }
